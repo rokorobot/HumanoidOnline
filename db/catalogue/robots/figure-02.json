@@ -1,0 +1,64 @@
+{
+  "slug": "figure-02",
+  "name": "Figure 02",
+  "manufacturer_slug": "figure-ai",
+  "model_code": "F.02",
+  "summary": "Second-generation general-purpose humanoid that ran a live BMW production deployment; now being retired in favour of Figure 03.",
+  "announced_year": 2024,
+  "commercial_status": "DISCONTINUED",
+  "is_published": true,
+  "specs": {
+    "height_cm": null,
+    "weight_kg": null,
+    "payload_kg": null,
+    "walk_speed_ms": null,
+    "runtime_minutes": null,
+    "battery_wh": null,
+    "mobility": "BIPEDAL",
+    "degrees_of_freedom": null,
+    "hand_type": null,
+    "hand_dof": null,
+    "autonomy": "TASK_AUTONOMOUS",
+    "has_manipulation": true,
+    "has_teleoperation": null,
+    "has_vision": true,
+    "has_language_ui": null,
+    "has_sdk": null,
+    "has_api": null,
+    "ros_support": null,
+    "developer_edition": null,
+    "simulation_support": null
+  },
+  "specs_note": "Physical spec numbers not confirmed against a Figure primary source in this pass -> left NULL. Figure 02 ran a full autonomous production task (sheet-metal loading) on an active line -> autonomy TASK_AUTONOMOUS, has_manipulation/has_vision true.",
+  "commercial_status_evidence": [
+    { "source_url": "https://www.figure.ai/news/production-at-bmw", "source_type": "MANUFACTURER_SITE", "source_title": "Figure — F.02 Contributed to the Production of 30,000 Cars at BMW", "excerpt": "Figure 02's return to HQ from BMW as part of their fleet-wide retirement", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "DISCONTINUED: Figure is retiring the Figure 02 fleet following the launch of Figure 03 (announced 2025-10-09). Status sourced from Figure's own deployment write-up." }
+  ],
+  "variants": [],
+  "pricing_offers": [],
+  "availability_offers": [],
+  "deployments": [
+    {
+      "customer_name": "BMW Group",
+      "region_code": "US",
+      "use_case_slug": "manufacturing",
+      "provider_slug": null,
+      "transaction_type": "OTHER",
+      "unit_count": null,
+      "contract_value": null,
+      "contract_currency": null,
+      "started_on": "2024-01-01",
+      "status": "completed",
+      "summary": "Live production deployment at BMW Group Plant Spartanburg: Figure 02 performed autonomous sheet-metal loading on an active assembly line over an 11-month deployment, loading 90,000+ parts and contributing to 30,000+ X3 vehicles across 1,250+ hours of runtime.",
+      "evidence": [
+        { "source_url": "https://www.figure.ai/news/production-at-bmw", "source_type": "MANUFACTURER_SITE", "source_title": "Figure — F.02 Contributed to the Production of 30,000 Cars at BMW", "excerpt": "90,000+ parts loaded; Contributed to the production of 30,000+ X3 vehicles; 1,250+ hours of runtime; BMW Group Plant Spartanburg", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "VERIFIED", "note": "Production deployment metrics confirmed by Figure's own page (observed 2026-07-24). started_on set to 2024 (year-level; the page describes an 11-month deployment ending 2025). transaction_type OTHER: engagement commercial terms not disclosed." }
+      ]
+    }
+  ],
+  "capabilities": [
+    { "slug": "autonomous-task", "supported": true, "detail": "Autonomous sheet-metal pick-and-place on a live BMW assembly line." },
+    { "slug": "bimanual-manipulation", "supported": true, "detail": "Two-handed part handling in manufacturing." }
+  ],
+  "use_case_fits": [
+    { "use_case_slug": "manufacturing", "fit_score": 0.7, "is_primary": true, "commercial_readiness": "DISCONTINUED", "notes": "Demonstrated real production-line capability at BMW; platform now superseded by Figure 03.", "limitations": "Model retired; superseded by Figure 03.", "confidence": "MEDIUM" }
+  ]
+}

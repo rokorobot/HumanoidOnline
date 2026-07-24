@@ -1,0 +1,95 @@
+{
+  "slug": "1x-neo",
+  "name": "NEO",
+  "manufacturer_slug": "1x-technologies",
+  "model_code": "NEO",
+  "summary": "Consumer home humanoid available for preorder, sold outright or by monthly subscription.",
+  "announced_year": 2025,
+  "commercial_status": "EARLY_ACCESS",
+  "is_published": true,
+  "specs": {
+    "height_cm": 167.6,
+    "weight_kg": 29.9,
+    "payload_kg": 24.9,
+    "walk_speed_ms": null,
+    "runtime_minutes": 240,
+    "battery_wh": null,
+    "mobility": "BIPEDAL",
+    "degrees_of_freedom": null,
+    "hand_type": "22 DoF hands",
+    "hand_dof": 22,
+    "autonomy": "TELEOPERATED",
+    "has_manipulation": true,
+    "has_teleoperation": true,
+    "has_vision": true,
+    "has_language_ui": true,
+    "has_sdk": null,
+    "has_api": null,
+    "ros_support": null,
+    "developer_edition": null,
+    "simulation_support": null
+  },
+  "specs_note": "weight (~29.9 kg / 66 lb), carrying capacity (~24.9 kg / 55 lb), 22 DoF hands and 4 h runtime from the official NEO page https://www.1x.tech/discover/neo-home-robot (observed 2026-07-24); height ~5'6\" (167.6 cm) per 1X. Built-in LLM -> has_language_ui true; early tasks are teleop-assisted -> autonomy TELEOPERATED. Total-body DoF and battery Wh not stated -> NULL.",
+  "commercial_status_evidence": [
+    { "source_url": "https://www.1x.tech/discover/neo-home-robot", "source_type": "MANUFACTURER_SITE", "source_title": "1X — NEO Home Robot", "excerpt": "NEO is now available for pre-order, with first orders shipping to consumer homes in 2026.", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "Early-access consumer product: available for preorder with first deliveries in 2026 (US first)." }
+  ],
+  "variants": [],
+  "pricing_offers": [
+    {
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "USD",
+      "price": 20000,
+      "price_min": null,
+      "price_max": null,
+      "billing_period": "ONE_TIME",
+      "region_code": "US",
+      "provider_slug": "1x-store",
+      "variant_slug": null,
+      "note": "Outright purchase price; includes priority delivery in 2026.",
+      "evidence": [
+        { "source_url": "https://www.1x.tech/discover/neo-home-robot", "source_type": "MANUFACTURER_SITE", "source_title": "1X — NEO Home Robot", "excerpt": "$20,000, which includes priority delivery in 2026", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "VERIFIED", "note": "Outright purchase price stated on the official NEO product page (2026-07-24)." }
+      ]
+    },
+    {
+      "transaction_type": "SUBSCRIPTION",
+      "price_type": "PUBLIC",
+      "currency": "USD",
+      "price": 499,
+      "price_min": null,
+      "price_max": null,
+      "billing_period": "MONTHLY",
+      "region_code": "US",
+      "provider_slug": "1x-store",
+      "variant_slug": null,
+      "note": "Subscription alternative to outright purchase.",
+      "evidence": [
+        { "source_url": "https://www.1x.tech/discover/neo-home-robot", "source_type": "MANUFACTURER_SITE", "source_title": "1X — NEO Home Robot", "excerpt": "$499/month which will be shipped at a later date", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "VERIFIED", "note": "Monthly subscription price stated on the official NEO product page (2026-07-24)." }
+      ]
+    }
+  ],
+  "availability_offers": [
+    {
+      "transaction_type": "PURCHASE",
+      "availability_status": "PREORDER",
+      "region_code": "US",
+      "provider_slug": "1x-store",
+      "variant_slug": null,
+      "lead_time_days": null,
+      "note": "Preorder; first orders ship to US consumer homes in 2026, other markets from 2027.",
+      "available_from": "2026-01-01",
+      "evidence": [
+        { "source_url": "https://www.1x.tech/discover/neo-home-robot", "source_type": "MANUFACTURER_SITE", "source_title": "1X — NEO Home Robot", "excerpt": "NEO is now available for pre-order, with first orders shipping to consumer homes in 2026 ... primarily in the U.S in 2026 and expand to other markets starting in 2027.", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "VERIFIED", "note": "Preorder availability and US-first 2026 delivery stated on the official product page (2026-07-24). available_from set to 2026 (year-level; day is indicative)." }
+      ]
+    }
+  ],
+  "deployments": [],
+  "capabilities": [
+    { "slug": "teleoperation", "supported": true, "detail": "Early tasks are performed teleoperated; used to train autonomy." },
+    { "slug": "voice-interaction", "supported": true, "detail": "Built-in language model; verbal command control." },
+    { "slug": "dexterous-hands", "supported": true, "detail": "22 DoF hands per manufacturer." }
+  ],
+  "use_case_fits": [
+    { "use_case_slug": "home", "fit_score": 0.6, "is_primary": true, "commercial_readiness": "EARLY_ACCESS", "notes": "Purpose-built home humanoid; earliest commercial stage, teleop-assisted for many tasks.", "limitations": "Autonomy limited at launch; preorder/early-access only.", "confidence": "MEDIUM" }
+  ]
+}

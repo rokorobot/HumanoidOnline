@@ -1,0 +1,13 @@
+{
+  "_comment": "Capability catalogue referenced by robots[].capabilities. Upserted by slug. category uses capability_category enum verbatim. These are descriptive engineering capabilities, NOT commercial facts, so they do not require evidence_source rows; robots attach them with a per-robot 'detail' qualifier.",
+  "capabilities": [
+    { "slug": "bimanual-manipulation", "name": "Bimanual manipulation",       "category": "MANIPULATION", "description": "Coordinated two-handed object handling." },
+    { "slug": "dexterous-hands",       "name": "Dexterous multi-finger hands", "category": "MANIPULATION", "description": "Articulated fingers beyond parallel grippers." },
+    { "slug": "dynamic-walking",       "name": "Dynamic walking",             "category": "MOBILITY",     "description": "Robust dynamic bipedal locomotion." },
+    { "slug": "teleoperation",         "name": "Teleoperation",               "category": "AI_AUTONOMY",  "description": "Remote human piloting / data collection." },
+    { "slug": "autonomous-task",       "name": "Autonomous task execution",   "category": "AI_AUTONOMY",  "description": "Autonomous execution of specific trained tasks." },
+    { "slug": "voice-interaction",     "name": "Voice interaction",           "category": "INTERACTION",  "description": "Spoken-language interaction / built-in language model." },
+    { "slug": "expressive-face",       "name": "Expressive face",             "category": "INTERACTION",  "description": "Human-like facial expression." },
+    { "slug": "object-recognition",    "name": "Object recognition",          "category": "PERCEPTION",   "description": "Vision-based object identification." }
+  ]
+}

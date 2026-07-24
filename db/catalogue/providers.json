@@ -1,0 +1,9 @@
+{
+  "_comment": "Commercial counterparties attached to pricing/availability/deployment offers. Upserted by slug. type uses provider_type enum verbatim. manufacturer_slug links an OEM provider to its manufacturer.",
+  "providers": [
+    { "slug": "unitree-store",       "type": "OEM",            "name": "Unitree Online Store",       "manufacturer_slug": "unitree",          "country_region_code": "CN", "website_url": "https://shop.unitree.com",        "description": "Direct OEM web store (shop.unitree.com)." },
+    { "slug": "1x-store",            "type": "OEM",            "name": "1X Technologies (direct)",   "manufacturer_slug": "1x-technologies",  "country_region_code": "NO", "website_url": "https://www.1x.tech",             "description": "Direct OEM sales / preorder for the NEO home robot." },
+    { "slug": "agility-raas",        "type": "RAAS_PROVIDER",  "name": "Agility Robotics (RaaS)",    "manufacturer_slug": "agility-robotics", "country_region_code": "US", "website_url": "https://www.agilityrobotics.com", "description": "OEM-operated Robots-as-a-Service deployments of Digit." },
+    { "slug": "engineered-arts-oem", "type": "OEM",            "name": "Engineered Arts",            "manufacturer_slug": "engineered-arts",  "country_region_code": "UK", "website_url": "https://engineeredarts.com",      "description": "OEM sale (by quote) and event rental of Ameca." }
+  ]
+}

@@ -66,12 +66,15 @@ def create_buyer_requirement(
 
     country_region_id = None
     if payload.country is not None:
+        # Canonical COUNTRY only: the Country step is a country, so a non-country
+        # region code (EU, GLOBAL, an economic zone) must NOT resolve. A stated
+        # country that does not resolve is a rejection, never a silent NULL.
         country_region_id = session.execute(
-            select(Region.id).where(Region.code == payload.country)
+            select(Region.id).where(
+                Region.code == payload.country, Region.type == "COUNTRY"
+            )
         ).scalar_one_or_none()
         if country_region_id is None:
-            # A stated country that does not resolve is a rejection, never a
-            # silent NULL (that would erase a real demand signal).
             raise HTTPException(status_code=422, detail=f"unknown country: {payload.country!r}")
 
     # --- budget: no 0/USD defaulting on a no-budget requirement ---
@@ -83,6 +86,9 @@ def create_buyer_requirement(
         budget_currency = None  # explicit NULL overrides the DDL DEFAULT 'USD'
         budget_min = None
         budget_max = None
+
+    # Versioned wizard payload (schema-validated: wizard_version + answer states).
+    raw_dict = payload.raw_input.model_dump()
 
     # --- at least one requirement signal (an explicit UNKNOWN counts) ---
     has_signal = any(
@@ -105,18 +111,17 @@ def create_buyer_requirement(
     has_signal = (
         has_signal
         or payload.preferred_transaction != "UNKNOWN"
-        or _raw_has_signal(payload.raw_input)
+        or _raw_has_signal(raw_dict)
     )
     if not has_signal:
         raise HTTPException(
             status_code=422, detail="at least one requirement signal is required"
         )
 
+    # WS5 is anonymous: contact identity (name/email/organization) is NOT captured
+    # here — those columns stay NULL and are owned by WS7 (commercial lead).
     requirement = BuyerRequirement(
         buyer_type=payload.buyer_type,
-        contact_name=_clean(payload.contact_name),
-        contact_email=_clean(payload.contact_email),
-        organization=_clean(payload.organization),
         country_region_id=country_region_id,
         use_case_id=use_case_id,
         industry=_clean(payload.industry),
@@ -131,7 +136,7 @@ def create_buyer_requirement(
         budget_max=budget_max,
         required_by=payload.required_by,
         preferred_transaction=payload.preferred_transaction,
-        raw_input=payload.raw_input,
+        raw_input=raw_dict,
     )
     session.add(requirement)
     session.commit()

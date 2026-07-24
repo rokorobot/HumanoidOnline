@@ -17,6 +17,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+AnswerStateIn = Literal["ANSWERED", "UNKNOWN", "SKIPPED"]
+
 BuyerTypeIn = Literal[
     "COMMERCIAL_BUYER", "TECHNICAL_EVALUATOR", "INDUSTRY_PARTICIPANT", "UNKNOWN"
 ]
@@ -51,10 +53,32 @@ class BudgetIn(BaseModel):
         return self
 
 
+class RawAnswer(BaseModel):
+    """One wizard answer inside raw_input. `state` is validated; the value shape
+    varies per step (value / use_case / currency / min / max), so extras are
+    allowed and preserved verbatim."""
+
+    model_config = ConfigDict(extra="allow")
+
+    state: AnswerStateIn
+
+
+class RawInput(BaseModel):
+    """Versioned wizard payload. WS5 REQUIRES this — the write path never persists
+    an unversioned requirement — and each answer's state must be one of
+    ANSWERED / UNKNOWN / SKIPPED so the UNKNOWN vs SKIPPED distinction is real."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    wizard_version: int = Field(ge=1)
+    answers: dict[str, RawAnswer]
+
+
 class BuyerRequirementCreate(BaseModel):
-    """Frozen POST body (API contract §4). Contact fields are accepted but the
-    WS5 wizard never sends them (anonymous capture); matching/leads are later
-    workstreams and have no fields here."""
+    """WS5 POST body (API contract §4). WS5 is ANONYMOUS intent: contact identity
+    (name / email / organization) is NOT collected here — that is WS7 (commercial
+    lead). With extra=forbid, sending a contact field is a 422. Matching and leads
+    have no fields here."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -78,13 +102,8 @@ class BuyerRequirementCreate(BaseModel):
 
     preferred_transaction: TransactionPreferenceIn = "UNKNOWN"
 
-    # Full versioned wizard payload; preserves ANSWERED/UNKNOWN/SKIPPED per answer.
-    raw_input: dict | None = None
-
-    # Contact fields exist in the frozen shape but are unused by WS5's UI.
-    contact_name: str | None = None
-    contact_email: str | None = None
-    organization: str | None = None
+    # Required, versioned. Preserves ANSWERED/UNKNOWN/SKIPPED per answer.
+    raw_input: RawInput
 
 
 class BuyerRequirementCreated(BaseModel):

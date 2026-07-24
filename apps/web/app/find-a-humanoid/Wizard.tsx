@@ -60,6 +60,10 @@ export function Wizard({ useCases, countries, seedUseCase }: WizardProps) {
   const [error, setError] = useState<string | null>(null);
   const [captured, setCaptured] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  // Synchronous re-entrancy guard: `submitting` state updates async, so two
+  // clicks in the same tick would both read it as false. The ref blocks the
+  // second call immediately, so a rapid double-submit fires exactly one POST.
+  const submittingRef = useRef(false);
 
   useEffect(() => {
     headingRef.current?.focus();
@@ -83,7 +87,8 @@ export function Wizard({ useCases, countries, seedUseCase }: WizardProps) {
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
   async function submit() {
-    if (submitting || !hasSignal(answers)) return;
+    if (submittingRef.current || !hasSignal(answers)) return;
+    submittingRef.current = true;
     setSubmitting(true);
     setError(null);
     try {
@@ -107,6 +112,7 @@ export function Wizard({ useCases, countries, seedUseCase }: WizardProps) {
     } catch {
       setError("Network error. Please try again.");
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   }

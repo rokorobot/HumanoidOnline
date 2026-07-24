@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# WS1 validation path: prove the database, backend, and frontend foundations
+# from a clean checkout. All three jobs must be green on the PR head.
+jobs:
+  db-validate:
+    name: Database (schema + seed + G2)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: humanoid
+          POSTGRES_PASSWORD: humanoid
+          POSTGRES_DB: humanoidonline
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U humanoid -d humanoidonline"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DATABASE_URL: postgresql+psycopg://humanoid:humanoid@localhost:5432/humanoidonline
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Apply canonical schema (+ forward migrations)
+        run: uv run db/bootstrap.py
+      - name: Load seed (runs the embedded G2 self-check)
+        run: uv run db/bootstrap.py --seed-only
+      - name: Validate schema objects + connection
+        run: uv run db/validate.py
+
+  api-test:
+    name: Backend (FastAPI + pytest)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: humanoid
+          POSTGRES_PASSWORD: humanoid
+          POSTGRES_DB: humanoidonline
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U humanoid -d humanoidonline"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DATABASE_URL: postgresql+psycopg://humanoid:humanoid@localhost:5432/humanoidonline
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Apply canonical schema (ORM<->schema tests need the tables)
+        run: uv run db/bootstrap.py
+      - name: Install dependencies
+        working-directory: apps/api
+        run: uv sync --frozen
+      - name: Lint
+        working-directory: apps/api
+        run: uv run ruff check .
+      - name: Test
+        working-directory: apps/api
+        run: uv run pytest
+
+  web-build:
+    name: Frontend (Next.js build + tests)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Test
+        run: npm run test
+      - name: Build
+        run: npm run build

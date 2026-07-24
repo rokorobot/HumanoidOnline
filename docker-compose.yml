@@ -1,0 +1,23 @@
+# Local development Postgres for HumanoidOnline (WS1).
+# Mirrors the CI `postgres` service so db/schema.sql + db/seed/seed.sql load
+# identically on a laptop and in CI. Not for production.
+services:
+  db:
+    image: postgres:16
+    container_name: humanoidonline-db
+    environment:
+      POSTGRES_USER: humanoid
+      POSTGRES_PASSWORD: humanoid
+      POSTGRES_DB: humanoidonline
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U humanoid -d humanoidonline"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:

@@ -1,0 +1,148 @@
+"""Robot read schemas (API contract §1)."""
+from __future__ import annotations
+
+from datetime import date, datetime
+
+from pydantic import BaseModel
+
+from app.schemas.common import EvidenceRead, ManufacturerRef, PriceDisplay
+
+
+class RobotListItem(BaseModel):
+    id: str
+    slug: str
+    name: str
+    manufacturer: ManufacturerRef
+    summary: str | None = None
+    hero_image_url: str | None = None
+    commercial_status: str
+    payload_kg: float | None = None
+    height_cm: float | None = None
+    mobility: str | None = None
+    price_display: PriceDisplay | None = None
+    available_modes: list[str]
+    deployment_count: int
+
+
+class StatusHistoryEntry(BaseModel):
+    status: str
+    effective_at: datetime
+    note: str | None = None
+
+
+class SpecsBlock(BaseModel):
+    height_cm: float | None = None
+    weight_kg: float | None = None
+    payload_kg: float | None = None
+    walk_speed_ms: float | None = None
+    runtime_minutes: int | None = None
+    battery_wh: float | None = None
+    mobility: str | None = None
+    degrees_of_freedom: int | None = None
+    hand_type: str | None = None
+    hand_dof: int | None = None
+    autonomy: str | None = None
+    has_manipulation: bool | None = None
+    has_teleoperation: bool | None = None
+    has_vision: bool | None = None
+    has_language_ui: bool | None = None
+    has_sdk: bool | None = None
+    has_api: bool | None = None
+    ros_support: bool | None = None
+    developer_edition: bool | None = None
+    simulation_support: bool | None = None
+
+
+class ExtendedSpec(BaseModel):
+    key: str
+    label: str
+    value: float | bool | str | None = None
+    unit: str | None = None
+    category: str
+
+
+class CapabilityRead(BaseModel):
+    slug: str
+    name: str
+    supported: bool
+    detail: str | None = None
+
+
+class VariantRead(BaseModel):
+    slug: str
+    name: str
+    is_developer: bool
+
+
+class UseCaseFitRead(BaseModel):
+    use_case: str
+    fit_score: float | None = None
+    commercial_readiness: str | None = None
+    limitations: str | None = None
+
+
+class PricingOfferRead(BaseModel):
+    transaction_type: str
+    price_type: str
+    price: float | None = None
+    price_min: float | None = None
+    price_max: float | None = None
+    currency: str
+    billing_period: str
+    region: str | None = None
+    provider: str | None = None
+    evidence: EvidenceRead | None = None
+
+
+class AvailabilityOfferRead(BaseModel):
+    transaction_type: str
+    availability_status: str
+    region: str | None = None
+    provider: str | None = None
+    available_from: date | None = None
+    lead_time_days: int | None = None
+    evidence: EvidenceRead | None = None
+
+
+class DeploymentRead(BaseModel):
+    customer_name: str | None = None
+    region: str | None = None
+    use_case: str | None = None
+    transaction_type: str | None = None
+    unit_count: int | None = None
+    contract_value: float | None = None
+    summary: str | None = None
+    evidence: EvidenceRead | None = None
+
+
+class RobotDetail(BaseModel):
+    id: str
+    slug: str
+    name: str
+    manufacturer: ManufacturerRef
+    commercial_status: str
+    summary: str | None = None
+    description: str | None = None
+    hero_image_url: str | None = None
+    announced_year: int | None = None
+    status_history: list[StatusHistoryEntry]
+    specs: SpecsBlock
+    extended_specs: list[ExtendedSpec]
+    capabilities: list[CapabilityRead]
+    variants: list[VariantRead]
+    use_case_fits: list[UseCaseFitRead]
+    pricing_offers: list[PricingOfferRead]
+    availability_offers: list[AvailabilityOfferRead]
+    deployments: list[DeploymentRead]
+
+
+class CompareRow(BaseModel):
+    group: str
+    key: str
+    label: str
+    values: dict[str, float | bool | str | None]
+
+
+class CompareResponse(BaseModel):
+    robots: list[RobotDetail]
+    rows: list[CompareRow]

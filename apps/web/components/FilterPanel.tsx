@@ -177,7 +177,7 @@ export function FilterPanel({
             type="number"
             name="price_max"
             min={0}
-            placeholder="e.g. 90000"
+            placeholder="e.g. 50000"
             defaultValue={asString(params.price_max) ?? ""}
           />
         </div>

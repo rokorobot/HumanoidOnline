@@ -31,6 +31,9 @@ interface WizardProps {
   useCases: UseCaseListItem[];
   countries: RegionListItem[];
   seedUseCase: string | null;
+  // Adjust Requirements: prefilled draft from a stored requirement's raw_input.
+  // Submitting an adjusted requirement creates a NEW buyer_requirement.
+  seedAnswers?: Answers | null;
 }
 
 const QUESTION: Record<StepKey, { label: string; help: string }> = {
@@ -53,12 +56,15 @@ const QUESTION: Record<StepKey, { label: string; help: string }> = {
   },
 };
 
-export function Wizard({ useCases, countries, seedUseCase }: WizardProps) {
-  const [answers, setAnswers] = useState<Answers>(() => initialAnswers(seedUseCase));
+export function Wizard({ useCases, countries, seedUseCase, seedAnswers }: WizardProps) {
+  const [answers, setAnswers] = useState<Answers>(
+    () => seedAnswers ?? initialAnswers(seedUseCase),
+  );
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [captured, setCaptured] = useState(false);
+  const [reqId, setReqId] = useState<string | null>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   // Synchronous re-entrancy guard: `submitting` state updates async, so two
   // clicks in the same tick would both read it as false. The ref blocks the
@@ -98,6 +104,8 @@ export function Wizard({ useCases, countries, seedUseCase }: WizardProps) {
         body: JSON.stringify(buildSubmission(answers)),
       });
       if (res.status === 201) {
+        const j = await res.json();
+        if (typeof j?.id === "string") setReqId(j.id);
         setCaptured(true);
         return;
       }
@@ -122,9 +130,10 @@ export function Wizard({ useCases, countries, seedUseCase }: WizardProps) {
     setStep(0);
     setCaptured(false);
     setError(null);
+    setReqId(null);
   }
 
-  // ---- interim capture confirmation (matching is WS6) --------------------
+  // ---- capture confirmation; primary action is SEE MATCHES (WS6) ---------
   if (captured) {
     return (
       <section className="wz-confirm" aria-live="polite">
@@ -132,14 +141,17 @@ export function Wizard({ useCases, countries, seedUseCase }: WizardProps) {
         <h2 ref={headingRef} tabIndex={-1} className="wz-confirm-title">
           Requirement captured
         </h2>
-        <p className="prose">Matching has not been generated yet.</p>
-        <p className="note">
-          {/* WS6 replaces this with real, explainable matches. */}
-          // Your requirement is saved. We will generate ranked matches in a later step.
+        <p className="prose">
+          See the humanoids that match your requirement — ranked, with the reasons why.
         </p>
         <div className="actions" style={{ marginTop: "var(--ho-sp-5)" }}>
-          <Link className="btn btn--signal" href="/robots">
-            Browse robots →
+          {reqId && (
+            <Link className="btn btn--signal" href={`/matches/${reqId}`}>
+              See matches →
+            </Link>
+          )}
+          <Link className="btn" href="/robots">
+            Browse robots
           </Link>
           <button className="btn" type="button" onClick={reset}>
             Start another requirement

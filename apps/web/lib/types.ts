@@ -260,6 +260,39 @@ export interface RegionListItem {
   iso_country?: string | null;
 }
 
+export interface MatchRobotRef {
+  slug: string;
+  name: string;
+  manufacturer: string;
+}
+
+export interface MatchItem {
+  robot: MatchRobotRef;
+  score: number;
+  rank: number;
+  category: string;
+  // Six stable keys; each value is the criterion's weighted contribution in points.
+  score_breakdown: Record<string, number>;
+  reasons: string[];
+  warnings: string[];
+}
+
+export interface MatchResponse {
+  requirement_id: string;
+  matches: MatchItem[];
+  excluded_count: number;
+  no_match_explanation?: string | null;
+}
+
+// Anonymous requirement read (Adjust Requirements prefill). raw_input carries the
+// versioned wizard answers the wizard re-seeds from.
+export interface RequirementRead {
+  id: string;
+  use_case?: string | null;
+  country?: string | null;
+  raw_input?: Record<string, unknown> | null;
+}
+
 export interface MarketSnapshot {
   total_tracked: number;
   commercially_accessible: number;

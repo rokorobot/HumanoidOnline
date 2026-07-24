@@ -80,6 +80,11 @@ buyer_type = _pg_enum(
     "buyer_type",
     "COMMERCIAL_BUYER", "TECHNICAL_EVALUATOR", "INDUSTRY_PARTICIPANT", "UNKNOWN",
 )
+match_category = _pg_enum(
+    "match_category",
+    "BEST_OVERALL", "BEST_COMMERCIAL", "BEST_LOWER_COST", "BEST_DEVELOPER",
+    "BEST_TECHNICAL", "ALTERNATIVE",
+)
 
 # Autonomy ordered low->high, for the `autonomy_min` catalogue filter.
 AUTONOMY_ORDER = [

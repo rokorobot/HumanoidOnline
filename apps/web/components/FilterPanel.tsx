@@ -75,6 +75,19 @@ export function FilterPanel({
     submitForm();
   }
 
+  // Auto-apply on discrete controls (checkbox/select). Free-text number inputs
+  // apply on Enter or the Apply button, so we don't re-navigate per keystroke.
+  function onChange(e: FormEvent<HTMLFormElement>) {
+    const target = e.target as HTMLElement;
+    if (
+      target instanceof HTMLInputElement &&
+      (target.type === "number" || target.type === "text")
+    ) {
+      return;
+    }
+    submitForm();
+  }
+
   function reset() {
     router.push("/robots", { scroll: false });
   }
@@ -90,7 +103,7 @@ export function FilterPanel({
       action="/robots"
       method="get"
       onSubmit={onSubmit}
-      onChange={submitForm}
+      onChange={onChange}
     >
       {/* Preserve orthogonal state (search text, sort, compare tray) across
           filter changes. */}

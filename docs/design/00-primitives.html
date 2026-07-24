@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HumanoidOnline — Primitives (UI-D1 reference)</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 var(--ho-sp-5) var(--ho-sp-9); }
+  .head { padding: var(--ho-sp-6) 0; border-bottom: var(--ho-rule-bold) solid var(--ho-ink); margin-bottom: var(--ho-sp-6); }
+  .head h1 { font-family: var(--ho-font-display-grotesk); font-weight:800; font-stretch:75%;
+    font-size: var(--ho-fs-display-m); text-transform: uppercase; letter-spacing:-0.02em; line-height:0.95; }
+  .spec { border: var(--ho-rule-hair) solid var(--ho-ink); margin-bottom: var(--ho-sp-5); }
+  .spec > .t { display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding: 10px 14px; border-bottom: var(--ho-rule-med) solid var(--ho-ink); background: var(--ho-paper-2); }
+  .spec > .t h2 { font-family: var(--ho-font-machine); font-size: var(--ho-fs-small);
+    letter-spacing: var(--ho-tracking-label); text-transform: uppercase; }
+  .spec .body { padding: 18px; display:flex; flex-wrap:wrap; gap: 14px; align-items:center; }
+  .spec .body.col { flex-direction: column; align-items: stretch; }
+  .swatch { display:flex; flex-direction:column; gap:6px; }
+  .swatch .box { width: 130px; height: 56px; border: var(--ho-rule-hair) solid var(--ho-ink); }
+  .row2 { display:grid; grid-template-columns: repeat(auto-fill, minmax(230px,1fr)); gap:14px; width:100%; }
+  .type-spec { display:flex; flex-direction:column; gap:4px; }
+  .type-spec .m { color: var(--ho-text-faint); }
+  .metric .k { display:block; }
+  .metric .v { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono); }
+  .metric .v.unk { color: var(--ho-unknown); }
+</style>
+</head>
+<body>
+
+<div class="ho-mockup-banner">
+  <span><span class="ho-marker ho-marker--signal"></span>&nbsp; UI-D1 REFERENCE COMPOSITION — STATIC MOCKUP, NOT WIRED TO ANY API</span>
+  <span>00 / PRIMITIVES · EACH SHOWN WITH ITS STATES</span>
+</div>
+
+<div class="wrap">
+  <div class="head">
+    <span class="ho-section-index">UI-D1 — PRODUCT PRIMITIVES</span>
+    <h1>Primitive spec sheet</h1>
+  </div>
+
+  <!-- SURFACES -->
+  <div class="spec"><div class="t"><h2>Tri-surface</h2><span class="ho-syslabel">paper / dark / orange-alert</span></div>
+    <div class="body">
+      <div class="swatch"><div class="box" style="background:var(--ho-paper)"></div><span class="ho-syslabel">PAPER #EFEBE2</span></div>
+      <div class="swatch"><div class="box" style="background:var(--ho-ink)"></div><span class="ho-syslabel">INK #131210</span></div>
+      <div class="swatch"><div class="box" style="background:var(--ho-signal)"></div><span class="ho-syslabel">SIGNAL #FF4A00</span></div>
+      <div class="swatch"><div class="box" style="background:var(--ho-verified)"></div><span class="ho-syslabel">VERIFIED #2E6B4F</span></div>
+      <div class="swatch"><div class="box" style="background:var(--ho-caution)"></div><span class="ho-syslabel">CAUTION #9A6B12</span></div>
+      <div class="swatch"><div class="box ho-hatch"></div><span class="ho-syslabel">UNKNOWN (hatch)</span></div>
+    </div>
+  </div>
+
+  <!-- TYPOGRAPHY -->
+  <div class="spec"><div class="t"><h2>Display roles (dual + techno)</h2><span class="ho-syslabel">serif / grotesk / techno / machine</span></div>
+    <div class="body col">
+      <div class="row2">
+        <div class="type-spec"><span class="ho-serif" style="font-size:2rem">Digit</span><span class="ho-syslabel m">DISPLAY-SERIF · names/editorial</span></div>
+        <div class="type-spec"><span class="ho-grotesk" style="font-size:2rem">DIGIT/V5</span><span class="ho-syslabel m">DISPLAY-GROTESK · codes/status</span></div>
+        <div class="type-spec"><span class="ho-techno" style="font-size:1.7rem">AI-OPS</span><span class="ho-syslabel m">DISPLAY-TECHNO · system words</span></div>
+        <div class="type-spec"><span class="ho-machine">RAAS_DEPLOYMENT</span><span class="ho-syslabel m">MACHINE · mono layer</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SystemLabel / SectionIndex / MachineCode -->
+  <div class="spec"><div class="t"><h2>SystemLabel · SectionIndex · MachineCode</h2><span class="ho-syslabel">the mono labels</span></div>
+    <div class="body">
+      <span class="ho-syslabel">PAYLOAD KG</span>
+      <span class="ho-section-index">01 — SECTION TITLE</span>
+      <span class="ho-code">DIGIT / v5</span>
+      <span class="ho-code">LOG ID: 2019-DGT-04</span>
+      <span class="ho-capsule"><span class="ho-marker ho-marker--signal"></span> AGILITY ROBOTICS · U S A</span>
+      <span class="ho-barcode ho-barcode--sm" style="width:120px"></span>
+    </div>
+  </div>
+
+  <!-- StatusBadge : Dimension 1 -->
+  <div class="spec"><div class="t"><h2>StatusBadge — DIM 1 commercial_status</h2><span class="ho-syslabel">maturity ladder · verbatim enums</span></div>
+    <div class="body">
+      <span class="ho-bracket">ANNOUNCED</span>
+      <span class="ho-bracket">DEVELOPMENT</span>
+      <span class="ho-bracket">PROTOTYPE</span>
+      <span class="ho-bracket">PILOT</span>
+      <span class="ho-bracket">EARLY_ACCESS</span>
+      <span class="ho-bracket">LIMITED_COMMERCIAL</span>
+      <span class="ho-badge ho-badge--solid">COMMERCIAL</span>
+      <span class="ho-badge ho-badge--solid">RAAS_DEPLOYMENT</span>
+      <span class="ho-badge ho-badge--ghost" style="text-decoration:line-through">DISCONTINUED</span>
+    </div>
+  </div>
+
+  <!-- AvailabilityState : Dimension 2 -->
+  <div class="spec"><div class="t"><h2>AvailabilityState — DIM 2 availability_status</h2><span class="ho-syslabel">obtainability · absence ≠ NOT_AVAILABLE</span></div>
+    <div class="body">
+      <span class="ho-badge ho-badge--ghost">AVAILABLE</span>
+      <span class="ho-badge ho-badge--ghost">WAITLIST</span>
+      <span class="ho-badge ho-badge--ghost">PREORDER</span>
+      <span class="ho-badge ho-badge--ghost">LIMITED</span>
+      <span class="ho-badge ho-badge--ghost">ON_REQUEST</span>
+      <span class="ho-badge ho-badge--caution">NOT_AVAILABLE</span>
+      <span class="ho-badge ho-badge--ghost" style="text-decoration:line-through">DISCONTINUED</span>
+      <span class="ho-badge ho-badge--unknown">NO CONFIRMED AVAIL.</span>
+    </div>
+  </div>
+
+  <!-- PricingState -->
+  <div class="spec"><div class="t"><h2>PricingState — six distinct states</h2><span class="ho-syslabel">QUOTE_ONLY ≠ UNKNOWN</span></div>
+    <div class="body">
+      <div class="metric"><span class="k ho-syslabel">PUBLIC</span><span class="v" style="font-weight:600">$16,000</span></div>
+      <div class="metric"><span class="k ho-syslabel">FROM</span><span class="v">From $5,900</span></div>
+      <div class="metric"><span class="k ho-syslabel">RANGE</span><span class="v">$120k–$200k</span></div>
+      <div class="metric"><span class="k ho-syslabel">ESTIMATED</span><span class="v" style="color:var(--ho-caution)">~$30,000</span></div>
+      <div class="metric"><span class="k ho-syslabel">QUOTE_ONLY</span><span class="v" style="color:var(--ho-caution)">Price on request</span></div>
+      <div class="metric"><span class="k ho-syslabel">UNKNOWN</span><span class="v unk" style="border:1px dashed var(--ho-grey-400);padding:1px 6px">No confirmed pricing</span></div>
+    </div>
+  </div>
+
+  <!-- Status-readout pairs (three dimensions) -->
+  <div class="spec"><div class="t"><h2>Status-readout pairs — the three dimensions</h2><span class="ho-syslabel">maturity / obtainability / evidence</span></div>
+    <div class="body">
+      <div class="ho-pair is-signal" style="min-width:200px"><span class="k">① Commercial maturity</span><span class="s">RAAS_DEPLOYMENT</span></div>
+      <div class="ho-pair" style="min-width:200px"><span class="k">② Obtainability</span><span class="s">AVAILABLE <span class="mono">· RAAS · US</span></span></div>
+      <div class="ho-pair is-verified" style="min-width:200px"><span class="k">③ Deployment evidence</span><span class="s">2 <span class="mono">· VERIFIED</span></span></div>
+    </div>
+  </div>
+
+  <!-- EvidenceStamp + ConfidenceIndicator -->
+  <div class="spec"><div class="t"><h2>EvidenceStamp · ConfidenceIndicator</h2><span class="ho-syslabel">no fact without evidence</span></div>
+    <div class="body col">
+      <div class="ho-leader" style="max-width:520px"><span>VERIFIED · 2026-07-01</span><span class="fill"></span><span>SOURCE: MANUFACTURER_STORE &reg;</span></div>
+      <div class="row2">
+        <span class="ho-conf" data-level="LOW"><span class="bars"><i></i><i></i><i></i><i></i></span> LOW</span>
+        <span class="ho-conf" data-level="MEDIUM"><span class="bars"><i></i><i></i><i></i><i></i></span> MEDIUM</span>
+        <span class="ho-conf" data-level="HIGH"><span class="bars"><i></i><i></i><i></i><i></i></span> HIGH</span>
+        <span class="ho-conf" data-level="VERIFIED"><span class="bars"><i></i><i></i><i></i><i></i></span> VERIFIED</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Metric / DataCell -->
+  <div class="spec"><div class="t"><h2>Metric · DataCell — NULL = UNKNOWN</h2><span class="ho-syslabel">never 0 / false</span></div>
+    <div class="body">
+      <div class="metric"><span class="k ho-syslabel">Payload</span><span class="v">16 kg</span></div>
+      <div class="metric"><span class="k ho-syslabel">Runtime</span><span class="v unk">UNKNOWN</span></div>
+      <div class="metric"><span class="k ho-syslabel">Rental mode</span><span class="v" style="color:var(--ho-unknown)">— (N/A)</span></div>
+      <div class="metric"><span class="k ho-syslabel">Contract value</span><span class="v"><span class="ho-redact ho-redact--sm"></span> UNDISCLOSED</span></div>
+    </div>
+  </div>
+
+  <!-- MatchScore -->
+  <div class="spec"><div class="t"><h2>MatchScore</h2><span class="ho-syslabel">category · score · segmented meter</span></div>
+    <div class="body" style="gap:24px">
+      <div><div class="ho-syslabel" style="color:var(--ho-signal-ink)">▪ BEST_COMMERCIAL</div>
+        <span class="ho-grotesk" style="font-size:3rem">82</span> <span class="ho-syslabel">MATCH %</span></div>
+      <div style="display:flex;gap:2px">
+        <i style="width:8px;height:22px;background:var(--ho-ink)"></i><i style="width:8px;height:22px;background:var(--ho-ink)"></i>
+        <i style="width:8px;height:22px;background:var(--ho-ink)"></i><i style="width:8px;height:22px;background:var(--ho-ink)"></i>
+        <i style="width:8px;height:22px;background:var(--ho-ink)"></i><i style="width:8px;height:22px;background:var(--ho-ink)"></i>
+        <i style="width:8px;height:22px;background:var(--ho-ink)"></i><i style="width:8px;height:22px;background:var(--ho-ink)"></i>
+        <i style="width:8px;height:22px;background:var(--ho-grey-200)"></i><i style="width:8px;height:22px;background:var(--ho-grey-200)"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphic grammar -->
+  <div class="spec"><div class="t"><h2>Graphic grammar</h2><span class="ho-syslabel">markers · brackets · crops · hazard · dot-matrix</span></div>
+    <div class="body" style="gap:22px">
+      <span class="ho-marker"></span>
+      <span class="ho-marker ho-marker--signal"></span>
+      <span class="ho-dots"><i></i><i></i><i></i><i></i></span>
+      <span class="ho-dots ho-dots--signal ho-dots--6"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="ho-star" style="font-size:1.2rem">&#9733;</span>
+      <span class="ho-reg-box">&reg;</span>
+      <span class="ho-circlemark">F</span>
+      <span class="ho-bracket--alert ho-bracket">WARNING</span>
+      <span class="ho-cropframe" style="display:inline-block;padding:12px 18px"><span class="ho-crop tl"></span><span class="ho-crop tr"></span><span class="ho-crop bl"></span><span class="ho-crop br"></span><span class="ho-machine">CROP FRAME</span></span>
+      <span class="ho-hazard" style="width:90px"></span>
+      <span class="ho-dotmatrix ho-grotesk" style="font-size:1.6rem">ACTIVE</span>
+    </div>
+  </div>
+
+  <p class="ho-syslabel" style="margin-top:var(--ho-sp-6);line-height:1.9">
+    // These primitives are DESIGN CONTRACTS for future React components (docs/02_ARCHITECTURE.md §4).<br>
+    // UI-D1 specifies and proves them; it does NOT implement production routes — that is WS3+.
+  </p>
+</div>
+
+</body>
+</html>

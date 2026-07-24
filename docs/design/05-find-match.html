@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HumanoidOnline — Find a Humanoid (UI-D1 reference)</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* ---- 05-find-match.html : WIZARD USABILITY-FIRST · MATCHES DISCIPLINED - */
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 var(--ho-sp-5); }
+
+  .site-head { display:flex; align-items:center; justify-content:space-between;
+    gap: var(--ho-sp-5); padding: var(--ho-sp-4) 0; border-bottom: var(--ho-rule-med) solid var(--ho-ink);
+    max-width: 1080px; margin: 0 auto; padding-left: var(--ho-sp-5); padding-right: var(--ho-sp-5); }
+  .logo b { font-family: var(--ho-font-display-grotesk); font-weight:800; font-stretch:75%;
+    font-size:1.15rem; letter-spacing:-0.02em; }
+  .site-head .ho-syslabel { }
+
+  /* ---------- WIZARD ---------- */
+  .wizard { display:grid; grid-template-columns: 210px 1fr; gap:0;
+    border: var(--ho-rule-med) solid var(--ho-ink); margin: var(--ho-sp-6) 0; }
+  .steps { border-right: var(--ho-rule-hair) solid var(--ho-ink); background: var(--ho-paper-2); }
+  .steps .sh { padding: 12px 14px; border-bottom: var(--ho-rule-med) solid var(--ho-ink); }
+  .step { display:flex; align-items:center; gap:10px; padding: 9px 14px;
+    border-bottom: var(--ho-rule-hair) solid var(--ho-line-soft);
+    font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s); letter-spacing: 0.04em;
+    text-transform: uppercase; color: var(--ho-text-faint); }
+  .step .n { width: 22px; }
+  .step.done { color: var(--ho-text); }
+  .step.done .n::before { content:"✓ "; color: var(--ho-verified); }
+  .step.current { color: var(--ho-ink); background: var(--ho-paper);
+    box-shadow: inset 3px 0 0 var(--ho-signal); font-weight: 600; }
+
+  .panel { padding: var(--ho-sp-6); position: relative; }
+  .progress { display:flex; align-items:center; justify-content:space-between; gap: var(--ho-sp-4);
+    margin-bottom: var(--ho-sp-5); }
+  .progress .lab { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+    letter-spacing: var(--ho-tracking-label); text-transform: uppercase; color: var(--ho-text-muted); }
+  .pbar { flex:1; height: 8px; margin: 0 var(--ho-sp-4); background: var(--ho-grey-200);
+    display:flex; }
+  .pbar i { flex:1; border-right: 2px solid var(--ho-paper); }
+  .pbar i.on { background: var(--ho-ink); }
+  .pbar i.on.last { background: var(--ho-signal); }
+
+  .qlabel { font-family: var(--ho-font-display-serif); font-weight:500; font-size: 2rem;
+    line-height: 1.05; letter-spacing: -0.01em; margin-bottom: 6px; }
+  .qhelp { color: var(--ho-text-muted); margin-bottom: var(--ho-sp-5); max-width: 52ch; }
+  .choices { display:grid; grid-template-columns: repeat(3,1fr); gap: var(--ho-sp-3); }
+  .choice { border: var(--ho-rule-hair) solid var(--ho-ink); background: var(--ho-paper-2);
+    padding: 16px 14px; cursor:pointer; display:flex; flex-direction:column; gap:6px; min-height: 92px; }
+  .choice:hover { outline: var(--ho-rule-med) solid var(--ho-ink); outline-offset:-1px; }
+  .choice.sel { background: var(--ho-signal); border-color: var(--ho-ink); }
+  .choice .ho-syslabel { color: var(--ho-text-muted); }
+  .choice.sel .ho-syslabel { color: var(--ho-ink); }
+  .choice .big { font-family: var(--ho-font-display-grotesk); font-weight:800; font-stretch:75%;
+    font-size: 1.35rem; text-transform:uppercase; letter-spacing:-0.01em; }
+  .choice .d { font-size: var(--ho-fs-small); color: var(--ho-text-muted); }
+  .choice.sel .d { color: var(--ho-ink); }
+  .navrow { display:flex; align-items:center; justify-content:space-between; margin-top: var(--ho-sp-6);
+    gap: var(--ho-sp-4); flex-wrap:wrap; }
+  .btn { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+    text-transform: uppercase; letter-spacing: var(--ho-tracking-label);
+    border: var(--ho-rule-med) solid var(--ho-ink); background: transparent; color: var(--ho-ink);
+    padding: 11px 18px; display:inline-flex; gap:8px; align-items:center; cursor:pointer; }
+  .btn--signal { background: var(--ho-signal); border-color: var(--ho-ink); }
+  .btn--ghost { border-color: var(--ho-grey-400); color: var(--ho-text-muted); }
+
+  /* ---------- MATCHES ---------- */
+  .matchhead { display:flex; align-items:flex-end; justify-content:space-between; gap: var(--ho-sp-4);
+    margin: var(--ho-sp-8) 0 var(--ho-sp-5); flex-wrap:wrap; }
+  .matchhead h2 { font-family: var(--ho-font-display-grotesk); font-weight:800; font-stretch:75%;
+    font-size: var(--ho-fs-display-m); letter-spacing:-0.02em; text-transform:uppercase; line-height:0.95; }
+  .reqline { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s); color: var(--ho-text-muted);
+    letter-spacing: var(--ho-tracking-code); }
+
+  .mcard { border: var(--ho-rule-hair) solid var(--ho-ink); background: var(--ho-paper-2);
+    margin-bottom: var(--ho-sp-4); }
+  .mcard .top { display:grid; grid-template-columns: auto 1fr auto; gap: var(--ho-sp-5);
+    align-items:center; padding: 16px 18px; border-bottom: var(--ho-rule-med) solid var(--ho-ink); }
+  .cat { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+    letter-spacing: var(--ho-tracking-label); text-transform: uppercase; }
+  .cat .tag { color: var(--ho-signal-ink); }
+  .mlock { display:flex; align-items:baseline; gap:10px; }
+  .mlock .name { font-family: var(--ho-font-display-serif); font-weight:500; font-size:1.7rem; line-height:0.95; }
+  .mlock .code { font-family: var(--ho-font-display-grotesk); font-weight:800; font-stretch:75%;
+    font-size:0.8rem; color: var(--ho-signal-ink); text-transform:uppercase; }
+  .mlock + .mfr { display:block; }
+  .score { text-align:right; }
+  .score .n { font-family: var(--ho-font-display-grotesk); font-weight:800; font-stretch:75%;
+    font-size: 3rem; line-height: 0.8; letter-spacing: -0.03em; }
+  .score .u { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+    letter-spacing: var(--ho-tracking-label); color: var(--ho-text-muted); }
+
+  .mbody { display:grid; grid-template-columns: 1fr 1fr; gap:0; }
+  .mbody .col { padding: 16px 18px; }
+  .mbody .col.left { border-right: var(--ho-rule-hair) solid var(--ho-line-soft); }
+  .breakdown { display:flex; flex-direction:column; gap: 11px; }
+  .bk { display:grid; grid-template-columns: 120px 1fr 42px; align-items:center; gap: 10px; }
+  .bk .k { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--ho-text-muted); }
+  .seg { display:flex; gap: 2px; }
+  .seg i { flex:1; height: 10px; background: var(--ho-grey-200); }
+  .seg i.on { background: var(--ho-ink); }
+  .bk .val { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s); text-align:right; }
+  .bk .val.unk { color: var(--ho-unknown); }
+
+  .reasons { list-style:none; display:flex; flex-direction:column; gap: 8px; }
+  .reasons li { display:flex; gap: 10px; font-size: var(--ho-fs-small); align-items:flex-start; }
+  .reasons li .mk { font-family: var(--ho-font-machine); font-weight:700; }
+  .reasons li.ok .mk { color: var(--ho-verified); }
+  .warn { margin-top: 12px; border-left: 0; }
+  .warn .whead { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .warnbar { height: 16px; width: 40px; }
+  .warn ul { list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .warn li { display:flex; gap:10px; font-size: var(--ho-fs-small); color: var(--ho-caution); align-items:flex-start; }
+  .warn li .mk { font-family: var(--ho-font-machine); font-weight:700; }
+  .mfoot { display:flex; gap: var(--ho-sp-3); padding: 14px 18px; border-top: var(--ho-rule-hair) solid var(--ho-line-soft); flex-wrap:wrap; }
+
+  /* empty state */
+  .empty { border: var(--ho-rule-med) dashed var(--ho-grey-400); padding: var(--ho-sp-6);
+    margin: var(--ho-sp-5) 0 var(--ho-sp-8); background: var(--ho-paper-2); }
+  .empty h3 { font-family: var(--ho-font-display-grotesk); font-weight:800; font-stretch:75%;
+    font-size: 1.3rem; text-transform: uppercase; margin-bottom: 8px; }
+  .empty p { color: var(--ho-text-muted); max-width: 60ch; margin-bottom: var(--ho-sp-4); }
+
+  @media (max-width: 760px){
+    .wizard, .mbody { grid-template-columns: 1fr; }
+    .steps { display:none; }
+    .choices { grid-template-columns: 1fr 1fr; }
+    .mcard .top { grid-template-columns: 1fr auto; }
+    .cat { grid-column: 1 / -1; }
+    .bk { grid-template-columns: 90px 1fr 38px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ho-mockup-banner">
+  <span><span class="ho-marker ho-marker--signal"></span>&nbsp; UI-D1 REFERENCE COMPOSITION — STATIC MOCKUP, NOT WIRED TO ANY API</span>
+  <span>05 / FIND A HUMANOID · WIZARD USABILITY-FIRST</span>
+</div>
+
+<header class="site-head">
+  <div class="logo"><b>HUMANOIDONLINE</b></div>
+  <span class="ho-syslabel">REQUIREMENT WIZARD → DETERMINISTIC MATCH</span>
+</header>
+
+<div class="wrap">
+
+  <!-- ===================== WIZARD ===================== -->
+  <div class="wizard">
+    <aside class="steps" aria-label="Steps">
+      <div class="sh"><span class="ho-syslabel">Requirements</span></div>
+      <div class="step done"><span class="n">01</span> Task</div>
+      <div class="step done"><span class="n">02</span> Industry</div>
+      <div class="step done"><span class="n">03</span> Country</div>
+      <div class="step done"><span class="n">04</span> Environment</div>
+      <div class="step done"><span class="n">05</span> Payload</div>
+      <div class="step done"><span class="n">06</span> Hours</div>
+      <div class="step done"><span class="n">07</span> Manipulation</div>
+      <div class="step done"><span class="n">08</span> Autonomy</div>
+      <div class="step done"><span class="n">09</span> Budget</div>
+      <div class="step done"><span class="n">10</span> Timeline</div>
+      <div class="step current"><span class="n">11</span> Transaction</div>
+      <div class="step"><span class="n">12</span> Review</div>
+    </aside>
+
+    <section class="panel">
+      <div class="progress">
+        <span class="lab">Step 11 / 12</span>
+        <div class="pbar" aria-hidden="true">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+          <i class="on last"></i><i></i>
+        </div>
+        <span class="lab">92%</span>
+      </div>
+
+      <h2 class="qlabel">How would you prefer to obtain it?</h2>
+      <p class="qhelp">This is captured as demand intelligence before transaction products exist.
+        Not sure? <strong>Unknown</strong> is a valid, first-class answer — it never counts against a match.</p>
+
+      <div class="choices" role="radiogroup" aria-label="Transaction preference">
+        <button class="choice" role="radio" aria-checked="false"><span class="ho-syslabel">Option</span><span class="big">Buy</span><span class="d">Outright unit purchase</span></button>
+        <button class="choice" role="radio" aria-checked="false"><span class="ho-syslabel">Option</span><span class="big">Rent</span><span class="d">Short-term paid use</span></button>
+        <button class="choice" role="radio" aria-checked="false"><span class="ho-syslabel">Option</span><span class="big">Lease</span><span class="d">Long-term financed</span></button>
+        <button class="choice sel" role="radio" aria-checked="true"><span class="ho-syslabel">Option · selected</span><span class="big">RaaS</span><span class="d">Robots-as-a-service</span></button>
+        <button class="choice" role="radio" aria-checked="false"><span class="ho-syslabel">Option</span><span class="big">Flexible</span><span class="d">Open to any model</span></button>
+        <button class="choice" role="radio" aria-checked="false"><span class="ho-syslabel">Default</span><span class="big">Unknown</span><span class="d">Not sure yet</span></button>
+      </div>
+
+      <div class="navrow">
+        <button class="btn btn--ghost" type="button">&larr; Back</button>
+        <div style="display:flex;gap:12px">
+          <button class="btn btn--ghost" type="button">Skip</button>
+          <button class="btn btn--signal" type="button">See matches &rarr;</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===================== MATCHES ===================== -->
+  <div class="matchhead">
+    <div>
+      <span class="ho-section-index">RESULTS — DETERMINISTIC MATCH_RESULT</span>
+      <h2>3 humanoids match</h2>
+    </div>
+    <span class="reqline">REQ: WAREHOUSE · US · ≥12KG PAYLOAD · SUPERVISED+ · RAAS · [ adjust ]</span>
+  </div>
+
+  <!-- BEST_COMMERCIAL -->
+  <article class="mcard">
+    <div class="top">
+      <div class="cat"><span class="tag">▪</span> BEST_<br>COMMERCIAL</div>
+      <div>
+        <div class="mlock"><span class="name">Digit</span><span class="code">v5</span></div>
+        <span class="mfr" style="color:var(--ho-text-muted);font-size:var(--ho-fs-small)">Agility Robotics · US</span>
+      </div>
+      <div class="score"><div class="n">82</div><div class="u">Match %</div></div>
+    </div>
+    <div class="mbody">
+      <div class="col left">
+        <div class="ho-syslabel" style="margin-bottom:12px">Score breakdown</div>
+        <div class="breakdown">
+          <div class="bk"><span class="k">Capability</span><span class="seg"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="val">0.90</span></div>
+          <div class="bk"><span class="k">Commercial fit</span><span class="seg"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span><span class="val">0.85</span></div>
+          <div class="bk"><span class="k">Payload</span><span class="seg"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="val">0.95</span></div>
+          <div class="bk"><span class="k">Budget</span><span class="seg"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="val unk">n/a</span></div>
+        </div>
+      </div>
+      <div class="col">
+        <ul class="reasons">
+          <li class="ok"><span class="mk">✓</span> Commercial RaaS deployment available (US)</li>
+          <li class="ok"><span class="mk">✓</span> Payload 16 kg ≥ 12 kg requirement</li>
+          <li class="ok"><span class="mk">✓</span> Warehouse use-case fit 0.92 · production deployments</li>
+        </ul>
+        <div class="warn">
+          <div class="whead"><span class="ho-hazard warnbar" aria-hidden="true"></span><span class="ho-syslabel" style="color:var(--ho-caution)">Warnings</span></div>
+          <ul>
+            <li><span class="mk">⚠</span> Pricing is quote-only — no published price</li>
+            <li><span class="mk">⚠</span> No purchase option — RaaS engagement only</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <a class="btn btn--signal" href="#"><span class="ho-marker"></span> Request commercial help</a>
+      <a class="btn" href="03-robot-detail.html"><span class="ho-marker"></span> Details</a>
+    </div>
+  </article>
+
+  <!-- BEST_LOWER_COST -->
+  <article class="mcard">
+    <div class="top">
+      <div class="cat"><span class="tag">▪</span> BEST_<br>LOWER_COST</div>
+      <div>
+        <div class="mlock"><span class="name">G1</span><span class="code">G1</span></div>
+        <span class="mfr" style="color:var(--ho-text-muted);font-size:var(--ho-fs-small)">Unitree Robotics · CN</span>
+      </div>
+      <div class="score"><div class="n">64</div><div class="u">Match %</div></div>
+    </div>
+    <div class="mbody">
+      <div class="col left">
+        <div class="ho-syslabel" style="margin-bottom:12px">Score breakdown</div>
+        <div class="breakdown">
+          <div class="bk"><span class="k">Capability</span><span class="seg"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="val">0.72</span></div>
+          <div class="bk"><span class="k">Commercial fit</span><span class="seg"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="val">0.90</span></div>
+          <div class="bk"><span class="k">Payload</span><span class="seg"><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="val">0.20</span></div>
+          <div class="bk"><span class="k">Budget</span><span class="seg"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="val">1.00</span></div>
+        </div>
+      </div>
+      <div class="col">
+        <ul class="reasons">
+          <li class="ok"><span class="mk">✓</span> Public price $16,000 — lowest obtainable</li>
+          <li class="ok"><span class="mk">✓</span> Available now · ships from OEM store</li>
+          <li class="ok"><span class="mk">✓</span> De-facto standard research platform</li>
+        </ul>
+        <div class="warn">
+          <div class="whead"><span class="ho-hazard warnbar" aria-hidden="true"></span><span class="ho-syslabel" style="color:var(--ho-caution)">Warnings</span></div>
+          <ul>
+            <li><span class="mk">⚠</span> Payload 3 kg is far below 12 kg requirement</li>
+            <li><span class="mk">⚠</span> Teleoperated autonomy — not task-autonomous</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <a class="btn btn--signal" href="#"><span class="ho-marker"></span> Request commercial help</a>
+      <a class="btn" href="02-catalogue.html"><span class="ho-marker"></span> Details</a>
+    </div>
+  </article>
+
+  <!-- BEST_DEVELOPER -->
+  <article class="mcard">
+    <div class="top">
+      <div class="cat"><span class="tag">▪</span> BEST_<br>DEVELOPER</div>
+      <div>
+        <div class="mlock"><span class="name">Booster T1</span><span class="code">T1</span></div>
+        <span class="mfr" style="color:var(--ho-text-muted);font-size:var(--ho-fs-small)">Booster Robotics · CN</span>
+      </div>
+      <div class="score"><div class="n">58</div><div class="u">Match %</div></div>
+    </div>
+    <div class="mbody">
+      <div class="col left">
+        <div class="ho-syslabel" style="margin-bottom:12px">Score breakdown</div>
+        <div class="breakdown">
+          <div class="bk"><span class="k">Capability</span><span class="seg"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span><span class="val">0.80</span></div>
+          <div class="bk"><span class="k">Commercial fit</span><span class="seg"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="val">0.70</span></div>
+          <div class="bk"><span class="k">Payload</span><span class="seg"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="val">0.30</span></div>
+          <div class="bk"><span class="k">Budget</span><span class="seg"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="val">0.70</span></div>
+        </div>
+      </div>
+      <div class="col">
+        <ul class="reasons">
+          <li class="ok"><span class="mk">✓</span> SDK + ROS support — developer edition</li>
+          <li class="ok"><span class="mk">✓</span> Available now · from $35,000</li>
+          <li class="ok"><span class="mk">✓</span> Competition-proven platform</li>
+        </ul>
+        <div class="warn">
+          <div class="whead"><span class="ho-hazard warnbar" aria-hidden="true"></span><span class="ho-syslabel" style="color:var(--ho-caution)">Warnings</span></div>
+          <ul>
+            <li><span class="mk">⚠</span> Compact 118 cm platform — small payload</li>
+            <li><span class="mk">⚠</span> Not warehouse-optimized</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <a class="btn btn--signal" href="#"><span class="ho-marker"></span> Request commercial help</a>
+      <a class="btn" href="02-catalogue.html"><span class="ho-marker"></span> Details</a>
+    </div>
+  </article>
+
+  <!-- EMPTY-STATE (honest elimination) -->
+  <div class="empty">
+    <span class="ho-syslabel" style="color:var(--ho-caution)">EMPTY-STATE EXAMPLE — HONEST ELIMINATION</span>
+    <h3>No robot matches at 40 kg payload</h3>
+    <p>If the payload requirement were raised to <strong>40 kg</strong>, that single constraint would
+      eliminate every tracked candidate. We say so plainly rather than returning a weak match —
+      and we still capture the demand.</p>
+    <a class="btn" href="#"><span class="ho-marker"></span> Tell us anyway — we track the market</a>
+  </div>
+
+</div>
+
+</body>
+</html>

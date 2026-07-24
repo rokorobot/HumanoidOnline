@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HumanoidOnline — Digit (UI-D1 reference)</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* ---- 03-robot-detail.html : IDENTITY HEADER EXPERIMENTAL · DATA DISCIPLINED */
+  .wrap { max-width: var(--ho-maxw); margin: 0 auto; padding: 0 var(--ho-sp-5); }
+
+  /* ===== DARK IDENTITY HEADER ===== */
+  .idhead { background: var(--ho-ink); }
+  .idhead .in { max-width: var(--ho-maxw); margin: 0 auto; }
+  .topbar { display:grid; grid-template-columns: 40px repeat(4, 1fr) 40px;
+    border-bottom: var(--ho-rule-med) solid var(--ho-paper-ink); }
+  .topbar .corner { display:flex; align-items:center; justify-content:center;
+    border-inline: var(--ho-rule-hair) solid var(--ho-grey-800); }
+  .topbar .seg { padding: 9px 14px; font-family: var(--ho-font-machine);
+    font-size: var(--ho-fs-mono-s); letter-spacing: var(--ho-tracking-label);
+    text-transform: uppercase; color: var(--ho-text-muted);
+    border-right: var(--ho-rule-hair) solid var(--ho-grey-800); display:flex; align-items:center; gap:8px; }
+  .topbar .seg b { color: var(--ho-paper-ink); }
+
+  .idbody { position: relative; padding: var(--ho-sp-7) var(--ho-sp-7) var(--ho-sp-6); }
+  .idside { position:absolute; top:0; bottom:0; width:40px; display:flex; align-items:center; justify-content:center; }
+  .idside.l { left:0; border-right: var(--ho-rule-hair) solid var(--ho-grey-800); }
+  .idside.r { right:0; border-left: var(--ho-rule-hair) solid var(--ho-grey-800); }
+
+  .id-kicker { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap;
+    gap: var(--ho-sp-4); margin-bottom: var(--ho-sp-5); }
+  .id-grid { display:grid; grid-template-columns: 1.55fr 1fr; gap: var(--ho-sp-6); align-items:center; }
+  .lockup-big { }
+  .lockup-big .name { font-family: var(--ho-font-display-serif); font-weight:500;
+    font-size: clamp(3.5rem, 9vw, 7rem); line-height: 0.92; letter-spacing: -0.015em;
+    color: var(--ho-paper-ink); }
+  .code-rules { position: relative; margin-top: 6px; padding: 12px 0; }
+  .code-rules .mc { font-family: var(--ho-font-display-grotesk); font-weight:800; font-stretch:75%;
+    font-size: clamp(1.6rem, 4vw, 2.6rem); letter-spacing: -0.01em; text-transform: uppercase;
+    color: var(--ho-paper-ink); position: relative; z-index: 1; display: inline-block;
+    background: var(--ho-ink); padding-right: 16px; }
+  .code-rules .r1, .code-rules .r2, .code-rules .r3 { position:absolute; left:0; right:0; height:2px; }
+  .code-rules .r1 { top: 46%; background: var(--ho-signal); }
+  .code-rules .r2 { top: calc(46% + 6px); background: var(--ho-signal-2); }
+  .code-rules .r3 { top: calc(46% + 12px); background: var(--ho-signal); }
+
+  .schematic { border: var(--ho-rule-hair) solid var(--ho-grey-800); padding: 14px; position: relative; }
+  .schematic svg { width: 100%; height: auto; }
+  .schematic .cap { position:absolute; bottom:8px; right:12px; }
+
+  .dims-strip { display:grid; grid-template-columns: repeat(3,1fr); gap: 0;
+    border: var(--ho-rule-hair) solid var(--ho-grey-800); border-bottom: 0; margin-top: var(--ho-sp-6); }
+  .dims-strip .d { padding: 14px 16px; border-right: var(--ho-rule-hair) solid var(--ho-grey-800); }
+  .dims-strip .d:last-child { border-right: 0; }
+  .barcode-row { display:flex; align-items:center; gap: var(--ho-sp-4); padding: 12px 16px;
+    border: var(--ho-rule-hair) solid var(--ho-grey-800); }
+  .barcode-row .ho-barcode { flex: 1; }
+
+  /* ===== LIGHT BODY ===== */
+  .summary-row { display:flex; align-items:flex-start; justify-content:space-between;
+    gap: var(--ho-sp-6); padding: var(--ho-sp-6) 0; flex-wrap:wrap;
+    border-bottom: var(--ho-rule-hair) solid var(--ho-line-soft); }
+  .summary-row p { font-size: 1.05rem; max-width: 62ch; }
+  .actions { display:flex; gap: var(--ho-sp-3); flex-wrap:wrap; }
+  .btn { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+    text-transform: uppercase; letter-spacing: var(--ho-tracking-label);
+    border: var(--ho-rule-med) solid var(--ho-ink); background: transparent; color: var(--ho-ink);
+    padding: 11px 16px; display:inline-flex; gap:8px; align-items:center; cursor:pointer; }
+  .btn--signal { background: var(--ho-signal); border-color: var(--ho-ink); }
+
+  section.blk { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid var(--ho-line); }
+  .blk-head { display:flex; align-items:baseline; justify-content:space-between; gap: var(--ho-sp-4);
+    margin-bottom: var(--ho-sp-5); flex-wrap:wrap; }
+  .blk-head h2 { font-family: var(--ho-font-display-grotesk); font-weight:800; font-stretch:75%;
+    font-size: var(--ho-fs-h1); letter-spacing: -0.02em; text-transform: uppercase; line-height:0.95; }
+
+  /* THREE DIMENSION PANELS */
+  .dims { display:grid; grid-template-columns: repeat(3,1fr); gap: var(--ho-sp-4); }
+  .dim { border: var(--ho-rule-hair) solid var(--ho-ink); background: var(--ho-paper-2);
+    display:flex; flex-direction:column; }
+  .dim .dtop { display:flex; align-items:center; gap: var(--ho-sp-3); padding: 12px 14px;
+    border-bottom: var(--ho-rule-med) solid var(--ho-ink); }
+  .dim .num { font-family: var(--ho-font-display-grotesk); font-weight:800; font-stretch:75%;
+    font-size: 2.2rem; line-height: 0.8; }
+  .dim .dtop .t { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+    letter-spacing: var(--ho-tracking-label); text-transform: uppercase; line-height:1.3; }
+  .dim .dbody { padding: 14px; display:flex; flex-direction:column; gap: 14px; flex:1; }
+  .matrix { border: var(--ho-rule-hair) solid var(--ho-line-soft); }
+  .matrix .mrow { display:grid; grid-template-columns: 1fr 0.7fr auto;
+    border-bottom: var(--ho-rule-hair) solid var(--ho-line-soft); }
+  .matrix .mrow:last-child { border-bottom: 0; }
+  .matrix .mrow > span { padding: 7px 9px; font-family: var(--ho-font-machine);
+    font-size: var(--ho-fs-mono-s); letter-spacing: 0.04em; text-transform: uppercase;
+    border-right: var(--ho-rule-hair) solid var(--ho-line-soft); }
+  .matrix .mrow > span:last-child { border-right: 0; text-align:right; }
+  .matrix .mrow.head > span { background: var(--ho-ink); color: var(--ho-paper); }
+  .matrix .mrow .na { color: var(--ho-unknown); }
+  .stamp { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+    letter-spacing: 0.03em; color: var(--ho-text-muted); }
+  .ladder { display:flex; gap: 3px; }
+  .ladder i { flex:1; height: 8px; background: var(--ho-grey-200); }
+  .ladder i.on { background: var(--ho-ink); }
+  .ladder i.cur { background: var(--ho-signal); }
+
+  /* PRICING */
+  .ptable { border: var(--ho-rule-hair) solid var(--ho-ink); }
+  .prow { display:grid; grid-template-columns: 0.8fr 0.6fr 1fr 1.4fr 1.2fr;
+    border-bottom: var(--ho-rule-hair) solid var(--ho-line-soft); align-items:center; }
+  .prow:last-child { border-bottom:0; }
+  .prow.head { background: var(--ho-ink); color: var(--ho-paper); }
+  .prow > div { padding: 11px 12px; font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+    letter-spacing: 0.03em; border-right: var(--ho-rule-hair) solid var(--ho-line-soft); text-transform: uppercase; }
+  .prow.head > div { border-right-color: var(--ho-grey-700); }
+  .prow > div:last-child { border-right: 0; }
+  .prow .val { font-size: var(--ho-fs-body); text-transform: none; }
+  .prow .val.quote { color: var(--ho-caution); }
+  .prow .val.unknown { color: var(--ho-unknown); }
+  .prow .val.public { font-weight: 600; }
+  .pstates { display:grid; grid-template-columns: repeat(6,1fr); gap: 0; margin-top: var(--ho-sp-4);
+    border: var(--ho-rule-hair) solid var(--ho-grey-300); }
+  .pstate { padding: 10px 10px; border-right: var(--ho-rule-hair) solid var(--ho-grey-300); }
+  .pstate:last-child { border-right:0; }
+  .pstate .lab { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+    letter-spacing: var(--ho-tracking-label); text-transform: uppercase; color: var(--ho-text-muted); }
+  .pstate .ex { font-family: var(--ho-font-machine); font-size: var(--ho-fs-small); margin-top: 6px; display:block; }
+  .pstate.q .ex { color: var(--ho-caution); }
+  .pstate.u .ex { color: var(--ho-unknown); }
+
+  /* SPECS */
+  .specgrid { display:grid; grid-template-columns: repeat(3,1fr); gap: var(--ho-sp-5); }
+  .spectbl { border-top: var(--ho-rule-med) solid var(--ho-ink); }
+  .spectbl h3 { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+    letter-spacing: var(--ho-tracking-label); text-transform: uppercase; padding: 10px 0; color: var(--ho-text-muted); }
+  .srow { display:flex; justify-content:space-between; gap: 12px; padding: 8px 0;
+    border-top: var(--ho-rule-hair) solid var(--ho-line-soft); }
+  .srow .k { color: var(--ho-text-muted); font-size: var(--ho-fs-small); }
+  .srow .v { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono); font-variant-numeric: tabular-nums; }
+  .srow .v.unk { color: var(--ho-unknown); display:inline-flex; align-items:center; gap:8px; }
+
+  /* EVIDENCE */
+  .ev { border: var(--ho-rule-hair) solid var(--ho-ink); background: var(--ho-paper-2);
+    display:flex; flex-direction:column; gap:0; }
+  .evrow { display:grid; grid-template-columns: 1.3fr 1fr auto; gap: 0; align-items:center;
+    border-bottom: var(--ho-rule-hair) solid var(--ho-line-soft); }
+  .evrow:last-child { border-bottom:0; }
+  .evrow > div { padding: 12px 14px; }
+  .evrow .subj { font-weight: 600; font-size: var(--ho-fs-small); }
+  .evrow .subj .ho-code { margin-top:6px; }
+  .evrow .src { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s); color: var(--ho-text-muted); line-height:1.7; }
+  .conf-cell { text-align:right; }
+
+  /* ACTION PANEL */
+  .action-panel { border: var(--ho-rule-med) solid var(--ho-ink); background: var(--ho-paper-2);
+    padding: var(--ho-sp-5); display:flex; align-items:center; justify-content:space-between;
+    gap: var(--ho-sp-5); flex-wrap:wrap; margin-bottom: var(--ho-sp-8); }
+  .action-panel .note { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+    color: var(--ho-text-faint); max-width: 52ch; line-height: 1.7; }
+
+  @media (max-width: 900px){
+    .id-grid, .dims, .specgrid, .pstates { grid-template-columns: 1fr; }
+    .dims-strip { grid-template-columns: 1fr; }
+    .prow, .pstates { grid-template-columns: 1fr 1fr; }
+    .idbody { padding-inline: var(--ho-sp-6); }
+    .topbar { grid-template-columns: 1fr 1fr; }
+    .topbar .corner { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ho-mockup-banner">
+  <span><span class="ho-marker ho-marker--signal"></span>&nbsp; UI-D1 REFERENCE COMPOSITION — STATIC MOCKUP, NOT WIRED TO ANY API</span>
+  <span>03 / ROBOT DETAIL · HEADER EXPERIMENTAL / DATA DISCIPLINED</span>
+</div>
+
+<!-- ===================== DARK IDENTITY HEADER ===================== -->
+<div class="idhead ho-dark ho-scan">
+  <div class="in">
+    <div class="topbar">
+      <div class="corner"><span class="ho-star">&#9733;</span></div>
+      <div class="seg"><b>UNIT / DIGIT-V5</b></div>
+      <div class="seg">LOGISTICS HUMANOID</div>
+      <div class="seg">STATUS &mdash; <b>PRODUCTION DEPLOYED</b></div>
+      <div class="seg">AGILITY ROBOTICS &middot; US</div>
+      <div class="corner"><span class="ho-reg-box">&reg;</span></div>
+    </div>
+
+    <div class="idbody">
+      <div class="idside l"><span class="ho-vertical">PROJECT: DIGIT / RAAS DEPLOYMENT</span></div>
+      <div class="idside r"><span class="ho-vertical">SERIAL NO. 004 / MODEL v5 / US</span></div>
+
+      <div class="id-kicker">
+        <span class="ho-section-index">ROBOT RECORD — 3 INDEPENDENT DIMENSIONS</span>
+        <span class="ho-capsule"><span class="ho-marker ho-marker--signal"></span> AGILITY ROBOTICS &middot; U S A</span>
+      </div>
+
+      <div class="id-grid">
+        <div>
+          <div class="lockup-big">
+            <div class="name">Digit</div>
+            <div class="code-rules">
+              <span class="r1"></span><span class="r2"></span><span class="r3"></span>
+              <span class="mc">DIGIT / v5</span>
+            </div>
+          </div>
+        </div>
+        <div class="schematic">
+          <!-- schematic humanoid (robotics control-doc line art, offline SVG) -->
+          <svg viewBox="0 0 220 200" role="img" aria-label="Schematic of Digit humanoid">
+            <g fill="none" stroke="#9C968A" stroke-width="1.4">
+              <circle cx="110" cy="34" r="15"/>
+              <line x1="110" y1="49" x2="110" y2="70"/>
+              <rect x="86" y="70" width="48" height="52"/>
+              <line x1="86" y1="86" x2="52" y2="110"/><line x1="52" y1="110" x2="56" y2="140"/>
+              <line x1="134" y1="86" x2="168" y2="110"/><line x1="168" y1="110" x2="164" y2="140"/>
+              <line x1="98" y1="122" x2="90" y2="160"/><line x1="90" y1="160" x2="94" y2="192"/>
+              <line x1="122" y1="122" x2="130" y2="160"/><line x1="130" y1="160" x2="126" y2="192"/>
+            </g>
+            <g fill="#FF4A00">
+              <rect x="105" y="29" width="10" height="4"/>
+            </g>
+            <g fill="#47433B">
+              <circle cx="20" cy="12" r="1.4"/><circle cx="28" cy="12" r="1.4"/>
+              <circle cx="20" cy="20" r="1.4"/><circle cx="28" cy="20" r="1.4"/>
+            </g>
+          </svg>
+          <span class="cap ho-syslabel">FIG. 01 — GEOMETRY (SCHEMATIC)</span>
+        </div>
+      </div>
+
+      <!-- three-dimension preview, status-readout pairs -->
+      <div class="dims-strip">
+        <div class="d ho-pair is-signal"><span class="k">① Commercial maturity</span><span class="s">RAAS_DEPLOYMENT</span></div>
+        <div class="d ho-pair"><span class="k">② Obtainability</span><span class="s">AVAILABLE <span class="mono">· RAAS · US</span></span></div>
+        <div class="d ho-pair is-verified"><span class="k">③ Deployment evidence</span><span class="s">2 DEPLOYMENTS <span class="mono">· VERIFIED</span></span></div>
+      </div>
+      <div class="barcode-row">
+        <span class="ho-syslabel">ARCHIVE REF: HO-ROBOT-DIGIT-V5-US</span>
+        <span class="ho-barcode ho-barcode--sm" aria-hidden="true"></span>
+        <span class="ho-syslabel">LOG ID: 2019-DGT-04</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- SUMMARY + ACTIONS -->
+  <div class="summary-row">
+    <p>Logistics humanoid in formal commercial <strong>RaaS deployments</strong> — contracted
+      multi-year orders, yet <strong>no purchase offer</strong>. A textbook case that maturity,
+      obtainability and evidence are three independent facts.</p>
+    <div class="actions">
+      <a class="btn" href="04-compare.html"><span class="ho-marker"></span> Compare +</a>
+      <a class="btn btn--signal" href="#"><span class="ho-marker"></span> Request Availability</a>
+    </div>
+  </div>
+
+  <!-- THE THREE DIMENSIONS -->
+  <section class="blk">
+    <div class="blk-head">
+      <div>
+        <span class="ho-section-index">01 — THE THREE DIMENSIONS</span>
+        <h2>Maturity &ne; obtainability &ne; evidence</h2>
+      </div>
+      <span class="ho-syslabel">RENDERED INDEPENDENTLY — NEVER COLLAPSED INTO ONE "AVAILABLE" FLAG</span>
+    </div>
+
+    <div class="dims">
+      <!-- DIM 1 : MATURITY -->
+      <article class="dim">
+        <div class="dtop"><span class="num">1</span><span class="t">Commercial<br>maturity</span></div>
+        <div class="dbody">
+          <div class="ho-pair is-signal"><span class="k">commercial_status</span><span class="s">RAAS_DEPLOYMENT</span></div>
+          <div>
+            <div class="ho-syslabel" style="margin-bottom:8px">Maturity ladder</div>
+            <div class="ladder" title="ANNOUNCED → … → RAAS_DEPLOYMENT">
+              <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="cur"></i><i></i>
+            </div>
+            <div class="ho-syslabel" style="margin-top:8px;color:var(--ho-text-faint)">ANNOUNCED ▸ RAAS_DEPLOYMENT ▸ DISCONTINUED</div>
+          </div>
+          <p class="stamp">Commercially deployed as a service; units not sold. A <strong>success</strong> state — not "unavailable".</p>
+          <div class="ho-leader stamp"><span>EVIDENCE</span><span class="fill"></span><span>VERIFIED</span></div>
+        </div>
+      </article>
+
+      <!-- DIM 2 : OBTAINABILITY -->
+      <article class="dim">
+        <div class="dtop"><span class="num">2</span><span class="t">Obtainability<br>mode × region</span></div>
+        <div class="dbody">
+          <div class="ho-pair"><span class="k">accessible?</span><span class="s">YES <span class="mono">· constrained (RaaS)</span></span></div>
+          <div class="matrix">
+            <div class="mrow head"><span>Mode</span><span>Region</span><span>Status</span></div>
+            <div class="mrow"><span>RAAS</span><span>US</span><span>AVAILABLE</span></div>
+            <div class="mrow"><span>PURCHASE</span><span class="na">—</span><span class="na">NO CONFIRMED</span></div>
+            <div class="mrow"><span>RENTAL</span><span class="na">—</span><span class="na">NO CONFIRMED</span></div>
+          </div>
+          <p class="stamp">Predicate <code>commercially_accessible</code> = is_current AND status &notin; {NOT_AVAILABLE, DISCONTINUED}. Absence of a row = unknown, not NOT_AVAILABLE.</p>
+        </div>
+      </article>
+
+      <!-- DIM 3 : EVIDENCE -->
+      <article class="dim">
+        <div class="dtop"><span class="num">3</span><span class="t">Deployment<br>evidence</span></div>
+        <div class="dbody">
+          <div class="ho-pair is-verified"><span class="k">deployments</span><span class="s">2 <span class="mono">· production / scaling</span></span></div>
+          <div class="matrix">
+            <div class="mrow head"><span>Customer</span><span>Use case</span><span>Conf.</span></div>
+            <div class="mrow"><span>GXO Logistics</span><span>Warehouse</span><span style="color:var(--ho-verified)">VERIFIED</span></div>
+            <div class="mrow"><span>&gt;$300M orders</span><span>RaaS</span><span style="color:var(--ho-verified)">VERIFIED</span></div>
+          </div>
+          <p class="stamp">Contract value <span class="ho-redact ho-redact--sm" aria-hidden="true"></span> <strong>UNDISCLOSED</strong> on GXO row — shown as explicitly unknown, never a guessed figure.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="blk">
+    <div class="blk-head">
+      <div>
+        <span class="ho-section-index">02 — PRICING</span>
+        <h2>Price is never one column</h2>
+      </div>
+      <span class="ho-syslabel">transaction_type × price_type × billing × region × provider</span>
+    </div>
+
+    <div class="ptable">
+      <div class="prow head"><div>Mode</div><div>Region</div><div>Provider</div><div>Price</div><div>Evidence</div></div>
+      <div class="prow">
+        <div>RAAS</div><div>US</div><div>Agility (RaaS)</div>
+        <div class="val quote">Price on request <span class="ho-syslabel" style="display:block;color:var(--ho-caution)">QUOTE_ONLY · annual</span></div>
+        <div class="stamp">VERIFIED · 2026-07-01<br>SOURCE: MANUFACTURER_SITE</div>
+      </div>
+      <div class="prow">
+        <div>PURCHASE</div><div class="val unknown" style="text-transform:none">—</div><div class="val unknown" style="text-transform:none">—</div>
+        <div class="val unknown">No confirmed pricing <span class="ho-syslabel" style="display:block;color:var(--ho-unknown)">UNKNOWN · no offer rows</span></div>
+        <div class="stamp" style="color:var(--ho-text-faint)">— absence claims nothing —</div>
+      </div>
+    </div>
+
+    <div class="ho-emlabel" style="margin:var(--ho-sp-5) 0 10px">PRICE-STATE DISPLAY CONTRACT — SIX DISTINCT STATES</div>
+    <div class="pstates">
+      <div class="pstate"><span class="lab">PUBLIC</span><span class="ex">$16,000</span></div>
+      <div class="pstate"><span class="lab">FROM</span><span class="ex">From $5,900</span></div>
+      <div class="pstate"><span class="lab">RANGE</span><span class="ex">$120k–$200k</span></div>
+      <div class="pstate"><span class="lab">ESTIMATED</span><span class="ex" style="color:var(--ho-caution)">~$30,000</span></div>
+      <div class="pstate q"><span class="lab">QUOTE_ONLY</span><span class="ex">Price on request</span></div>
+      <div class="pstate u"><span class="lab">UNKNOWN</span><span class="ex">No confirmed pricing</span></div>
+    </div>
+  </section>
+
+  <!-- SPECIFICATIONS -->
+  <section class="blk">
+    <div class="blk-head">
+      <div>
+        <span class="ho-section-index">03 — SPECIFICATIONS</span>
+        <h2>Physical / intelligence / developer</h2>
+      </div>
+      <span class="ho-syslabel">NULL = UNKNOWN, NEVER 0 OR FALSE</span>
+    </div>
+    <div class="specgrid">
+      <div class="spectbl">
+        <h3>Physical</h3>
+        <div class="srow"><span class="k">Height</span><span class="v">175 cm</span></div>
+        <div class="srow"><span class="k">Weight</span><span class="v">65 kg</span></div>
+        <div class="srow"><span class="k">Payload</span><span class="v">16 kg</span></div>
+        <div class="srow"><span class="k">Mobility</span><span class="v">BIPEDAL</span></div>
+        <div class="srow"><span class="k">Runtime</span><span class="v unk"><span class="ho-marker" style="background:var(--ho-grey-400)"></span>UNKNOWN</span></div>
+        <div class="srow"><span class="k">Arm reach</span><span class="v">90 cm</span></div>
+      </div>
+      <div class="spectbl">
+        <h3>Intelligence</h3>
+        <div class="srow"><span class="k">Autonomy</span><span class="v">TASK_AUTONOMOUS</span></div>
+        <div class="srow"><span class="k">Manipulation</span><span class="v">YES</span></div>
+        <div class="srow"><span class="k">Vision</span><span class="v">YES</span></div>
+        <div class="srow"><span class="k">Autonomous nav</span><span class="v">YES</span></div>
+        <div class="srow"><span class="k">Language UI</span><span class="v unk">UNKNOWN</span></div>
+        <div class="srow"><span class="k">Dexterous hands</span><span class="v">NO (tote grippers)</span></div>
+      </div>
+      <div class="spectbl">
+        <h3>Developer</h3>
+        <div class="srow"><span class="k">API</span><span class="v">YES</span></div>
+        <div class="srow"><span class="k">SDK</span><span class="v unk">UNKNOWN</span></div>
+        <div class="srow"><span class="k">ROS support</span><span class="v unk">UNKNOWN</span></div>
+        <div class="srow"><span class="k">Developer edition</span><span class="v unk">UNKNOWN</span></div>
+        <div class="srow"><span class="k">Announced</span><span class="v">2019</span></div>
+        <div class="srow"><span class="k">DOF</span><span class="v unk">UNKNOWN</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EVIDENCE / PROVENANCE -->
+  <section class="blk">
+    <div class="blk-head">
+      <div>
+        <span class="ho-section-index">04 — EVIDENCE &amp; PROVENANCE</span>
+        <h2>No commercial fact without evidence</h2>
+      </div>
+      <span class="ho-syslabel">EvidenceStamp + ConfidenceIndicator</span>
+    </div>
+    <div class="ev">
+      <div class="evrow">
+        <div class="subj">Commercial status — RAAS_DEPLOYMENT<br><span class="ho-code">SUBJECT: COMMERCIAL_STATUS</span></div>
+        <div class="src">SOURCE: MANUFACTURER_SITE<br>Agility deployment model<br>OBSERVED 2026-01-01 · VERIFIED 2026-07-01 &reg;</div>
+        <div class="conf-cell"><span class="ho-conf" data-level="VERIFIED"><span class="bars"><i></i><i></i><i></i><i></i></span> VERIFIED</span></div>
+      </div>
+      <div class="evrow">
+        <div class="subj">Availability — RAAS · US · AVAILABLE<br><span class="ho-code">SUBJECT: AVAILABILITY_OFFER</span></div>
+        <div class="src">SOURCE: MANUFACTURER_SITE<br>RaaS-only engagement confirmed<br>VERIFIED 2026-07-01 &reg;</div>
+        <div class="conf-cell"><span class="ho-conf" data-level="VERIFIED"><span class="bars"><i></i><i></i><i></i><i></i></span> VERIFIED</span></div>
+      </div>
+      <div class="evrow">
+        <div class="subj">Deployment — GXO Logistics<br><span class="ho-code">SUBJECT: DEPLOYMENT</span></div>
+        <div class="src">SOURCE: PRESS_RELEASE<br>GXO multi-site deployment<br>PUBLISHED 2024-06-15 · VERIFIED 2026-06-15</div>
+        <div class="conf-cell"><span class="ho-conf" data-level="HIGH"><span class="bars"><i></i><i></i><i></i><i></i></span> HIGH</span></div>
+      </div>
+      <div class="evrow">
+        <div class="subj">Deployment — &gt;$300M contracted orders<br><span class="ho-code">SUBJECT: DEPLOYMENT</span></div>
+        <div class="src">SOURCE: PRESS_RELEASE<br>Company-reported figure<br>PUBLISHED 2026-05-01 · VERIFIED 2026-07-10 &reg;</div>
+        <div class="conf-cell"><span class="ho-conf" data-level="VERIFIED"><span class="bars"><i></i><i></i><i></i><i></i></span> VERIFIED</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMERCIAL ACTION PANEL -->
+  <div class="action-panel">
+    <div>
+      <span class="ho-section-index">COMMERCIAL ACTION</span>
+      <p class="note" style="margin-top:10px">v0.1 exposes one generic action (lead capture). Phase 3+ Rent / Buy / Lease-RaaS
+        buttons appear in this same panel, driven by availability_offer rows — no redesign.</p>
+    </div>
+    <a class="btn btn--signal" href="#"><span class="ho-marker"></span> Request Availability</a>
+  </div>
+
+</div>
+</body>
+</html>

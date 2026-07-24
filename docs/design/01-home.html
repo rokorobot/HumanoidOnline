@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HumanoidOnline — Home (UI-D1 reference)</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* ---- 01-home.html : HIGHLY EXPERIMENTAL band -------------------------- */
+  .wrap { max-width: var(--ho-maxw); margin: 0 auto; padding: 0 var(--ho-sp-5); }
+
+  /* ---------- HERO (dark, editorial) ---------- */
+  .hero-shell { background: var(--ho-ink); }
+  .hero-inner { max-width: var(--ho-maxw); margin: 0 auto; padding: 0; }
+
+  /* boxed technical header bar */
+  .topbar {
+    display: grid; grid-template-columns: 40px 1fr auto 1fr 40px;
+    align-items: stretch; border-bottom: var(--ho-rule-med) solid var(--ho-paper-ink);
+  }
+  .topbar .corner { display: flex; align-items: center; justify-content: center;
+    border-inline: var(--ho-rule-hair) solid var(--ho-grey-800); }
+  .topbar .seg { display: flex; align-items: center; gap: var(--ho-sp-3);
+    padding: 10px 16px; font-family: var(--ho-font-machine);
+    font-size: var(--ho-fs-mono-s); letter-spacing: var(--ho-tracking-label);
+    text-transform: uppercase; color: var(--ho-text-muted); }
+  .topbar .seg.mid { justify-content: center; color: var(--ho-paper-ink); }
+  .topbar .logo b { font-family: var(--ho-font-display-grotesk); font-weight: 800;
+    font-stretch: 75%; font-size: 1.15rem; letter-spacing: -0.02em; color: var(--ho-paper-ink); }
+  .topnav { display: flex; gap: var(--ho-sp-4); justify-content: flex-end; }
+  .topnav a:hover { color: var(--ho-signal); }
+
+  .hero-body { position: relative; padding: var(--ho-sp-8) var(--ho-sp-7) var(--ho-sp-7); }
+  .hero-side { position: absolute; top: 0; bottom: 0; width: 40px;
+    display: flex; align-items: center; justify-content: center; }
+  .hero-side.l { left: 0; border-right: var(--ho-rule-hair) solid var(--ho-grey-800); }
+  .hero-side.r { right: 0; border-left: var(--ho-rule-hair) solid var(--ho-grey-800); }
+
+  .hero-kicker { display:flex; align-items:center; justify-content:space-between;
+    margin-bottom: var(--ho-sp-5); flex-wrap: wrap; gap: var(--ho-sp-4); }
+  .hero-body h1 {
+    font-family: var(--ho-font-display-serif); font-weight: 500;
+    font-size: var(--ho-fs-display-xl); line-height: 0.98;
+    letter-spacing: var(--ho-tracking-serif); color: var(--ho-paper-ink);
+  }
+  .hero-body h1 em { font-style: italic; }
+  .subrow { display: grid; grid-template-columns: 1fr 1fr auto;
+    border: var(--ho-rule-med) solid var(--ho-paper-ink); margin-top: var(--ho-sp-6); }
+  .subrow .cell { padding: 14px 16px; font-family: var(--ho-font-machine);
+    font-size: var(--ho-fs-mono-s); line-height: 1.7; letter-spacing: var(--ho-tracking-code);
+    color: var(--ho-text-muted); border-right: var(--ho-rule-hair) solid var(--ho-grey-800); }
+  .subrow .cell:last-child { border-right: 0; }
+  .subrow .act { display:flex; align-items:center; justify-content:center;
+    background: var(--ho-signal); color: var(--ho-ink); text-transform: uppercase;
+    letter-spacing: var(--ho-tracking-label); font-size: var(--ho-fs-mono-s);
+    padding: 0 22px; cursor: pointer; }
+
+  .hero-tools { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--ho-sp-6);
+    margin-top: var(--ho-sp-6); align-items: end; }
+  .searchbar { display: flex; border: var(--ho-rule-med) solid var(--ho-paper-ink); background: transparent; }
+  .searchbar input { flex: 1; border: 0; background: transparent; padding: 13px 16px;
+    font-family: var(--ho-font-machine); font-size: var(--ho-fs-body); color: var(--ho-paper-ink); }
+  .searchbar input::placeholder { color: var(--ho-grey-500); }
+  .searchbar button { border: 0; border-left: var(--ho-rule-med) solid var(--ho-paper-ink);
+    background: var(--ho-paper-ink); color: var(--ho-ink); padding: 0 18px;
+    font-family: var(--ho-font-machine); text-transform: uppercase;
+    letter-spacing: var(--ho-tracking-label); font-size: var(--ho-fs-mono-s); cursor: pointer; }
+  .hero-actions { display: flex; gap: var(--ho-sp-3); margin-top: var(--ho-sp-4); }
+  .btn { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+    text-transform: uppercase; letter-spacing: var(--ho-tracking-label);
+    border: var(--ho-rule-med) solid var(--ho-paper-ink); background: transparent;
+    color: var(--ho-paper-ink); padding: 11px 16px; display: inline-flex; gap: 8px;
+    align-items: center; cursor: pointer; }
+  .btn--signal { background: var(--ho-signal); border-color: var(--ho-signal); color: var(--ho-ink); }
+  .readout { border: var(--ho-rule-hair) solid var(--ho-grey-800); padding: 14px 16px; }
+  .readout .ho-leader { color: var(--ho-text-muted); padding: 3px 0; }
+
+  /* ---------- LIGHT SECTIONS ---------- */
+  section.block { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid var(--ho-line); }
+  .block-head { display: flex; align-items: baseline; justify-content: space-between;
+    gap: var(--ho-sp-5); margin-bottom: var(--ho-sp-5); flex-wrap: wrap; }
+
+  /* RobotCard */
+  .card-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--ho-sp-4); }
+  .rcard { border: var(--ho-rule-hair) solid var(--ho-ink); background: var(--ho-paper-2);
+    display: flex; flex-direction: column; min-height: 250px; }
+  .rcard:hover { outline: var(--ho-rule-med) solid var(--ho-ink); outline-offset: -1px; }
+  .rcard-top { display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 12px; border-bottom: var(--ho-rule-hair) solid var(--ho-line-soft); }
+  .rcard-body { padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+  .lockup { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .lockup .name { font-family: var(--ho-font-display-serif); font-weight: 500;
+    font-size: 1.9rem; line-height: 0.95; letter-spacing: -0.01em; }
+  .lockup .code { font-family: var(--ho-font-display-grotesk); font-weight: 800;
+    font-stretch: 75%; font-size: 0.9rem; letter-spacing: 0; color: var(--ho-signal-ink);
+    text-transform: uppercase; }
+  .mfr { color: var(--ho-text-muted); font-size: var(--ho-fs-small); }
+  .metrics { display: flex; gap: 16px; flex-wrap: wrap; }
+  .metric .k { display: block; }
+  .metric .v { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono);
+    font-variant-numeric: tabular-nums; }
+  .metric .v.unk { color: var(--ho-unknown); }
+  .rcard-foot { margin-top: auto; padding: 10px 12px;
+    border-top: var(--ho-rule-hair) solid var(--ho-line-soft);
+    display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .price { font-family: var(--ho-font-machine); font-variant-numeric: tabular-nums; }
+  .price .amt { font-size: 1rem; font-weight: 600; }
+  .price .ctx { display: block; font-size: var(--ho-fs-mono-s); text-transform: uppercase;
+    letter-spacing: var(--ho-tracking-label); color: var(--ho-text-muted); }
+  .price.quote .amt { font-size: var(--ho-fs-body); color: var(--ho-caution); }
+  .price.unknown .amt { color: var(--ho-unknown); font-size: var(--ho-fs-body); }
+
+  /* Applications */
+  .apps { display: grid; grid-template-columns: repeat(4, 1fr);
+    border: var(--ho-rule-hair) solid var(--ho-ink); }
+  .app { padding: 16px 14px; border-right: var(--ho-rule-hair) solid var(--ho-line-soft);
+    border-bottom: var(--ho-rule-hair) solid var(--ho-line-soft); min-height: 90px;
+    display: flex; flex-direction: column; justify-content: space-between; }
+  .app:hover { background: var(--ho-ink); color: var(--ho-paper-ink); }
+  .app:hover .ho-syslabel { color: var(--ho-grey-400); }
+  .app .name { font-family: var(--ho-font-display-grotesk); font-weight: 800;
+    font-stretch: 75%; font-size: 1.15rem; letter-spacing: -0.01em; text-transform: uppercase; }
+
+  /* Orange alert status strip (tri-surface demo) */
+  .alert-strip { display:flex; align-items:center; justify-content:space-between;
+    gap: var(--ho-sp-5); padding: 16px var(--ho-sp-5); flex-wrap: wrap; }
+  .alert-strip .big { font-family: var(--ho-font-display-grotesk); font-weight: 800;
+    font-stretch: 75%; font-size: clamp(1.6rem,4vw,2.4rem); text-transform: uppercase;
+    letter-spacing: -0.01em; display:flex; align-items:center; gap: 14px; }
+
+  /* Manufacturers */
+  .mfr-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--ho-sp-4); }
+  .mcard { border: var(--ho-rule-hair) solid var(--ho-ink); padding: 14px;
+    background: var(--ho-paper-2); display: flex; flex-direction: column; gap: 12px; }
+  .mcard h3 { font-family: var(--ho-font-display-serif); font-weight: 500; font-size: 1.5rem;
+    letter-spacing: -0.01em; line-height: 0.95; }
+  .mcard .ho-leader { padding: 2px 0; color: var(--ho-text-muted); }
+
+  /* Snapshot (dark) */
+  .snapshot .wrap { padding-top: var(--ho-sp-7); padding-bottom: var(--ho-sp-7); }
+  .snap-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--ho-sp-5);
+    margin-top: var(--ho-sp-5); }
+  .snap .num { font-family: var(--ho-font-display-grotesk); font-weight: 800; font-stretch: 75%;
+    font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 0.9; letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums; color: var(--ho-paper-ink); }
+  .snap .num.sig { color: var(--ho-signal); }
+  .snap .lbl { color: var(--ho-grey-400); margin-top: 8px; }
+  .snapshot .ho-section-index::after { background: var(--ho-paper-ink); }
+
+  footer.foot { border-top: var(--ho-rule-med) solid var(--ho-ink); padding: var(--ho-sp-6) 0; }
+  .foot-grid { display: flex; justify-content: space-between; gap: var(--ho-sp-5);
+    flex-wrap: wrap; align-items: center; }
+  .foot-grid b { font-family: var(--ho-font-display-grotesk); font-weight: 800; font-stretch: 75%; }
+
+  @media (max-width: 900px) {
+    .hero-tools, .subrow, .card-row, .apps, .mfr-row, .snap-grid { grid-template-columns: 1fr 1fr; }
+    .subrow { grid-template-columns: 1fr; }
+    .topnav { display: none; }
+    .hero-body { padding-inline: var(--ho-sp-6); }
+  }
+  @media (max-width: 560px) {
+    .card-row, .apps, .mfr-row, .snap-grid, .hero-tools { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ho-mockup-banner">
+  <span><span class="ho-marker ho-marker--signal"></span>&nbsp; UI-D1 REFERENCE COMPOSITION — STATIC MOCKUP, NOT WIRED TO ANY API</span>
+  <span>01 / HOME · DISCIPLINE: HIGHLY EXPERIMENTAL</span>
+</div>
+
+<!-- ============================ HERO (DARK) ============================ -->
+<div class="hero-shell ho-dark ho-scan">
+  <div class="hero-inner">
+    <!-- boxed technical header bar -->
+    <div class="topbar">
+      <div class="corner"><span class="ho-star">&#9733;</span></div>
+      <div class="seg logo"><b>HUMANOIDONLINE</b> <span class="ho-chip">SYS/UI-D1</span></div>
+      <div class="seg mid">MARKET INTELLIGENCE PLATFORM</div>
+      <div class="seg topnav">
+        <a href="02-catalogue.html">Robots</a>
+        <a href="04-compare.html">Compare</a>
+        <a href="#">Manufacturers</a>
+        <a href="05-find-match.html">Find a Humanoid</a>
+      </div>
+      <div class="corner"><span class="ho-star">&#9733;</span></div>
+    </div>
+
+    <div class="hero-body">
+      <div class="hero-side l"><span class="ho-vertical">PROJECT: HUMANOID MARKET INTELLIGENCE</span></div>
+      <div class="hero-side r"><span class="ho-vertical">SERIAL NO. 001 / BUILT FOR OPERATORS</span></div>
+
+      <div class="hero-kicker">
+        <span class="ho-section-index">00 — THE HUMANOID MARKET, INSTRUMENTED</span>
+        <span class="ho-reg-box">&reg;</span>
+      </div>
+
+      <h1>Find the right<br><em>humanoid.</em></h1>
+
+      <div class="subrow">
+        <div class="cell">Compare capabilities, commercial availability, pricing and
+          deployment evidence across the humanoid-robot market.</div>
+        <div class="cell">Maturity, obtainability and evidence kept as three independent
+          facts. Unknown stays unknown — no fabricated numbers.</div>
+        <div class="act">Find a<br>Humanoid</div>
+      </div>
+
+      <div class="hero-tools">
+        <div>
+          <div class="searchbar">
+            <input type="text" placeholder="SEARCH ROBOTS, MANUFACTURERS, CAPABILITIES…" aria-label="Search robots">
+            <button type="button">Search</button>
+          </div>
+          <div class="hero-actions">
+            <a class="btn" href="02-catalogue.html"><span class="ho-marker"></span> Explore Robots</a>
+            <a class="btn btn--signal" href="05-find-match.html"><span class="ho-marker"></span> Find a Humanoid</a>
+          </div>
+        </div>
+        <div class="readout">
+          <div class="ho-leader"><span>ROBOTS</span><span class="fill"></span><span>20 TRACKED</span></div>
+          <div class="ho-leader"><span>MAKERS</span><span class="fill"></span><span>15 MANUFACTURERS</span></div>
+          <div class="ho-leader"><span>REGIONS</span><span class="fill"></span><span>US·EU·CN·UK·NO·CA</span></div>
+          <div class="ho-leader"><span>SYS.STATUS</span><span class="fill"></span><span>ALL OK ( 0 FAIL )</span></div>
+          <div class="ho-leader"><span>UPDATED</span><span class="fill"></span><span>2026-07-24</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== COMMERCIALLY ACCESSIBLE ===================== -->
+<section class="block">
+  <div class="wrap">
+    <div class="block-head">
+      <div>
+        <span class="ho-section-index">01 — COMMERCIALLY ACCESSIBLE</span>
+        <h2 class="ho-section-title" style="margin-top:10px">Obtainable now</h2>
+      </div>
+      <span class="ho-syslabel">PREDICATE: is_current AND status &notin; {NOT_AVAILABLE, DISCONTINUED}</span>
+    </div>
+    <div class="card-row">
+
+      <article class="rcard">
+        <div class="rcard-top"><span class="ho-code">UNITREE / CN</span><span class="ho-dots"><i></i><i></i><i></i><i></i></span></div>
+        <div class="rcard-body">
+          <div>
+            <div class="lockup"><span class="name">G1</span><span class="code">G1</span></div>
+            <div class="mfr">Unitree Robotics</div>
+          </div>
+          <span class="ho-bracket">COMMERCIAL</span>
+          <div class="metrics">
+            <div class="metric"><span class="k ho-syslabel">Payload</span><span class="v">3 kg</span></div>
+            <div class="metric"><span class="k ho-syslabel">Height</span><span class="v">130 cm</span></div>
+            <div class="metric"><span class="k ho-syslabel">Mobility</span><span class="v">BIPEDAL</span></div>
+          </div>
+        </div>
+        <div class="rcard-foot">
+          <div class="price"><span class="amt">$16,000</span><span class="ctx">PUBLIC · Purchase</span></div>
+          <span class="ho-badge ho-badge--ghost">AVAILABLE</span>
+        </div>
+      </article>
+
+      <article class="rcard">
+        <div class="rcard-top"><span class="ho-code">UNITREE / CN</span><span class="ho-dots"><i></i><i></i><i></i><i></i></span></div>
+        <div class="rcard-body">
+          <div>
+            <div class="lockup"><span class="name">H1</span><span class="code">H1</span></div>
+            <div class="mfr">Unitree Robotics</div>
+          </div>
+          <span class="ho-bracket">COMMERCIAL</span>
+          <div class="metrics">
+            <div class="metric"><span class="k ho-syslabel">Payload</span><span class="v">30 kg</span></div>
+            <div class="metric"><span class="k ho-syslabel">Height</span><span class="v">180 cm</span></div>
+            <div class="metric"><span class="k ho-syslabel">Mobility</span><span class="v">BIPEDAL</span></div>
+          </div>
+        </div>
+        <div class="rcard-foot">
+          <div class="price"><span class="amt">$90,000</span><span class="ctx">PUBLIC · Purchase</span></div>
+          <span class="ho-badge ho-badge--ghost">AVAILABLE</span>
+        </div>
+      </article>
+
+      <article class="rcard">
+        <div class="rcard-top"><span class="ho-code">AGILITY / US</span><span class="ho-dots ho-dots--signal"><i></i><i></i><i></i><i></i></span></div>
+        <div class="rcard-body">
+          <div>
+            <div class="lockup"><span class="name">Digit</span><span class="code">v5</span></div>
+            <div class="mfr">Agility Robotics</div>
+          </div>
+          <span class="ho-bracket">RAAS_DEPLOYMENT</span>
+          <div class="metrics">
+            <div class="metric"><span class="k ho-syslabel">Payload</span><span class="v">16 kg</span></div>
+            <div class="metric"><span class="k ho-syslabel">Height</span><span class="v">175 cm</span></div>
+            <div class="metric"><span class="k ho-syslabel">Runtime</span><span class="v unk">UNKNOWN</span></div>
+          </div>
+        </div>
+        <div class="rcard-foot">
+          <div class="price quote"><span class="amt">Price on request</span><span class="ctx">QUOTE_ONLY · RaaS</span></div>
+          <span class="ho-badge ho-badge--ghost">AVAILABLE</span>
+        </div>
+      </article>
+
+      <article class="rcard">
+        <div class="rcard-top"><span class="ho-code">ENG. ARTS / UK</span><span class="ho-dots"><i></i><i></i><i></i><i></i></span></div>
+        <div class="rcard-body">
+          <div>
+            <div class="lockup"><span class="name">Ameca</span><span class="code">EA</span></div>
+            <div class="mfr">Engineered Arts</div>
+          </div>
+          <span class="ho-bracket">COMMERCIAL</span>
+          <div class="metrics">
+            <div class="metric"><span class="k ho-syslabel">Height</span><span class="v">187 cm</span></div>
+            <div class="metric"><span class="k ho-syslabel">Mobility</span><span class="v">STATIONARY</span></div>
+            <div class="metric"><span class="k ho-syslabel">Payload</span><span class="v unk">UNKNOWN</span></div>
+          </div>
+        </div>
+        <div class="rcard-foot">
+          <div class="price"><span class="amt">From &euro;2,500</span><span class="ctx">ESTIMATED · Rental/day</span></div>
+          <span class="ho-badge ho-badge--signal"><span class="ho-marker"></span>RENTAL LIVE</span>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BY APPLICATION ===================== -->
+<section class="block">
+  <div class="wrap">
+    <div class="block-head">
+      <div>
+        <span class="ho-section-index">02 — BY APPLICATION</span>
+        <h2 class="ho-section-title" style="margin-top:10px">Explore by use case</h2>
+      </div>
+    </div>
+    <div class="apps">
+      <a class="app" href="#"><span class="ho-syslabel">01</span><span class="name">Manufacturing</span></a>
+      <a class="app" href="#"><span class="ho-syslabel">02</span><span class="name">Warehouse&nbsp;/&nbsp;Logistics</span></a>
+      <a class="app" href="#"><span class="ho-syslabel">03</span><span class="name">Research&nbsp;/&nbsp;Education</span></a>
+      <a class="app" href="#"><span class="ho-syslabel">04</span><span class="name">Hospitality</span></a>
+      <a class="app" href="#"><span class="ho-syslabel">05</span><span class="name">Events</span></a>
+      <a class="app" href="#"><span class="ho-syslabel">06</span><span class="name">Home</span></a>
+      <a class="app" href="#"><span class="ho-syslabel">07</span><span class="name">Inspection</span></a>
+      <a class="app" href="02-catalogue.html"><span class="ho-syslabel">&rarr;</span><span class="name">All robots</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ORANGE ALERT STRIP (tri-surface) ===================== -->
+<section class="ho-orange">
+  <div class="wrap alert-strip">
+    <div class="big"><span class="ho-dots ho-dots--6"><i></i><i></i><i></i><i></i><i></i><i></i></span> MARKET STATUS: ACTIVE</div>
+    <div class="ho-machine" style="font-size:var(--ho-fs-mono-s);letter-spacing:var(--ho-tracking-label);text-transform:uppercase">
+      7 COMMERCIALLY ACCESSIBLE &middot; 6 IN PILOT/DEPLOYMENT &middot; LIVE RENTAL OFFERS PRESENT
+    </div>
+    <a class="ho-chip ho-chip--inv" href="02-catalogue.html">OPEN CATALOGUE &rarr;</a>
+  </div>
+</section>
+
+<!-- ===================== MANUFACTURERS ===================== -->
+<section class="block">
+  <div class="wrap">
+    <div class="block-head">
+      <div>
+        <span class="ho-section-index">03 — MANUFACTURERS</span>
+        <h2 class="ho-section-title" style="margin-top:10px">Who builds them</h2>
+      </div>
+      <span class="ho-syslabel">15 TRACKED</span>
+    </div>
+    <div class="mfr-row">
+      <article class="mcard">
+        <h3>Agility Robotics</h3>
+        <div>
+          <div class="ho-leader"><span>REGION</span><span class="fill"></span><span>US</span></div>
+          <div class="ho-leader"><span>MODEL</span><span class="fill"></span><span>RAAS/PARTNER</span></div>
+          <div class="ho-leader"><span>DEPLOY</span><span class="fill"></span><span>RAAS_DEPLOYMENT</span></div>
+        </div>
+      </article>
+      <article class="mcard">
+        <h3>Unitree Robotics</h3>
+        <div>
+          <div class="ho-leader"><span>REGION</span><span class="fill"></span><span>CN</span></div>
+          <div class="ho-leader"><span>MODEL</span><span class="fill"></span><span>DIRECT SALE</span></div>
+          <div class="ho-leader"><span>DEPLOY</span><span class="fill"></span><span>COMMERCIAL</span></div>
+        </div>
+      </article>
+      <article class="mcard">
+        <h3>Figure</h3>
+        <div>
+          <div class="ho-leader"><span>REGION</span><span class="fill"></span><span>US</span></div>
+          <div class="ho-leader"><span>MODEL</span><span class="fill"></span><span>COMMERCIAL PILOTS</span></div>
+          <div class="ho-leader"><span>DEPLOY</span><span class="fill"></span><span>PILOT</span></div>
+        </div>
+      </article>
+      <article class="mcard">
+        <h3>Engineered Arts</h3>
+        <div>
+          <div class="ho-leader"><span>REGION</span><span class="fill"></span><span>UK</span></div>
+          <div class="ho-leader"><span>MODEL</span><span class="fill"></span><span>SALE + RENTAL</span></div>
+          <div class="ho-leader"><span>DEPLOY</span><span class="fill"></span><span>COMMERCIAL</span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MARKET SNAPSHOT (DARK) ===================== -->
+<section class="snapshot ho-dark ho-scan">
+  <div class="wrap">
+    <span class="ho-section-index">04 — MARKET SNAPSHOT</span>
+    <div class="snap-grid">
+      <div class="snap"><div class="num">20</div><div class="lbl ho-syslabel">Humanoids tracked</div></div>
+      <div class="snap"><div class="num sig">7</div><div class="lbl ho-syslabel">Commercially accessible</div></div>
+      <div class="snap"><div class="num">6</div><div class="lbl ho-syslabel">In pilot / deployment</div></div>
+      <div class="snap"><div class="num">15</div><div class="lbl ho-syslabel">Manufacturers</div></div>
+    </div>
+    <hr class="ho-rule" style="border-color:var(--ho-grey-800);margin-top:var(--ho-sp-6)">
+    <p class="ho-syslabel" style="margin-top:var(--ho-sp-4);max-width:72ch;line-height:1.8">
+      Counts are illustrative seed data. Every commercial fact on a live record carries an
+      evidence source and confidence level — no commercial fact without evidence.
+    </p>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap foot-grid">
+    <div><b>HUMANOIDONLINE</b></div>
+    <span class="ho-syslabel">UI-D1 VISUAL SYSTEM · REFERENCE COMPOSITION 01/05</span>
+    <span class="ho-chip">SYS/UI-D1</span>
+  </div>
+</footer>
+
+</body>
+</html>

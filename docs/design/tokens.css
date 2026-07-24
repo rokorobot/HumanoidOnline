@@ -1,0 +1,496 @@
+/* =============================================================================
+   HumanoidOnline — UI-D1 Visual System : DESIGN TOKENS
+   -----------------------------------------------------------------------------
+   Shared by every reference composition in docs/design/*.html.
+   Contract lives in docs/07_VISUAL_SYSTEM.md. This file is the machine-readable
+   half of that contract: palette, DUAL surface modes, DUAL display roles, the
+   machine layer, spacing, and the shared grammar primitives (rules, markers,
+   crop marks, dot-matrix, hazard stripes, chips, leaders, scanlines).
+
+   Calibrated against the supplied reference imagery: industrial editorial
+   brutalism / systems-graphics / control-documentation / manufacturing identity.
+
+   LAW: Graphic boldness AROUND the data, never INSTEAD of the data.
+   ========================================================================== */
+
+:root {
+
+  /* --- CORE PALETTE ------------------------------------------------------- */
+  --ho-ink:       #131210;  /* primary ink / dark surface (warm near-black) */
+  --ho-ink-2:     #1D1B18;  /* raised dark surface                          */
+  --ho-paper:     #EFEBE2;  /* technical off-white paper (primary surface)  */
+  --ho-paper-2:   #F7F4EC;  /* raised paper (cards on paper)                */
+  --ho-paper-ink: #E7E3D8;  /* off-white ink used ON dark surfaces          */
+
+  --ho-signal:    #FF4A00;  /* SIGNAL ORANGE — thin precision rules, dot
+                               markers, small chips. Scarce. Never a wash.   */
+  --ho-signal-2:  #E23C00;  /* darker signal, deeper rule in a 2-3 line set  */
+  --ho-signal-ink:#C33200;  /* signal as TEXT on paper (contrast-safe)       */
+
+  /* Warm neutral grey scale */
+  --ho-grey-900:  #24221E;
+  --ho-grey-800:  #322F2A;
+  --ho-grey-700:  #47433B;
+  --ho-grey-600:  #635E53;
+  --ho-grey-500:  #7C776B;
+  --ho-grey-400:  #9C968A;
+  --ho-grey-300:  #BDB7AB;
+  --ho-grey-200:  #D6D1C6;
+  --ho-grey-100:  #E4E0D6;
+
+  /* --- SEMANTIC STATE COLORS (restrained, derived — no rainbow) ---------- */
+  --ho-verified:    #2E6B4F;  /* muted technical green — VERIFIED only       */
+  --ho-verified-bg: #E1EAE3;
+  --ho-caution:     #9A6B12;  /* muted amber — quote-only / warnings / stale */
+  --ho-caution-bg:  #F0E7D2;
+  --ho-unknown:     var(--ho-grey-500); /* UNKNOWN = grey + hatch, never red */
+
+  /* Confidence ladder = a VALUE ramp, not a hue rainbow */
+  --ho-conf-low:      var(--ho-grey-400);
+  --ho-conf-medium:   var(--ho-grey-600);
+  --ho-conf-high:     var(--ho-ink);
+  --ho-conf-verified: var(--ho-verified);
+
+  /* --- SURFACE / TEXT ROLES (LIGHT is the default surface) --------------- */
+  --ho-bg:         var(--ho-paper);
+  --ho-surface:    var(--ho-paper-2);
+  --ho-text:       var(--ho-ink);
+  --ho-text-muted: var(--ho-grey-600);
+  --ho-text-faint: var(--ho-grey-500);
+  --ho-mark:       var(--ho-ink);        /* markers / dots / stars          */
+  --ho-line:       var(--ho-ink);        /* hard rules are ink              */
+  --ho-line-soft:  var(--ho-grey-200);   /* structural hairlines            */
+  --ho-dot:        var(--ho-ink);        /* dot-matrix fill                 */
+
+  /* --- TYPE ROLES -------------------------------------------------------- */
+  /* Preferred faces named first; robust SYSTEM fallbacks render offline.   */
+
+  /* DISPLAY-SERIF — high-contrast editorial serif (Didone / modern).
+     Expressive headlines, editorial voice. */
+  --ho-font-display-serif: "Canela", "GT Sectra", "Playfair Display",
+                           "Didot", "Bodoni MT", "Georgia", "Times New Roman", serif;
+
+  /* DISPLAY-GROTESK — heavy industrial/condensed grotesk.
+     Machine + product headlines (huge robot names, "ACTIVE", "FUEL"). */
+  --ho-font-display-grotesk: "Druk Wide", "Aeonik Fono", "Archivo Black",
+                             "Helvetica Neue", "Arial Narrow", Arial, sans-serif;
+
+  /* DISPLAY-TECHNO — squared OCR/techno face for short system/status words
+     (e.g. "AI-OPS", "AT-R1"). A THIRD display option beside serif + grotesk. */
+  --ho-font-display-techno: "Eurostile", "Michroma", "Orbitron", "OCR A Std",
+                            "Bank Gothic", "Arial Narrow", var(--ho-font-machine);
+
+  /* INTERFACE — high-legibility grotesk for UI, tables, prose */
+  --ho-font-interface: "Inter", "Söhne", "Neue Haas Grotesk Text",
+                       system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+
+  /* MACHINE — monospace / technical: codes, metrics, labels, status logs */
+  --ho-font-machine: "JetBrains Mono", "IBM Plex Mono", "Berkeley Mono",
+                     ui-monospace, "Cascadia Mono", Consolas, "SFMono-Regular",
+                     Menlo, monospace;
+
+  /* Type scale — extreme contrast between DISPLAY and MACHINE is deliberate */
+  --ho-fs-display-xl: clamp(3.25rem, 11vw, 9rem);
+  --ho-fs-display-l:  clamp(2.5rem, 7vw, 5.25rem);
+  --ho-fs-display-m:  clamp(1.9rem, 4vw, 3rem);
+  --ho-fs-h1:  2rem;
+  --ho-fs-h2:  1.375rem;
+  --ho-fs-h3:  1.0625rem;
+  --ho-fs-body:  0.9375rem;   /* 15px */
+  --ho-fs-small: 0.8125rem;   /* 13px */
+  --ho-fs-mono:  0.8125rem;   /* 13px */
+  --ho-fs-mono-s:0.6875rem;   /* 11px — machine labels / codes              */
+
+  --ho-tracking-display: -0.03em;
+  --ho-tracking-serif:   -0.01em;
+  --ho-tracking-label:   0.14em;   /* uppercase machine labels               */
+  --ho-tracking-code:    0.02em;
+
+  /* --- SPACING (4px grid) ----------------------------------------------- */
+  --ho-sp-1: 4px;   --ho-sp-2: 8px;   --ho-sp-3: 12px;  --ho-sp-4: 16px;
+  --ho-sp-5: 24px;  --ho-sp-6: 32px;  --ho-sp-7: 48px;  --ho-sp-8: 64px;
+  --ho-sp-9: 96px;  --ho-sp-10: 128px;
+
+  /* --- RULES & MARKERS --------------------------------------------------- */
+  --ho-rule-hair: 1px;
+  --ho-rule-med:  2px;
+  --ho-rule-bold: 3px;
+  --ho-marker-size: 8px;
+  --ho-radius: 0;             /* brutalist: corners are square, always       */
+  --ho-maxw: 1480px;
+}
+
+/* --- DARK SURFACE MODE ---------------------------------------------------- */
+/* Apply .ho-dark to any section to flip to light-on-dark. Grammar primitives
+   below read --ho-line/--ho-text/--ho-mark so they invert automatically.     */
+.ho-dark {
+  --ho-bg:         var(--ho-ink);
+  --ho-surface:    var(--ho-ink-2);
+  --ho-text:       var(--ho-paper-ink);
+  --ho-text-muted: var(--ho-grey-400);
+  --ho-text-faint: var(--ho-grey-500);
+  --ho-mark:       var(--ho-paper-ink);
+  --ho-line:       var(--ho-paper-ink);
+  --ho-line-soft:  var(--ho-grey-800);
+  --ho-dot:        var(--ho-paper-ink);
+  --ho-signal-ink: var(--ho-signal);
+  background: var(--ho-bg);
+  color: var(--ho-text);
+}
+
+/* --- ORANGE ALERT SURFACE MODE ------------------------------------------- */
+/* Apply .ho-orange ONLY to loud STATUS/ALERT moments (e.g. a "DROIDS ACTIVE"
+   panel). Black ink on signal orange. NEVER on data-dense pages (catalogue /
+   compare) — that is the strongest expression of the discipline gradient.     */
+.ho-orange {
+  --ho-bg:         var(--ho-signal);
+  --ho-surface:    var(--ho-signal);
+  --ho-text:       var(--ho-ink);
+  --ho-text-muted: #5c2200;
+  --ho-text-faint: #7a2e00;
+  --ho-mark:       var(--ho-ink);
+  --ho-line:       var(--ho-ink);
+  --ho-line-soft:  rgba(0,0,0,0.25);
+  --ho-dot:        var(--ho-ink);
+  --ho-signal-ink: var(--ho-ink);
+  background: var(--ho-bg);
+  color: var(--ho-text);
+}
+
+/* =============================================================================
+   RESET (minimal) + BASE
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--ho-bg);
+  color: var(--ho-text);
+  font-family: var(--ho-font-interface);
+  font-size: var(--ho-fs-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, h4, p, figure, ul, ol, dl, dd { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+a { color: inherit; text-decoration: none; }
+img, svg { display: block; max-width: 100%; }
+table { border-collapse: collapse; width: 100%; }
+button, input, select { font: inherit; color: inherit; }
+
+/* =============================================================================
+   DISPLAY HELPERS
+   ========================================================================== */
+.ho-serif {
+  font-family: var(--ho-font-display-serif);
+  font-weight: 500;
+  letter-spacing: var(--ho-tracking-serif);
+  line-height: 1.02;
+}
+.ho-grotesk {
+  font-family: var(--ho-font-display-grotesk);
+  font-weight: 800;
+  letter-spacing: var(--ho-tracking-display);
+  line-height: 0.9;
+  text-transform: uppercase;
+  /* condense the fallback grotesk toward the reference's heavy narrow look */
+  font-stretch: 75%;
+}
+.ho-techno {
+  font-family: var(--ho-font-display-techno);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* =============================================================================
+   MACHINE LAYER
+   ========================================================================== */
+.ho-machine {
+  font-family: var(--ho-font-machine);
+  font-size: var(--ho-fs-mono);
+  letter-spacing: var(--ho-tracking-code);
+  font-variant-numeric: tabular-nums;
+}
+
+/* SYSTEM LABEL — small uppercase machine label (field names, kickers) */
+.ho-syslabel {
+  font-family: var(--ho-font-machine);
+  font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-label);
+  text-transform: uppercase;
+  color: var(--ho-text-muted);
+  font-weight: 500;
+}
+
+/* SECTION INDEX — "01 —" ordinal marker preceding section titles */
+.ho-section-index {
+  font-family: var(--ho-font-machine);
+  font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-label);
+  color: var(--ho-signal-ink);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ho-sp-2);
+  text-transform: uppercase;
+}
+.ho-section-index::after {
+  content: "";
+  width: 28px;
+  height: var(--ho-rule-med);
+  background: var(--ho-line);
+}
+
+/* MACHINE CODE / boxed technical chip */
+.ho-code, .ho-chip {
+  font-family: var(--ho-font-machine);
+  font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-code);
+  padding: 3px 7px;
+  border: var(--ho-rule-hair) solid var(--ho-line);
+  color: var(--ho-text);
+  white-space: nowrap;
+  display: inline-block;
+}
+.ho-chip--inv { background: var(--ho-line); color: var(--ho-bg); }
+.ho-chip--signal { background: var(--ho-signal); border-color: var(--ho-signal); color: var(--ho-ink); }
+
+/* STATUS-READOUT PAIR — "LABEL / status" two-line block. Ideal for rendering
+   the three independent dimensions (maturity / obtainability / evidence). */
+.ho-pair { display: block; }
+.ho-pair > .k {
+  display: block; font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-label); text-transform: uppercase;
+  color: var(--ho-text-muted); margin-bottom: 4px;
+}
+.ho-pair > .s {
+  display: flex; align-items: baseline; gap: 8px;
+  font-family: var(--ho-font-interface); font-weight: 700; font-size: 1.05rem;
+  letter-spacing: -0.01em; line-height: 1.2;
+}
+.ho-pair > .s .mono {
+  font-family: var(--ho-font-machine); font-weight: 500; font-size: var(--ho-fs-mono);
+  letter-spacing: var(--ho-tracking-code);
+}
+.ho-pair.is-signal   > .s { color: var(--ho-signal-ink); }
+.ho-pair.is-verified > .s { color: var(--ho-verified); }
+.ho-pair.is-caution  > .s { color: var(--ho-caution); }
+.ho-pair.is-unknown  > .s { color: var(--ho-unknown); }
+
+/* ORG CAPSULE — rounded-rect enclosed identifier, e.g. ( AGILITY ROBOTICS ) */
+.ho-capsule {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: var(--ho-rule-hair) solid var(--ho-line); border-radius: 999px;
+  padding: 4px 13px; font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-label); text-transform: uppercase; color: var(--ho-text);
+}
+.ho-capsule--inv { background: var(--ho-line); color: var(--ho-bg); border-color: var(--ho-line); }
+
+/* BARCODE strip — machine/archive motif (decorative registration only) */
+.ho-barcode {
+  height: 34px;
+  background-image: repeating-linear-gradient(90deg,
+    var(--ho-line) 0 2px, transparent 2px 3px,
+    var(--ho-line) 3px 5px, transparent 5px 8px,
+    var(--ho-line) 8px 9px, transparent 9px 11px,
+    var(--ho-line) 11px 14px, transparent 14px 15px);
+}
+.ho-barcode--sm { height: 20px; }
+
+/* HONEST REDACTION — a solid block for an undisclosed/unknown value.
+   RULE: must ALWAYS sit beside an explicit UNKNOWN / UNDISCLOSED label. It
+   never implies a hidden real number (that would be QUOTE_ONLY → "on request"). */
+.ho-redact {
+  display: inline-block; height: 0.95em; width: 4.5em; vertical-align: -0.12em;
+  background: var(--ho-ink);
+}
+.ho-redact--sm { width: 2.5em; }
+
+/* EM-DASH-FLANKED centered label:  — LABEL — */
+.ho-emlabel {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-label); text-transform: uppercase; color: var(--ho-text-muted);
+}
+.ho-emlabel::before, .ho-emlabel::after { content: "—"; color: var(--ho-text-faint); }
+
+/* ORANGE HIGHLIGHT for a single key phrase (scarce) */
+.ho-hl { background: var(--ho-signal); color: var(--ho-ink); padding: 0 0.28em; }
+
+/* BRACKETED STATUS CHIP: [ FLIGHT TESTED ] / [[[ WARNING ]]] */
+.ho-bracket {
+  font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-label); text-transform: uppercase;
+  color: var(--ho-text); white-space: nowrap;
+}
+.ho-bracket::before { content: "[ "; color: var(--ho-text-muted); }
+.ho-bracket::after  { content: " ]"; color: var(--ho-text-muted); }
+.ho-bracket--alert { color: var(--ho-signal-ink); }
+.ho-bracket--alert::before { content: "[[[ "; color: var(--ho-signal); }
+.ho-bracket--alert::after  { content: " ]]]"; color: var(--ho-signal); }
+
+/* F-in-circle / letter-in-circle logo mark */
+.ho-circlemark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 50%;
+  border: var(--ho-rule-med) solid var(--ho-line); color: var(--ho-mark);
+  font-family: var(--ho-font-display-grotesk); font-weight: 800; font-size: 0.8rem;
+}
+
+/* DOTTED LEADER row: LABEL ........... VALUE  (control-doc vocabulary) */
+.ho-leader {
+  display: flex; align-items: baseline; gap: var(--ho-sp-3);
+  font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-code); text-transform: uppercase;
+}
+.ho-leader > .fill {
+  flex: 1; align-self: center; height: 0;
+  border-bottom: var(--ho-rule-hair) dotted var(--ho-grey-400);
+}
+
+/* =============================================================================
+   GRAPHIC GRAMMAR PRIMITIVES
+   ========================================================================== */
+
+/* Square marker ▪ */
+.ho-marker {
+  display: inline-block; width: var(--ho-marker-size); height: var(--ho-marker-size);
+  background: var(--ho-mark); vertical-align: middle;
+}
+.ho-marker--signal { background: var(--ho-signal); }
+
+/* 2x2 / 2x3 DOT-MATRIX marker block */
+.ho-dots {
+  display: inline-grid; grid-template-columns: repeat(2, 5px);
+  gap: 4px; vertical-align: middle;
+}
+.ho-dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--ho-mark); }
+.ho-dots--signal i { background: var(--ho-signal); }
+.ho-dots--6 { grid-template-rows: repeat(3, 5px); }
+
+/* Registration star ★ and marks */
+.ho-star { font-family: var(--ho-font-machine); color: var(--ho-mark); line-height: 1; }
+.ho-reg-box {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border: var(--ho-rule-hair) solid var(--ho-line);
+  color: var(--ho-mark);
+}
+
+/* Crop-mark corner frame: wrap content, get 4 L-brackets at the corners */
+.ho-cropframe { position: relative; }
+.ho-cropframe > .ho-crop {
+  position: absolute; width: 14px; height: 14px; pointer-events: none;
+  border-color: var(--ho-signal); border-style: solid; border-width: 0;
+}
+.ho-crop.tl { top: 0; left: 0; border-top-width: 2px; border-left-width: 2px; }
+.ho-crop.tr { top: 0; right: 0; border-top-width: 2px; border-right-width: 2px; }
+.ho-crop.bl { bottom: 0; left: 0; border-bottom-width: 2px; border-left-width: 2px; }
+.ho-crop.br { bottom: 0; right: 0; border-bottom-width: 2px; border-right-width: 2px; }
+
+/* Hard rules */
+.ho-rule       { border: 0; border-top: var(--ho-rule-hair) solid var(--ho-line); margin: 0; }
+.ho-rule--med  { border-top-width: var(--ho-rule-med); }
+.ho-rule--bold { border-top-width: var(--ho-rule-bold); }
+.ho-rule--signal { border-top-color: var(--ho-signal); }
+
+/* SIGNAL PRECISION RULES — a 2–3 line orange rule set cutting across type */
+.ho-signal-rules { position: relative; }
+.ho-signal-rules > .ho-srule {
+  position: absolute; left: 0; right: 0; height: 2px; background: var(--ho-signal);
+  pointer-events: none;
+}
+.ho-srule.b { background: var(--ho-signal-2); }
+
+/* Section title: heavy grotesk, tight */
+.ho-section-title {
+  font-family: var(--ho-font-display-grotesk);
+  font-weight: 800; font-stretch: 75%;
+  font-size: var(--ho-fs-h1);
+  letter-spacing: var(--ho-tracking-display);
+  line-height: 1.0; text-transform: uppercase;
+}
+
+/* Vertical machine label (selective use only) */
+.ho-vertical {
+  writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg);
+  font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-label); text-transform: uppercase;
+  color: var(--ho-text-faint);
+}
+
+/* Hazard stripe bar (thin) */
+.ho-hazard {
+  height: 26px;
+  background-image: repeating-linear-gradient(
+    -45deg, var(--ho-line) 0 12px, transparent 12px 24px);
+}
+
+/* Hatched fill for UNKNOWN / empty states (never a fake value) */
+.ho-hatch {
+  background-image: repeating-linear-gradient(
+    45deg, var(--ho-grey-300) 0 1px, transparent 1px 7px);
+}
+
+/* DOT-MATRIX / LED text (offline via background-clip:text) */
+.ho-dotmatrix {
+  color: transparent;
+  background-image: radial-gradient(var(--ho-dot) 42%, transparent 46%);
+  background-size: 0.15em 0.15em;
+  -webkit-background-clip: text; background-clip: text;
+}
+.ho-dotmatrix--signal { --ho-dot: var(--ho-signal); }
+
+/* Faint SCANLINE texture overlay (control-monitor feel). Put on a positioned
+   container; ::after paints subtle horizontal lines that never touch data. */
+.ho-scan { position: relative; }
+.ho-scan::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image: repeating-linear-gradient(
+    0deg, rgba(0,0,0,0.05) 0 1px, transparent 1px 4px);
+}
+.ho-dark.ho-scan::after,
+.ho-dark .ho-scan::after {
+  background-image: repeating-linear-gradient(
+    0deg, rgba(255,255,255,0.045) 0 1px, transparent 1px 4px);
+}
+.ho-scan > * { position: relative; z-index: 1; }
+
+/* --- MOCKUP BANNER: every reference composition declares it is a mockup --- */
+.ho-mockup-banner {
+  font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-label); text-transform: uppercase;
+  background: var(--ho-ink); color: var(--ho-paper-ink);
+  padding: var(--ho-sp-2) var(--ho-sp-4);
+  display: flex; gap: var(--ho-sp-4); align-items: center;
+  justify-content: space-between; flex-wrap: wrap;
+}
+
+/* --- STATUS / STATE PILLS (shared anatomy) ------------------------------- */
+.ho-badge {
+  font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-label); text-transform: uppercase;
+  padding: 3px 8px; border: var(--ho-rule-hair) solid var(--ho-line);
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  line-height: 1.3;
+}
+.ho-badge--solid    { background: var(--ho-line); color: var(--ho-bg); }
+.ho-badge--signal   { background: var(--ho-signal); color: var(--ho-ink); border-color: var(--ho-signal); }
+.ho-badge--ghost    { background: transparent; color: var(--ho-text-muted); border-color: var(--ho-grey-300); }
+.ho-badge--verified { background: var(--ho-verified-bg); color: var(--ho-verified); border-color: var(--ho-verified); }
+.ho-badge--caution  { background: var(--ho-caution-bg); color: var(--ho-caution); border-color: var(--ho-caution); }
+.ho-badge--unknown  { background: transparent; color: var(--ho-unknown); border-color: var(--ho-grey-300); border-style: dashed; }
+
+/* Confidence ramp (4 bars) */
+.ho-conf { display: inline-flex; align-items: center; gap: 6px;
+           font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+           letter-spacing: var(--ho-tracking-label); text-transform: uppercase; }
+.ho-conf .bars { display: inline-flex; gap: 2px; }
+.ho-conf .bars i { width: 4px; height: 12px; background: var(--ho-grey-300); }
+.ho-conf[data-level="LOW"]      .bars i:nth-child(-n+1){ background: var(--ho-conf-low); }
+.ho-conf[data-level="MEDIUM"]   .bars i:nth-child(-n+2){ background: var(--ho-conf-medium); }
+.ho-conf[data-level="HIGH"]     .bars i:nth-child(-n+3){ background: var(--ho-conf-high); }
+.ho-conf[data-level="VERIFIED"] .bars i{ background: var(--ho-conf-verified); }
+
+/* Focus visibility (usability, esp. filters/wizard/admin) */
+:focus-visible { outline: var(--ho-rule-med) solid var(--ho-signal); outline-offset: 2px; }

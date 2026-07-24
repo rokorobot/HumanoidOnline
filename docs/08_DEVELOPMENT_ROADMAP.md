@@ -1,8 +1,8 @@
 # HumanoidOnline — Development Roadmap
 
 > **Status:** Living delivery roadmap
-> **Current stage:** WS6 — Deterministic Matching
-> **Last updated:** 2026-07-24
+> **Current stage:** WS7 — Commercial Lead
+> **Last updated:** 2026-07-25
 
 This document defines **implementation sequencing and workstream boundaries**: in
 what order we build the product, what each workstream owns, what is already
@@ -35,8 +35,8 @@ UI-D1  Visual System                      ✅ COMPLETE
 WS3    Intelligence UI                    ✅ COMPLETE
 WS4    Advanced Compare / Decision        ✅ COMPLETE
 WS5    Buyer Intent                       ✅ COMPLETE
-WS6    Deterministic Matching             🟠 CURRENT
-WS7    Commercial Lead                    ⏳ PLANNED
+WS6    Deterministic Matching             ✅ COMPLETE
+WS7    Commercial Lead                    🟠 CURRENT
 WS8    MVP Hardening / Release            ⏳ PLANNED
 ```
 
@@ -199,7 +199,18 @@ Selecting one never implies HumanoidOnline already operates that transaction.
 
 ---
 
-## 6. WS6 — Deterministic Matching 🟠 CURRENT
+## 6. WS6 — Deterministic Matching ✅ COMPLETE
+
+*Merged in #12 (`f3c8664`): the pure, deterministic, explainable scorer
+(`app/services/matching`) + `match_result` persistence on first
+`GET /api/buyer-requirements/{id}/matches` (lock → recheck → atomic; idempotent;
+concurrent-safe; zero-survivor recomputes with no sentinel) + the `/matches/[id]`
+results UI (SEE MATCHES, Compare These, Adjust Requirements). Three independent
+review passes hardened the policy: accessibility-vs-maturity separation, real
+lowest-price BEST_LOWER_COST with a no-FX full-currency-universe rule,
+transaction-scoped geography, order-independent budget, count-all quantified
+no-match wording, and genuine ≥2 reasons per survivor. No schema/LLM/randomness,
+no leads. `maturity ≠ obtainability ≠ evidence` preserved end-to-end.*
 
 The explainable matching engine (pure function; no I/O, no randomness, **no LLM in
 the scoring path**). Initial weighting:
@@ -216,7 +227,7 @@ reasons · warnings · commercial constraints · supporting evidence.
 
 ---
 
-## 7. WS7 — Commercial Lead ⏳
+## 7. WS7 — Commercial Lead 🟠 CURRENT
 
 Connect buyer demand to commercial action:
 ```
@@ -274,11 +285,11 @@ after this anchor and before the next branch is cut). The next workstream is cut
 from whatever `main` is at cut time and verified 0 ahead / 0 behind then.)*
 
 ```
-Last completed workstream merge:  01403935d98cd5398b98b53a99dddb4d232e30f7
-Current workstream:               WS6 — Deterministic Matching
-Current branch:                   fm/ws6-deterministic-matching
+Last completed workstream merge:  f3c86643dab488e35d9b6d5cb8704931660607b8
+Current workstream:               WS7 — Commercial Lead
+Current branch:                   fm/ws7-commercial-lead
 
-Completed:  ✅ WS0  ✅ WS1  ✅ WS2A  ✅ WS2B  ✅ UI-D1  ✅ WS3  ✅ WS4  ✅ WS5
-Current:    🟠 WS6
-Next:       WS7 → WS8
+Completed:  ✅ WS0  ✅ WS1  ✅ WS2A  ✅ WS2B  ✅ UI-D1  ✅ WS3  ✅ WS4  ✅ WS5  ✅ WS6
+Current:    🟠 WS7
+Next:       WS8
 ```

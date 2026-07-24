@@ -267,13 +267,16 @@ migration to activate.
 ## 10. Current project state
 
 *(This section is deliberately updated after every merge. It records the
-**workstream base** — the `main` commit a workstream is cut from — not the commit
-that contains this file, which can never store its own future merge SHA.)*
+**last completed substantive workstream merge** — a stable anchor, not the literal
+future commit the next branch is cut from (this file can never store its own future
+merge SHA, and docs-only roadmap housekeeping like this update may itself merge
+after this anchor and before the next branch is cut). The next workstream is cut
+from whatever `main` is at cut time and verified 0 ahead / 0 behind then.)*
 
 ```
-Current workstream base:  01403935d98cd5398b98b53a99dddb4d232e30f7
-Current workstream:       WS6 — Deterministic Matching
-Current branch:           fm/ws6-deterministic-matching
+Last completed workstream merge:  01403935d98cd5398b98b53a99dddb4d232e30f7
+Current workstream:               WS6 — Deterministic Matching
+Current branch:                   fm/ws6-deterministic-matching
 
 Completed:  ✅ WS0  ✅ WS1  ✅ WS2A  ✅ WS2B  ✅ UI-D1  ✅ WS3  ✅ WS4  ✅ WS5
 Current:    🟠 WS6

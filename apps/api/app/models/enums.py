@@ -72,6 +72,14 @@ evidence_subject = _pg_enum(
 spec_value_type = _pg_enum(
     "spec_value_type", "NUMBER", "BOOLEAN", "TEXT", "ENUM"
 )
+# Decision-layer (Phase 2 / WS5 buyer intent).
+transaction_preference = _pg_enum(
+    "transaction_preference", "UNKNOWN", "RENT", "BUY", "LEASE", "RAAS", "FLEXIBLE"
+)
+buyer_type = _pg_enum(
+    "buyer_type",
+    "COMMERCIAL_BUYER", "TECHNICAL_EVALUATOR", "INDUSTRY_PARTICIPANT", "UNKNOWN",
+)
 
 # Autonomy ordered low->high, for the `autonomy_min` catalogue filter.
 AUTONOMY_ORDER = [

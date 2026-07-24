@@ -11,6 +11,7 @@ from fastapi import FastAPI
 from sqladmin import Admin, ModelView
 
 from app.db.session import engine
+from app.models.buyer_requirement import BuyerRequirement
 from app.models.capability import Capability
 from app.models.commercial import AvailabilityOffer, Deployment, PricingOffer
 from app.models.evidence import EvidenceSource
@@ -86,10 +87,18 @@ class EvidenceSourceAdmin(ModelView, model=EvidenceSource):
     name_plural = "Evidence sources"
 
 
+class BuyerRequirementAdmin(ModelView, model=BuyerRequirement):
+    column_list = [
+        BuyerRequirement.id, BuyerRequirement.use_case_id,
+        BuyerRequirement.preferred_transaction, BuyerRequirement.created_at,
+    ]
+    name_plural = "Buyer requirements"
+
+
 _VIEWS = [
     ManufacturerAdmin, ProviderAdmin, RobotAdmin, RobotVariantAdmin, UseCaseAdmin,
     CapabilityAdmin, SpecDefinitionAdmin, PricingOfferAdmin, AvailabilityOfferAdmin,
-    DeploymentAdmin, EvidenceSourceAdmin,
+    DeploymentAdmin, EvidenceSourceAdmin, BuyerRequirementAdmin,
 ]
 
 

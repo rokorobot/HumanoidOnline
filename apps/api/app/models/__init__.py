@@ -5,11 +5,12 @@
 Importing this package registers all models on ``Base.metadata``.
 
 WS2 covers the Knowledge Layer plus the commercial *read* models (pricing /
-availability / deployment) needed to render the three independent dimensions and
-price states. Decision- and transaction-layer tables (buyer_requirement,
-match_result, commercial_lead*) are later workstreams and are intentionally
-absent here.
+availability / deployment). WS5 adds the first Decision-layer *write* model,
+`buyer_requirement` (Phase-2 buyer intent). Matching (`match_result`) and the
+transaction layer (`commercial_lead*`) are later workstreams (WS6/WS7) and are
+intentionally absent here.
 """
+from app.models.buyer_requirement import BuyerRequirement
 from app.models.capability import Capability, RobotCapability
 from app.models.commercial import AvailabilityOffer, Deployment, PricingOffer
 from app.models.event_log import EventLog
@@ -22,6 +23,7 @@ from app.models.use_case import UseCase, UseCaseFit
 
 __all__ = [
     "AvailabilityOffer",
+    "BuyerRequirement",
     "Capability",
     "Deployment",
     "EventLog",

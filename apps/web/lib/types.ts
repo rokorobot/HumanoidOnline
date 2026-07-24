@@ -253,6 +253,13 @@ export interface UseCaseDetail {
   suitable_robots: SuitableRobot[];
 }
 
+export interface RegionListItem {
+  code: string;
+  name: string;
+  type: string;
+  iso_country?: string | null;
+}
+
 export interface MarketSnapshot {
   total_tracked: number;
   commercially_accessible: number;

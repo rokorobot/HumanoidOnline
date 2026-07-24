@@ -114,6 +114,22 @@ For **every** commercial fact record: `source_url`, `source_type` (mapped to the
   / corroboration only, never the sole basis for a `VERIFIED` fact.
 - `is_published = true` **only** when every published commercial fact carries evidence.
 
+### Status normalization (deterministic mappings)
+
+Where a manufacturer states a status in their own words, HumanoidOnline maps it
+**deterministically** to a `commercial_status` enum value. A directly manufacturer-
+declared mapping is `VERIFIED`; an inferred/framing-only one is at most `HIGH`.
+
+| Manufacturer statement (primary source) | Normalized `commercial_status` | Confidence |
+|---|---|---|
+| Explicit product/fleet **retirement** ("retiring", "retirement of X", "discontinued") | `DISCONTINUED` | `VERIFIED` |
+| Retirement only **implied** by a successor launch (no explicit retire statement) | prior supported status; `DISCONTINUED` only at `HIGH` with rationale | `HIGH` |
+
+Example — **Figure 02**: Figure's own page (2025-11-19) states *"officially starting
+the retirement of Figure 02"* and *"fleet-wide retirement"* → `DISCONTINUED`,
+`VERIFIED`. The historical BMW deployment is retained as **separate** evidence:
+retiring the product does not erase its verified deployment history.
+
 ## 4. Confidence rubric (`confidence_level`)
 
 | Level | When to use | `verified_at` |

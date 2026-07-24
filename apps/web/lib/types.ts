@@ -31,6 +31,9 @@ export interface PriceDisplay {
 export interface Evidence {
   source_type: string;
   confidence: string;
+  // observed_at is always present (TIMESTAMPTZ NOT NULL); published/verified are
+  // nullable. These three dates stay SEPARATE — never a synthetic freshness value.
+  observed_at: string;
   verified_at?: string | null;
   published_at?: string | null;
   source_url?: string | null;

@@ -80,6 +80,25 @@ def test_robot_detail_404(client, database_url) -> None:
     assert resp.status_code == 404
 
 
+def test_evidence_exposes_observed_at(client, database_url) -> None:
+    """observed_at (TIMESTAMPTZ NOT NULL) reaches the API response on every
+    evidence object — on the detail endpoint and through /compare. Additive,
+    read-only; the other provenance dates stay separate (no freshness score)."""
+    body = _get(client, "/api/robots/digit")
+    evs = [d["evidence"] for d in body["deployments"] if d.get("evidence")]
+    assert evs, "expected at least one deployment carrying evidence"
+    for ev in evs:
+        # Always present (never null); distinct from published_at/verified_at.
+        assert ev.get("observed_at"), "observed_at must always be present"
+        assert "published_at" in ev and "verified_at" in ev
+
+    # Same fact-level evidence, carried through the compare endpoint.
+    comp = _get(client, "/api/robots/compare", ids="unitree-g1,digit")
+    digit = next(r for r in comp["robots"] if r["slug"] == "digit")
+    comp_evs = [d["evidence"] for d in digit["deployments"] if d.get("evidence")]
+    assert comp_evs and all(e.get("observed_at") for e in comp_evs)
+
+
 # ---- Compare -------------------------------------------------------------
 
 def test_compare_two(client, database_url) -> None:

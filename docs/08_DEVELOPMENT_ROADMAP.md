@@ -251,12 +251,14 @@ migration to activate.
 
 ## 10. Current project state
 
-*(This section is deliberately updated after every merge.)*
+*(This section is deliberately updated after every merge. It records the
+**workstream base** — the `main` commit a workstream is cut from — not the commit
+that contains this file, which can never store its own future merge SHA.)*
 
 ```
-Current canonical main:   b31d81b8adf65bbe80c17ccccc31decee51f9bdb
+Current workstream base:  521e2b90fd1290a9791de671f26e76792cd1b9b9
 Current workstream:       WS4 — Advanced Compare / Decision
-Current branch:           (not yet cut — branch fresh from main)
+Current branch:           fm/ws4-advanced-compare
 
 Completed:  ✅ WS0  ✅ WS1  ✅ WS2A  ✅ WS2B  ✅ UI-D1  ✅ WS3
 Current:    🟠 WS4

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HumanoidOnline — Compare (UI-D1 reference)</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* ---- 04-compare.html : DISCIPLINED — legibility over decoration -------- */
+  .wrap { max-width: var(--ho-maxw); margin: 0 auto; padding: 0 var(--ho-sp-5); }
+
+  .site-head { display:flex; align-items:center; justify-content:space-between;
+    gap: var(--ho-sp-5); padding: var(--ho-sp-4) 0; border-bottom: var(--ho-rule-med) solid var(--ho-ink); }
+  .logo b { font-family: var(--ho-font-display-grotesk); font-weight:800; font-stretch:75%;
+    font-size:1.15rem; letter-spacing:-0.02em; }
+  .nav { display:flex; gap: var(--ho-sp-5); }
+  .nav a { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+    text-transform: uppercase; letter-spacing: var(--ho-tracking-label); color: var(--ho-text-muted); }
+  .nav a[aria-current]{ color: var(--ho-signal-ink); }
+
+  .pagebar { display:flex; align-items:flex-end; justify-content:space-between; gap: var(--ho-sp-5);
+    padding: var(--ho-sp-6) 0 var(--ho-sp-4); flex-wrap:wrap; }
+  .pagebar h1 { font-family: var(--ho-font-display-grotesk); font-weight:800; font-stretch:75%;
+    font-size: var(--ho-fs-display-m); letter-spacing:-0.02em; text-transform:uppercase; line-height:0.95; }
+
+  /* Selector row */
+  .selrow { display:grid; grid-template-columns: 180px repeat(3,1fr); gap:0;
+    border: var(--ho-rule-med) solid var(--ho-ink); border-bottom: 0; }
+  .selrow .cell { padding: 12px 14px; border-right: var(--ho-rule-hair) solid var(--ho-line-soft); }
+  .selrow .cell:last-child { border-right:0; }
+  .selrow .rowlab { display:flex; align-items:center; }
+  .selrow .robotpick { display:flex; flex-direction:column; gap:8px; }
+  .selrow .lockup { display:flex; align-items:baseline; gap:8px; }
+  .selrow .lockup .name { font-family: var(--ho-font-display-serif); font-weight:500; font-size:1.5rem; line-height:0.95; }
+  .selrow .lockup .code { font-family: var(--ho-font-display-grotesk); font-weight:800; font-stretch:75%;
+    font-size:0.78rem; color: var(--ho-signal-ink); text-transform:uppercase; }
+  .selrow .mfr { font-size: var(--ho-fs-small); color: var(--ho-text-muted); }
+  .selrow select { border: var(--ho-rule-hair) solid var(--ho-grey-400); background: var(--ho-paper-2);
+    padding: 6px 8px; font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s); }
+
+  /* Matrix */
+  table.matrix { border: var(--ho-rule-med) solid var(--ho-ink); border-top:0; table-layout: fixed; }
+  table.matrix col.lab { width: 180px; }
+  .grouprow th { text-align:left; background: var(--ho-ink); color: var(--ho-paper);
+    font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+    letter-spacing: var(--ho-tracking-label); text-transform: uppercase; padding: 8px 14px; }
+  tbody td, tbody th { border-top: var(--ho-rule-hair) solid var(--ho-line-soft);
+    border-right: var(--ho-rule-hair) solid var(--ho-line-soft); padding: 10px 14px; vertical-align: top; }
+  tbody td:last-child { border-right:0; }
+  th.rowlab { text-align:left; font-weight:500; color: var(--ho-text-muted); font-size: var(--ho-fs-small);
+    font-family: var(--ho-font-interface); }
+  td.cell { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono);
+    font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+  td .sub { display:block; font-size: var(--ho-fs-mono-s); color: var(--ho-text-muted);
+    letter-spacing: var(--ho-tracking-label); text-transform: uppercase; margin-top: 3px; }
+  td.na { color: var(--ho-unknown); }
+  td.unk { color: var(--ho-unknown); }
+  td.unk .hatch { display:inline-block; padding: 1px 7px; border: var(--ho-rule-hair) dashed var(--ho-grey-400); }
+  td.best { position: relative; }
+  td.best::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background: var(--ho-signal); }
+  td .q { color: var(--ho-caution); }
+  td .v { color: var(--ho-verified); }
+  .legend { display:flex; gap: var(--ho-sp-5); flex-wrap:wrap; margin: var(--ho-sp-5) 0 var(--ho-sp-8);
+    font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s); color: var(--ho-text-muted);
+    letter-spacing: var(--ho-tracking-code); }
+  .legend span { display:inline-flex; align-items:center; gap:8px; }
+
+  @media (max-width: 820px){ .nav{display:none;} }
+  @media (max-width: 680px){
+    .selrow{ grid-template-columns: 1fr; }
+    table.matrix, .matrix thead { font-size: 12px; }
+    table.matrix col.lab { width: 110px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ho-sysheader">
+  <span class="title"><span class="ho-marker"></span> COMPARISON MATRIX</span>
+  <span class="mm">
+    <span class="f">DATA OBSERVED <b>24 JUL 2026</b></span>
+    <span class="f"><b>3</b> PLATFORMS SELECTED</span>
+    <span class="ref">STATIC REF MOCKUP</span>
+  </span>
+</div>
+
+<div class="wrap">
+  <header class="site-head">
+    <div class="logo"><b>HUMANOIDONLINE</b></div>
+    <nav class="nav">
+      <a href="02-catalogue.html">Robots</a>
+      <a href="04-compare.html" aria-current="page">Compare</a>
+      <a href="#">Manufacturers</a>
+      <a href="#">Use Cases</a>
+    </nav>
+  </header>
+
+  <div class="pagebar">
+    <div>
+      <span class="ho-section-index">COMPARE — SIDE BY SIDE</span>
+      <h1>Comparison matrix</h1>
+    </div>
+    <a class="ho-chip" href="#">&#128279; SHARE LINK</a>
+  </div>
+
+  <!-- SELECTOR ROW -->
+  <div class="selrow">
+    <div class="cell rowlab"><span class="ho-syslabel">Robots ×3</span></div>
+    <div class="cell robotpick">
+      <div class="lockup"><span class="name">Digit</span><span class="code">v5</span></div>
+      <div class="mfr">Agility Robotics · US</div>
+      <select aria-label="Robot A"><option>Digit</option><option>change…</option></select>
+    </div>
+    <div class="cell robotpick">
+      <div class="lockup"><span class="name">G1</span><span class="code">G1</span></div>
+      <div class="mfr">Unitree Robotics · CN</div>
+      <select aria-label="Robot B"><option>G1</option><option>change…</option></select>
+    </div>
+    <div class="cell robotpick">
+      <div class="lockup"><span class="name">Figure 02</span><span class="code">F02</span></div>
+      <div class="mfr">Figure · US</div>
+      <select aria-label="Robot C"><option>Figure 02</option><option>change…</option></select>
+    </div>
+  </div>
+
+  <!-- MATRIX -->
+  <table class="matrix">
+    <colgroup><col class="lab"><col><col><col></colgroup>
+
+    <tbody>
+      <tr class="grouprow"><th colspan="4">① Commercial — maturity · obtainability</th></tr>
+      <tr><th class="rowlab">Commercial status</th>
+        <td class="cell">RAAS_DEPLOYMENT</td>
+        <td class="cell">COMMERCIAL</td>
+        <td class="cell">PILOT</td></tr>
+      <tr><th class="rowlab">Price</th>
+        <td class="cell"><span class="q">Price on request</span><span class="sub">Quote_only · RaaS</span></td>
+        <td class="cell best">$16,000<span class="sub">Public · Purchase</span></td>
+        <td class="cell"><span class="q">Price on request</span><span class="sub">Quote_only · Pilot</span></td></tr>
+      <tr><th class="rowlab">Purchase</th>
+        <td class="cell na">—</td>
+        <td class="cell">AVAILABLE</td>
+        <td class="cell na">—</td></tr>
+      <tr><th class="rowlab">Rental</th>
+        <td class="cell na">—</td>
+        <td class="cell na">—</td>
+        <td class="cell na">—</td></tr>
+      <tr><th class="rowlab">Lease / RaaS</th>
+        <td class="cell">AVAILABLE<span class="sub">US</span></td>
+        <td class="cell na">—</td>
+        <td class="cell na">—</td></tr>
+      <tr><th class="rowlab">Pilot</th>
+        <td class="cell na">—</td>
+        <td class="cell na">—</td>
+        <td class="cell">ON_REQUEST<span class="sub">US</span></td></tr>
+      <tr><th class="rowlab">Commercially accessible?</th>
+        <td class="cell">YES<span class="sub">Constrained · RaaS</span></td>
+        <td class="cell">YES<span class="sub">Purchase</span></td>
+        <td class="cell">YES<span class="sub">Bespoke · on request</span></td></tr>
+
+      <tr class="grouprow"><th colspan="4">② Physical</th></tr>
+      <tr><th class="rowlab">Payload</th>
+        <td class="cell">16 kg</td>
+        <td class="cell">3 kg</td>
+        <td class="cell best">20 kg</td></tr>
+      <tr><th class="rowlab">Height</th>
+        <td class="cell">175 cm</td>
+        <td class="cell">130 cm</td>
+        <td class="cell">168 cm</td></tr>
+      <tr><th class="rowlab">Weight</th>
+        <td class="cell">65 kg</td>
+        <td class="cell">35 kg</td>
+        <td class="cell">70 kg</td></tr>
+      <tr><th class="rowlab">Mobility</th>
+        <td class="cell">BIPEDAL</td>
+        <td class="cell">BIPEDAL</td>
+        <td class="cell">BIPEDAL</td></tr>
+      <tr><th class="rowlab">Runtime</th>
+        <td class="cell unk"><span class="hatch">UNKNOWN</span></td>
+        <td class="cell">120 min</td>
+        <td class="cell unk"><span class="hatch">UNKNOWN</span></td></tr>
+      <tr><th class="rowlab">Autonomy</th>
+        <td class="cell best">TASK_AUTONOMOUS</td>
+        <td class="cell">TELEOPERATED</td>
+        <td class="cell">SUPERVISED_AUTONOMY</td></tr>
+
+      <tr class="grouprow"><th colspan="4">③ Intelligence · developer</th></tr>
+      <tr><th class="rowlab">Manipulation</th>
+        <td class="cell">YES</td>
+        <td class="cell">YES</td>
+        <td class="cell">YES</td></tr>
+      <tr><th class="rowlab">SDK</th>
+        <td class="cell unk">UNKNOWN</td>
+        <td class="cell">YES</td>
+        <td class="cell unk">UNKNOWN</td></tr>
+      <tr><th class="rowlab">ROS support</th>
+        <td class="cell unk">UNKNOWN</td>
+        <td class="cell">YES</td>
+        <td class="cell unk">UNKNOWN</td></tr>
+
+      <tr class="grouprow"><th colspan="4">④ Deployment — evidence</th></tr>
+      <tr><th class="rowlab">Deployments</th>
+        <td class="cell best">2<span class="sub">Production / scaling</span></td>
+        <td class="cell unk">UNKNOWN</td>
+        <td class="cell">1<span class="sub">BMW · pilot</span></td></tr>
+      <tr><th class="rowlab">Evidence confidence</th>
+        <td class="cell"><span class="v">VERIFIED</span></td>
+        <td class="cell"><span class="v">VERIFIED</span><span class="sub">price</span></td>
+        <td class="cell">MEDIUM</td></tr>
+    </tbody>
+  </table>
+
+  <div class="legend">
+    <span><span class="ho-marker ho-marker--signal"></span> best-in-row (indicative)</span>
+    <span>— = not applicable / no offer in this mode</span>
+    <span><span style="border:1px dashed var(--ho-grey-400);padding:0 5px">UNKNOWN</span> = no data (never 0/false)</span>
+    <span><span class="ho-badge ho-badge--caution" style="padding:1px 6px">QUOTE</span> = price on request &ne; unknown</span>
+  </div>
+</div>
+
+</body>
+</html>

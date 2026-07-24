@@ -84,6 +84,9 @@ test("WS4: evidence view is inspectable; UNKNOWN facts read NO CONFIRMED FACT", 
   await expect(page.getByText(/Pricing — headline offer/i)).toBeVisible();
   // G1's price fact carries store provenance.
   await expect(page.getByText(/MANUFACTURER_STORE/i).first()).toBeVisible();
+  // The three provenance dates are kept SEPARATE; OBSERVED is always present.
+  await expect(page.getByText("OBSERVED").first()).toBeVisible();
+  await expect(page.getByText(/OBSERVED\s+\d{2}\s+[A-Z]{3}\s+\d{4}/).first()).toBeVisible();
   // Neither robot has deployments → explicit NO CONFIRMED FACT.
   await expect(page.getByText(/NO CONFIRMED FACT/i).first()).toBeVisible();
   // Confidence is the raw enum ladder, never a computed/synthetic number.

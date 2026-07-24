@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { modeLabel } from "@/lib/format";
+import { formatObservedDate, modeLabel } from "@/lib/format";
 import type { CompareResponse, CompareRow, PricingOffer, RobotDetail } from "@/lib/types";
 import {
   bestInRow,
@@ -38,7 +38,6 @@ import {
   type SavedView,
 } from "@/lib/saved-views";
 import { ConfidenceIndicator } from "@/components/ConfidenceIndicator";
-import { EvidenceStamp } from "@/components/EvidenceStamp";
 import { GraphicMarker } from "@/components/GraphicMarker";
 import { deriveModelCode } from "@/components/RobotCard";
 import { PriceStateLong } from "@/components/PricingState";
@@ -666,7 +665,7 @@ function FactRow({
         </span>
       </div>
       <div className="src">
-        <EvidenceStamp evidence={evidence} />
+        <EvidenceDates evidence={evidence} />
       </div>
       <div className="conf-cell">
         {evidence ? (
@@ -675,6 +674,48 @@ function FactRow({
           <span className="ho-syslabel">—</span>
         )}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Provenance dates for a compared fact, kept STRICTLY SEPARATE — PUBLISHED,
+ * OBSERVED, VERIFIED — never collapsed into one synthetic "freshness" value.
+ * observed_at is always present (TIMESTAMPTZ NOT NULL); the other two rows are
+ * omitted when genuinely absent. A ® rides along only when verified_at exists.
+ */
+function EvidenceDates({ evidence }: { evidence?: import("@/lib/types").Evidence | null }) {
+  if (!evidence) {
+    return <span className="stamp" style={{ color: "var(--ho-text-faint)" }}>— no evidence on record —</span>;
+  }
+  const published = formatObservedDate(evidence.published_at);
+  const observed = formatObservedDate(evidence.observed_at);
+  const verified = formatObservedDate(evidence.verified_at);
+  return (
+    <div className="src cmp-ev-dates">
+      <div>SOURCE: {evidence.source_type}</div>
+      {published && (
+        <div>
+          <span className="cmp-dlabel">PUBLISHED</span> {published}
+        </div>
+      )}
+      {observed && (
+        <div>
+          <span className="cmp-dlabel">OBSERVED</span> {observed}
+        </div>
+      )}
+      {verified && (
+        <div>
+          <span className="cmp-dlabel">VERIFIED</span> {verified} &reg;
+        </div>
+      )}
+      {evidence.source_url && (
+        <div>
+          <a href={evidence.source_url} target="_blank" rel="noopener noreferrer">
+            View source ↗
+          </a>
+        </div>
+      )}
     </div>
   );
 }

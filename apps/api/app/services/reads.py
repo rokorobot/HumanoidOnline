@@ -98,6 +98,7 @@ def load_evidence(
             best[key] = EvidenceRead(
                 source_type=e.source_type,
                 confidence=e.confidence,
+                observed_at=e.observed_at,
                 verified_at=e.verified_at,
                 published_at=e.published_at,
                 source_url=e.source_url,

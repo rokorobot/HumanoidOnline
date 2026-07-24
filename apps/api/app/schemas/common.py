@@ -32,6 +32,9 @@ class EvidenceRead(BaseModel):
 
     source_type: str
     confidence: str
+    # observed_at is TIMESTAMPTZ NOT NULL — the catalogue always records when a
+    # fact was observed, so it is always present (unlike published/verified).
+    observed_at: datetime
     verified_at: datetime | None = None
     published_at: date | None = None
     source_url: str | None = None

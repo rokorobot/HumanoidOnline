@@ -468,6 +468,9 @@ td .v { color: var(--ho-verified); }
 .cmp-factval .hatch { display: inline-block; padding: 1px 7px; color: var(--ho-unknown);
   border: var(--ho-rule-hair) dashed var(--ho-grey-400); }
 .evrow.is-ref { box-shadow: inset 3px 0 0 var(--ho-signal); }
+.cmp-ev-dates > div { line-height: 1.7; }
+.cmp-dlabel { display: inline-block; min-width: 74px; color: var(--ho-text-faint);
+  letter-spacing: var(--ho-tracking-label); }
 
 /* ---- USE-CASE / MANUFACTURER DETAIL -------------------------------------- */
 .prose { max-width: 68ch; line-height: 1.7; }

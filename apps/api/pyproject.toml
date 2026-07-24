@@ -10,6 +10,7 @@ dependencies = [
     "psycopg[binary]>=3.2",
     "pydantic>=2.7",
     "pydantic-settings>=2.3",
+    "sqladmin>=0.19",
 ]
 
 [dependency-groups]
@@ -35,3 +36,5 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+# Keep classic typing.Generic for broad Pydantic-generic compatibility.
+ignore = ["UP046", "UP047"]

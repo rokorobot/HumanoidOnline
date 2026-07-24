@@ -59,8 +59,8 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-      - name: Apply canonical schema (ORM<->schema tests need the tables)
-        run: uv run db/bootstrap.py
+      - name: Apply schema + seed (knowledge-API tests query seed data)
+        run: uv run db/bootstrap.py --seed
       - name: Install dependencies
         working-directory: apps/api
         run: uv sync --frozen

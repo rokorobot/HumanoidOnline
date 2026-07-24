@@ -5,23 +5,11 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import CHAR, DateTime, ForeignKey, Text, text
-from sqlalchemy.dialects.postgresql import ENUM, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
-
-# The enum type already exists (created by db/schema.sql). create_type=False so
-# the ORM never CREATEs/DROPs it — the canonical schema owns it.
-region_type_enum = ENUM(
-    "GLOBAL",
-    "CONTINENT",
-    "ECONOMIC_ZONE",
-    "COUNTRY",
-    "SUBREGION",
-    name="region_type",
-    schema="humanoid",
-    create_type=False,
-)
+from app.models.enums import region_type
 
 
 class Region(Base):
@@ -37,7 +25,7 @@ class Region(Base):
         ForeignKey("region.id", ondelete="SET NULL"),
         nullable=True,
     )
-    type: Mapped[str] = mapped_column(region_type_enum, nullable=False)
+    type: Mapped[str] = mapped_column(region_type, nullable=False)
     code: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
     name: Mapped[str] = mapped_column(Text, nullable=False)
     iso_country: Mapped[str | None] = mapped_column(CHAR(2), nullable=True)

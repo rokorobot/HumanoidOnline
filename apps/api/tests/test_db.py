@@ -40,3 +40,22 @@ def test_event_log_model_mirrors_canonical_schema(database_url) -> None:
     with Session(engine) as session:
         rows = session.execute(select(EventLog)).scalars().all()
         assert isinstance(rows, list)
+
+
+def test_all_knowledge_models_mirror_canonical_schema(database_url) -> None:
+    # A SELECT over every mapped column of each knowledge-layer table proves the
+    # ORM aligns with the canonical DDL — a name/type mismatch would raise here.
+    from app import models
+    from app.db.session import engine
+
+    entities = [
+        models.Manufacturer, models.Provider, models.Robot, models.RobotVariant,
+        models.RobotStatusHistory, models.SpecDefinition, models.Specification,
+        models.Capability, models.RobotCapability, models.UseCase, models.UseCaseFit,
+        models.PricingOffer, models.AvailabilityOffer, models.Deployment,
+        models.EvidenceSource,
+    ]
+    with Session(engine) as session:
+        for entity in entities:
+            rows = session.execute(select(entity).limit(1)).scalars().all()
+            assert isinstance(rows, list), entity.__name__

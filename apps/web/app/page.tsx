@@ -2,22 +2,31 @@
 // /api/market-snapshot and /api/robots at runtime — no illustrative values.
 import Link from "next/link";
 
-import { getMarketSnapshot, listRobots } from "@/lib/api-client";
+import {
+  getMarketSnapshot,
+  listManufacturers,
+  listRobots,
+  listUseCases,
+} from "@/lib/api-client";
 import { formatObservedDate } from "@/lib/format";
 import { DotMatrix, GraphicMarker } from "@/components/GraphicMarker";
 import { MachineCode } from "@/components/MachineCode";
+import { ManufacturerCard } from "@/components/ManufacturerCard";
 import { RobotCard } from "@/components/RobotCard";
 import { SectionIndex } from "@/components/SectionIndex";
 import { DarkNav, SiteFooter } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 import { SystemLabel } from "@/components/SystemLabel";
+import { UseCaseTile } from "@/components/UseCaseTile";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [snapshot, robotPage] = await Promise.all([
+  const [snapshot, robotPage, useCasePage, manufacturerPage] = await Promise.all([
     getMarketSnapshot(),
     listRobots({ limit: 24, sort: "name" }),
+    listUseCases({ limit: 100 }),
+    listManufacturers({ limit: 100 }),
   ]);
 
   const observed = formatObservedDate(snapshot.latest_observed_at);
@@ -168,6 +177,32 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* EXPLORE BY USE CASE (live /api/use-cases) */}
+      <section className="block">
+        <div className="wrap">
+          <div className="block-head">
+            <div>
+              <SectionIndex>02 — EXPLORE BY USE CASE</SectionIndex>
+              <h2 className="ho-section-title">Explore by use case</h2>
+            </div>
+            <SystemLabel>{useCasePage.total} APPLICATIONS</SystemLabel>
+          </div>
+          {useCasePage.items.length > 0 ? (
+            <div className="apps">
+              {useCasePage.items.slice(0, 7).map((u, i) => (
+                <UseCaseTile key={u.slug} useCase={u} index={i + 1} />
+              ))}
+              <Link className="app" href="/use-cases">
+                <SystemLabel>→</SystemLabel>
+                <span className="name">All use cases</span>
+              </Link>
+            </div>
+          ) : (
+            <p className="empty-state">No use cases on record.</p>
+          )}
+        </div>
+      </section>
+
       {/* ORANGE ALERT STRIP (loud status only) */}
       <section className="ho-orange">
         <div className="wrap alert-strip">
@@ -187,10 +222,32 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* WHO BUILDS THEM (live /api/manufacturers) */}
+      <section className="block">
+        <div className="wrap">
+          <div className="block-head">
+            <div>
+              <SectionIndex>03 — WHO BUILDS THEM</SectionIndex>
+              <h2 className="ho-section-title">Who builds them</h2>
+            </div>
+            <SystemLabel>{manufacturerPage.total} TRACKED</SystemLabel>
+          </div>
+          {manufacturerPage.items.length > 0 ? (
+            <div className="mfr-row">
+              {manufacturerPage.items.slice(0, 8).map((m) => (
+                <ManufacturerCard key={m.slug} manufacturer={m} />
+              ))}
+            </div>
+          ) : (
+            <p className="empty-state">No manufacturers on record.</p>
+          )}
+        </div>
+      </section>
+
       {/* MARKET SNAPSHOT (dark) */}
       <section className="snapshot ho-dark ho-scan">
         <div className="wrap">
-          <SectionIndex>02 — MARKET SNAPSHOT</SectionIndex>
+          <SectionIndex>04 — MARKET SNAPSHOT</SectionIndex>
           <div className="snap-grid">
             <Snap n={snapshot.total_tracked} label="Humanoids tracked" />
             <Snap

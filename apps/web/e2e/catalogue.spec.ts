@@ -15,6 +15,35 @@ test("home renders live market-snapshot counts (not illustrative)", async ({ pag
   await expect(page.locator("body")).not.toContainText("20 PLATFORMS TRACKED");
 });
 
+test("home: EXPLORE BY USE CASE and WHO BUILDS THEM render live data in the frozen order", async ({
+  page,
+}) => {
+  await page.goto("/");
+  // Both restored sections are present, backed by live API data.
+  await expect(page.getByRole("heading", { name: /Explore by use case/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Who builds them/i })).toBeVisible();
+  // A real use-case name from the catalogue (not the static-HTML categories).
+  await expect(page.getByText("Manufacturing").first()).toBeVisible();
+  // A real manufacturer name, linked to its detail record.
+  const agility = page.locator('a[href="/manufacturers/agility-robotics"]', {
+    hasText: "Agility Robotics",
+  });
+  await expect(agility.first()).toBeVisible();
+  // Sequence: Explore-by-Use-Case -> orange "Market" strip -> Who-Builds-Them -> Market Snapshot.
+  const body = await page.locator("#main-content").innerText();
+  const iExplore = body.indexOf("EXPLORE BY USE CASE");
+  const iStrip = body.indexOf("HUMANOID MARKET: ACTIVE");
+  const iWho = body.indexOf("WHO BUILDS THEM");
+  const iSnapshot = body.indexOf("MARKET SNAPSHOT");
+  expect(iExplore).toBeGreaterThan(-1);
+  expect(iStrip).toBeGreaterThan(iExplore);
+  expect(iWho).toBeGreaterThan(iStrip);
+  expect(iSnapshot).toBeGreaterThan(iWho);
+  // Static-HTML illustrative categories must not leak in (e.g. Hospitality is
+  // not in the catalogue).
+  await expect(page.locator("#main-content")).not.toContainText("Hospitality");
+});
+
 test("catalogue: G1 shows $13,500 PUBLIC, never the illustrative $16,000", async ({ page }) => {
   await page.goto("/robots");
   await expect(page.getByText("$13,500")).toBeVisible();
@@ -74,6 +103,14 @@ test("filters are URL-addressable: DISCONTINUED filter isolates figure-02", asyn
   await expect(page.getByText("Figure 02").first()).toBeVisible();
   // G1 (COMMERCIAL) must be filtered out.
   await expect(page.locator(".grid")).not.toContainText("$13,500");
+});
+
+test("compare empty state is user-facing (no 'slug' / URL syntax)", async ({ page }) => {
+  await page.goto("/compare");
+  const body = (await page.locator("#main-content").innerText()).toLowerCase();
+  expect(body).not.toContain("slug");
+  expect(body).not.toContain("/compare?ids=");
+  await expect(page.getByRole("link", { name: /catalogue/i }).first()).toBeVisible();
 });
 
 test("compare renders a matrix with QUOTE_ONLY, PUBLIC and UNKNOWN kept distinct", async ({

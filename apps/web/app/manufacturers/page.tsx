@@ -1,8 +1,6 @@
 // Manufacturers index — from /api/manufacturers.
-import Link from "next/link";
-
 import { listManufacturers } from "@/lib/api-client";
-import { formatRobotCount } from "@/lib/format";
+import { ManufacturerCard } from "@/components/ManufacturerCard";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteFooter, SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
@@ -30,18 +28,7 @@ export default async function ManufacturersPage() {
 
         <div className="mfr-row" style={{ paddingBottom: "var(--ho-sp-8)" }}>
           {page.items.map((m) => (
-            <Link className="mcard" href={`/manufacturers/${m.slug}`} key={m.slug}>
-              <h3>{m.name}</h3>
-              <div>
-                <Leader k="REGION" v={m.country ?? "UNKNOWN"} unknown={!m.country} />
-                <Leader
-                  k="PORTFOLIO"
-                  v={m.portfolio_status ?? "UNKNOWN"}
-                  unknown={!m.portfolio_status}
-                />
-                <Leader k="ROBOTS" v={formatRobotCount(m.robot_count)} />
-              </div>
-            </Link>
+            <ManufacturerCard key={m.slug} manufacturer={m} />
           ))}
         </div>
         {page.items.length === 0 && (
@@ -52,15 +39,5 @@ export default async function ManufacturersPage() {
       </div>
       <SiteFooter />
     </>
-  );
-}
-
-function Leader({ k, v, unknown }: { k: string; v: string; unknown?: boolean }) {
-  return (
-    <div className="ho-leader">
-      <span>{k}</span>
-      <span className="fill" />
-      <span style={unknown ? { color: "var(--ho-unknown)" } : undefined}>{v}</span>
-    </div>
   );
 }

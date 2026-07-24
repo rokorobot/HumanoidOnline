@@ -130,12 +130,12 @@ export default async function ComparePage({
         {!data ? (
           <div className="empty-state" style={{ marginBottom: "var(--ho-sp-8)" }}>
             <p>
-              Select <strong>2 to 4 robots</strong> to compare. Add them from the{" "}
+              Add robots to compare from the{" "}
               <Link href="/robots" style={{ textDecoration: "underline" }}>
                 catalogue
-              </Link>{" "}
-              using <em>Compare +</em>, or pass slugs directly, e.g.{" "}
-              <code>/compare?ids=unitree-g1,agility-digit</code>.
+              </Link>
+              . Select <strong>2 to 4 robots</strong> using <em>Compare +</em> to see
+              them side by side.
             </p>
           </div>
         ) : (

@@ -1,12 +1,9 @@
 // Use-cases index — from /api/use-cases.
-import Link from "next/link";
-
 import { listUseCases } from "@/lib/api-client";
-import { formatRobotCount } from "@/lib/format";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteFooter, SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
-import { SystemLabel } from "@/components/SystemLabel";
+import { UseCaseTile } from "@/components/UseCaseTile";
 
 export const dynamic = "force-dynamic";
 
@@ -30,11 +27,7 @@ export default async function UseCasesPage() {
 
         <div className="apps" style={{ marginBottom: "var(--ho-sp-8)" }}>
           {page.items.map((u, i) => (
-            <Link className="app" href={`/use-cases/${u.slug}`} key={u.slug}>
-              <SystemLabel>{String(i + 1).padStart(2, "0")}</SystemLabel>
-              <span className="name">{u.name}</span>
-              <SystemLabel>{formatRobotCount(u.robot_count)}</SystemLabel>
-            </Link>
+            <UseCaseTile key={u.slug} useCase={u} index={i + 1} />
           ))}
         </div>
         {page.items.length === 0 && (

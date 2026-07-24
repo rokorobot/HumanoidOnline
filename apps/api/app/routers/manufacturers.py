@@ -19,6 +19,7 @@ from app.schemas.manufacturer import (
     ManufacturerRobot,
     ProviderRead,
 )
+from app.services.reads import derive_portfolio_status
 
 router = APIRouter(prefix="/api/manufacturers", tags=["manufacturers"])
 
@@ -44,6 +45,17 @@ def list_manufacturers(
         .offset(offset)
     ).all()
 
+    # Published robots' commercial_status per manufacturer, for portfolio_status.
+    mfr_ids = [m.id for m, _ in rows]
+    statuses: dict[object, list[str]] = {}
+    if mfr_ids:
+        for mid, status in session.execute(
+            select(Robot.manufacturer_id, Robot.commercial_status).where(
+                Robot.manufacturer_id.in_(mfr_ids), Robot.is_published.is_(True)
+            )
+        ).all():
+            statuses.setdefault(mid, []).append(status)
+
     items = [
         ManufacturerListItem(
             slug=m.slug,
@@ -51,6 +63,7 @@ def list_manufacturers(
             country=m.country.code if m.country else None,
             robot_count=int(count),
             deployment_status=m.deployment_status,
+            portfolio_status=derive_portfolio_status(statuses.get(m.id, [])),
         )
         for m, count in rows
     ]

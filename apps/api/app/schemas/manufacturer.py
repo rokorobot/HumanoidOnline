@@ -10,6 +10,9 @@ class ManufacturerListItem(BaseModel):
     country: str | None = None
     robot_count: int
     deployment_status: str | None = None
+    # Derived from published robots' commercial_status (see reads.derive_portfolio_status).
+    # Distinct from the coarse `deployment_status` company column.
+    portfolio_status: str | None = None
 
 
 class ManufacturerRobot(BaseModel):

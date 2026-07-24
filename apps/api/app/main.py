@@ -14,7 +14,7 @@ from fastapi import FastAPI
 import app.models  # noqa: F401  (register all ORM models on Base.metadata)
 from app.admin import mount_admin
 from app.config import get_settings
-from app.routers import health, manufacturers, robots, use_cases
+from app.routers import health, manufacturers, robots, stats, use_cases
 
 settings = get_settings()
 
@@ -24,6 +24,7 @@ app.include_router(health.router)
 app.include_router(robots.router)
 app.include_router(manufacturers.router)
 app.include_router(use_cases.router)
+app.include_router(stats.router)
 
 # Internal-only admin at /admin (network-gate in deployment; not public).
 mount_admin(app)

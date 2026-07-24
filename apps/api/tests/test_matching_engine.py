@@ -444,6 +444,46 @@ def test_disjoint_currency_union_blocks_lower_cost() -> None:
     assert "BEST_LOWER_COST" not in {m.category for m in out.matches}
 
 
+# ---- final-2a: currency comparison spans ALL ranks 2-4 (incl. taken) -----
+
+def test_lower_cost_currency_universe_includes_taken_commercial_winner() -> None:
+    a = robot("a", use_case_fit=0.99, offers=(offer(),))  # rank 1
+    # rank 2: accessible + USD-priced -> becomes BEST_COMMERCIAL (taken).
+    r2 = robot("r2", use_case_fit=0.90, offers=(offer(status="AVAILABLE"),),
+               prices=(price(amount=10000, cur="USD"),))
+    # rank 3: EUR-priced, not accessible.
+    r3 = robot("r3", use_case_fit=0.80, prices=(price(amount=8000, cur="EUR"),))
+    out = match(req(use_case="warehouse-logistics", preferred_transaction="BUY"), [a, r2, r3])
+    cats = {m.slug: m.category for m in out.matches}
+    assert cats["r2"] == "BEST_COMMERCIAL"
+    # USD (taken r2) + EUR (r3) across ranks 2-4 -> incomparable -> NO label.
+    assert "BEST_LOWER_COST" not in cats.values()
+
+
+# ---- final-2b: maturity never implies obtainability ---------------------
+
+def test_maturity_reason_never_implies_obtainability() -> None:
+    out = match(req(), [robot("r", commercial_status="COMMERCIAL")])  # no availability offer
+    m = out.matches[0]
+    joined = " ".join(m.reasons).lower()
+    assert "commercial maturity: commercial" in joined       # maturity stated verbatim
+    assert any("unconfirmed" in x for x in m.reasons)         # neutral availability explanation
+    assert "no confirmed commercial availability" in m.warnings
+    # maturity must NOT be translated into an obtainability claim.
+    assert "generally commercially available" not in joined
+    assert "obtainable" not in joined
+
+
+def test_commercial_maturity_with_not_available_offer_is_not_contradictory() -> None:
+    r = robot("r", commercial_status="COMMERCIAL", offers=(offer(status="NOT_AVAILABLE"),))
+    out = match(req(preferred_transaction="BUY"), [r])
+    m = out.matches[0]
+    joined = " ".join(m.reasons).lower()
+    assert "commercial maturity: commercial" in joined
+    assert any("no accessible commercial offer" in x for x in m.reasons)
+    assert "commercially available" not in joined  # no contradictory obtainability wording
+
+
 # ---- final-4: no-match wording is quantified, not absolute ---------------
 
 def test_no_match_wording_is_quantified_not_absolute() -> None:

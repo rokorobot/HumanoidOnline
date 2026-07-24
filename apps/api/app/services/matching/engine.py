@@ -56,20 +56,6 @@ _EXCLUSION_DETAIL = {
     "discontinued": "candidates are discontinued",
 }
 
-# Plain-language maturity descriptor — a genuine, always-available fact derived
-# from commercial_status (the deployment-readiness input), used only to guarantee
-# every survivor has >=2 concrete reasons. Not marketing filler.
-MATURITY_LABEL = {
-    "ANNOUNCED": "announced platform",
-    "DEVELOPMENT": "in active development",
-    "PROTOTYPE": "working prototype",
-    "PILOT": "in customer pilots",
-    "EARLY_ACCESS": "in early access",
-    "LIMITED_COMMERCIAL": "in limited commercial release",
-    "COMMERCIAL": "generally commercially available",
-    "RAAS_DEPLOYMENT": "deployed commercially as a service",
-    "DISCONTINUED": "discontinued",
-}
 
 
 def _clamp(x: float, lo: float = 0.0, hi: float = 1.0) -> float:
@@ -145,13 +131,15 @@ def _matching_offers(req: RequirementInput, r: RobotInput):
 
 
 def _commercial(req: RequirementInput, r: RobotInput) -> _Criterion:
+    # OBTAINABILITY dimension — availability_offer by transaction mode. Kept strictly
+    # separate from MATURITY (commercial_status): accessibility is NEVER inferred
+    # from status. Every branch emits a truthful reason so the always-active
+    # commercial criterion explains its own score.
     offers = _matching_offers(req, r)
     accessible = [o for o in offers if o.availability_status not in NON_ACCESSIBLE]
-    reasons: list[str] = []
     warnings: list[str] = []
     if accessible:
         sub = 1.0
-        reasons.append("commercially accessible for the requested transaction")
         if not any(o.availability_status == "AVAILABLE" for o in accessible):
             warnings.append("commercial availability is constrained (waitlist/preorder/on-request)")
         if req.required_by is not None:
@@ -159,14 +147,18 @@ def _commercial(req: RequirementInput, r: RobotInput) -> _Criterion:
             if known and min(known) > req.required_by:
                 sub = 0.5
                 warnings.append("earliest known availability is after the required-by date")
-        # Accessibility is a genuine fact regardless of the timeline soft penalty,
-        # so the reason is always emitted (the lateness is carried as a warning).
-        return _Criterion(sub, reasons=reasons, warnings=warnings, accessible=True)
-    if offers:  # matching offers exist but all are NOT_AVAILABLE / DISCONTINUED
         return _Criterion(
-            0.0, warnings=["no accessible commercial offer for the requested transaction"]
+            sub, reasons=["commercially accessible for the requested transaction"],
+            warnings=warnings, accessible=True,
         )
-    return _Criterion(0.5, warnings=["no confirmed commercial availability"])
+    if offers:  # matching offers exist but all are NOT_AVAILABLE / DISCONTINUED
+        msg = "no accessible commercial offer for the requested transaction"
+        return _Criterion(0.0, reasons=[msg], warnings=[msg])
+    return _Criterion(
+        0.5,
+        reasons=["commercial availability unconfirmed; neutral score applied"],
+        warnings=["no confirmed commercial availability"],
+    )
 
 
 def _geography(req: RequirementInput, r: RobotInput) -> _Criterion | None:
@@ -359,8 +351,9 @@ def _deployment(r: RobotInput) -> _Criterion:
     maturity = MATURITY.get(r.commercial_status, 0.0)
     evidence = 1.0 if r.deployment_count >= 1 else 0.5
     sub = 0.5 * maturity + 0.5 * evidence
-    # commercial_status is NOT NULL — always a genuine, contributing fact.
-    reasons = [f"commercial status: {r.commercial_status}"]
+    # MATURITY dimension only — commercial_status verbatim, NEVER translated into an
+    # obtainability/purchasability claim (frozen: maturity != availability).
+    reasons = [f"commercial maturity: {r.commercial_status}"]
     if r.deployment_count >= 1:
         reasons.append(f"{r.deployment_count} confirmed deployment(s)")
     return _Criterion(sub, reasons=reasons)
@@ -422,13 +415,10 @@ def _score(req: RequirementInput, r: RobotInput) -> _Scored:
     for _, text in contributions:
         if text not in reasons:
             reasons.append(text)
-    # Guarantee >= 2 genuine reasons for EVERY survivor: the plain-language maturity
-    # descriptor (derived from the always-present commercial_status) is a real,
-    # non-marketing fact tied to the deployment-readiness criterion.
-    if len(reasons) < 2:
-        label = MATURITY_LABEL.get(r.commercial_status)
-        if label and label not in reasons:
-            reasons.append(label)
+    # >= 2 genuine reasons for EVERY survivor is guaranteed WITHOUT any invented
+    # obtainability claim: the two always-active criteria each explain themselves —
+    # deployment readiness gives a maturity fact and commercial availability gives
+    # an accessibility/unknown/negative fact.
     reasons = reasons[:4]
 
     vt = r.freshest_verified_at
@@ -470,18 +460,21 @@ def _assign_categories(
         "BEST_COMMERCIAL",
     )
 
-    # BEST_LOWER_COST: lowest KNOWN numeric eligible cost. No FX: with no buyer
-    # currency, inspect EVERY eligible currency reference across the compared
-    # candidates — a single robot carrying two currencies is enough to make the
-    # comparison incomparable, so no label is assigned.
-    cost_pool = [s for s in pool if s.slug not in taken and s.lowest_cost is not None]
+    # BEST_LOWER_COST: lowest KNOWN numeric eligible cost. Comparability (no FX) is
+    # judged over the COMPARISON UNIVERSE — every lower-cost-eligible reference
+    # across ALL of ranks 2-4 — NOT the reduced label-candidate set. A candidate
+    # already claimed by a higher-precedence category still contributes its
+    # currencies, so e.g. a USD BEST_COMMERCIAL winner + an EUR candidate remain
+    # incomparable and no label is assigned.
+    comparison = [s for s in pool if s.lowest_cost is not None]
     if not req.budget_currency:
         all_currencies: set[str] = set()
-        for s in cost_pool:
+        for s in comparison:
             all_currencies |= s.cost_currencies
         if len(all_currencies) > 1:
-            cost_pool = []
-    claim(sorted(cost_pool, key=lambda s: (s.lowest_cost, s.slug)), "BEST_LOWER_COST")
+            comparison = []
+    label_candidates = [s for s in comparison if s.slug not in taken]
+    claim(sorted(label_candidates, key=lambda s: (s.lowest_cost, s.slug)), "BEST_LOWER_COST")
 
     # BEST_DEVELOPER: a developer-oriented platform.
     def dev(s: _Scored) -> bool:

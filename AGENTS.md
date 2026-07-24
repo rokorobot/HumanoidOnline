@@ -2,6 +2,8 @@
 
 These rules are binding for any autonomous or semi-autonomous coding agent working in this repository. They exist because the product contract, not the agent, owns product-level decisions.
 
+**Before starting a new workstream, read [`docs/08_DEVELOPMENT_ROADMAP.md`](docs/08_DEVELOPMENT_ROADMAP.md).** The roadmap controls delivery sequencing; frozen product contracts remain authoritative.
+
 1. **Do not alter product scope without explicit approval.** Scope is `docs/01_PRODUCT_CONTRACT.md`. If a task seems to require scope change, stop and ask.
 
 2. **The PostgreSQL DDL is the canonical data model.** `db/schema.sql` wins over ORM models, API shapes, and UI assumptions. Schema changes are their own reviewed change, never a side effect.

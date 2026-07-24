@@ -20,8 +20,16 @@ MVP v0.1 implements Phases 1–2; Phases 3–5 exist dormant in the data model.
 | [`docs/04_API_CONTRACT.md`](docs/04_API_CONTRACT.md) | Endpoints + request/response shapes |
 | [`docs/05_ACCEPTANCE_CRITERIA.md`](docs/05_ACCEPTANCE_CRITERIA.md) | Given/When/Then completion tests |
 | [`docs/06_WIREFRAMES.md`](docs/06_WIREFRAMES.md) | Rough structural wireframes (appearance deliberately unspecified) |
+| [`docs/07_VISUAL_SYSTEM.md`](docs/07_VISUAL_SYSTEM.md) | Frozen visual system (UI-D1): palette, typography, primitives, UI laws |
 | [`AGENTS.md`](AGENTS.md) | Binding operating rules for coding agents |
 | [`db/seed/seed.sql`](db/seed/seed.sql) | Stress-test seed dataset (schema-validated) |
+
+## Development roadmap
+
+See [`docs/08_DEVELOPMENT_ROADMAP.md`](docs/08_DEVELOPMENT_ROADMAP.md) for the
+current workstream sequence, completed stages, scope boundaries, exit gates and
+long-term product phases. It controls delivery *sequencing*; the frozen contracts
+above remain authoritative.
 
 ## Stack (frozen)
 

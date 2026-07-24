@@ -47,12 +47,28 @@ PREF_TO_TXN: dict[str, set[str] | None] = {
 NON_ACCESSIBLE = {"NOT_AVAILABLE", "DISCONTINUED"}
 CONSTRAINED = {"WAITLIST", "PREORDER", "LIMITED", "ON_REQUEST"}
 
-# Exclusion reason code -> human explanation (for no_match_explanation).
-_EXCLUSION_TEXT = {
-    "payload": "the stated minimum payload exceeded every candidate's known capacity",
-    "manipulation": "manipulation was required but candidates are known not to manipulate",
-    "autonomy": "the required autonomy level was above every candidate's known level",
-    "discontinued": "the matching platforms are discontinued",
+# Dominant-constraint detail (for no_match_explanation). Factual and quantified —
+# no absolute "every candidate" phrasing when the rule eliminated only a subset.
+_EXCLUSION_DETAIL = {
+    "payload": "the stated minimum payload exceeded the known capacity",
+    "manipulation": "candidates are known not to provide the required manipulation",
+    "autonomy": "the required autonomy level was above the known level",
+    "discontinued": "candidates are discontinued",
+}
+
+# Plain-language maturity descriptor — a genuine, always-available fact derived
+# from commercial_status (the deployment-readiness input), used only to guarantee
+# every survivor has >=2 concrete reasons. Not marketing filler.
+MATURITY_LABEL = {
+    "ANNOUNCED": "announced platform",
+    "DEVELOPMENT": "in active development",
+    "PROTOTYPE": "working prototype",
+    "PILOT": "in customer pilots",
+    "EARLY_ACCESS": "in early access",
+    "LIMITED_COMMERCIAL": "in limited commercial release",
+    "COMMERCIAL": "generally commercially available",
+    "RAAS_DEPLOYMENT": "deployed commercially as a service",
+    "DISCONTINUED": "discontinued",
 }
 
 
@@ -143,10 +159,9 @@ def _commercial(req: RequirementInput, r: RobotInput) -> _Criterion:
             if known and min(known) > req.required_by:
                 sub = 0.5
                 warnings.append("earliest known availability is after the required-by date")
-        # `accessible` stays True even when the timeline soft penalty lowers sub.
-        return _Criterion(
-            sub, reasons=reasons if sub == 1.0 else [], warnings=warnings, accessible=True
-        )
+        # Accessibility is a genuine fact regardless of the timeline soft penalty,
+        # so the reason is always emitted (the lateness is carried as a warning).
+        return _Criterion(sub, reasons=reasons, warnings=warnings, accessible=True)
     if offers:  # matching offers exist but all are NOT_AVAILABLE / DISCONTINUED
         return _Criterion(
             0.0, warnings=["no accessible commercial offer for the requested transaction"]
@@ -216,6 +231,10 @@ def _technical(req: RequirementInput, r: RobotInput) -> _Criterion | None:
             parts.append(0.5 + 0.5 * _clamp(r.runtime_minutes / need if need else 1.0))
             if need and r.runtime_minutes < need:
                 warnings.append("runtime may require a charging strategy")
+            else:
+                reasons.append(
+                    f"runtime covers the requested {req.operating_hours_day:g} h/day duty cycle"
+                )
 
     if not parts:
         return None
@@ -284,14 +303,19 @@ def _budget(req: RequirementInput, r: RobotInput) -> _Criterion | None:
                 bf = 1.0
             elif p.price_min > max_:
                 bf = ramp(p.price_min)
+                w.append("price range starts above the stated budget")
             else:
                 bf = 0.5
                 w.append("price range crosses the budget ceiling")
         elif p.price_type == "FROM" and p.price is not None:
             bf = min(ramp(p.price), 0.75)
             w.append("only a starting ('from') price is published")
+            if p.price > max_:
+                w.append("price exceeds the stated budget")
         elif p.price_type in ("PUBLIC", "ESTIMATED") and p.price is not None:
             bf = ramp(p.price)
+            if p.price > max_:
+                w.append("price exceeds the stated budget")
             if p.price_type == "ESTIMATED":
                 w.append("price is an estimate, not confirmed")
         else:
@@ -305,14 +329,16 @@ def _budget(req: RequirementInput, r: RobotInput) -> _Criterion | None:
     return _Criterion(best_bf, reasons=reasons, warnings=best_warnings)
 
 
-def eligible_cost(req: RequirementInput, r: RobotInput) -> tuple[float, str] | None:
-    """The lowest 'lower-cost'-eligible price for BEST_LOWER_COST: a current,
+def lower_cost_refs(req: RequirementInput, r: RobotInput) -> list[tuple[float, str]]:
+    """ALL 'lower-cost'-eligible price references for BEST_LOWER_COST: current,
     transaction-compatible, geography-compatible (when a country is stated),
-    ONE_TIME, PUBLIC/ESTIMATED point price. When the buyer stated a budget
-    currency, only that currency is eligible. Returns (price, currency) or None."""
+    ONE_TIME, PUBLIC/ESTIMATED point prices. When the buyer stated a budget
+    currency, only that currency is eligible. Returns every (price, currency) —
+    the caller inspects the full set so a robot carrying two currencies makes the
+    comparison incomparable (no FX)."""
     allowed = _txn_allowed(req.preferred_transaction)
     want_cur = req.budget_currency.upper() if req.budget_currency else None
-    elig: list[PriceInput] = []
+    refs: list[tuple[float, str]] = []
     for p in r.prices:
         if not p.is_current or p.price is None:
             continue
@@ -322,13 +348,11 @@ def eligible_cost(req: RequirementInput, r: RobotInput) -> tuple[float, str] | N
             continue
         if req.country is not None and not p.geo_applicable:
             continue
-        if want_cur is not None and (p.currency or "").upper() != want_cur:
+        currency = (p.currency or "").upper()
+        if want_cur is not None and currency != want_cur:
             continue
-        elig.append(p)
-    if not elig:
-        return None
-    best = min(elig, key=lambda p: (p.price, (p.currency or "")))
-    return (float(best.price), (best.currency or "").upper())
+        refs.append((float(p.price), currency))
+    return refs
 
 
 def _deployment(r: RobotInput) -> _Criterion:
@@ -355,7 +379,7 @@ class _Scored:
     commercial_sub: float
     commercial_accessible: bool
     lowest_cost: float | None
-    cost_currency: str | None
+    cost_currencies: frozenset[str]
     deployment_count: int
     verified_key: float  # -epoch (fresher sorts first); +inf when unknown
 
@@ -398,18 +422,25 @@ def _score(req: RequirementInput, r: RobotInput) -> _Scored:
     for _, text in contributions:
         if text not in reasons:
             reasons.append(text)
+    # Guarantee >= 2 genuine reasons for EVERY survivor: the plain-language maturity
+    # descriptor (derived from the always-present commercial_status) is a real,
+    # non-marketing fact tied to the deployment-readiness criterion.
+    if len(reasons) < 2:
+        label = MATURITY_LABEL.get(r.commercial_status)
+        if label and label not in reasons:
+            reasons.append(label)
     reasons = reasons[:4]
 
     vt = r.freshest_verified_at
     verified_key = -vt.timestamp() if vt is not None else float("inf")
-    ec = eligible_cost(req, r)
+    refs = lower_cost_refs(req, r)
     return _Scored(
         slug=r.slug, score=score, breakdown=breakdown, reasons=reasons,
         warnings=warnings,
         commercial_sub=crits["commercial_availability"].subscore,
         commercial_accessible=crits["commercial_availability"].accessible,
-        lowest_cost=ec[0] if ec else None,
-        cost_currency=ec[1] if ec else None,
+        lowest_cost=min(p for p, _ in refs) if refs else None,
+        cost_currencies=frozenset(c for _, c in refs),
         deployment_count=r.deployment_count, verified_key=verified_key,
     )
 
@@ -440,11 +471,15 @@ def _assign_categories(
     )
 
     # BEST_LOWER_COST: lowest KNOWN numeric eligible cost. No FX: with no buyer
-    # currency, only assign when the compared candidates share one currency.
+    # currency, inspect EVERY eligible currency reference across the compared
+    # candidates — a single robot carrying two currencies is enough to make the
+    # comparison incomparable, so no label is assigned.
     cost_pool = [s for s in pool if s.slug not in taken and s.lowest_cost is not None]
     if not req.budget_currency:
-        currencies = {s.cost_currency for s in cost_pool}
-        if len(currencies) > 1:
+        all_currencies: set[str] = set()
+        for s in cost_pool:
+            all_currencies |= s.cost_currencies
+        if len(all_currencies) > 1:
             cost_pool = []
     claim(sorted(cost_pool, key=lambda s: (s.lowest_cost, s.slug)), "BEST_LOWER_COST")
 
@@ -497,11 +532,10 @@ def match(req: RequirementInput, robots: list[RobotInput]) -> MatchOutcome:
     if not matches:
         if excluded_counts:
             reason = max(sorted(excluded_counts), key=lambda k: excluded_counts[k])
-            n = excluded_counts[reason]
-            total = len(robots)
+            n, total = excluded_counts[reason], len(robots)
             no_match_explanation = (
-                f"No platform matched: {_EXCLUSION_TEXT[reason]} "
-                f"({n} of {total} candidates excluded)."
+                f"No platform matched. The dominant eliminating constraint was "
+                f"{reason}: {_EXCLUSION_DETAIL[reason]} — {n} of {total} candidates."
             )
         else:
             no_match_explanation = "No published platforms are available to match yet."

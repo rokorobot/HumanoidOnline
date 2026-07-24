@@ -63,9 +63,10 @@ def test_first_fetch_scores_and_persists(client, database_url) -> None:
 
     first = data["matches"][0]
     assert first["rank"] == 1 and first["category"] == "BEST_OVERALL"
-    # E6: score == round(sum(breakdown)), >= 2 reasons, 6 stable keys.
-    assert first["score"] == round(sum(first["score_breakdown"].values()))
-    assert len(first["reasons"]) >= 2
+    # E6 for EVERY returned match: score == round(sum(breakdown)) and >= 2 reasons.
+    for m in data["matches"]:
+        assert m["score"] == round(sum(m["score_breakdown"].values()))
+        assert len(m["reasons"]) >= 2
     assert set(first["score_breakdown"]) == {
         "use_case_fit", "commercial_availability", "technical_fit",
         "geographic_fit", "budget_fit", "deployment_readiness",

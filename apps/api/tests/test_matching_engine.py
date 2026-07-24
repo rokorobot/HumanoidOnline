@@ -371,6 +371,92 @@ def test_sparse_reasons_are_genuine_and_at_least_two() -> None:
     assert "maker" not in joined  # no manufacturer-name filler
 
 
+# ---- final-1: every survivor gets >= 2 genuine reasons ------------------
+
+def _no_filler(reasons) -> bool:
+    joined = " ".join(reasons).lower()
+    return "tracked platform" not in joined and "maker" not in joined
+
+
+def test_completely_sparse_survivor_has_two_genuine_reasons() -> None:
+    # No offers, no deployments, no fits; buyer states nothing.
+    out = match(req(), [robot("r", commercial_status="COMMERCIAL")])
+    m = out.matches[0]
+    assert len(m.reasons) >= 2 and _no_filler(m.reasons)
+
+
+def test_late_accessible_offer_still_has_two_reasons() -> None:
+    r = robot("r", offers=(offer(status="AVAILABLE", avail=date(2030, 1, 1)),))
+    out = match(req(required_by=date(2026, 1, 1)), [r])
+    m = out.matches[0]
+    assert len(m.reasons) >= 2 and _no_filler(m.reasons)
+    assert any("commercially accessible" in x for x in m.reasons)  # accessibility fact kept
+
+
+def test_runtime_only_requirement_has_two_reasons() -> None:
+    r = robot("r", runtime_minutes=600)  # >= 8h*60
+    out = match(req(operating_hours_day=8), [r])
+    m = out.matches[0]
+    assert len(m.reasons) >= 2 and _no_filler(m.reasons)
+    assert any("runtime covers" in x for x in m.reasons)
+
+
+# ---- final-2: over-budget numeric prices warn ---------------------------
+
+def _budget_case(**price_kw):
+    r = robot("a", offers=(offer(),), prices=(price(**price_kw),))
+    out = match(req(budget_currency="USD", budget_max=100000, preferred_transaction="BUY"), [r])
+    return out.matches[0]
+
+
+def test_public_over_budget_warns_and_ramps() -> None:
+    m105 = _budget_case(amount=105000)
+    assert m105.breakdown["budget_fit"] == round(0.5 * 25, 2)  # ramp, not a cliff
+    assert "price exceeds the stated budget" in m105.warnings
+    m110 = _budget_case(amount=110000)
+    assert m110.breakdown["budget_fit"] == 0.0
+    assert "price exceeds the stated budget" in m110.warnings
+
+
+def test_range_starting_above_budget_warns() -> None:
+    m = _budget_case(ptype="RANGE", amount=None, pmin=105000, pmax=150000)
+    assert m.breakdown["budget_fit"] == round(0.5 * 25, 2)  # ramp on price_min
+    assert "price range starts above the stated budget" in m.warnings
+
+
+# ---- final-3: full-reference mixed-currency blocks BEST_LOWER_COST -------
+
+def test_single_robot_with_two_currencies_blocks_lower_cost() -> None:
+    a = robot("a", use_case_fit=0.99, offers=(offer(),))
+    b = robot("b", use_case_fit=0.80,
+              prices=(price(amount=10000, cur="USD"), price(amount=9000, cur="EUR")))
+    out = match(req(use_case="warehouse-logistics", preferred_transaction="BUY"), [a, b])
+    assert "BEST_LOWER_COST" not in {m.category for m in out.matches}
+
+
+def test_disjoint_currency_union_blocks_lower_cost() -> None:
+    a = robot("a", use_case_fit=0.99, offers=(offer(),))
+    b = robot("b", use_case_fit=0.80,
+              prices=(price(amount=9000, cur="EUR"), price(amount=10000, cur="USD")))
+    c = robot("c", use_case_fit=0.79,
+              prices=(price(amount=8000, cur="EUR"), price(amount=7000, cur="GBP")))
+    out = match(req(use_case="warehouse-logistics", preferred_transaction="BUY"), [a, b, c])
+    assert "BEST_LOWER_COST" not in {m.category for m in out.matches}
+
+
+# ---- final-4: no-match wording is quantified, not absolute ---------------
+
+def test_no_match_wording_is_quantified_not_absolute() -> None:
+    payloaders = [robot(f"p{i}", payload_kg=1) for i in range(6)]
+    disc = [robot(f"d{i}", commercial_status="DISCONTINUED", payload_kg=50) for i in range(5)]
+    out = match(req(payload_min_kg=40), payloaders + disc)
+    assert out.matches == ()
+    expl = out.no_match_explanation
+    assert expl.lower().startswith("no platform matched")
+    assert "every" not in expl.lower()       # dominant eliminated a subset, not all
+    assert "6 of 11 candidates" in expl      # quantified
+
+
 # ---- required-by soft penalty (never a hard exclude) --------------------
 
 def test_required_by_soft_penalty_not_exclusion() -> None:

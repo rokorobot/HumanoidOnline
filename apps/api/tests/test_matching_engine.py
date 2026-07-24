@@ -256,6 +256,121 @@ def test_categories_best_overall_then_labels() -> None:
     assert "BEST_COMMERCIAL" in cats.values() or "BEST_LOWER_COST" in cats.values()
 
 
+# ---- correction 1: BEST_COMMERCIAL requires an accessible offer ---------
+
+def test_best_commercial_requires_accessible_offer_not_just_subscore() -> None:
+    a = robot("a", use_case_fit=0.99, offers=(offer(),))          # rank 1
+    b = robot("b", use_case_fit=0.80, offers=(offer(status="ON_REQUEST"),))  # accessible
+    c = robot("c", use_case_fit=0.79)                             # NO offer -> 0.5, not accessible
+    out = match(req(use_case="warehouse-logistics"), [a, b, c])
+    cats = {m.slug: m.category for m in out.matches}
+    assert cats["b"] == "BEST_COMMERCIAL"      # ON_REQUEST is accessible
+    assert cats["c"] != "BEST_COMMERCIAL"      # no confirmed availability -> never
+
+
+def test_constrained_statuses_stay_commercially_eligible() -> None:
+    for status in ("ON_REQUEST", "WAITLIST", "LIMITED", "PREORDER"):
+        a = robot("a", use_case_fit=0.99, offers=(offer(),))
+        b = robot("b", use_case_fit=0.80, offers=(offer(status=status),))
+        out = match(req(use_case="warehouse-logistics"), [a, b])
+        cats = {m.slug: m.category for m in out.matches}
+        assert cats["b"] == "BEST_COMMERCIAL", status
+
+
+# ---- correction 2: BEST_LOWER_COST is a real lowest numeric price -------
+
+def test_best_lower_cost_picks_lowest_known_numeric_price() -> None:
+    a = robot("a", use_case_fit=0.99, offers=(offer(),))                 # rank 1
+    cheap = robot("cheap", use_case_fit=0.80, prices=(price(amount=10000),))
+    exp = robot("exp", use_case_fit=0.81, prices=(price(amount=90000),))
+    out = match(req(use_case="warehouse-logistics", preferred_transaction="BUY"),
+                [a, cheap, exp])
+    cats = {m.slug: m.category for m in out.matches}
+    assert cats["cheap"] == "BEST_LOWER_COST"   # 10k beats 90k, not slug order
+
+
+def test_quote_only_never_best_lower_cost() -> None:
+    a = robot("a", use_case_fit=0.99, offers=(offer(),))
+    q = robot("q", use_case_fit=0.80, prices=(price(ptype="QUOTE_ONLY", amount=None),))
+    out = match(req(use_case="warehouse-logistics", preferred_transaction="BUY"), [a, q])
+    cats = {m.slug: m.category for m in out.matches}
+    assert cats.get("q") != "BEST_LOWER_COST"
+
+
+def test_mixed_currencies_yield_no_best_lower_cost_without_buyer_currency() -> None:
+    a = robot("a", use_case_fit=0.99, offers=(offer(),))
+    usd = robot("usd", use_case_fit=0.80, prices=(price(amount=10000, cur="USD"),))
+    eur = robot("eur", use_case_fit=0.81, prices=(price(amount=9000, cur="EUR"),))
+    out = match(req(use_case="warehouse-logistics", preferred_transaction="BUY"),
+                [a, usd, eur])
+    assert "BEST_LOWER_COST" not in {m.category for m in out.matches}  # no FX
+
+
+# ---- correction 3: geography must not leak across transaction modes ------
+
+def _offer(txn, status, region, geo, avail=None) -> OfferInput:
+    return OfferInput(
+        transaction_type=txn, availability_status=status, is_current=True,
+        region_code=region, geo_applicable=geo, available_from=avail,
+    )
+
+
+def test_geography_does_not_leak_across_transaction_modes() -> None:
+    # Buyer wants RENT in DE; RENTAL only in US, PURCHASE available in DE.
+    r = robot("r", offers=(
+        _offer("RENTAL", "AVAILABLE", "US", geo=False),
+        _offer("PURCHASE", "AVAILABLE", "DE", geo=True),
+    ))
+    out = match(req(country="DE", preferred_transaction="RENT"), [r])
+    # geo active with commercial(20)+geo(15)+deployment(10)=45 => geo eff 33.33.
+    assert out.matches[0].breakdown["geographic_fit"] == round(0.5 * (15 * 100 / 45), 2)
+
+
+def test_geography_negative_only_when_transaction_matches() -> None:
+    r = robot("r", offers=(
+        _offer("RENTAL", "NOT_AVAILABLE", "DE", geo=True),
+        _offer("PURCHASE", "AVAILABLE", "DE", geo=True),
+    ))
+    out = match(req(country="DE", preferred_transaction="RENT"), [r])
+    # The applicable RENTAL DE offer is not accessible -> 0.0, PURCHASE can't rescue it.
+    assert out.matches[0].breakdown["geographic_fit"] == 0.0
+
+
+# ---- correction 4: multi-price budget is order-independent ---------------
+
+def test_budget_evaluation_is_order_independent() -> None:
+    p1 = price(ptype="QUOTE_ONLY", amount=None)
+    p2 = price(amount=5000, period="MONTHLY")
+    r = req(use_case="warehouse-logistics", budget_currency="USD", budget_max=100000,
+            preferred_transaction="BUY")
+    a = match(r, [robot("r", use_case_fit=0.9, offers=(offer(),), prices=(p1, p2))])
+    b = match(r, [robot("r", use_case_fit=0.9, offers=(offer(),), prices=(p2, p1))])
+    assert a == b  # identical score, reasons AND warnings regardless of price order
+
+
+# ---- correction 5: count ALL violations for the dominant constraint -----
+
+def test_no_match_explanation_counts_all_violations() -> None:
+    both = [robot(f"b{i}", payload_kg=1, autonomy="TELEOPERATED") for i in range(6)]
+    auto = [robot(f"a{i}", payload_kg=None, autonomy="TELEOPERATED") for i in range(5)]
+    out = match(req(payload_min_kg=50, autonomy_required="HIGHLY_AUTONOMOUS"), both + auto)
+    assert out.matches == ()
+    # autonomy=11 (6 both + 5 auto), payload=6 -> autonomy dominates, not payload.
+    assert "autonomy" in out.no_match_explanation.lower()
+
+
+# ---- correction 6: reasons are genuine, never manufacturer/tracking filler
+
+def test_sparse_reasons_are_genuine_and_at_least_two() -> None:
+    r = robot("r", commercial_status="COMMERCIAL", offers=(offer(status="ON_REQUEST"),))
+    out = match(req(use_case="warehouse-logistics"), [r])
+    m = out.matches[0]
+    assert len(m.reasons) >= 2
+    joined = " ".join(m.reasons).lower()
+    assert "tracked platform" not in joined
+    assert "maker" not in joined  # no manufacturer-name filler
+
+
 # ---- required-by soft penalty (never a hard exclude) --------------------
 
 def test_required_by_soft_penalty_not_exclusion() -> None:

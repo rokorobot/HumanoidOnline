@@ -126,6 +126,45 @@ def test_matching_writes_no_commercial_lead(client, database_url) -> None:
     assert _scalar("SELECT count(*) FROM commercial_lead") == before
 
 
+# ---- E7 at the API boundary: all candidates excluded --------------------
+
+def test_e7_all_candidates_excluded_returns_deterministic_empty(client, database_url) -> None:
+    # Controlled state: give every published robot a KNOWN low payload, then
+    # require a huge payload so all are hard-excluded. Restore afterwards.
+    with engine.begin() as conn:
+        conn.execute(text("SET search_path TO humanoid, public"))
+        original = conn.execute(
+            text("SELECT id, payload_kg FROM robot WHERE is_published")
+        ).all()
+        conn.execute(text("UPDATE robot SET payload_kg = 1 WHERE is_published"))
+    try:
+        leads_before = _scalar("SELECT count(*) FROM commercial_lead")
+        raw = {"wizard_version": 1, "answers": {"payload": {"state": "ANSWERED", "value": 9999}}}
+        rid = _create(client, {"payload_min_kg": 9999, "raw_input": raw})
+
+        a = client.get(f"/api/buyer-requirements/{rid}/matches")
+        assert a.status_code == 200
+        ja = a.json()
+        assert ja["matches"] == []
+        assert ja["no_match_explanation"] and "payload" in ja["no_match_explanation"].lower()
+        assert _scalar("SELECT count(*) FROM match_result WHERE requirement_id=:i", i=rid) == 0
+
+        # idempotent second GET — same response, still zero persisted rows.
+        jb = client.get(f"/api/buyer-requirements/{rid}/matches").json()
+        assert ja == jb
+        assert _scalar("SELECT count(*) FROM match_result WHERE requirement_id=:i", i=rid) == 0
+        # matching still writes no leads.
+        assert _scalar("SELECT count(*) FROM commercial_lead") == leads_before
+    finally:
+        with engine.begin() as conn:
+            conn.execute(text("SET search_path TO humanoid, public"))
+            for robot_id, payload in original:
+                conn.execute(
+                    text("UPDATE robot SET payload_kg = :p WHERE id = :i"),
+                    {"p": payload, "i": robot_id},
+                )
+
+
 # ---- unknown id ---------------------------------------------------------
 
 def test_matches_unknown_id_404(client, database_url) -> None:

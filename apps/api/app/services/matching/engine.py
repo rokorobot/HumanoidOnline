@@ -2,7 +2,8 @@
 
 `match(requirement, robots)` takes fully-materialized inputs and returns a
 `MatchOutcome`. It performs NO I/O, reads NO clock, uses NO randomness and NO LLM
-(frozen contract §7). Identical inputs always produce byte-identical output.
+(frozen contract §7). Identical inputs always produce byte-identical output —
+including when the caller passes offers/prices in a different order.
 
 Weights (§7): use-case 25 · commercial 20 · technical 20 · geography 15 ·
 budget 10 · deployment-readiness 10. A criterion the buyer did not engage is
@@ -13,10 +14,11 @@ criterion the robot has no data for scores a neutral-uncertain 0.5 + warning
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from app.services.matching.inputs import (
     MatchOutcome,
+    PriceInput,
     RequirementInput,
     RobotInput,
     ScoredMatch,
@@ -58,34 +60,53 @@ def _clamp(x: float, lo: float = 0.0, hi: float = 1.0) -> float:
     return lo if x < lo else hi if x > hi else x
 
 
+def _txn_allowed(pref: str) -> set[str] | None:
+    return PREF_TO_TXN.get(pref, None)
+
+
+def _txn_ok(txn: str, allowed: set[str] | None) -> bool:
+    return allowed is None or txn in allowed
+
+
 @dataclass
 class _Criterion:
     subscore: float
-    reasons: list[str]
-    warnings: list[str]
+    reasons: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    # commercial only: is there a real current, transaction-compatible, accessible
+    # offer? Distinct from subscore, which is 0.5 both for "no offer" and for an
+    # accessible-but-late offer (timeline soft penalty).
+    accessible: bool = False
 
 
 # --------------------------------------------------------------------------- #
-# Hard exclusions (§7.1) — a KNOWN value violating a STATED requirement.
+# Hard exclusions (§7.1). exclusion_reasons returns ALL violated rules so the
+# no_match_explanation can count each independently (not just the first hit).
 # --------------------------------------------------------------------------- #
-def exclusion_reason(req: RequirementInput, r: RobotInput) -> str | None:
+def exclusion_reasons(req: RequirementInput, r: RobotInput) -> list[str]:
+    out: list[str] = []
     if (
         req.payload_min_kg is not None
         and r.payload_kg is not None
         and r.payload_kg < req.payload_min_kg
     ):
-        return "payload"
+        out.append("payload")
     if req.manipulation_required is True and r.has_manipulation is False:
-        return "manipulation"
+        out.append("manipulation")
     if (
         req.autonomy_required is not None
         and r.autonomy is not None
         and AUTONOMY_ORDER.get(r.autonomy, 0) < AUTONOMY_ORDER.get(req.autonomy_required, 0)
     ):
-        return "autonomy"
+        out.append("autonomy")
     if r.commercial_status == "DISCONTINUED":
-        return "discontinued"
-    return None
+        out.append("discontinued")
+    return out
+
+
+def exclusion_reason(req: RequirementInput, r: RobotInput) -> str | None:
+    reasons = exclusion_reasons(req, r)
+    return reasons[0] if reasons else None
 
 
 # --------------------------------------------------------------------------- #
@@ -96,18 +117,15 @@ def _use_case(req: RequirementInput, r: RobotInput) -> _Criterion | None:
     if req.use_case is None:
         return None
     if r.use_case_fit is None:
-        return _Criterion(0.5, [], [f"use-case fit for {req.use_case} is unverified"])
+        return _Criterion(0.5, warnings=[f"use-case fit for {req.use_case} is unverified"])
     fit = _clamp(r.use_case_fit)
     reasons = [f"use-case fit {fit:.2f} for {req.use_case}"] if fit >= 0.6 else []
-    return _Criterion(fit, reasons, [])
+    return _Criterion(fit, reasons=reasons)
 
 
 def _matching_offers(req: RequirementInput, r: RobotInput):
-    allowed = PREF_TO_TXN.get(req.preferred_transaction, None)
-    return [
-        o for o in r.offers
-        if o.is_current and (allowed is None or o.transaction_type in allowed)
-    ]
+    allowed = _txn_allowed(req.preferred_transaction)
+    return [o for o in r.offers if o.is_current and _txn_ok(o.transaction_type, allowed)]
 
 
 def _commercial(req: RequirementInput, r: RobotInput) -> _Criterion:
@@ -120,28 +138,38 @@ def _commercial(req: RequirementInput, r: RobotInput) -> _Criterion:
         reasons.append("commercially accessible for the requested transaction")
         if not any(o.availability_status == "AVAILABLE" for o in accessible):
             warnings.append("commercial availability is constrained (waitlist/preorder/on-request)")
-        # required-by soft penalty (never a hard exclude)
         if req.required_by is not None:
             known = [o.available_from for o in accessible if o.available_from is not None]
             if known and min(known) > req.required_by:
                 sub = 0.5
                 warnings.append("earliest known availability is after the required-by date")
-        return _Criterion(sub, reasons if sub == 1.0 else [], warnings)
+        # `accessible` stays True even when the timeline soft penalty lowers sub.
+        return _Criterion(
+            sub, reasons=reasons if sub == 1.0 else [], warnings=warnings, accessible=True
+        )
     if offers:  # matching offers exist but all are NOT_AVAILABLE / DISCONTINUED
-        return _Criterion(0.0, [], ["no accessible commercial offer for the requested transaction"])
-    return _Criterion(0.5, [], ["no confirmed commercial availability"])
+        return _Criterion(
+            0.0, warnings=["no accessible commercial offer for the requested transaction"]
+        )
+    return _Criterion(0.5, warnings=["no confirmed commercial availability"])
 
 
 def _geography(req: RequirementInput, r: RobotInput) -> _Criterion | None:
     if req.country is None:
         return None
-    applicable = [o for o in r.offers if o.is_current and o.geo_applicable]
+    # Geography must use the SAME transaction-compatible offer universe as the
+    # buyer's preference — a PURCHASE offer must not prove RENT geography.
+    allowed = _txn_allowed(req.preferred_transaction)
+    applicable = [
+        o for o in r.offers
+        if o.is_current and o.geo_applicable and _txn_ok(o.transaction_type, allowed)
+    ]
     accessible = [o for o in applicable if o.availability_status not in NON_ACCESSIBLE]
     if accessible:
-        return _Criterion(1.0, [f"available in {req.country}"], [])
+        return _Criterion(1.0, reasons=[f"available in {req.country}"])
     if applicable:
-        return _Criterion(0.0, [], [f"offers for {req.country} are not accessible"])
-    return _Criterion(0.5, [], [f"no regional availability evidence for {req.country}"])
+        return _Criterion(0.0, warnings=[f"offers for {req.country} are not accessible"])
+    return _Criterion(0.5, warnings=[f"no regional availability evidence for {req.country}"])
 
 
 def _technical(req: RequirementInput, r: RobotInput) -> _Criterion | None:
@@ -191,28 +219,35 @@ def _technical(req: RequirementInput, r: RobotInput) -> _Criterion | None:
 
     if not parts:
         return None
-    return _Criterion(sum(parts) / len(parts), reasons, warnings)
+    return _Criterion(sum(parts) / len(parts), reasons=reasons, warnings=warnings)
+
+
+def _price_key(p: PriceInput) -> tuple:
+    """A stable, order-independent identity for a price offer."""
+    return (
+        p.transaction_type, p.price_type, p.currency or "", p.billing_period,
+        p.price if p.price is not None else -1.0,
+        p.price_min if p.price_min is not None else -1.0,
+        p.price_max if p.price_max is not None else -1.0,
+    )
 
 
 def _budget(req: RequirementInput, r: RobotInput) -> _Criterion | None:
     if req.budget_min is None and req.budget_max is None:
         return None
-    # Descriptive minimum only, no ceiling -> neutral (never penalize "too cheap").
     if req.budget_max is None:
-        return _Criterion(0.5, [], [])
+        # Descriptive minimum only, no ceiling -> neutral (never penalize "cheaper").
+        return _Criterion(0.5)
 
     cur = (req.budget_currency or "").upper()
-    allowed = PREF_TO_TXN.get(req.preferred_transaction, None)
+    allowed = _txn_allowed(req.preferred_transaction)
 
-    def comparable(p) -> bool:
-        # No FX in WS6: only compare a price stated in the buyer's currency,
-        # matching the transaction preference, and geographically applicable
-        # when a country was stated.
+    def comparable(p: PriceInput) -> bool:
         if not p.is_current:
             return False
         if not (p.currency and p.currency.upper() == cur):
             return False
-        if allowed is not None and p.transaction_type not in allowed:
+        if not _txn_ok(p.transaction_type, allowed):
             return False
         if req.country is not None and not p.geo_applicable:
             return False
@@ -220,13 +255,10 @@ def _budget(req: RequirementInput, r: RobotInput) -> _Criterion | None:
 
     prices = [p for p in r.prices if comparable(p)]
     if not prices:
-        # Distinguish *why* there is no comparable price (all neutral-uncertain).
         if any(p.is_current for p in r.prices):
-            return _Criterion(0.5, [], ["no price in the requested currency/terms"])
-        return _Criterion(0.5, [], ["no confirmed pricing"])
+            return _Criterion(0.5, warnings=["no price in the requested currency/terms"])
+        return _Criterion(0.5, warnings=["no confirmed pricing"])
 
-    best = 0.0
-    best_warnings: list[str] = []
     max_ = req.budget_max
 
     def ramp(price: float) -> float:
@@ -236,6 +268,9 @@ def _budget(req: RequirementInput, r: RobotInput) -> _Criterion | None:
             return 0.0
         return (1.1 * max_ - price) / (0.1 * max_)
 
+    # Evaluate every comparable price, then pick the winner ORDER-INDEPENDENTLY:
+    # highest fit, then fewest warnings, then a stable price key.
+    evaluated: list[tuple[float, int, tuple, list[str]]] = []
     for p in prices:
         w: list[str] = []
         if p.price_type == "QUOTE_ONLY":
@@ -262,22 +297,49 @@ def _budget(req: RequirementInput, r: RobotInput) -> _Criterion | None:
         else:
             bf = 0.5
             w.append("pricing is indicative")
-        if bf > best:
-            best, best_warnings = bf, w
-    reasons = ["within the stated budget"] if best >= 0.99 else []
-    return _Criterion(best, reasons, best_warnings)
+        evaluated.append((bf, len(w), _price_key(p), w))
+
+    evaluated.sort(key=lambda e: (-e[0], e[1], e[2]))
+    best_bf, _, _, best_warnings = evaluated[0]
+    reasons = ["within the stated budget"] if best_bf >= 0.99 else []
+    return _Criterion(best_bf, reasons=reasons, warnings=best_warnings)
+
+
+def eligible_cost(req: RequirementInput, r: RobotInput) -> tuple[float, str] | None:
+    """The lowest 'lower-cost'-eligible price for BEST_LOWER_COST: a current,
+    transaction-compatible, geography-compatible (when a country is stated),
+    ONE_TIME, PUBLIC/ESTIMATED point price. When the buyer stated a budget
+    currency, only that currency is eligible. Returns (price, currency) or None."""
+    allowed = _txn_allowed(req.preferred_transaction)
+    want_cur = req.budget_currency.upper() if req.budget_currency else None
+    elig: list[PriceInput] = []
+    for p in r.prices:
+        if not p.is_current or p.price is None:
+            continue
+        if p.billing_period != "ONE_TIME" or p.price_type not in ("PUBLIC", "ESTIMATED"):
+            continue
+        if not _txn_ok(p.transaction_type, allowed):
+            continue
+        if req.country is not None and not p.geo_applicable:
+            continue
+        if want_cur is not None and (p.currency or "").upper() != want_cur:
+            continue
+        elig.append(p)
+    if not elig:
+        return None
+    best = min(elig, key=lambda p: (p.price, (p.currency or "")))
+    return (float(best.price), (best.currency or "").upper())
 
 
 def _deployment(r: RobotInput) -> _Criterion:
     maturity = MATURITY.get(r.commercial_status, 0.0)
     evidence = 1.0 if r.deployment_count >= 1 else 0.5
     sub = 0.5 * maturity + 0.5 * evidence
-    reasons: list[str] = []
+    # commercial_status is NOT NULL — always a genuine, contributing fact.
+    reasons = [f"commercial status: {r.commercial_status}"]
     if r.deployment_count >= 1:
         reasons.append(f"{r.deployment_count} confirmed deployment(s)")
-    if maturity >= 1.0:
-        reasons.append(f"commercial maturity: {r.commercial_status}")
-    return _Criterion(sub, reasons, [])
+    return _Criterion(sub, reasons=reasons)
 
 
 # --------------------------------------------------------------------------- #
@@ -291,6 +353,9 @@ class _Scored:
     reasons: list[str]
     warnings: list[str]
     commercial_sub: float
+    commercial_accessible: bool
+    lowest_cost: float | None
+    cost_currency: str | None
     deployment_count: int
     verified_key: float  # -epoch (fresher sorts first); +inf when unknown
 
@@ -310,7 +375,6 @@ def _score(req: RequirementInput, r: RobotInput) -> _Scored:
 
     breakdown: dict[str, float] = {}
     contributions: list[tuple[float, str]] = []
-    reasons: list[str] = []
     warnings: list[str] = []
     for key in BREAKDOWN_KEYS:
         c = crits[key]
@@ -326,24 +390,26 @@ def _score(req: RequirementInput, r: RobotInput) -> _Scored:
 
     score = round(sum(breakdown.values()))
 
-    # reasons[] = top concrete contributing facts, guaranteed >= 2 (§7.5).
+    # reasons[] = genuine facts only (active-criterion contributions + the always-
+    # known commercial-status fact), highest-contributing first, de-duplicated. No
+    # generic/marketing filler (§7.5).
     contributions.sort(key=lambda t: (-t[0], t[1]))
+    reasons: list[str] = []
     for _, text in contributions:
         if text not in reasons:
             reasons.append(text)
-    if len(reasons) < 2:
-        pub = f"tracked platform by {r.manufacturer_name}"
-        if pub not in reasons:
-            reasons.append(pub)
-    if len(reasons) < 2:
-        reasons.append(f"commercial status: {r.commercial_status}")
     reasons = reasons[:4]
 
     vt = r.freshest_verified_at
     verified_key = -vt.timestamp() if vt is not None else float("inf")
+    ec = eligible_cost(req, r)
     return _Scored(
         slug=r.slug, score=score, breakdown=breakdown, reasons=reasons,
-        warnings=warnings, commercial_sub=crits["commercial_availability"].subscore,
+        warnings=warnings,
+        commercial_sub=crits["commercial_availability"].subscore,
+        commercial_accessible=crits["commercial_availability"].accessible,
+        lowest_cost=ec[0] if ec else None,
+        cost_currency=ec[1] if ec else None,
         deployment_count=r.deployment_count, verified_key=verified_key,
     )
 
@@ -351,7 +417,9 @@ def _score(req: RequirementInput, r: RobotInput) -> _Scored:
 # --------------------------------------------------------------------------- #
 # Category assignment among the top survivors (§6.8 result labels).
 # --------------------------------------------------------------------------- #
-def _assign_categories(ranked: list[_Scored], robots: dict[str, RobotInput]) -> dict[str, str]:
+def _assign_categories(
+    ranked: list[_Scored], robots: dict[str, RobotInput], req: RequirementInput
+) -> dict[str, str]:
     cats = {ranked[0].slug: "BEST_OVERALL"} if ranked else {}
     pool = ranked[1:]  # ranks 2..N
     taken: set[str] = set()
@@ -363,12 +431,23 @@ def _assign_categories(ranked: list[_Scored], robots: dict[str, RobotInput]) -> 
                 taken.add(s.slug)
                 return
 
-    # BEST_COMMERCIAL: strongest commercial availability (must be positive).
-    claim(sorted([s for s in pool if s.commercial_sub > 0.0],
-                 key=lambda s: (-s.commercial_sub, s.slug)), "BEST_COMMERCIAL")
-    # BEST_LOWER_COST: strongest budget fit (must be positive).
-    claim(sorted([s for s in pool if s.breakdown["budget_fit"] > 0.0],
-                 key=lambda s: (-s.breakdown["budget_fit"], s.slug)), "BEST_LOWER_COST")
+    # BEST_COMMERCIAL: "Best Commercial (available)" — must have a real accessible
+    # offer, not merely a 0.5 unknown-availability subscore.
+    claim(
+        sorted([s for s in pool if s.commercial_accessible],
+               key=lambda s: (-s.commercial_sub, s.slug)),
+        "BEST_COMMERCIAL",
+    )
+
+    # BEST_LOWER_COST: lowest KNOWN numeric eligible cost. No FX: with no buyer
+    # currency, only assign when the compared candidates share one currency.
+    cost_pool = [s for s in pool if s.slug not in taken and s.lowest_cost is not None]
+    if not req.budget_currency:
+        currencies = {s.cost_currency for s in cost_pool}
+        if len(currencies) > 1:
+            cost_pool = []
+    claim(sorted(cost_pool, key=lambda s: (s.lowest_cost, s.slug)), "BEST_LOWER_COST")
+
     # BEST_DEVELOPER: a developer-oriented platform.
     def dev(s: _Scored) -> bool:
         rb = robots[s.slug]
@@ -384,13 +463,17 @@ def _assign_categories(ranked: list[_Scored], robots: dict[str, RobotInput]) -> 
 # Public entrypoint.
 # --------------------------------------------------------------------------- #
 def match(req: RequirementInput, robots: list[RobotInput]) -> MatchOutcome:
-    excluded: dict[str, int] = {}
+    excluded_counts: dict[str, int] = {}
+    excluded_total = 0
     survivors: list[_Scored] = []
     by_slug: dict[str, RobotInput] = {}
     for r in robots:
-        reason = exclusion_reason(req, r)
-        if reason is not None:
-            excluded[reason] = excluded.get(reason, 0) + 1
+        reasons = exclusion_reasons(req, r)
+        if reasons:
+            excluded_total += 1
+            # Count EVERY violated rule so the dominant constraint is order-free.
+            for code in reasons:
+                excluded_counts[code] = excluded_counts.get(code, 0) + 1
             continue
         by_slug[r.slug] = r
         survivors.append(_score(req, r))
@@ -399,7 +482,7 @@ def match(req: RequirementInput, robots: list[RobotInput]) -> MatchOutcome:
         -s.score, -s.commercial_sub, -s.deployment_count, s.verified_key, s.slug,
     ))
     top = survivors[:4]
-    cats = _assign_categories(top, by_slug)
+    cats = _assign_categories(top, by_slug, req)
 
     matches = tuple(
         ScoredMatch(
@@ -412,9 +495,9 @@ def match(req: RequirementInput, robots: list[RobotInput]) -> MatchOutcome:
 
     no_match_explanation = None
     if not matches:
-        if excluded:
-            reason = max(sorted(excluded), key=lambda k: excluded[k])
-            n = excluded[reason]
+        if excluded_counts:
+            reason = max(sorted(excluded_counts), key=lambda k: excluded_counts[k])
+            n = excluded_counts[reason]
             total = len(robots)
             no_match_explanation = (
                 f"No platform matched: {_EXCLUSION_TEXT[reason]} "

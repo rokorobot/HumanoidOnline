@@ -1,7 +1,7 @@
 # HumanoidOnline — Development Roadmap
 
 > **Status:** Living delivery roadmap
-> **Current stage:** WS4 — Advanced Compare / Decision
+> **Current stage:** WS5 — Buyer Intent
 > **Last updated:** 2026-07-24
 
 This document defines **implementation sequencing and workstream boundaries**: in
@@ -33,8 +33,8 @@ WS2A   Knowledge API                      ✅ COMPLETE
 WS2B   Verified Catalogue                 ✅ COMPLETE
 UI-D1  Visual System                      ✅ COMPLETE
 WS3    Intelligence UI                    ✅ COMPLETE
-WS4    Advanced Compare / Decision        🟠 CURRENT
-WS5    Buyer Intent                       ⏳ PLANNED
+WS4    Advanced Compare / Decision        ✅ COMPLETE
+WS5    Buyer Intent                       🟠 CURRENT
 WS6    Deterministic Matching             ⏳ PLANNED
 WS7    Commercial Lead                    ⏳ PLANNED
 WS8    MVP Hardening / Release            ⏳ PLANNED
@@ -155,7 +155,14 @@ wizard persistence, scoring, results or lead capture is implemented.
 
 ---
 
-## 4. WS4 — Advanced Compare / Decision ⏳
+## 4. WS4 — Advanced Compare / Decision ✅ COMPLETE
+
+*Merged in #7 (`6c2d982`): additive to the shipped `/compare` — normalization +
+Metric/Imperial, a single tested ComparisonPolicy, metric-local best-in-row (never
+a score), like-for-like price comparison, deeper fact-level evidence comparison
+(incl. the authorized additive `evidence.observed_at`), reference-robot deltas,
+URL-canonical shareable state, localStorage-only saved views. No
+matching/scoring/persistence/schema.*
 
 Base `/compare` shipped as part of WS3, so WS4 does **not** re-implement it. WS4 owns:
 ```
@@ -256,11 +263,11 @@ migration to activate.
 that contains this file, which can never store its own future merge SHA.)*
 
 ```
-Current workstream base:  521e2b90fd1290a9791de671f26e76792cd1b9b9
-Current workstream:       WS4 — Advanced Compare / Decision
-Current branch:           fm/ws4-advanced-compare
+Current workstream base:  6c2d982f16585b5254e6dda940c3227446947608
+Current workstream:       WS5 — Buyer Intent
+Current branch:           fm/ws5-buyer-intent
 
-Completed:  ✅ WS0  ✅ WS1  ✅ WS2A  ✅ WS2B  ✅ UI-D1  ✅ WS3
-Current:    🟠 WS4
-Next:       WS5 → WS6 → WS7 → WS8
+Completed:  ✅ WS0  ✅ WS1  ✅ WS2A  ✅ WS2B  ✅ UI-D1  ✅ WS3  ✅ WS4
+Current:    🟠 WS5
+Next:       WS6 → WS7 → WS8
 ```

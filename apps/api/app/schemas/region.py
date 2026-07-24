@@ -21,3 +21,15 @@ class RegionRead(BaseModel):
     name: str
     iso_country: str | None
     created_at: datetime
+
+
+class RegionListItem(BaseModel):
+    """Compact canonical region for pickers (e.g. the buyer-intent Country step).
+    `code` is the value submitted back to POST /api/buyer-requirements."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    code: str
+    name: str
+    type: str
+    iso_country: str | None = None

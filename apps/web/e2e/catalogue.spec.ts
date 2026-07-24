@@ -156,21 +156,25 @@ test("use-cases: robot count uses singular grammar ('1 ROBOT') and whole-card li
   await expect(tile).toBeFocused();
 });
 
-test("find-a-humanoid: informational only — no step contract, no selectable cards", async ({
+test("find-a-humanoid: the 12-step buyer-intent wizard renders (WS5 supersedes the WS3 placeholder)", async ({
   page,
 }) => {
   await page.goto("/find-a-humanoid");
-  const body = await page.locator("body").innerText();
-  expect(body).not.toContain("STEP 01 / 06");
-  expect(body).not.toContain("STEP 01");
-  // The illustrative selectable use-case option cards are gone.
-  await expect(page.locator(".choices, .choice")).toHaveCount(0);
-  // No interactive form controls on the page (buttons that are real controls,
-  // inputs, selects). Only navigational links remain.
-  await expect(page.locator("input, select, textarea, button")).toHaveCount(0);
-  // The boundary marker + live catalogue action are present.
-  await expect(page.getByText(/COMING IN BUYER INTENT/i)).toBeVisible();
-  await expect(page.getByRole("link", { name: /Browse the catalogue/i })).toBeVisible();
+  // Step 1 is TASK, seeded from the live use-case catalogue.
+  await expect(
+    page.getByRole("heading", { name: /What do you need the robot to do/i }),
+  ).toBeVisible();
+  // A real catalogue use case is a selectable option (not illustrative).
+  await expect(page.locator("#wz-usecase")).toBeVisible();
+  await expect(
+    page.locator("#wz-usecase option", { hasText: "Warehouse & Logistics" }),
+  ).toHaveCount(1);
+  // Exactly 12 steps; UNKNOWN and SKIP are distinct, explicit actions.
+  await expect(page.locator(".wz-step")).toHaveCount(12);
+  await expect(page.getByRole("button", { name: "Unknown" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Skip" })).toBeVisible();
+  // The WS3 placeholder is gone.
+  await expect(page.locator("body")).not.toContainText("COMING IN BUYER INTENT");
 });
 
 test("robot detail 404s for an unknown slug", async ({ page }) => {

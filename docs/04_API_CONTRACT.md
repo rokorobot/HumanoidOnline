@@ -93,10 +93,21 @@ Full detail. Response `200` (abbreviated):
 ### `GET /api/use-cases` — index with `robot_count` per use case.
 ### `GET /api/use-cases/{slug}` — detail + `suitable_robots: [{slug, name, fit_score, commercial_readiness, limitations}]` ordered by `fit_score` desc.
 
+## 3b. Regions (supporting read)
+
+### `GET /api/regions`
+Canonical geography for pickers — added in WS5 to drive the buyer-intent **Country** step from live data (never a hardcoded country array), mirroring how the TASK step is seeded from `GET /api/use-cases`. Optional `?type=` filters by `region_type` (e.g. `COUNTRY`). Returns a bare array ordered by name:
+```json
+[ { "code": "DE", "name": "Germany", "type": "COUNTRY", "iso_country": "DE" } ]
+```
+`code` is exactly what `POST /api/buyer-requirements` resolves for `country` (COUNTRY rows only). Read-only; product-owner-authorized additive endpoint.
+
 ## 4. Buyer intent & matching
 
+`POST /api/buyer-requirements` is **anonymous intent capture** (WS5): it collects **no contact identity** (name/email/organization belong to WS7 `commercial-leads`), runs **no matching** and creates **no** `match_result`/`commercial_lead`. `raw_input` is **required and versioned** (`wizard_version` + per-answer `state` ∈ `ANSWERED|UNKNOWN|SKIPPED`), and `country` resolves **only** to a canonical `COUNTRY` region (an economic zone like `EU` or `GLOBAL` is rejected `422`).
+
 ### `POST /api/buyer-requirements`
-Body (all fields optional except at least one requirement signal; contact fields optional at this stage):
+Body (all fields optional except a required versioned `raw_input` and at least one requirement signal):
 ```json
 {
   "buyer_type": "COMMERCIAL_BUYER",
@@ -112,10 +123,13 @@ Body (all fields optional except at least one requirement signal; contact fields
   "budget": { "currency": "EUR", "min": null, "max": 250000 },
   "required_by": "2027-01-01",
   "preferred_transaction": "RAAS",
-  "raw_input": { "wizard_answers": "…" }
+  "raw_input": {
+    "wizard_version": 1,
+    "answers": { "country": { "state": "ANSWERED", "value": "DE" }, "payload": { "state": "UNKNOWN" } }
+  }
 }
 ```
-Response `201`: `{ "id": "uuid" }`. Matching runs synchronously on create (or on first fetch below).
+Response `201`: `{ "id": "uuid" }`. In WS5 matching does **not** run on create — it runs on the first `GET …/matches` fetch below (WS6). Invalid `use_case`/`country`, a missing/unversioned `raw_input`, a contact field, or no requirement signal all return `422`, and a rejected request persists nothing.
 
 ### `GET /api/buyer-requirements/{id}/matches`
 Response `200`:

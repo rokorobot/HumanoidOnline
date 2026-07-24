@@ -11,6 +11,7 @@ import type {
   ManufacturerListItem,
   MarketSnapshot,
   Page,
+  RegionListItem,
   RobotDetail,
   RobotListItem,
   UseCaseDetail,
@@ -134,6 +135,18 @@ export function getUseCase(slug: string): Promise<UseCaseDetail> {
   return getJSON<UseCaseDetail>(`/api/use-cases/${encodeURIComponent(slug)}`, {
     notFoundOn404: true,
   });
+}
+
+// ---- Regions ---------------------------------------------------------------
+
+// Canonical region reference (drives the buyer-intent Country step). `type` can
+// filter to COUNTRY. Returned `code` is what POST /api/buyer-requirements resolves.
+export function listRegions(
+  params: { type?: string } = {},
+): Promise<RegionListItem[]> {
+  return getJSON<RegionListItem[]>(
+    `/api/regions${buildQuery(params as Record<string, QueryValue>)}`,
+  );
 }
 
 // ---- Market snapshot -------------------------------------------------------

@@ -2,8 +2,9 @@
 
 WS1 established the infrastructure surface (health/readiness). WS2 adds the
 Knowledge-Layer READ API (robots, manufacturers, use-cases) plus a minimal
-internal admin. Decision/transaction features (matching, buyer intent, leads)
-are later workstreams and are intentionally absent.
+internal admin. WS5 adds the first Decision-layer write path — buyer intent
+(`POST /api/buyer-requirements`) with a canonical regions read. Matching and
+lead capture remain later workstreams (WS6/WS7) and are intentionally absent.
 
 Run locally:  uv run python -m uvicorn app.main:app --reload
 """
@@ -14,7 +15,15 @@ from fastapi import FastAPI
 import app.models  # noqa: F401  (register all ORM models on Base.metadata)
 from app.admin import mount_admin
 from app.config import get_settings
-from app.routers import health, manufacturers, robots, stats, use_cases
+from app.routers import (
+    buyer_requirements,
+    health,
+    manufacturers,
+    regions,
+    robots,
+    stats,
+    use_cases,
+)
 
 settings = get_settings()
 
@@ -24,7 +33,10 @@ app.include_router(health.router)
 app.include_router(robots.router)
 app.include_router(manufacturers.router)
 app.include_router(use_cases.router)
+app.include_router(regions.router)
 app.include_router(stats.router)
+# WS5 — Phase-2 buyer intent (first write path).
+app.include_router(buyer_requirements.router)
 
 # Internal-only admin at /admin (network-gate in deployment; not public).
 mount_admin(app)

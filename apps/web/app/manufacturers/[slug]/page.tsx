@@ -2,6 +2,7 @@
 import Link from "next/link";
 
 import { getManufacturer } from "@/lib/api-client";
+import { regionLabel } from "@/lib/format";
 import { StatusBracket } from "@/components/StatusBadge";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteFooter, SiteNav } from "@/components/SiteNav";
@@ -58,7 +59,7 @@ export default async function ManufacturerDetailPage({
               )}
             </div>
             <div>
-              <div className="ho-leader"><span>COUNTRY</span><span className="fill" /><span style={m.country ? undefined : { color: "var(--ho-unknown)" }}>{m.country ?? "UNKNOWN"}</span></div>
+              <div className="ho-leader"><span>REGION</span><span className="fill" /><span style={m.country ? undefined : { color: "var(--ho-unknown)" }}>{regionLabel(m.country) ?? "UNKNOWN"}</span></div>
               <div className="ho-leader"><span>FOUNDED</span><span className="fill" /><span style={m.founded_year ? undefined : { color: "var(--ho-unknown)" }}>{m.founded_year ?? "UNKNOWN"}</span></div>
               <div className="ho-leader"><span>MODEL</span><span className="fill" /><span style={m.commercial_model ? undefined : { color: "var(--ho-unknown)" }}>{m.commercial_model ?? "UNKNOWN"}</span></div>
               <div className="ho-leader"><span>DEPLOY</span><span className="fill" /><span style={m.deployment_status ? undefined : { color: "var(--ho-unknown)" }}>{m.deployment_status ?? "UNKNOWN"}</span></div>

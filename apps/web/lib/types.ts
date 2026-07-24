@@ -182,6 +182,8 @@ export interface ManufacturerListItem {
   country?: string | null;
   robot_count: number;
   deployment_status?: string | null;
+  // Derived from published robots' commercial_status (not the deployment column).
+  portfolio_status?: string | null;
 }
 
 export interface ManufacturerRobot {

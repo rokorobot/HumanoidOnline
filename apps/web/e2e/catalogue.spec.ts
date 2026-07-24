@@ -89,6 +89,53 @@ test("compare renders a matrix with QUOTE_ONLY, PUBLIC and UNKNOWN kept distinct
   expect(body).not.toContain("$90,000");
 });
 
+test("manufacturers: Figure PORTFOLIO is DISCONTINUED (derived), not COMMERCIAL", async ({
+  page,
+}) => {
+  await page.goto("/manufacturers");
+  // The Figure card is a whole-card link.
+  const card = page.locator("a.mcard", { hasText: "Figure" });
+  await expect(card).toBeVisible();
+  // PORTFOLIO shows the derived robot-portfolio status, not the company column.
+  await expect(card).toContainText("PORTFOLIO");
+  await expect(card).toContainText("DISCONTINUED");
+  await expect(card).not.toContainText("DEPLOY");
+  // Whole-card link is keyboard-focusable.
+  await card.focus();
+  await expect(card).toBeFocused();
+});
+
+test("use-cases: robot count uses singular grammar ('1 ROBOT') and whole-card links", async ({
+  page,
+}) => {
+  await page.goto("/use-cases");
+  const body = await page.locator("body").innerText();
+  // Singular must appear somewhere; the malformed '1 ROBOTS' must not.
+  expect(body).toContain("1 ROBOT");
+  expect(body).not.toContain("1 ROBOTS");
+  const tile = page.locator("a.app").first();
+  await expect(tile).toBeVisible();
+  await tile.focus();
+  await expect(tile).toBeFocused();
+});
+
+test("find-a-humanoid: informational only — no step contract, no selectable cards", async ({
+  page,
+}) => {
+  await page.goto("/find-a-humanoid");
+  const body = await page.locator("body").innerText();
+  expect(body).not.toContain("STEP 01 / 06");
+  expect(body).not.toContain("STEP 01");
+  // The illustrative selectable use-case option cards are gone.
+  await expect(page.locator(".choices, .choice")).toHaveCount(0);
+  // No interactive form controls on the page (buttons that are real controls,
+  // inputs, selects). Only navigational links remain.
+  await expect(page.locator("input, select, textarea, button")).toHaveCount(0);
+  // The boundary marker + live catalogue action are present.
+  await expect(page.getByText(/COMING IN BUYER INTENT/i)).toBeVisible();
+  await expect(page.getByRole("link", { name: /Browse the catalogue/i })).toBeVisible();
+});
+
 test("robot detail 404s for an unknown slug", async ({ page }) => {
   const res = await page.goto("/robots/does-not-exist");
   expect(res?.status()).toBe(404);

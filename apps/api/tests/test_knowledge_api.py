@@ -113,6 +113,34 @@ def test_manufacturer_404(client, database_url) -> None:
     assert client.get("/api/manufacturers/nope").status_code == 404
 
 
+def test_derive_portfolio_status_rules() -> None:
+    """Pure derivation rules (no DB): DISCONTINUED excluded from the ranking and
+    only chosen when EVERY robot is discontinued; null when empty."""
+    from app.services.reads import derive_portfolio_status
+
+    assert derive_portfolio_status([]) is None
+    assert derive_portfolio_status(["DISCONTINUED"]) == "DISCONTINUED"
+    assert derive_portfolio_status(["DISCONTINUED", "DISCONTINUED"]) == "DISCONTINUED"
+    # An active status always outranks DISCONTINUED.
+    assert derive_portfolio_status(["DISCONTINUED", "PILOT"]) == "PILOT"
+    # Most commercially-mature ACTIVE status wins.
+    assert derive_portfolio_status(["ANNOUNCED", "PILOT", "COMMERCIAL"]) == "COMMERCIAL"
+    assert derive_portfolio_status(["PILOT", "ANNOUNCED"]) == "PILOT"
+    assert derive_portfolio_status(["COMMERCIAL", "RAAS_DEPLOYMENT"]) == "RAAS_DEPLOYMENT"
+
+
+def test_manufacturer_portfolio_status(client, database_url) -> None:
+    body = _get(client, "/api/manufacturers", limit=100)
+    by_slug = {m["slug"]: m for m in body["items"]}
+    for item in body["items"]:
+        assert "portfolio_status" in item
+    # Honda: only ASIMO (DISCONTINUED) -> the all-discontinued rule.
+    assert by_slug["honda"]["portfolio_status"] == "DISCONTINUED"
+    # Figure: figure-02 PILOT + figure-03 ANNOUNCED -> most mature ACTIVE = PILOT
+    # (derived from robots, NOT the coarse deployment_status company column).
+    assert by_slug["figure-ai"]["portfolio_status"] == "PILOT"
+
+
 # ---- Use cases -----------------------------------------------------------
 
 def test_use_cases_list_and_detail(client, database_url) -> None:

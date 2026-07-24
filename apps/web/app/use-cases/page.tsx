@@ -2,6 +2,7 @@
 import Link from "next/link";
 
 import { listUseCases } from "@/lib/api-client";
+import { formatRobotCount } from "@/lib/format";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteFooter, SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
@@ -32,7 +33,7 @@ export default async function UseCasesPage() {
             <Link className="app" href={`/use-cases/${u.slug}`} key={u.slug}>
               <SystemLabel>{String(i + 1).padStart(2, "0")}</SystemLabel>
               <span className="name">{u.name}</span>
-              <SystemLabel>{u.robot_count} ROBOTS</SystemLabel>
+              <SystemLabel>{formatRobotCount(u.robot_count)}</SystemLabel>
             </Link>
           ))}
         </div>

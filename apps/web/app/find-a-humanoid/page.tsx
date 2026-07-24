@@ -1,7 +1,9 @@
-// Find a Humanoid — DORMANT reference surface. WS3 keeps the nav entry and the
-// approved visual reference, but implements NO requirement persistence, scoring,
-// match results, or lead capture (hard scope boundary). MatchScore stays
-// dormant. This page renders the approved shell and states the boundary plainly.
+// Find a Humanoid — PURELY INFORMATIONAL reference surface. WS3 keeps the nav
+// entry and states the boundary plainly. It establishes NO wizard step contract,
+// contains NOTHING selectable/interactive, and implements NO requirement
+// persistence, scoring, matches, or lead capture (hard scope boundary). The
+// frozen Buyer-Intent flow (12 steps) is shown only as static, non-interactive
+// architectural preview text.
 import Link from "next/link";
 
 import { GraphicMarker } from "@/components/GraphicMarker";
@@ -14,71 +16,97 @@ export const metadata = {
   title: "Find a Humanoid — HumanoidOnline",
 };
 
+// The frozen Buyer-Intent requirement flow (12 steps). Static reference only.
+const FUTURE_STEPS = [
+  "TASK",
+  "INDUSTRY",
+  "COUNTRY",
+  "ENVIRONMENT",
+  "PAYLOAD",
+  "HOURS",
+  "MANIPULATION",
+  "AUTONOMY",
+  "BUDGET",
+  "TIMELINE",
+  "TRANSACTION",
+  "REVIEW",
+];
+
 export default function FindAHumanoidPage() {
   return (
     <>
       <SystemHeader
-        title="FIND A HUMANOID / GUIDED MATCH"
-        fields={[{ label: "STATUS", value: "REFERENCE — NOT YET WIRED" }]}
+        title="FIND A HUMANOID / GUIDED REQUIREMENT MATCHING"
+        fields={[{ label: "STATUS", value: "PLANNED — BUYER INTENT STAGE" }]}
       />
       <div className="wrap wrap--narrow">
         <SiteNav active="find" />
 
         <div className="pagebar">
           <div>
-            <SectionIndex>FIND A HUMANOID — GUIDED MATCH</SectionIndex>
+            <SectionIndex>FIND A HUMANOID / GUIDED REQUIREMENT MATCHING</SectionIndex>
             <h1>Find a humanoid</h1>
           </div>
+          <span className="ho-badge ho-badge--caution">
+            COMING IN BUYER INTENT / MATCHING
+          </span>
         </div>
 
-        <div
-          className="action-panel"
-          style={{ marginTop: "var(--ho-sp-4)", alignItems: "flex-start" }}
-        >
-          <div>
-            <SystemLabel as="div">Guided requirement matching</SystemLabel>
-            <p className="prose" style={{ marginTop: 10 }}>
-              A guided wizard will capture your requirements — use case, payload,
-              autonomy, budget, region, preferred transaction — and return ranked
-              matches with reasons and warnings, each grounded in the same
-              evidence-backed catalogue.
-            </p>
-            <p className="note" style={{ marginTop: 12 }}>
-              // This surface is a visual reference in WS3. Requirement capture,
-              scoring, match results and lead capture are delivered by later
-              workstreams (Buyer Intent / Matching). Nothing here persists data or
-              computes a score.
-            </p>
+        <section className="blk" style={{ borderTop: 0 }}>
+          <p className="prose" style={{ fontSize: "1.05rem" }}>
+            A guided requirement wizard is planned for the Buyer Intent stage. It
+            will capture use case, payload, autonomy, budget, region and commercial
+            preferences, then return explainable ranked matches grounded in the
+            evidence-backed catalogue.
+          </p>
+          <p className="note" style={{ marginTop: 12 }}>
+            // Nothing here persists data or computes a score.
+          </p>
+          <div className="actions" style={{ marginTop: "var(--ho-sp-5)" }}>
+            <Link className="btn btn--signal" href="/robots">
+              <GraphicMarker /> Browse the catalogue →
+            </Link>
           </div>
-          <Link className="btn" href="/robots">
-            <GraphicMarker /> Browse the catalogue instead
-          </Link>
-        </div>
+        </section>
 
-        {/* Approved wizard-shell reference (dormant — no inputs are wired). */}
-        <section className="blk" style={{ marginBottom: "var(--ho-sp-8)" }} aria-hidden="true">
+        {/* Non-interactive architectural preview: static text, no inputs. */}
+        <section className="blk" style={{ marginBottom: "var(--ho-sp-8)" }}>
           <div className="blk-head">
             <div>
-              <SectionIndex>PREVIEW — WIZARD SHELL</SectionIndex>
-              <h2>Step 01 / 06</h2>
+              <SectionIndex>PREVIEW — FUTURE REQUIREMENT FLOW</SectionIndex>
+              <h2>The planned 12-step flow</h2>
             </div>
-            <SystemLabel>USABILITY-FIRST · DORMANT PREVIEW</SystemLabel>
+            <SystemLabel>NON-INTERACTIVE · NO DATA CAPTURE</SystemLabel>
           </div>
-          <div style={{ opacity: 0.55, pointerEvents: "none" }}>
-            <p className="prose" style={{ fontWeight: 700, fontSize: "1.4rem" }}>
-              What is the primary use case?
-            </p>
-            <div className="apps" style={{ marginTop: 16 }}>
-              {["Manufacturing", "Warehouse / Logistics", "Research / Education", "Hospitality"].map(
-                (c, i) => (
-                  <div className="app" key={c}>
-                    <SystemLabel>{String(i + 1).padStart(2, "0")}</SystemLabel>
-                    <span className="name">{c}</span>
-                  </div>
-                ),
-              )}
-            </div>
-          </div>
+          <ol
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+              gap: "var(--ho-sp-3)",
+            }}
+          >
+            {FUTURE_STEPS.map((step, i) => (
+              <li
+                key={step}
+                className="ho-leader"
+                style={{
+                  border: "var(--ho-rule-hair) solid var(--ho-line-soft)",
+                  padding: "10px 12px",
+                }}
+              >
+                <span style={{ color: "var(--ho-text-faint)" }}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="fill" />
+                <span>{step}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="note" style={{ marginTop: "var(--ho-sp-4)" }}>
+            // Requirement capture, scoring, match results and lead capture are
+            delivered by later workstreams (Buyer Intent / Matching). This page is
+            a reference only.
+          </p>
         </section>
       </div>
       <SiteFooter />

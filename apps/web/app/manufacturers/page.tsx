@@ -2,6 +2,7 @@
 import Link from "next/link";
 
 import { listManufacturers } from "@/lib/api-client";
+import { formatRobotCount } from "@/lib/format";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteFooter, SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
@@ -34,11 +35,11 @@ export default async function ManufacturersPage() {
               <div>
                 <Leader k="REGION" v={m.country ?? "UNKNOWN"} unknown={!m.country} />
                 <Leader
-                  k="DEPLOY"
-                  v={m.deployment_status ?? "UNKNOWN"}
-                  unknown={!m.deployment_status}
+                  k="PORTFOLIO"
+                  v={m.portfolio_status ?? "UNKNOWN"}
+                  unknown={!m.portfolio_status}
                 />
-                <Leader k="ROBOTS" v={String(m.robot_count)} />
+                <Leader k="ROBOTS" v={formatRobotCount(m.robot_count)} />
               </div>
             </Link>
           ))}

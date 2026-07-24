@@ -238,6 +238,40 @@ export function formatNumber(n: number): string {
   return Number.isInteger(n) ? String(n) : String(n);
 }
 
+/** Pluralize a robot count. Shared everywhere a robot count renders. */
+export function formatRobotCount(n: number): string {
+  return `${n} ROBOT${n === 1 ? "" : "S"}`;
+}
+
+const COUNTRY_NAMES: Record<string, string> = {
+  US: "United States",
+  CN: "China",
+  GB: "United Kingdom",
+  UK: "United Kingdom",
+  NO: "Norway",
+  DE: "Germany",
+  CA: "Canada",
+  JP: "Japan",
+  KR: "South Korea",
+  FR: "France",
+  CH: "Switzerland",
+  EU: "European Union",
+  APAC: "Asia-Pacific",
+};
+
+/** Full country name for a code, or null when unknown. */
+export function countryName(code: string | null | undefined): string | null {
+  if (!code) return null;
+  return COUNTRY_NAMES[code.toUpperCase()] ?? null;
+}
+
+/** Detail-page region label: "NORWAY / NO" when the name is known, else the code. */
+export function regionLabel(code: string | null | undefined): string | null {
+  if (!code) return null;
+  const name = countryName(code);
+  return name ? `${name.toUpperCase()} / ${code.toUpperCase()}` : code.toUpperCase();
+}
+
 /** Format an ISO date/datetime as YYYY-MM-DD (stable, locale-free). */
 export function formatDate(iso: string | null | undefined): string | null {
   if (!iso) return null;

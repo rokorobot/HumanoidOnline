@@ -30,6 +30,32 @@ from app.schemas.robot import (
     VariantRead,
 )
 
+# Maturity ranking for a manufacturer's PORTFOLIO status (display-only, derived
+# from an existing canonical fact — the published robots' commercial_status).
+# DISCONTINUED is deliberately OUTSIDE this ranking: it is only surfaced when
+# every published robot is discontinued. No new predicate is introduced.
+_PORTFOLIO_ORDER = [
+    "ANNOUNCED", "DEVELOPMENT", "PROTOTYPE", "PILOT", "EARLY_ACCESS",
+    "LIMITED_COMMERCIAL", "COMMERCIAL", "RAAS_DEPLOYMENT",
+]
+
+
+def derive_portfolio_status(statuses: list[str]) -> str | None:
+    """Most commercially-mature ACTIVE status among a manufacturer's published
+    robots. Returns ``DISCONTINUED`` only when every robot is discontinued, and
+    ``None`` when there are no published robots.
+    """
+    if not statuses:
+        return None
+    active = [s for s in statuses if s != "DISCONTINUED"]
+    if not active:
+        return "DISCONTINUED"
+    return max(
+        active,
+        key=lambda s: _PORTFOLIO_ORDER.index(s) if s in _PORTFOLIO_ORDER else -1,
+    )
+
+
 # Headline-price preference: prefer a purchase-like mode, then the most concrete
 # price_type, then most recently updated.
 _TXN_PREF = {"PURCHASE": 0, "DEVELOPER": 1}

@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   boolLabel,
+  countryName,
+  formatRobotCount,
   maturityIndex,
+  regionLabel,
   resolveAvailabilitySummary,
   resolvePriceState,
   specValue,
@@ -96,6 +99,29 @@ describe("maturityIndex", () => {
   it("orders the ladder and puts DISCONTINUED off-ladder", () => {
     expect(maturityIndex("COMMERCIAL")).toBeGreaterThan(maturityIndex("PILOT"));
     expect(maturityIndex("DISCONTINUED")).toBe(-1);
+  });
+});
+
+describe("formatRobotCount — singular/plural grammar", () => {
+  it("uses the singular for exactly 1", () => {
+    expect(formatRobotCount(1)).toBe("1 ROBOT");
+  });
+  it("uses the plural for 0 and N>1", () => {
+    expect(formatRobotCount(0)).toBe("0 ROBOTS");
+    expect(formatRobotCount(2)).toBe("2 ROBOTS");
+    expect(formatRobotCount(11)).toBe("11 ROBOTS");
+  });
+});
+
+describe("region labels", () => {
+  it("maps known codes to names", () => {
+    expect(countryName("NO")).toBe("Norway");
+    expect(countryName("xx")).toBeNull();
+  });
+  it("detail label is 'NAME / CODE', card keeps the code", () => {
+    expect(regionLabel("NO")).toBe("NORWAY / NO");
+    expect(regionLabel("ZZ")).toBe("ZZ");
+    expect(regionLabel(null)).toBeNull();
   });
 });
 

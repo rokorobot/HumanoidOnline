@@ -1,7 +1,7 @@
 # HumanoidOnline — Development Roadmap
 
 > **Status:** Living delivery roadmap
-> **Current stage:** WS3 — Intelligence UI
+> **Current stage:** WS4 — Advanced Compare / Decision
 > **Last updated:** 2026-07-24
 
 This document defines **implementation sequencing and workstream boundaries**: in
@@ -32,8 +32,8 @@ WS1    Foundation                         ✅ COMPLETE
 WS2A   Knowledge API                      ✅ COMPLETE
 WS2B   Verified Catalogue                 ✅ COMPLETE
 UI-D1  Visual System                      ✅ COMPLETE
-WS3    Intelligence UI                    🟠 CURRENT
-WS4    Advanced Compare / Decision        ⏳ PLANNED
+WS3    Intelligence UI                    ✅ COMPLETE
+WS4    Advanced Compare / Decision        🟠 CURRENT
 WS5    Buyer Intent                       ⏳ PLANNED
 WS6    Deterministic Matching             ⏳ PLANNED
 WS7    Commercial Lead                    ⏳ PLANNED
@@ -106,7 +106,11 @@ Full contract in [`07_VISUAL_SYSTEM.md`](07_VISUAL_SYSTEM.md).
 
 ---
 
-## 3. WS3 — Intelligence UI 🟠 CURRENT
+## 3. WS3 — Intelligence UI ✅ COMPLETE
+
+*Merged in #5 (`b31d81b`): all production routes wired to the live WS2A API + WS2B
+catalogue, with a production-like Playwright integration gate proving the verified
+truths. Base `/compare` shipped here — WS4 builds advanced comparison on top.*
 
 **Objective:** productionize UI-D1 against the real WS2A API and WS2B catalogue.
 
@@ -250,11 +254,11 @@ migration to activate.
 *(This section is deliberately updated after every merge.)*
 
 ```
-Current canonical main:   9fcfae0ff450c9191d514232a017011f02136fde
-Current workstream:       WS3 — Intelligence UI
-Current branch:           fm/ws3-intelligence-ui
+Current canonical main:   b31d81b8adf65bbe80c17ccccc31decee51f9bdb
+Current workstream:       WS4 — Advanced Compare / Decision
+Current branch:           (not yet cut — branch fresh from main)
 
-Completed:  ✅ WS0  ✅ WS1  ✅ WS2A  ✅ WS2B  ✅ UI-D1
-Current:    🟠 WS3
-Next:       WS4 → WS5 → WS6 → WS7 → WS8
+Completed:  ✅ WS0  ✅ WS1  ✅ WS2A  ✅ WS2B  ✅ UI-D1  ✅ WS3
+Current:    🟠 WS4
+Next:       WS5 → WS6 → WS7 → WS8
 ```

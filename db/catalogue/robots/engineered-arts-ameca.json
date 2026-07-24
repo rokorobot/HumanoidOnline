@@ -1,0 +1,89 @@
+{
+  "slug": "engineered-arts-ameca",
+  "name": "Ameca",
+  "manufacturer_slug": "engineered-arts",
+  "model_code": "Ameca",
+  "summary": "Expressive humanoid for events, attractions and research; sold by quote and rented for events.",
+  "announced_year": 2021,
+  "commercial_status": "COMMERCIAL",
+  "is_published": true,
+  "specs": {
+    "height_cm": null,
+    "weight_kg": null,
+    "payload_kg": null,
+    "walk_speed_ms": null,
+    "runtime_minutes": null,
+    "battery_wh": null,
+    "mobility": null,
+    "degrees_of_freedom": null,
+    "hand_type": null,
+    "hand_dof": null,
+    "autonomy": null,
+    "has_manipulation": null,
+    "has_teleoperation": null,
+    "has_vision": true,
+    "has_language_ui": true,
+    "has_sdk": null,
+    "has_api": null,
+    "ros_support": null,
+    "developer_edition": null,
+    "simulation_support": null
+  },
+  "specs_note": "Ameca is an expressive upper-body/interaction robot (base configuration does not walk); physical specs and mobility were not confirmed against an Engineered Arts primary source in this pass -> left NULL. Vision + conversational interaction are core Ameca features -> has_vision/has_language_ui true.",
+  "commercial_status_evidence": [
+    { "source_url": "https://engineeredarts.com", "source_type": "MANUFACTURER_SITE", "source_title": "Engineered Arts official site", "excerpt": "Robot Rentals; Contact Sales", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "COMMERCIAL: Ameca is generally available for sale (by quote) and event rental per the manufacturer site." }
+  ],
+  "variants": [],
+  "pricing_offers": [
+    {
+      "transaction_type": "PURCHASE",
+      "price_type": "QUOTE_ONLY",
+      "currency": "GBP",
+      "price": null,
+      "price_min": null,
+      "price_max": null,
+      "billing_period": "ONE_TIME",
+      "region_code": "GLOBAL",
+      "provider_slug": "engineered-arts-oem",
+      "variant_slug": null,
+      "note": "No public purchase price; Engineered Arts directs buyers to Contact Sales. Media-reported figures (~$250k) are secondary and deliberately NOT published as a price.",
+      "evidence": [
+        { "source_url": "https://engineeredarts.com/contact-sales", "source_type": "MANUFACTURER_SITE", "source_title": "Engineered Arts — Contact Sales", "excerpt": "Contact Sales", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "Quote-only purchase model confirmed on the manufacturer site (no public price displayed)." }
+      ]
+    }
+  ],
+  "availability_offers": [
+    {
+      "transaction_type": "PURCHASE",
+      "availability_status": "ON_REQUEST",
+      "region_code": "GLOBAL",
+      "provider_slug": "engineered-arts-oem",
+      "variant_slug": null,
+      "lead_time_days": null,
+      "note": "Purchase via sales contact (quote/build to order).",
+      "evidence": [
+        { "source_url": "https://engineeredarts.com/contact-sales", "source_type": "MANUFACTURER_SITE", "source_title": "Engineered Arts — Contact Sales", "excerpt": "Contact Sales", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "Purchase is bespoke/contact-required per the manufacturer site." }
+      ]
+    },
+    {
+      "transaction_type": "RENTAL",
+      "availability_status": "AVAILABLE",
+      "region_code": "GLOBAL",
+      "provider_slug": "engineered-arts-oem",
+      "variant_slug": null,
+      "lead_time_days": null,
+      "note": "Event rental offered directly by the manufacturer.",
+      "evidence": [
+        { "source_url": "https://engineeredarts.com/rentals", "source_type": "MANUFACTURER_SITE", "source_title": "Engineered Arts — Robot Rentals", "excerpt": "Robot Rentals", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "Event rental availability confirmed via the manufacturer site's Robot Rentals offering. Rental rate not public -> no pricing_offer recorded." }
+      ]
+    }
+  ],
+  "deployments": [],
+  "capabilities": [
+    { "slug": "expressive-face", "supported": true, "detail": "Human-like facial expression is Ameca's signature capability." },
+    { "slug": "voice-interaction", "supported": true, "detail": "Conversational voice interaction for events and demos." }
+  ],
+  "use_case_fits": [
+    { "use_case_slug": "events-entertainment", "fit_score": 0.8, "is_primary": true, "commercial_readiness": "COMMERCIAL", "notes": "Purpose-built for expressive event/attraction engagement; available to buy or rent.", "limitations": "Interaction-focused; base configuration does not perform physical manipulation/locomotion tasks.", "confidence": "MEDIUM" }
+  ]
+}

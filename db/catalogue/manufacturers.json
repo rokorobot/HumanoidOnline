@@ -1,0 +1,107 @@
+{
+  "_comment": "OEM company profiles. Upserted by slug. country_region_code links to regions.json. deployment_status (coarse company-level maturity) uses commercial_status enum verbatim. Company-identity fields (name, country, founded_year, website) are low-risk descriptive facts; a single MANUFACTURER_SITE evidence row per company records where the profile was sourced.",
+  "manufacturers": [
+    {
+      "slug": "unitree",
+      "name": "Unitree Robotics",
+      "legal_name": "Hangzhou Unitree Technology Co., Ltd.",
+      "country_region_code": "CN",
+      "website_url": "https://www.unitree.com",
+      "founded_year": 2016,
+      "description": "Chinese manufacturer of consumer-priced legged and humanoid robots sold directly online.",
+      "target_markets": ["research", "education", "industry"],
+      "commercial_model": "Direct online sale via OEM store (shop.unitree.com).",
+      "deployment_status": "COMMERCIAL",
+      "is_public_company": false,
+      "ticker": null,
+      "evidence": [
+        { "source_url": "https://www.unitree.com", "source_type": "MANUFACTURER_SITE", "source_title": "Unitree Robotics official site", "excerpt": null, "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "Company identity and direct-sale model sourced from the official manufacturer site." }
+      ]
+    },
+    {
+      "slug": "agility-robotics",
+      "name": "Agility Robotics",
+      "legal_name": "Agility Robotics, Inc.",
+      "country_region_code": "US",
+      "website_url": "https://www.agilityrobotics.com",
+      "founded_year": 2015,
+      "description": "US manufacturer of the Digit humanoid for logistics, delivered primarily as Robots-as-a-Service (RaaS).",
+      "target_markets": ["logistics", "warehouse", "manufacturing"],
+      "commercial_model": "RaaS / partner deployment.",
+      "deployment_status": "RAAS_DEPLOYMENT",
+      "is_public_company": false,
+      "ticker": null,
+      "evidence": [
+        { "source_url": "https://www.agilityrobotics.com/solutions", "source_type": "MANUFACTURER_SITE", "source_title": "Agility Robotics — Humanoid Solutions", "excerpt": null, "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "Company identity and RaaS delivery model sourced from the official manufacturer site." }
+      ]
+    },
+    {
+      "slug": "apptronik",
+      "name": "Apptronik",
+      "legal_name": "Apptronik, Inc.",
+      "country_region_code": "US",
+      "website_url": "https://apptronik.com",
+      "founded_year": 2016,
+      "description": "US manufacturer of the Apollo humanoid for industrial and logistics work.",
+      "target_markets": ["manufacturing", "logistics"],
+      "commercial_model": "Commercial pilots with industrial partners.",
+      "deployment_status": "PILOT",
+      "is_public_company": false,
+      "ticker": null,
+      "evidence": [
+        { "source_url": "https://apptronik.com", "source_type": "MANUFACTURER_SITE", "source_title": "Apptronik official site", "excerpt": null, "published_at": null, "observed_at": "2026-07-24", "verified_at": null, "confidence": "MEDIUM", "note": "Company identity sourced from the official manufacturer site." }
+      ]
+    },
+    {
+      "slug": "figure-ai",
+      "name": "Figure",
+      "legal_name": "Figure AI Inc.",
+      "country_region_code": "US",
+      "website_url": "https://www.figure.ai",
+      "founded_year": 2022,
+      "description": "US manufacturer of general-purpose humanoids; ran a live production deployment at BMW with Figure 02 before moving to Figure 03.",
+      "target_markets": ["manufacturing", "logistics", "home"],
+      "commercial_model": "Direct commercial deployments with enterprise partners.",
+      "deployment_status": "COMMERCIAL",
+      "is_public_company": false,
+      "ticker": null,
+      "evidence": [
+        { "source_url": "https://www.figure.ai", "source_type": "MANUFACTURER_SITE", "source_title": "Figure official site", "excerpt": null, "published_at": null, "observed_at": "2026-07-24", "verified_at": null, "confidence": "MEDIUM", "note": "Company identity sourced from the official manufacturer site." }
+      ]
+    },
+    {
+      "slug": "1x-technologies",
+      "name": "1X Technologies",
+      "legal_name": "1X Technologies AS",
+      "country_region_code": "NO",
+      "website_url": "https://www.1x.tech",
+      "founded_year": 2014,
+      "description": "Norwegian/US manufacturer of the NEO home humanoid, sold direct to consumers via preorder.",
+      "target_markets": ["home", "consumer"],
+      "commercial_model": "Direct sale + monthly subscription (preorder).",
+      "deployment_status": "EARLY_ACCESS",
+      "is_public_company": false,
+      "ticker": null,
+      "evidence": [
+        { "source_url": "https://www.1x.tech/discover/neo-home-robot", "source_type": "MANUFACTURER_SITE", "source_title": "1X — NEO Home Robot", "excerpt": null, "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "Company identity and direct preorder model sourced from the official NEO product page." }
+      ]
+    },
+    {
+      "slug": "engineered-arts",
+      "name": "Engineered Arts",
+      "legal_name": "Engineered Arts Limited",
+      "country_region_code": "UK",
+      "website_url": "https://engineeredarts.com",
+      "founded_year": 2004,
+      "description": "UK manufacturer of the Ameca expressive humanoid for events, attractions and research; sold by quote and rented for events.",
+      "target_markets": ["events", "entertainment", "research"],
+      "commercial_model": "Sale (by quote) and event rental.",
+      "deployment_status": "COMMERCIAL",
+      "is_public_company": false,
+      "ticker": null,
+      "evidence": [
+        { "source_url": "https://engineeredarts.com", "source_type": "MANUFACTURER_SITE", "source_title": "Engineered Arts official site", "excerpt": "Robot Rentals; Contact Sales", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "Company identity and sale-plus-rental model sourced from the official manufacturer site." }
+      ]
+    }
+  ]
+}

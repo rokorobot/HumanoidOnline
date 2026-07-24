@@ -1,0 +1,10 @@
+{
+  "_comment": "Use-case catalogue referenced by robots[].use_case_fits and deployments[].use_case_slug. Upserted by slug.",
+  "use_cases": [
+    { "slug": "warehouse-logistics", "name": "Warehouse & Logistics", "category": "logistics", "description": "Humanoids for material movement in warehouses and distribution centers.", "typical_tasks": ["tote handling", "material movement", "line feeding"] },
+    { "slug": "manufacturing",       "name": "Manufacturing",         "category": "industry",  "description": "Humanoids on production lines and intralogistics in factories.", "typical_tasks": ["part sequencing", "machine tending", "sheet-metal loading", "kitting"] },
+    { "slug": "research-education",  "name": "Research & Education",  "category": "research",  "description": "Humanoid platforms for labs and universities.", "typical_tasks": ["locomotion research", "manipulation research", "teaching"] },
+    { "slug": "home",               "name": "Home",                  "category": "consumer",  "description": "Domestic assistance and companionship.", "typical_tasks": ["tidying", "fetching", "companionship"] },
+    { "slug": "events-entertainment","name": "Events & Entertainment","category": "service",   "description": "Humanoids as attractions, presenters and brand activations.", "typical_tasks": ["presenting", "interaction", "photo engagement"] }
+  ]
+}

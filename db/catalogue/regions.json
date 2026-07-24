@@ -1,0 +1,12 @@
+{
+  "_comment": "Region codes referenced by the verified catalogue. Hierarchical via parent_code (region.parent_id). Codes are UNIQUE (schema: region.code UNIQUE). Types use the region_type enum verbatim.",
+  "regions": [
+    { "code": "GLOBAL", "type": "GLOBAL",        "name": "Global",         "iso_country": null, "parent_code": null },
+    { "code": "US",     "type": "COUNTRY",        "name": "United States",  "iso_country": "US", "parent_code": null },
+    { "code": "CN",     "type": "COUNTRY",        "name": "China",          "iso_country": "CN", "parent_code": null },
+    { "code": "NO",     "type": "COUNTRY",        "name": "Norway",         "iso_country": "NO", "parent_code": null },
+    { "code": "UK",     "type": "COUNTRY",        "name": "United Kingdom", "iso_country": "GB", "parent_code": null },
+    { "code": "EU",     "type": "ECONOMIC_ZONE",  "name": "European Union", "iso_country": null, "parent_code": null },
+    { "code": "DE",     "type": "COUNTRY",        "name": "Germany",        "iso_country": "DE", "parent_code": "EU" }
+  ]
+}

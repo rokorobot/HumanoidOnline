@@ -37,6 +37,36 @@ jobs:
       - name: Validate schema objects + connection
         run: uv run db/validate.py
 
+  catalogue-validate:
+    name: Catalogue (WS2B verified catalogue + G2)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: humanoid
+          POSTGRES_PASSWORD: humanoid
+          POSTGRES_DB: catalogue
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U humanoid -d catalogue"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      # Fresh DB distinct from the seeded one: schema only, NO seed.
+      DATABASE_URL: postgresql+psycopg://humanoid:humanoid@localhost:5432/catalogue
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Apply canonical schema (NO seed)
+        run: uv run db/bootstrap.py
+      - name: Import the verified catalogue
+        run: uv run db/import_catalogue.py
+      - name: Validate catalogue provenance (G2)
+        run: uv run db/validate_catalogue.py
+
   api-test:
     name: Backend (FastAPI + pytest)
     runs-on: ubuntu-latest

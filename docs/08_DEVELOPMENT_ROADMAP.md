@@ -1,7 +1,7 @@
 # HumanoidOnline — Development Roadmap
 
 > **Status:** Living delivery roadmap
-> **Current stage:** WS5 — Buyer Intent
+> **Current stage:** WS6 — Deterministic Matching
 > **Last updated:** 2026-07-24
 
 This document defines **implementation sequencing and workstream boundaries**: in
@@ -34,8 +34,8 @@ WS2B   Verified Catalogue                 ✅ COMPLETE
 UI-D1  Visual System                      ✅ COMPLETE
 WS3    Intelligence UI                    ✅ COMPLETE
 WS4    Advanced Compare / Decision        ✅ COMPLETE
-WS5    Buyer Intent                       🟠 CURRENT
-WS6    Deterministic Matching             ⏳ PLANNED
+WS5    Buyer Intent                       ✅ COMPLETE
+WS6    Deterministic Matching             🟠 CURRENT
 WS7    Commercial Lead                    ⏳ PLANNED
 WS8    MVP Hardening / Release            ⏳ PLANNED
 ```
@@ -173,7 +173,15 @@ deeper evidence comparison · comparison persistence · decision-support refinem
 
 ---
 
-## 5. WS5 — Buyer Intent ⏳
+## 5. WS5 — Buyer Intent ✅ COMPLETE
+
+*Merged in #10 (`0140393`): the real 12-step requirement wizard + the first
+Decision-layer write path (`buyer_requirement`) via `POST /api/buyer-requirements`,
+plus the canonical `GET /api/regions` read that seeds the Country step. Anonymous
+capture (no contact/identity), `raw_input` required + versioned (UNKNOWN ≠ SKIP
+preserved), `country` resolves only to canonical `COUNTRY` regions, and creation
+makes zero `match_result` / `commercial_lead` rows. Contract-hardened per an
+independent gate review before merge.*
 
 Productionize **Find a Humanoid**. Requirement sequence:
 ```
@@ -191,7 +199,7 @@ Selecting one never implies HumanoidOnline already operates that transaction.
 
 ---
 
-## 6. WS6 — Deterministic Matching ⏳
+## 6. WS6 — Deterministic Matching 🟠 CURRENT
 
 The explainable matching engine (pure function; no I/O, no randomness, **no LLM in
 the scoring path**). Initial weighting:
@@ -259,15 +267,18 @@ migration to activate.
 ## 10. Current project state
 
 *(This section is deliberately updated after every merge. It records the
-**workstream base** — the `main` commit a workstream is cut from — not the commit
-that contains this file, which can never store its own future merge SHA.)*
+**last completed substantive workstream merge** — a stable anchor, not the literal
+future commit the next branch is cut from (this file can never store its own future
+merge SHA, and docs-only roadmap housekeeping like this update may itself merge
+after this anchor and before the next branch is cut). The next workstream is cut
+from whatever `main` is at cut time and verified 0 ahead / 0 behind then.)*
 
 ```
-Current workstream base:  6c2d982f16585b5254e6dda940c3227446947608
-Current workstream:       WS5 — Buyer Intent
-Current branch:           fm/ws5-buyer-intent
+Last completed workstream merge:  01403935d98cd5398b98b53a99dddb4d232e30f7
+Current workstream:               WS6 — Deterministic Matching
+Current branch:                   fm/ws6-deterministic-matching
 
-Completed:  ✅ WS0  ✅ WS1  ✅ WS2A  ✅ WS2B  ✅ UI-D1  ✅ WS3  ✅ WS4
-Current:    🟠 WS5
-Next:       WS6 → WS7 → WS8
+Completed:  ✅ WS0  ✅ WS1  ✅ WS2A  ✅ WS2B  ✅ UI-D1  ✅ WS3  ✅ WS4  ✅ WS5
+Current:    🟠 WS6
+Next:       WS7 → WS8
 ```

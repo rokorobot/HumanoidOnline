@@ -418,6 +418,57 @@ td .v { color: var(--ho-verified); }
   letter-spacing: var(--ho-tracking-code); }
 .legend span { display: inline-flex; align-items: center; gap: 8px; }
 
+/* ---- COMPARE — WS4 advanced controls (extends the base, no redesign) ------ */
+.cmp-toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+  gap: var(--ho-sp-4); border: var(--ho-rule-med) solid var(--ho-ink); background: var(--ho-paper-2);
+  padding: var(--ho-sp-4) var(--ho-sp-5); margin-bottom: var(--ho-sp-5); }
+.cmp-controls, .cmp-actions { display: flex; flex-wrap: wrap; gap: var(--ho-sp-4); align-items: flex-end; }
+.cmp-seg { display: flex; flex-direction: column; gap: 4px; }
+.cmp-seg-btns { display: inline-flex; border: var(--ho-rule-hair) solid var(--ho-ink); }
+.cmp-seg-btn { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-label); text-transform: uppercase; padding: 6px 12px;
+  background: var(--ho-paper); color: var(--ho-text-muted); border: 0;
+  border-right: var(--ho-rule-hair) solid var(--ho-line-soft); cursor: pointer; }
+.cmp-seg-btn:last-child { border-right: 0; }
+.cmp-seg-btn.on { background: var(--ho-ink); color: var(--ho-paper); }
+.cmp-nameform { display: inline-flex; gap: 6px; align-items: center; }
+.cmp-nameinput { border: var(--ho-rule-hair) solid var(--ho-ink); background: var(--ho-paper);
+  font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s); padding: 6px 10px; }
+.cmp-saves { flex-basis: 100%; border-top: var(--ho-rule-hair) solid var(--ho-line-soft);
+  margin-top: var(--ho-sp-3); padding-top: var(--ho-sp-3); }
+.cmp-saves ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.cmp-saves li { display: flex; align-items: center; gap: 10px; }
+.cmp-save-apply { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s); background: none;
+  border: 0; border-bottom: var(--ho-rule-hair) solid var(--ho-signal); color: var(--ho-text);
+  cursor: pointer; padding: 2px 0; }
+.cmp-save-del { background: none; border: 0; color: var(--ho-text-faint); cursor: pointer; font-size: 0.9rem; }
+.cmp-saves-note { margin-top: 8px; }
+.cmp-ref-btn { margin-top: 10px; font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-label); text-transform: uppercase; background: var(--ho-paper);
+  border: var(--ho-rule-hair) solid var(--ho-grey-400); color: var(--ho-text-muted);
+  padding: 5px 9px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.cmp-ref-btn.on { border-color: var(--ho-signal); color: var(--ho-signal-ink); }
+.selrow .robotpick.is-ref { box-shadow: inset 3px 0 0 var(--ho-signal); }
+.cmp-canon { display: block; font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  color: var(--ho-text-faint); letter-spacing: var(--ho-tracking-code); margin-top: 2px; }
+.cmp-delta { display: block; font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  color: var(--ho-signal-ink); letter-spacing: var(--ho-tracking-code); margin-top: 3px; }
+.cmp-delta.unk { color: var(--ho-unknown); }
+.cmp-delta.ref { color: var(--ho-text-muted); }
+.cmp-annot td { padding-top: 4px !important; padding-bottom: 8px !important; border-top: 0 !important; }
+.cmp-framing { margin-top: var(--ho-sp-3); color: var(--ho-text-muted); }
+/* Evidence view */
+.cmp-ev-intro { margin-bottom: var(--ho-sp-5); }
+.cmp-ev-block { margin-bottom: var(--ho-sp-6); }
+.cmp-ev-h { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-label); text-transform: uppercase; color: var(--ho-text-muted);
+  padding: 8px 0; }
+.cmp-factval { display: block; font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono);
+  text-transform: none; margin-top: 6px; }
+.cmp-factval .hatch { display: inline-block; padding: 1px 7px; color: var(--ho-unknown);
+  border: var(--ho-rule-hair) dashed var(--ho-grey-400); }
+.evrow.is-ref { box-shadow: inset 3px 0 0 var(--ho-signal); }
+
 /* ---- USE-CASE / MANUFACTURER DETAIL -------------------------------------- */
 .prose { max-width: 68ch; line-height: 1.7; }
 .taglist { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }

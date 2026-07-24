@@ -29,9 +29,12 @@
 </head>
 <body>
 
-<div class="ho-mockup-banner">
-  <span><span class="ho-marker ho-marker--signal"></span>&nbsp; UI-D1 REFERENCE COMPOSITION — STATIC MOCKUP, NOT WIRED TO ANY API</span>
-  <span>00 / PRIMITIVES · EACH SHOWN WITH ITS STATES</span>
+<div class="ho-sysheader">
+  <span class="title"><span class="ho-marker"></span> UI-D1 PRIMITIVE LIBRARY</span>
+  <span class="mm">
+    <span class="f"><b>16</b> PRIMITIVES</span>
+    <span class="ref">STATIC REF MOCKUP</span>
+  </span>
 </div>
 
 <div class="wrap">
@@ -76,6 +79,20 @@
     </div>
   </div>
 
+  <!-- SystemHeader / MachineMeta -->
+  <div class="spec"><div class="t"><h2>SystemHeader / MachineMeta</h2><span class="ho-syslabel">functional top strip · real page data</span></div>
+    <div class="body col" style="padding:0">
+      <div class="ho-sysheader" style="width:100%">
+        <span class="title"><span class="ho-marker"></span> ROBOT RECORD / HMD-00147</span>
+        <span class="mm">
+          <span class="f">OBSERVED <b>24 JUL 2026</b></span>
+          <span class="f ev-high">EVIDENCE STATUS: <b>VERIFIED</b></span>
+          <span class="ref">STATIC REF MOCKUP</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
   <!-- StatusBadge : Dimension 1 -->
   <div class="spec"><div class="t"><h2>StatusBadge — DIM 1 commercial_status</h2><span class="ho-syslabel">maturity ladder · verbatim enums</span></div>
     <div class="body">
@@ -101,19 +118,24 @@
       <span class="ho-badge ho-badge--ghost">ON_REQUEST</span>
       <span class="ho-badge ho-badge--caution">NOT_AVAILABLE</span>
       <span class="ho-badge ho-badge--ghost" style="text-decoration:line-through">DISCONTINUED</span>
-      <span class="ho-badge ho-badge--unknown">NO CONFIRMED AVAIL.</span>
+      <span class="ho-badge ho-badge--unknown ho-state">AVAILABILITY UNKNOWN</span>
+      <span class="ho-syslabel" style="width:100%">// absence (short/card): "AVAILABILITY UNKNOWN" &nbsp;·&nbsp; (long/detail): "No confirmed commercial availability"</span>
     </div>
   </div>
 
   <!-- PricingState -->
-  <div class="spec"><div class="t"><h2>PricingState — six distinct states</h2><span class="ho-syslabel">QUOTE_ONLY ≠ UNKNOWN</span></div>
-    <div class="body">
-      <div class="metric"><span class="k ho-syslabel">PUBLIC</span><span class="v" style="font-weight:600">$16,000</span></div>
-      <div class="metric"><span class="k ho-syslabel">FROM</span><span class="v">From $5,900</span></div>
-      <div class="metric"><span class="k ho-syslabel">RANGE</span><span class="v">$120k–$200k</span></div>
-      <div class="metric"><span class="k ho-syslabel">ESTIMATED</span><span class="v" style="color:var(--ho-caution)">~$30,000</span></div>
-      <div class="metric"><span class="k ho-syslabel">QUOTE_ONLY</span><span class="v" style="color:var(--ho-caution)">Price on request</span></div>
-      <div class="metric"><span class="k ho-syslabel">UNKNOWN</span><span class="v unk" style="border:1px dashed var(--ho-grey-400);padding:1px 6px">No confirmed pricing</span></div>
+  <div class="spec"><div class="t"><h2>PricingState — six states · SHORT (card) / LONG (detail)</h2><span class="ho-syslabel">QUOTE_ONLY ≠ UNKNOWN in both</span></div>
+    <div class="body col">
+      <div class="row2">
+        <div class="metric"><span class="k ho-syslabel">PUBLIC</span><span class="v" style="font-weight:600">$16,000</span></div>
+        <div class="metric"><span class="k ho-syslabel">FROM</span><span class="v">From $5,900</span></div>
+        <div class="metric"><span class="k ho-syslabel">RANGE</span><span class="v">$120k–$200k <span class="ho-syslabel">/ $120,000 – $200,000</span></span></div>
+        <div class="metric"><span class="k ho-syslabel">ESTIMATED</span><span class="v" style="color:var(--ho-caution)">~$30,000</span></div>
+        <div class="metric"><span class="k ho-syslabel">QUOTE_ONLY · card</span><span class="v ho-state" style="color:var(--ho-caution)">PRICE ON REQUEST</span></div>
+        <div class="metric"><span class="k ho-syslabel">QUOTE_ONLY · detail</span><span class="v" style="color:var(--ho-caution)">Price on request</span></div>
+        <div class="metric"><span class="k ho-syslabel">UNKNOWN · card</span><span class="v unk ho-state" style="border:1px dashed var(--ho-grey-400);padding:1px 6px">NO PRICE DATA</span></div>
+        <div class="metric"><span class="k ho-syslabel">UNKNOWN · detail</span><span class="v unk">No confirmed pricing</span></div>
+      </div>
     </div>
   </div>
 

@@ -42,8 +42,9 @@
   .pbar i.on { background: var(--ho-ink); }
   .pbar i.on.last { background: var(--ho-signal); }
 
-  .qlabel { font-family: var(--ho-font-display-serif); font-weight:500; font-size: 2rem;
-    line-height: 1.05; letter-spacing: -0.01em; margin-bottom: 6px; }
+  /* Tier-2: a wizard question is a CONTROL/heading, not a name → INTERFACE, not serif. */
+  .qlabel { font-family: var(--ho-font-interface); font-weight:700; font-size: 1.75rem;
+    line-height: 1.1; letter-spacing: -0.015em; margin-bottom: 6px; }
   .qhelp { color: var(--ho-text-muted); margin-bottom: var(--ho-sp-5); max-width: 52ch; }
   .choices { display:grid; grid-template-columns: repeat(3,1fr); gap: var(--ho-sp-3); }
   .choice { border: var(--ho-rule-hair) solid var(--ho-ink); background: var(--ho-paper-2);
@@ -135,9 +136,13 @@
 </head>
 <body>
 
-<div class="ho-mockup-banner">
-  <span><span class="ho-marker ho-marker--signal"></span>&nbsp; UI-D1 REFERENCE COMPOSITION — STATIC MOCKUP, NOT WIRED TO ANY API</span>
-  <span>05 / FIND A HUMANOID · WIZARD USABILITY-FIRST</span>
+<div class="ho-sysheader">
+  <span class="title"><span class="ho-marker"></span> REQUIREMENT WIZARD / LEAD INTAKE</span>
+  <span class="mm">
+    <span class="f">STEP <b>11 / 12</b></span>
+    <span class="f"><b>3</b> MATCHES FOUND</span>
+    <span class="ref">STATIC REF MOCKUP</span>
+  </span>
 </div>
 
 <header class="site-head">

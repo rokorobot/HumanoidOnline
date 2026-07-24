@@ -1,9 +1,10 @@
 # HumanoidOnline — Visual System (UI-D1)
 
-**Status:** Contract for the UI/UX layer. This document defines the visual language,
-tokens, and product primitives that later workstreams (esp. WS3 Intelligence UI, WS4
-Compare, WS5 Buyer Intent) must render against. It does **not** implement product
-routes. See the NON-GOALS section.
+**Status: UI-D1 — FROZEN design baseline for WS3.** Approved by the product owner as the
+governing design baseline (not inspiration). This document defines the visual language,
+tokens, and product primitives that later workstreams (WS3 Intelligence UI, WS4 Compare,
+WS5 Buyer Intent) implement — see the WS3 COMPONENT MAP for the pattern→component
+mapping. It does **not** implement product routes. See the NON-GOALS section.
 
 ---
 
@@ -30,6 +31,24 @@ Corollaries, binding:
    provenance affordance (`EvidenceStamp` / `ConfidenceIndicator`).
 4. **Enum labels are rendered verbatim** from `docs/03_DATA_DICTIONARY.md`. The visual
    system styles them; it never renames, merges, or invents them.
+
+## 0.1 FROZEN UI LAWS
+
+These are frozen for WS3. They override any local styling temptation.
+
+- **COLOR.** The palette is technical white / near-black / signal orange / neutral grey.
+  **Orange means:** selected · active · primary action · critical commercial signal ·
+  progress/current position. Orange is **never** generic decoration.
+- **SHAPE.** Square / near-square; hard borders; almost no radius; no floating glass
+  surfaces; no shadows unless functionally necessary.
+- **INFORMATION.** Maturity / Obtainability / Evidence **always remain separate**. Never
+  a single "available" flag.
+- **UNKNOWN.** UNKNOWN is information; it is never visually hidden; it is never converted
+  to false or zero.
+- **INTERACTION.** Experimental shell, conventional controls. (Bold hero/identity;
+  ordinary, predictable filters, forms, tables.)
+- **DATA.** Commercial truth outranks visual completeness. A blank you must show honestly
+  beats a tidy grid that lies.
 
 ## 1. Discipline gradient (where boldness is allowed)
 
@@ -150,18 +169,26 @@ system fonts and require no network**, so the fallback stacks are load-bearing.
 | **INTERFACE** | Inter / Söhne / Neue Haas Grotesk Text | `system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif` | High-legibility grotesk. All UI text, prose, table body, forms. |
 | **MACHINE** | JetBrains Mono / IBM Plex Mono / Berkeley Mono | `ui-monospace, Consolas, "SFMono-Regular", Menlo, monospace` | Codes, metrics, enum labels, status logs, field names, indices, serials, coordinates. Tabular numerals. Optional **dot-matrix** display variant for status words. |
 
-**When to use which display voice.**
-- **SERIF** = the human/editorial voice: page titles that make a claim ("Find the right
-  humanoid"), and the *proper name* of a robot or manufacturer.
-- **GROTESK** = the machine voice: the *code/designation* of a thing (`DIGIT`, `G1`), big
-  status words (`ACTIVE`, `PRODUCTION DEPLOYED`), section titles, numeric indices.
-- **Identity lockup** (RobotCard title + robot header): serif **name** set immediately
-  beside the grotesk **model code** — e.g. serif *Digit* + grotesk `RAAS_DEPLOYMENT / v5`.
+### Strict 3-tier hierarchy (GOVERNING RULE — no arbitrary switching)
+
+Every text element belongs to exactly one tier. Do not switch a face for effect.
+
+| Tier | Face | Used for — and ONLY for |
+|---|---|---|
+| **1 · DISPLAY / EDITORIAL** | DISPLAY-SERIF | **Robot (and manufacturer) NAMES**, and major page moments (the home hero claim). Nothing else. |
+| **2 · GROTESK / INTERFACE** | DISPLAY-GROTESK (headings/section titles/model codes) + INTERFACE (navigation, controls, buttons, prose, table body) | Structure and interaction. Headings and model codes are grotesk; nav/controls/body are interface. |
+| **3 · MONO / SYSTEM** | MACHINE | Metadata, statuses, dimensions/metrics, IDs, section indices, evidence, coordinates, serials. The instrumented layer. |
+
+- **Identity lockup** (RobotCard title + robot header): tier-1 serif **name** set beside
+  a tier-2 grotesk **model code** — e.g. serif *Digit* + grotesk `v5`.
+- **DISPLAY-TECHNO is not a tier.** It is an *optional* special-use accent for short
+  system words only (`AI-OPS`); reach for it rarely, never for names/headings/body.
+- Dot-matrix/LED is a decorative variant of tier-3, not a text tier.
 
 **Extreme type-scale contrast** is a signature: DISPLAY runs to `clamp(3.25rem, 11vw,
 9rem)`; MACHINE labels sit at 11px. The gap between loudest and quietest type is
 deliberately enormous — but only the *framing* is loud; the *data* sits in the calm
-INTERFACE/MACHINE middle.
+tier-2/tier-3 middle.
 
 ---
 
@@ -176,6 +203,7 @@ Each device below has a defined job. Devices are structural, not ornamental.
 | **Square markers** `▪` | 8px solid squares as bullets/"live" dots/active ticks. Ink default; orange only for a live/active fact. | `.ho-marker[--signal]` |
 | **Dot-matrix markers** | 2×2 / 2×3 dot blocks (from the refs' corner dot clusters). Rhythm and registration. | `.ho-dots[--signal/--6]` |
 | **Dot-matrix / LED text** | Optional display variant for status words (`ACTIVE`, `LIVE`). Offline via `background-clip:text`. | `.ho-dotmatrix` |
+| **SystemHeader / MachineMeta** | The slim black top strip. **Functional, not decorative** — carries real page data (index title + record ID, observed date, counts, evidence status). See §5.1. | `.ho-sysheader` |
 | **System identifiers** | Every robot/manufacturer carries `model_code`/slug as a boxed `MachineCode` chip. Asset-tagged feel. | `.ho-code` |
 | **Boxed label bars** | Top-of-section header bars of monospace technical labels in hairline boxes. | `.ho-chip`, `.ho-chip--inv` |
 | **Bracketed status chips** | `[ FLIGHT TESTED ]`, `[[[ WARNING ]]]` — the refs' bracket vocabulary for statuses/flags. | `.ho-bracket[--alert]` |
@@ -197,6 +225,27 @@ Anti-patterns (prohibited): drop shadows and soft rounding as primary style; gra
 behind data; glossy photography that displaces specs; color used to imply a value
 judgement on a neutral fact; **orange as a background wash on data-dense surfaces**;
 scanline/dither texture over tables or prices.
+
+### 5.1 SystemHeader / MachineMeta — functional, not decorative
+
+The slim black strip at the top of every page is a **SystemHeader**: it carries real
+page data, not flavour text. It reads as an index/record line for the thing on screen.
+
+- **Home:** `■ HUMANOIDONLINE / COMMERCIAL INTELLIGENCE — 20 PLATFORMS TRACKED`
+- **Catalogue:** `■ HUMANOID MARKET INDEX — DATA OBSERVED 24 JUL 2026 — 20 PLATFORMS TRACKED`
+- **Robot detail:** `■ ROBOT RECORD / HMD-00147 — EVIDENCE STATUS: HIGH`
+
+The **MachineMeta** fields are the functional payload: observed date, record ID, counts,
+evidence status. The "static reference mockup" disclaimer rides along **quiet and small**
+on the right (`.ho-sysheader .ref`) — present, but never shouting.
+
+### 5.2 Metadata density — keep it a system, not a parody
+
+Production section headers use the **clean** form: `02 / ROBOT CATALOGUE` — **not**
+`02 / CATALOGUE · DISCIPLINE: CONTROLLED`. The discipline gradient is an internal design
+rule (this document), not on-screen chrome. Reference compositions may annotate lightly
+for teaching, but keep decorative machine-metadata sparse: enough to feel instrumented,
+never so much that it self-parodies. When in doubt, delete a label.
 
 ---
 
@@ -241,8 +290,14 @@ Universal rules: primitives render enum labels verbatim; any commercial fact car
 - **Purpose:** render obtainability per `transaction_type` × region. Independent of maturity.
 - **Anatomy:** a small matrix row: `mode | region | availability_status`.
 - **States (verbatim):** `NOT_AVAILABLE`, `WAITLIST`, `PREORDER`, `LIMITED`, `AVAILABLE`,
-  `ON_REQUEST`, `DISCONTINUED`; plus the **absence state** → "No confirmed commercial
-  availability" (hatch/grey). Absence ≠ `NOT_AVAILABLE`.
+  `ON_REQUEST`, `DISCONTINUED`; plus the **absence state** (no offer rows). Absence ≠
+  `NOT_AVAILABLE`.
+- **SHORT / LONG label convention (mandatory — no truncation, no ugly wrap):**
+  | State | SHORT (card) | LONG (detail / compare) |
+  |---|---|---|
+  | absence (unknown) | **"AVAILABILITY UNKNOWN"** | **"No confirmed commercial availability"** |
+  Cards use the short, single-line form (`.ho-state`, `white-space:nowrap`); detail uses
+  the full sentence. Enum statuses render verbatim either way.
 - **Accessibility predicate:** where a binary "commercially accessible?" is shown, it uses
   the one schema rule `is_current AND status NOT IN (NOT_AVAILABLE, DISCONTINUED)` — never
   an ad-hoc list.
@@ -253,18 +308,20 @@ Universal rules: primitives render enum labels verbatim; any commercial fact car
   (`transaction_type` × `price_type` × `billing_period` × region × provider).
 - **Anatomy:** value (or explicit non-value) + `price_type` context tag + billing period +
   region/provider qualifier + `EvidenceStamp`.
-- **Distinct states — all six are visually different:**
-  | State | `price_type` / data | Renders |
-  |---|---|---|
-  | PUBLIC | `PUBLIC` | the number, as-is (e.g. `$16,000`) |
-  | FROM | `FROM` | `From $40,000` |
-  | RANGE | `RANGE` (`price_min`–`price_max`) | `$120,000 – $200,000` |
-  | ESTIMATED | `ESTIMATED` | number + visible **`ESTIMATED`** flag (amber) |
-  | QUOTE_ONLY | `price_type = QUOTE_ONLY` | **"Price on request"** — never a number |
-  | UNKNOWN | *no `pricing_offer` rows* | **"No confirmed pricing"** — grey + hatch |
-- **Hard law:** `QUOTE_ONLY ≠ UNKNOWN`. Quote-only is a positive claim about the seller's
-  model (needs evidence); unknown claims nothing. They must never collapse into one look.
-  NULL never becomes `$0` / "free" / "N/A".
+- **Distinct states — all six are visually different, with SHORT (card) / LONG (detail):**
+  | State | `price_type` / data | SHORT (card) | LONG (detail / compare) |
+  |---|---|---|---|
+  | PUBLIC | `PUBLIC` | `$16,000` | `$16,000` |
+  | FROM | `FROM` | `From $40,000` | `From $40,000` |
+  | RANGE | `RANGE` (`price_min`–`price_max`) | `$120k–$200k` | `$120,000 – $200,000` |
+  | ESTIMATED | `ESTIMATED` | `~$30,000` (amber) | number + **`ESTIMATED`** flag (amber) |
+  | QUOTE_ONLY | `price_type = QUOTE_ONLY` | **"PRICE ON REQUEST"** | **"Price on request"** |
+  | UNKNOWN | *no `pricing_offer` rows* | **"NO PRICE DATA"** | **"No confirmed pricing"** |
+- **Hard law:** `QUOTE_ONLY ≠ UNKNOWN` — in **both** SHORT and LONG variants. Quote-only is
+  a positive claim about the seller's model (needs evidence); unknown claims nothing. They
+  must never collapse into one look. NULL never becomes `$0` / "free" / "N/A". Card state
+  labels use `.ho-state` (`white-space:nowrap`) so they never truncate with an ellipsis or
+  wrap onto three ugly lines.
 - **Data:** `pricing_offer` (all matching rows via the offer view), or absence.
 
 ### 6.7 EvidenceStamp — DIMENSION 3 (evidence/provenance)
@@ -369,6 +426,29 @@ and each renders offline. Optional `00-primitives.html` shows every primitive in
 | `03-robot-detail.html` | Robot detail | header experimental, data disciplined | **The key proof.** Three independent dimensions rendered distinctly; all price states incl. QUOTE_ONLY + UNKNOWN; EvidenceStamp + ConfidenceIndicator with source + verified date. |
 | `04-compare.html` | Compare | disciplined | High-density ComparisonMatrix across 3 robots; no decoration obscuring data. |
 | `05-find-match.html` | Wizard + matches | usability first | WizardStep form and MatchScore card with breakdown / reasons / warnings. |
+
+---
+
+## 7.1 WS3 COMPONENT MAP
+
+These patterns are the **frozen baseline** WS3 implements as production React components
+(`docs/02_ARCHITECTURE.md` §4). WS3 builds *these patterns*, deriving from the primitives
+below — not recreated from scratch off screenshots.
+
+| WS3 component | Derives from primitive(s) | Renders |
+|---|---|---|
+| **RobotCard** | 6.11 RobotCard = identity lockup (6.1/6.3) + StatusBadge (6.4) + Metric (6.9) + PricingState (6.6) + AvailabilityState (6.5) | Catalogue/summary unit; SHORT state labels. |
+| **FilterPanel** | filter rail (tier-2 controls) + SystemLabel (6.1) | Conventional, usable filters. |
+| **SystemHeader** | §5.1 SystemHeader + MachineMeta | Functional black top strip. |
+| **MachineMeta** | §5.1 (observed date / record ID / count / evidence status) | The header's data payload; reusable inline. |
+| **StatusIndicator** | 6.4 StatusBadge / 6.8 ConfidenceIndicator | Enum status + confidence ramp. |
+| **CommercialState** | 6.4 StatusBadge (Dim 1) + 6.5 AvailabilityState (Dim 2) | Maturity + obtainability, kept separate. |
+| **PricingState** | 6.6 PricingState | Six price states, SHORT/LONG variants. |
+| **EvidenceStamp** | 6.7 EvidenceStamp | Provenance readout (source + verified date). |
+| **SectionIndex** | 6.2 SectionIndex | `NN / TITLE` clean header. |
+| **ComparisonCell** | 6.10 DataCell / 6.14 ComparisonMatrix | One matrix cell: value / unknown / N/A. |
+| **WizardProgress** | 6.15 WizardStep (progress bar + step list) | `STEP n / N` + segmented bar. |
+| **RequirementStep** | 6.15 WizardStep | One question, usability-first. |
 
 ---
 

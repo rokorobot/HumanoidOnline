@@ -16,6 +16,7 @@ from app.models.capability import Capability
 from app.models.commercial import AvailabilityOffer, Deployment, PricingOffer
 from app.models.evidence import EvidenceSource
 from app.models.manufacturer import Manufacturer, Provider
+from app.models.match_result import MatchResult
 from app.models.robot import Robot, RobotVariant
 from app.models.spec import SpecDefinition
 from app.models.use_case import UseCase
@@ -95,10 +96,18 @@ class BuyerRequirementAdmin(ModelView, model=BuyerRequirement):
     name_plural = "Buyer requirements"
 
 
+class MatchResultAdmin(ModelView, model=MatchResult):
+    column_list = [
+        MatchResult.requirement_id, MatchResult.robot_id, MatchResult.rank,
+        MatchResult.score, MatchResult.category,
+    ]
+    name_plural = "Match results"
+
+
 _VIEWS = [
     ManufacturerAdmin, ProviderAdmin, RobotAdmin, RobotVariantAdmin, UseCaseAdmin,
     CapabilityAdmin, SpecDefinitionAdmin, PricingOfferAdmin, AvailabilityOfferAdmin,
-    DeploymentAdmin, EvidenceSourceAdmin, BuyerRequirementAdmin,
+    DeploymentAdmin, EvidenceSourceAdmin, BuyerRequirementAdmin, MatchResultAdmin,
 ]
 
 

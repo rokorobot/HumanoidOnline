@@ -52,12 +52,12 @@ test("wizard: submitting captures a requirement and stops at confirmation (no ma
   await expect(page.getByRole("heading", { name: /Review/i })).toBeVisible();
   await page.getByRole("button", { name: /Submit requirements/i }).click();
 
-  // Interim capture confirmation — WS5 persists + confirms only.
+  // Capture confirmation — primary action is SEE MATCHES (WS6).
   await expect(page.getByRole("heading", { name: "Requirement captured" })).toBeVisible();
-  await expect(page.getByText("Matching has not been generated yet.")).toBeVisible();
+  await expect(page.getByRole("link", { name: /See matches/i })).toBeVisible();
   await expect(page.getByRole("link", { name: /Browse robots/i })).toBeVisible();
-  // No matches are generated and no /matches route is offered in WS5.
-  await expect(page.locator('a[href^="/matches"]')).toHaveCount(0);
+  // No contact form is presented at capture.
+  await expect(page.locator("input[type=email]")).toHaveCount(0);
 });
 
 // ---- exit-gate proofs (accessibility / robustness) ----------------------

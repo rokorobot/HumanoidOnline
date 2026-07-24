@@ -7,7 +7,8 @@
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteFooter, SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
-import { listRegions, listUseCases } from "@/lib/api-client";
+import { getRequirement, listRegions, listUseCases } from "@/lib/api-client";
+import { answersFromRawInput, type Answers } from "@/lib/wizard";
 
 import { Wizard } from "./Wizard";
 
@@ -20,7 +21,7 @@ export const metadata = {
 export default async function FindAHumanoidPage({
   searchParams,
 }: {
-  searchParams: Promise<{ use_case?: string }>;
+  searchParams: Promise<{ use_case?: string; from?: string }>;
 }) {
   const sp = await searchParams;
   const [useCasesPage, countries] = await Promise.all([
@@ -33,6 +34,14 @@ export default async function FindAHumanoidPage({
     sp.use_case && useCases.some((u) => u.slug === sp.use_case)
       ? sp.use_case
       : null;
+
+  // Adjust Requirements: prefill the wizard from a stored requirement (?from=id).
+  // This creates a NEW requirement on submit; the historical one is never mutated.
+  let seedAnswers: Answers | null = null;
+  if (sp.from) {
+    const requirement = await getRequirement(sp.from);
+    seedAnswers = answersFromRawInput(requirement.raw_input);
+  }
 
   return (
     <>
@@ -63,6 +72,7 @@ export default async function FindAHumanoidPage({
           useCases={useCases}
           countries={countries}
           seedUseCase={seedUseCase}
+          seedAnswers={seedAnswers}
         />
       </div>
       <SiteFooter />

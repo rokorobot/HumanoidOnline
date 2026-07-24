@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   type Answers,
+  answersFromRawInput,
   buildRawInput,
   buildSubmission,
   hasSignal,
@@ -112,6 +113,34 @@ describe("buildRawInput", () => {
     };
     expect(raw.wizard_version).toBe(1);
     expect(Object.keys(raw.answers)).toHaveLength(11);
+  });
+});
+
+describe("answersFromRawInput (Adjust Requirements prefill)", () => {
+  it("round-trips states and values through buildRawInput", () => {
+    const a = initialAnswers("warehouse-logistics");
+    a.country = { state: "ANSWERED", value: "DE" };
+    a.payload = { state: "UNKNOWN", value: "" };
+    a.environment = { state: "SKIPPED", value: "" };
+    a.manipulation = { state: "ANSWERED", value: false };
+    a.budget = { state: "ANSWERED", currency: "EUR", min: "", max: "250000" };
+    a.transaction = { state: "ANSWERED", value: "RENT" };
+
+    const back = answersFromRawInput(buildRawInput(a));
+    expect(back.task.state).toBe("ANSWERED");
+    expect(back.task.useCase).toBe("warehouse-logistics");
+    expect(back.country).toEqual({ state: "ANSWERED", value: "DE" });
+    expect(back.payload.state).toBe("UNKNOWN");
+    expect(back.environment.state).toBe("SKIPPED");
+    expect(back.manipulation).toEqual({ state: "ANSWERED", value: false });
+    expect(back.budget).toEqual({ state: "ANSWERED", currency: "EUR", min: "", max: "250000" });
+    expect(back.transaction).toEqual({ state: "ANSWERED", value: "RENT" });
+  });
+
+  it("is robust to missing/garbage raw_input", () => {
+    expect(answersFromRawInput(null).task.state).toBe("SKIPPED");
+    expect(answersFromRawInput({}).country.state).toBe("SKIPPED");
+    expect(answersFromRawInput({ answers: 5 }).budget.state).toBe("SKIPPED");
   });
 });
 

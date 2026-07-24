@@ -110,6 +110,54 @@ export function initialAnswers(seedUseCase?: string | null): Answers {
   };
 }
 
+// Reverse of buildRawInput: reconstruct wizard draft from a stored requirement's
+// versioned raw_input (Adjust Requirements prefill). Robust to partial/omitted
+// answers — anything missing stays SKIPPED. Submitting creates a NEW requirement.
+export function answersFromRawInput(raw: unknown): Answers {
+  const a = initialAnswers(null);
+  const answers =
+    raw && typeof raw === "object"
+      ? (raw as { answers?: Record<string, Record<string, unknown>> }).answers
+      : undefined;
+  if (!answers || typeof answers !== "object") return a;
+
+  const st = (o: Record<string, unknown> | undefined): AnswerState =>
+    o?.state === "ANSWERED" || o?.state === "UNKNOWN" ? (o.state as AnswerState) : "SKIPPED";
+  const s = (v: unknown): string => (v === null || v === undefined ? "" : String(v));
+
+  if (answers.task) {
+    a.task = {
+      state: st(answers.task),
+      useCase: s(answers.task.use_case),
+      taskDescription: s(answers.task.task_description),
+    };
+  }
+  const simple: (keyof Answers)[] = [
+    "industry", "country", "environment", "payload", "hours", "timeline",
+  ];
+  for (const k of simple) {
+    const src = answers[k as string];
+    if (src) (a[k] as { state: AnswerState; value: string }) = { state: st(src), value: s(src.value) };
+  }
+  if (answers.manipulation) {
+    const v = answers.manipulation.value;
+    a.manipulation = { state: st(answers.manipulation), value: v === true ? true : v === false ? false : null };
+  }
+  if (answers.autonomy) a.autonomy = { state: st(answers.autonomy), value: s(answers.autonomy.value) };
+  if (answers.transaction) {
+    a.transaction = { state: st(answers.transaction), value: s(answers.transaction.value) };
+  }
+  if (answers.budget) {
+    a.budget = {
+      state: st(answers.budget),
+      currency: s(answers.budget.currency),
+      min: s(answers.budget.min),
+      max: s(answers.budget.max),
+    };
+  }
+  return a;
+}
+
 function trimOrUndef(s: string): string | undefined {
   const t = s.trim();
   return t === "" ? undefined : t;

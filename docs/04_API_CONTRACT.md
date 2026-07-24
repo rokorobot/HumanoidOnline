@@ -131,7 +131,11 @@ Body (all fields optional except a required versioned `raw_input` and at least o
 ```
 Response `201`: `{ "id": "uuid" }`. In WS5 matching does **not** run on create — it runs on the first `GET …/matches` fetch below (WS6). Invalid `use_case`/`country`, a missing/unversioned `raw_input`, a contact field, or no requirement signal all return `422`, and a rejected request persists nothing.
 
+### `GET /api/buyer-requirements/{id}` (WS6 supporting read)
+Anonymous requirement read (no contact identity) — powers **Adjust Requirements**: the wizard prefills from the stored `raw_input` (versioned answers) and submitting creates a **new** `buyer_requirement` (the historical one is never mutated — no `PUT`/`PATCH`). `404` for an unknown id. Product-owner-authorized additive read.
+
 ### `GET /api/buyer-requirements/{id}/matches`
+Deterministic matching runs on the **first** request and is persisted; later requests return the stored result unchanged (idempotent; the requirement row is locked so a concurrent first request reads the persisted result rather than rescoring). A zero-survivor outcome persists nothing (no sentinel row, no schema change) and is recomputed deterministically. `404` for an unknown id.
 Response `200`:
 ```json
 {

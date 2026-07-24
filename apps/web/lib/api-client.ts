@@ -10,8 +10,10 @@ import type {
   ManufacturerDetail,
   ManufacturerListItem,
   MarketSnapshot,
+  MatchResponse,
   Page,
   RegionListItem,
+  RequirementRead,
   RobotDetail,
   RobotListItem,
   UseCaseDetail,
@@ -146,6 +148,25 @@ export function listRegions(
 ): Promise<RegionListItem[]> {
   return getJSON<RegionListItem[]>(
     `/api/regions${buildQuery(params as Record<string, QueryValue>)}`,
+  );
+}
+
+// ---- Buyer intent & matching (WS6) -----------------------------------------
+
+// Triggers deterministic matching on the first call (server persists the result);
+// later calls return the stored result. 404 -> notFound() for an unknown id.
+export function getMatches(id: string): Promise<MatchResponse> {
+  return getJSON<MatchResponse>(
+    `/api/buyer-requirements/${encodeURIComponent(id)}/matches`,
+    { notFoundOn404: true },
+  );
+}
+
+// Anonymous requirement read for the Adjust-Requirements prefill.
+export function getRequirement(id: string): Promise<RequirementRead> {
+  return getJSON<RequirementRead>(
+    `/api/buyer-requirements/${encodeURIComponent(id)}`,
+    { notFoundOn404: true },
   );
 }
 

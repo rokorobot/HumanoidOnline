@@ -1043,5 +1043,147 @@ COMMENT ON VIEW robot_commercial_snapshot IS
     'heavily deployed simultaneously.';
 
 -- =============================================================================
+-- SECTION 10 — DISCOVERY LAYER (DATA-D1, docs/11_DATA_D1_CONTRACT.md, RATIFIED v0.1)
+-- =============================================================================
+-- Noncanonical competitive-discovery research queue. STRUCTURALLY SEPARATE from
+-- canonical (§5 / DATA-D1.10 / Gate K): no canonical table above is altered and
+-- none gains a foreign key to a discovery table. The only cross-references point
+-- FROM a candidate TO canonical (possible_*/promoted_robot_id), never the reverse.
+-- Mirrored by db/migrations/0003_add_discovery_layer.sql.
+
+CREATE TYPE discovery_source_class AS ENUM (
+    'COMPETITOR_DIRECTORY', 'MARKETPLACE', 'EDITORIAL', 'SEARCH_RESULT',
+    'DISTRIBUTOR', 'MANUFACTURER', 'PRESS_RELEASE', 'OFFICIAL_DOCUMENT',
+    'OFFICIAL_VIDEO', 'OTHER');
+
+CREATE TYPE candidate_entity_type AS ENUM (
+    'ROBOT', 'MANUFACTURER', 'VARIANT', 'SPEC', 'PRICING', 'AVAILABILITY',
+    'DEPLOYMENT', 'IMAGE', 'OTHER');
+
+CREATE TYPE candidate_identity_status AS ENUM (
+    'UNRESOLVED', 'MATCHED_EXISTING', 'NEW_ENTITY', 'AMBIGUOUS', 'POSSIBLE_DUPLICATE');
+
+CREATE TYPE candidate_status AS ENUM (
+    'DISCOVERED', 'IDENTITY_REVIEW', 'SOURCE_TRACE', 'VERIFICATION',
+    'READY_FOR_PROMOTION', 'PROMOTED', 'POSSIBLE_DUPLICATE', 'CONFLICT',
+    'INSUFFICIENT_EVIDENCE', 'REJECTED', 'STALE', 'RECHECK_REQUIRED');
+
+CREATE TYPE trace_state AS ENUM (
+    'NOT_TRACED', 'TRACE_CONFIRMED', 'TRACE_PARTIAL', 'TRACE_FAILED');
+
+CREATE TYPE claim_status AS ENUM (
+    'NOT_VERIFIED', 'VERIFIED', 'CONFLICT', 'REJECTED', 'UNKNOWN');
+
+-- Radar registry. DATA-D1.9: a source is crawler-eligible only after its ToS +
+-- robots/access policy are reviewed. The CHECK encodes that gate in the schema.
+CREATE TABLE discovery_source (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    key             TEXT NOT NULL UNIQUE,
+    name            TEXT NOT NULL,
+    source_class    discovery_source_class NOT NULL,
+    homepage_url    TEXT,
+    tos_reviewed    BOOLEAN NOT NULL DEFAULT FALSE,
+    robots_allowed  BOOLEAN NOT NULL DEFAULT FALSE,
+    is_enabled      BOOLEAN NOT NULL DEFAULT FALSE,
+    notes           TEXT,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT ck_discovery_source_eligible
+        CHECK (NOT is_enabled OR (tos_reviewed AND robots_allowed))
+);
+COMMENT ON TABLE discovery_source IS
+    'DATA-D1 radar registry. is_enabled requires tos_reviewed AND robots_allowed (DATA-D1.9).';
+
+CREATE TABLE discovery_candidate (
+    id                        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    source_id                 UUID NOT NULL REFERENCES discovery_source(id) ON DELETE CASCADE,
+    entity_type               candidate_entity_type NOT NULL DEFAULT 'ROBOT',
+    candidate_name            TEXT,
+    candidate_manufacturer    TEXT,
+    discovery_url             TEXT,
+    external_ref              TEXT,
+    candidate_data            JSONB,          -- MINIMAL (DATA-D1.10): leads + claims only
+    identity_status           candidate_identity_status NOT NULL DEFAULT 'UNRESOLVED',
+    status                    candidate_status NOT NULL DEFAULT 'DISCOVERED',
+    trace_state               trace_state NOT NULL DEFAULT 'NOT_TRACED',
+    trace_url                 TEXT,
+    possible_robot_id         UUID REFERENCES robot(id) ON DELETE SET NULL,
+    possible_manufacturer_id  UUID REFERENCES manufacturer(id) ON DELETE SET NULL,
+    promoted_robot_id         UUID REFERENCES robot(id) ON DELETE SET NULL,
+    discovered_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
+    last_seen_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT uq_candidate_source_ref UNIQUE (source_id, external_ref)
+);
+COMMENT ON TABLE discovery_candidate IS
+    'DATA-D1 noncanonical research candidate. Never public (§22/Gate I); canonical '
+    'only after the promotion gate (§7). Minimal retention (DATA-D1.10), not a shadow DB.';
+
+CREATE TABLE candidate_claim (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    candidate_id        UUID NOT NULL REFERENCES discovery_candidate(id) ON DELETE CASCADE,
+    field_key           TEXT NOT NULL,
+    claimed_value       TEXT,              -- NULL = UNKNOWN (never 0/false)
+    unit                TEXT,
+    claim_status        claim_status NOT NULL DEFAULT 'NOT_VERIFIED',
+    discovery_source_id UUID REFERENCES discovery_source(id) ON DELETE SET NULL,
+    evidence_url        TEXT,
+    note                TEXT,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+COMMENT ON TABLE candidate_claim IS
+    'Per-field claims. Conflicting values are retained side-by-side, never averaged (DATA-D1.8).';
+
+-- Reference-only candidate imagery (R3): URL + metadata, NO stored binary.
+CREATE TABLE candidate_image_ref (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    candidate_id        UUID NOT NULL REFERENCES discovery_candidate(id) ON DELETE CASCADE,
+    image_url           TEXT NOT NULL,
+    discovery_source_id UUID REFERENCES discovery_source(id) ON DELETE SET NULL,
+    credited_to         TEXT,
+    media_status        TEXT NOT NULL DEFAULT 'CANDIDATE',
+    note                TEXT,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+COMMENT ON TABLE candidate_image_ref IS
+    'DATA-D1 R3: reference-only imagery (URL + metadata, no binary). MEDIA-01 authoritative.';
+
+CREATE TABLE promotion_audit (
+    id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    candidate_id         UUID NOT NULL REFERENCES discovery_candidate(id) ON DELETE CASCADE,
+    action               TEXT NOT NULL,
+    promoted_entity_type candidate_entity_type,
+    promoted_robot_id    UUID REFERENCES robot(id) ON DELETE SET NULL,
+    evidence_source_id   UUID,   -- soft ref to evidence_source(id)
+    approved_by          TEXT NOT NULL,
+    detail               JSONB,
+    created_at           TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+COMMENT ON TABLE promotion_audit IS
+    'DATA-D1 §19/Gate J: human-approval + promotion lineage (candidate -> evidence -> robot).';
+
+CREATE INDEX idx_candidate_source          ON discovery_candidate (source_id);
+CREATE INDEX idx_candidate_status          ON discovery_candidate (status);
+CREATE INDEX idx_candidate_possible_robot  ON discovery_candidate (possible_robot_id);
+CREATE INDEX idx_candidate_claim_candidate ON candidate_claim (candidate_id);
+CREATE INDEX idx_candidate_image_candidate ON candidate_image_ref (candidate_id);
+CREATE INDEX idx_promotion_audit_candidate ON promotion_audit (candidate_id);
+
+-- discovery_source / discovery_candidate / candidate_claim carry updated_at; give
+-- them the same maintenance trigger as the canonical tables above.
+DO $$
+DECLARE t TEXT;
+BEGIN
+    FOR t IN SELECT unnest(ARRAY['discovery_source','discovery_candidate','candidate_claim'])
+    LOOP
+        EXECUTE format(
+            'CREATE TRIGGER trg_%1$s_updated BEFORE UPDATE ON %1$s
+             FOR EACH ROW EXECUTE FUNCTION set_updated_at();', t);
+    END LOOP;
+END$$;
+
+-- =============================================================================
 -- END OF SCHEMA
 -- =============================================================================

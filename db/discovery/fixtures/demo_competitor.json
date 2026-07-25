@@ -1,0 +1,27 @@
+[
+  {
+    "external_ref": "demo-001",
+    "entity_type": "ROBOT",
+    "name": "Zeta ZX-1",
+    "manufacturer": "Zeta Dynamics",
+    "discovery_url": "https://example-directory.invalid/robots/zeta-zx-1",
+    "data": { "official_url": "https://zeta-dynamics.invalid/zx-1" },
+    "claims": [
+      { "field_key": "height_cm", "claimed_value": "170", "unit": "cm",
+        "evidence_url": "https://zeta-dynamics.invalid/zx-1/specs" },
+      { "field_key": "payload_kg", "claimed_value": null }
+    ],
+    "images": [
+      { "image_url": "https://example-directory.invalid/img/zeta-zx-1.jpg",
+        "credited_to": "Zeta Dynamics" }
+    ]
+  },
+  {
+    "external_ref": "demo-002",
+    "entity_type": "ROBOT",
+    "name": "Figure",
+    "manufacturer": "Figure AI",
+    "discovery_url": "https://example-directory.invalid/robots/figure",
+    "data": { "official_url": "https://figure.invalid/" }
+  }
+]

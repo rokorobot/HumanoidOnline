@@ -110,6 +110,37 @@ lead_status = _pg_enum(
     "WON", "LOST", "DISQUALIFIED",
 )
 
+# Discovery layer (DATA-D1 / docs/11_DATA_D1_CONTRACT.md). Noncanonical research
+# queue — competitors are radar only; nothing here is a canonical fact until it
+# passes the promotion gate (§7). Mirrors db/migrations/0003_add_discovery_layer.sql.
+discovery_source_class = _pg_enum(
+    "discovery_source_class",
+    "COMPETITOR_DIRECTORY", "MARKETPLACE", "EDITORIAL", "SEARCH_RESULT",
+    "DISTRIBUTOR", "MANUFACTURER", "PRESS_RELEASE", "OFFICIAL_DOCUMENT",
+    "OFFICIAL_VIDEO", "OTHER",
+)
+candidate_entity_type = _pg_enum(
+    "candidate_entity_type",
+    "ROBOT", "MANUFACTURER", "VARIANT", "SPEC", "PRICING", "AVAILABILITY",
+    "DEPLOYMENT", "IMAGE", "OTHER",
+)
+candidate_identity_status = _pg_enum(
+    "candidate_identity_status",
+    "UNRESOLVED", "MATCHED_EXISTING", "NEW_ENTITY", "AMBIGUOUS", "POSSIBLE_DUPLICATE",
+)
+candidate_status = _pg_enum(
+    "candidate_status",
+    "DISCOVERED", "IDENTITY_REVIEW", "SOURCE_TRACE", "VERIFICATION",
+    "READY_FOR_PROMOTION", "PROMOTED", "POSSIBLE_DUPLICATE", "CONFLICT",
+    "INSUFFICIENT_EVIDENCE", "REJECTED", "STALE", "RECHECK_REQUIRED",
+)
+trace_state = _pg_enum(
+    "trace_state", "NOT_TRACED", "TRACE_CONFIRMED", "TRACE_PARTIAL", "TRACE_FAILED"
+)
+claim_status = _pg_enum(
+    "claim_status", "NOT_VERIFIED", "VERIFIED", "CONFLICT", "REJECTED", "UNKNOWN"
+)
+
 # Autonomy ordered low->high, for the `autonomy_min` catalogue filter.
 AUTONOMY_ORDER = [
     "TELEOPERATED", "ASSISTED", "SUPERVISED_AUTONOMY", "TASK_AUTONOMOUS",

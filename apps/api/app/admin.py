@@ -15,6 +15,13 @@ from app.models.buyer_requirement import BuyerRequirement
 from app.models.capability import Capability
 from app.models.commercial import AvailabilityOffer, Deployment, PricingOffer
 from app.models.commercial_lead import CommercialLead, CommercialLeadProvider
+from app.models.discovery import (
+    CandidateClaim,
+    CandidateImageRef,
+    DiscoveryCandidate,
+    DiscoverySource,
+    PromotionAudit,
+)
 from app.models.evidence import EvidenceSource
 from app.models.manufacturer import Manufacturer, Provider
 from app.models.match_result import MatchResult
@@ -140,12 +147,67 @@ class CommercialLeadProviderAdmin(ModelView, model=CommercialLeadProvider):
     name_plural = "Commercial lead — provider routes"
 
 
+class DiscoverySourceAdmin(ModelView, model=DiscoverySource):
+    # DATA-D1 radar registry. A source is crawler-eligible only when reviewed +
+    # access-permitted + enabled (DATA-D1.9, enforced by a DB CHECK).
+    column_list = [
+        DiscoverySource.key, DiscoverySource.name, DiscoverySource.source_class,
+        DiscoverySource.tos_reviewed, DiscoverySource.robots_allowed,
+        DiscoverySource.is_enabled,
+    ]
+    column_searchable_list = [DiscoverySource.key, DiscoverySource.name]
+    name_plural = "Discovery sources (DATA-D1)"
+
+
+class DiscoveryCandidateAdmin(ModelView, model=DiscoveryCandidate):
+    # Noncanonical research triage. Promotion to canonical is NOT done here — it is
+    # the governed CLI (app.cli.promote_candidate); the pipeline never promotes.
+    column_list = [
+        DiscoveryCandidate.candidate_name, DiscoveryCandidate.candidate_manufacturer,
+        DiscoveryCandidate.entity_type, DiscoveryCandidate.identity_status,
+        DiscoveryCandidate.status, DiscoveryCandidate.trace_state,
+        DiscoveryCandidate.promoted_robot_id,
+    ]
+    column_searchable_list = [
+        DiscoveryCandidate.candidate_name, DiscoveryCandidate.candidate_manufacturer,
+    ]
+    column_sortable_list = [DiscoveryCandidate.status, DiscoveryCandidate.identity_status]
+    name_plural = "Discovery candidates (DATA-D1)"
+
+
+class CandidateClaimAdmin(ModelView, model=CandidateClaim):
+    column_list = [
+        CandidateClaim.candidate_id, CandidateClaim.field_key,
+        CandidateClaim.claimed_value, CandidateClaim.claim_status,
+    ]
+    name_plural = "Candidate claims (DATA-D1)"
+
+
+class CandidateImageRefAdmin(ModelView, model=CandidateImageRef):
+    column_list = [
+        CandidateImageRef.candidate_id, CandidateImageRef.image_url,
+        CandidateImageRef.credited_to, CandidateImageRef.media_status,
+    ]
+    name_plural = "Candidate images (DATA-D1, reference-only)"
+
+
+class PromotionAuditAdmin(ModelView, model=PromotionAudit):
+    column_list = [
+        PromotionAudit.candidate_id, PromotionAudit.action,
+        PromotionAudit.promoted_robot_id, PromotionAudit.approved_by,
+        PromotionAudit.created_at,
+    ]
+    name_plural = "Promotion audit (DATA-D1)"
+
+
 _VIEWS = [
     ManufacturerAdmin, ProviderAdmin, RobotAdmin, RobotVariantAdmin, RobotImageAdmin,
     UseCaseAdmin,
     CapabilityAdmin, SpecDefinitionAdmin, PricingOfferAdmin, AvailabilityOfferAdmin,
     DeploymentAdmin, EvidenceSourceAdmin, BuyerRequirementAdmin, MatchResultAdmin,
     CommercialLeadAdmin, CommercialLeadProviderAdmin,
+    DiscoverySourceAdmin, DiscoveryCandidateAdmin, CandidateClaimAdmin,
+    CandidateImageRefAdmin, PromotionAuditAdmin,
 ]
 
 

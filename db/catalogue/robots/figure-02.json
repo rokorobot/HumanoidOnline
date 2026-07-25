@@ -101,13 +101,13 @@
     {
       "image_url": "/robots/figure-02.jpg",
       "source_url": "https://www.therobotreport.com/figure-02-humanoid-robot-is-ready-to-get-to-work/",
-      "source_name": "Figure AI",
-      "source_type": "MANUFACTURER",
+      "source_name": "The Robot Report",
+      "source_type": "EDITORIAL",
       "image_type": "FRONT",
       "identity_status": "VERIFIED",
-      "rights_status": "UNKNOWN",
-      "usage_basis": "OFFICIAL_MANUFACTURER_MEDIA",
-      "is_official": true,
+      "rights_status": "ATTRIBUTION_REQUIRED",
+      "usage_basis": "NONE",
+      "is_official": false,
       "is_primary": true,
       "attribution": "© Figure AI",
       "last_verified_at": "2026-07-25T00:00:00Z"

@@ -489,6 +489,10 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-ink); padding: var(-
 .foot-grid { display: flex; justify-content: space-between; gap: var(--ho-sp-5);
   flex-wrap: wrap; align-items: center; }
 .foot-grid b { font-family: var(--ho-font-display-grotesk); font-weight: 800; font-stretch: 75%; }
+.foot-brand { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-code); color: var(--ho-text-muted); }
+.foot-brand-link { color: var(--ho-ink); text-decoration: underline; }
+.ho-dark .foot-brand-link { color: var(--ho-paper-ink); }
 
 /* ---- TRIAD (CommercialTriad) --------------------------------------------- */
 .triad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;

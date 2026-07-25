@@ -86,6 +86,13 @@ export function SiteFooter() {
       <div className="wrap foot-grid">
         <div>
           <b>HUMANOIDONLINE</b>
+          <span className="foot-brand">
+            {" "}· A{" "}
+            <a className="foot-brand-link" href="https://humanoid.company/">
+              Humanoid.Company
+            </a>{" "}
+            project
+          </span>
         </div>
         <span className="ho-syslabel">
           COMMERCIAL INTELLIGENCE · MATURITY / OBTAINABILITY / EVIDENCE — KEPT

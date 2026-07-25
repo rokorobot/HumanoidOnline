@@ -5,17 +5,21 @@ model mirrors it and never generates DDL. `robot.hero_image_url` is dormant and
 is NOT the read path.
 
 The one place the display-eligibility rule lives is `is_display_eligible` /
-`DISPLAY_ELIGIBLE_CLAUSE`: an image is shown ONLY when it depicts the exact robot
-(identity_status VERIFIED) AND we may display it (rights_status PERMITTED or
-ATTRIBUTION_REQUIRED). A non-NULL image_url is NEVER sufficient, and rights_status
-UNKNOWN never behaves like PERMITTED (MEDIA-01.5).
+`DISPLAY_ELIGIBLE_CLAUSE`. THREE independent dimensions, never collapsed:
+  - identity_status: does it depict THIS exact robot;
+  - rights_status: legal/licensing EVIDENCE for reuse;
+  - usage_basis: platform display POLICY (why we display absent a formal license).
+An image is shown ONLY when identity VERIFIED AND rights_status != RESTRICTED AND
+(rights_status PERMITTED/ATTRIBUTION_REQUIRED OR usage_basis
+OFFICIAL_MANUFACTURER_MEDIA). A non-NULL image_url is NEVER sufficient; RESTRICTED
+always blocks; UNKNOWN rights never behaves like PERMITTED (MEDIA-01.5, §H2).
 """
 from __future__ import annotations
 
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Text, and_, text
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Text, and_, or_, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -25,10 +29,13 @@ from app.models.enums import (
     image_rights_status,
     image_source_type,
     image_type,
+    image_usage_basis,
 )
 
-# The rights values that permit display. UNKNOWN and RESTRICTED never display.
+# Rights values that on their own permit display (a real reuse basis on record).
 DISPLAYABLE_RIGHTS = ("PERMITTED", "ATTRIBUTION_REQUIRED")
+# Usage-policy bases that permit display absent a formal license.
+DISPLAYABLE_USAGE = ("OFFICIAL_MANUFACTURER_MEDIA",)
 
 
 class RobotImage(Base):
@@ -53,6 +60,9 @@ class RobotImage(Base):
     rights_status: Mapped[str] = mapped_column(
         image_rights_status, nullable=False, server_default=text("'UNKNOWN'")
     )
+    usage_basis: Mapped[str] = mapped_column(
+        image_usage_basis, nullable=False, server_default=text("'NONE'")
+    )
     is_official: Mapped[bool] = mapped_column(
         Boolean, nullable=False, server_default=text("false")
     )
@@ -72,15 +82,26 @@ class RobotImage(Base):
     robot: Mapped[Robot] = relationship("Robot", back_populates="images")  # noqa: F821
 
     def is_display_eligible(self) -> bool:
-        """MEDIA-01 display gate. The ONE rule — never `bool(image_url)`."""
+        """MEDIA-01 display gate. The ONE rule — never `bool(image_url)`.
+        Identity must be VERIFIED; RESTRICTED rights always block; otherwise a
+        real reuse basis (PERMITTED/ATTRIBUTION_REQUIRED) OR an approved display
+        policy (usage_basis OFFICIAL_MANUFACTURER_MEDIA) is required."""
+        if self.identity_status != "VERIFIED":
+            return False
+        if self.rights_status == "RESTRICTED":
+            return False
         return (
-            self.identity_status == "VERIFIED"
-            and self.rights_status in DISPLAYABLE_RIGHTS
+            self.rights_status in DISPLAYABLE_RIGHTS
+            or self.usage_basis in DISPLAYABLE_USAGE
         )
 
 
 # SQL form of the same gate, for filtering in queries (identical semantics).
 DISPLAY_ELIGIBLE_CLAUSE = and_(
     RobotImage.identity_status == "VERIFIED",
-    RobotImage.rights_status.in_(DISPLAYABLE_RIGHTS),
+    RobotImage.rights_status != "RESTRICTED",
+    or_(
+        RobotImage.rights_status.in_(DISPLAYABLE_RIGHTS),
+        RobotImage.usage_basis.in_(DISPLAYABLE_USAGE),
+    ),
 )

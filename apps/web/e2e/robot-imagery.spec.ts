@@ -23,3 +23,12 @@ test("robot without a cleared image shows IMAGE_UNAVAILABLE (never an invented i
   await expect(page.getByText("IMAGE UNAVAILABLE")).toBeVisible();
   await expect(page.locator(".ro-gallery__img")).toHaveCount(0);
 });
+
+test("catalogue cards use the same image truth: real images + honest unavailable tiles", async ({ page }) => {
+  await page.goto("/robots");
+  // populated robots render a real card image...
+  await expect(page.locator(".rcard-media__img").first()).toBeVisible();
+  expect(await page.locator(".rcard-media__img").count()).toBeGreaterThanOrEqual(1);
+  // ...and robots without a cleared image render the explicit unavailable tile.
+  expect(await page.locator(".rcard-media__unavailable").count()).toBeGreaterThanOrEqual(1);
+});

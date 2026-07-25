@@ -94,6 +94,9 @@ image_rights_status = _pg_enum(
     "image_rights_status",
     "PERMITTED", "ATTRIBUTION_REQUIRED", "UNKNOWN", "RESTRICTED",
 )
+image_usage_basis = _pg_enum(
+    "image_usage_basis", "NONE", "OFFICIAL_MANUFACTURER_MEDIA"
+)
 match_category = _pg_enum(
     "match_category",
     "BEST_OVERALL", "BEST_COMMERCIAL", "BEST_LOWER_COST", "BEST_DEVELOPER",

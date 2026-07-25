@@ -657,6 +657,15 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-ink); padding: var(-
   .mr-breakdown { border-right: 0; border-bottom: var(--ho-rule-hair) solid var(--ho-line-soft); }
 }
 
+/* ---- MEDIA-01 — CATALOGUE-CARD IMAGE ------------------------------------- */
+.rcard-media { display: block; width: 100%; height: 180px; background: var(--ho-paper-2);
+  border-bottom: var(--ho-rule-hair) solid var(--ho-line-soft); overflow: hidden;
+  display: flex; align-items: center; justify-content: center; }
+.rcard-media__img { width: 100%; height: 100%; object-fit: contain; }
+.rcard-media__unavailable { font-family: var(--ho-font-machine);
+  font-size: var(--ho-fs-mono-s); letter-spacing: var(--ho-tracking-label);
+  text-transform: uppercase; color: var(--ho-text-faint); }
+
 /* ---- MEDIA-01 — VERIFIED IMAGERY GALLERY --------------------------------- */
 .ro-gallery { margin: var(--ho-sp-5) 0; }
 .ro-gallery__figure { position: relative; margin: var(--ho-sp-3) 0 0;

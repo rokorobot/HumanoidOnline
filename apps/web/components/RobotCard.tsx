@@ -43,6 +43,22 @@ export function RobotCard({
         <MachineCode>{robot.manufacturer.name.toUpperCase()}</MachineCode>
         <DotMatrix signal={live} />
       </div>
+      {/* MEDIA-01: verified real image (same image truth as Robot Detail) in the
+          smaller catalogue format, or an explicit unavailable tile — never an
+          invented/placeholder robot picture. */}
+      <Link className="rcard-media" href={detailHref} aria-label={`${robot.name} image`}>
+        {robot.primary_image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            className="rcard-media__img"
+            src={robot.primary_image.image_url}
+            alt={robot.name}
+            loading="lazy"
+          />
+        ) : (
+          <span className="rcard-media__unavailable">IMAGE UNAVAILABLE</span>
+        )}
+      </Link>
       <div className="rcard-body">
         <div>
           <div className="lockup">

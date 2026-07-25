@@ -251,12 +251,22 @@ CREATE TYPE image_identity_status AS ENUM (
     'VERIFIED',
     'UNVERIFIED'
 );
--- May we DISPLAY it? UNKNOWN must never behave like PERMITTED (MEDIA-01.5).
+-- Legal/licensing evidence for reuse. UNKNOWN must never behave like PERMITTED
+-- (MEDIA-01.5). This is EVIDENCE, kept separate from platform display policy below.
 CREATE TYPE image_rights_status AS ENUM (
     'PERMITTED',
     'ATTRIBUTION_REQUIRED',
     'UNKNOWN',
     'RESTRICTED'
+);
+-- Platform display POLICY basis — why HumanoidOnline displays an image even when a
+-- formal reuse license is not on record. Distinct from rights_status (legal
+-- evidence): OFFICIAL_MANUFACTURER_MEDIA records the ratified business decision to
+-- display official manufacturer product media for the robots the platform markets,
+-- WITHOUT falsely asserting an attribution license was granted (MEDIA-01 §H2).
+CREATE TYPE image_usage_basis AS ENUM (
+    'NONE',
+    'OFFICIAL_MANUFACTURER_MEDIA'
 );
 
 -- =============================================================================
@@ -423,10 +433,13 @@ COMMENT ON TABLE robot_status_history IS 'Timeline of commercial_status changes 
 -- Compare and Phases 3-5 (Rent/Buy/Lease) without a second image system.
 --
 -- Two invariants encoded here:
---   * identity_status (does it depict THIS robot) is SEPARATE from rights_status
---     (may we display it). An image is display-eligible ONLY when
---     identity_status='VERIFIED' AND rights_status IN ('PERMITTED',
---     'ATTRIBUTION_REQUIRED'). A non-NULL image_url is NEVER sufficient.
+--   * THREE independent dimensions, never collapsed: identity_status (does it
+--     depict THIS exact robot), rights_status (legal/licensing EVIDENCE for reuse),
+--     and usage_basis (platform display POLICY). An image is display-eligible ONLY
+--     when identity_status='VERIFIED' AND rights_status <> 'RESTRICTED' AND
+--     (rights_status IN ('PERMITTED','ATTRIBUTION_REQUIRED') OR
+--      usage_basis='OFFICIAL_MANUFACTURER_MEDIA'). A non-NULL image_url is NEVER
+--     sufficient; RESTRICTED always blocks; UNKNOWN rights never acts like PERMITTED.
 --   * image_url (the asset rendered) is SEPARATE from source_url (the
 --     authoritative page establishing provenance) — we must be able to
 --     reconstruct WHY an image was trusted, not just WHAT was shown.
@@ -440,7 +453,8 @@ CREATE TABLE robot_image (
     source_type     image_source_type NOT NULL,
     image_type      image_type NOT NULL DEFAULT 'FRONT',
     identity_status image_identity_status NOT NULL DEFAULT 'UNVERIFIED',
-    rights_status   image_rights_status NOT NULL DEFAULT 'UNKNOWN',
+    rights_status   image_rights_status NOT NULL DEFAULT 'UNKNOWN',   -- legal evidence
+    usage_basis     image_usage_basis NOT NULL DEFAULT 'NONE',        -- display policy
     is_official     BOOLEAN NOT NULL DEFAULT FALSE,
     is_primary      BOOLEAN NOT NULL DEFAULT FALSE,
     attribution     TEXT,                      -- required credit line when ATTRIBUTION_REQUIRED
@@ -450,10 +464,11 @@ CREATE TABLE robot_image (
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 COMMENT ON TABLE robot_image IS
-    'MEDIA-01 verified product imagery. Display-eligible only when identity_status '
-    'VERIFIED and rights_status IN (PERMITTED, ATTRIBUTION_REQUIRED); a non-null '
-    'image_url is never sufficient. No GENERATED source exists — real robots are '
-    'never depicted by synthesized imagery. Missing/ineligible -> IMAGE_UNAVAILABLE.';
+    'MEDIA-01 verified product imagery. Display-eligible only when identity VERIFIED, '
+    'rights_status <> RESTRICTED, and (rights PERMITTED/ATTRIBUTION_REQUIRED OR '
+    'usage_basis OFFICIAL_MANUFACTURER_MEDIA); a non-null image_url is never '
+    'sufficient. No GENERATED source exists — real robots are never depicted by '
+    'synthesized imagery. Missing/ineligible -> IMAGE_UNAVAILABLE.';
 -- At most one primary image per robot (partial unique — many non-primary allowed).
 CREATE UNIQUE INDEX uq_robot_image_primary ON robot_image (robot_id) WHERE is_primary;
 CREATE INDEX idx_robot_image_robot ON robot_image (robot_id);

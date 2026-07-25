@@ -8,6 +8,16 @@ from pydantic import BaseModel
 from app.schemas.common import EvidenceRead, ManufacturerRef, PriceDisplay
 
 
+class RobotImagePrimary(BaseModel):
+    """The single display-eligible primary image for a catalogue card (MEDIA-01).
+    Same image truth as Robot Detail, through the same gate — just the compact
+    fields a card needs. None -> the card shows the IMAGE_UNAVAILABLE treatment."""
+
+    image_url: str
+    source_name: str | None = None
+    is_official: bool
+
+
 class RobotListItem(BaseModel):
     id: str
     slug: str
@@ -15,6 +25,8 @@ class RobotListItem(BaseModel):
     manufacturer: ManufacturerRef
     summary: str | None = None
     hero_image_url: str | None = None
+    # MEDIA-01 catalogue-card image (display-eligible primary, or null -> unavailable).
+    primary_image: RobotImagePrimary | None = None
     commercial_status: str
     payload_kg: float | None = None
     height_cm: float | None = None

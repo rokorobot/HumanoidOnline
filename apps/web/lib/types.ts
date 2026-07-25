@@ -39,6 +39,12 @@ export interface Evidence {
   source_url?: string | null;
 }
 
+export interface RobotImagePrimary {
+  image_url: string;
+  source_name?: string | null;
+  is_official: boolean;
+}
+
 export interface RobotListItem {
   id: string;
   slug: string;
@@ -46,6 +52,8 @@ export interface RobotListItem {
   manufacturer: ManufacturerRef;
   summary?: string | null;
   hero_image_url?: string | null;
+  // MEDIA-01 catalogue-card image (display-eligible primary; null -> unavailable).
+  primary_image?: RobotImagePrimary | null;
   commercial_status: string;
   payload_kg?: number | null;
   height_cm?: number | null;

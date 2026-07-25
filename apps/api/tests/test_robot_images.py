@@ -27,20 +27,22 @@ def _robot_id() -> uuid.UUID:
         ).scalar_one()
 
 
-def _insert_image(robot_id, *, identity, rights, source_type="MANUFACTURER") -> uuid.UUID:
+def _insert_image(
+    robot_id, *, identity, rights, usage="NONE", source_type="MANUFACTURER"
+) -> uuid.UUID:
     with engine.begin() as c:
         c.execute(text("SET search_path TO humanoid, public"))
         return c.execute(
             text(
                 "INSERT INTO robot_image "
                 "(robot_id, image_url, source_url, source_name, source_type, "
-                " identity_status, rights_status, is_primary, attribution) "
-                "VALUES (:r, :u, :su, :sn, :st, :idn, :rgt, true, :at) RETURNING id"
+                " identity_status, rights_status, usage_basis, is_primary, attribution) "
+                "VALUES (:r, :u, :su, :sn, :st, :idn, :rgt, :ub, true, :at) RETURNING id"
             ),
             {
                 "r": robot_id, "u": "https://example.com/robot.jpg",
                 "su": "https://example.com/source", "sn": "Example Source",
-                "st": source_type, "idn": identity, "rgt": rights,
+                "st": source_type, "idn": identity, "rgt": rights, "ub": usage,
                 "at": "© Example",
             },
         ).scalar_one()
@@ -70,21 +72,26 @@ def test_no_images_returns_empty(client, database_url) -> None:
 
 def test_display_eligibility_matrix(client, database_url) -> None:
     rid = _robot_id()
-    # (identity, rights) -> should the image be display-eligible?
+    # (identity, rights, usage_basis) -> should the image be display-eligible?
     matrix = [
-        ("VERIFIED", "PERMITTED", True),
-        ("VERIFIED", "ATTRIBUTION_REQUIRED", True),
-        ("VERIFIED", "UNKNOWN", False),          # UNKNOWN rights != PERMITTED
-        ("VERIFIED", "RESTRICTED", False),
-        ("UNVERIFIED", "PERMITTED", False),      # identity not established
-        ("UNVERIFIED", "UNKNOWN", False),
+        ("VERIFIED", "PERMITTED", "NONE", True),
+        ("VERIFIED", "ATTRIBUTION_REQUIRED", "NONE", True),
+        ("VERIFIED", "UNKNOWN", "NONE", False),          # UNKNOWN + no policy basis
+        ("VERIFIED", "RESTRICTED", "NONE", False),
+        ("UNVERIFIED", "PERMITTED", "NONE", False),      # identity not established
+        ("UNVERIFIED", "UNKNOWN", "NONE", False),
+        # §H2: official-manufacturer-media policy authorises display when rights are
+        # merely UNKNOWN (no false license), but RESTRICTED still blocks.
+        ("VERIFIED", "UNKNOWN", "OFFICIAL_MANUFACTURER_MEDIA", True),
+        ("VERIFIED", "RESTRICTED", "OFFICIAL_MANUFACTURER_MEDIA", False),
+        ("UNVERIFIED", "UNKNOWN", "OFFICIAL_MANUFACTURER_MEDIA", False),  # identity gate
     ]
-    for identity, rights, should_display in matrix:
-        img_id = _insert_image(rid, identity=identity, rights=rights)
+    for identity, rights, usage, should_display in matrix:
+        img_id = _insert_image(rid, identity=identity, rights=rights, usage=usage)
         try:
             imgs = _detail_images(client)
             shown = len(imgs) == 1
-            assert shown == should_display, (identity, rights, imgs)
+            assert shown == should_display, (identity, rights, usage, imgs)
             if shown:
                 assert imgs[0]["image_url"] == "https://example.com/robot.jpg"
                 assert imgs[0]["source_name"] == "Example Source"

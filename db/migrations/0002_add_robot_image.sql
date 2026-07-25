@@ -33,6 +33,10 @@ BEGIN
         CREATE TYPE image_rights_status AS ENUM (
             'PERMITTED', 'ATTRIBUTION_REQUIRED', 'UNKNOWN', 'RESTRICTED');
     END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+                   WHERE t.typname = 'image_usage_basis' AND n.nspname = 'humanoid') THEN
+        CREATE TYPE image_usage_basis AS ENUM ('NONE', 'OFFICIAL_MANUFACTURER_MEDIA');
+    END IF;
 END$$;
 
 CREATE TABLE IF NOT EXISTS robot_image (
@@ -45,6 +49,7 @@ CREATE TABLE IF NOT EXISTS robot_image (
     image_type      image_type NOT NULL DEFAULT 'FRONT',
     identity_status image_identity_status NOT NULL DEFAULT 'UNVERIFIED',
     rights_status   image_rights_status NOT NULL DEFAULT 'UNKNOWN',
+    usage_basis     image_usage_basis NOT NULL DEFAULT 'NONE',
     is_official     BOOLEAN NOT NULL DEFAULT FALSE,
     is_primary      BOOLEAN NOT NULL DEFAULT FALSE,
     attribution     TEXT,

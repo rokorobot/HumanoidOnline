@@ -94,17 +94,23 @@ def main() -> None:
             if offenders:
                 gaps[label] = offenders
 
-        # MEDIA-01 imagery gate: a DISPLAY-ELIGIBLE image (identity VERIFIED +
-        # rights PERMITTED/ATTRIBUTION_REQUIRED) must carry provenance (source_url
-        # + source_name), and an ATTRIBUTION_REQUIRED image must carry attribution.
-        # (The DB enum already forbids a GENERATED source outright.)
+        # MEDIA-01 imagery gate. Display-eligibility (canonical): identity VERIFIED
+        # AND rights <> RESTRICTED AND (rights PERMITTED/ATTRIBUTION_REQUIRED OR
+        # usage_basis OFFICIAL_MANUFACTURER_MEDIA). Every display-eligible image must
+        # carry provenance (source_url + source_name), and an ATTRIBUTION_REQUIRED
+        # image must carry attribution. (The DB enum already forbids a GENERATED
+        # source outright.)
+        eligible_sql = (
+            "identity_status = 'VERIFIED' AND rights_status <> 'RESTRICTED' "
+            "AND (rights_status IN ('PERMITTED','ATTRIBUTION_REQUIRED') "
+            "     OR usage_basis = 'OFFICIAL_MANUFACTURER_MEDIA')"
+        )
         media_offenders = sorted({
             row[0] for row in conn.execute(
-                """
+                f"""
                 SELECT r.slug
                 FROM robot_image i JOIN robot r ON r.id = i.robot_id
-                WHERE i.identity_status = 'VERIFIED'
-                  AND i.rights_status IN ('PERMITTED', 'ATTRIBUTION_REQUIRED')
+                WHERE ({eligible_sql})
                   AND (
                         i.source_url IS NULL OR i.source_name IS NULL
                      OR (i.rights_status = 'ATTRIBUTION_REQUIRED' AND i.attribution IS NULL)
@@ -113,10 +119,7 @@ def main() -> None:
             ).fetchall()
         })
         images_total = scalar("SELECT count(*) FROM robot_image")
-        images_eligible = scalar(
-            "SELECT count(*) FROM robot_image WHERE identity_status='VERIFIED' "
-            "AND rights_status IN ('PERMITTED','ATTRIBUTION_REQUIRED')"
-        )
+        images_eligible = scalar(f"SELECT count(*) FROM robot_image WHERE {eligible_sql}")
         print(
             f"imagery summary (MEDIA-01): robot_images={images_total} "
             f"display_eligible={images_eligible}"

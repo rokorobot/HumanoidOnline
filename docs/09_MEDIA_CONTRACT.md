@@ -46,26 +46,38 @@ v0.1; changes require product-owner ratification (cf. AGENTS.md rule 1).
 4. Official distributor / integrator imagery
 5. Credible third-party editorial photography, with source / licensing recorded
 
-## 4. Identity and rights are SEPARATE dimensions
+## 4. Identity, rights, and display policy are THREE SEPARATE dimensions (§H2)
 
 An image can unquestionably depict the correct robot yet have uncertain reuse
-rights. The two are never collapsed into one flag.
+rights; and the platform may have a legitimate basis to display an image even
+without a formal reuse license on record. These are never collapsed:
 
 ```
-identity_status:  VERIFIED | UNVERIFIED
-rights_status:    PERMITTED | ATTRIBUTION_REQUIRED | UNKNOWN | RESTRICTED
+identity_status:  VERIFIED | UNVERIFIED            -- does it depict THIS exact robot?
+rights_status:    PERMITTED | ATTRIBUTION_REQUIRED -- legal/licensing EVIDENCE of reuse
+                | UNKNOWN | RESTRICTED
+usage_basis:      NONE | OFFICIAL_MANUFACTURER_MEDIA -- platform display POLICY
 ```
 
-**Display-eligibility rule (canonical):**
+We do **not** encode a business decision to display official manufacturer product
+media as `rights_status = ATTRIBUTION_REQUIRED` — that would falsely assert an
+attribution license was granted. Instead `rights_status` stays `UNKNOWN` (honest:
+no license on record) and `usage_basis = OFFICIAL_MANUFACTURER_MEDIA` records the
+ratified policy basis (HumanoidOnline displays official manufacturer product media
+for the robots it markets, always credited to and linked from the manufacturer).
+
+**Display-eligibility rule (canonical, one place):**
 
 ```
 display_eligible  ⇔  identity_status = VERIFIED
-                     AND rights_status IN (PERMITTED, ATTRIBUTION_REQUIRED)
+                     AND rights_status <> RESTRICTED
+                     AND ( rights_status IN (PERMITTED, ATTRIBUTION_REQUIRED)
+                           OR usage_basis = OFFICIAL_MANUFACTURER_MEDIA )
 ```
 
-`rights_status = UNKNOWN` must **never** behave like `PERMITTED` (this mirrors the
-platform's `UNKNOWN != 0/false` doctrine). A non-null `image_url` alone is never
-sufficient — the eligibility rule is the single gate, applied in one place.
+`RESTRICTED` **always** blocks display (even with a usage_basis). `rights_status =
+UNKNOWN` never behaves like `PERMITTED` (mirrors `UNKNOWN != 0/false`). A non-null
+`image_url` alone is never sufficient.
 
 ## 5. Asset vs provenance (two distinct URLs)
 
@@ -98,8 +110,9 @@ robot_image {
   source_name
   source_type         -- MANUFACTURER | PRESS_KIT | DISTRIBUTOR | EDITORIAL | VIDEO_FRAME  (no GENERATED)
   image_type          -- FRONT | SIDE | REAR | ACTION | WORKPLACE | DETAIL | DIMENSIONS
-  identity_status     -- VERIFIED | UNVERIFIED
-  rights_status       -- PERMITTED | ATTRIBUTION_REQUIRED | UNKNOWN | RESTRICTED
+  identity_status     -- VERIFIED | UNVERIFIED (depicts THIS exact robot)
+  rights_status       -- PERMITTED | ATTRIBUTION_REQUIRED | UNKNOWN | RESTRICTED (legal evidence)
+  usage_basis         -- NONE | OFFICIAL_MANUFACTURER_MEDIA (platform display policy)
   is_official
   is_primary
   attribution
@@ -130,11 +143,12 @@ robot_image {
 - The display-eligibility negative matrix is tested:
 
   ```
-  correct robot + permitted rights        → DISPLAY
-  correct robot + UNKNOWN rights           → IMAGE_UNAVAILABLE
-  correct robot + RESTRICTED rights        → IMAGE_UNAVAILABLE
-  unverified identity + permitted rights   → IMAGE_UNAVAILABLE
-  missing asset                            → IMAGE_UNAVAILABLE
+  correct robot + permitted rights                         → DISPLAY
+  correct robot + UNKNOWN rights + OFFICIAL_MANUFACTURER    → DISPLAY (policy basis)
+  correct robot + UNKNOWN rights + usage NONE              → IMAGE_UNAVAILABLE
+  correct robot + RESTRICTED rights + OFFICIAL_MANUFACTURER → IMAGE_UNAVAILABLE (RESTRICTED wins)
+  unverified identity + permitted rights                   → IMAGE_UNAVAILABLE
+  missing asset                                            → IMAGE_UNAVAILABLE
   ```
 
 - No `GENERATED` source type is accepted by import, schema, or API.

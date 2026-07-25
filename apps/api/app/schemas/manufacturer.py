@@ -1,6 +1,8 @@
 """Manufacturer read schemas (API contract §2)."""
 from __future__ import annotations
 
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -13,6 +15,7 @@ class ManufacturerListItem(BaseModel):
     # Derived from published robots' commercial_status (see reads.derive_portfolio_status).
     # Distinct from the coarse `deployment_status` company column.
     portfolio_status: str | None = None
+    updated_at: datetime  # sitemap lastmod (AGENT-01)
 
 
 class ManufacturerRobot(BaseModel):

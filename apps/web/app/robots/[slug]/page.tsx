@@ -5,6 +5,7 @@
 import Link from "next/link";
 
 import { getRobot, listRegions } from "@/lib/api-client";
+import { buildRobotJsonLd } from "@/lib/jsonld";
 import {
   formatDate,
   maturityIndex,
@@ -123,8 +124,17 @@ export default async function RobotDetailPage({
     ? { label: "EVIDENCE STATUS:", value: conf, emphasis: conf === "VERIFIED" || conf === "HIGH" }
     : { label: "EVIDENCE STATUS:", value: "NONE ON RECORD" };
 
+  // AGENT-01: machine projection of the SAME governed read (Product + Organization
+  // JSON-LD). Semantic parity with the HTML below; UNKNOWN specs omitted, not faked.
+  const jsonLd = buildRobotJsonLd(robot);
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger -- JSON.stringify output is safe, non-user markup
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <SystemHeader
         title={`ROBOT RECORD / ${robot.slug.toUpperCase()}`}
         fields={[evidenceStatusField]}

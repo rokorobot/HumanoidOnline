@@ -61,6 +61,7 @@ export interface RobotListItem {
   price_display?: PriceDisplay | null;
   available_modes: string[];
   deployment_count: number;
+  updated_at: string; // sitemap lastmod (AGENT-01)
 }
 
 export interface StatusHistoryEntry {
@@ -209,6 +210,7 @@ export interface ManufacturerListItem {
   deployment_status?: string | null;
   // Derived from published robots' commercial_status (not the deployment column).
   portfolio_status?: string | null;
+  updated_at: string; // sitemap lastmod (AGENT-01)
 }
 
 export interface ManufacturerRobot {

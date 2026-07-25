@@ -191,6 +191,7 @@ def serialize_list_item(
         price_display=price_display_for(robot),
         available_modes=modes,
         deployment_count=dep_count,
+        updated_at=robot.updated_at,
     )
 
 

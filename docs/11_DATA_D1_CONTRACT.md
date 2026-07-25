@@ -450,7 +450,9 @@ DATA-D1 discovery → verification → canonical truth → AGENT-01
 ```
 
 not `DATA-D1 candidate → AGENT-01 public answer`. This is why AGENT-01
-ratification stays blocked until DATA-D1 is ratified (see `docs/10_AGENT_CONTRACT.md`).
+ratification stays blocked until DATA-D1 v0.1 is **built** and its canonical/
+public-boundary guarantees are proven by the §27 acceptance gates — not merely
+ratified (see `docs/10_AGENT_CONTRACT.md`, and the §30 final paragraph).
 
 ## 24. Initial competitor radar set
 
@@ -463,7 +465,7 @@ source passes the radar-eligibility (ToS/robots) review before activation** — 
 of these may be discovery-eligible, rate-limited, or excluded depending on that
 review.
 
-## 25. First build slice — DATA-D1 v0.1 (BLOCKED until ratified)
+## 25. First build slice — DATA-D1 v0.1 (AUTHORIZED; build requires explicit owner trigger)
 
 Deliberately narrow after ratification:
 
@@ -491,9 +493,9 @@ transactional marketplace operations; AGENT-01/MCP implementation; Rent/Buy/Leas
 workflows; full historical price tracking; arbitrary competitor schema cloning.
 DATA-D1 is **discovery + verification infrastructure**.
 
-## 27. Proposed acceptance gates
+## 27. Frozen v0.1 acceptance gates
 
-DATA-D1 is not complete unless tests prove at least:
+DATA-D1 v0.1 is not complete unless tests prove at least:
 
 - **A** — competitor discovery does not become canonical (competitor payload, no
   authoritative evidence → canonical unchanged).

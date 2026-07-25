@@ -6,12 +6,17 @@ Importing this package registers all models on ``Base.metadata``.
 
 WS2 covers the Knowledge Layer plus the commercial *read* models (pricing /
 availability / deployment). WS5 adds `buyer_requirement` and WS6 adds
-`match_result` (the Decision layer). The transaction layer (`commercial_lead*`)
-is a later workstream (WS7) and is intentionally absent here.
+`match_result` (the Decision layer). WS7 adds the transaction layer
+(`commercial_lead` + `commercial_lead_robot` + `commercial_lead_provider`).
 """
 from app.models.buyer_requirement import BuyerRequirement
 from app.models.capability import Capability, RobotCapability
 from app.models.commercial import AvailabilityOffer, Deployment, PricingOffer
+from app.models.commercial_lead import (
+    CommercialLead,
+    CommercialLeadProvider,
+    CommercialLeadRobot,
+)
 from app.models.event_log import EventLog
 from app.models.evidence import EvidenceSource
 from app.models.manufacturer import Manufacturer, Provider
@@ -25,6 +30,9 @@ __all__ = [
     "AvailabilityOffer",
     "BuyerRequirement",
     "Capability",
+    "CommercialLead",
+    "CommercialLeadProvider",
+    "CommercialLeadRobot",
     "Deployment",
     "EventLog",
     "EvidenceSource",

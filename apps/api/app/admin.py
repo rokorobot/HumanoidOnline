@@ -14,6 +14,7 @@ from app.db.session import engine
 from app.models.buyer_requirement import BuyerRequirement
 from app.models.capability import Capability
 from app.models.commercial import AvailabilityOffer, Deployment, PricingOffer
+from app.models.commercial_lead import CommercialLead, CommercialLeadProvider
 from app.models.evidence import EvidenceSource
 from app.models.manufacturer import Manufacturer, Provider
 from app.models.match_result import MatchResult
@@ -104,10 +105,34 @@ class MatchResultAdmin(ModelView, model=MatchResult):
     name_plural = "Match results"
 
 
+class CommercialLeadAdmin(ModelView, model=CommercialLead):
+    # The transaction objects finally surface to internal ops (WS7 §16). Read/
+    # triage only — SQLAdmin, not a CRM. `lead_status` transitions happen here
+    # (admin-owned); the public capture path never sets anything but 'NEW'.
+    column_list = [
+        CommercialLead.id, CommercialLead.created_at, CommercialLead.contact_email,
+        CommercialLead.organization, CommercialLead.country_region_id,
+        CommercialLead.preferred_transaction, CommercialLead.lead_status,
+    ]
+    column_searchable_list = [CommercialLead.contact_email, CommercialLead.organization]
+    column_sortable_list = [CommercialLead.created_at, CommercialLead.lead_status]
+    name_plural = "Commercial leads"
+
+
+class CommercialLeadProviderAdmin(ModelView, model=CommercialLeadProvider):
+    column_list = [
+        CommercialLeadProvider.lead_id, CommercialLeadProvider.provider_id,
+        CommercialLeadProvider.robot_id, CommercialLeadProvider.status,
+        CommercialLeadProvider.contacted_at,
+    ]
+    name_plural = "Commercial lead — provider routes"
+
+
 _VIEWS = [
     ManufacturerAdmin, ProviderAdmin, RobotAdmin, RobotVariantAdmin, UseCaseAdmin,
     CapabilityAdmin, SpecDefinitionAdmin, PricingOfferAdmin, AvailabilityOfferAdmin,
     DeploymentAdmin, EvidenceSourceAdmin, BuyerRequirementAdmin, MatchResultAdmin,
+    CommercialLeadAdmin, CommercialLeadProviderAdmin,
 ]
 
 

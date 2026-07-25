@@ -4,7 +4,7 @@
 // real source/dates/confidence/link. 404 -> notFound(). All facts from the API.
 import Link from "next/link";
 
-import { getRobot } from "@/lib/api-client";
+import { getRobot, listRegions } from "@/lib/api-client";
 import {
   formatDate,
   maturityIndex,
@@ -23,6 +23,7 @@ import { ConfidenceIndicator } from "@/components/ConfidenceIndicator";
 import { deriveModelCode } from "@/components/RobotCard";
 import { EvidenceStamp } from "@/components/EvidenceStamp";
 import { GraphicMarker } from "@/components/GraphicMarker";
+import { RequestAvailabilityButton } from "@/components/RequestAvailabilityButton";
 import { MachineCode } from "@/components/MachineCode";
 import { PriceStateLong } from "@/components/PricingState";
 import { SpecRow } from "@/components/DataCell";
@@ -104,7 +105,10 @@ export default async function RobotDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const robot = await getRobot(slug);
+  const [robot, countries] = await Promise.all([
+    getRobot(slug),
+    listRegions({ type: "COUNTRY" }),
+  ]);
 
   const code = deriveModelCode(robot.slug, robot.manufacturer.slug);
   const conf = strongestConfidence(robot);
@@ -225,9 +229,11 @@ export default async function RobotDetailPage({
             <Link className="btn" href={`/compare?ids=${robot.slug}`}>
               <GraphicMarker /> Compare +
             </Link>
-            <Link className="btn btn--signal" href="/find-a-humanoid">
-              <GraphicMarker /> Request Availability
-            </Link>
+            <RequestAvailabilityButton
+              robotSlug={robot.slug}
+              robotName={robot.name}
+              countries={countries}
+            />
           </div>
         </div>
 
@@ -502,9 +508,11 @@ export default async function RobotDetailPage({
               phases, driven by availability_offer rows without redesign.
             </p>
           </div>
-          <Link className="btn btn--signal" href="/find-a-humanoid">
-            <GraphicMarker /> Request Availability
-          </Link>
+          <RequestAvailabilityButton
+            robotSlug={robot.slug}
+            robotName={robot.name}
+            countries={countries}
+          />
         </div>
       </div>
       <SiteFooter />

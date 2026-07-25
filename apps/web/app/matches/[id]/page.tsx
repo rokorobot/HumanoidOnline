@@ -1,15 +1,17 @@
-// Match Results — /matches/[id] (WS6). Server component: fetching the matches
-// triggers deterministic matching on the first request (persisted server-side),
-// then renders the ranked, explainable result cards. Zero survivors renders an
-// honest "no match" state with the dominant eliminating constraint. Requesting
-// commercial help is reserved for WS7 — there is no form and no lead write here.
+// Match Results — /matches/[id] (WS6 + WS7). Server component: fetching the
+// matches triggers deterministic matching on the first request (persisted
+// server-side), then renders the ranked, explainable result cards. WS7 adds the
+// commercial capture surfaces (per-card, whole-shortlist, and the zero-match
+// "tell us anyway" path) via a client wrapper — a modal over this page, no new
+// route. The server never reruns matching for a lead; it validates the buyer's
+// selection against the persisted match_result.
 import Link from "next/link";
 
-import { MatchCard } from "@/components/MatchCard";
+import { MatchesCommercial } from "@/components/MatchesCommercial";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteFooter, SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
-import { getMatches } from "@/lib/api-client";
+import { getMatches, listRegions } from "@/lib/api-client";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +25,10 @@ export default async function MatchesPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const data = await getMatches(id);
+  const [data, countries] = await Promise.all([
+    getMatches(id),
+    listRegions({ type: "COUNTRY" }),
+  ]);
   const n = data.matches.length;
   const compareHref = `/compare?ids=${data.matches.map((m) => m.robot.slug).join(",")}`;
   const adjustHref = `/find-a-humanoid?from=${encodeURIComponent(id)}`;
@@ -50,47 +55,14 @@ export default async function MatchesPage({
           </Link>
         </div>
 
-        {n === 0 ? (
-          <section className="wz-confirm" aria-live="polite">
-            <SectionIndex>NO MATCH — HONEST ELIMINATION</SectionIndex>
-            <h2 className="wz-confirm-title">No humanoid matched</h2>
-            <p className="prose">{data.no_match_explanation}</p>
-            <p className="note">
-              {/* We still capture the demand; lead capture arrives in WS7. */}
-              // We still track this demand. Adjust your requirements or browse the catalogue.
-            </p>
-            <div className="actions" style={{ marginTop: "var(--ho-sp-5)" }}>
-              <Link className="btn btn--signal" href={adjustHref}>
-                Adjust requirements →
-              </Link>
-              <Link className="btn" href="/robots">
-                Browse robots
-              </Link>
-            </div>
-          </section>
-        ) : (
-          <>
-            {n >= 2 && (
-              <div className="results-head">
-                <span className="count">
-                  <b>{n}</b> RANKED MATCHES
-                </span>
-                <Link className="btn btn--ghost" href={compareHref}>
-                  Compare these →
-                </Link>
-              </div>
-            )}
-            <div className="matchlist">
-              {data.matches.map((m) => (
-                <MatchCard key={m.robot.slug} match={m} />
-              ))}
-            </div>
-            <p className="note" style={{ marginTop: "var(--ho-sp-5)" }}>
-              // Requesting commercial help arrives in a later step — no contact is
-              captured here.
-            </p>
-          </>
-        )}
+        <MatchesCommercial
+          requirementId={id}
+          matches={data.matches}
+          noMatchExplanation={data.no_match_explanation ?? null}
+          countries={countries}
+          compareHref={compareHref}
+          adjustHref={adjustHref}
+        />
       </div>
       <SiteFooter />
     </>

@@ -1,11 +1,13 @@
 # DATA-D1 — Competitive Discovery & Verification Contract
 
-> ## STATUS: DRAFT — NOT RATIFIED — NO IMPLEMENTATION AUTHORIZED
+> ## STATUS: RATIFIED v0.1 — 2026-07-25 — NO IMPLEMENTATION until a separate build trigger
 >
-> Architecture reasoning captured for review and continuity. Nothing here
-> authorizes code. Ratification is a separate, explicit owner action (see §30).
-> This draft freezes **principles**, not implementation details. The laws below
-> are **Proposed** (draft); the term *Frozen* is reserved for post-ratification.
+> Ratified by the product owner (Robert) on 2026-07-25. The laws below are now
+> **FROZEN**. Ratification authorizes the DATA-D1 v0.1 **architecture** (RADAR →
+> CANDIDATE → TRACE → VERIFY → PROMOTE) and unblocks the bounded v0.1 build slice
+> (§25) — but does **not** itself start implementation. The build begins only on a
+> separate, explicit owner trigger. Ratification record + statement-in-force: §30.
+> This contract freezes **principles**, not implementation details.
 >
 > Subordinate to the existing frozen laws: **MEDIA-01 / MEDIA-01.8** remain
 > authoritative for imagery; the **UNKNOWN** semantics, **G2** ("no commercial
@@ -13,7 +15,7 @@
 > scoring laws remain binding throughout. See `docs/09_MEDIA_CONTRACT.md`,
 > `docs/10_AGENT_CONTRACT.md` (also draft), and the delivery/data laws.
 
-### Revision note — refinements folded in (2026-07-25, owner-approved, pre-ratification)
+### Revision note — refinements folded in (2026-07-25, owner-approved; now in force)
 
 This draft incorporates six refinements beyond the original outline, plus a
 v0.1 promotion-authority clarification. They are marked inline as
@@ -80,7 +82,7 @@ records.
 DATA-D1 produces **research candidates and verification work**, not automatically
 trusted catalogue facts.
 
-## 2. Proposed DATA-D1 Laws
+## 2. DATA-D1 Laws (Frozen v0.1)
 
 ### DATA-D1.1 — Competitors are discovery sources only
 A competitor directory, marketplace, publication, comparison site or aggregator
@@ -531,14 +533,15 @@ From `human remembers robot → manually researches → adds record` to `market 
 canonical promotion` — the scalable path `7 → 50 → 200 → 500+` **without**
 sacrificing the evidence discipline that differentiates HumanoidOnline.
 
-## 30. Ratification boundary
+## 30. Ratification record
 
-This draft freezes **principles**, not implementation. Ratification would
-authorize the architecture `RADAR → CANDIDATE → TRACE → VERIFY → PROMOTE` but does
-**not** authorize implementation until the product owner explicitly ratifies
-DATA-D1.
+**RATIFIED v0.1 by the product owner (Robert) on 2026-07-25.** This contract
+freezes **principles**, not implementation. Ratification authorizes the
+architecture `RADAR → CANDIDATE → TRACE → VERIFY → PROMOTE` and unblocks the
+bounded v0.1 build slice (§25). It does **not** start implementation: the build
+begins only on a separate, explicit owner trigger.
 
-**Suggested ratification statement:**
+**Ratification statement (in force, 2026-07-25):**
 
 > DATA-D1 Competitive Discovery & Verification Contract v0.1 is ratified.
 > Competitor and external sources may create noncanonical research candidates
@@ -551,7 +554,15 @@ DATA-D1.
 > canonical mutation (no deterministic auto-promotion in v0.1). Proceed with the
 > bounded DATA-D1 v0.1 implementation described in the contract.
 
-**Recommended v0.1 promotion authority:** human approval required for every
-canonical promotion — high automation up to the proposal, low risk of silent
-catalogue corruption. Narrow deterministic auto-promotion may be ratified later,
-separately, once DATA-D1 has real operating history.
+**Ratified v0.1 promotion authority:** human approval required for every canonical
+promotion — high automation up to the proposal, low risk of silent catalogue
+corruption. Narrow deterministic auto-promotion may be ratified **later,
+separately**, once DATA-D1 has real operating history; it is not authorized now.
+
+---
+
+**Next authorized step:** the DATA-D1 **v0.1 build slice** (§25 A–H) may be built
+once the owner issues a separate build trigger. The build must land through the
+normal PR-gated ritual and satisfy the §27 acceptance gates (A–K). Until then, no
+DATA-D1 implementation is authorized. AGENT-01 (`docs/10_AGENT_CONTRACT.md`)
+remains blocked until DATA-D1 is built.

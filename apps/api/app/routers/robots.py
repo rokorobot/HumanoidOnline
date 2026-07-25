@@ -161,6 +161,7 @@ def _load_detail(session: Session, slug: str) -> Robot | None:
             selectinload(Robot.pricing_offers),
             selectinload(Robot.availability_offers),
             selectinload(Robot.deployments),
+            selectinload(Robot.images),
         )
     )
     return session.execute(stmt).scalars().first()

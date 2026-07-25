@@ -94,13 +94,47 @@ def main() -> None:
             if offenders:
                 gaps[label] = offenders
 
+        # MEDIA-01 imagery gate: a DISPLAY-ELIGIBLE image (identity VERIFIED +
+        # rights PERMITTED/ATTRIBUTION_REQUIRED) must carry provenance (source_url
+        # + source_name), and an ATTRIBUTION_REQUIRED image must carry attribution.
+        # (The DB enum already forbids a GENERATED source outright.)
+        media_offenders = sorted({
+            row[0] for row in conn.execute(
+                """
+                SELECT r.slug
+                FROM robot_image i JOIN robot r ON r.id = i.robot_id
+                WHERE i.identity_status = 'VERIFIED'
+                  AND i.rights_status IN ('PERMITTED', 'ATTRIBUTION_REQUIRED')
+                  AND (
+                        i.source_url IS NULL OR i.source_name IS NULL
+                     OR (i.rights_status = 'ATTRIBUTION_REQUIRED' AND i.attribution IS NULL)
+                  )
+                """
+            ).fetchall()
+        })
+        images_total = scalar("SELECT count(*) FROM robot_image")
+        images_eligible = scalar(
+            "SELECT count(*) FROM robot_image WHERE identity_status='VERIFIED' "
+            "AND rights_status IN ('PERMITTED','ATTRIBUTION_REQUIRED')"
+        )
+        print(
+            f"imagery summary (MEDIA-01): robot_images={images_total} "
+            f"display_eligible={images_eligible}"
+        )
+
     if gaps:
         print("\nG2 VIOLATION — published commercial fact(s) without evidence:")
         for label, slugs in gaps.items():
             print(f"  {label}: {', '.join(slugs)}")
         sys.exit(1)
 
+    if media_offenders:
+        print("\nMEDIA-01 VIOLATION — display-eligible image(s) lacking provenance/attribution:")
+        print(f"  {', '.join(media_offenders)}")
+        sys.exit(1)
+
     print("G2 OK: every published commercial fact carries an evidence_source row.")
+    print("MEDIA-01 OK: every display-eligible image carries provenance (+ attribution).")
 
 
 if __name__ == "__main__":

@@ -79,7 +79,11 @@ test("unknown-price robot (agility-digit) shows explicit unknown, never $0/0/una
   await expect(page.getByText("No confirmed pricing").first()).toBeVisible();
   const body = await page.locator("body").innerText();
   expect(body).not.toContain("$0");
-  expect(body.toLowerCase()).not.toContain("unavailable");
+  // Price/availability FACTS must never read "unavailable". MEDIA-01 adds a
+  // legitimate, ratified "IMAGE UNAVAILABLE" identity-imagery state, so strip that
+  // one phrase before the guard — the pricing law it protects is unchanged.
+  const bodyNoImageState = body.toLowerCase().replaceAll("image unavailable", "");
+  expect(bodyNoImageState).not.toContain("unavailable");
   // The price cell must not read a bare "0".
   await expect(page.locator(".prow .val.unknown").first()).toBeVisible();
 });

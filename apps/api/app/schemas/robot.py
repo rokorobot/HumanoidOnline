@@ -115,6 +115,22 @@ class DeploymentRead(BaseModel):
     evidence: EvidenceRead | None = None
 
 
+class RobotImageRead(BaseModel):
+    """A DISPLAY-ELIGIBLE verified image (MEDIA-01). The read path returns ONLY
+    eligible images (identity VERIFIED + rights PERMITTED/ATTRIBUTION_REQUIRED),
+    so the client cannot render an unverified or rights-uncleared image. When the
+    list is empty the UI shows the explicit IMAGE_UNAVAILABLE state."""
+
+    image_url: str
+    image_type: str
+    source_name: str | None = None
+    source_url: str | None = None
+    source_type: str
+    is_official: bool
+    is_primary: bool
+    attribution: str | None = None
+
+
 class RobotDetail(BaseModel):
     id: str
     slug: str
@@ -134,6 +150,9 @@ class RobotDetail(BaseModel):
     pricing_offers: list[PricingOfferRead]
     availability_offers: list[AvailabilityOfferRead]
     deployments: list[DeploymentRead]
+    # MEDIA-01: display-eligible verified images only, primary first. Empty -> the
+    # UI renders IMAGE_UNAVAILABLE (never a generated/placeholder fill).
+    images: list[RobotImageRead] = []
 
 
 class CompareRow(BaseModel):

@@ -213,7 +213,7 @@ Each device below has a defined job. Devices are structural, not ornamental.
 | **Crop-mark corners** | L-bracket crop marks framing hero/identity blocks (orange). | `.ho-cropframe > .ho-crop` |
 | **Serials & coordinates** | `SERIAL NO. 001`, `BADGE ID:`, `REF DRS-…`, `37°47′43″ N` strings as vertical or inline machine text. | machine layer |
 | **Hazard stripes** | 45° ink/transparent diagonal band for warnings/caution surfaces. | `.ho-hazard` |
-| **Halftone / dither imagery** | Robot/hero imagery rendered as dithered/halftone or schematic SVG, never glossy photography. | inline SVG |
+| **Real vs decorative imagery** | Imagery of a **specific named robot** must use verified real photographs or official visual assets. Real robot photographs may be visually framed by the HumanoidOnline design system, but the robot itself must not be redrawn, generated, stylized, materially altered, or replaced by schematic artwork (MEDIA-01, `docs/09_MEDIA_CONTRACT.md`); no verified usable image → `IMAGE_UNAVAILABLE`. Dithered/halftone/schematic SVG and abstract machine motifs remain valid for **decorative/abstract** surfaces (backgrounds, category/section graphics, empty/loading states, editorial concepts) that do not depict a named robot. | inline SVG / `robot_image` |
 | **Scanline texture** | Faint monitor scanlines on *experimental* surfaces only (hero/header). Under data, never over it. | `.ho-scan` |
 | **Eye / lens motif** | Concentric-oval "lens/eye" mark for perception/vision/monitoring. | inline SVG |
 | **Technical labels** | Field names uppercase mono, wide tracking (`0.14em`). Labels quiet; values loud. | `.ho-syslabel` |
@@ -222,7 +222,7 @@ Each device below has a defined job. Devices are structural, not ornamental.
 | **Machine-status language** | Statuses read like readouts: `RAAS_DEPLOYMENT`, `ON_REQUEST`, `QUOTE_ONLY`, `CONF: VERIFIED`. Verbatim enums, mono-set. | — |
 
 Anti-patterns (prohibited): drop shadows and soft rounding as primary style; gradients
-behind data; glossy photography that displaces specs; color used to imply a value
+behind data; photography that dominates or displaces decision-critical specifications; color used to imply a value
 judgement on a neutral fact; **orange as a background wash on data-dense surfaces**;
 scanline/dither texture over tables or prices.
 

@@ -165,6 +165,20 @@ export interface RobotDetail {
   pricing_offers: PricingOffer[];
   availability_offers: AvailabilityOffer[];
   deployments: Deployment[];
+  // MEDIA-01: display-eligible verified images only (primary first). Empty -> the
+  // UI must render the IMAGE_UNAVAILABLE state, never a generated/placeholder fill.
+  images: RobotImage[];
+}
+
+export interface RobotImage {
+  image_url: string;
+  image_type: string;
+  source_name?: string | null;
+  source_url?: string | null;
+  source_type: string;
+  is_official: boolean;
+  is_primary: boolean;
+  attribution?: string | null;
 }
 
 export interface CompareRow {

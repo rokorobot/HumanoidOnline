@@ -234,6 +234,31 @@ CREATE TYPE buyer_type AS ENUM (
     'UNKNOWN'
 );
 
+-- Verified product imagery (MEDIA-01, docs/09). NO 'GENERATED' value exists for
+-- identity imagery — a real robot is never depicted by a synthesized image.
+CREATE TYPE image_source_type AS ENUM (
+    'MANUFACTURER',
+    'PRESS_KIT',
+    'DISTRIBUTOR',
+    'EDITORIAL',
+    'VIDEO_FRAME'
+);
+CREATE TYPE image_type AS ENUM (
+    'FRONT', 'SIDE', 'REAR', 'ACTION', 'WORKPLACE', 'DETAIL', 'DIMENSIONS'
+);
+-- Does the image DEPICT the exact robot/model? (kept separate from reuse rights)
+CREATE TYPE image_identity_status AS ENUM (
+    'VERIFIED',
+    'UNVERIFIED'
+);
+-- May we DISPLAY it? UNKNOWN must never behave like PERMITTED (MEDIA-01.5).
+CREATE TYPE image_rights_status AS ENUM (
+    'PERMITTED',
+    'ATTRIBUTION_REQUIRED',
+    'UNKNOWN',
+    'RESTRICTED'
+);
+
 -- =============================================================================
 -- SECTION 2 — KNOWLEDGE LAYER: GEOGRAPHY
 -- =============================================================================
@@ -391,6 +416,47 @@ CREATE TABLE robot_status_history (
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 COMMENT ON TABLE robot_status_history IS 'Timeline of commercial_status changes per robot.';
+
+-- Verified product imagery (MEDIA-01, docs/09_MEDIA_CONTRACT.md). The single
+-- image-truth system for a named robot: one robot -> many images, each carrying
+-- its own provenance, identity verification and reuse-rights status. Reused by
+-- Compare and Phases 3-5 (Rent/Buy/Lease) without a second image system.
+--
+-- Two invariants encoded here:
+--   * identity_status (does it depict THIS robot) is SEPARATE from rights_status
+--     (may we display it). An image is display-eligible ONLY when
+--     identity_status='VERIFIED' AND rights_status IN ('PERMITTED',
+--     'ATTRIBUTION_REQUIRED'). A non-NULL image_url is NEVER sufficient.
+--   * image_url (the asset rendered) is SEPARATE from source_url (the
+--     authoritative page establishing provenance) — we must be able to
+--     reconstruct WHY an image was trusted, not just WHAT was shown.
+-- `robot.hero_image_url` is dormant/non-canonical and is NOT the read path.
+CREATE TABLE robot_image (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    robot_id        UUID NOT NULL REFERENCES robot(id) ON DELETE CASCADE,
+    image_url       TEXT NOT NULL,             -- the actual asset being rendered
+    source_url      TEXT,                      -- authoritative provenance page
+    source_name     TEXT,                      -- e.g. 'Unitree Robotics', 'Wikimedia Commons'
+    source_type     image_source_type NOT NULL,
+    image_type      image_type NOT NULL DEFAULT 'FRONT',
+    identity_status image_identity_status NOT NULL DEFAULT 'UNVERIFIED',
+    rights_status   image_rights_status NOT NULL DEFAULT 'UNKNOWN',
+    is_official     BOOLEAN NOT NULL DEFAULT FALSE,
+    is_primary      BOOLEAN NOT NULL DEFAULT FALSE,
+    attribution     TEXT,                      -- required credit line when ATTRIBUTION_REQUIRED
+    captured_at     DATE,                      -- when the photo/asset was captured, if known
+    last_verified_at TIMESTAMPTZ,              -- when identity/rights were last checked
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+COMMENT ON TABLE robot_image IS
+    'MEDIA-01 verified product imagery. Display-eligible only when identity_status '
+    'VERIFIED and rights_status IN (PERMITTED, ATTRIBUTION_REQUIRED); a non-null '
+    'image_url is never sufficient. No GENERATED source exists — real robots are '
+    'never depicted by synthesized imagery. Missing/ineligible -> IMAGE_UNAVAILABLE.';
+-- At most one primary image per robot (partial unique — many non-primary allowed).
+CREATE UNIQUE INDEX uq_robot_image_primary ON robot_image (robot_id) WHERE is_primary;
+CREATE INDEX idx_robot_image_robot ON robot_image (robot_id);
 
 -- =============================================================================
 -- SECTION 2 — KNOWLEDGE LAYER: SPECIFICATIONS (flexible long tail)

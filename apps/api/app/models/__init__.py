@@ -17,6 +17,13 @@ from app.models.commercial_lead import (
     CommercialLeadProvider,
     CommercialLeadRobot,
 )
+from app.models.discovery import (
+    CandidateClaim,
+    CandidateImageRef,
+    DiscoveryCandidate,
+    DiscoverySource,
+    PromotionAudit,
+)
 from app.models.event_log import EventLog
 from app.models.evidence import EvidenceSource
 from app.models.manufacturer import Manufacturer, Provider
@@ -31,15 +38,20 @@ __all__ = [
     "AvailabilityOffer",
     "BuyerRequirement",
     "Capability",
+    "CandidateClaim",
+    "CandidateImageRef",
     "CommercialLead",
     "CommercialLeadProvider",
     "CommercialLeadRobot",
     "Deployment",
+    "DiscoveryCandidate",
+    "DiscoverySource",
     "EventLog",
     "EvidenceSource",
     "Manufacturer",
     "MatchResult",
     "PricingOffer",
+    "PromotionAudit",
     "Provider",
     "Region",
     "Robot",

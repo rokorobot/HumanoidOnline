@@ -31,7 +31,17 @@
   },
   "specs_note": "height ~5'8\" (172.7 cm), weight ~160 lb (72.6 kg), lift capacity ~55 lb (24.9 kg) from the Apptronik/Mercedes-Benz press release (2024-03-15). Autonomy level and DoF not stated there -> NULL.",
   "commercial_status_evidence": [
-    { "source_url": "https://www.prnewswire.com/news-releases/apptronik-and-mercedes-benz-enter-commercial-agreement-that-will-pilot-apptroniks-apollo-humanoid-robot-in-mercedes-benz-manufacturing-facilities-302089972.html", "source_type": "PRESS_RELEASE", "source_title": "Apptronik and Mercedes-Benz Enter Commercial Agreement to Pilot Apollo", "excerpt": "Apptronik's first publicly announced commercial deployment of Apollo", "published_at": "2024-03-15", "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "PILOT: Apollo is in a commercial pilot agreement with Mercedes-Benz per Apptronik's press release." }
+    {
+      "source_url": "https://www.prnewswire.com/news-releases/apptronik-and-mercedes-benz-enter-commercial-agreement-that-will-pilot-apptroniks-apollo-humanoid-robot-in-mercedes-benz-manufacturing-facilities-302089972.html",
+      "source_type": "PRESS_RELEASE",
+      "source_title": "Apptronik and Mercedes-Benz Enter Commercial Agreement to Pilot Apollo",
+      "excerpt": "Apptronik's first publicly announced commercial deployment of Apollo",
+      "published_at": "2024-03-15",
+      "observed_at": "2026-07-24",
+      "verified_at": "2026-07-24",
+      "confidence": "HIGH",
+      "note": "PILOT: Apollo is in a commercial pilot agreement with Mercedes-Benz per Apptronik's press release."
+    }
   ],
   "variants": [],
   "pricing_offers": [],
@@ -50,14 +60,52 @@
       "status": "pilot",
       "summary": "Commercial agreement to pilot Apollo in Mercedes-Benz manufacturing: delivering assembly kits to production lines and inspecting/ delivering totes of kitted parts.",
       "evidence": [
-        { "source_url": "https://www.prnewswire.com/news-releases/apptronik-and-mercedes-benz-enter-commercial-agreement-that-will-pilot-apptroniks-apollo-humanoid-robot-in-mercedes-benz-manufacturing-facilities-302089972.html", "source_type": "PRESS_RELEASE", "source_title": "Apptronik and Mercedes-Benz Enter Commercial Agreement to Pilot Apollo", "excerpt": "Apptronik and Mercedes-Benz will collaborate on identifying applications for highly advanced robotics in Mercedes-Benz Manufacturing", "published_at": "2024-03-15", "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "Pilot deployment announced 2024-03-15. Specific plant/region not stated in the release -> region NULL; contract value not disclosed -> NULL." }
+        {
+          "source_url": "https://www.prnewswire.com/news-releases/apptronik-and-mercedes-benz-enter-commercial-agreement-that-will-pilot-apptroniks-apollo-humanoid-robot-in-mercedes-benz-manufacturing-facilities-302089972.html",
+          "source_type": "PRESS_RELEASE",
+          "source_title": "Apptronik and Mercedes-Benz Enter Commercial Agreement to Pilot Apollo",
+          "excerpt": "Apptronik and Mercedes-Benz will collaborate on identifying applications for highly advanced robotics in Mercedes-Benz Manufacturing",
+          "published_at": "2024-03-15",
+          "observed_at": "2026-07-24",
+          "verified_at": "2026-07-24",
+          "confidence": "HIGH",
+          "note": "Pilot deployment announced 2024-03-15. Specific plant/region not stated in the release -> region NULL; contract value not disclosed -> NULL."
+        }
       ]
     }
   ],
   "capabilities": [
-    { "slug": "bimanual-manipulation", "supported": true, "detail": "Designed for two-handed part handling / kitting in manufacturing." }
+    {
+      "slug": "bimanual-manipulation",
+      "supported": true,
+      "detail": "Designed for two-handed part handling / kitting in manufacturing."
+    }
   ],
   "use_case_fits": [
-    { "use_case_slug": "manufacturing", "fit_score": 0.7, "is_primary": true, "commercial_readiness": "PILOT", "notes": "Targeted at intralogistics and part delivery in manufacturing; in pilot with Mercedes-Benz.", "limitations": "Pilot maturity; not offered for open purchase.", "confidence": "MEDIUM" }
+    {
+      "use_case_slug": "manufacturing",
+      "fit_score": 0.7,
+      "is_primary": true,
+      "commercial_readiness": "PILOT",
+      "notes": "Targeted at intralogistics and part delivery in manufacturing; in pilot with Mercedes-Benz.",
+      "limitations": "Pilot maturity; not offered for open purchase.",
+      "confidence": "MEDIUM"
+    }
+  ],
+  "images": [
+    {
+      "image_url": "/robots/apptronik-apollo.jpg",
+      "source_url": "https://apptronik.com/apollo",
+      "source_name": "Apptronik",
+      "source_type": "MANUFACTURER",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "UNKNOWN",
+      "usage_basis": "OFFICIAL_MANUFACTURER_MEDIA",
+      "is_official": true,
+      "is_primary": true,
+      "attribution": "© Apptronik",
+      "last_verified_at": "2026-07-25T00:00:00Z"
+    }
   ]
 }

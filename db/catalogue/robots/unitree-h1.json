@@ -31,7 +31,17 @@
   },
   "specs_note": "height (~180 cm), weight (~47 kg), max moving speed 3.3 m/s, battery 864 Wh from the official spec page https://www.unitree.com/h1/ (observed 2026-07-24). A single total DoF figure is not stated there (page lists per-limb DoF only) -> degrees_of_freedom left NULL rather than inferred.",
   "commercial_status_evidence": [
-    { "source_url": "https://shop.unitree.com/products/unitree-h1", "source_type": "MANUFACTURER_STORE", "source_title": "Unitree H1 — official store listing", "excerpt": "Contact us for the real price", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "H1 is a shipping commercial product listed on the OEM store; sold on a contact-for-price basis." }
+    {
+      "source_url": "https://shop.unitree.com/products/unitree-h1",
+      "source_type": "MANUFACTURER_STORE",
+      "source_title": "Unitree H1 — official store listing",
+      "excerpt": "Contact us for the real price",
+      "published_at": null,
+      "observed_at": "2026-07-24",
+      "verified_at": "2026-07-24",
+      "confidence": "HIGH",
+      "note": "H1 is a shipping commercial product listed on the OEM store; sold on a contact-for-price basis."
+    }
   ],
   "variants": [],
   "pricing_offers": [
@@ -48,7 +58,17 @@
       "variant_slug": null,
       "note": "CONFLICT PRESERVED: the OEM store page shows a $90,000.00 USD figure but explicitly states 'Contact us for the real price' and directs buyers to sales_global@unitree.cc. Recorded as QUOTE_ONLY (no numeric price) because the store disavows the displayed figure as the real price.",
       "evidence": [
-        { "source_url": "https://shop.unitree.com/products/unitree-h1", "source_type": "MANUFACTURER_STORE", "source_title": "Unitree H1 — official store listing", "excerpt": "Unitree H1（Contact us for the real price） — $90,000.00 USD; Contact us for the real price", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "Quote-only commercial model observed directly on the OEM store. The $90,000 figure shown on the same page is explicitly disavowed as the real price (conflict retained in the offer note, not resolved into a published number)." }
+        {
+          "source_url": "https://shop.unitree.com/products/unitree-h1",
+          "source_type": "MANUFACTURER_STORE",
+          "source_title": "Unitree H1 — official store listing",
+          "excerpt": "Unitree H1（Contact us for the real price） — $90,000.00 USD; Contact us for the real price",
+          "published_at": null,
+          "observed_at": "2026-07-24",
+          "verified_at": "2026-07-24",
+          "confidence": "HIGH",
+          "note": "Quote-only commercial model observed directly on the OEM store. The $90,000 figure shown on the same page is explicitly disavowed as the real price (conflict retained in the offer note, not resolved into a published number)."
+        }
       ]
     }
   ],
@@ -62,15 +82,53 @@
       "lead_time_days": null,
       "note": "Obtainable via sales contact (quote required).",
       "evidence": [
-        { "source_url": "https://shop.unitree.com/products/unitree-h1", "source_type": "MANUFACTURER_STORE", "source_title": "Unitree H1 — official store listing", "excerpt": "Contact us for the real price ... sales_global@unitree.cc", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "Purchase is bespoke/contact-required per the OEM store listing." }
+        {
+          "source_url": "https://shop.unitree.com/products/unitree-h1",
+          "source_type": "MANUFACTURER_STORE",
+          "source_title": "Unitree H1 — official store listing",
+          "excerpt": "Contact us for the real price ... sales_global@unitree.cc",
+          "published_at": null,
+          "observed_at": "2026-07-24",
+          "verified_at": "2026-07-24",
+          "confidence": "HIGH",
+          "note": "Purchase is bespoke/contact-required per the OEM store listing."
+        }
       ]
     }
   ],
   "deployments": [],
   "capabilities": [
-    { "slug": "dynamic-walking", "supported": true, "detail": "High-speed dynamic walking; manufacturer cites 3.3 m/s moving speed." }
+    {
+      "slug": "dynamic-walking",
+      "supported": true,
+      "detail": "High-speed dynamic walking; manufacturer cites 3.3 m/s moving speed."
+    }
   ],
   "use_case_fits": [
-    { "use_case_slug": "research-education", "fit_score": 0.7, "is_primary": true, "commercial_readiness": "COMMERCIAL", "notes": "High-performance locomotion platform used in research.", "limitations": "Priced/sold by quote; hand/manipulation configuration varies.", "confidence": "LOW" }
+    {
+      "use_case_slug": "research-education",
+      "fit_score": 0.7,
+      "is_primary": true,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "High-performance locomotion platform used in research.",
+      "limitations": "Priced/sold by quote; hand/manipulation configuration varies.",
+      "confidence": "LOW"
+    }
+  ],
+  "images": [
+    {
+      "image_url": "/robots/unitree-h1.jpg",
+      "source_url": "https://shop.unitree.com/products/unitree-h1",
+      "source_name": "Unitree Robotics",
+      "source_type": "MANUFACTURER",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "UNKNOWN",
+      "usage_basis": "OFFICIAL_MANUFACTURER_MEDIA",
+      "is_official": true,
+      "is_primary": true,
+      "attribution": "© Unitree Robotics",
+      "last_verified_at": "2026-07-25T00:00:00Z"
+    }
   ]
 }

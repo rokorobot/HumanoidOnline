@@ -31,7 +31,17 @@
   },
   "specs_note": "Physical spec numbers not confirmed against a Figure primary source in this pass -> left NULL. Figure 02 ran a full autonomous production task (sheet-metal loading) on an active line -> autonomy TASK_AUTONOMOUS, has_manipulation/has_vision true.",
   "commercial_status_evidence": [
-    { "source_url": "https://www.figure.ai/news/production-at-bmw", "source_type": "MANUFACTURER_SITE", "source_title": "Figure — F.02 Contributed to the Production of 30,000 Cars at BMW", "excerpt": "Following the release of Figure 03, we're officially starting the retirement of Figure 02, our second-generation humanoid robot. ... With Figure 02's return to HQ from BMW as part of our fleet-wide retirement", "published_at": "2025-11-19", "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "VERIFIED", "note": "Manufacturer-declared retirement (Figure, 2025-11-19), quote confirmed on Figure's own page: 'officially starting the retirement of Figure 02' and 'fleet-wide retirement', F.02 returned from BMW to HQ. HumanoidOnline normalization policy: a directly manufacturer-declared product retirement maps deterministically to commercial_status DISCONTINUED -> confidence VERIFIED. Historical BMW deployment retained separately as its own evidence." }
+    {
+      "source_url": "https://www.figure.ai/news/production-at-bmw",
+      "source_type": "MANUFACTURER_SITE",
+      "source_title": "Figure — F.02 Contributed to the Production of 30,000 Cars at BMW",
+      "excerpt": "Following the release of Figure 03, we're officially starting the retirement of Figure 02, our second-generation humanoid robot. ... With Figure 02's return to HQ from BMW as part of our fleet-wide retirement",
+      "published_at": "2025-11-19",
+      "observed_at": "2026-07-24",
+      "verified_at": "2026-07-24",
+      "confidence": "VERIFIED",
+      "note": "Manufacturer-declared retirement (Figure, 2025-11-19), quote confirmed on Figure's own page: 'officially starting the retirement of Figure 02' and 'fleet-wide retirement', F.02 returned from BMW to HQ. HumanoidOnline normalization policy: a directly manufacturer-declared product retirement maps deterministically to commercial_status DISCONTINUED -> confidence VERIFIED. Historical BMW deployment retained separately as its own evidence."
+    }
   ],
   "variants": [],
   "pricing_offers": [],
@@ -50,15 +60,57 @@
       "status": "completed",
       "summary": "Live production deployment at BMW Group Plant Spartanburg: Figure 02 performed autonomous sheet-metal loading on an active assembly line over an 11-month deployment, loading 90,000+ parts and contributing to 30,000+ X3 vehicles across 1,250+ hours of runtime.",
       "evidence": [
-        { "source_url": "https://www.figure.ai/news/production-at-bmw", "source_type": "MANUFACTURER_SITE", "source_title": "Figure — F.02 Contributed to the Production of 30,000 Cars at BMW", "excerpt": "90,000+ parts loaded; Contributed to the production of 30,000+ X3 vehicles; 1,250+ hours of runtime; BMW Group Plant Spartanburg", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "VERIFIED", "note": "Production deployment metrics confirmed by Figure's own page (observed 2026-07-24). started_on set to 2024 (year-level; the page describes an 11-month deployment ending 2025). transaction_type OTHER: engagement commercial terms not disclosed." }
+        {
+          "source_url": "https://www.figure.ai/news/production-at-bmw",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Figure — F.02 Contributed to the Production of 30,000 Cars at BMW",
+          "excerpt": "90,000+ parts loaded; Contributed to the production of 30,000+ X3 vehicles; 1,250+ hours of runtime; BMW Group Plant Spartanburg",
+          "published_at": null,
+          "observed_at": "2026-07-24",
+          "verified_at": "2026-07-24",
+          "confidence": "VERIFIED",
+          "note": "Production deployment metrics confirmed by Figure's own page (observed 2026-07-24). started_on set to 2024 (year-level; the page describes an 11-month deployment ending 2025). transaction_type OTHER: engagement commercial terms not disclosed."
+        }
       ]
     }
   ],
   "capabilities": [
-    { "slug": "autonomous-task", "supported": true, "detail": "Autonomous sheet-metal pick-and-place on a live BMW assembly line." },
-    { "slug": "bimanual-manipulation", "supported": true, "detail": "Two-handed part handling in manufacturing." }
+    {
+      "slug": "autonomous-task",
+      "supported": true,
+      "detail": "Autonomous sheet-metal pick-and-place on a live BMW assembly line."
+    },
+    {
+      "slug": "bimanual-manipulation",
+      "supported": true,
+      "detail": "Two-handed part handling in manufacturing."
+    }
   ],
   "use_case_fits": [
-    { "use_case_slug": "manufacturing", "fit_score": 0.7, "is_primary": true, "commercial_readiness": "DISCONTINUED", "notes": "Demonstrated real production-line capability at BMW; platform now superseded by Figure 03.", "limitations": "Model retired; superseded by Figure 03.", "confidence": "MEDIUM" }
+    {
+      "use_case_slug": "manufacturing",
+      "fit_score": 0.7,
+      "is_primary": true,
+      "commercial_readiness": "DISCONTINUED",
+      "notes": "Demonstrated real production-line capability at BMW; platform now superseded by Figure 03.",
+      "limitations": "Model retired; superseded by Figure 03.",
+      "confidence": "MEDIUM"
+    }
+  ],
+  "images": [
+    {
+      "image_url": "/robots/figure-02.jpg",
+      "source_url": "https://www.therobotreport.com/figure-02-humanoid-robot-is-ready-to-get-to-work/",
+      "source_name": "Figure AI",
+      "source_type": "MANUFACTURER",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "UNKNOWN",
+      "usage_basis": "OFFICIAL_MANUFACTURER_MEDIA",
+      "is_official": true,
+      "is_primary": true,
+      "attribution": "© Figure AI",
+      "last_verified_at": "2026-07-25T00:00:00Z"
+    }
   ]
 }

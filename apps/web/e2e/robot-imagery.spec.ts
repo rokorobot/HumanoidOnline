@@ -19,7 +19,9 @@ test("robot with a cleared official image shows the verified gallery + provenanc
 });
 
 test("robot without a cleared image shows IMAGE_UNAVAILABLE (never an invented image)", async ({ page }) => {
-  await page.goto("/robots/apptronik-apollo");
+  // figure-02 is retired by Figure; no clean OEM front full-body could be honestly
+  // sourced, so it stays IMAGE_UNAVAILABLE rather than a guess.
+  await page.goto("/robots/figure-02");
   await expect(page.getByText("IMAGE UNAVAILABLE")).toBeVisible();
   await expect(page.locator(".ro-gallery__img")).toHaveCount(0);
 });

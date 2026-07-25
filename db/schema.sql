@@ -684,6 +684,7 @@ CREATE TABLE commercial_lead (
     budget_max            NUMERIC(14,2),
     timeline              DATE,               -- required-by
     requirements_snapshot JSONB,              -- frozen copy of the requirement
+    message               TEXT,               -- buyer's free-text commercial inquiry (WS7)
     lead_status           lead_status NOT NULL DEFAULT 'NEW',
     outcome               TEXT,
     created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),

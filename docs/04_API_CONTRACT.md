@@ -158,17 +158,33 @@ When `matches` is empty, `no_match_explanation` states the dominant eliminating 
 
 ## 5. Commercial leads
 
+The first commercial conversion (WS7). This is where WS5 anonymity ends: `contact_email` is required. The body is `extra=forbid` — the client owns only its contact info and declared commercial intent; `lead_status`, `outcome`, `match_score`, provider ids/status, `contacted_at`, and any payment/price/commission field are **server-owned** and rejected `422`.
+
 ### `POST /api/commercial-leads`
 ```json
 {
-  "requirement_id": "uuid",
+  "requirement_id": "uuid | null",
   "contact_name": "…", "contact_email": "…", "organization": "…",
+  "country": "DE",
   "robot_slugs": ["digit", "apollo"],
   "preferred_transaction": "RAAS",
   "message": "…"
 }
 ```
-Response `201`: `{ "id": "uuid", "lead_status": "NEW" }`. `contact_email` required here (this is the capture point). **No checkout, no payment fields — ever, in v0.1.**
+- `contact_email` **required** (valid, trimmed). `contact_name`/`organization`/`message` optional (trimmed; blank→NULL; capped 200/300/4000). `country` resolves **only** to a canonical `COUNTRY` region (economic zone like `EU`/`GLOBAL` → `422`). `preferred_transaction` ∈ `UNKNOWN|RENT|BUY|LEASE|RAAS|FLEXIBLE`; **omitted** means "inherit the requirement" (requirement-linked) or `UNKNOWN` (direct).
+
+**Response.** `201` on first capture, `200` when an existing requirement-linked lead is **extended** (see below); both return `{ "id": "uuid", "lead_status": "NEW" }`. `lead_status` is admin-only and always `NEW` from the public path. There is **no** public `GET`/`PATCH` for a lead (it carries PII).
+
+**Requirement-linked capture** (`requirement_id` set — from `/matches/[id]`). The server locks the `buyer_requirement`, reads its **persisted** `match_result`, and never reruns matching or mutates the historical scoring fields:
+- `robot_slugs` must be a **subset** of the persisted shortlist, else `422` (spoof protection). The full surfaced shortlist is stored as `commercial_lead_robot` context with each robot's `match_score`; `is_selected` marks the submitted pick(s).
+- **Zero-match** (no persisted `match_result`): `robot_slugs` must be `[]`, else `422`; the lead is created with zero robot rows (demand intelligence).
+- **Create-or-extend, one lead per requirement.** A repeat submission with the **same** `contact_email` extends that lead (`200`): unions in newly-selected robots, and applies buyer refinements to the **lead only** (`country`/`preferred_transaction` when explicitly supplied; fills `contact_name`/`organization` when previously NULL). A **different** `contact_email` on a bound requirement → `409` (identity is never overwritten). Concurrent first submissions serialize on the requirement row lock → exactly one lead.
+
+**Direct Robot-Detail capture** (`requirement_id: null` — from `/robots/[slug]` → Request Availability). `robot_slugs` must contain **exactly one** robot (`0` or `>1` → `422`, zero writes). The server creates a fresh minimal `buyer_requirement` (`buyer_type UNKNOWN`, versioned `raw_input` recording the robot interest — no fabricated task/use-case/budget/payload) plus the lead, atomically; the robot is attached with `match_score = NULL` (never produced by the matcher).
+
+**Provider routing.** On capture the server writes deterministic `commercial_lead_provider` routes with `status='PENDING'`, `contacted_at=NULL`, for each eligible (provider × selected-robot): provider `is_active` + `accepts_leads`, owning an offer that is `is_current AND commercially_accessible(status)` (the canonical predicate), transaction- and geography-compatible with the lead. A PENDING route means a candidate exists — **nothing is contacted** (no email/webhook/CRM). Extension **reconciles** routes (adds newly-eligible PENDING, removes only now-ineligible PENDING, retains non-PENDING history). The verified catalogue asserts no `accepts_leads=true`, so production may legitimately yield **zero** routes.
+
+**No checkout, no payment fields — ever, in v0.1.**
 
 ## 6. Analytics
 

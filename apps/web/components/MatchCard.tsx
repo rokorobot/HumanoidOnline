@@ -3,6 +3,7 @@
 // summing to the score), the concrete reasons, and any warnings — every number
 // reproducible from score_breakdown (frozen contract §7.5).
 import Link from "next/link";
+import type { MouseEvent } from "react";
 
 import type { MatchItem } from "@/lib/types";
 
@@ -15,7 +16,15 @@ const CRITERIA: [string, string][] = [
   ["deployment_readiness", "Deployment"],
 ];
 
-export function MatchCard({ match }: { match: MatchItem }) {
+export function MatchCard({
+  match,
+  onRequestHelp,
+}: {
+  match: MatchItem;
+  // WS7: when provided, renders a per-card "Request commercial help" CTA that
+  // opens the lead form for this robot. Omitted -> the card is display-only.
+  onRequestHelp?: (e: MouseEvent<HTMLButtonElement>) => void;
+}) {
   const b = match.score_breakdown;
   return (
     <article className="mr-card" data-slug={match.robot.slug}>
@@ -74,6 +83,11 @@ export function MatchCard({ match }: { match: MatchItem }) {
         <Link className="btn" href={`/robots/${match.robot.slug}`}>
           Robot detail →
         </Link>
+        {onRequestHelp && (
+          <button type="button" className="btn btn--signal" onClick={onRequestHelp}>
+            Request commercial help →
+          </button>
+        )}
       </div>
     </article>
   );

@@ -39,7 +39,11 @@ test("SEE MATCHES leads to ranked results with the exact six-part breakdown", as
   expect(await card.locator(".mr-reasons li").count()).toBeGreaterThanOrEqual(2);
   // Rank 1 is BEST OVERALL.
   await expect(page.locator(".mr-cat").first()).toHaveText(/BEST OVERALL/i);
-  // No lead capture / contact form on the results surface (WS7 territory).
+  // WS7 commercial capture is present as CTAs, but no contact form is in the DOM
+  // until the buyer opens the modal (no PII surface on initial render).
+  await expect(
+    page.getByRole("button", { name: /Request commercial help/i }).first(),
+  ).toBeVisible();
   await expect(page.locator("input[type=email]")).toHaveCount(0);
 });
 

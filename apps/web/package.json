@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "e2e": "playwright test"
+    "e2e": "playwright test --grep-invert @zeromatch",
+    "e2e:zero": "playwright test --grep @zeromatch"
   },
   "dependencies": {
     "next": "^15.1.6",

@@ -32,5 +32,9 @@ uv run db/bootstrap.py            # baseline (schema.sql) + every pending migrat
 uv run db/bootstrap.py --seed     # ...then load the seed dataset
 ```
 
-There are no forward migrations yet — the frozen v0.1 baseline is the whole
-schema.
+Forward migrations:
+
+- `0001_add_commercial_lead_message.sql` — adds `commercial_lead.message`
+  (WS7), reconciling the frozen `POST /api/commercial-leads` body with the
+  canonical model. Idempotent (`ADD COLUMN IF NOT EXISTS`) so it is a no-op on
+  fresh databases already built from `schema.sql`.

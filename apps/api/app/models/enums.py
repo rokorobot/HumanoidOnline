@@ -85,6 +85,13 @@ match_category = _pg_enum(
     "BEST_OVERALL", "BEST_COMMERCIAL", "BEST_LOWER_COST", "BEST_DEVELOPER",
     "BEST_TECHNICAL", "ALTERNATIVE",
 )
+# Transaction-layer (Phase 2 / WS7 commercial lead). Lifecycle is admin-only:
+# the public capture path always writes 'NEW' and never transitions it.
+lead_status = _pg_enum(
+    "lead_status",
+    "NEW", "QUALIFYING", "QUALIFIED", "MATCHED", "INTRODUCED", "IN_DISCUSSION",
+    "WON", "LOST", "DISQUALIFIED",
+)
 
 # Autonomy ordered low->high, for the `autonomy_min` catalogue filter.
 AUTONOMY_ORDER = [

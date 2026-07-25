@@ -196,3 +196,83 @@ jobs:
           name: playwright-report
           path: apps/web/playwright-report/
           retention-days: 7
+
+  web-zero-match:
+    name: Frontend zero-match acceptance (isolated ephemeral DB)
+    # WS7 §20: the verified catalogue cannot produce a genuine zero-match (Ameca
+    # has UNKNOWN on every hard filter, so >= 1 match always survives). This job
+    # stands up a SEPARATE ephemeral DB with the catalogue imported and then ALL
+    # robots unpublished, so the deterministic matcher genuinely returns [] and
+    # the "Tell us anyway" capture path can be driven in the browser. It never
+    # touches the verified-catalogue suite (which runs in web-integration).
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: humanoid
+          POSTGRES_PASSWORD: humanoid
+          POSTGRES_DB: zeromatch
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U humanoid -d zeromatch"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DATABASE_URL: postgresql+psycopg://humanoid:humanoid@localhost:5432/zeromatch
+      API_BASE_URL: http://127.0.0.1:8000
+      PGPASSWORD: humanoid
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      # 1) schema -> catalogue import -> unpublish ALL robots (controlled state)
+      - name: Apply canonical schema (NO seed)
+        run: uv run db/bootstrap.py
+      - name: Import the verified catalogue
+        run: uv run db/import_catalogue.py
+      - name: Unpublish all robots (force a genuine zero-match state)
+        run: psql -h localhost -U humanoid -d zeromatch -c "SET search_path TO humanoid, public; UPDATE robot SET is_published = false;"
+
+      # 2) FastAPI (background)
+      - name: Install API dependencies
+        working-directory: apps/api
+        run: uv sync --frozen
+      - name: Start FastAPI (uvicorn)
+        working-directory: apps/api
+        run: |
+          nohup uv run python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 \
+            > "$RUNNER_TEMP/api.log" 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:8000/ > /dev/null; then echo "API up"; break; fi
+            sleep 2
+          done
+          curl -sf http://127.0.0.1:8000/ || (cat "$RUNNER_TEMP/api.log"; exit 1)
+
+      # 3) Next (built) + 4) the isolated zero-match spec only
+      - name: Install web dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Install Playwright browsers
+        working-directory: apps/web
+        run: npx playwright install --with-deps chromium
+      - name: Build web
+        working-directory: apps/web
+        run: npm run build
+      - name: Run the isolated zero-match acceptance
+        working-directory: apps/web
+        run: npm run e2e:zero
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-zero-match
+          path: apps/web/playwright-report/
+          retention-days: 7

@@ -46,6 +46,9 @@ test("llms.txt is canonical-only text with the UNKNOWN semantics", async ({ requ
   expect(body).toContain("# HumanoidOnline");
   expect(body).toContain("UNKNOWN is not 0");
   expect(body).toContain("/robots/unitree-g1");
-  // Canonical-only surface: no discovery-layer leakage.
-  expect(body.toLowerCase()).not.toContain("candidate");
+  // Canonical-only surface: no discovery-layer status tokens leak. (The word
+  // "candidate" legitimately appears in the semantics prose that says candidates
+  // are excluded — so we check for internal status leakage, not that word.)
+  expect(body).not.toContain("NOT_VERIFIED");
+  expect(body).not.toContain("discovery_candidate");
 });

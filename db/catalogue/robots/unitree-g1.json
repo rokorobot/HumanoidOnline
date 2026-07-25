@@ -31,10 +31,25 @@
   },
   "specs_note": "height (1320 mm), weight (~35 kg with battery), 23 base joints, ~2 h runtime and EDU dexterous-hand option from the official spec page https://www.unitree.com/g1/ (observed 2026-07-24). Walking speed and battery Wh not stated there -> left NULL. SDK/ROS/simulation are documented developer features of the G1 platform.",
   "commercial_status_evidence": [
-    { "source_url": "https://shop.unitree.com/products/unitree-g1", "source_type": "MANUFACTURER_STORE", "source_title": "Unitree G1 — official store listing", "excerpt": "$13,500.00 USD", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "VERIFIED", "note": "G1 is generally commercially available: listed for direct purchase on the OEM store (observed 2026-07-24)." }
+    {
+      "source_url": "https://shop.unitree.com/products/unitree-g1",
+      "source_type": "MANUFACTURER_STORE",
+      "source_title": "Unitree G1 — official store listing",
+      "excerpt": "$13,500.00 USD",
+      "published_at": null,
+      "observed_at": "2026-07-24",
+      "verified_at": "2026-07-24",
+      "confidence": "VERIFIED",
+      "note": "G1 is generally commercially available: listed for direct purchase on the OEM store (observed 2026-07-24)."
+    }
   ],
   "variants": [
-    { "slug": "g1-edu", "name": "G1 EDU", "is_developer": true, "description": "Education/developer configuration with expandable DoF (23-43) and optional force-controlled three-fingered hands." }
+    {
+      "slug": "g1-edu",
+      "name": "G1 EDU",
+      "is_developer": true,
+      "description": "Education/developer configuration with expandable DoF (23-43) and optional force-controlled three-fingered hands."
+    }
   ],
   "pricing_offers": [
     {
@@ -50,7 +65,17 @@
       "variant_slug": null,
       "note": "Base G1 list price on the OEM store.",
       "evidence": [
-        { "source_url": "https://shop.unitree.com/products/unitree-g1", "source_type": "MANUFACTURER_STORE", "source_title": "Unitree G1 — official store listing", "excerpt": "$13,500.00 USD", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "VERIFIED", "note": "Store list price observed directly on the OEM store (2026-07-24)." }
+        {
+          "source_url": "https://shop.unitree.com/products/unitree-g1",
+          "source_type": "MANUFACTURER_STORE",
+          "source_title": "Unitree G1 — official store listing",
+          "excerpt": "$13,500.00 USD",
+          "published_at": null,
+          "observed_at": "2026-07-24",
+          "verified_at": "2026-07-24",
+          "confidence": "VERIFIED",
+          "note": "Store list price observed directly on the OEM store (2026-07-24)."
+        }
       ]
     }
   ],
@@ -64,17 +89,62 @@
       "lead_time_days": null,
       "note": "Orderable on the OEM store but shown as backordered at time of observation.",
       "evidence": [
-        { "source_url": "https://shop.unitree.com/products/unitree-g1", "source_type": "MANUFACTURER_STORE", "source_title": "Unitree G1 — official store listing", "excerpt": "backordered", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "Listed and orderable on the OEM store; page indicated backorder, mapped to LIMITED (obtainable with constraints)." }
+        {
+          "source_url": "https://shop.unitree.com/products/unitree-g1",
+          "source_type": "MANUFACTURER_STORE",
+          "source_title": "Unitree G1 — official store listing",
+          "excerpt": "backordered",
+          "published_at": null,
+          "observed_at": "2026-07-24",
+          "verified_at": "2026-07-24",
+          "confidence": "HIGH",
+          "note": "Listed and orderable on the OEM store; page indicated backorder, mapped to LIMITED (obtainable with constraints)."
+        }
       ]
     }
   ],
   "deployments": [],
   "capabilities": [
-    { "slug": "dynamic-walking", "supported": true, "detail": "Bipedal locomotion; core G1 capability." },
-    { "slug": "teleoperation", "supported": true, "detail": "Teleoperation supported for data collection / control." },
-    { "slug": "dexterous-hands", "supported": true, "detail": "Optional force-controlled three-fingered hands on the EDU configuration." }
+    {
+      "slug": "dynamic-walking",
+      "supported": true,
+      "detail": "Bipedal locomotion; core G1 capability."
+    },
+    {
+      "slug": "teleoperation",
+      "supported": true,
+      "detail": "Teleoperation supported for data collection / control."
+    },
+    {
+      "slug": "dexterous-hands",
+      "supported": true,
+      "detail": "Optional force-controlled three-fingered hands on the EDU configuration."
+    }
   ],
   "use_case_fits": [
-    { "use_case_slug": "research-education", "fit_score": 0.75, "is_primary": true, "commercial_readiness": "COMMERCIAL", "notes": "Low price point and SDK/ROS support make G1 a common research/education platform.", "limitations": "Small arm payload; teleop-first autonomy.", "confidence": "MEDIUM" }
+    {
+      "use_case_slug": "research-education",
+      "fit_score": 0.75,
+      "is_primary": true,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "Low price point and SDK/ROS support make G1 a common research/education platform.",
+      "limitations": "Small arm payload; teleop-first autonomy.",
+      "confidence": "MEDIUM"
+    }
+  ],
+  "images": [
+    {
+      "image_url": "/robots/unitree-g1.jpg",
+      "source_url": "https://www.unitree.com/g1/",
+      "source_name": "Unitree Robotics",
+      "source_type": "MANUFACTURER",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "ATTRIBUTION_REQUIRED",
+      "is_official": true,
+      "is_primary": true,
+      "attribution": "© Unitree Robotics",
+      "last_verified_at": "2026-07-25T00:00:00Z"
+    }
   ]
 }

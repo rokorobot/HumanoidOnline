@@ -31,7 +31,17 @@
   },
   "specs_note": "Ameca is an expressive upper-body/interaction robot (base configuration does not walk); physical specs and mobility were not confirmed against an Engineered Arts primary source in this pass -> left NULL. Vision + conversational interaction are core Ameca features -> has_vision/has_language_ui true.",
   "commercial_status_evidence": [
-    { "source_url": "https://engineeredarts.com", "source_type": "MANUFACTURER_SITE", "source_title": "Engineered Arts official site", "excerpt": "Robot Rentals; Contact Sales", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "COMMERCIAL: Ameca is generally available for sale (by quote) and event rental per the manufacturer site." }
+    {
+      "source_url": "https://engineeredarts.com",
+      "source_type": "MANUFACTURER_SITE",
+      "source_title": "Engineered Arts official site",
+      "excerpt": "Robot Rentals; Contact Sales",
+      "published_at": null,
+      "observed_at": "2026-07-24",
+      "verified_at": "2026-07-24",
+      "confidence": "HIGH",
+      "note": "COMMERCIAL: Ameca is generally available for sale (by quote) and event rental per the manufacturer site."
+    }
   ],
   "variants": [],
   "pricing_offers": [
@@ -48,7 +58,17 @@
       "variant_slug": null,
       "note": "No public purchase price; Engineered Arts directs buyers to Contact Sales. Media-reported figures (~$250k) are secondary and deliberately NOT published as a price.",
       "evidence": [
-        { "source_url": "https://engineeredarts.com/contact-sales", "source_type": "MANUFACTURER_SITE", "source_title": "Engineered Arts — Contact Sales", "excerpt": "Contact Sales", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "Quote-only purchase model confirmed on the manufacturer site (no public price displayed)." }
+        {
+          "source_url": "https://engineeredarts.com/contact-sales",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Engineered Arts — Contact Sales",
+          "excerpt": "Contact Sales",
+          "published_at": null,
+          "observed_at": "2026-07-24",
+          "verified_at": "2026-07-24",
+          "confidence": "HIGH",
+          "note": "Quote-only purchase model confirmed on the manufacturer site (no public price displayed)."
+        }
       ]
     }
   ],
@@ -62,7 +82,17 @@
       "lead_time_days": null,
       "note": "Purchase via sales contact (quote/build to order).",
       "evidence": [
-        { "source_url": "https://engineeredarts.com/contact-sales", "source_type": "MANUFACTURER_SITE", "source_title": "Engineered Arts — Contact Sales", "excerpt": "Contact Sales", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "Purchase is bespoke/contact-required per the manufacturer site." }
+        {
+          "source_url": "https://engineeredarts.com/contact-sales",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Engineered Arts — Contact Sales",
+          "excerpt": "Contact Sales",
+          "published_at": null,
+          "observed_at": "2026-07-24",
+          "verified_at": "2026-07-24",
+          "confidence": "HIGH",
+          "note": "Purchase is bespoke/contact-required per the manufacturer site."
+        }
       ]
     },
     {
@@ -74,16 +104,57 @@
       "lead_time_days": null,
       "note": "Event rental offered directly by the manufacturer.",
       "evidence": [
-        { "source_url": "https://engineeredarts.com/rentals", "source_type": "MANUFACTURER_SITE", "source_title": "Engineered Arts — Robot Rentals", "excerpt": "Robot Rentals", "published_at": null, "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "Event rental availability confirmed via the manufacturer site's Robot Rentals offering. Rental rate not public -> no pricing_offer recorded." }
+        {
+          "source_url": "https://engineeredarts.com/rentals",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Engineered Arts — Robot Rentals",
+          "excerpt": "Robot Rentals",
+          "published_at": null,
+          "observed_at": "2026-07-24",
+          "verified_at": "2026-07-24",
+          "confidence": "HIGH",
+          "note": "Event rental availability confirmed via the manufacturer site's Robot Rentals offering. Rental rate not public -> no pricing_offer recorded."
+        }
       ]
     }
   ],
   "deployments": [],
   "capabilities": [
-    { "slug": "expressive-face", "supported": true, "detail": "Human-like facial expression is Ameca's signature capability." },
-    { "slug": "voice-interaction", "supported": true, "detail": "Conversational voice interaction for events and demos." }
+    {
+      "slug": "expressive-face",
+      "supported": true,
+      "detail": "Human-like facial expression is Ameca's signature capability."
+    },
+    {
+      "slug": "voice-interaction",
+      "supported": true,
+      "detail": "Conversational voice interaction for events and demos."
+    }
   ],
   "use_case_fits": [
-    { "use_case_slug": "events-entertainment", "fit_score": 0.8, "is_primary": true, "commercial_readiness": "COMMERCIAL", "notes": "Purpose-built for expressive event/attraction engagement; available to buy or rent.", "limitations": "Interaction-focused; base configuration does not perform physical manipulation/locomotion tasks.", "confidence": "MEDIUM" }
+    {
+      "use_case_slug": "events-entertainment",
+      "fit_score": 0.8,
+      "is_primary": true,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "Purpose-built for expressive event/attraction engagement; available to buy or rent.",
+      "limitations": "Interaction-focused; base configuration does not perform physical manipulation/locomotion tasks.",
+      "confidence": "MEDIUM"
+    }
+  ],
+  "images": [
+    {
+      "image_url": "/robots/engineered-arts-ameca.webp",
+      "source_url": "https://engineeredarts.com/robot/ameca/",
+      "source_name": "Engineered Arts",
+      "source_type": "MANUFACTURER",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "ATTRIBUTION_REQUIRED",
+      "is_official": true,
+      "is_primary": true,
+      "attribution": "© Engineered Arts",
+      "last_verified_at": "2026-07-25T00:00:00Z"
+    }
   ]
 }

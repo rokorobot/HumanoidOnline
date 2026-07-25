@@ -190,7 +190,7 @@ export function LeadDialog({
           <div aria-live="polite">
             <p className="prose">
               We&apos;ve saved your requirement and robot interest. HumanoidOnline
-              will review the relevant commercial paths and follow up by email.
+              will review the relevant commercial paths.
             </p>
             <div className="actions" style={{ marginTop: "var(--ho-sp-5)" }}>
               <button type="button" className="btn btn--signal" onClick={onClose}>

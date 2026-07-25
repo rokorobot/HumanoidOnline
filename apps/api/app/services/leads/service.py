@@ -36,7 +36,7 @@ from app.models.region import Region
 from app.models.robot import Robot
 from app.models.use_case import UseCase
 from app.schemas.commercial_lead import CommercialLeadCreate
-from app.services.leads.routing import route_providers
+from app.services.leads.routing import reconcile_routes
 
 SNAPSHOT_VERSION = 1
 DIRECT_CAPTURE_WIZARD_VERSION = 1
@@ -193,14 +193,14 @@ def _capture_requirement_linked(
 
     if existing is not None:
         # One public commercial conversion object per requirement: extend, never
-        # duplicate. Identity is never overwritten.
+        # duplicate. Contact email (identity) is never overwritten.
         if existing.contact_email.strip().lower() != payload.contact_email.lower():
             raise HTTPException(
                 status_code=409,
                 detail="requirement is already bound to a different contact email",
             )
-        _extend_requirement_linked(existing, submitted_robot_ids, payload)
-        route_providers(session, existing)
+        _extend_requirement_linked(existing, submitted_robot_ids, payload, country_id)
+        reconcile_routes(session, existing)
         session.commit()
         return existing, False
 
@@ -243,7 +243,7 @@ def _capture_requirement_linked(
         req.organization = payload.organization
 
     session.flush()  # assign lead.id before routing appends child rows
-    route_providers(session, lead)
+    reconcile_routes(session, lead)
     session.commit()
     return lead, True
 
@@ -252,14 +252,37 @@ def _extend_requirement_linked(
     lead: CommercialLead,
     submitted_robot_ids: set[uuid.UUID],
     payload: CommercialLeadCreate,
+    country_id: uuid.UUID | None,
 ) -> None:
-    """Extend an existing requirement-linked lead: union in newly-selected robots
-    (rows for the full shortlist already exist from first capture) and fill a
-    message if none was captured yet. Additive only — a robot is never
-    un-selected, and existing identity/message are never clobbered."""
+    """Extend an existing requirement-linked lead (WS7 §9): union in newly-selected
+    robots and apply the buyer's commercial refinements to the LEAD only. This
+    never mutates the historical scoring fields on `buyer_requirement`, so the
+    persisted match_result still describes the requirement that generated it.
+
+      - country / preferred_transaction: updated when EXPLICITLY supplied in this
+        submission; an omitted field preserves the existing lead value.
+      - contact_name / organization: filled only when the existing value is NULL
+        and the buyer now supplies one; a non-null identity field is never
+        silently overwritten (contact_email identity is guarded upstream by 409).
+      - message: filled only when none was captured yet.
+
+    Additive on robots — a robot is never un-selected. Route reconciliation runs
+    after this in the caller (a refined country/transaction may change eligibility)."""
     for row in lead.robots:
         if row.robot_id in submitted_robot_ids:
             row.is_selected = True
+
+    # `payload.country is not None` == the field was explicitly supplied (an
+    # invalid country would already have raised 422 during resolution).
+    if payload.country is not None:
+        lead.country_region_id = country_id
+    if payload.preferred_transaction is not None:
+        lead.preferred_transaction = payload.preferred_transaction
+
+    if lead.contact_name is None and payload.contact_name is not None:
+        lead.contact_name = payload.contact_name
+    if lead.organization is None and payload.organization is not None:
+        lead.organization = payload.organization
     if payload.message is not None and lead.message is None:
         lead.message = payload.message
 
@@ -269,10 +292,13 @@ def _extend_requirement_linked(
 def _capture_direct(
     session: Session, payload: CommercialLeadCreate, country_id: uuid.UUID | None
 ) -> tuple[CommercialLead, bool]:
-    if not payload.robot_slugs:
+    # The direct surface is /robots/[slug] -> Request Availability: it represents
+    # exactly ONE specific robot. A handcrafted POST with 0 or >1 slugs has no
+    # corresponding UI and is rejected with zero writes.
+    if len(payload.robot_slugs) != 1:
         raise HTTPException(
             status_code=422,
-            detail="a direct capture (no requirement_id) must name at least one robot",
+            detail="a direct capture (no requirement_id) must name exactly one robot",
         )
     robot_ids = _resolve_published_robots(session, payload.robot_slugs)
 
@@ -321,6 +347,6 @@ def _capture_direct(
         )
     session.add(lead)
     session.flush()
-    route_providers(session, lead)
+    reconcile_routes(session, lead)
     session.commit()
     return lead, True

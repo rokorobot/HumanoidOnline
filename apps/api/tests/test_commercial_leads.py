@@ -140,28 +140,50 @@ def test_l3_spoof_robot_not_in_shortlist_422(client, database_url) -> None:
 # ---- L4 — zero match ------------------------------------------------------
 
 def test_l4_zero_match_capture(client, database_url) -> None:
-    # A requirement with no persisted match_result. Only an empty selection is
-    # valid; the lead is created as demand intelligence with zero robot rows.
-    raw = {"wizard_version": 1, "answers": {"industry": {"state": "ANSWERED", "value": "logistics"}}}  # noqa: E501
-    rid = _create_requirement(client, {"industry": "logistics", "raw_input": raw})
-    assert _scalar("SELECT count(*) FROM match_result WHERE requirement_id=:i", i=rid) == 0
+    # A GENUINE zero-match flow (not merely an unmatched requirement). WS6-E7
+    # controlled state: give every published robot a KNOWN low payload so a
+    # huge-payload requirement hard-excludes ALL of them (UNKNOWN payloads would
+    # otherwise survive). The REAL matcher runs, persists nothing, and we then
+    # capture the zero-match demand lead. Restore the payloads afterwards.
+    with engine.begin() as conn:
+        conn.execute(text("SET search_path TO humanoid, public"))
+        original = conn.execute(
+            text("SELECT id, payload_kg FROM robot WHERE is_published")
+        ).all()
+        conn.execute(text("UPDATE robot SET payload_kg = 1 WHERE is_published"))
+    try:
+        raw = {"wizard_version": 1, "answers": {"payload": {"state": "ANSWERED", "value": 9999}}}
+        rid = _create_requirement(client, {"payload_min_kg": 9999, "raw_input": raw})
 
-    # a non-empty selection is rejected
-    bad = client.post("/api/commercial-leads", json={
-        "requirement_id": rid, "contact_email": "jane@example.com", "robot_slugs": ["digit"],
-    })
-    assert bad.status_code == 422, bad.text
+        # Real matcher -> genuinely empty, and nothing persisted.
+        m = client.get(f"/api/buyer-requirements/{rid}/matches")
+        assert m.status_code == 200 and m.json()["matches"] == [], m.text
+        assert _scalar("SELECT count(*) FROM match_result WHERE requirement_id=:i", i=rid) == 0
 
-    resp = client.post("/api/commercial-leads", json={
-        "requirement_id": rid, "contact_email": "jane@example.com", "robot_slugs": [],
-    })
-    assert resp.status_code == 201, resp.text
-    lid = resp.json()["id"]
-    assert _scalar("SELECT count(*) FROM commercial_lead_robot WHERE lead_id=:l", l=lid) == 0
-    # snapshot frozen server-side, and identity is NOT duplicated inside it
-    snap = _scalar("SELECT requirements_snapshot FROM commercial_lead WHERE id=:l", l=lid)
-    assert snap and snap["snapshot_version"] == 1 and snap["industry"] == "logistics"
-    assert "contact_email" not in snap and "contact_name" not in snap
+        # A non-empty selection is rejected (no surfaced match backs it)...
+        bad = client.post("/api/commercial-leads", json={
+            "requirement_id": rid, "contact_email": "jane@example.com", "robot_slugs": ["digit"],
+        })
+        assert bad.status_code == 422, bad.text
+        # ...and the empty selection creates the demand lead.
+        resp = client.post("/api/commercial-leads", json={
+            "requirement_id": rid, "contact_email": "jane@example.com", "robot_slugs": [],
+        })
+        assert resp.status_code == 201, resp.text
+        lid = resp.json()["id"]
+        assert _scalar("SELECT count(*) FROM commercial_lead_robot WHERE lead_id=:l", l=lid) == 0
+        # snapshot frozen server-side, and identity is NOT duplicated inside it
+        snap = _scalar("SELECT requirements_snapshot FROM commercial_lead WHERE id=:l", l=lid)
+        assert snap and snap["snapshot_version"] == 1
+        assert "contact_email" not in snap and "contact_name" not in snap
+    finally:
+        with engine.begin() as conn:
+            conn.execute(text("SET search_path TO humanoid, public"))
+            for robot_id, payload in original:
+                conn.execute(
+                    text("UPDATE robot SET payload_kg = :p WHERE id = :i"),
+                    {"p": payload, "i": robot_id},
+                )
 
 
 # ---- L5 — repeated capture extends, never duplicates ----------------------
@@ -269,11 +291,21 @@ def test_l8_direct_capture(client, database_url) -> None:
     assert raw["answers"]["robot_interest"] == {"state": "ANSWERED", "value": "digit"}
 
 
-def test_l8_direct_capture_requires_a_robot(client, database_url) -> None:
-    resp = client.post("/api/commercial-leads", json={
+def test_l8_direct_capture_requires_exactly_one_robot(client, database_url) -> None:
+    reqs_before = _scalar("SELECT count(*) FROM buyer_requirement")
+    # zero robots -> 422
+    empty = client.post("/api/commercial-leads", json={
         "contact_email": "dev@example.com", "robot_slugs": [],
     })
-    assert resp.status_code == 422, resp.text
+    assert empty.status_code == 422, empty.text
+    # more than one robot -> 422 (no such direct UI; adversarial handcrafted POST)
+    many = client.post("/api/commercial-leads", json={
+        "contact_email": "dev@example.com",
+        "robot_slugs": ["digit", "unitree-g1", "apollo"],
+    })
+    assert many.status_code == 422, many.text
+    # zero writes for either rejection
+    assert _scalar("SELECT count(*) FROM buyer_requirement") == reqs_before
 
 
 # ---- L9 — message round-trip ----------------------------------------------
@@ -403,6 +435,14 @@ def test_l11_routing_positive(client, database_url) -> None:
     assert contacted_at is None
 
 
+def test_l11_routing_all_accessible_statuses_are_eligible(client, database_url) -> None:
+    # The canonical commercially_accessible() predicate: everything EXCEPT
+    # NOT_AVAILABLE / DISCONTINUED counts as a real commercial path.
+    for status in ("AVAILABLE", "WAITLIST", "PREORDER", "LIMITED", "ON_REQUEST"):
+        routes = _routing_case(client, availability_status=status, lead_pref="RAAS")
+        assert len(routes) == 1, f"{status} should be routable"
+
+
 def test_l11_routing_flexible_matches_any_mode(client, database_url) -> None:
     routes = _routing_case(client, transaction_type="PURCHASE", lead_pref="FLEXIBLE")
     assert len(routes) == 1
@@ -422,13 +462,190 @@ def test_l12_routing_negatives(client, database_url) -> None:
     assert len(_routing_case(client, accepts_leads=False)) == 0
     # inactive provider
     assert len(_routing_case(client, is_active=False)) == 0
-    # inaccessible availability
+    # inaccessible availability (the only two NOT commercially_accessible)
     assert len(_routing_case(client, availability_status="NOT_AVAILABLE")) == 0
     assert len(_routing_case(client, availability_status="DISCONTINUED")) == 0
     # wrong transaction mode (RENT preference vs PURCHASE-only offer)
     assert len(_routing_case(client, transaction_type="PURCHASE", lead_pref="RENT")) == 0
     # wrong geography (offer scoped to US, buyer in DE)
     assert len(_routing_case(client, offer_region_code="US", lead_country="DE")) == 0
+
+
+# ---- Fix 2 — extension refines the LEAD only + route reconciliation --------
+
+def _make_linked_fixture(
+    *,
+    transaction_type: str = "RAAS",
+    offer_region_code: str | None = None,
+    req_country: str = "US",
+    req_pref: str = "RAAS",
+):
+    """Insert a controlled robot/provider/offer graph + a buyer_requirement with a
+    persisted match_result for that robot, bypassing the matcher for determinism.
+    Returns identifiers; call `_drop_linked_fixture` to tear it down."""
+    tag = uuid.uuid4().hex[:8]
+    offer_region_id = _region_id(offer_region_code) if offer_region_code else None
+    with engine.begin() as conn:
+        conn.execute(text("SET search_path TO humanoid, public"))
+        mfr_id = conn.execute(text(
+            "INSERT INTO manufacturer (slug, name) VALUES (:s, :n) RETURNING id"
+        ), {"s": f"m-{tag}", "n": f"Fixture Mfr {tag}"}).scalar_one()
+        robot_id = conn.execute(text(
+            "INSERT INTO robot (slug, manufacturer_id, name, is_published) "
+            "VALUES (:s, :m, :n, true) RETURNING id"
+        ), {"s": f"r-{tag}", "m": mfr_id, "n": f"Fixture Robot {tag}"}).scalar_one()
+        provider_id = conn.execute(text(
+            "INSERT INTO provider (slug, type, name, is_active, accepts_leads) "
+            "VALUES (:s, 'RAAS_PROVIDER', :n, true, true) RETURNING id"
+        ), {"s": f"p-{tag}", "n": f"Fixture Provider {tag}"}).scalar_one()
+        conn.execute(text(
+            "INSERT INTO availability_offer "
+            "(robot_id, provider_id, region_id, transaction_type, availability_status, is_current) "
+            "VALUES (:r, :p, :reg, :t, 'AVAILABLE', true)"
+        ), {"r": robot_id, "p": provider_id, "reg": offer_region_id, "t": transaction_type})
+        req_country_id = _region_id(req_country)
+        req_id = conn.execute(text(
+            "INSERT INTO buyer_requirement (country_region_id, preferred_transaction) "
+            "VALUES (:c, :pref) RETURNING id"
+        ), {"c": req_country_id, "pref": req_pref}).scalar_one()
+        conn.execute(text(
+            "INSERT INTO match_result (requirement_id, robot_id, score, rank, category) "
+            "VALUES (:req, :rob, 90, 1, 'BEST_OVERALL')"
+        ), {"req": req_id, "rob": robot_id})
+    return {
+        "robot_slug": f"r-{tag}", "robot_id": robot_id, "provider_id": provider_id,
+        "mfr_id": mfr_id, "req_id": str(req_id), "req_country_id": req_country_id,
+    }
+
+
+def _drop_linked_fixture(fx) -> None:
+    with engine.begin() as conn:
+        conn.execute(text("SET search_path TO humanoid, public"))
+        req = {"i": fx["req_id"]}
+        rob = {"r": fx["robot_id"]}
+        conn.execute(text("DELETE FROM commercial_lead WHERE requirement_id=:i"), req)
+        conn.execute(text("DELETE FROM buyer_requirement WHERE id=:i"), req)
+        conn.execute(text("DELETE FROM availability_offer WHERE robot_id=:r"), rob)
+        conn.execute(text("DELETE FROM robot WHERE id=:r"), rob)
+        conn.execute(text("DELETE FROM provider WHERE id=:p"), {"p": fx["provider_id"]})
+        conn.execute(text("DELETE FROM manufacturer WHERE id=:m"), {"m": fx["mfr_id"]})
+
+
+def test_extension_refines_lead_never_requirement(client, database_url) -> None:
+    fx = _make_linked_fixture(req_country="US", req_pref="RAAS")
+    try:
+        rid = fx["req_id"]
+        first = client.post("/api/commercial-leads", json={
+            "requirement_id": rid, "contact_email": "jane@example.com",
+            "robot_slugs": [fx["robot_slug"]],
+        })
+        assert first.status_code == 201, first.text
+
+        # refine country + transaction on the SAME lead
+        second = client.post("/api/commercial-leads", json={
+            "requirement_id": rid, "contact_email": "jane@example.com",
+            "robot_slugs": [fx["robot_slug"]], "country": "DE",
+            "preferred_transaction": "BUY", "organization": "Acme Later",
+        })
+        assert second.status_code == 200, second.text
+
+        de_id = _region_id("DE")
+        lead = _rows(
+            "SELECT country_region_id, preferred_transaction, organization "
+            "FROM commercial_lead WHERE requirement_id=:i", i=rid,
+        )[0]
+        assert str(lead[0]) == str(de_id)          # lead country refined
+        assert lead[1] == "BUY"                     # lead transaction refined
+        assert lead[2] == "Acme Later"              # org filled (was NULL)
+
+        # the historical scoring requirement is UNCHANGED
+        req = _rows(
+            "SELECT country_region_id, preferred_transaction "
+            "FROM buyer_requirement WHERE id=:i", i=rid,
+        )[0]
+        assert str(req[0]) == str(fx["req_country_id"])  # still US
+        assert req[1] == "RAAS"                           # still RAAS
+    finally:
+        _drop_linked_fixture(fx)
+
+
+def test_extension_reconciles_routes_add_remove_retain(client, database_url) -> None:
+    # Provider offers the fixture robot ONLY under RAAS (region-agnostic).
+    fx = _make_linked_fixture(transaction_type="RAAS", offer_region_code=None, req_pref="RAAS")
+    try:
+        rid, slug = fx["req_id"], fx["robot_slug"]
+
+        def route_rows():
+            return _rows(
+                "SELECT status, contacted_at FROM commercial_lead_provider "
+                "WHERE lead_id=(SELECT id FROM commercial_lead WHERE requirement_id=:i)",
+                i=rid,
+            )
+
+        # First capture as BUY: RAAS offer is transaction-incompatible -> 0 routes.
+        c1 = client.post("/api/commercial-leads", json={
+            "requirement_id": rid, "contact_email": "jane@example.com",
+            "robot_slugs": [slug], "preferred_transaction": "BUY",
+        })
+        assert c1.status_code == 201, c1.text
+        assert len(route_rows()) == 0
+
+        # Refine to RAAS -> reconcile ADDS one PENDING route.
+        c2 = client.post("/api/commercial-leads", json={
+            "requirement_id": rid, "contact_email": "jane@example.com",
+            "robot_slugs": [slug], "preferred_transaction": "RAAS",
+        })
+        assert c2.status_code == 200, c2.text
+        rows = route_rows()
+        assert len(rows) == 1 and rows[0][0] == "PENDING" and rows[0][1] is None
+
+        # Simulate ops marking the route CONTACTED (non-PENDING history).
+        with engine.begin() as conn:
+            conn.execute(text("SET search_path TO humanoid, public"))
+            conn.execute(text(
+                "UPDATE commercial_lead_provider SET status='CONTACTED', contacted_at=now() "
+                "WHERE lead_id=(SELECT id FROM commercial_lead WHERE requirement_id=:i)"
+            ), {"i": rid})
+
+        # Refine back to BUY -> route is now ineligible, but it is CONTACTED, so it
+        # is RETAINED as operational history (never removed, contacted_at intact).
+        c3 = client.post("/api/commercial-leads", json={
+            "requirement_id": rid, "contact_email": "jane@example.com",
+            "robot_slugs": [slug], "preferred_transaction": "BUY",
+        })
+        assert c3.status_code == 200, c3.text
+        rows = route_rows()
+        assert len(rows) == 1 and rows[0][0] == "CONTACTED" and rows[0][1] is not None
+    finally:
+        _drop_linked_fixture(fx)
+
+
+def test_extension_removes_now_ineligible_pending_route(client, database_url) -> None:
+    fx = _make_linked_fixture(transaction_type="RAAS", offer_region_code=None, req_pref="RAAS")
+    try:
+        rid, slug = fx["req_id"], fx["robot_slug"]
+
+        def n_routes():
+            return _scalar(
+                "SELECT count(*) FROM commercial_lead_provider "
+                "WHERE lead_id=(SELECT id FROM commercial_lead WHERE requirement_id=:i)",
+                i=rid,
+            )
+
+        c1 = client.post("/api/commercial-leads", json={
+            "requirement_id": rid, "contact_email": "jane@example.com",
+            "robot_slugs": [slug], "preferred_transaction": "RAAS",
+        })
+        assert c1.status_code == 201 and n_routes() == 1
+
+        # Refine to BUY -> the still-PENDING RAAS route is now ineligible -> removed.
+        c2 = client.post("/api/commercial-leads", json={
+            "requirement_id": rid, "contact_email": "jane@example.com",
+            "robot_slugs": [slug], "preferred_transaction": "BUY",
+        })
+        assert c2.status_code == 200 and n_routes() == 0
+    finally:
+        _drop_linked_fixture(fx)
 
 
 # ---- L14 — WS5 anonymity regression ---------------------------------------

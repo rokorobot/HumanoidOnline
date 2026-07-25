@@ -7,9 +7,10 @@ email, webhook, CRM push or provider notification happens here.
 
 A route (provider × selected-robot) is eligible only when ALL hold:
   - provider.is_active AND provider.accepts_leads
-  - the provider owns a *current, accessible* availability_offer for that robot
-    (the canonical accessibility law: is_current AND availability_status NOT IN
-    (NOT_AVAILABLE, DISCONTINUED)) — the same predicate used everywhere else
+  - the provider owns an availability_offer for that robot that is
+    `is_current AND commercially_accessible(availability_status)` — the CANONICAL
+    DB predicate (schema.sql), never an ad-hoc status list. WAITLIST / PREORDER /
+    LIMITED / ON_REQUEST / AVAILABLE all count; NOT_AVAILABLE / DISCONTINUED do not.
   - the offer's transaction_type is compatible with the lead's preference
     (RENT->RENTAL, BUY->PURCHASE, LEASE->LEASE, RAAS->RAAS; FLEXIBLE/UNKNOWN ->
     any mode)
@@ -26,16 +27,13 @@ from __future__ import annotations
 
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models.commercial import AvailabilityOffer
 from app.models.commercial_lead import CommercialLead, CommercialLeadProvider
 from app.models.manufacturer import Provider
 from app.models.region import Region
-
-# availability_status values that mean "not obtainable" — excluded from routing.
-_INACCESSIBLE = ("NOT_AVAILABLE", "DISCONTINUED")
 
 # Buyer preference -> the offer transaction_type(s) it is compatible with. A
 # preference absent from this map (FLEXIBLE / UNKNOWN) matches any mode.
@@ -68,15 +66,13 @@ def _applicable_region_ids(session: Session, region_id: uuid.UUID) -> set[uuid.U
     return ids
 
 
-def route_providers(session: Session, lead: CommercialLead) -> int:
-    """Create any missing PENDING routes for the lead's SELECTED robots and
-    return the number of routes newly created. Idempotent: existing (lead,
-    provider, robot) routes are left untouched, so re-running on an extended lead
-    never duplicates rows (the UNIQUE(lead_id, provider_id, robot_id) also
-    guards this). Never mutates or auto-contacts an existing route."""
+def _eligible_routes(session: Session, lead: CommercialLead) -> set[tuple[uuid.UUID, uuid.UUID]]:
+    """The set of (provider_id, robot_id) pairs eligible for a PENDING route for
+    the lead's SELECTED robots, applying the canonical accessibility predicate +
+    transaction + geography compatibility."""
     selected_robot_ids = [r.robot_id for r in lead.robots if r.is_selected]
     if not selected_robot_ids:
-        return 0
+        return set()
 
     country_known = lead.country_region_id is not None
     applicable = (
@@ -84,14 +80,6 @@ def route_providers(session: Session, lead: CommercialLead) -> int:
     )
     compatible_txn = _PREFERENCE_TO_TXN.get(lead.preferred_transaction)  # None => any
 
-    existing = {
-        (r.provider_id, r.robot_id) for r in lead.providers
-    }
-
-    # Candidate offers: current + accessible, for a selected robot, owned by an
-    # active lead-accepting provider. Transaction and geography are filtered in
-    # Python against the canonical hierarchy (keeps this readable and matches the
-    # matcher's approach).
     rows = session.execute(
         select(
             AvailabilityOffer.provider_id,
@@ -103,32 +91,50 @@ def route_providers(session: Session, lead: CommercialLead) -> int:
         .where(
             AvailabilityOffer.robot_id.in_(selected_robot_ids),
             AvailabilityOffer.is_current.is_(True),
-            AvailabilityOffer.availability_status.notin_(_INACCESSIBLE),
+            # CANONICAL access predicate — never an ad-hoc status list.
+            func.commercially_accessible(AvailabilityOffer.availability_status),
             AvailabilityOffer.provider_id.is_not(None),
             Provider.is_active.is_(True),
             Provider.accepts_leads.is_(True),
         )
     ).all()
 
-    created = 0
-    seen: set[tuple[uuid.UUID, uuid.UUID]] = set()
+    eligible: set[tuple[uuid.UUID, uuid.UUID]] = set()
     for provider_id, robot_id, txn, region_id in rows:
         if compatible_txn is not None and txn not in compatible_txn:
             continue
-        geo_ok = (not country_known) or region_id is None or region_id in applicable
-        if not geo_ok:
+        if country_known and not (region_id is None or region_id in applicable):
             continue
-        key = (provider_id, robot_id)
-        if key in existing or key in seen:
-            continue
-        seen.add(key)
-        lead.providers.append(
-            CommercialLeadProvider(
-                provider_id=provider_id,
-                robot_id=robot_id,
-                status="PENDING",
-                contacted_at=None,
+        eligible.add((provider_id, robot_id))
+    return eligible
+
+
+def reconcile_routes(session: Session, lead: CommercialLead) -> None:
+    """Reconcile the lead's PENDING provider routes with the currently-eligible
+    set (WS7 §13). Idempotent:
+      - remove ONLY now-ineligible routes whose status is still PENDING (e.g. the
+        buyer refined country/transaction so a provider no longer qualifies);
+      - RETAIN non-PENDING routes (CONTACTED/ACCEPTED/DECLINED) as operational
+        history, and never touch their `contacted_at`;
+      - add newly-eligible routes as PENDING (contacted_at NULL).
+    On first capture there is nothing to remove or retain, so this simply creates
+    the eligible PENDING routes."""
+    eligible = _eligible_routes(session, lead)
+
+    # Remove now-ineligible PENDING routes only (delete-orphan cascade removes them).
+    for route in list(lead.providers):
+        if route.status == "PENDING" and (route.provider_id, route.robot_id) not in eligible:
+            lead.providers.remove(route)
+
+    present = {(r.provider_id, r.robot_id) for r in lead.providers}
+    # Deterministic add order (stable across runs; no reliance on set iteration).
+    for provider_id, robot_id in sorted(eligible, key=lambda k: (str(k[0]), str(k[1]))):
+        if (provider_id, robot_id) not in present:
+            lead.providers.append(
+                CommercialLeadProvider(
+                    provider_id=provider_id,
+                    robot_id=robot_id,
+                    status="PENDING",
+                    contacted_at=None,
+                )
             )
-        )
-        created += 1
-    return created

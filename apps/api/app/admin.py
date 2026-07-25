@@ -152,8 +152,8 @@ class DiscoverySourceAdmin(ModelView, model=DiscoverySource):
     # access-permitted + enabled (DATA-D1.9, enforced by a DB CHECK).
     column_list = [
         DiscoverySource.key, DiscoverySource.name, DiscoverySource.source_class,
-        DiscoverySource.tos_reviewed, DiscoverySource.robots_allowed,
-        DiscoverySource.is_enabled,
+        DiscoverySource.tos_status, DiscoverySource.robots_status,
+        DiscoverySource.eligibility_reviewed_by, DiscoverySource.is_enabled,
     ]
     column_searchable_list = [DiscoverySource.key, DiscoverySource.name]
     name_plural = "Discovery sources (DATA-D1)"

@@ -33,7 +33,6 @@ def main(argv: list[str] | None = None) -> int:
     group.add_argument("--reject", action="store_true", help="record a rejection")
     group.add_argument("--show", action="store_true", help="print the proposal only")
     ap.add_argument("--reason", default="", help="rejection reason")
-    ap.add_argument("--publish", action="store_true", help="publish the promoted robot now")
     args = ap.parse_args(argv)
 
     try:
@@ -56,7 +55,7 @@ def main(argv: list[str] | None = None) -> int:
                 print("--approve requires --approved-by", file=sys.stderr)
                 return 2
             try:
-                robot = promote(session, candidate, args.approved_by, publish=args.publish)
+                robot = promote(session, candidate, args.approved_by)
             except PromotionError as exc:
                 session.rollback()
                 print(f"PROMOTION BLOCKED: {exc}", file=sys.stderr)
@@ -69,7 +68,12 @@ def main(argv: list[str] | None = None) -> int:
             if not args.approved_by:
                 print("--reject requires --approved-by", file=sys.stderr)
                 return 2
-            reject(session, candidate, args.approved_by, args.reason)
+            try:
+                reject(session, candidate, args.approved_by, args.reason)
+            except PromotionError as exc:
+                session.rollback()
+                print(f"REJECTION REFUSED: {exc}", file=sys.stderr)
+                return 3
             session.commit()
             print(f"REJECTED candidate {cid}")
             return 0

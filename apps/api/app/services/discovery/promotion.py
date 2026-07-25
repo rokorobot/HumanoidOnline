@@ -1,18 +1,23 @@
 """Promotion gate + governed canonical write (DATA-D1 §7/§8/§18/§25-F/G/H).
 
 `build_proposal` is autonomous (no writes). `promote` is the ONE human-invoked
-canonical writer: it enforces gates P1-P8 and, only if they pass, creates the
-canonical robot (unpublished) and its evidence THROUGH the existing G2 evidence
-model (R5 — no parallel evidence system), then records the promotion lineage
-(§19/Gate J). It never commits; the caller (CLI/admin) owns the transaction.
+canonical writer: it enforces gates P1-P8 and, only if they pass, creates/links the
+canonical robot, writes VERIFIED claims into a small approved set of typed fields,
+records provenance THROUGH the existing G2 evidence model (R5 — no parallel evidence
+system), and records the promotion lineage (§19/Gate J). It never commits; the
+caller (CLI/admin) owns the transaction.
 
-No autonomous promotion in v0.1: the pipeline can reach READY_FOR_PROMOTION and a
-proposal, but only a human calling `promote` mutates canonical truth.
+Truthful scope (H4): only claims a confirmed trace VERIFIED are written to canonical
+fields, and only into the approved set below; UNKNOWN/NOT_VERIFIED/CONFLICT claims
+are never written (Gate F), and an existing non-null canonical value is never
+overwritten (that path is a conflict for a later slice). Promotion is idempotent
+(H5): an already-promoted candidate is refused.
 """
 from __future__ import annotations
 
 import re
 from datetime import UTC, datetime
+from decimal import Decimal, InvalidOperation
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -26,6 +31,14 @@ from app.services.discovery.identity import normalize
 
 _PROMOTABLE_IDENTITY = {"MATCHED_EXISTING", "NEW_ENTITY"}
 
+# The narrow, typed set of canonical fields a VERIFIED claim may write in v0.1.
+# (field_key) -> (robot attribute, expected unit or None, minimum-allowed value).
+_APPROVED_FIELDS: dict[str, tuple[str, str | None, Decimal]] = {
+    "height_cm": ("height_cm", "cm", Decimal("0.1")),
+    "weight_kg": ("weight_kg", "kg", Decimal("0.1")),
+    "payload_kg": ("payload_kg", "kg", Decimal("0")),
+}
+
 
 def check_gates(session: Session, candidate: DiscoveryCandidate) -> list[str]:
     """Return the list of FAILED promotion gates (empty = promotable)."""
@@ -33,9 +46,13 @@ def check_gates(session: Session, candidate: DiscoveryCandidate) -> list[str]:
     # P1 — identity resolved
     if candidate.identity_status not in _PROMOTABLE_IDENTITY:
         fails.append(f"P1 identity not resolved (identity_status={candidate.identity_status})")
-    # P2 — a qualifying authoritative source was traced
-    if candidate.trace_state != "TRACE_CONFIRMED" or not candidate.trace_url:
-        fails.append("P2 no confirmed authoritative source (trace_state != TRACE_CONFIRMED)")
+    # P2 — an explicitly CONFIRMED authoritative trace (not a bare lead, H2)
+    if (
+        candidate.trace_state != "TRACE_CONFIRMED"
+        or not candidate.trace_url
+        or not candidate.trace_verified_by
+    ):
+        fails.append("P2 no confirmed authoritative trace (needs record_trace)")
     # P4 — no unresolved conflict
     has_conflict = candidate.status == "CONFLICT" or any(
         c.claim_status == "CONFLICT" for c in candidate.claims
@@ -59,6 +76,7 @@ def build_proposal(session: Session, candidate: DiscoveryCandidate) -> dict:
         {
             "field": c.field_key, "value": c.claimed_value,
             "unit": c.unit, "evidence_url": c.evidence_url,
+            "promotable": c.field_key in _APPROVED_FIELDS,
         }
         for c in candidate.claims
         if c.claim_status == "VERIFIED"
@@ -75,24 +93,23 @@ def build_proposal(session: Session, candidate: DiscoveryCandidate) -> dict:
         "manufacturer": candidate.candidate_manufacturer,
         "identity_status": candidate.identity_status,
         "trace_url": candidate.trace_url,
+        "trace_source_type": candidate.trace_source_type,
+        "trace_verified_by": candidate.trace_verified_by,
         "verified_claims": verified,
         "unresolved_claims": unresolved,
         "gates_failed": check_gates(session, candidate),
     }
 
 
-def promote(
-    session: Session,
-    candidate: DiscoveryCandidate,
-    approved_by: str,
-    *,
-    publish: bool = False,
-) -> Robot:
+def promote(session: Session, candidate: DiscoveryCandidate, approved_by: str) -> Robot:
     """HUMAN promotion gate (P8). Raises PromotionError (no canonical write) if any
-    gate fails. On success: create/link the canonical robot, write an EvidenceSource
-    (existing G2 path), record promotion lineage. Does not commit."""
+    gate fails. Idempotent: an already-promoted candidate is refused. The promoted
+    robot is always created UNPUBLISHED — publishing is the separate canonical
+    catalogue workflow, never a side effect of discovery. Does not commit."""
     if not approved_by or not approved_by.strip():
         raise PromotionError("promotion requires an approving human (approved_by)")
+    if candidate.status == "PROMOTED" or candidate.promoted_robot_id is not None:
+        raise PromotionError("candidate already promoted (idempotency guard)")
     fails = check_gates(session, candidate)
     if fails:
         raise PromotionError("; ".join(fails))
@@ -100,36 +117,42 @@ def promote(
     proposal = build_proposal(session, candidate)
 
     if candidate.identity_status == "MATCHED_EXISTING":
-        # Dedup (DATA-D1.7): the robot already exists canonically. v0.1 does NOT
-        # create a duplicate and does not overwrite existing specs; it records the
-        # confirmed link + lineage. (Field-level canonical updates are a later slice.)
         robot = session.get(Robot, candidate.possible_robot_id)
         if robot is None:
             raise PromotionError("P1 matched robot no longer exists")
-        evidence_id = None
+        # Dedup (DATA-D1.7): no duplicate robot. Fill only NULL approved fields from
+        # VERIFIED claims (never overwrite an existing canonical value).
+        promoted_fields = _write_verified_fields(robot, candidate)
     else:  # NEW_ENTITY
         manufacturer = _get_or_create_manufacturer(session, candidate)
         robot = Robot(
             slug=_unique_robot_slug(session, candidate.candidate_name or "robot"),
             manufacturer_id=manufacturer.id,
             name=candidate.candidate_name or "Unknown",
-            is_published=publish,  # promotion creates UNPUBLISHED by default
+            is_published=False,  # always unpublished — publishing is a separate workflow
         )
         session.add(robot)
         session.flush()  # assign robot.id
-        evidence = EvidenceSource(
-            subject_type="ROBOT",
-            subject_id=robot.id,
-            source_url=candidate.trace_url,
-            source_type="MANUFACTURER_SITE",
-            source_title=f"{candidate.candidate_name} — official source",
-            confidence="VERIFIED",
-            verified_at=datetime.now(UTC),
-            note="Promoted via DATA-D1 governed pipeline (human-approved).",
-        )
-        session.add(evidence)
-        session.flush()
-        evidence_id = evidence.id
+        promoted_fields = _write_verified_fields(robot, candidate)
+
+    # Provenance ALWAYS recorded, for NEW_ENTITY *and* MATCHED_EXISTING, through the
+    # existing G2 evidence model (R5 / Gate J). source_type/verified time come from
+    # the confirmed trace — never hardcoded (H2).
+    evidence = EvidenceSource(
+        subject_type="ROBOT",
+        subject_id=robot.id,
+        source_url=candidate.trace_url,
+        source_type=candidate.trace_source_type or "OTHER",
+        source_title=f"{candidate.candidate_name} — confirmed authoritative source",
+        confidence="VERIFIED",
+        verified_at=candidate.trace_verified_at or datetime.now(UTC),
+        note=(
+            "DATA-D1 governed promotion (human-approved). Trace confirmed by "
+            f"{candidate.trace_verified_by}."
+        ),
+    )
+    session.add(evidence)
+    session.flush()
 
     candidate.status = "PROMOTED"
     candidate.promoted_robot_id = robot.id
@@ -139,9 +162,9 @@ def promote(
             action="PROMOTED",
             promoted_entity_type="ROBOT",
             promoted_robot_id=robot.id,
-            evidence_source_id=evidence_id,
+            evidence_source_id=evidence.id,
             approved_by=approved_by,
-            detail=proposal,
+            detail={**proposal, "promoted_fields": promoted_fields},
         )
     )
     session.flush()
@@ -149,7 +172,14 @@ def promote(
 
 
 def reject(session: Session, candidate: DiscoveryCandidate, approved_by: str, reason: str) -> None:
-    """Human rejection — recorded, not deleted (research history, §21). No canonical write."""
+    """Human rejection — recorded, not deleted (research history, §21). Independently
+    requires an attributed human + a reason (H5); no canonical write."""
+    if not approved_by or not approved_by.strip():
+        raise PromotionError("rejection requires an approving human (approved_by)")
+    if not reason or not reason.strip():
+        raise PromotionError("rejection requires a reason")
+    if candidate.status in {"PROMOTED", "REJECTED"}:
+        raise PromotionError(f"candidate is terminal ({candidate.status})")
     candidate.status = "REJECTED"
     session.add(
         PromotionAudit(
@@ -163,6 +193,30 @@ def reject(session: Session, candidate: DiscoveryCandidate, approved_by: str, re
 
 
 # --- helpers -----------------------------------------------------------------
+
+def _write_verified_fields(robot: Robot, candidate: DiscoveryCandidate) -> list[dict]:
+    """Write VERIFIED claims into the approved typed field set, with normalization
+    + validation. Never overwrites a non-null canonical value; skips anything that
+    fails normalization. Returns the list of fields actually written (for audit)."""
+    written: list[dict] = []
+    for claim in candidate.claims:
+        if claim.claim_status != "VERIFIED" or claim.field_key not in _APPROVED_FIELDS:
+            continue
+        attr, expected_unit, minimum = _APPROVED_FIELDS[claim.field_key]
+        if getattr(robot, attr) is not None:
+            continue  # never overwrite existing canonical (conflict-safe)
+        if expected_unit and claim.unit and claim.unit.lower() != expected_unit:
+            continue  # unit mismatch -> do not coerce
+        try:
+            value = Decimal(str(claim.claimed_value))
+        except (InvalidOperation, ValueError, TypeError):
+            continue
+        if value < minimum:
+            continue  # fails the canonical CHECK domain
+        setattr(robot, attr, value)
+        written.append({"field": attr, "value": str(value), "evidence_url": claim.evidence_url})
+    return written
+
 
 def _get_or_create_manufacturer(session: Session, candidate: DiscoveryCandidate) -> Manufacturer:
     if candidate.possible_manufacturer_id is not None:

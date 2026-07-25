@@ -24,6 +24,12 @@ from app.models.discovery import (
 )
 from app.services.discovery import DiscoveryError
 
+# DATA-D1.10 minimal retention: the ONLY free-form lead we persist in
+# candidate_data is a trace lead. Any other key is rejected so the candidate store
+# can never accumulate a copied competitor record / prose corpus. `official_url` is
+# a LEAD, not proof — it never auto-confirms a trace (that is record_trace(), H2).
+ALLOWED_CANDIDATE_DATA_KEYS = frozenset({"official_url"})
+
 
 @dataclass
 class RawClaim:
@@ -103,6 +109,10 @@ def ingest(
 
     created: list[DiscoveryCandidate] = []
     for raw in adapter.discover(source):
+        _reject_shadow_data(raw)   # DATA-D1.10: no shadow-database payloads
+        _validate_image_refs(raw)  # R3: reference-only, http/https, no inline binary
+        if not raw.external_ref:
+            raise DiscoveryError("candidate is missing external_ref (required for dedup)")
         existing = session.execute(
             select(DiscoveryCandidate).where(
                 DiscoveryCandidate.source_id == source.id,
@@ -145,6 +155,28 @@ def ingest(
 
     session.flush()
     return created
+
+
+def _reject_shadow_data(raw: RawCandidate) -> None:
+    """DATA-D1.10 / H3: only allowlisted lead keys may be persisted. Any unknown
+    key (a copied competitor field, prose, source payload) is rejected outright."""
+    extra = set((raw.data or {}).keys()) - ALLOWED_CANDIDATE_DATA_KEYS
+    if extra:
+        raise DiscoveryError(
+            f"candidate_data may only contain {sorted(ALLOWED_CANDIDATE_DATA_KEYS)} "
+            f"(DATA-D1.10 minimal retention); rejected keys: {sorted(extra)}"
+        )
+
+
+def _validate_image_refs(raw: RawCandidate) -> None:
+    """R3 / H3: candidate imagery is reference-only. Accept only http/https URLs so
+    a `data:`/`file:` inline payload can never become a disguised binary cache."""
+    for im in raw.images:
+        url = (im.image_url or "").strip().lower()
+        if not (url.startswith("http://") or url.startswith("https://")):
+            raise DiscoveryError(
+                f"candidate image must be an http(s) reference URL, got: {im.image_url!r}"
+            )
 
 
 def _now(session: Session):

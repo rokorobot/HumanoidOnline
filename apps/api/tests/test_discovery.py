@@ -1,4 +1,5 @@
-"""DATA-D1 v0.1 acceptance gates (docs/11_DATA_D1_CONTRACT.md §27, A-K).
+"""DATA-D1 v0.1 acceptance gates (docs/11_DATA_D1_CONTRACT.md §27, A-K) + the
+governance hardenings H1-H5.
 
 Every test runs inside a transaction that is rolled back, so nothing touches the
 shared seeded database. The service functions never commit (the caller owns the
@@ -8,6 +9,7 @@ then discarded here.
 from __future__ import annotations
 
 import uuid
+from datetime import UTC, datetime
 
 import pytest
 from sqlalchemy import func, select, text
@@ -15,15 +17,15 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.db.session import engine
-from app.models.discovery import DiscoverySource, PromotionAudit
+from app.models.discovery import DiscoveryCandidate, DiscoverySource, PromotionAudit
 from app.models.evidence import EvidenceSource
 from app.models.manufacturer import Manufacturer
 from app.models.robot import Robot
 from app.models.robot_image import RobotImage
 from app.services.discovery import DiscoveryError, PromotionError
 from app.services.discovery.adapters import FixtureAdapter, ingest
-from app.services.discovery.pipeline import advance, flag_recheck
-from app.services.discovery.promotion import build_proposal, promote
+from app.services.discovery.pipeline import advance, flag_recheck, record_trace
+from app.services.discovery.promotion import build_proposal, promote, reject
 
 DISCOVERY_TABLES = {
     "discovery_source", "discovery_candidate", "candidate_claim",
@@ -50,14 +52,17 @@ def _uniq() -> str:
 
 
 def _source(session: Session, *, eligible: bool = True) -> DiscoverySource:
-    src = DiscoverySource(
-        key=f"fixture-{_uniq()}",
-        name="Fixture source",
-        source_class="COMPETITOR_DIRECTORY",
-        tos_reviewed=eligible,
-        robots_allowed=eligible,
-        is_enabled=eligible,
-    )
+    """An eligible source has an affirmative ToS/robots decision + attributed review
+    (DATA-D1.9); an ineligible one keeps the UNKNOWN defaults."""
+    kwargs = dict(key=f"fixture-{_uniq()}", name="Fixture source",
+                  source_class="COMPETITOR_DIRECTORY")
+    if eligible:
+        kwargs.update(
+            tos_status="ALLOWED", robots_status="ALLOWED",
+            eligibility_reviewed_at=datetime.now(UTC), eligibility_reviewed_by="ops@h.co",
+            is_enabled=True,
+        )
+    src = DiscoverySource(**kwargs)
     session.add(src)
     session.flush()
     return src
@@ -79,8 +84,16 @@ def _canon_robot(session: Session, mfr_name: str, robot_name: str) -> Robot:
 
 def _ingest_one(session: Session, record: dict, source: DiscoverySource | None = None):
     source = source or _source(session)
-    created = ingest(session, source, FixtureAdapter([record]))
-    return created[0]
+    return ingest(session, source, FixtureAdapter([record]))[0]
+
+
+def _confirm_trace(session: Session, cand, confirmed_fields=frozenset(),
+                   source_type: str = "MANUFACTURER_SITE") -> None:
+    record_trace(
+        session, cand, trace_url="https://oem.invalid/x",
+        trace_source_type=source_type, verified_by="ops@h.co",
+        confirmed_fields=frozenset(confirmed_fields),
+    )
 
 
 def _count(session: Session, model) -> int:
@@ -96,48 +109,46 @@ def _robot_count(session: Session) -> int:
 def test_A_discovery_alone_is_not_canonical(dsession):
     before = _robot_count(dsession)
     cand = _ingest_one(dsession, {
-        "external_ref": "a-1", "name": "Nova NX", "manufacturer": "Nova Robotics",
-        "claims": [{"field_key": "payload_kg", "claimed_value": "20"}],  # no evidence
+        "external_ref": "a-1", "name": "Nova NX", "manufacturer": "Nova",
+        "claims": [{"field_key": "payload_kg", "claimed_value": "20"}],  # no trace
     })
     advance(dsession, cand)
-    # No authoritative source -> not promotable, canonical untouched.
-    assert cand.trace_state == "TRACE_FAILED"
-    assert cand.status == "INSUFFICIENT_EVIDENCE"
+    # No confirmed authoritative trace -> stuck at SOURCE_TRACE, not promotable.
+    assert cand.status == "SOURCE_TRACE"
+    assert cand.trace_state == "NOT_TRACED"
     with pytest.raises(PromotionError):
         promote(dsession, cand, approved_by="ops")
     assert _robot_count(dsession) == before
 
 
-# --- B: an independently verified fact can promote ---------------------------
+# --- B: an independently verified fact can promote (into a canonical field) ----
 
-def test_B_verified_candidate_promotes(dsession):
+def test_B_verified_fact_promotes_to_canonical_field(dsession):
     cand = _ingest_one(dsession, {
         "external_ref": "b-1", "name": "Zeta ZX-1", "manufacturer": f"Zeta {_uniq()}",
         "data": {"official_url": "https://zeta.invalid/zx-1"},
-        "claims": [{"field_key": "height_cm", "claimed_value": "170",
-                    "evidence_url": "https://zeta.invalid/zx-1/specs"}],
+        "claims": [{"field_key": "height_cm", "claimed_value": "170", "unit": "cm"}],
     })
-    advance(dsession, cand)
+    advance(dsession, cand)                       # -> SOURCE_TRACE (lead is not proof)
+    assert cand.status == "SOURCE_TRACE"
+    _confirm_trace(dsession, cand, confirmed_fields={"height_cm"})
+    advance(dsession, cand)                       # -> READY_FOR_PROMOTION
     assert cand.identity_status == "NEW_ENTITY"
     assert cand.status == "READY_FOR_PROMOTION"
 
     robot = promote(dsession, cand, approved_by="ops@humanoid.company")
-    assert cand.status == "PROMOTED"
-    assert cand.promoted_robot_id == robot.id
-    # Canonical robot exists but UNPUBLISHED (a human publishes separately).
-    assert session_get_robot(dsession, robot.id).is_published is False
-    # Evidence written through the existing G2 model (R5).
+    fresh = dsession.get(Robot, robot.id)
+    assert fresh.is_published is False
+    # The VERIFIED fact is actually written to canonical.
+    assert float(fresh.height_cm) == 170.0
     ev = dsession.execute(
         select(EvidenceSource).where(
             EvidenceSource.subject_type == "ROBOT", EvidenceSource.subject_id == robot.id
         )
     ).scalar_one()
-    assert ev.source_url == "https://zeta.invalid/zx-1"
+    assert ev.source_url == "https://oem.invalid/x"
+    assert ev.source_type == "MANUFACTURER_SITE"  # from the confirmed trace, not hardcoded
     assert ev.confidence == "VERIFIED"
-
-
-def session_get_robot(session: Session, rid) -> Robot:
-    return session.get(Robot, rid)
 
 
 # --- C: ambiguous identity blocks promotion ----------------------------------
@@ -148,7 +159,6 @@ def test_C_ambiguous_identity_blocks(dsession):
     _canon_robot(dsession, mfr, "Figure 03")
     cand = _ingest_one(dsession, {
         "external_ref": "c-1", "name": "Figure", "manufacturer": mfr,
-        "data": {"official_url": "https://figure.invalid/"},
     })
     advance(dsession, cand)
     assert cand.identity_status == "AMBIGUOUS"
@@ -156,24 +166,29 @@ def test_C_ambiguous_identity_blocks(dsession):
         promote(dsession, cand, approved_by="ops")
 
 
-# --- D: duplicate detection -> no duplicate canonical robot ------------------
+# --- D: duplicate detection -> no duplicate; still records evidence lineage ---
 
-def test_D_dedup_links_no_duplicate(dsession):
+def test_D_dedup_links_no_duplicate_but_keeps_lineage(dsession):
     mfr = f"Zeta {_uniq()}"
     existing = _canon_robot(dsession, mfr, "ZX-1")
     before = _robot_count(dsession)
     cand = _ingest_one(dsession, {
         "external_ref": "d-1", "name": f"{mfr} ZX-1", "manufacturer": mfr,
-        "data": {"official_url": "https://zeta.invalid/zx-1"},
     })
     advance(dsession, cand)
     assert cand.identity_status == "MATCHED_EXISTING"
-    assert cand.possible_robot_id == existing.id
+    _confirm_trace(dsession, cand)
+    advance(dsession, cand)
 
     promote(dsession, cand, approved_by="ops")
-    # Linked to the existing robot; NO new canonical robot created.
     assert cand.promoted_robot_id == existing.id
-    assert _robot_count(dsession) == before
+    assert _robot_count(dsession) == before                      # no duplicate robot
+    # Gate J: existing-robot promotion still writes G2 evidence lineage.
+    audit = dsession.execute(
+        select(PromotionAudit).where(PromotionAudit.candidate_id == cand.id)
+    ).scalar_one()
+    assert audit.evidence_source_id is not None
+    assert dsession.get(EvidenceSource, audit.evidence_source_id).subject_id == existing.id
 
 
 # --- E: conflicting authoritative evidence -> CONFLICT, no silent overwrite ---
@@ -181,12 +196,13 @@ def test_D_dedup_links_no_duplicate(dsession):
 def test_E_conflict_preserved_not_averaged(dsession):
     cand = _ingest_one(dsession, {
         "external_ref": "e-1", "name": "Orbit O1", "manufacturer": f"Orbit {_uniq()}",
-        "data": {"official_url": "https://orbit.invalid/o1"},
         "claims": [
             {"field_key": "payload_kg", "claimed_value": "20"},
             {"field_key": "payload_kg", "claimed_value": "30"},
         ],
     })
+    advance(dsession, cand)
+    _confirm_trace(dsession, cand, confirmed_fields={"payload_kg"})
     advance(dsession, cand)
     assert cand.status == "CONFLICT"
     assert all(c.claim_status == "CONFLICT" for c in cand.claims)
@@ -194,17 +210,18 @@ def test_E_conflict_preserved_not_averaged(dsession):
         promote(dsession, cand, approved_by="ops")
 
 
-# --- F: unknown stays unknown ------------------------------------------------
+# --- F: unknown stays unknown; unverified never leaks to canonical -----------
 
-def test_F_unknown_stays_unknown(dsession):
+def test_F_unknown_and_unverified_never_promote(dsession):
     cand = _ingest_one(dsession, {
         "external_ref": "f-1", "name": "Vega V1", "manufacturer": f"Vega {_uniq()}",
-        "data": {"official_url": "https://vega.invalid/v1"},
         "claims": [
-            {"field_key": "payload_kg", "claimed_value": "25"},   # no evidence -> NOT_VERIFIED
-            {"field_key": "height_cm", "claimed_value": None},    # -> UNKNOWN
+            {"field_key": "payload_kg", "claimed_value": "25"},   # NOT confirmed
+            {"field_key": "height_cm", "claimed_value": None},    # UNKNOWN
         ],
     })
+    advance(dsession, cand)
+    _confirm_trace(dsession, cand, confirmed_fields=frozenset())   # confirm existence only
     advance(dsession, cand)
     statuses = {c.field_key: c.claim_status for c in cand.claims}
     assert statuses["payload_kg"] == "NOT_VERIFIED"
@@ -212,9 +229,8 @@ def test_F_unknown_stays_unknown(dsession):
 
     robot = promote(dsession, cand, approved_by="ops")
     fresh = dsession.get(Robot, robot.id)
-    # Unverified/unknown claims never leak into canonical as fabricated values.
-    assert fresh.payload_kg is None
-    assert fresh.height_cm is None
+    assert fresh.payload_kg is None      # unverified -> never written (not 25, not 0)
+    assert fresh.height_cm is None       # unknown -> never written
 
 
 # --- G: image candidate obeys MEDIA-01 (+ no binary cache, R3) ---------------
@@ -222,17 +238,16 @@ def test_F_unknown_stays_unknown(dsession):
 def test_G_image_candidate_not_auto_promoted(dsession):
     cand = _ingest_one(dsession, {
         "external_ref": "g-1", "name": "Iris I1", "manufacturer": f"Iris {_uniq()}",
-        "data": {"official_url": "https://iris.invalid/i1"},
         "images": [{"image_url": "https://competitor.invalid/iris.jpg", "credited_to": "Iris"}],
     })
     advance(dsession, cand)
+    _confirm_trace(dsession, cand)
+    advance(dsession, cand)
     robot = promote(dsession, cand, approved_by="ops")
-    # The candidate image is NOT auto-promoted to a display-eligible robot_image.
     img_count = dsession.execute(
         select(func.count()).select_from(RobotImage).where(RobotImage.robot_id == robot.id)
     ).scalar_one()
     assert img_count == 0
-    # R3: the candidate image layer stores no binary.
     types = dsession.execute(text(
         "SELECT data_type FROM information_schema.columns "
         "WHERE table_schema='humanoid' AND table_name='candidate_image_ref'"
@@ -248,9 +263,10 @@ def test_H_pipeline_never_writes_canonical(dsession):
     e_before = _count(dsession, EvidenceSource)
     cand = _ingest_one(dsession, {
         "external_ref": "h-1", "name": "Helio H1", "manufacturer": f"Helio {_uniq()}",
-        "data": {"official_url": "https://helio.invalid/h1"},
     })
-    advance(dsession, cand)  # full pipeline, NO promote
+    advance(dsession, cand)
+    _confirm_trace(dsession, cand)
+    advance(dsession, cand)              # full pipeline to READY, NO promote
     assert cand.status == "READY_FOR_PROMOTION"
     assert _robot_count(dsession) == r_before
     assert _count(dsession, Manufacturer) == m_before
@@ -272,18 +288,16 @@ def test_I_public_api_excludes_candidates():
 def test_J_provenance_lineage_reconstructable(dsession):
     cand = _ingest_one(dsession, {
         "external_ref": "j-1", "name": "Lyra L1", "manufacturer": f"Lyra {_uniq()}",
-        "data": {"official_url": "https://lyra.invalid/l1"},
     })
+    advance(dsession, cand)
+    _confirm_trace(dsession, cand)
     advance(dsession, cand)
     robot = promote(dsession, cand, approved_by="ops@humanoid.company")
 
     audit = dsession.execute(
         select(PromotionAudit).where(PromotionAudit.candidate_id == cand.id)
     ).scalar_one()
-    assert audit.action == "PROMOTED"
-    assert audit.promoted_robot_id == robot.id
-    assert audit.approved_by == "ops@humanoid.company"
-    # candidate -> evidence -> canonical robot is fully reconstructable.
+    assert audit.action == "PROMOTED" and audit.promoted_robot_id == robot.id
     ev = dsession.get(EvidenceSource, audit.evidence_source_id)
     assert ev is not None and ev.subject_id == robot.id
     assert ev.source_url == cand.trace_url
@@ -296,7 +310,7 @@ def test_K_structural_isolation(dsession):
         "SELECT table_name FROM information_schema.tables "
         "WHERE table_schema='humanoid' AND table_name = ANY(:names)"
     ), {"names": list(DISCOVERY_TABLES)}).scalars().all()
-    assert set(existing) == DISCOVERY_TABLES  # the discovery layer exists
+    assert set(existing) == DISCOVERY_TABLES
 
     fks = dsession.execute(text(
         "SELECT conrelid::regclass::text AS child, confrelid::regclass::text AS parent "
@@ -308,11 +322,121 @@ def test_K_structural_isolation(dsession):
 
     for child, parent in fks:
         if _leaf(parent) in DISCOVERY_TABLES:
-            # A discovery table may only be referenced by another discovery table;
-            # no canonical table may point at the candidate layer (Gate K).
             assert _leaf(child) in DISCOVERY_TABLES, (
                 f"canonical table {child!r} has an FK to discovery table {parent!r}"
             )
+
+
+# --- H1: DATA-D1.9 enforces AFFIRMATIVE eligibility, not just "reviewed" -------
+
+def test_H1_enable_requires_affirmative_permission(dsession):
+    # Reviewed, attributed, but ToS PROHIBITS automation -> may not be enabled.
+    dsession.add(DiscoverySource(
+        key=f"proh-{_uniq()}", name="prohibited", source_class="OTHER",
+        tos_status="PROHIBITED", robots_status="ALLOWED",
+        eligibility_reviewed_at=datetime.now(UTC), eligibility_reviewed_by="ops",
+        is_enabled=True,
+    ))
+    with pytest.raises(IntegrityError):
+        dsession.flush()
+
+
+def test_H1_enable_requires_review_attribution(dsession):
+    # Affirmative ToS/robots but NO recorded reviewer/time -> may not be enabled.
+    dsession.add(DiscoverySource(
+        key=f"unattr-{_uniq()}", name="unattributed", source_class="OTHER",
+        tos_status="ALLOWED", robots_status="ALLOWED", is_enabled=True,
+    ))
+    with pytest.raises(IntegrityError):
+        dsession.flush()
+
+
+def test_H1_prohibited_source_is_not_radar_eligible(dsession):
+    src = DiscoverySource(
+        key=f"proh2-{_uniq()}", name="p", source_class="OTHER",
+        tos_status="PROHIBITED", robots_status="ALLOWED",
+        eligibility_reviewed_at=datetime.now(UTC), eligibility_reviewed_by="ops",
+        is_enabled=False,
+    )
+    dsession.add(src)
+    dsession.flush()
+    assert src.radar_eligible is False
+    rec = {"external_ref": "z", "name": "Z", "manufacturer": "Q"}
+    with pytest.raises(DiscoveryError):
+        ingest(dsession, src, FixtureAdapter([rec]))
+
+
+# --- H2: an official_url lead is NOT a confirmed trace ------------------------
+
+def test_H2_lead_is_not_proof(dsession):
+    cand = _ingest_one(dsession, {
+        "external_ref": "h2-1", "name": "Sol S1", "manufacturer": f"Sol {_uniq()}",
+        "data": {"official_url": "https://sol.invalid/s1"},   # a lead only
+    })
+    advance(dsession, cand)
+    # The lead did NOT confirm a trace.
+    assert cand.trace_state == "NOT_TRACED"
+    assert cand.status == "SOURCE_TRACE"
+    with pytest.raises(PromotionError):
+        promote(dsession, cand, approved_by="ops")
+    # Only an explicit trace unblocks it.
+    _confirm_trace(dsession, cand)
+    advance(dsession, cand)
+    assert cand.status == "READY_FOR_PROMOTION"
+
+
+# --- H3: minimal retention + reference-only imagery are ENFORCED --------------
+
+def test_H3_shadow_data_rejected(dsession):
+    src = _source(dsession)
+    bad = {"external_ref": "h3-1", "name": "X", "manufacturer": "Y",
+           "data": {"competitor_description": "a long copied prose blob ..."}}
+    with pytest.raises(DiscoveryError):
+        ingest(dsession, src, FixtureAdapter([bad]))
+
+
+def test_H3_non_http_image_rejected(dsession):
+    src = _source(dsession)
+    bad = {"external_ref": "h3-2", "name": "X", "manufacturer": "Y",
+           "images": [{"image_url": "data:image/png;base64,AAAA"}]}
+    with pytest.raises(DiscoveryError):
+        ingest(dsession, src, FixtureAdapter([bad]))
+
+
+# --- H5: terminal-safe state machine + durable audit + required fields -------
+
+def test_H5_promotion_is_idempotent(dsession):
+    cand = _ingest_one(dsession, {
+        "external_ref": "h5-1", "name": "Ida I2", "manufacturer": f"Ida {_uniq()}",
+    })
+    advance(dsession, cand)
+    _confirm_trace(dsession, cand)
+    advance(dsession, cand)
+    promote(dsession, cand, approved_by="ops")
+    with pytest.raises(PromotionError):        # second promote refused
+        promote(dsession, cand, approved_by="ops")
+    with pytest.raises(DiscoveryError):        # terminal candidate not re-advanced
+        advance(dsession, cand)
+
+
+def test_H5_audit_survives_candidate_deletion(dsession):
+    cand = _ingest_one(dsession, {
+        "external_ref": "h5-2", "name": "Juno J1", "manufacturer": f"Juno {_uniq()}",
+    })
+    advance(dsession, cand)
+    _confirm_trace(dsession, cand)
+    advance(dsession, cand)
+    promote(dsession, cand, approved_by="ops")
+    dsession.delete(cand)                       # blocked by ON DELETE RESTRICT audit FK
+    with pytest.raises(IntegrityError):
+        dsession.flush()
+
+
+def test_H5_external_ref_is_required(dsession):
+    src = _source(dsession)
+    dsession.add(DiscoveryCandidate(source_id=src.id, candidate_name="No Ref", external_ref=None))
+    with pytest.raises(IntegrityError):
+        dsession.flush()
 
 
 # --- supporting invariants ---------------------------------------------------
@@ -324,32 +448,33 @@ def test_recheck_is_autonomous_and_non_canonical(dsession):
     })
     flag_recheck(dsession, cand, "official page changed")
     assert cand.status == "RECHECK_REQUIRED"
-    assert _robot_count(dsession) == before  # metadata only, no canonical mutation
+    assert _robot_count(dsession) == before
+
+
+def test_reject_requires_reason(dsession):
+    cand = _ingest_one(dsession, {
+        "external_ref": "rj-1", "name": "Kilo K1", "manufacturer": f"Kilo {_uniq()}",
+    })
+    with pytest.raises(PromotionError):
+        reject(dsession, cand, approved_by="ops", reason="")
+    reject(dsession, cand, approved_by="ops", reason="no independent source")
+    assert cand.status == "REJECTED"
 
 
 def test_ineligible_source_cannot_be_crawled(dsession):
-    src = _source(dsession, eligible=False)  # not reviewed / not enabled
+    src = _source(dsession, eligible=False)
     record = {"external_ref": "x", "name": "X", "manufacturer": "Y"}
     with pytest.raises(DiscoveryError):
         ingest(dsession, src, FixtureAdapter([record]))
-
-
-def test_source_enabled_requires_review_db_check(dsession):
-    # DATA-D1.9 encoded as a DB CHECK: enabled without review must be rejected.
-    dsession.add(DiscoverySource(
-        key=f"bad-{_uniq()}", name="bad", source_class="OTHER",
-        tos_reviewed=False, robots_allowed=False, is_enabled=True,
-    ))
-    with pytest.raises(IntegrityError):
-        dsession.flush()
 
 
 def test_build_proposal_is_read_only(dsession):
     before = _robot_count(dsession)
     cand = _ingest_one(dsession, {
         "external_ref": "p-1", "name": "Pax P1", "manufacturer": f"Pax {_uniq()}",
-        "data": {"official_url": "https://pax.invalid/p1"},
     })
+    advance(dsession, cand)
+    _confirm_trace(dsession, cand)
     advance(dsession, cand)
     proposal = build_proposal(dsession, cand)
     assert proposal["name"] == "Pax P1"

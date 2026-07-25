@@ -25,13 +25,17 @@ from app.models.enums import (
     candidate_status,
     claim_status,
     discovery_source_class,
+    robots_status,
+    source_type,
+    tos_status,
     trace_state,
 )
 
 
 class DiscoverySource(Base):
-    """A radar source. DATA-D1.9: crawler-eligible only once ToS/robots reviewed
-    (the DB CHECK forbids is_enabled unless tos_reviewed AND robots_allowed)."""
+    """A radar source. DATA-D1.9: crawler-eligible only when the ToS AFFIRMATIVELY
+    permits automation, the robots policy is not a disallow, and the review is
+    attributed + timestamped. The DB CHECK enforces the same on is_enabled."""
 
     __tablename__ = "discovery_source"
 
@@ -42,12 +46,14 @@ class DiscoverySource(Base):
     name: Mapped[str] = mapped_column(Text, nullable=False)
     source_class: Mapped[str] = mapped_column(discovery_source_class, nullable=False)
     homepage_url: Mapped[str | None] = mapped_column(Text)
-    tos_reviewed: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, server_default=text("false")
+    tos_status: Mapped[str] = mapped_column(
+        tos_status, nullable=False, server_default=text("'UNKNOWN'")
     )
-    robots_allowed: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, server_default=text("false")
+    robots_status: Mapped[str] = mapped_column(
+        robots_status, nullable=False, server_default=text("'UNKNOWN'")
     )
+    eligibility_reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    eligibility_reviewed_by: Mapped[str | None] = mapped_column(Text)
     is_enabled: Mapped[bool] = mapped_column(
         Boolean, nullable=False, server_default=text("false")
     )
@@ -61,9 +67,16 @@ class DiscoverySource(Base):
 
     @property
     def radar_eligible(self) -> bool:
-        """DATA-D1.9 in one place: a source may be crawled only when reviewed,
-        access-permitted, and explicitly enabled."""
-        return self.is_enabled and self.tos_reviewed and self.robots_allowed
+        """DATA-D1.9 in one place: a source may be crawled only when the ToS
+        affirmatively permits automation, robots is not a disallow, an attributed
+        review exists, and it is explicitly enabled. Reviewing != being allowed."""
+        return (
+            self.is_enabled
+            and self.tos_status == "ALLOWED"
+            and self.robots_status in ("ALLOWED", "NOT_APPLICABLE")
+            and self.eligibility_reviewed_at is not None
+            and bool(self.eligibility_reviewed_by)
+        )
 
 
 class DiscoveryCandidate(Base):
@@ -84,8 +97,8 @@ class DiscoveryCandidate(Base):
     candidate_name: Mapped[str | None] = mapped_column(Text)
     candidate_manufacturer: Mapped[str | None] = mapped_column(Text)
     discovery_url: Mapped[str | None] = mapped_column(Text)
-    external_ref: Mapped[str | None] = mapped_column(Text)
-    # Minimal (DATA-D1.10): identity leads + claimed values under investigation.
+    external_ref: Mapped[str] = mapped_column(Text, nullable=False)
+    # Minimal (DATA-D1.10): allowlisted leads only — never a copied competitor record.
     candidate_data: Mapped[dict | None] = mapped_column(JSONB)
     identity_status: Mapped[str] = mapped_column(
         candidate_identity_status, nullable=False, server_default=text("'UNRESOLVED'")
@@ -93,10 +106,15 @@ class DiscoveryCandidate(Base):
     status: Mapped[str] = mapped_column(
         candidate_status, nullable=False, server_default=text("'DISCOVERED'")
     )
+    # Trace = EXPLICIT confirmation of an authoritative source (H2). A bare
+    # official-URL lead never sets these; only record_trace() does.
     trace_state: Mapped[str] = mapped_column(
         trace_state, nullable=False, server_default=text("'NOT_TRACED'")
     )
     trace_url: Mapped[str | None] = mapped_column(Text)
+    trace_source_type: Mapped[str | None] = mapped_column(source_type)
+    trace_verified_by: Mapped[str | None] = mapped_column(Text)
+    trace_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     # Candidate -> canonical only. No canonical row points back here (Gate K).
     possible_robot_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("robot.id", ondelete="SET NULL")

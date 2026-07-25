@@ -1056,6 +1056,11 @@ CREATE TYPE discovery_source_class AS ENUM (
     'DISTRIBUTOR', 'MANUFACTURER', 'PRESS_RELEASE', 'OFFICIAL_DOCUMENT',
     'OFFICIAL_VIDEO', 'OTHER');
 
+-- DATA-D1.9: an AFFIRMATIVE decision that automated access is permitted — not
+-- merely that a review happened. PROHIBITED/RESTRICTED/UNKNOWN block enablement.
+CREATE TYPE tos_status AS ENUM ('UNKNOWN', 'ALLOWED', 'RESTRICTED', 'PROHIBITED');
+CREATE TYPE robots_status AS ENUM ('UNKNOWN', 'ALLOWED', 'DISALLOWED', 'NOT_APPLICABLE');
+
 CREATE TYPE candidate_entity_type AS ENUM (
     'ROBOT', 'MANUFACTURER', 'VARIANT', 'SPEC', 'PRICING', 'AVAILABILITY',
     'DEPLOYMENT', 'IMAGE', 'OTHER');
@@ -1074,25 +1079,35 @@ CREATE TYPE trace_state AS ENUM (
 CREATE TYPE claim_status AS ENUM (
     'NOT_VERIFIED', 'VERIFIED', 'CONFLICT', 'REJECTED', 'UNKNOWN');
 
--- Radar registry. DATA-D1.9: a source is crawler-eligible only after its ToS +
--- robots/access policy are reviewed. The CHECK encodes that gate in the schema.
+-- Radar registry. DATA-D1.9: is_enabled requires an AFFIRMATIVE ToS-permits-
+-- automation decision, a robots decision that is not a disallow, and recorded
+-- review attribution + time. Reviewing a source is NOT the same as being allowed.
 CREATE TABLE discovery_source (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    key             TEXT NOT NULL UNIQUE,
-    name            TEXT NOT NULL,
-    source_class    discovery_source_class NOT NULL,
-    homepage_url    TEXT,
-    tos_reviewed    BOOLEAN NOT NULL DEFAULT FALSE,
-    robots_allowed  BOOLEAN NOT NULL DEFAULT FALSE,
-    is_enabled      BOOLEAN NOT NULL DEFAULT FALSE,
-    notes           TEXT,
-    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT ck_discovery_source_eligible
-        CHECK (NOT is_enabled OR (tos_reviewed AND robots_allowed))
+    id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    key                     TEXT NOT NULL UNIQUE,
+    name                    TEXT NOT NULL,
+    source_class            discovery_source_class NOT NULL,
+    homepage_url            TEXT,
+    tos_status              tos_status NOT NULL DEFAULT 'UNKNOWN',
+    robots_status           robots_status NOT NULL DEFAULT 'UNKNOWN',
+    eligibility_reviewed_at TIMESTAMPTZ,
+    eligibility_reviewed_by TEXT,
+    is_enabled              BOOLEAN NOT NULL DEFAULT FALSE,
+    notes                   TEXT,
+    created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT ck_discovery_source_eligible CHECK (
+        NOT is_enabled OR (
+            tos_status = 'ALLOWED'
+            AND robots_status IN ('ALLOWED', 'NOT_APPLICABLE')
+            AND eligibility_reviewed_at IS NOT NULL
+            AND eligibility_reviewed_by IS NOT NULL
+        )
+    )
 );
 COMMENT ON TABLE discovery_source IS
-    'DATA-D1 radar registry. is_enabled requires tos_reviewed AND robots_allowed (DATA-D1.9).';
+    'DATA-D1 radar registry. is_enabled requires an affirmative ToS-permits-automation '
+    'decision + non-disallow robots decision + recorded review attribution (DATA-D1.9).';
 
 CREATE TABLE discovery_candidate (
     id                        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -1101,12 +1116,17 @@ CREATE TABLE discovery_candidate (
     candidate_name            TEXT,
     candidate_manufacturer    TEXT,
     discovery_url             TEXT,
-    external_ref              TEXT,
-    candidate_data            JSONB,          -- MINIMAL (DATA-D1.10): leads + claims only
+    external_ref              TEXT NOT NULL,            -- required for dependable dedup
+    candidate_data            JSONB,                   -- allowlisted leads only (DATA-D1.10)
     identity_status           candidate_identity_status NOT NULL DEFAULT 'UNRESOLVED',
     status                    candidate_status NOT NULL DEFAULT 'DISCOVERED',
+    -- Trace = an EXPLICIT confirmation of an authoritative source, distinct from a
+    -- discovered lead. A bare official-URL lead never sets these (DATA-D1.2/§9).
     trace_state               trace_state NOT NULL DEFAULT 'NOT_TRACED',
     trace_url                 TEXT,
+    trace_source_type         source_type,
+    trace_verified_by         TEXT,
+    trace_verified_at         TIMESTAMPTZ,
     possible_robot_id         UUID REFERENCES robot(id) ON DELETE SET NULL,
     possible_manufacturer_id  UUID REFERENCES manufacturer(id) ON DELETE SET NULL,
     promoted_robot_id         UUID REFERENCES robot(id) ON DELETE SET NULL,
@@ -1136,7 +1156,7 @@ CREATE TABLE candidate_claim (
 COMMENT ON TABLE candidate_claim IS
     'Per-field claims. Conflicting values are retained side-by-side, never averaged (DATA-D1.8).';
 
--- Reference-only candidate imagery (R3): URL + metadata, NO stored binary.
+-- Reference-only candidate imagery (R3): http/https URL + metadata, NO binary.
 CREATE TABLE candidate_image_ref (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     candidate_id        UUID NOT NULL REFERENCES discovery_candidate(id) ON DELETE CASCADE,
@@ -1145,14 +1165,17 @@ CREATE TABLE candidate_image_ref (
     credited_to         TEXT,
     media_status        TEXT NOT NULL DEFAULT 'CANDIDATE',
     note                TEXT,
-    created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT ck_candidate_image_ref_scheme CHECK (image_url ~* '^https?://')
 );
 COMMENT ON TABLE candidate_image_ref IS
-    'DATA-D1 R3: reference-only imagery (URL + metadata, no binary). MEDIA-01 authoritative.';
+    'DATA-D1 R3: reference-only imagery (http/https URL + metadata, no binary). MEDIA-01 authoritative.';
 
+-- Promotion lineage (§19 / Gate J). Durable: ON DELETE RESTRICT so a candidate
+-- with promotion history cannot be deleted out from under the audit trail.
 CREATE TABLE promotion_audit (
     id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    candidate_id         UUID NOT NULL REFERENCES discovery_candidate(id) ON DELETE CASCADE,
+    candidate_id         UUID NOT NULL REFERENCES discovery_candidate(id) ON DELETE RESTRICT,
     action               TEXT NOT NULL,
     promoted_entity_type candidate_entity_type,
     promoted_robot_id    UUID REFERENCES robot(id) ON DELETE SET NULL,
@@ -1162,7 +1185,8 @@ CREATE TABLE promotion_audit (
     created_at           TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 COMMENT ON TABLE promotion_audit IS
-    'DATA-D1 §19/Gate J: human-approval + promotion lineage (candidate -> evidence -> robot).';
+    'DATA-D1 §19/Gate J: human-approval + promotion lineage (candidate -> evidence -> robot). '
+    'Append-only + delete-restricted so lineage survives.';
 
 CREATE INDEX idx_candidate_source          ON discovery_candidate (source_id);
 CREATE INDEX idx_candidate_status          ON discovery_candidate (status);

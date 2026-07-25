@@ -119,6 +119,13 @@ discovery_source_class = _pg_enum(
     "DISTRIBUTOR", "MANUFACTURER", "PRESS_RELEASE", "OFFICIAL_DOCUMENT",
     "OFFICIAL_VIDEO", "OTHER",
 )
+# DATA-D1.9: affirmative access decisions (reviewing != being allowed).
+tos_status = _pg_enum(
+    "tos_status", "UNKNOWN", "ALLOWED", "RESTRICTED", "PROHIBITED"
+)
+robots_status = _pg_enum(
+    "robots_status", "UNKNOWN", "ALLOWED", "DISALLOWED", "NOT_APPLICABLE"
+)
 candidate_entity_type = _pg_enum(
     "candidate_entity_type",
     "ROBOT", "MANUFACTURER", "VARIANT", "SPEC", "PRICING", "AVAILABILITY",

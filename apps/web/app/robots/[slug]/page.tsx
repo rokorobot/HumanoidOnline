@@ -24,6 +24,7 @@ import { deriveModelCode } from "@/components/RobotCard";
 import { EvidenceStamp } from "@/components/EvidenceStamp";
 import { GraphicMarker } from "@/components/GraphicMarker";
 import { RequestAvailabilityButton } from "@/components/RequestAvailabilityButton";
+import { RobotGallery } from "@/components/RobotGallery";
 import { MachineCode } from "@/components/MachineCode";
 import { PriceStateLong } from "@/components/PricingState";
 import { SpecRow } from "@/components/DataCell";
@@ -222,6 +223,9 @@ export default async function RobotDetailPage({
       </div>
 
       <div className="wrap">
+        {/* MEDIA-01 — verified identity imagery (or honest IMAGE_UNAVAILABLE) */}
+        <RobotGallery robotName={robot.name} images={robot.images} />
+
         {/* SUMMARY + ACTIONS */}
         <div className="summary-row">
           <p>{robot.summary ?? robot.description ?? "No description on record."}</p>

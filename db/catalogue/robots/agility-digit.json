@@ -31,10 +31,25 @@
   },
   "specs_note": "Physical spec figures were not confirmed against an Agility primary source in this pass, so they are left NULL rather than copied from aggregators. Digit performs autonomous tote-handling tasks in live operation -> autonomy TASK_AUTONOMOUS, has_manipulation/has_vision true.",
   "commercial_status_evidence": [
-    { "source_url": "https://www.agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics", "source_type": "PRESS_RELEASE", "source_title": "GXO Signs Industry-First Multi-Year Agreement with Agility Robotics", "excerpt": "the industry's first formal commercial deployment of humanoid robots and first Robots-as-a-Service (RaaS) deployment of humanoid robots", "published_at": "2024-06-27", "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "VERIFIED", "note": "RAAS_DEPLOYMENT: Digit is commercially deployed as a service (units not sold), confirmed by Agility's own announcement." }
+    {
+      "source_url": "https://www.agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics",
+      "source_type": "PRESS_RELEASE",
+      "source_title": "GXO Signs Industry-First Multi-Year Agreement with Agility Robotics",
+      "excerpt": "the industry's first formal commercial deployment of humanoid robots and first Robots-as-a-Service (RaaS) deployment of humanoid robots",
+      "published_at": "2024-06-27",
+      "observed_at": "2026-07-24",
+      "verified_at": "2026-07-24",
+      "confidence": "VERIFIED",
+      "note": "RAAS_DEPLOYMENT: Digit is commercially deployed as a service (units not sold), confirmed by Agility's own announcement."
+    }
   ],
   "variants": [
-    { "slug": "digit-v5", "name": "Digit (current gen)", "is_developer": false, "description": "Current-generation deployment model used in commercial RaaS operations." }
+    {
+      "slug": "digit-v5",
+      "name": "Digit (current gen)",
+      "is_developer": false,
+      "description": "Current-generation deployment model used in commercial RaaS operations."
+    }
   ],
   "pricing_offers": [],
   "availability_offers": [
@@ -47,7 +62,17 @@
       "lead_time_days": null,
       "note": "Engaged via multi-year RaaS contract; no outright unit purchase offered.",
       "evidence": [
-        { "source_url": "https://www.agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics", "source_type": "PRESS_RELEASE", "source_title": "GXO Signs Industry-First Multi-Year Agreement with Agility Robotics", "excerpt": "first Robots-as-a-Service (RaaS) deployment of humanoid robots", "published_at": "2024-06-27", "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "HIGH", "note": "RaaS engagement model (contract, not unit sale) confirmed by the announcement; recorded as ON_REQUEST (bespoke contract)." }
+        {
+          "source_url": "https://www.agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics",
+          "source_type": "PRESS_RELEASE",
+          "source_title": "GXO Signs Industry-First Multi-Year Agreement with Agility Robotics",
+          "excerpt": "first Robots-as-a-Service (RaaS) deployment of humanoid robots",
+          "published_at": "2024-06-27",
+          "observed_at": "2026-07-24",
+          "verified_at": "2026-07-24",
+          "confidence": "HIGH",
+          "note": "RaaS engagement model (contract, not unit sale) confirmed by the announcement; recorded as ON_REQUEST (bespoke contract)."
+        }
       ]
     }
   ],
@@ -65,15 +90,57 @@
       "status": "production",
       "summary": "Multi-year RaaS agreement to deploy Digit in GXO logistics operations; described by Agility as the industry's first formal commercial and first RaaS humanoid deployment.",
       "evidence": [
-        { "source_url": "https://www.agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics", "source_type": "PRESS_RELEASE", "source_title": "GXO Signs Industry-First Multi-Year Agreement with Agility Robotics", "excerpt": "the industry's first formal commercial deployment of humanoid robots and first Robots-as-a-Service (RaaS) deployment of humanoid robots", "published_at": "2024-06-27", "observed_at": "2026-07-24", "verified_at": "2026-07-24", "confidence": "VERIFIED", "note": "Deployment confirmed by Agility Robotics' own announcement (2024-06-27). Contract value not disclosed -> NULL." }
+        {
+          "source_url": "https://www.agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics",
+          "source_type": "PRESS_RELEASE",
+          "source_title": "GXO Signs Industry-First Multi-Year Agreement with Agility Robotics",
+          "excerpt": "the industry's first formal commercial deployment of humanoid robots and first Robots-as-a-Service (RaaS) deployment of humanoid robots",
+          "published_at": "2024-06-27",
+          "observed_at": "2026-07-24",
+          "verified_at": "2026-07-24",
+          "confidence": "VERIFIED",
+          "note": "Deployment confirmed by Agility Robotics' own announcement (2024-06-27). Contract value not disclosed -> NULL."
+        }
       ]
     }
   ],
   "capabilities": [
-    { "slug": "autonomous-task", "supported": true, "detail": "Autonomous tote handling in live warehouse operation." },
-    { "slug": "dynamic-walking", "supported": true, "detail": "Bipedal locomotion in warehouse environments." }
+    {
+      "slug": "autonomous-task",
+      "supported": true,
+      "detail": "Autonomous tote handling in live warehouse operation."
+    },
+    {
+      "slug": "dynamic-walking",
+      "supported": true,
+      "detail": "Bipedal locomotion in warehouse environments."
+    }
   ],
   "use_case_fits": [
-    { "use_case_slug": "warehouse-logistics", "fit_score": 0.85, "is_primary": true, "commercial_readiness": "RAAS_DEPLOYMENT", "notes": "Purpose-built for warehouse tote handling; in live commercial RaaS operation.", "limitations": "Available only as a service, not for outright purchase.", "confidence": "MEDIUM" }
+    {
+      "use_case_slug": "warehouse-logistics",
+      "fit_score": 0.85,
+      "is_primary": true,
+      "commercial_readiness": "RAAS_DEPLOYMENT",
+      "notes": "Purpose-built for warehouse tote handling; in live commercial RaaS operation.",
+      "limitations": "Available only as a service, not for outright purchase.",
+      "confidence": "MEDIUM"
+    }
+  ],
+  "images": [
+    {
+      "image_url": "/robots/agility-digit.avif",
+      "source_url": "https://www.agilityrobotics.com/",
+      "source_name": "Agility Robotics",
+      "source_type": "MANUFACTURER",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "UNKNOWN",
+      "usage_basis": "OFFICIAL_MANUFACTURER_MEDIA",
+      "is_official": true,
+      "is_primary": true,
+      "attribution": "© Agility Robotics",
+      "last_verified_at": "2026-07-25T00:00:00Z"
+    }
   ]
 }

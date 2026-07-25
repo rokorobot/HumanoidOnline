@@ -139,7 +139,10 @@ def list_robots(
     order = col.desc().nullslast() if desc else col.asc().nullslast()
 
     stmt = _apply_filters(
-        select(Robot).options(selectinload(Robot.pricing_offers)), **filters
+        select(Robot).options(
+            selectinload(Robot.pricing_offers), selectinload(Robot.images)
+        ),
+        **filters,
     ).order_by(order, Robot.slug).limit(limit).offset(offset)
     robots = list(session.execute(stmt).scalars())
 
@@ -161,6 +164,7 @@ def _load_detail(session: Session, slug: str) -> Robot | None:
             selectinload(Robot.pricing_offers),
             selectinload(Robot.availability_offers),
             selectinload(Robot.deployments),
+            selectinload(Robot.images),
         )
     )
     return session.execute(stmt).scalars().first()

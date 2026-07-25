@@ -80,6 +80,23 @@ buyer_type = _pg_enum(
     "buyer_type",
     "COMMERCIAL_BUYER", "TECHNICAL_EVALUATOR", "INDUSTRY_PARTICIPANT", "UNKNOWN",
 )
+# Verified product imagery (MEDIA-01). No 'GENERATED' identity-image source exists.
+image_source_type = _pg_enum(
+    "image_source_type",
+    "MANUFACTURER", "PRESS_KIT", "DISTRIBUTOR", "EDITORIAL", "VIDEO_FRAME",
+)
+image_type = _pg_enum(
+    "image_type",
+    "FRONT", "SIDE", "REAR", "ACTION", "WORKPLACE", "DETAIL", "DIMENSIONS",
+)
+image_identity_status = _pg_enum("image_identity_status", "VERIFIED", "UNVERIFIED")
+image_rights_status = _pg_enum(
+    "image_rights_status",
+    "PERMITTED", "ATTRIBUTION_REQUIRED", "UNKNOWN", "RESTRICTED",
+)
+image_usage_basis = _pg_enum(
+    "image_usage_basis", "NONE", "OFFICIAL_MANUFACTURER_MEDIA"
+)
 match_category = _pg_enum(
     "match_category",
     "BEST_OVERALL", "BEST_COMMERCIAL", "BEST_LOWER_COST", "BEST_DEVELOPER",

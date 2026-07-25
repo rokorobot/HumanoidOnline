@@ -23,6 +23,7 @@ from app.models.manufacturer import Manufacturer, Provider
 from app.models.match_result import MatchResult
 from app.models.region import Region
 from app.models.robot import Robot, RobotStatusHistory, RobotVariant
+from app.models.robot_image import RobotImage
 from app.models.spec import SpecDefinition, Specification
 from app.models.use_case import UseCase, UseCaseFit
 
@@ -43,6 +44,7 @@ __all__ = [
     "Region",
     "Robot",
     "RobotCapability",
+    "RobotImage",
     "RobotStatusHistory",
     "RobotVariant",
     "SpecDefinition",

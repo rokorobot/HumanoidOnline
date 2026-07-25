@@ -38,3 +38,7 @@ Forward migrations:
   (WS7), reconciling the frozen `POST /api/commercial-leads` body with the
   canonical model. Idempotent (`ADD COLUMN IF NOT EXISTS`) so it is a no-op on
   fresh databases already built from `schema.sql`.
+- `0002_add_robot_image.sql` — adds the MEDIA-01 verified-imagery entity
+  `robot_image` and its four enums (`docs/09_MEDIA_CONTRACT.md`). Idempotent
+  (pg_type guards + `CREATE TABLE/INDEX IF NOT EXISTS`) so it is a no-op on fresh
+  databases already built from `schema.sql`. `robot.hero_image_url` stays dormant.

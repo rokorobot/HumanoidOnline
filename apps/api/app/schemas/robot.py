@@ -8,6 +8,16 @@ from pydantic import BaseModel
 from app.schemas.common import EvidenceRead, ManufacturerRef, PriceDisplay
 
 
+class RobotImagePrimary(BaseModel):
+    """The single display-eligible primary image for a catalogue card (MEDIA-01).
+    Same image truth as Robot Detail, through the same gate — just the compact
+    fields a card needs. None -> the card shows the IMAGE_UNAVAILABLE treatment."""
+
+    image_url: str
+    source_name: str | None = None
+    is_official: bool
+
+
 class RobotListItem(BaseModel):
     id: str
     slug: str
@@ -15,6 +25,8 @@ class RobotListItem(BaseModel):
     manufacturer: ManufacturerRef
     summary: str | None = None
     hero_image_url: str | None = None
+    # MEDIA-01 catalogue-card image (display-eligible primary, or null -> unavailable).
+    primary_image: RobotImagePrimary | None = None
     commercial_status: str
     payload_kg: float | None = None
     height_cm: float | None = None
@@ -115,6 +127,22 @@ class DeploymentRead(BaseModel):
     evidence: EvidenceRead | None = None
 
 
+class RobotImageRead(BaseModel):
+    """A DISPLAY-ELIGIBLE verified image (MEDIA-01). The read path returns ONLY
+    eligible images (identity VERIFIED + rights PERMITTED/ATTRIBUTION_REQUIRED),
+    so the client cannot render an unverified or rights-uncleared image. When the
+    list is empty the UI shows the explicit IMAGE_UNAVAILABLE state."""
+
+    image_url: str
+    image_type: str
+    source_name: str | None = None
+    source_url: str | None = None
+    source_type: str
+    is_official: bool
+    is_primary: bool
+    attribution: str | None = None
+
+
 class RobotDetail(BaseModel):
     id: str
     slug: str
@@ -134,6 +162,9 @@ class RobotDetail(BaseModel):
     pricing_offers: list[PricingOfferRead]
     availability_offers: list[AvailabilityOfferRead]
     deployments: list[DeploymentRead]
+    # MEDIA-01: display-eligible verified images only, primary first. Empty -> the
+    # UI renders IMAGE_UNAVAILABLE (never a generated/placeholder fill).
+    images: list[RobotImageRead] = []
 
 
 class CompareRow(BaseModel):

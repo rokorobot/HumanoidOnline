@@ -218,7 +218,7 @@ def _reset_robot_children(cur, robot_id) -> None:
         (robot_id,),
     )
     for table in ("pricing_offer", "availability_offer", "deployment",
-                  "robot_capability", "use_case_fit", "robot_variant"):
+                  "robot_capability", "use_case_fit", "robot_variant", "robot_image"):
         cur.execute(f"DELETE FROM {table} WHERE robot_id = %s", (robot_id,))
 
 
@@ -330,6 +330,41 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
         ).fetchone()[0]
         for ev in d.get("evidence", []):
             insert_evidence(cur, "DEPLOYMENT", did, ev)
+
+    # Verified product images (MEDIA-01). Provenance is mandatory and a synthesized
+    # identity image is categorically rejected — `source_type` must be a real-source
+    # enum value; GENERATED (or anything outside the enum) aborts the import rather
+    # than silently degrading. Display eligibility is decided at read time by
+    # identity_status + rights_status, never by the mere presence of image_url.
+    _ALLOWED_IMAGE_SOURCES = {
+        "MANUFACTURER", "PRESS_KIT", "DISTRIBUTOR", "EDITORIAL", "VIDEO_FRAME",
+    }
+    for im in robot.get("images", []):
+        src = im.get("source_type")
+        if src not in _ALLOWED_IMAGE_SOURCES:
+            raise ValueError(
+                f"robot {robot['slug']!r}: illegal image source_type {src!r} "
+                f"(MEDIA-01 forbids generated/synthesized identity imagery; "
+                f"allowed: {sorted(_ALLOWED_IMAGE_SOURCES)})"
+            )
+        cur.execute(
+            """
+            INSERT INTO robot_image
+                (robot_id, image_url, source_url, source_name, source_type, image_type,
+                 identity_status, rights_status, usage_basis, is_official, is_primary,
+                 attribution, captured_at, last_verified_at)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            """,
+            (
+                robot_id, im["image_url"], im.get("source_url"), im.get("source_name"),
+                src, im.get("image_type", "FRONT"),
+                im.get("identity_status", "UNVERIFIED"),
+                im.get("rights_status", "UNKNOWN"),
+                im.get("usage_basis", "NONE"),
+                im.get("is_official", False), im.get("is_primary", False),
+                im.get("attribution"), im.get("captured_at"), im.get("last_verified_at"),
+            ),
+        )
 
     # Capabilities.
     for c in robot.get("capabilities", []):

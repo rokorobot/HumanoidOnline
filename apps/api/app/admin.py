@@ -19,6 +19,7 @@ from app.models.evidence import EvidenceSource
 from app.models.manufacturer import Manufacturer, Provider
 from app.models.match_result import MatchResult
 from app.models.robot import Robot, RobotVariant
+from app.models.robot_image import RobotImage
 from app.models.spec import SpecDefinition
 from app.models.use_case import UseCase
 
@@ -43,6 +44,17 @@ class RobotAdmin(ModelView, model=Robot):
 class RobotVariantAdmin(ModelView, model=RobotVariant):
     column_list = [RobotVariant.slug, RobotVariant.name, RobotVariant.is_developer]
     name_plural = "Robot variants"
+
+
+class RobotImageAdmin(ModelView, model=RobotImage):
+    # MEDIA-01 provenance triage. identity_status / rights_status decide display
+    # eligibility — never the presence of image_url.
+    column_list = [
+        RobotImage.robot_id, RobotImage.image_type, RobotImage.source_type,
+        RobotImage.source_name, RobotImage.identity_status, RobotImage.rights_status,
+        RobotImage.is_primary, RobotImage.is_official,
+    ]
+    name_plural = "Robot images (MEDIA-01)"
 
 
 class UseCaseAdmin(ModelView, model=UseCase):
@@ -129,7 +141,8 @@ class CommercialLeadProviderAdmin(ModelView, model=CommercialLeadProvider):
 
 
 _VIEWS = [
-    ManufacturerAdmin, ProviderAdmin, RobotAdmin, RobotVariantAdmin, UseCaseAdmin,
+    ManufacturerAdmin, ProviderAdmin, RobotAdmin, RobotVariantAdmin, RobotImageAdmin,
+    UseCaseAdmin,
     CapabilityAdmin, SpecDefinitionAdmin, PricingOfferAdmin, AvailabilityOfferAdmin,
     DeploymentAdmin, EvidenceSourceAdmin, BuyerRequirementAdmin, MatchResultAdmin,
     CommercialLeadAdmin, CommercialLeadProviderAdmin,

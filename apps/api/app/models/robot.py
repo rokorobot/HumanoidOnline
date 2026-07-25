@@ -115,6 +115,9 @@ class Robot(Base):
     deployments: Mapped[list[Deployment]] = relationship(  # noqa: F821
         "Deployment", back_populates="robot", cascade="all, delete-orphan"
     )
+    images: Mapped[list[RobotImage]] = relationship(  # noqa: F821
+        "RobotImage", back_populates="robot", cascade="all, delete-orphan", lazy="selectin"
+    )
 
 
 class RobotVariant(Base):

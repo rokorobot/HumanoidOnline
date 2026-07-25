@@ -23,6 +23,8 @@ from app.schemas.robot import (
     ExtendedSpec,
     PricingOfferRead,
     RobotDetail,
+    RobotImagePrimary,
+    RobotImageRead,
     RobotListItem,
     SpecsBlock,
     StatusHistoryEntry,
@@ -144,6 +146,30 @@ def price_display_for(robot: Robot) -> PriceDisplay | None:
     )
 
 
+def _eligible_images(robot: Robot):
+    """Display-eligible images (MEDIA-01 gate), primary first then official. The
+    single ordering shared by the catalogue card and the detail gallery."""
+    return sorted(
+        (i for i in robot.images if i.is_display_eligible()),
+        key=lambda i: (not i.is_primary, not i.is_official),
+    )
+
+
+def _primary_image(robot: Robot) -> RobotImagePrimary | None:
+    """The catalogue-card primary image (MEDIA-01.8). Among display-eligible images,
+    prefer an explicit primary, then a FRONT view (comparable lineup), then official."""
+    eligible = _eligible_images(robot)
+    if not eligible:
+        return None
+    img = min(
+        eligible,
+        key=lambda i: (not i.is_primary, i.image_type != "FRONT", not i.is_official),
+    )
+    return RobotImagePrimary(
+        image_url=img.image_url, source_name=img.source_name, is_official=img.is_official
+    )
+
+
 def serialize_list_item(
     robot: Robot, snapshot: dict[uuid.UUID, tuple[int, list[str]]]
 ) -> RobotListItem:
@@ -157,6 +183,7 @@ def serialize_list_item(
         ),
         summary=robot.summary,
         hero_image_url=robot.hero_image_url,
+        primary_image=_primary_image(robot),
         commercial_status=robot.commercial_status,
         payload_kg=_f(robot.payload_kg),
         height_cm=_f(robot.height_cm),
@@ -281,6 +308,22 @@ def serialize_detail(session: Session, robot: Robot) -> RobotDetail:
         StatusHistoryEntry(status=h.status, effective_at=h.effective_at, note=h.note)
         for h in robot.status_history
     ]
+    # MEDIA-01: only DISPLAY-ELIGIBLE images cross the API boundary (identity
+    # VERIFIED + rights PERMITTED/ATTRIBUTION_REQUIRED). A non-null image_url is
+    # never sufficient. Primary first, then official, for a stable gallery order.
+    images = [
+        RobotImageRead(
+            image_url=img.image_url,
+            image_type=img.image_type,
+            source_name=img.source_name,
+            source_url=img.source_url,
+            source_type=img.source_type,
+            is_official=img.is_official,
+            is_primary=img.is_primary,
+            attribution=img.attribution,
+        )
+        for img in _eligible_images(robot)
+    ]
 
     return RobotDetail(
         id=str(robot.id),
@@ -305,6 +348,7 @@ def serialize_detail(session: Session, robot: Robot) -> RobotDetail:
         pricing_offers=pricing,
         availability_offers=availability,
         deployments=deployments,
+        images=images,
     )
 
 

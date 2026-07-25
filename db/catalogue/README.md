@@ -53,7 +53,34 @@ each carrying **its own evidence array**:
   "availability_offers": [ { "transaction_type": "...", "availability_status": "...", ..., "evidence": [ ... ] } ],
   "deployments":         [ { "customer_name": "...", ..., "evidence": [ ... ] } ],
   "capabilities":        [ { "slug": "...", "supported": true, "detail": "..." } ],
-  "use_case_fits":       [ { "use_case_slug": "...", "fit_score": 0.75, "confidence": "MEDIUM", ... } ]
+  "use_case_fits":       [ { "use_case_slug": "...", "fit_score": 0.75, "confidence": "MEDIUM", ... } ],
+  "images":              [ { <robot_image> } ]   // MEDIA-01 verified imagery (see below)
+}
+```
+
+### `images[]` — MEDIA-01 verified product imagery (`docs/09_MEDIA_CONTRACT.md`)
+
+Each image of a **specific named robot** must depict that exact robot. There is no
+`GENERATED` source — a synthesized/look-alike identity image is rejected by the
+importer. An image is only *displayed* when `identity_status = VERIFIED` **and**
+`rights_status ∈ {PERMITTED, ATTRIBUTION_REQUIRED}`; a non-null `image_url` is never
+sufficient. A robot with no honestly-clearable image simply has an empty `images`
+array → the UI shows `IMAGE_UNAVAILABLE` (never a placeholder fill).
+
+```jsonc
+{
+  "image_url":       "https://…/g1.jpg",       // the asset rendered
+  "source_url":      "https://…/press-kit",     // authoritative provenance page
+  "source_name":     "Unitree Robotics",
+  "source_type":     "MANUFACTURER",            // MANUFACTURER|PRESS_KIT|DISTRIBUTOR|EDITORIAL|VIDEO_FRAME (never GENERATED)
+  "image_type":      "FRONT",                   // FRONT|SIDE|REAR|ACTION|WORKPLACE|DETAIL|DIMENSIONS
+  "identity_status": "VERIFIED",                // VERIFIED|UNVERIFIED — depicts THIS exact model?
+  "rights_status":   "ATTRIBUTION_REQUIRED",    // PERMITTED|ATTRIBUTION_REQUIRED|UNKNOWN|RESTRICTED — UNKNOWN != PERMITTED
+  "is_official":     true,
+  "is_primary":      true,                       // at most one primary per robot
+  "attribution":     "© Unitree Robotics",      // required when ATTRIBUTION_REQUIRED
+  "captured_at":     "2025-01-01",
+  "last_verified_at":"2026-07-25T00:00:00Z"
 }
 ```
 

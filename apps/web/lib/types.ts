@@ -39,6 +39,12 @@ export interface Evidence {
   source_url?: string | null;
 }
 
+export interface RobotImagePrimary {
+  image_url: string;
+  source_name?: string | null;
+  is_official: boolean;
+}
+
 export interface RobotListItem {
   id: string;
   slug: string;
@@ -46,6 +52,8 @@ export interface RobotListItem {
   manufacturer: ManufacturerRef;
   summary?: string | null;
   hero_image_url?: string | null;
+  // MEDIA-01 catalogue-card image (display-eligible primary; null -> unavailable).
+  primary_image?: RobotImagePrimary | null;
   commercial_status: string;
   payload_kg?: number | null;
   height_cm?: number | null;
@@ -165,6 +173,20 @@ export interface RobotDetail {
   pricing_offers: PricingOffer[];
   availability_offers: AvailabilityOffer[];
   deployments: Deployment[];
+  // MEDIA-01: display-eligible verified images only (primary first). Empty -> the
+  // UI must render the IMAGE_UNAVAILABLE state, never a generated/placeholder fill.
+  images: RobotImage[];
+}
+
+export interface RobotImage {
+  image_url: string;
+  image_type: string;
+  source_name?: string | null;
+  source_url?: string | null;
+  source_type: string;
+  is_official: boolean;
+  is_primary: boolean;
+  attribution?: string | null;
 }
 
 export interface CompareRow {

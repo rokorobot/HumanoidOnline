@@ -5,6 +5,9 @@ from datetime import date, datetime
 
 from pydantic import BaseModel
 
+# AGENT-01 (docs/10): read schemas feed the machine projections (JSON-LD, sitemap).
+# `updated_at` gives the sitemap a real `lastmod`. No new model — an existing
+# canonical column surfaced on the governed read.
 from app.schemas.common import EvidenceRead, ManufacturerRef, PriceDisplay
 
 
@@ -34,6 +37,7 @@ class RobotListItem(BaseModel):
     price_display: PriceDisplay | None = None
     available_modes: list[str]
     deployment_count: int
+    updated_at: datetime  # sitemap lastmod (AGENT-01)
 
 
 class StatusHistoryEntry(BaseModel):

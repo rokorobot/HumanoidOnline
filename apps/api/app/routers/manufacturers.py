@@ -64,6 +64,7 @@ def list_manufacturers(
             robot_count=int(count),
             deployment_status=m.deployment_status,
             portfolio_status=derive_portfolio_status(statuses.get(m.id, [])),
+            updated_at=m.updated_at,
         )
         for m, count in rows
     ]

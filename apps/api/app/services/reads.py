@@ -156,10 +156,15 @@ def _eligible_images(robot: Robot):
 
 
 def _primary_image(robot: Robot) -> RobotImagePrimary | None:
+    """The catalogue-card primary image (MEDIA-01.8). Among display-eligible images,
+    prefer an explicit primary, then a FRONT view (comparable lineup), then official."""
     eligible = _eligible_images(robot)
     if not eligible:
         return None
-    img = eligible[0]
+    img = min(
+        eligible,
+        key=lambda i: (not i.is_primary, i.image_type != "FRONT", not i.is_official),
+    )
     return RobotImagePrimary(
         image_url=img.image_url, source_name=img.source_name, is_official=img.is_official
     )

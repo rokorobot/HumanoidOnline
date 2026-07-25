@@ -37,6 +37,25 @@ v0.1; changes require product-owner ratification (cf. AGENTS.md rule 1).
   representation.
 - **MEDIA-01.7 — Commercial inheritance.** The same verified image records feed
   Compare → Rent → Buy → Lease. One image-truth system, never a second marketplace one.
+- **MEDIA-01.8 — Catalogue comparability.** The catalogue-card primary image should,
+  where available, depict the exact robot in a **front or near-front full-body view**
+  suitable for cross-robot visual comparison (height, proportions, silhouette,
+  morphology). Catalogue cards render every image in a **standardized frame and scale
+  treatment** (same container size, centered, `object-fit: contain` — never stretched
+  or proportionally altered) so robots appear comparably presented. The image itself is
+  never distorted, redrawn, composited, normalized, or swapped to a different model for
+  a better angle. If no sufficiently comparable verified image exists, use the best
+  truthful verified image available, or render `IMAGE_UNAVAILABLE` — never fabricate
+  comparability.
+
+  **Catalogue primary-image selection priority** (per robot):
+  1. verified front full-body
+  2. verified near-front full-body
+  3. verified front / near-front partial (only if no full-body)
+  4. otherwise `IMAGE_UNAVAILABLE`
+
+  (Selection is applied at curation time; at runtime the card prefers a `FRONT`
+  `image_type` among the robot's display-eligible images.)
 
 ## 3. Acceptable source priority
 

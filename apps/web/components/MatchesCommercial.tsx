@@ -83,8 +83,7 @@ export function MatchesCommercial({
           <h2 className="wz-confirm-title">No humanoid matched</h2>
           <p className="prose">{noMatchExplanation}</p>
           <p className="note">
-            // We still track this demand. Tell us anyway, or adjust your
-            requirements.
+            {"// We still track this demand. Tell us anyway, or adjust your requirements."}
           </p>
           <div className="actions" style={{ marginTop: "var(--ho-sp-5)" }}>
             <button
@@ -161,8 +160,7 @@ export function MatchesCommercial({
       </div>
 
       <p className="note" style={{ marginTop: "var(--ho-sp-5)" }}>
-        // A commercial inquiry captures a qualified lead only — no checkout, no
-        payment.
+        {"// A commercial inquiry captures a qualified lead only — no checkout, no payment."}
       </p>
       {dialog}
     </>

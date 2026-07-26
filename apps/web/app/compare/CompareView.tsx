@@ -12,7 +12,7 @@
 // All comparison SEMANTICS live in lib/comparison-policy.ts (tested). This file
 // only renders the answers. UNKNOWN stays UNKNOWN; QUOTE_ONLY ≠ UNKNOWN.
 // ============================================================================
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -121,6 +121,14 @@ function CompareToolbar({
   const [showSaves, setShowSaves] = useState(false);
   const [naming, setNaming] = useState(false);
   const [name, setName] = useState("");
+  // WS8.4 / R17: focus the name input when the inline naming control opens.
+  // Programmatic focus is the accessible equivalent of the `autoFocus` prop
+  // (jsx-a11y/no-autofocus): it moves focus only in response to the user's
+  // "Save view" action, not on initial page render.
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (naming) nameInputRef.current?.focus();
+  }, [naming]);
   const [copied, setCopied] = useState(false);
 
   // localStorage is device-local & client-only — read after mount.
@@ -189,6 +197,7 @@ function CompareToolbar({
         {naming ? (
           <span className="cmp-nameform">
             <input
+              ref={nameInputRef}
               className="cmp-nameinput"
               aria-label="Saved view name"
               placeholder="Name this view"
@@ -198,7 +207,6 @@ function CompareToolbar({
                 if (e.key === "Enter") commitSave();
                 if (e.key === "Escape") setNaming(false);
               }}
-              autoFocus
             />
             <button type="button" className="btn btn--signal" onClick={commitSave} disabled={!name.trim()}>
               SAVE
@@ -367,8 +375,10 @@ function CompareMatrix({
   const priceWinners = new Set(priceLeader.winners);
   const refOffer = refSlug ? headlines.get(refSlug) ?? null : null;
 
+  // WS8.4 / R17: the comparison matrix scrolls horizontally on narrow
+  // viewports, so the scroll container is keyboard-focusable (WCAG 2.1.1).
   return (
-    <div className="cmp-scroll">
+    <div className="cmp-scroll" tabIndex={0} role="group" aria-label="Comparison matrix">
       <table className="cmatrix" style={{ minWidth: 640 }}>
         <colgroup>
           <col className="lab" />
@@ -583,9 +593,7 @@ function EvidenceCompare({ robots, refSlug }: { robots: RobotDetail[]; refSlug: 
   return (
     <div className="cmp-evidence">
       <p className="note cmp-ev-intro">
-        // FACT-LEVEL PROVENANCE, SIDE BY SIDE. Value · source · confidence ·
-        dates · link — straight from the catalogue. No synthetic evidence score.
-        UNKNOWN facts read &quot;NO CONFIRMED FACT&quot;.
+        {'// FACT-LEVEL PROVENANCE, SIDE BY SIDE. Value · source · confidence · dates · link — straight from the catalogue. No synthetic evidence score. UNKNOWN facts read "NO CONFIRMED FACT".'}
       </p>
 
       <EvidenceBlock title="Pricing — headline offer">
@@ -740,7 +748,12 @@ function Legend() {
           = price on request ≠ unknown
         </span>
       </div>
-      <p className="note cmp-framing">// {BEST_IN_ROW_FRAMING} Reference deltas are factual differences in canonical units, not verdicts. Matching / fit scoring is out of scope (WS6).</p>
+      <p className="note cmp-framing">
+        {"// "}
+        {BEST_IN_ROW_FRAMING} Reference deltas are factual differences in
+        canonical units, not verdicts. Matching / fit scoring is out of scope
+        (WS6).
+      </p>
     </>
   );
 }

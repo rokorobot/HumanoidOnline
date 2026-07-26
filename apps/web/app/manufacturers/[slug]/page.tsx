@@ -5,7 +5,7 @@ import { getManufacturer } from "@/lib/api-client";
 import { regionLabel } from "@/lib/format";
 import { StatusBracket } from "@/components/StatusBadge";
 import { SectionIndex } from "@/components/SectionIndex";
-import { SiteFooter, SiteNav } from "@/components/SiteNav";
+import { SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 import { SystemLabel } from "@/components/SystemLabel";
 
@@ -137,7 +137,6 @@ export default async function ManufacturerDetailPage({
           </section>
         )}
       </div>
-      <SiteFooter />
     </>
   );
 }

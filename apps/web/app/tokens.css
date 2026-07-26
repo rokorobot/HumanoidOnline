@@ -32,7 +32,12 @@
   --ho-grey-800:  #322F2A;
   --ho-grey-700:  #47433B;
   --ho-grey-600:  #635E53;
-  --ho-grey-500:  #7C776B;
+  /* WS8.4 / R17: muted-text grey nudged #7C776B -> #6B6659 to meet WCAG 2.2 AA
+     (was 4.05:1 on the paper surfaces, now ~4.85:1). Same warm-grey character;
+     this is the single token behind --ho-unknown / --ho-text-faint / faint
+     labels, so one nudge fixes every muted-text contrast failure without
+     touching the UI-D1 layout or type. */
+  --ho-grey-500:  #6B6659;
   --ho-grey-400:  #9C968A;
   --ho-grey-300:  #BDB7AB;
   --ho-grey-200:  #D6D1C6;
@@ -41,7 +46,10 @@
   /* --- SEMANTIC STATE COLORS (restrained, derived — no rainbow) ---------- */
   --ho-verified:    #2E6B4F;  /* muted technical green — VERIFIED only       */
   --ho-verified-bg: #E1EAE3;
-  --ho-caution:     #9A6B12;  /* muted amber — quote-only / warnings / stale */
+  /* WS8.4 / R17: quote-only/caution amber nudged #9A6B12 -> #835B0F to meet
+     WCAG 2.2 AA (was 4.25:1 on paper, now ~4.7:1). Same amber semantic, just
+     legible; darker fg only raises contrast on the lighter --ho-caution-bg. */
+  --ho-caution:     #835B0F;  /* muted amber — quote-only / warnings / stale */
   --ho-caution-bg:  #F0E7D2;
   --ho-unknown:     var(--ho-grey-500); /* UNKNOWN = grey + hatch, never red */
 

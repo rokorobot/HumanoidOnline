@@ -104,7 +104,65 @@ recur. No other existing assertion was modified.
 | 01.6 projection only | Automated | `agent-truth.test.ts` — an empty governed read yields an empty projection, never a fallback | R14 | **PASS** |
 | 01.7 published-canonical-only surface | Automated | `test_r14_unpublished_robot_is_absent_from_every_public_surface` (real unpublished robot + sentinels, 404 on direct fetch) · `test_r14_unpublished_robot_is_absent_from_matching_and_leads` · `agent-truth.test.ts` proves the projection adds nothing back | R14 | **PASS** |
 
-## 4. WS8.3 gate status
+## 4. WS8.4 gate status
+
+| Gate | Class | Status | Evidence |
+|---|---|---|---|
+| R16 Journeys A/B/C | Automated | **PASS** | `e2e/journeys.spec.ts` — explore→compare matrix, wizard→match→lead capture, use-case→suitable robot→detail; each asserts the governed result, not a page load |
+| R17 WCAG 2.2 AA (automated) | Automated | **PASS** | All **five** frozen obligations covered — not "axe reports zero violations": **(1) every §5.1 public route** — `e2e/accessibility-axe.spec.ts` axe WCAG 2.2 AA on `/`, `/robots`, `/robots/[slug]`, `/compare`, `/manufacturers`, `/manufacturers/[slug]`, `/use-cases`, `/use-cases/[slug]`, `/find-a-humanoid`, `/matches/[id]`, **404** + interactive states (dialog open, validation error), zero violations, desktop **and** Pixel-7; **(2) keyboard-only journeys** — `e2e/keyboard.spec.ts` skip-link→main focus, keyboard-only nav activation, open→submit the lead dialog by keyboard; **(3) focus behaviour** — dialog focus-trap (Tab/Shift+Tab stay inside), Escape closes + returns focus to opener, invalid field takes focus; **(4) semantic headings/forms/dialogs** — `e2e/semantics.spec.ts` one H1 + main landmark + one `contentinfo` (footer) landmark + named primary nav per route, programmatic form labels, dialog role/`aria-modal`/accessible-title, invalid↔alert wiring; **(5) mobile target size** — `e2e/responsive.spec.ts` direct ≥24×24 measurement of the deliberate controls **plus** axe's `target-size` rule by name on the Pixel-7 profile |
+| R18 screen-reader | **Attested** | **PASS** | `docs/14_R18_SCREEN_READER_ATTESTATION.md` completed by a named human operator — **Robert Konecny / Product Owner, 2026-07-26, NVDA + Chrome / Windows, head `5a3ca6a`**. §1–§8 PASS across the frozen §9.4 surfaces (nav, catalogue, robot detail, wizard, matches, lead dialog); §9 mobile N-A (desktop scope). NOT self-attested — a person completed the record; axe green (R17) does not satisfy it |
+| R19 responsive | Automated | **PASS** | `e2e/responsive.spec.ts` on a real **mobile-chromium (Pixel 7)** project in CI + desktop: no horizontal overflow, cards not clipped, compare/spec tables scroll in-container, primary actions operable |
+| R20 empty/error states | Automated | **PASS** | `e2e/ux-states.spec.ts` — 404, compare<2 prompt, price trichotomy (never $0), availability-unknown≠unavailable, invalid-email announced, API-failure retains input; `__tests__/robot-gallery.test.tsx` for the missing-image state |
+| R21 lint / jsx-a11y | Automated | **PASS** | `.eslintrc.cjs` (jsx-a11y recommended at error, `--max-warnings=0`) wired into CI `web-build`; real defects fixed, not silenced |
+
+**R17 note — axe is an oracle for detectable defects, not for conformance.** That
+is why R18 is a separate Attested gate, and why R17 is proven by four specs across
+all five obligations (above), not axe alone. The exploratory axe pass found and
+this slice fixed real defects: a critical `aria-pressed` on a link, keyboard-inaccessible
+scroll regions, a page-inflating off-screen skip-link, two mobile horizontal
+overflows (identity-header grid, evidence rows), and three contrast failures
+(muted-grey text, quote amber, and the illegible bright-orange validation error).
+The broadened R17 suite then surfaced three more, also fixed minimally: the skip link
+scrolled but did **not** move focus (added `tabIndex={-1}` to `<main>` so activating
+it lands focus in the landmark); the lead-dialog close button measured 22px wide
+(min-size raised to the 24×24 AA target-size minimum); and the `<footer>` exposed **no**
+`contentinfo` landmark because it was rendered inside `<main>` (fixed by *composition*,
+not a faked `role`: the shared footer is now rendered once by `RootLayout` as a sibling
+of `<main>`, and the per-page instances were removed — `semantics.spec.ts` asserts
+exactly one `contentinfo` per route). Every fix was a minimal markup/composition
+correction — **UI-D1 layout and type are unchanged** (the footer renders identically,
+same place, same styles); the palette's muted/amber/signal semantics are preserved,
+only their exact lightness meets AA.
+
+**R17 — robot-detail navigation is an intentional UI-D1 variance (not a WCAG
+waiver).** The every-route semantic suite makes explicit that `/robots/[slug]` is
+the only public route without a primary-nav landmark: it renders its frozen dark
+identity header (`idhead`) and does not repeat `SiteNav`, whereas the sibling detail
+pages (`/manufacturers/[slug]`, `/use-cases/[slug]`) do. This is **conformant**:
+WCAG 2.2 SC 3.2.3 (Consistent Navigation) governs the relative *order* of navigation
+mechanisms **when they are repeated** — it does not require the same navigation on
+every page. `e2e/semantics.spec.ts` asserts the absence on robot detail (locking the
+variance so it cannot drift accidentally) and, separately, that the nav which *is*
+repeated appears identically named on every browse surface. Recorded as a deliberate
+UI-D1 composition variance, decided by the design owner; **no `DarkNav` added in WS8.4.**
+
+*Separately, manual R18 testing exposed a genuine **navigation/discoverability** weakness
+(distinct from the WCAG question): once on a robot record there was no visible return path
+to home or the catalogue. Fixed with the **smallest** UI-D1-preserving escape — a two-link
+breadcrumb `HumanoidOnline / Robot Catalogue` (→ `/` and `/robots`) inside the dark identity
+header, deliberately **not** wrapped in `<nav>` and **not** the full `SiteNav`, so the
+no-primary-nav variance holds exactly (the absence assertion still passes: zero navigation
+landmarks on robot detail). `semantics.spec.ts` asserts both escape links exist with
+meaningful accessible names ("HumanoidOnline home", "Robot Catalogue") and correct targets;
+the links use `--ho-paper-ink` on `--ho-ink` (AA) and pass axe contrast + target-size.*
+
+**R21 note — narrow, documented exceptions only.** One `eslint-disable-next-line`
+(the lead-dialog backdrop pointer-dismiss, redundant with Escape + a labelled Close
+button) and one precise rule *config* (`no-noninteractive-tabindex` allows the
+labelled scroll-region pattern that WCAG 2.1.1 requires and axe enforces). No
+a11y rule is blanket-disabled to get green.
+
+## 5. WS8.3 gate status
 
 | Gate | Class | Status | Evidence |
 |---|---|---|---|
@@ -134,7 +192,7 @@ attribution licence is ever falsely asserted.) Verified against the real catalog
 mirror of coercing UNKNOWN into `0`. UNKNOWN is `null` and is omitted; `0` and
 `false` are real canonical values and are asserted. Both halves are pinned.
 
-## 5. WS8.2 gate status
+## 6. WS8.2 gate status
 
 | Gate | Class | Status | Evidence |
 |---|---|---|---|
@@ -168,7 +226,7 @@ starts (release phase, init container, deploy step) is R25/R26's. The app also
 expects the governed migration files to be reachable (`MIGRATIONS_DIR`), which is
 a binding point for whatever packaging WS8.7 chooses.
 
-## 6. WS8.1 gate status
+## 7. WS8.1 gate status
 
 | Gate | Class | Status | Evidence |
 |---|---|---|---|
@@ -189,7 +247,7 @@ only its application layer is.
 |---|---|---|
 | **Admin session-cookie attributes.** The SQLAdmin session cookie must be proven to carry the intended production attributes (`Secure`, `HttpOnly`, `SameSite`) rather than inheriting Starlette defaults — `Secure` in particular is opt-in and only meaningful once TLS terminates at the ingress. | Redesigning the admin auth mechanism is outside the authorized WS8.1 scope, and the attribute that matters most (`Secure`) cannot be asserted without a deployed HTTPS surface. | **R27** (configuration) + **R29** (deployed assertion) |
 
-## 7. Registered gaps still open (`12` §8)
+## 8. Registered gaps still open (`12` §8)
 
 Carried forward so nothing is lost between slices. `CLOSED` here means the gate
 that owns it has passed.
@@ -214,6 +272,10 @@ that owns it has passed.
 | Q9 no unpublished-absence test | CLOSE | WS8.3 | **CLOSED** |
 | Q12 JSON-LD coercion gap | CLOSE | WS8.3 | **CLOSED** |
 | Q14 attribution not enforced | CLOSE | WS8.3 | **CLOSED** |
-| Q1-Q3a, Q4, Q10, Q11, Q13 | CLOSE | WS8.4 / WS8.5 | open |
+| Q1 no a11y tooling | CLOSE | WS8.4 | **CLOSED** (axe + jsx-a11y) |
+| Q2 single chromium project | CLOSE | WS8.4 | **CLOSED** (Pixel-7 mobile project in CI) |
+| Q4 no web lint | CLOSE | WS8.4 | **CLOSED** (ESLint + jsx-a11y in CI) |
+| Q3a no generateMetadata | CLOSE | WS8.5 | open |
+| Q10, Q11, Q13 | CLOSE | WS8.5 | open |
 | Q3b OG/Twitter imagery | ACCEPT-DEFER | product owner | runbook entry at R30 (open) |
 | Q8b DATA-D1 P3/P5/P7 gates | ACCEPT-DEFER | product owner | runbook entry at R30 (open) |

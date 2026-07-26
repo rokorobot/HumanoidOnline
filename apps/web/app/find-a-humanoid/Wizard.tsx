@@ -75,7 +75,7 @@ export function Wizard({ useCases, countries, seedUseCase, seedAnswers }: Wizard
     headingRef.current?.focus();
   }, [step, captured]);
 
-  const useCaseName = (slug: string) =>
+  const resolveUseCaseName = (slug: string) =>
     useCases.find((u) => u.slug === slug)?.name ?? slug;
   const countryName = (code: string) =>
     countries.find((c) => c.code === code)?.name ?? code;
@@ -489,8 +489,8 @@ export function Wizard({ useCases, countries, seedUseCase, seedAnswers }: Wizard
         return {
           state: "ANSWERED",
           text: t.taskDescription.trim()
-            ? `${useCaseName(t.useCase)} — ${t.taskDescription.trim()}`
-            : useCaseName(t.useCase),
+            ? `${resolveUseCaseName(t.useCase)} — ${t.taskDescription.trim()}`
+            : resolveUseCaseName(t.useCase),
         };
       }
       case "country":

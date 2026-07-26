@@ -25,7 +25,7 @@ export function RobotGallery({
           <GraphicMarker />
           <span className="ro-unavailable__label">IMAGE UNAVAILABLE</span>
           <span className="ro-unavailable__note">
-            // No verified image of this exact robot has cleared identity and rights.
+            {"// No verified image of this exact robot has cleared identity and rights."}
           </span>
         </div>
       </div>

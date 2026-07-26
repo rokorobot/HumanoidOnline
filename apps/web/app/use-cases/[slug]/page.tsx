@@ -5,7 +5,7 @@ import Link from "next/link";
 import { getUseCase } from "@/lib/api-client";
 import { StatusBracket } from "@/components/StatusBadge";
 import { SectionIndex } from "@/components/SectionIndex";
-import { SiteFooter, SiteNav } from "@/components/SiteNav";
+import { SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 import { SystemLabel } from "@/components/SystemLabel";
 
@@ -104,7 +104,6 @@ export default async function UseCaseDetailPage({
           )}
         </section>
       </div>
-      <SiteFooter />
     </>
   );
 }

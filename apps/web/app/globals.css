@@ -9,14 +9,24 @@
 .wrap { max-width: var(--ho-maxw); margin: 0 auto; padding: 0 var(--ho-sp-5); }
 .wrap--narrow { max-width: 1080px; }
 
+/* WS8.4 / R19: the skip link is visually hidden but keyboard-focusable. The old
+   `left: -9999px` technique placed a 146px element off-screen-left, which
+   inflated document scrollWidth and produced a spurious horizontal overflow on
+   every page. The clip pattern removes it from layout flow entirely (no scroll
+   contribution) while keeping it in the accessibility tree and focusable. */
 .skip-link {
-  position: absolute; left: -9999px; top: 0; z-index: 100;
+  position: absolute; top: 0; left: 0; z-index: 100;
+  width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
   background: var(--ho-ink); color: var(--ho-paper-ink);
   padding: 10px 16px; font-family: var(--ho-font-machine);
   font-size: var(--ho-fs-mono-s); letter-spacing: var(--ho-tracking-label);
   text-transform: uppercase;
 }
-.skip-link:focus { left: 8px; top: 8px; }
+.skip-link:focus {
+  width: auto; height: auto; overflow: visible;
+  clip: auto; clip-path: none; left: 8px; top: 8px;
+}
 
 /* ---- SITE HEADER / PERMANENT NAV (light data register) ------------------- */
 .site-head {
@@ -45,6 +55,16 @@
   color: var(--ho-text-muted); }
 .darknav a[aria-current="page"] { color: var(--ho-signal); }
 .darknav a:hover { color: var(--ho-signal); }
+
+/* Robot-detail return path (breadcrumb) inside the dark identity header. NOT the
+   primary nav — a minimal home/catalogue escape. Links use --ho-paper-ink
+   (#E7E3D8 on --ho-ink) for AA contrast; the "/" separator is decorative. */
+.idcrumb { display: flex; gap: var(--ho-sp-3); align-items: center; margin: 0;
+  padding: 10px 16px; font-family: var(--ho-font-machine);
+  font-size: var(--ho-fs-mono-s); letter-spacing: var(--ho-tracking-label);
+  text-transform: uppercase; color: var(--ho-text-muted); }
+.idcrumb a { color: var(--ho-paper-ink); text-decoration: none; }
+.idcrumb a:hover { color: var(--ho-signal); }
 
 /* ---- PAGE TITLE BAR ------------------------------------------------------- */
 .pagebar { display: flex; align-items: flex-end; justify-content: space-between;
@@ -121,7 +141,11 @@ section.block { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid
 
 /* ---- ROBOT CARD (home + catalogue) --------------------------------------- */
 .card-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--ho-sp-4); }
-.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--ho-sp-4); }
+/* WS8.4 / R19: minmax(0, 1fr) so card tracks can shrink below their content's
+   min-content; plain 1fr tracks (min-width:auto) overflowed under wider fallback
+   fonts. Card inner content wraps rather than forcing width. */
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ho-sp-4); }
+.rcard, .rcard * { min-width: 0; overflow-wrap: anywhere; }
 .rcard { border: var(--ho-rule-hair) solid var(--ho-ink); background: var(--ho-paper-2);
   display: flex; flex-direction: column; min-height: 250px; color: inherit; }
 .rcard:hover, .rcard:focus-within { outline: var(--ho-rule-med) solid var(--ho-ink); outline-offset: -1px; }
@@ -161,8 +185,13 @@ section.block { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid
 .cmp:hover { background: var(--ho-ink); color: var(--ho-paper); }
 
 /* ---- CATALOGUE LAYOUT + FILTER RAIL -------------------------------------- */
-.layout { display: grid; grid-template-columns: 268px 1fr; gap: var(--ho-sp-6);
+/* WS8.4 / R19: minmax(0, 1fr) instead of 1fr so the results column can shrink
+   below its content's min-content (a plain 1fr track defaults to min-width:auto
+   and overflowed under wider fallback fonts). min-width:0 on the children is the
+   belt-and-suspenders form of the same fix. */
+.layout { display: grid; grid-template-columns: 268px minmax(0, 1fr); gap: var(--ho-sp-6);
   align-items: start; padding-bottom: var(--ho-sp-8); }
+.layout > * { min-width: 0; }
 .filters { border: var(--ho-rule-hair) solid var(--ho-ink); background: var(--ho-paper-2);
   position: sticky; top: 8px; }
 .filters .fhead { display: flex; align-items: center; justify-content: space-between;
@@ -183,7 +212,13 @@ section.block { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid
 .field select, .field input[type=number], .field input[type=text] {
   border: var(--ho-rule-hair) solid var(--ho-grey-400); background: var(--ho-paper);
   padding: 8px 10px; font-family: var(--ho-font-machine); font-size: var(--ho-fs-small); }
+/* WS8.4 / R19: flex items default to min-width:auto (= min-content), so the
+   min/max number inputs refused to shrink and overflowed the filter column when
+   fallback fonts (wider than the UI-D1 stack, e.g. on a runner without the
+   fonts installed) were used. min-width:0 + flex lets them shrink to fit. */
 .range { display: flex; gap: 8px; }
+.range > * { min-width: 0; flex: 1 1 0; }
+.range input { width: 100%; }
 .frow { display: flex; gap: 8px; padding: 12px 14px; }
 .fbtn { flex: 1; text-align: center; font-family: var(--ho-font-machine);
   font-size: var(--ho-fs-mono-s); letter-spacing: var(--ho-tracking-label);
@@ -248,7 +283,21 @@ section.block { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid
 
 /* ---- ROBOT DETAIL : identity header -------------------------------------- */
 .idhead { background: var(--ho-ink); }
+/* WS8.4 / R19: the identity header is a fixed-grid machine-code strip whose
+   corner columns can hold content wider than their track; grid/flex items
+   default to min-width:auto, so that content forced a small page-level
+   horizontal overflow on the detail route. `min-width: 0` lets the flexible
+   tracks shrink, and `overflow-x: clip` keeps the decorative strip from ever
+   propagating page scroll — the strip renders identically. */
 .idhead .in { max-width: var(--ho-maxw); margin: 0 auto; }
+/* Applies to every machine-code header strip (identity header, hero, system
+   header), not just .idhead — the fixed-grid corners hold content that can be
+   wider than their track under fallback fonts, and grid/flex items default to
+   min-width:auto. min-width:0 lets the flexible tracks shrink; the seg clips so
+   the decorative strip never propagates page scroll. */
+.topbar,
+.topbar > * { min-width: 0; }
+.topbar .seg { overflow: hidden; }
 .idbody { position: relative; padding: var(--ho-sp-7) var(--ho-sp-7) var(--ho-sp-6); }
 .idside { position: absolute; top: 0; bottom: 0; width: 40px; display: flex;
   align-items: center; justify-content: center; }
@@ -365,7 +414,11 @@ section.blk { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid v
 .evrow { display: grid; grid-template-columns: 1.3fr 1fr auto; gap: 0; align-items: center;
   border-bottom: var(--ho-rule-hair) solid var(--ho-line-soft); }
 .evrow:last-child { border-bottom: 0; }
-.evrow > div { padding: 12px 14px; }
+/* WS8.4 / R19: let the flexible columns shrink on narrow viewports (grid items
+   default to min-width:auto = min-content, which forced the evidence row wider
+   than a phone). min-width:0 + wrapping keeps the row inside the viewport. */
+.evrow > div { padding: 12px 14px; min-width: 0; }
+.evrow > div, .evrow .src { overflow-wrap: anywhere; }
 .evrow .subj { font-weight: 600; font-size: var(--ho-fs-small); }
 .evrow .subj .ho-code { margin-top: 6px; }
 .evrow .src { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
@@ -502,7 +555,7 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-ink); padding: var(-
 
 /* ---- RESPONSIVE ---------------------------------------------------------- */
 @media (max-width: 1000px) {
-  .grid { grid-template-columns: repeat(2, 1fr); }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 900px) {
   .hero-tools, .card-row, .apps, .mfr-row, .snap-grid { grid-template-columns: 1fr 1fr; }
@@ -708,8 +761,13 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-ink); padding: var(-
 .ho-dark .lead-modal { border-color: var(--ho-paper-ink); }
 .lead-modal__head { display: flex; align-items: flex-start; justify-content: space-between;
   gap: var(--ho-sp-4); margin-bottom: var(--ho-sp-4); }
+/* min 24x24 + centred glyph — WCAG 2.2 AA target size (2.5.8). The ✕ glyph alone
+   measured 22px wide; the min-size guarantees the AA minimum without changing the
+   visual weight. */
 .lead-modal__close { background: transparent; border: 0; cursor: pointer; line-height: 1;
-  font-size: 1.1rem; color: var(--ho-text-muted); padding: 4px; }
+  font-size: 1.1rem; color: var(--ho-text-muted); padding: 4px;
+  min-width: 24px; min-height: 24px; display: inline-flex; align-items: center;
+  justify-content: center; }
 .lead-modal__close:hover { color: var(--ho-ink); }
 .lead-modal .field input[type=email], .lead-modal .field input[type=text],
 .lead-modal .field textarea, .lead-modal .field select {
@@ -717,5 +775,8 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-ink); padding: var(-
   padding: 8px 10px; font-family: var(--ho-font-machine); font-size: var(--ho-fs-small);
   width: 100%; }
 .lead-modal .field textarea { resize: vertical; }
+/* WS8.4 / R17: small validation-error text used bright --ho-signal (#FF4A00),
+   2.83:1 on paper — illegible. --ho-signal-ink is the purpose-built
+   contrast-safe signal-as-text token (~4.66:1 AA); same orange semantic. */
 .field-error { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
-  color: var(--ho-signal); letter-spacing: var(--ho-tracking-code); }
+  color: var(--ho-signal-ink); letter-spacing: var(--ho-tracking-code); }

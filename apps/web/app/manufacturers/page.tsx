@@ -2,7 +2,7 @@
 import { listManufacturers } from "@/lib/api-client";
 import { ManufacturerCard } from "@/components/ManufacturerCard";
 import { SectionIndex } from "@/components/SectionIndex";
-import { SiteFooter, SiteNav } from "@/components/SiteNav";
+import { SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 import { SystemLabel } from "@/components/SystemLabel";
 
@@ -37,7 +37,6 @@ export default async function ManufacturersPage() {
           </p>
         )}
       </div>
-      <SiteFooter />
     </>
   );
 }

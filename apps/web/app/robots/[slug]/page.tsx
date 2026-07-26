@@ -30,7 +30,6 @@ import { MachineCode } from "@/components/MachineCode";
 import { PriceStateLong } from "@/components/PricingState";
 import { SpecRow } from "@/components/DataCell";
 import { SectionIndex } from "@/components/SectionIndex";
-import { SiteFooter } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 import { SystemLabel } from "@/components/SystemLabel";
 
@@ -143,6 +142,18 @@ export default async function RobotDetailPage({
       {/* DARK IDENTITY HEADER */}
       <div className="idhead ho-dark ho-scan">
         <div className="in">
+          {/* Minimal return path (WS8.4). Robot detail deliberately does NOT
+              repeat the primary SiteNav (intentional UI-D1 variance) — but a
+              record page still needs an obvious escape to home/catalogue. Two
+              links, NOT wrapped in <nav>, so no navigation landmark is added and
+              the no-SiteNav variance is preserved exactly. */}
+          <p className="idcrumb">
+            <Link href="/" aria-label="HumanoidOnline home">
+              HumanoidOnline
+            </Link>
+            <span aria-hidden="true">/</span>
+            <Link href="/robots">Robot Catalogue</Link>
+          </p>
           <div className="topbar">
             <div className="corner">
               <span className="ho-star">&#9733;</span>
@@ -373,7 +384,9 @@ export default async function RobotDetailPage({
             </SystemLabel>
           </div>
 
-          <div className="ptable">
+          {/* WS8.4 / R17: horizontally-scrollable on narrow viewports, so it is
+              keyboard-focusable (WCAG 2.1.1) with a named region. */}
+          <div className="ptable" tabIndex={0} role="group" aria-label="Specifications table">
             <div className="prow head">
               <div>Mode</div>
               <div>Region</div>
@@ -529,7 +542,6 @@ export default async function RobotDetailPage({
           />
         </div>
       </div>
-      <SiteFooter />
     </>
   );
 }

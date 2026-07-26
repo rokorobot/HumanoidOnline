@@ -159,6 +159,13 @@ export function LeadDialog({
   }
 
   return (
+    // The backdrop click-to-dismiss is a pointer-only convenience. Keyboard and
+    // screen-reader users dismiss via Escape (handled above) or the labelled
+    // "Close" button inside the dialog; exposing the whole backdrop as an
+    // interactive control would announce a large spurious button to AT, which is
+    // worse than the narrow suppression here (WS8.4 / R21 — narrowest documented
+    // exception, not a blanket rule-off).
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
       className="lead-overlay"
       onMouseDown={(e) => {
@@ -307,8 +314,7 @@ export function LeadDialog({
               </button>
             </div>
             <p className="note">
-              // No checkout, no payment. This captures a qualified commercial
-              inquiry only.
+              {"// No checkout, no payment. This captures a qualified commercial inquiry only."}
             </p>
           </form>
         )}

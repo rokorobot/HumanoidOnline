@@ -221,19 +221,24 @@ def test_r11_ineligible_image_never_reaches_the_api(client, database_url) -> Non
         _exec("DELETE FROM robot_image WHERE image_url = :u", u=forbidden)
 
 
+@pytest.mark.parametrize("usage", ["NONE", "OFFICIAL_MANUFACTURER_MEDIA"])
 def test_r11_attribution_required_without_credit_never_reaches_the_api(
-    client, database_url
+    client, database_url, usage
 ) -> None:
-    """Q14 end-to-end: an uncredited ATTRIBUTION_REQUIRED image is not served."""
+    """Q14 end-to-end, over BOTH usage bases: an uncredited ATTRIBUTION_REQUIRED
+    image is never served — the display policy (OFFICIAL_MANUFACTURER_MEDIA)
+    cannot waive the licensing obligation, proven through the real response and
+    not only the unit gate."""
     forbidden = f"https://uncredited.invalid/{_uniq('img')}.jpg"
     robot_id = _exec("SELECT id FROM robot WHERE is_published LIMIT 1").scalar_one()
     slug = _exec("SELECT slug FROM robot WHERE id = :i", i=robot_id).scalar_one()
     _exec(
         "INSERT INTO robot_image (robot_id, image_url, source_type, image_type, "
         "identity_status, rights_status, usage_basis, attribution) VALUES "
-        "(:r, :u, 'EDITORIAL', 'FRONT', 'VERIFIED', 'ATTRIBUTION_REQUIRED', 'NONE', NULL)",
+        "(:r, :u, 'EDITORIAL', 'FRONT', 'VERIFIED', 'ATTRIBUTION_REQUIRED', :g, NULL)",
         r=robot_id,
         u=forbidden,
+        g=usage,
     )
     try:
         detail = client.get(f"/api/robots/{slug}")
@@ -254,8 +259,10 @@ def test_r11_every_served_image_carries_its_required_attribution(
                 "WHERE image_url = :u",
                 u=img["image_url"],
             ).all()
-            for rights, usage, attribution in rows:
-                if rights == "ATTRIBUTION_REQUIRED" and usage != "OFFICIAL_MANUFACTURER_MEDIA":
+            for rights, _usage, attribution in rows:
+                # The credit obligation attaches to the rights state and is not
+                # waived by usage_basis, so no usage carve-out here.
+                if rights == "ATTRIBUTION_REQUIRED":
                     assert (attribution or "").strip(), img["image_url"]
                     assert (img.get("attribution") or "").strip(), img["image_url"]
 

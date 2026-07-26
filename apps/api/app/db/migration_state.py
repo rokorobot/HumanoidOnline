@@ -74,17 +74,32 @@ class MigrationState:
         )
 
     @property
-    def unknown(self) -> list[str]:
-        """Applied migrations with no corresponding governed file.
+    def ahead(self) -> list[str]:
+        """Applied migrations with no corresponding file in *this* build.
 
-        Usually means the database is *ahead* of this build — a rollback hazard
-        worth surfacing rather than ignoring.
+        The database is **ahead** of the running code — the normal state during
+        an application rollback: version B applied `0004`, B turned out to be
+        defective, and the operator rolled the code back to A.
+
+        This is reported loudly but is **not** fatal, because WS8-L7 requires
+        that *application rollback remains possible against the migrated
+        schema*. Refusing to start here would be the single thing that prevents
+        the rollback L7 exists to guarantee — the doctrine's own safety valve,
+        wired shut. L7's additive/backward-compatible rule is what makes the
+        older build able to run against the newer schema; destructive changes
+        are prohibited precisely so this holds.
         """
         return sorted(set(self.applied) - set(self.expected))
 
     @property
     def is_clean(self) -> bool:
-        return not (self.missing or self.drifted or self.unknown)
+        """Blocking conditions only.
+
+        `ahead` is deliberately excluded: a newer database is a rollback, not a
+        fault. Missing and drifted migrations mean the code needs something the
+        database does not have, which genuinely cannot be served.
+        """
+        return not (self.missing or self.drifted)
 
 
 def sha256_text(text_value: str) -> str:
@@ -169,21 +184,36 @@ def describe(state: MigrationState) -> str:
             "checksum drift (file edited after it was applied): "
             + ", ".join(state.drifted)
         )
-    if state.unknown:
-        parts.append(
-            "applied but not present in this build: " + ", ".join(state.unknown)
-        )
     return "; ".join(parts)
 
 
+def describe_ahead(state: MigrationState) -> str:
+    return (
+        "database is ahead of this build (applied but not present here): "
+        + ", ".join(state.ahead)
+    )
+
+
 def verify_migration_state(connection: Connection) -> MigrationState:
-    """Raise unless the database matches the governed migration set."""
+    """Raise unless the database can serve this build.
+
+    Blocking: a migration this build expects is missing, or one it knows has
+    drifted. Non-blocking: the database is *ahead* — surfaced loudly (L7
+    rollback compatibility).
+    """
     state = inspect_migration_state(connection)
     if not state.is_clean:
         raise MigrationStateError(
             "database migration state does not match this build — "
             f"{describe(state)}. Run `uv run db/bootstrap.py` against this "
             "database before starting the application."
+        )
+    if state.ahead:
+        logger.warning(
+            "%s. Continuing: WS8-L7 requires application rollback to remain "
+            "possible against a migrated schema, and WS8 migrations are "
+            "additive/backward-compatible by doctrine.",
+            describe_ahead(state),
         )
     return state
 
@@ -219,5 +249,10 @@ def enforce_migration_state_at_startup(engine) -> MigrationState | None:
         )
         return None
 
+    if state.ahead:
+        logger.warning(
+            "Migration state OK for this build, but the database is AHEAD: %s.",
+            ", ".join(state.ahead),
+        )
     logger.info("Migration state verified: %d applied.", len(state.applied))
     return state

@@ -36,7 +36,7 @@ a later slice) · `N/A` with a reason.
 | L4 | No law weakening to pass a gate | WS8 §3 | Attested | per-PR review; **WS8.1 note below** | R33 | IN PROGRESS |
 | L5 | Fail closed in production | WS8 §3 | Automated | `test_r1_admin_is_not_mounted_when_unconfigured`, `test_r1_partial_configuration_still_fails_closed`, `test_unknown_policy_fails_closed_at_check_time`, `test_unknown_policy_is_rejected_at_wiring_time`, `test_there_is_no_global_disable_switch`, `test_malformed_trusted_ingress_config_fails_loudly` | R1, R3, R7 | **PASS** — admin, abuse control, ingress config (WS8.1) + database URL and canonical origin (WS8.2, `test_config_contract.py`, `__tests__/site-origin.test.ts`) |
 | L6 | PII containment | WS8 §3 | Automated | `test_pii_containment.py` (5 tests) | R2, R5 | **PASS** |
-| L7 | Reversibility + schema rollback doctrine | WS8 §3 | Attested | migrations remain additive; no destructive change and no synthetic down-migration introduced by WS8.2 (`db/migrations/README.md`); rollback drill still owed | R9, R30 | PARTIAL — doctrine conformance **PASS**, drill PENDING (WS8.8) |
+| L7 | Reversibility + schema rollback doctrine | WS8 §3 | Attested | migrations remain additive; no destructive change and no synthetic down-migration introduced by WS8.2. **Application rollback is proven possible against a migrated schema** — `test_database_ahead_of_the_build_is_not_blocking`, `test_ahead_database_passes_verification_against_the_real_database`. Rollback drill still owed | R9, R30 | PARTIAL — doctrine conformance **PASS**, drill PENDING (WS8.8) |
 | L8 | Evidence of readiness by declared class | WS8 §3 | Attested | this matrix | R33 | IN PROGRESS |
 | L9 | Explicit policy over implicit default | WS8 §3 | Automated | `test_r4_default_posture_is_strict_same_origin`, `test_r4_wildcard_origin_is_not_an_accepted_policy`, `e2e/security-headers.spec.ts` | R4 | **PASS** |
 | L10 | Anonymity preserved under abuse control | WS8 §3 | Automated | `test_legitimate_repeat_submission_is_not_treated_as_abuse`; no auth dependency added to either write path | R3 | **PASS** |
@@ -111,7 +111,7 @@ recur. No other existing assertion was modified.
 | R7 fail-closed production configuration | Automated | **PASS** | `test_config_contract.py` — 14 tests. B3 closed (production/staging refuse to start without `DATABASE_URL`; the development URL is unreachable in a strict env). B4 closed (`siteUrl()` refuses to invent an origin). The classifier is the adversarial part: unset/empty/whitespace resolve to **production**, and a typo raises — nothing can be misclassified as development |
 | R8 canonical-origin correctness | Automated | **PASS** | `__tests__/site-origin.test.ts` — 12 tests. One authoritative resolver (`lib/site.ts`); JSON-LD, sitemap, robots.txt and llms.txt all proven to emit a staging origin and **never** the production hostname; `next.config.mjs` build guard pinned to the same rule |
 | R9 migration integrity | Automated | **PASS** | `test_migration_integrity.py` — 13 tests. `db/bootstrap.py` now compares the recorded sha256 and refuses on drift (exit 1); `app/db/migration_state.py` enforces migration-before-app-start, strict environments refusing to serve. Baseline is presence-only by design (below) |
-| R10 one bootstrap truth | Attested | **PASS** | `README.md` divergent `psql -f` path removed and replaced with an explicit warning; `apps/web`, `apps/api` and `db/catalogue` READMEs reworded to `db/bootstrap.py`; migration `0003` documented plus a checksum-integrity section |
+| R10 one bootstrap truth | **Automated** | **PASS** | `test_bootstrap_docs.py` — 9 tests (bypass commands absent from governed docs, bootstrap named canonical, every migration documented, doctrine stated, no second runner). Supplementary sweep: `README.md` divergent `psql -f` path removed and replaced with an explicit warning; `apps/web`, `apps/api` and `db/catalogue` READMEs reworded to `db/bootstrap.py`; migration `0003` documented plus a checksum-integrity section |
 
 **R9 design note — the baseline is deliberately exempt from checksum comparison.**
 `db/schema.sql` is canonical and is *edited* whenever the model changes ("schema
@@ -122,6 +122,15 @@ environment corrupt and, because bootstrap now refuses on drift, would block the
 very migrations meant to bring it up to date. **Forward migrations are the
 immutable history that is verified.** Both implementations are pinned to this by
 `test_baseline_checksum_is_exempt_on_both_sides`.
+
+**R9 design note — a database *ahead* of the build is not an error.** An applied
+migration this build does not know about is the normal state during an
+application rollback: version B applied `0004`, B proved defective, the operator
+rolled the code back to A. Treating that as fatal would make A refuse to start —
+wiring shut the very rollback WS8-L7 guarantees. `ahead` is therefore reported
+loudly and excluded from the blocking check; `missing` and `drifted` remain
+fatal. L7's additive/backward-compatible rule is what makes the older build able
+to serve the newer schema.
 
 **Deployment note carried to WS8.7.** `enforce_migration_state_at_startup` defines
 the contract; the mechanism guaranteeing migrations have *run* before the process

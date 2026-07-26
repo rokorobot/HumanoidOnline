@@ -71,7 +71,18 @@ function normalizeOrigin(raw: string, source: string): string {
       `${source}="${raw}" must use http or https (got "${parsed.protocol}").`,
     );
   }
-  return `${parsed.origin}${parsed.pathname}`.replace(/\/+$/, "");
+  // An origin is scheme + host + port — no path, query or fragment. Accepting
+  // "https://example.com/foo" and quietly folding the path into the canonical
+  // base would emit subtly wrong canonical URLs everywhere; reject it instead
+  // of normalising a value the operator did not mean.
+  const hasPath = parsed.pathname !== "" && parsed.pathname !== "/";
+  if (hasPath || parsed.search || parsed.hash) {
+    throw new ConfigurationError(
+      `${source}="${raw}" must be a bare origin (scheme + host + port) with no ` +
+        `path, query or fragment. Use "${parsed.origin}".`,
+    );
+  }
+  return parsed.origin;
 }
 
 /**

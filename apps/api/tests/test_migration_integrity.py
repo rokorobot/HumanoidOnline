@@ -130,7 +130,7 @@ def test_bootstrap_ignores_not_yet_applied_migrations():
 # ---- application-level state comparison -----------------------------------
 
 
-def test_missing_drifted_and_unknown_are_reported_separately():
+def test_missing_drifted_and_ahead_are_reported_separately():
     expected = {"0000_schema": None, "0001_x": "bbb", "0002_y": "ccc"}
     state = MigrationState(
         expected=expected,
@@ -139,8 +139,63 @@ def test_missing_drifted_and_unknown_are_reported_separately():
     assert state.missing == ["0001_x"]
     # The baseline is exempt even with a completely different checksum.
     assert state.drifted == ["0002_y"]
-    assert state.unknown == ["0009_future"]
-    assert not state.is_clean
+    assert state.ahead == ["0009_future"]
+    assert not state.is_clean  # because of missing + drifted, NOT because of ahead
+
+
+# ---- L7: an older build must still boot against a newer schema ------------
+
+
+def test_database_ahead_of_the_build_is_not_blocking():
+    """The rollback case, stated directly.
+
+    Deploy B with `0004`; the migration runs; B turns out to be defective; the
+    operator rolls the code back to A. A now sees `0004` as unknown. If that
+    made the state unclean, A would refuse to start — and the rollback WS8-L7
+    guarantees would be impossible. L7's additive/backward-compatible rule is
+    exactly what lets A run against B's schema.
+    """
+    expected = {"0000_schema": None, "0001_x": "aaa"}
+    rolled_back = MigrationState(
+        expected=expected,
+        applied={"0000_schema": "whatever", "0001_x": "aaa", "0004_from_b": "zzz"},
+    )
+    assert rolled_back.ahead == ["0004_from_b"]
+    assert rolled_back.missing == [] and rolled_back.drifted == []
+    assert rolled_back.is_clean, "an older build must boot against a newer schema"
+
+
+def test_ahead_database_passes_verification_against_the_real_database(database_url):
+    """Same guarantee, against a live database: insert a later migration record
+    inside a rolled-back transaction and prove this build still accepts it."""
+    conn = engine.connect()
+    trans = conn.begin()
+    try:
+        conn.execute(
+            text(
+                "INSERT INTO public.schema_migrations (version, checksum) "
+                "VALUES (:v, :c)"
+            ),
+            {"v": "9999_from_a_newer_build", "c": "f" * 64},
+        )
+        state = verify_migration_state(conn)  # must NOT raise
+        assert "9999_from_a_newer_build" in state.ahead
+        assert state.is_clean
+    finally:
+        trans.rollback()
+        conn.close()
+
+
+def test_ahead_is_still_surfaced_loudly(caplog):
+    """Non-blocking must not mean invisible — an operator needs to know the
+    database is newer than the code they just rolled back to."""
+    from app.db.migration_state import describe_ahead
+
+    state = MigrationState(
+        expected={"0000_schema": None},
+        applied={"0000_schema": "x", "0004_from_b": "y"},
+    )
+    assert "0004_from_b" in describe_ahead(state)
 
 
 def test_clean_state_is_clean():

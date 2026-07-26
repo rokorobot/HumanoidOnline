@@ -103,6 +103,22 @@ describe("siteUrl()", () => {
     expect(siteUrl()).toBe(STAGING_ORIGIN);
   });
 
+  it("rejects an origin carrying a path, query or fragment", async () => {
+    // An origin is scheme + host + port. Folding a path into the canonical base
+    // would emit subtly wrong URLs on every machine surface.
+    for (const bad of [
+      "https://example.com/foo",
+      "https://example.com/foo/",
+      "https://example.com/?x=1",
+      "https://example.com/#frag",
+    ]) {
+      vi.resetModules();
+      setEnv({ APP_ENV: "production", NEXT_PUBLIC_SITE_URL: bad });
+      const { siteUrl, ConfigurationError } = await loadSite();
+      expect(() => siteUrl(), bad).toThrow(ConfigurationError);
+    }
+  });
+
   it("rejects a malformed or non-http origin", async () => {
     for (const bad of ["not-a-url", "ftp://example.com", "example.com"]) {
       vi.resetModules();
@@ -184,6 +200,8 @@ describe("next.config.mjs mirrors the same contract", () => {
     // If these drift, a bad config could build cleanly and fail in production.
     expect(config).toContain("NEXT_PUBLIC_SITE_URL is required to build");
     expect(config).toContain('["development", "test"]');
+    // The build guard must reject exactly what the runtime rejects.
+    expect(config).toContain("must be a bare origin");
     expect(config).not.toContain(PRODUCTION_HOST);
   });
 });

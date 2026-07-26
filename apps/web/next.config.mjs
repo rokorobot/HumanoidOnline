@@ -63,6 +63,18 @@ function assertCanonicalOriginConfigured() {
         `[WS8.2/R7] NEXT_PUBLIC_SITE_URL="${origin}" must use http or https.`,
       );
     }
+    // Must match lib/site.ts: an origin carries no path, query or fragment.
+    // A build guard that accepts what the runtime rejects is worse than none.
+    if (
+      (parsed.pathname !== "" && parsed.pathname !== "/") ||
+      parsed.search ||
+      parsed.hash
+    ) {
+      throw new Error(
+        `[WS8.2/R7] NEXT_PUBLIC_SITE_URL="${origin}" must be a bare origin ` +
+          `(scheme + host + port). Use "${parsed.origin}".`,
+      );
+    }
     return;
   }
 

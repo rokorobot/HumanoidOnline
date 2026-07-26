@@ -11,6 +11,9 @@ dependencies = [
     "pydantic>=2.7",
     "pydantic-settings>=2.3",
     "sqladmin>=0.19",
+    # WS8.1 / R1 — Starlette's SessionMiddleware (used by the SQLAdmin
+    # authentication backend) signs the session cookie with itsdangerous.
+    "itsdangerous>=2.2",
 ]
 
 [dependency-groups]

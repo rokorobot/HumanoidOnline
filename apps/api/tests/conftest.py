@@ -7,6 +7,33 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.security.rate_limit import RATE_LIMITER, RateLimitPolicy
+
+#: WS8.1 / R3. The limiter is a process-local singleton (DEP P2/P3), so state
+#: leaks between tests unless it is reset. The rest of the suite predates rate
+#: limiting and legitimately posts repeatedly, so it runs under permissive
+#: policies; `test_rate_limiting.py` installs tight policies itself and proves
+#: the enforcement, and `test_security_boundaries.py` separately asserts that
+#: the *shipped defaults* are strict.
+_PERMISSIVE = 10_000
+
+
+@pytest.fixture(autouse=True)
+def reset_rate_limiter():
+    RATE_LIMITER.reset()
+    for name in ("buyer_requirements", "commercial_leads"):
+        RATE_LIMITER.set_policy(
+            RateLimitPolicy(
+                name=name,
+                burst_limit=_PERMISSIVE,
+                burst_window_seconds=60,
+                sustained_limit=_PERMISSIVE,
+                sustained_window_seconds=3600,
+            )
+        )
+    yield
+    RATE_LIMITER.reset()
+    RATE_LIMITER.load_from_settings()
 
 
 @pytest.fixture(scope="session")

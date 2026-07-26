@@ -14,7 +14,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Text, UniqueConstraint, text
+from sqlalchemy import Boolean, DateTime, ForeignKey, Text, UniqueConstraint, event, text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -246,4 +246,38 @@ class PromotionAudit(Base):
     detail: Mapped[dict | None] = mapped_column(JSONB)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("now()"), nullable=False
+    )
+
+
+# --------------------------------------------------------------- WS8.1 / R6 --
+# Gap B5: `promotion_audit` is declared append-only in three places (this
+# docstring, db/schema.sql:1187-1189, and the DATA-D1 contract) but nothing
+# enforced it — SQLAdmin exposed full CRUD. WS8 gate R6 requires the promise to
+# be **enforced by the application**, not merely documented.
+#
+# The listeners are registered at model-import time so every ORM session is
+# covered: the API, the admin, and the governed promotion CLI alike.
+#
+# Honest scope: this is ORM-level enforcement. It stops `session.delete(...)`,
+# attribute mutation and SQLAdmin's edit/delete paths. It does **not** stop raw
+# SQL or a bulk Core `UPDATE`/`DELETE` issued against the table directly. A
+# database-level guarantee would need a trigger, i.e. new DDL — out of scope for
+# WS8.1, and any such enforcement must satisfy L7's database-enforcement clause.
+
+
+class PromotionAuditImmutableError(RuntimeError):
+    """Raised when an append-only promotion-audit row is modified or removed."""
+
+
+@event.listens_for(PromotionAudit, "before_update", propagate=True)
+def _promotion_audit_block_update(_mapper, _connection, target: PromotionAudit) -> None:
+    raise PromotionAuditImmutableError(
+        f"promotion_audit is append-only: refusing UPDATE of row {target.id!r}"
+    )
+
+
+@event.listens_for(PromotionAudit, "before_delete", propagate=True)
+def _promotion_audit_block_delete(_mapper, _connection, target: PromotionAudit) -> None:
+    raise PromotionAuditImmutableError(
+        f"promotion_audit is append-only: refusing DELETE of row {target.id!r}"
     )

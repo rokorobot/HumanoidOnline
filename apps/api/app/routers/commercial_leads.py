@@ -19,12 +19,20 @@ from sqlalchemy.orm import Session
 
 from app.db.session import get_session
 from app.schemas.commercial_lead import CommercialLeadCreate, CommercialLeadCreated
+from app.security.rate_limit import rate_limited
 from app.services.leads import capture_lead
 
 router = APIRouter(prefix="/api/commercial-leads", tags=["commercial-lead"])
 
 
-@router.post("", response_model=CommercialLeadCreated)
+@router.post(
+    "",
+    response_model=CommercialLeadCreated,
+    # WS8.1 / R3 — endpoint-aware abuse control. Stricter than buyer-intent:
+    # this path captures PII. Anonymity is preserved (WS8-L10): no auth is
+    # added, and the WS7 create-or-extend repeat remains a legitimate call.
+    dependencies=[Depends(rate_limited("commercial_leads"))],
+)
 def create_commercial_lead(
     payload: CommercialLeadCreate,
     session: Annotated[Session, Depends(get_session)],

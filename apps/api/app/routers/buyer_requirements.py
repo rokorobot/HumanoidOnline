@@ -33,6 +33,7 @@ from app.models.robot import Robot
 from app.models.use_case import UseCase
 from app.schemas.buyer_requirement import BuyerRequirementCreate, BuyerRequirementCreated
 from app.schemas.match import MatchItem, MatchResponse, MatchRobotRef, RequirementRead
+from app.security.rate_limit import rate_limited
 from app.services.matching import match
 from app.services.matching.repository import (
     load_candidates,
@@ -67,7 +68,15 @@ def _raw_has_signal(raw_input: dict | None) -> bool:
     )
 
 
-@router.post("", response_model=BuyerRequirementCreated, status_code=201)
+@router.post(
+    "",
+    response_model=BuyerRequirementCreated,
+    status_code=201,
+    # WS8.1 / R3 — endpoint-aware abuse control on the anonymous buyer-intent
+    # write path. No authentication is introduced (WS8-L10): WS5 anonymity is
+    # preserved, and abuse is bounded by IP-tiered limits only.
+    dependencies=[Depends(rate_limited("buyer_requirements"))],
+)
 def create_buyer_requirement(
     payload: BuyerRequirementCreate,
     session: Annotated[Session, Depends(get_session)],

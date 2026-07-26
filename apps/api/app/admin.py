@@ -2,14 +2,20 @@
 
 Internal CRUD only — not the public contract, not styled (02_ARCHITECTURE.md §1,
 API contract §7). Association tables with composite keys are intentionally not
-registered here. No auth layer in WS2: this must be network-gated in deployment,
-not exposed publicly.
+registered here.
+
+WS8.1 / R1 (gap B1): this surface is no longer unauthenticated. It now requires
+application-level authentication **and** fails closed when unconfigured. The
+network boundary (DEP P4) is still owed by WS8.7/WS8.8 — see `mount_admin`.
 """
 from __future__ import annotations
+
+import logging
 
 from fastapi import FastAPI
 from sqladmin import Admin, ModelView
 
+from app.config import get_settings
 from app.db.session import engine
 from app.models.buyer_requirement import BuyerRequirement
 from app.models.capability import Capability
@@ -29,6 +35,9 @@ from app.models.robot import Robot, RobotVariant
 from app.models.robot_image import RobotImage
 from app.models.spec import SpecDefinition
 from app.models.use_case import UseCase
+from app.security.admin_auth import AdminAuth
+
+logger = logging.getLogger(__name__)
 
 
 class ManufacturerAdmin(ModelView, model=Manufacturer):
@@ -197,7 +206,14 @@ class PromotionAuditAdmin(ModelView, model=PromotionAudit):
         PromotionAudit.promoted_robot_id, PromotionAudit.approved_by,
         PromotionAudit.created_at,
     ]
-    name_plural = "Promotion audit (DATA-D1)"
+    name_plural = "Promotion audit (DATA-D1, append-only)"
+    # WS8.1 / R6 (gap B5): the append-only promise is now enforced, not merely
+    # documented. These flags remove create/edit/delete from the admin UI; the
+    # ORM listeners in `app.models.discovery` are the backstop that also covers
+    # any other session (defence in depth — the UI flag alone is not the gate).
+    can_create = False
+    can_edit = False
+    can_delete = False
 
 
 _VIEWS = [
@@ -211,8 +227,43 @@ _VIEWS = [
 ]
 
 
-def mount_admin(app: FastAPI) -> Admin:
-    admin = Admin(app, engine, title="HumanoidOnline — internal admin")
+def admin_is_configured() -> bool:
+    """True when every credential the admin needs is present."""
+    s = get_settings()
+    return bool(s.admin_username and s.admin_password and s.admin_session_secret)
+
+
+def mount_admin(app: FastAPI) -> Admin | None:
+    """Mount the internal admin, or refuse to mount it (WS8.1 / R1).
+
+    Fail closed (WS8-L5): with no configured credentials the surface is **not
+    mounted at all**. Returning ``None`` is the correct, safe outcome — never
+    mount an unauthenticated CRUD surface over buyer PII.
+
+    This is B1 *stage 1*. The network boundary that puts admin on a separate
+    protected host/listener (DEP P4) is realized in WS8.7 (R27) and probed from
+    outside in WS8.8 (R29). Both layers are mandatory; neither substitutes for
+    the other.
+    """
+    s = get_settings()
+    if not admin_is_configured():
+        logger.warning(
+            "Internal admin NOT mounted: ADMIN_USERNAME, ADMIN_PASSWORD and "
+            "ADMIN_SESSION_SECRET must all be set. Refusing to expose an "
+            "unauthenticated admin surface (WS8.1 / R1)."
+        )
+        return None
+
+    admin = Admin(
+        app,
+        engine,
+        title="HumanoidOnline — internal admin",
+        authentication_backend=AdminAuth(
+            secret_key=s.admin_session_secret,
+            username=s.admin_username,
+            password=s.admin_password,
+        ),
+    )
     for view in _VIEWS:
         admin.add_view(view)
     return admin

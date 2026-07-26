@@ -179,6 +179,19 @@ def test_use_case_404(client, database_url) -> None:
 
 # ---- Admin ---------------------------------------------------------------
 
-def test_admin_mounted(client, database_url) -> None:
-    resp = client.get("/admin/", follow_redirects=True)
-    assert resp.status_code == 200
+def test_admin_is_not_anonymously_reachable(client, database_url) -> None:
+    """WS8.1 / R1 — replaces the former `test_admin_mounted`.
+
+    That test asserted `GET /admin/` returned **200 to an anonymous caller**.
+    It passed, and what it pinned was gap B1 itself: unauthenticated SQLAdmin
+    CRUD over buyer PII, expressed as a green test. The ratified contract
+    forbids it — unconfigured means *not mounted* (404), configured means
+    redirect to login. Anonymous 200 is never acceptable again.
+
+    Both branches (fail-closed, and authenticated-when-configured) are covered
+    in `test_security_boundaries.py`; this asserts the invariant on the real app.
+    """
+    resp = client.get("/admin/", follow_redirects=False)
+    assert resp.status_code != 200
+    # This suite runs with no admin credentials configured, so: fail closed.
+    assert resp.status_code == 404

@@ -26,10 +26,25 @@ from app.routers import (
     stats,
     use_cases,
 )
+from app.security.client_ip import validate_trusted_ingress_config
+from app.security.headers import SecurityHeadersMiddleware, configure_cors
 
 settings = get_settings()
 
 app = FastAPI(title=settings.api_title, version=settings.api_version)
+
+# WS8.1 / R4 — the security posture is now explicit and tested (WS8-L9) rather
+# than an accident of same-origin browser rules. `configure_cors` installs CORS
+# ONLY when an explicit allowlist is configured; the default is strict
+# same-origin, and `CORS_ALLOWED_ORIGINS` is the documented opt-in.
+app.add_middleware(SecurityHeadersMiddleware)
+CORS_ALLOWED_ORIGINS = configure_cors(app)
+
+# DEP P1 — parse the trusted-ingress configuration at import so a malformed
+# value refuses to boot. Silently reinterpreting it as "trust nobody" would
+# collapse every client behind the proxy onto one address and rate-limit them
+# as a single caller — an outage that looks nothing like a config error.
+TRUSTED_INGRESS = validate_trusted_ingress_config()
 
 app.include_router(health.router)
 app.include_router(robots.router)
@@ -42,8 +57,10 @@ app.include_router(buyer_requirements.router)
 # WS7 — commercial lead (first commercial conversion / monetization seam).
 app.include_router(commercial_leads.router)
 
-# Internal-only admin at /admin (network-gate in deployment; not public).
-mount_admin(app)
+# Internal admin at /admin — WS8.1 / R1: authenticated at the application layer
+# and NOT mounted at all when unconfigured (fail closed). The production network
+# boundary (DEP P4) is still owed by WS8.7 (R27) + WS8.8 (R29).
+admin = mount_admin(app)
 
 
 @app.get("/")

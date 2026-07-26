@@ -1,14 +1,21 @@
 # WS8 — MVP Hardening / Release
 
-> ## STATUS: DRAFT v0.4 — RATIFICATION CANDIDATE — NO IMPLEMENTATION
+> ## STATUS: RATIFIED v0.4 — IMPLEMENTATION AUTHORIZED ONLY AFTER MERGE
 >
-> v0.4 folds the owner's **v0.3 verdict (REQUEST MINOR REVISION)** — four corrections,
-> two blocking. It is a **narrow** revision: the Deployment Execution Profile is now
-> actually frozen to values, the two mixed-evidence gates are split, the Q14/L7
-> database-enforcement language is tightened, and gates are renumbered accordingly.
-> No architectural change; C3–C8 are not reopened.
+> **Ratified by the product owner on 2026-07-26** at exact head
+> `0f4426cc87a120fc77fa2b592ba6f7d7844f6209`, after a ratify-or-reject review, with
+> all six CI jobs green on that head. Ratification covers **WS8-L1–L11**, **DEP
+> P1–P5**, **D1–D7**, **R1–R34**, the **§8 gap dispositions**, the **§10 Release
+> Invariant Matrix** requirement, and the **WS8.1 → WS8.9** execution order. The laws
+> in §3 and the DEP values in §6 are now **FROZEN**.
 >
-> Nothing here authorizes implementation. **`build WS8` remains CLOSED.**
+> v0.4 folded the owner's v0.3 verdict (REQUEST MINOR REVISION) — four corrections,
+> two blocking: the Deployment Execution Profile frozen to values, the two
+> mixed-evidence gates split, the Q14/L7 database-enforcement language tightened, and
+> gates renumbered. No architectural change; C3–C8 were not reopened.
+>
+> **`build WS8` opens on completion of the contract merge boundary** (§15). WS8 begins
+> with **WS8.1 Security Boundaries**; each slice still lands PR-gated.
 >
 > Revision history: v0.1 initial draft · v0.2 owner decisions D1–D7 + B2 reframing ·
 > v0.3 owner corrections C1–C8 + sequencing · **v0.4 owner corrections E1–E4** (§14).
@@ -541,17 +548,24 @@ test inventory floor · C-seq B3/B4 → WS8.2, R1 staged, new law L11.
 
 ## 15. Ratification record
 
-**STATUS: DRAFT v0.4 — RATIFICATION CANDIDATE — NOT RATIFIED.**
-No implementation authorized. **`build WS8` remains CLOSED.**
+**STATUS: RATIFIED v0.4 — IMPLEMENTATION AUTHORIZED ONLY AFTER MERGE.**
 
 ```
 v0.2 verdict:      REQUEST REVISION (owner, 2026-07-26) — C1-C8 + sequencing
 v0.3 verdict:      REQUEST MINOR REVISION (owner, 2026-07-26) — E1-E4
 v0.4 folds:        E1-E6; C3-C8 not reopened; Q4 + Q14 decisions accepted
 Decisions folded:  D1-D7 (owner, 2026-07-26)
-Ratified by:       (pending ratify-or-reject review of v0.4)
-Ratified on:       (pending)
-Build trigger:     `build WS8` (not yet issued)
-Frozen at ratification: Deployment Execution Profile P1-P5 (§6), to values
-Provider selection: confirmed DEFERRED to WS8.7 (§11 D2)
+
+Ratified by:        Product owner
+Ratified on:        2026-07-26
+Ratified content:   v0.4 / 0f4426c
+Build trigger:      opens after this ratified contract is merged to main
+DEP P1-P5:          FROZEN
+Provider selection: DEFERRED to WS8.7
 ```
+
+Ratification covers WS8-L1–L11, DEP P1–P5, D1–D7, R1–R34, the §8 gap dispositions,
+the §10 Release Invariant Matrix requirement, and the WS8.1 → WS8.9 execution order.
+It does **not** authorize implementation before the contract merge boundary is
+completed. On merge, `build WS8` opens, beginning with **WS8.1 Security Boundaries**;
+each slice still lands PR-gated.

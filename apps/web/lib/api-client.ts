@@ -4,6 +4,7 @@
 // responses throw so the error boundary / build surfaces the failure.
 import { notFound } from "next/navigation";
 
+import { correlationHeader } from "./request-id";
 import { API_BASE_URL } from "./server";
 import type {
   CompareResponse,
@@ -42,7 +43,10 @@ async function getJSON<T>(
   path: string,
   { notFoundOn404 = false }: { notFoundOn404?: boolean } = {},
 ): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${path}`, { cache: "no-store" });
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    cache: "no-store",
+    headers: await correlationHeader(),
+  });
   if (res.status === 404 && notFoundOn404) {
     notFound();
   }
@@ -58,7 +62,10 @@ async function getJSON<T>(
 // itself renders notFound() — both sharing ONE governed read (wrap in React
 // cache()), never an alternate data path (AGENT-01 projection-only).
 async function getJSONOrNull<T>(path: string): Promise<T | null> {
-  const res = await fetch(`${API_BASE_URL}${path}`, { cache: "no-store" });
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    cache: "no-store",
+    headers: await correlationHeader(),
+  });
   if (res.status === 404) return null;
   if (!res.ok) {
     throw new Error(`API ${res.status} for ${path}`);
@@ -113,7 +120,7 @@ export async function compareRobots(
   const clean = ids.map((s) => s.trim()).filter(Boolean);
   const res = await fetch(
     `${API_BASE_URL}/api/robots/compare${buildQuery({ ids: clean.join(",") })}`,
-    { cache: "no-store" },
+    { cache: "no-store", headers: await correlationHeader() },
   );
   if (res.status === 422 || res.status === 404) return null;
   if (!res.ok) throw new Error(`API ${res.status} for /api/robots/compare`);

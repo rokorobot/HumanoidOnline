@@ -129,6 +129,8 @@ jobs:
         run: npm run test
       - name: Build
         run: npm run build
+      - name: Performance budgets (WS8.6 / R24 Part A — deterministic bundle weight)
+        run: npm run perf:budget
 
   web-integration:
     name: Frontend integration (verified catalogue e2e)

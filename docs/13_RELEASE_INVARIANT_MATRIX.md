@@ -262,8 +262,10 @@ that owns it has passed.
 | D5a checksum never compared | CLOSE | WS8.2 | **CLOSED** (R9) |
 | D6 divergent README bootstrap | CLOSE | WS8.2 | **CLOSED** (R10) |
 | D7 migration `0003` undocumented | CLOSE | WS8.2 | **CLOSED** (R10) |
-| D1–D4, D9 | CLOSE | WS8.6 / WS8.7 | open |
-| D8 `event_log` dead | NOT A RELEASE DEFECT | — | documented dormant at R25 (open) |
+| D9 no app logging / error / metrics / correlation | CLOSE | WS8.6 | **CLOSED** (R25 — structured JSON request log + `X-Request-ID` correlation across Next↔FastAPI, no PII in output; uvicorn access log silenced in prod) |
+| D1–D4 deployment gaps | CLOSE | WS8.7 | open |
+| D8 `event_log` dead | NOT A RELEASE DEFECT | — | **documented dormant** (R25 — model docstring + no application writer proven + zero-write regression) |
+| R24 performance | CLOSE | WS8.6 | **CLOSED** — deterministic bundle budgets (`scripts/perf-budget.mjs`, gzipped First Load JS in CI) **+** built-route budget (`e2e/perf-budget.spec.ts`: document bytes / JS asset count+size vs the fixed catalogue). No timing/LCP thresholds; field CWV is post-release SLO (§11.1) |
 | D10 scheduled re-verification | ACCEPT-DEFER | product owner | runbook entry at R30 (open) |
 | Q5 dead SQL clause + 9/16 matrix | CLOSE | WS8.3 | **CLOSED** |
 | Q6 `hero_image_url` bypass | CLOSE | WS8.3 | **CLOSED** |

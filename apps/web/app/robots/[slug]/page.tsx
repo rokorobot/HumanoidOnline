@@ -373,7 +373,9 @@ export default async function RobotDetailPage({
             </SystemLabel>
           </div>
 
-          <div className="ptable">
+          {/* WS8.4 / R17: horizontally-scrollable on narrow viewports, so it is
+              keyboard-focusable (WCAG 2.1.1) with a named region. */}
+          <div className="ptable" tabIndex={0} role="group" aria-label="Specifications table">
             <div className="prow head">
               <div>Mode</div>
               <div>Region</div>

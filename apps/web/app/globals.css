@@ -9,14 +9,24 @@
 .wrap { max-width: var(--ho-maxw); margin: 0 auto; padding: 0 var(--ho-sp-5); }
 .wrap--narrow { max-width: 1080px; }
 
+/* WS8.4 / R19: the skip link is visually hidden but keyboard-focusable. The old
+   `left: -9999px` technique placed a 146px element off-screen-left, which
+   inflated document scrollWidth and produced a spurious horizontal overflow on
+   every page. The clip pattern removes it from layout flow entirely (no scroll
+   contribution) while keeping it in the accessibility tree and focusable. */
 .skip-link {
-  position: absolute; left: -9999px; top: 0; z-index: 100;
+  position: absolute; top: 0; left: 0; z-index: 100;
+  width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
   background: var(--ho-ink); color: var(--ho-paper-ink);
   padding: 10px 16px; font-family: var(--ho-font-machine);
   font-size: var(--ho-fs-mono-s); letter-spacing: var(--ho-tracking-label);
   text-transform: uppercase;
 }
-.skip-link:focus { left: 8px; top: 8px; }
+.skip-link:focus {
+  width: auto; height: auto; overflow: visible;
+  clip: auto; clip-path: none; left: 8px; top: 8px;
+}
 
 /* ---- SITE HEADER / PERMANENT NAV (light data register) ------------------- */
 .site-head {
@@ -248,7 +258,16 @@ section.block { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid
 
 /* ---- ROBOT DETAIL : identity header -------------------------------------- */
 .idhead { background: var(--ho-ink); }
+/* WS8.4 / R19: the identity header is a fixed-grid machine-code strip whose
+   corner columns can hold content wider than their track; grid/flex items
+   default to min-width:auto, so that content forced a small page-level
+   horizontal overflow on the detail route. `min-width: 0` lets the flexible
+   tracks shrink, and `overflow-x: clip` keeps the decorative strip from ever
+   propagating page scroll — the strip renders identically. */
 .idhead .in { max-width: var(--ho-maxw); margin: 0 auto; }
+.idhead .topbar,
+.idhead .topbar > * { min-width: 0; }
+.idhead .topbar .seg { overflow: hidden; }
 .idbody { position: relative; padding: var(--ho-sp-7) var(--ho-sp-7) var(--ho-sp-6); }
 .idside { position: absolute; top: 0; bottom: 0; width: 40px; display: flex;
   align-items: center; justify-content: center; }
@@ -365,7 +384,11 @@ section.blk { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid v
 .evrow { display: grid; grid-template-columns: 1.3fr 1fr auto; gap: 0; align-items: center;
   border-bottom: var(--ho-rule-hair) solid var(--ho-line-soft); }
 .evrow:last-child { border-bottom: 0; }
-.evrow > div { padding: 12px 14px; }
+/* WS8.4 / R19: let the flexible columns shrink on narrow viewports (grid items
+   default to min-width:auto = min-content, which forced the evidence row wider
+   than a phone). min-width:0 + wrapping keeps the row inside the viewport. */
+.evrow > div { padding: 12px 14px; min-width: 0; }
+.evrow > div, .evrow .src { overflow-wrap: anywhere; }
 .evrow .subj { font-weight: 600; font-size: var(--ho-fs-small); }
 .evrow .subj .ho-code { margin-top: 6px; }
 .evrow .src { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
@@ -717,5 +740,8 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-ink); padding: var(-
   padding: 8px 10px; font-family: var(--ho-font-machine); font-size: var(--ho-fs-small);
   width: 100%; }
 .lead-modal .field textarea { resize: vertical; }
+/* WS8.4 / R17: small validation-error text used bright --ho-signal (#FF4A00),
+   2.83:1 on paper — illegible. --ho-signal-ink is the purpose-built
+   contrast-safe signal-as-text token (~4.66:1 AA); same orange semantic. */
 .field-error { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
-  color: var(--ho-signal); letter-spacing: var(--ho-tracking-code); }
+  color: var(--ho-signal-ink); letter-spacing: var(--ho-tracking-code); }

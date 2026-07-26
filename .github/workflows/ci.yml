@@ -121,6 +121,8 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - name: Install dependencies
         run: npm ci
+      - name: Lint (ESLint + jsx-a11y, WS8.4 / R21)
+        run: npm run lint
       - name: Typecheck
         run: npm run typecheck
       - name: Test

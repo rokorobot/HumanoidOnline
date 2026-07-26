@@ -104,7 +104,34 @@ recur. No other existing assertion was modified.
 | 01.6 projection only | Automated | `agent-truth.test.ts` — an empty governed read yields an empty projection, never a fallback | R14 | **PASS** |
 | 01.7 published-canonical-only surface | Automated | `test_r14_unpublished_robot_is_absent_from_every_public_surface` (real unpublished robot + sentinels, 404 on direct fetch) · `test_r14_unpublished_robot_is_absent_from_matching_and_leads` · `agent-truth.test.ts` proves the projection adds nothing back | R14 | **PASS** |
 
-## 4. WS8.3 gate status
+## 4. WS8.4 gate status
+
+| Gate | Class | Status | Evidence |
+|---|---|---|---|
+| R16 Journeys A/B/C | Automated | **PASS** | `e2e/journeys.spec.ts` — explore→compare matrix, wizard→match→lead capture, use-case→suitable robot→detail; each asserts the governed result, not a page load |
+| R17 WCAG 2.2 AA (automated) | Automated | **PASS** | `e2e/accessibility-axe.spec.ts` — axe WCAG 2.2 AA on home/catalogue/detail/compare/wizard/matches/manufacturers/use-cases **plus** interactive states (dialog open, validation error), **zero violations**, on BOTH desktop and Pixel-7 projects |
+| R18 screen-reader | **Attested** | **PENDING** | Checklist prepared: `docs/14_R18_SCREEN_READER_ATTESTATION.md`. Deliberately NOT self-attested — a person must complete the record. Axe green (R17) does not satisfy it |
+| R19 responsive | Automated | **PASS** | `e2e/responsive.spec.ts` on a real **mobile-chromium (Pixel 7)** project in CI + desktop: no horizontal overflow, cards not clipped, compare/spec tables scroll in-container, primary actions operable |
+| R20 empty/error states | Automated | **PASS** | `e2e/ux-states.spec.ts` — 404, compare<2 prompt, price trichotomy (never $0), availability-unknown≠unavailable, invalid-email announced, API-failure retains input; `__tests__/robot-gallery.test.tsx` for the missing-image state |
+| R21 lint / jsx-a11y | Automated | **PASS** | `.eslintrc.cjs` (jsx-a11y recommended at error, `--max-warnings=0`) wired into CI `web-build`; real defects fixed, not silenced |
+
+**R17 note — axe is an oracle for detectable defects, not for conformance.** That
+is why R18 is a separate Attested gate. The exploratory axe pass found and this
+slice fixed real defects: a critical `aria-pressed` on a link, keyboard-inaccessible
+scroll regions, a page-inflating off-screen skip-link, two mobile horizontal
+overflows (identity-header grid, evidence rows), and three contrast failures
+(muted-grey text, quote amber, and the illegible bright-orange validation error).
+Every fix was a minimal token nudge or markup correction — **UI-D1 layout and type
+are unchanged**; the palette's muted/amber/signal semantics are preserved, only
+their exact lightness meets AA.
+
+**R21 note — narrow, documented exceptions only.** One `eslint-disable-next-line`
+(the lead-dialog backdrop pointer-dismiss, redundant with Escape + a labelled Close
+button) and one precise rule *config* (`no-noninteractive-tabindex` allows the
+labelled scroll-region pattern that WCAG 2.1.1 requires and axe enforces). No
+a11y rule is blanket-disabled to get green.
+
+## 5. WS8.3 gate status
 
 | Gate | Class | Status | Evidence |
 |---|---|---|---|
@@ -134,7 +161,7 @@ attribution licence is ever falsely asserted.) Verified against the real catalog
 mirror of coercing UNKNOWN into `0`. UNKNOWN is `null` and is omitted; `0` and
 `false` are real canonical values and are asserted. Both halves are pinned.
 
-## 5. WS8.2 gate status
+## 6. WS8.2 gate status
 
 | Gate | Class | Status | Evidence |
 |---|---|---|---|
@@ -168,7 +195,7 @@ starts (release phase, init container, deploy step) is R25/R26's. The app also
 expects the governed migration files to be reachable (`MIGRATIONS_DIR`), which is
 a binding point for whatever packaging WS8.7 chooses.
 
-## 6. WS8.1 gate status
+## 7. WS8.1 gate status
 
 | Gate | Class | Status | Evidence |
 |---|---|---|---|
@@ -189,7 +216,7 @@ only its application layer is.
 |---|---|---|
 | **Admin session-cookie attributes.** The SQLAdmin session cookie must be proven to carry the intended production attributes (`Secure`, `HttpOnly`, `SameSite`) rather than inheriting Starlette defaults — `Secure` in particular is opt-in and only meaningful once TLS terminates at the ingress. | Redesigning the admin auth mechanism is outside the authorized WS8.1 scope, and the attribute that matters most (`Secure`) cannot be asserted without a deployed HTTPS surface. | **R27** (configuration) + **R29** (deployed assertion) |
 
-## 7. Registered gaps still open (`12` §8)
+## 8. Registered gaps still open (`12` §8)
 
 Carried forward so nothing is lost between slices. `CLOSED` here means the gate
 that owns it has passed.
@@ -214,6 +241,10 @@ that owns it has passed.
 | Q9 no unpublished-absence test | CLOSE | WS8.3 | **CLOSED** |
 | Q12 JSON-LD coercion gap | CLOSE | WS8.3 | **CLOSED** |
 | Q14 attribution not enforced | CLOSE | WS8.3 | **CLOSED** |
-| Q1-Q3a, Q4, Q10, Q11, Q13 | CLOSE | WS8.4 / WS8.5 | open |
+| Q1 no a11y tooling | CLOSE | WS8.4 | **CLOSED** (axe + jsx-a11y) |
+| Q2 single chromium project | CLOSE | WS8.4 | **CLOSED** (Pixel-7 mobile project in CI) |
+| Q4 no web lint | CLOSE | WS8.4 | **CLOSED** (ESLint + jsx-a11y in CI) |
+| Q3a no generateMetadata | CLOSE | WS8.5 | open |
+| Q10, Q11, Q13 | CLOSE | WS8.5 | open |
 | Q3b OG/Twitter imagery | ACCEPT-DEFER | product owner | runbook entry at R30 (open) |
 | Q8b DATA-D1 P3/P5/P7 gates | ACCEPT-DEFER | product owner | runbook entry at R30 (open) |

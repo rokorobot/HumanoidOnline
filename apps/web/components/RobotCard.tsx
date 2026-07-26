@@ -83,7 +83,11 @@ export function RobotCard({
         <div className="foot-actions">
           <AvailabilityBadge modes={robot.available_modes} />
           {compareHref ? (
-            <Link className="cmp" href={compareHref} aria-pressed={inCompare}>
+            <Link
+              className="cmp"
+              href={compareHref}
+              aria-label={inCompare ? "Remove from compare" : "Add to compare"}
+            >
               {inCompare ? "In compare ✓" : "Compare +"}
             </Link>
           ) : (

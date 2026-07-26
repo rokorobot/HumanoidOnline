@@ -112,14 +112,11 @@ export default async function RobotsPage({
             )}
 
             <p className="note">
-              // PRICE STATES: PUBLIC · FROM · RANGE · ESTIMATED · QUOTE_ONLY · UNKNOWN.
+              {"// PRICE STATES: PUBLIC · FROM · RANGE · ESTIMATED · QUOTE_ONLY · UNKNOWN."}
               <br />
-              // QUOTE_ONLY (&quot;Price on request&quot;) ≠ UNKNOWN (&quot;No confirmed
-              pricing&quot;). Absence of availability rows renders &quot;Availability
-              unknown&quot;, never NOT_AVAILABLE.
+              {'// QUOTE_ONLY ("Price on request") ≠ UNKNOWN ("No confirmed pricing"). Absence of availability rows renders "Availability unknown", never NOT_AVAILABLE.'}
               <br />
-              // Every price/status/availability on a record carries an evidence
-              source — open a robot to drill in.
+              {"// Every price/status/availability on a record carries an evidence source — open a robot to drill in."}
             </p>
           </section>
         </div>

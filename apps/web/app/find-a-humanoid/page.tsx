@@ -15,7 +15,7 @@ import { Wizard } from "./Wizard";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Find a Humanoid — HumanoidOnline",
+  title: "Find a Humanoid",
 };
 
 export default async function FindAHumanoidPage({

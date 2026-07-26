@@ -1,52 +1,62 @@
 import type { MetadataRoute } from "next";
 
-import { listManufacturers, listRobots } from "@/lib/api-client";
 import { siteUrl } from "@/lib/site";
+import {
+  lastMod,
+  listAllManufacturers,
+  listAllRobots,
+  listAllUseCases,
+} from "@/lib/seo";
 
-// AGENT-01 (docs/10): the sitemap is a projection of the governed read, so it
+// AGENT-01 (docs/10): the sitemap is a projection of the governed reads, so it
 // lists ONLY is_published canonical entities (AGENT-01.7) — discovery candidates
 // and promoted-but-unpublished robots never appear. Dynamic so it stays current;
 // `lastModified` is the real canonical `updated_at`.
 export const dynamic = "force-dynamic";
 
-// Defensive: an invalid/missing timestamp must not 500 the whole sitemap — omit
-// lastModified rather than emit an Invalid Date (which throws on serialization).
-function lastMod(value: string): { lastModified?: Date } {
-  const d = new Date(value);
-  return Number.isNaN(d.getTime()) ? {} : { lastModified: d };
-}
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // WS8.2 / R8 — one authoritative origin resolver for every machine surface.
   const origin = siteUrl();
-  // limit=100 is the API's max page; it covers the catalogue at current scale.
-  // Pagination (loop until total) is the scale path when entities exceed 100.
-  const [robots, manufacturers] = await Promise.all([
-    listRobots({ limit: 100 }),
-    listManufacturers({ limit: 100 }),
+
+  // WS8.5 / R23 — enumerate the ENTIRE published canonical set of every public
+  // entity type (robots, manufacturers, use cases), paginated via the governed
+  // reads. No 100-entity ceiling.
+  const [robots, manufacturers, useCases] = await Promise.all([
+    listAllRobots(),
+    listAllManufacturers(),
+    listAllUseCases(),
   ]);
 
   const core: MetadataRoute.Sitemap = [
     { url: `${origin}/`, changeFrequency: "daily", priority: 1 },
     { url: `${origin}/robots`, changeFrequency: "daily", priority: 0.9 },
     { url: `${origin}/manufacturers`, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${origin}/use-cases`, changeFrequency: "weekly", priority: 0.7 },
   ];
 
-  const robotPages: MetadataRoute.Sitemap = robots.items.map((r) => ({
+  const robotPages: MetadataRoute.Sitemap = robots.map((r) => ({
     url: `${origin}/robots/${r.slug}`,
     ...lastMod(r.updated_at),
     changeFrequency: "weekly",
     priority: 0.8,
   }));
 
-  const mfrPages: MetadataRoute.Sitemap = manufacturers.items.map((m) => ({
+  const mfrPages: MetadataRoute.Sitemap = manufacturers.map((m) => ({
     url: `${origin}/manufacturers/${m.slug}`,
     ...lastMod(m.updated_at),
     changeFrequency: "weekly",
     priority: 0.6,
   }));
 
+  // Use-case list items carry no `updated_at`, so lastModified is honestly
+  // omitted (never fabricated).
+  const useCasePages: MetadataRoute.Sitemap = useCases.map((u) => ({
+    url: `${origin}/use-cases/${u.slug}`,
+    changeFrequency: "weekly",
+    priority: 0.6,
+  }));
+
   // Grouped by entity type. At catalogue scale this is one file; Next's
   // generateSitemaps() is the split-by-type path when the catalogue grows.
-  return [...core, ...robotPages, ...mfrPages];
+  return [...core, ...robotPages, ...mfrPages, ...useCasePages];
 }

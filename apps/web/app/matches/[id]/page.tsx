@@ -16,7 +16,7 @@ import { getMatches, listRegions } from "@/lib/api-client";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Match results — HumanoidOnline",
+  title: "Match results",
 };
 
 export default async function MatchesPage({

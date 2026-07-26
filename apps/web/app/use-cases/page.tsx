@@ -7,6 +7,13 @@ import { UseCaseTile } from "@/components/UseCaseTile";
 
 export const dynamic = "force-dynamic";
 
+// WS8.5 / R22 — specific per-route title (no generic root inheritance).
+export const metadata = {
+  title: "Use Cases",
+  description:
+    "Humanoid-robot deployment use cases and the robots suited to each, ranked by fit.",
+};
+
 export default async function UseCasesPage() {
   const page = await listUseCases({ limit: 100 });
   return (

@@ -20,6 +20,13 @@ import { SystemLabel } from "@/components/SystemLabel";
 
 export const dynamic = "force-dynamic";
 
+// WS8.5 / R22 — specific per-route title (no generic root inheritance).
+export const metadata = {
+  title: "Robot Catalogue",
+  description:
+    "Browse every verified humanoid robot — capabilities, commercial status, availability and evidence, kept as three independent facts.",
+};
+
 export default async function RobotsPage({
   searchParams,
 }: {

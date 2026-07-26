@@ -1,9 +1,9 @@
-import { listRobots } from "@/lib/api-client";
 import { siteUrl } from "@/lib/site";
+import { listAllManufacturers, listAllRobots, listAllUseCases } from "@/lib/seo";
 
 // AGENT-01 (A6): `/llms.txt` — a concise, LLM-friendly description of the site.
-// CANONICAL-ONLY: built from the governed read, so it lists only is_published
-// robots (AGENT-01.7) — discovery candidates are never part of the public
+// CANONICAL-ONLY: built from the governed reads, so it lists only is_published
+// entities (AGENT-01.7) — discovery candidates are never part of the public
 // knowledge surface. Dynamic so it stays current. llms.txt is a useful-but-
 // non-canonical proposal; we provide it without architecting around it.
 export const dynamic = "force-dynamic";
@@ -11,9 +11,14 @@ export const dynamic = "force-dynamic";
 export async function GET(): Promise<Response> {
   // WS8.2 / R8 — one authoritative origin resolver for every machine surface.
   const origin = siteUrl();
-  // limit=100 is the API's max page (covers the catalogue at current scale;
-  // pagination is the scale path).
-  const robots = await listRobots({ limit: 100 });
+
+  // WS8.5 / R23 — enumerate the ENTIRE published canonical set of every public
+  // entity type, paginated via the governed reads (no 100-entity ceiling).
+  const [robots, manufacturers, useCases] = await Promise.all([
+    listAllRobots(),
+    listAllManufacturers(),
+    listAllUseCases(),
+  ]);
 
   const lines: string[] = [
     "# HumanoidOnline",
@@ -31,12 +36,19 @@ export async function GET(): Promise<Response> {
     "## Canonical entry points",
     `- Catalogue: ${origin}/robots`,
     `- Manufacturers: ${origin}/manufacturers`,
+    `- Use cases: ${origin}/use-cases`,
     `- Sitemap: ${origin}/sitemap.xml`,
     "",
     "## Robots (published, canonical)",
-    ...robots.items.map(
+    ...robots.map(
       (r) => `- ${r.name} (${r.manufacturer.name}): ${origin}/robots/${r.slug}`,
     ),
+    "",
+    "## Manufacturers (published, canonical)",
+    ...manufacturers.map((m) => `- ${m.name}: ${origin}/manufacturers/${m.slug}`),
+    "",
+    "## Use cases (published, canonical)",
+    ...useCases.map((u) => `- ${u.name}: ${origin}/use-cases/${u.slug}`),
     "",
   ];
 

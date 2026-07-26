@@ -8,6 +8,13 @@ import { SystemLabel } from "@/components/SystemLabel";
 
 export const dynamic = "force-dynamic";
 
+// WS8.5 / R22 — specific per-route title (no generic root inheritance).
+export const metadata = {
+  title: "Manufacturers",
+  description:
+    "Humanoid-robot manufacturers tracked by HumanoidOnline, with their verified platforms.",
+};
+
 export default async function ManufacturersPage() {
   const page = await listManufacturers({ limit: 100 });
   return (

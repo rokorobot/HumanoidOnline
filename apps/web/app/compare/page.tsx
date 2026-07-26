@@ -26,6 +26,13 @@ function first(v: string | string[] | undefined): string | undefined {
   return Array.isArray(v) ? v[0] : v;
 }
 
+// WS8.5 / R22 — specific per-route title (static; not query-state-dependent).
+export const metadata = {
+  title: "Compare Robots",
+  description:
+    "Side-by-side comparison of humanoid robots across capabilities, pricing and availability.",
+};
+
 export default async function ComparePage({
   searchParams,
 }: {

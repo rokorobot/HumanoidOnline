@@ -1,7 +1,10 @@
 // Manufacturer detail — from /api/manufacturers/{slug}. 404 -> notFound().
+import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { cache } from "react";
 
-import { getManufacturer } from "@/lib/api-client";
+import { findManufacturer } from "@/lib/api-client";
 import { regionLabel } from "@/lib/format";
 import { StatusBracket } from "@/components/StatusBadge";
 import { SectionIndex } from "@/components/SectionIndex";
@@ -11,13 +14,34 @@ import { SystemLabel } from "@/components/SystemLabel";
 
 export const dynamic = "force-dynamic";
 
+// WS8.5 / R22 — one governed read shared by the page and generateMetadata via
+// React cache() (per-request memoization), never an alternate data path.
+const getManufacturerCached = cache(findManufacturer);
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const m = await getManufacturerCached(slug);
+  if (!m) return { title: "Not found" };
+  return {
+    title: m.name,
+    description:
+      m.description ??
+      `${m.name} — humanoid-robot manufacturer profile and verified platforms on HumanoidOnline.`,
+  };
+}
+
 export default async function ManufacturerDetailPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const m = await getManufacturer(slug);
+  const m = await getManufacturerCached(slug);
+  if (!m) notFound();
 
   return (
     <>

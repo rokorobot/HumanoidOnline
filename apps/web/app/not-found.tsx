@@ -4,6 +4,10 @@ import { SectionIndex } from "@/components/SectionIndex";
 import { SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 
+export const metadata = {
+  title: "Not found",
+};
+
 export default function NotFound() {
   return (
     <>

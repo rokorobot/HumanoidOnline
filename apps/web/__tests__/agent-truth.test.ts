@@ -129,6 +129,7 @@ describe("AGENT-01.7 — the projection cannot resurrect a withheld entity", () 
         items: [{ slug: "acme", name: "Acme Robotics", updated_at: "2026-01-01T00:00:00Z" }],
         total: 1,
       })),
+      listUseCases: vi.fn(async () => ({ items: [], total: 0 })),
     }));
   });
 
@@ -157,6 +158,7 @@ describe("AGENT-01.7 — the projection cannot resurrect a withheld entity", () 
     vi.doMock("@/lib/api-client", () => ({
       listRobots: vi.fn(async () => ({ items: [], total: 0 })),
       listManufacturers: vi.fn(async () => ({ items: [], total: 0 })),
+      listUseCases: vi.fn(async () => ({ items: [], total: 0 })),
     }));
     const { GET } = await import("@/app/llms.txt/route");
     const body = await (await GET()).text();

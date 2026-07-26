@@ -52,6 +52,20 @@ async function getJSON<T>(
   return (await res.json()) as T;
 }
 
+// Non-throwing sibling of getJSON: a 404 yields null instead of Next's
+// notFound(), so the caller decides how to handle a missing entity. This lets a
+// page's generateMetadata return a specific "Not found" title while the page
+// itself renders notFound() — both sharing ONE governed read (wrap in React
+// cache()), never an alternate data path (AGENT-01 projection-only).
+async function getJSONOrNull<T>(path: string): Promise<T | null> {
+  const res = await fetch(`${API_BASE_URL}${path}`, { cache: "no-store" });
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    throw new Error(`API ${res.status} for ${path}`);
+  }
+  return (await res.json()) as T;
+}
+
 // ---- Robots ----------------------------------------------------------------
 
 export interface RobotListParams {
@@ -85,10 +99,10 @@ export function listRobots(
   );
 }
 
-export function getRobot(slug: string): Promise<RobotDetail> {
-  return getJSON<RobotDetail>(`/api/robots/${encodeURIComponent(slug)}`, {
-    notFoundOn404: true,
-  });
+// Non-throwing detail read (404 -> null). Detail pages wrap this in React
+// cache() so the page render and generateMetadata share a single governed fetch.
+export function findRobot(slug: string): Promise<RobotDetail | null> {
+  return getJSONOrNull<RobotDetail>(`/api/robots/${encodeURIComponent(slug)}`);
 }
 
 // compare returns 422 for <2 or >4 valid slugs — surfaced to the caller as null
@@ -116,10 +130,11 @@ export function listManufacturers(
   );
 }
 
-export function getManufacturer(slug: string): Promise<ManufacturerDetail> {
-  return getJSON<ManufacturerDetail>(
+export function findManufacturer(
+  slug: string,
+): Promise<ManufacturerDetail | null> {
+  return getJSONOrNull<ManufacturerDetail>(
     `/api/manufacturers/${encodeURIComponent(slug)}`,
-    { notFoundOn404: true },
   );
 }
 
@@ -133,10 +148,10 @@ export function listUseCases(
   );
 }
 
-export function getUseCase(slug: string): Promise<UseCaseDetail> {
-  return getJSON<UseCaseDetail>(`/api/use-cases/${encodeURIComponent(slug)}`, {
-    notFoundOn404: true,
-  });
+export function findUseCase(slug: string): Promise<UseCaseDetail | null> {
+  return getJSONOrNull<UseCaseDetail>(
+    `/api/use-cases/${encodeURIComponent(slug)}`,
+  );
 }
 
 // ---- Regions ---------------------------------------------------------------

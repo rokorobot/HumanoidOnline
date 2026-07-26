@@ -153,6 +153,10 @@ describe("every machine surface derives from the one resolver", () => {
         items: [{ slug: "unitree", name: "Unitree", updated_at: "2026-01-01T00:00:00Z" }],
         total: 1,
       })),
+      listUseCases: vi.fn(async () => ({
+        items: [{ slug: "warehouse-logistics", name: "Warehouse & Logistics" }],
+        total: 1,
+      })),
     }));
   });
 

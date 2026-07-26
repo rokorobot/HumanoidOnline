@@ -2,9 +2,12 @@
 // The key proof: three INDEPENDENT dimensions; all six price states incl.
 // QUOTE_ONLY ≠ UNKNOWN; specs with explicit UNKNOWN; evidence drill-down with
 // real source/dates/confidence/link. 404 -> notFound(). All facts from the API.
+import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { cache } from "react";
 
-import { getRobot, listRegions } from "@/lib/api-client";
+import { findRobot, listRegions } from "@/lib/api-client";
 import { buildRobotJsonLd } from "@/lib/jsonld";
 import {
   formatDate,
@@ -100,6 +103,26 @@ function collectEvidence(robot: RobotDetail): EvidenceRow[] {
   return rows;
 }
 
+// WS8.5 / R22 — one governed read shared by the page and generateMetadata via
+// React cache() (per-request memoization), never an alternate data path.
+const getRobotCached = cache(findRobot);
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const robot = await getRobotCached(slug);
+  if (!robot) return { title: "Not found" };
+  return {
+    title: robot.name,
+    description:
+      robot.summary ??
+      `${robot.name} by ${robot.manufacturer.name} — verified capabilities, commercial status and evidence on HumanoidOnline.`,
+  };
+}
+
 export default async function RobotDetailPage({
   params,
 }: {
@@ -107,9 +130,10 @@ export default async function RobotDetailPage({
 }) {
   const { slug } = await params;
   const [robot, countries] = await Promise.all([
-    getRobot(slug),
+    getRobotCached(slug),
     listRegions({ type: "COUNTRY" }),
   ]);
+  if (!robot) notFound();
 
   const code = deriveModelCode(robot.slug, robot.manufacturer.slug);
   const conf = strongestConfidence(robot);

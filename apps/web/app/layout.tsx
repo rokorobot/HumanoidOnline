@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 import { SiteFooter } from "@/components/SiteNav";
@@ -5,8 +6,14 @@ import { SiteFooter } from "@/components/SiteNav";
 import "./tokens.css";
 import "./globals.css";
 
-export const metadata = {
-  title: "HumanoidOnline — Commercial intelligence for the humanoid market",
+// WS8.5 / R22 — a title template so every child route gets a specific title and
+// none inherits a bare generic root title. `default` is the home title; child
+// pages set a short `title` and render as "<title> — HumanoidOnline".
+export const metadata: Metadata = {
+  title: {
+    default: "HumanoidOnline — Commercial intelligence for the humanoid market",
+    template: "%s — HumanoidOnline",
+  },
   description:
     "Compare capabilities, commercial availability, pricing and deployment evidence across the humanoid-robot market. Maturity, obtainability and evidence kept as three independent facts.",
 };

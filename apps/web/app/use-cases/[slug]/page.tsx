@@ -1,8 +1,11 @@
 // Use-case detail — from /api/use-cases/{slug}. 404 -> notFound().
 // suitable_robots ordered by fit_score desc (from the API).
+import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { cache } from "react";
 
-import { getUseCase } from "@/lib/api-client";
+import { findUseCase } from "@/lib/api-client";
 import { StatusBracket } from "@/components/StatusBadge";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteNav } from "@/components/SiteNav";
@@ -11,13 +14,34 @@ import { SystemLabel } from "@/components/SystemLabel";
 
 export const dynamic = "force-dynamic";
 
+// WS8.5 / R22 — one governed read shared by the page and generateMetadata via
+// React cache() (per-request memoization), never an alternate data path.
+const getUseCaseCached = cache(findUseCase);
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const u = await getUseCaseCached(slug);
+  if (!u) return { title: "Not found" };
+  return {
+    title: u.name,
+    description:
+      u.description ??
+      `Humanoid robots suited to ${u.name}, ranked by fit on HumanoidOnline.`,
+  };
+}
+
 export default async function UseCaseDetailPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const u = await getUseCase(slug);
+  const u = await getUseCaseCached(slug);
+  if (!u) notFound();
 
   return (
     <>

@@ -93,7 +93,9 @@ def _expected_eligible(identity: str, rights: str, usage: str, attribution: str 
     has_usage = usage == "OFFICIAL_MANUFACTURER_MEDIA"
     if not (rights in ("PERMITTED", "ATTRIBUTION_REQUIRED") or has_usage):
         return False
-    if rights == "ATTRIBUTION_REQUIRED" and not has_usage:
+    # The credit obligation attaches to the rights state and is NOT overridable
+    # by usage_basis (a display policy). ATTRIBUTION_REQUIRED always owes a credit.
+    if rights == "ATTRIBUTION_REQUIRED":
         return bool((attribution or "").strip())
     return True
 
@@ -140,11 +142,22 @@ def test_r11_attribution_required_without_attribution_is_ineligible(missing) -> 
     assert _image("VERIFIED", "ATTRIBUTION_REQUIRED", "NONE", "© Figure AI").is_display_eligible()
 
 
-def test_r11_attribution_rule_does_not_gate_official_media() -> None:
-    """Official-manufacturer-media stands on its own; it must not be collateral
-    damage of the attribution fix."""
-    assert _image(
+def test_r11_attribution_required_is_not_overridden_by_official_media() -> None:
+    """`usage_basis` is a platform display POLICY, not a licence override.
+
+    An ATTRIBUTION_REQUIRED image with no credit is INELIGIBLE even when
+    usage_basis is OFFICIAL_MANUFACTURER_MEDIA — the credit obligation attaches
+    to the KNOWN rights state and a display policy cannot waive it. (Official
+    media whose licence is genuinely unknown is modelled as rights_status=UNKNOWN
+    + usage OFFICIAL_MANUFACTURER_MEDIA, exactly so no attribution licence is
+    falsely asserted; that path stands on its own — see the UNKNOWN test above.)
+    """
+    assert not _image(
         "VERIFIED", "ATTRIBUTION_REQUIRED", "OFFICIAL_MANUFACTURER_MEDIA", attribution=None
+    ).is_display_eligible()
+    # With a credit line it is displayable.
+    assert _image(
+        "VERIFIED", "ATTRIBUTION_REQUIRED", "OFFICIAL_MANUFACTURER_MEDIA", "© Maker"
     ).is_display_eligible()
 
 

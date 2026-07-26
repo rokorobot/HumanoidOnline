@@ -117,9 +117,18 @@ recur. No other existing assertion was modified.
 **R11 note — `hero_image_url` is gated, not removed.** The column is in the frozen
 API contract, so it keeps its nullable shape; it may now only carry a URL that a
 display-eligible image also carries, and serializes as `null` otherwise. MEDIA-01
-is the single authority on which imagery crosses the boundary. Verified against
-the real catalogue: **7/7 images still display**, and Figure 02
-(`ATTRIBUTION_REQUIRED`) keeps its credit.
+is the single authority on which imagery crosses the boundary.
+
+**R11 note — attribution is a rights OBLIGATION, not a fourth dimension.** MEDIA-01
+has three independent dimensions (identity / rights / usage). `attribution` is the
+credit line owed by the `ATTRIBUTION_REQUIRED` rights state, and that obligation is
+**not** overridable by `usage_basis`: a display policy cannot waive a known
+licensing condition. So `VERIFIED + ATTRIBUTION_REQUIRED + OFFICIAL_MANUFACTURER_MEDIA
++ no attribution → IMAGE_UNAVAILABLE`. (Official media of genuinely unknown licence
+is modelled as `rights_status=UNKNOWN` + `usage=OFFICIAL_MANUFACTURER_MEDIA`, so no
+attribution licence is ever falsely asserted.) Verified against the real catalogue:
+**7/7 images still display**, and Figure 02 (`ATTRIBUTION_REQUIRED`) keeps its
+`© Figure AI` credit — the rule tightens the gate without dropping a cleared image.
 
 **R14 note — a genuine `0` is kept on purpose.** Omitting it would be the exact
 mirror of coercing UNKNOWN into `0`. UNKNOWN is `null` and is omitted; `0` and

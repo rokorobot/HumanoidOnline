@@ -7,16 +7,19 @@ is NOT the read path.
 The one place the display-eligibility rule lives is `is_display_eligible` —
 **exactly one implementation** (WS8.3 / R11 removed a duplicate SQL form that no
 query used; two copies of a governed gate can only diverge, and the second copy
-already lacked the attribution rule below). FOUR dimensions, never collapsed:
+already lacked the attribution rule below). THREE independent dimensions, never
+collapsed:
   - identity_status: does it depict THIS exact robot;
   - rights_status: legal/licensing EVIDENCE for reuse;
   - usage_basis: platform display POLICY (why we display absent a formal license).
-  - attribution: present whenever ATTRIBUTION_REQUIRED is the basis of display.
-An image is shown ONLY when identity VERIFIED AND rights_status != RESTRICTED AND
-(rights_status PERMITTED/ATTRIBUTION_REQUIRED OR usage_basis
-OFFICIAL_MANUFACTURER_MEDIA) AND, where the basis is ATTRIBUTION_REQUIRED, an
-attribution string exists. A non-NULL image_url is NEVER sufficient; RESTRICTED
-always blocks; UNKNOWN rights never behaves like PERMITTED (MEDIA-01.5, §H2).
+`attribution` is NOT a fourth dimension — it is the credit OBLIGATION attached to
+the `ATTRIBUTION_REQUIRED` rights state (schema: "required credit line when
+ATTRIBUTION_REQUIRED"). An image is shown ONLY when identity VERIFIED AND
+rights_status != RESTRICTED AND (rights_status PERMITTED/ATTRIBUTION_REQUIRED OR
+usage_basis OFFICIAL_MANUFACTURER_MEDIA) AND, whenever rights_status is
+ATTRIBUTION_REQUIRED, a credit line exists. A non-NULL image_url is NEVER
+sufficient; RESTRICTED always blocks; UNKNOWN rights never behaves like PERMITTED
+(MEDIA-01.5, §H2).
 """
 from __future__ import annotations
 
@@ -92,12 +95,20 @@ class RobotImage(Base):
         real reuse basis (PERMITTED/ATTRIBUTION_REQUIRED) OR an approved display
         policy (usage_basis OFFICIAL_MANUFACTURER_MEDIA) is required.
 
-        WS8.3 / R11 (gap Q14): where ATTRIBUTION_REQUIRED is what makes the
-        image displayable, a missing attribution makes it **ineligible**. The
-        schema documented the requirement in a comment and enforced nothing, so
-        such an image rendered with no credit at all — a live rights exposure,
-        not a latent one. Enforced here rather than by DDL so no migration is
-        needed and L7's database-enforcement clause is not engaged.
+        WS8.3 / R11 (gap Q14): when `rights_status` is ATTRIBUTION_REQUIRED, a
+        missing credit line makes the image **ineligible**. The schema
+        documented the requirement in a comment and enforced nothing, so such an
+        image rendered with no credit at all — a live rights exposure, not a
+        latent one. Enforced here rather than by DDL, so no migration is needed
+        and L7's database-enforcement clause is not engaged.
+
+        The obligation holds **regardless of `usage_basis`**. `usage_basis` is a
+        platform *display policy*; it is not a mechanism for overriding a known
+        legal condition recorded in `rights_status`. Official manufacturer media
+        whose licence is genuinely unknown is modelled as
+        `rights_status=UNKNOWN` + `usage_basis=OFFICIAL_MANUFACTURER_MEDIA`
+        precisely so that an attribution licence is never falsely asserted —
+        so ATTRIBUTION_REQUIRED always means a credit is owed.
         """
         if self.identity_status != "VERIFIED":
             return False
@@ -109,9 +120,6 @@ class RobotImage(Base):
         if not (has_rights_basis or has_usage_basis):
             return False
 
-        # If the ONLY thing permitting display is "attribution required", the
-        # attribution has to exist. An official-manufacturer-media basis stands
-        # on its own and does not depend on a credit line.
-        if self.rights_status == "ATTRIBUTION_REQUIRED" and not has_usage_basis:
+        if self.rights_status == "ATTRIBUTION_REQUIRED":
             return bool((self.attribution or "").strip())
         return True

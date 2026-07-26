@@ -8,7 +8,8 @@ Run internally (network-gated), never by the pipeline/crawler:
     ... --reject --approved-by "ops@..." --reason "no independent source"
     ... --show          # print the structured proposal + failing gates, no write
 
-`--approve` refuses (nonzero exit, no write) if any promotion gate P1-P8 fails.
+`--approve` refuses (nonzero exit, no write) if any IMPLEMENTED promotion gate
+fails (P1, P2, P4, P6, readiness, and the P8 human approval).
 """
 from __future__ import annotations
 

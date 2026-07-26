@@ -4,22 +4,29 @@ The single image-truth system for a named robot. The DDL is canonical; this
 model mirrors it and never generates DDL. `robot.hero_image_url` is dormant and
 is NOT the read path.
 
-The one place the display-eligibility rule lives is `is_display_eligible` /
-`DISPLAY_ELIGIBLE_CLAUSE`. THREE independent dimensions, never collapsed:
+The one place the display-eligibility rule lives is `is_display_eligible` —
+**exactly one implementation** (WS8.3 / R11 removed a duplicate SQL form that no
+query used; two copies of a governed gate can only diverge, and the second copy
+already lacked the attribution rule below). THREE independent dimensions, never
+collapsed:
   - identity_status: does it depict THIS exact robot;
   - rights_status: legal/licensing EVIDENCE for reuse;
   - usage_basis: platform display POLICY (why we display absent a formal license).
-An image is shown ONLY when identity VERIFIED AND rights_status != RESTRICTED AND
-(rights_status PERMITTED/ATTRIBUTION_REQUIRED OR usage_basis
-OFFICIAL_MANUFACTURER_MEDIA). A non-NULL image_url is NEVER sufficient; RESTRICTED
-always blocks; UNKNOWN rights never behaves like PERMITTED (MEDIA-01.5, §H2).
+`attribution` is NOT a fourth dimension — it is the credit OBLIGATION attached to
+the `ATTRIBUTION_REQUIRED` rights state (schema: "required credit line when
+ATTRIBUTION_REQUIRED"). An image is shown ONLY when identity VERIFIED AND
+rights_status != RESTRICTED AND (rights_status PERMITTED/ATTRIBUTION_REQUIRED OR
+usage_basis OFFICIAL_MANUFACTURER_MEDIA) AND, whenever rights_status is
+ATTRIBUTION_REQUIRED, a credit line exists. A non-NULL image_url is NEVER
+sufficient; RESTRICTED always blocks; UNKNOWN rights never behaves like PERMITTED
+(MEDIA-01.5, §H2).
 """
 from __future__ import annotations
 
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Text, and_, or_, text
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Text, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -83,25 +90,36 @@ class RobotImage(Base):
 
     def is_display_eligible(self) -> bool:
         """MEDIA-01 display gate. The ONE rule — never `bool(image_url)`.
+
         Identity must be VERIFIED; RESTRICTED rights always block; otherwise a
         real reuse basis (PERMITTED/ATTRIBUTION_REQUIRED) OR an approved display
-        policy (usage_basis OFFICIAL_MANUFACTURER_MEDIA) is required."""
+        policy (usage_basis OFFICIAL_MANUFACTURER_MEDIA) is required.
+
+        WS8.3 / R11 (gap Q14): when `rights_status` is ATTRIBUTION_REQUIRED, a
+        missing credit line makes the image **ineligible**. The schema
+        documented the requirement in a comment and enforced nothing, so such an
+        image rendered with no credit at all — a live rights exposure, not a
+        latent one. Enforced here rather than by DDL, so no migration is needed
+        and L7's database-enforcement clause is not engaged.
+
+        The obligation holds **regardless of `usage_basis`**. `usage_basis` is a
+        platform *display policy*; it is not a mechanism for overriding a known
+        legal condition recorded in `rights_status`. Official manufacturer media
+        whose licence is genuinely unknown is modelled as
+        `rights_status=UNKNOWN` + `usage_basis=OFFICIAL_MANUFACTURER_MEDIA`
+        precisely so that an attribution licence is never falsely asserted —
+        so ATTRIBUTION_REQUIRED always means a credit is owed.
+        """
         if self.identity_status != "VERIFIED":
             return False
         if self.rights_status == "RESTRICTED":
             return False
-        return (
-            self.rights_status in DISPLAYABLE_RIGHTS
-            or self.usage_basis in DISPLAYABLE_USAGE
-        )
 
+        has_rights_basis = self.rights_status in DISPLAYABLE_RIGHTS
+        has_usage_basis = self.usage_basis in DISPLAYABLE_USAGE
+        if not (has_rights_basis or has_usage_basis):
+            return False
 
-# SQL form of the same gate, for filtering in queries (identical semantics).
-DISPLAY_ELIGIBLE_CLAUSE = and_(
-    RobotImage.identity_status == "VERIFIED",
-    RobotImage.rights_status != "RESTRICTED",
-    or_(
-        RobotImage.rights_status.in_(DISPLAYABLE_RIGHTS),
-        RobotImage.usage_basis.in_(DISPLAYABLE_USAGE),
-    ),
-)
+        if self.rights_status == "ATTRIBUTION_REQUIRED":
+            return bool((self.attribution or "").strip())
+        return True

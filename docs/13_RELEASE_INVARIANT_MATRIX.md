@@ -65,46 +65,76 @@ recur. No other existing assertion was modified.
 
 | Invariant | Source | Class | Evidence | Gate | Status |
 |---|---|---|---|---|---|
-| UNKNOWN ≠ 0 / false / unavailable | WS0 | Automated | `test_knowledge_api.py`, `e2e/catalogue.spec.ts` | R15 | PENDING re-assertion (WS8.3) |
-| QUOTE_ONLY ≠ UNKNOWN | WS0 | Automated | `test_knowledge_api.py` | R15 | PENDING re-assertion (WS8.3) |
-| maturity ≠ obtainability ≠ evidence | WS0 | Automated | `test_knowledge_api.py`, `test_matching_engine.py` | R15 | PENDING re-assertion (WS8.3) |
-| No commercial fact without evidence (G2) | WS0 | Automated | `db/seed/seed.sql` self-check, `db/validate_catalogue.py` | R15 | PENDING re-assertion (WS8.3) |
-| Deterministic, LLM-free scoring | WS6 | Automated | `test_matching_engine.py` (40 tests) | R15 | PENDING re-assertion (WS8.3) |
+| UNKNOWN ≠ 0 / false / unavailable | WS0 | Automated | `test_r14_unknown_specs_stay_null_and_are_never_coerced`, `test_knowledge_api.py`, `e2e/catalogue.spec.ts` | R15 | **PASS** |
+| QUOTE_ONLY ≠ UNKNOWN | WS0 | Automated | `test_r15_price_trichotomy_holds_across_the_catalogue` (every published robot, not one) | R15 | **PASS** |
+| maturity ≠ obtainability ≠ evidence | WS0 | Automated | `test_r15_three_dimensions_never_collapse` — asserts no `available` boolean exists anywhere | R15 | **PASS** |
+| No commercial fact without evidence (G2) | WS0 | Automated | `test_r15_g2_every_published_commercial_fact_carries_evidence` (live DB, not trusting the importer) + both G2 gates | R15 | **PASS** |
+| Deterministic, LLM-free scoring | WS6 | Automated | `test_matching_engine.py` (40 tests) | R15 | **PASS** |
 
 ### MEDIA-01 (`09_MEDIA_CONTRACT.md`)
 
 | Invariant | Class | Evidence | Gate | Status |
 |---|---|---|---|---|
-| Only VERIFIED-identity, rights-cleared images display | Automated | `test_robot_images.py` matrix (9/16 cells today) | R11 | PENDING — full 16-cell matrix owed (Q5) |
-| Missing image renders IMAGE UNAVAILABLE, never a placeholder | Automated | `RobotGallery` / `RobotCard` + backend tests | R11 | PENDING (WS8.3) |
-| `hero_image_url` cannot bypass the eligibility gate | Automated | — | R11 | PENDING (Q6, WS8.3) |
-| ATTRIBUTION_REQUIRED never renders without attribution | Automated | — | R11 | PENDING (Q14, WS8.3) |
+| Only VERIFIED-identity, rights-cleared images display | Automated | `test_truth_regressions.py` — **all 16 cells**, asserted against a restatement of the law rather than the implementation | R11 | **PASS** |
+| Missing image renders IMAGE UNAVAILABLE, never a placeholder | Automated | `RobotGallery` / `RobotCard` + `test_robot_images.py` | R11 | **PASS** |
+| `hero_image_url` cannot bypass the eligibility gate | Automated | `test_r11_hero_image_url_cannot_bypass_the_gate` — plants an un-cleared URL and reads every public surface | R11 | **PASS** |
+| ATTRIBUTION_REQUIRED never renders without attribution | Automated | the eligibility gate now enforces it, plus unit / end-to-end / whole-catalogue sweep | R11 | **PASS** |
 
 ### DATA-D1 (`11_DATA_D1_CONTRACT.md`)
 
 | Invariant | Class | Evidence | Gate | Status |
 |---|---|---|---|---|
-| Candidate ≠ canonical; discovery never auto-promotes | Automated | `test_discovery.py` A–K | R12 | PENDING re-assertion (WS8.3) |
-| Structural isolation (no canonical → discovery FK) | Automated | `test_K_structural_isolation` | R12 | PENDING re-assertion (WS8.3) |
-| Candidate data absent from public **response bodies** | Automated | — (today's `test_I` asserts route paths only) | R12 | PENDING (Q7, WS8.3) |
-| Promotion is human-gated and idempotent | Automated | `test_H5_promotion_is_idempotent`, `test_discovery.py` | R12 | PENDING re-assertion (WS8.3) |
+| Candidate ≠ canonical; discovery never auto-promotes | Automated | `test_discovery.py` A–K | R12 | **PASS** |
+| Structural isolation (no canonical → discovery FK) | Automated | `test_K_structural_isolation` | R12 | **PASS** |
+| Candidate data absent from public **response bodies** | Automated | `test_r12_candidate_data_never_appears_in_any_public_response_body` — real source/candidate/claim with sentinels, every public body searched | R12 | **PASS** |
+| Promotion is human-gated and idempotent | Automated | `test_H5_promotion_is_idempotent`, `test_discovery.py` | R12 | **PASS** |
 | **`promotion_audit` is append-only** | Automated | `test_r6_admin_cannot_create_edit_or_delete_audit_rows`, `test_r6_orm_listeners_are_registered`, `test_r6_update_is_refused`, `test_r6_delete_is_refused`, `test_r6_insert_is_still_allowed` | R6 | **PASS** |
-| No live crawling (fixture-only) | Automated | `test_ineligible_source_cannot_be_crawled` + no network adapter | R13 | PENDING re-assertion (WS8.3) |
-| Promotion docs truthful to implemented gates | Attested | — | R12 | PENDING (Q8a, WS8.3) |
+| No live crawling (fixture-only) | Automated | `test_r13_*` — no HTTP client reachable from the adapter, FixtureAdapter is the only concrete adapter, and a public request sweep runs with outbound sockets made fatal | R13 | **PASS** |
+| Promotion docs truthful to implemented gates | Automated | `test_r12_promotion_docs_match_implemented_gates` + `test_r12_deferred_gates_are_still_deferred` | R12 | **PASS** |
 
 ### AGENT-01 (`10_AGENT_CONTRACT.md`)
 
 | Invariant | Class | Evidence | Gate | Status |
 |---|---|---|---|---|
-| 01.1 canonical identity URI | Automated | `e2e/agent-accessibility.spec.ts` | R14 | PENDING re-assertion (WS8.3) |
-| 01.2 semantic parity | Automated | `__tests__/jsonld.test.ts` | R14 | PENDING re-assertion (WS8.3) |
-| 01.3 explicit uncertainty (UNKNOWN never coerced) | Automated | `jsonld.test.ts` — the `0` / `""` case is **not** yet covered | R14 | PENDING (Q12, WS8.3) |
-| 01.4 provenance preserved, never fabricated | Automated | — | R14 | PENDING (WS8.3) |
+| 01.1 canonical identity URI | Automated | `e2e/agent-accessibility.spec.ts` | R14 | **PASS** |
+| 01.2 semantic parity | Automated | `__tests__/jsonld.test.ts` | R14 | **PASS** |
+| 01.3 explicit uncertainty (UNKNOWN never coerced) | Automated | `agent-truth.test.ts` — empty/whitespace strings omitted, a genuine `0` KEPT (dropping it is the mirror-image error), no placeholder strings; `test_r14_unknown_specs_stay_null_and_are_never_coerced` server-side | R14 | **PASS** |
+| 01.4 provenance preserved, never fabricated | Automated | `agent-truth.test.ts` asserts no invented provenance keys; `test_r15_evidence_carries_provenance_not_just_a_flag` | R14, R15 | **PASS** |
 | 01.5 typed action parity | — | — | — | **N/A** — later separately-ratified slice; gate CLOSED |
-| 01.6 projection only | Attested | no second source of truth introduced | R14 | PENDING (WS8.3) |
-| 01.7 published-canonical-only surface | Automated | — (no test asserts an unpublished entity is **absent**) | R14 | PENDING (Q9, WS8.3) |
+| 01.6 projection only | Automated | `agent-truth.test.ts` — an empty governed read yields an empty projection, never a fallback | R14 | **PASS** |
+| 01.7 published-canonical-only surface | Automated | `test_r14_unpublished_robot_is_absent_from_every_public_surface` (real unpublished robot + sentinels, 404 on direct fetch) · `test_r14_unpublished_robot_is_absent_from_matching_and_leads` · `agent-truth.test.ts` proves the projection adds nothing back | R14 | **PASS** |
 
-## 4. WS8.2 gate status
+## 4. WS8.3 gate status
+
+| Gate | Class | Status | Evidence |
+|---|---|---|---|
+| R11 MEDIA-01 | Automated | **PASS** | Full 16-cell matrix; the dead SQL twin removed so exactly one eligibility implementation exists; `hero_image_url` bypass closed (Q6) and proven by injection; ATTRIBUTION_REQUIRED without a credit is now ineligible (Q14) |
+| R12 DATA-D1 | Automated | **PASS** | Candidate data absent from real **response bodies**, proven with planted sentinels rather than route-name matching (Q7); promotion docs corrected to name only implemented gates (Q8a); P3/P5/P7 remain deferred and a test holds them out |
+| R13 no live crawling | Automated | **PASS** | No HTTP client reachable from the discovery adapter; `FixtureAdapter` is the only concrete adapter; a public request sweep runs with `socket.create_connection` made fatal |
+| R14 AGENT-01 | Automated | **PASS** | Unpublished entities absent from every public surface, from matching and from lead capture, proven by injection (Q9); JSON-LD coercion gap closed (Q12) with `0` deliberately retained; provenance never fabricated |
+| R15 whole-surface truth | Automated | **PASS** | Price trichotomy across the whole catalogue; three dimensions never collapsed; G2 asserted against the live database; evidence carries provenance |
+
+**R11 note — `hero_image_url` is gated, not removed.** The column is in the frozen
+API contract, so it keeps its nullable shape; it may now only carry a URL that a
+display-eligible image also carries, and serializes as `null` otherwise. MEDIA-01
+is the single authority on which imagery crosses the boundary.
+
+**R11 note — attribution is a rights OBLIGATION, not a fourth dimension.** MEDIA-01
+has three independent dimensions (identity / rights / usage). `attribution` is the
+credit line owed by the `ATTRIBUTION_REQUIRED` rights state, and that obligation is
+**not** overridable by `usage_basis`: a display policy cannot waive a known
+licensing condition. So `VERIFIED + ATTRIBUTION_REQUIRED + OFFICIAL_MANUFACTURER_MEDIA
++ no attribution → IMAGE_UNAVAILABLE`. (Official media of genuinely unknown licence
+is modelled as `rights_status=UNKNOWN` + `usage=OFFICIAL_MANUFACTURER_MEDIA`, so no
+attribution licence is ever falsely asserted.) Verified against the real catalogue:
+**7/7 images still display**, and Figure 02 (`ATTRIBUTION_REQUIRED`) keeps its
+`© Figure AI` credit — the rule tightens the gate without dropping a cleared image.
+
+**R14 note — a genuine `0` is kept on purpose.** Omitting it would be the exact
+mirror of coercing UNKNOWN into `0`. UNKNOWN is `null` and is omitted; `0` and
+`false` are real canonical values and are asserted. Both halves are pinned.
+
+## 5. WS8.2 gate status
 
 | Gate | Class | Status | Evidence |
 |---|---|---|---|
@@ -138,7 +168,7 @@ starts (release phase, init container, deploy step) is R25/R26's. The app also
 expects the governed migration files to be reachable (`MIGRATIONS_DIR`), which is
 a binding point for whatever packaging WS8.7 chooses.
 
-## 5. WS8.1 gate status
+## 6. WS8.1 gate status
 
 | Gate | Class | Status | Evidence |
 |---|---|---|---|
@@ -159,7 +189,7 @@ only its application layer is.
 |---|---|---|
 | **Admin session-cookie attributes.** The SQLAdmin session cookie must be proven to carry the intended production attributes (`Secure`, `HttpOnly`, `SameSite`) rather than inheriting Starlette defaults — `Secure` in particular is opt-in and only meaningful once TLS terminates at the ingress. | Redesigning the admin auth mechanism is outside the authorized WS8.1 scope, and the attribute that matters most (`Secure`) cannot be asserted without a deployed HTTPS surface. | **R27** (configuration) + **R29** (deployed assertion) |
 
-## 6. Registered gaps still open (`12` §8)
+## 7. Registered gaps still open (`12` §8)
 
 Carried forward so nothing is lost between slices. `CLOSED` here means the gate
 that owns it has passed.
@@ -177,6 +207,13 @@ that owns it has passed.
 | D1–D4, D9 | CLOSE | WS8.6 / WS8.7 | open |
 | D8 `event_log` dead | NOT A RELEASE DEFECT | — | documented dormant at R25 (open) |
 | D10 scheduled re-verification | ACCEPT-DEFER | product owner | runbook entry at R30 (open) |
-| Q1–Q3a, Q4–Q14 | CLOSE | WS8.3 / WS8.4 / WS8.5 | open |
+| Q5 dead SQL clause + 9/16 matrix | CLOSE | WS8.3 | **CLOSED** |
+| Q6 `hero_image_url` bypass | CLOSE | WS8.3 | **CLOSED** |
+| Q7 route-path-only isolation test | CLOSE | WS8.3 | **CLOSED** |
+| Q8a promotion docs overstate gates | CLOSE | WS8.3 | **CLOSED** |
+| Q9 no unpublished-absence test | CLOSE | WS8.3 | **CLOSED** |
+| Q12 JSON-LD coercion gap | CLOSE | WS8.3 | **CLOSED** |
+| Q14 attribution not enforced | CLOSE | WS8.3 | **CLOSED** |
+| Q1-Q3a, Q4, Q10, Q11, Q13 | CLOSE | WS8.4 / WS8.5 | open |
 | Q3b OG/Twitter imagery | ACCEPT-DEFER | product owner | runbook entry at R30 (open) |
 | Q8b DATA-D1 P3/P5/P7 gates | ACCEPT-DEFER | product owner | runbook entry at R30 (open) |

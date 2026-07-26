@@ -15,4 +15,4 @@ class DiscoveryError(Exception):
 
 
 class PromotionError(Exception):
-    """A promotion gate (P1-P8) blocked the candidate. No canonical write occurred."""
+    """An implemented promotion gate blocked the candidate. No canonical write occurred."""

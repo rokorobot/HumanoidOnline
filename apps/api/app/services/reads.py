@@ -155,6 +155,27 @@ def _eligible_images(robot: Robot):
     )
 
 
+def _governed_hero_image_url(robot: Robot) -> str | None:
+    """WS8.3 / R11 — close the `hero_image_url` bypass (gap Q6).
+
+    `robot.hero_image_url` is a free-text column that predates MEDIA-01 and was
+    serialized RAW on both read paths, so any URL written there reached the API
+    without passing the eligibility gate at all — MEDIA-01 enforced on one field
+    and bypassable via another. It renders in no component today, which made it
+    a latent hole rather than a live one, but "currently unused" is not a
+    security property.
+
+    The column stays (it is in the frozen API contract) and keeps its nullable
+    shape, but it may only carry a URL that a display-eligible image *also*
+    carries. Anything else serializes as null: MEDIA-01 is the single authority
+    on which imagery may cross the boundary.
+    """
+    hero = (robot.hero_image_url or "").strip()
+    if not hero:
+        return None
+    return hero if any(i.image_url == hero for i in _eligible_images(robot)) else None
+
+
 def _primary_image(robot: Robot) -> RobotImagePrimary | None:
     """The catalogue-card primary image (MEDIA-01.8). Among display-eligible images,
     prefer an explicit primary, then a FRONT view (comparable lineup), then official."""
@@ -182,7 +203,7 @@ def serialize_list_item(
             slug=robot.manufacturer.slug, name=robot.manufacturer.name
         ),
         summary=robot.summary,
-        hero_image_url=robot.hero_image_url,
+        hero_image_url=_governed_hero_image_url(robot),
         primary_image=_primary_image(robot),
         commercial_status=robot.commercial_status,
         payload_kg=_f(robot.payload_kg),
@@ -338,7 +359,7 @@ def serialize_detail(session: Session, robot: Robot) -> RobotDetail:
         commercial_status=robot.commercial_status,
         summary=robot.summary,
         description=robot.description,
-        hero_image_url=robot.hero_image_url,
+        hero_image_url=_governed_hero_image_url(robot),
         announced_year=robot.announced_year,
         status_history=status_history,
         specs=_specs_block(robot),

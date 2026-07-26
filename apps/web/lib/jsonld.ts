@@ -41,19 +41,46 @@ const TEXT_SPECS: Array<{ key: "mobility" | "autonomy"; name: string }> = [
   { key: "autonomy", name: "Autonomy" },
 ];
 
+/**
+ * WS8.3 / R14 — is this value a fact we may assert? (AGENT-01.3)
+ *
+ * The previous guard was `!== null && !== undefined`, which let an empty or
+ * whitespace-only string through as a `PropertyValue`. A machine consumer
+ * cannot tell an empty assertion from a meaningful one, so an empty string
+ * becomes a fabricated fact — the precise coercion AGENT-01.3 forbids, arriving
+ * from the other direction.
+ *
+ * `0` and `false` are deliberately KEPT: they are real canonical values, and
+ * dropping them would be the mirror-image error of coercing UNKNOWN to `0`.
+ * UNKNOWN is `null`/absent and is omitted entirely — never rendered as `0`,
+ * `false`, `""`, "unknown" or "n/a".
+ */
+function isAssertableFact(value: unknown): value is string | number | boolean {
+  if (value === null || value === undefined) return false;
+  if (typeof value === "string" && value.trim() === "") return false;
+  return true;
+}
+
 function additionalProperty(robot: RobotDetail): PropertyValue[] {
   const props: PropertyValue[] = [];
-  // Commercial maturity is a real canonical fact (kept distinct from obtainability).
-  props.push({ "@type": "PropertyValue", name: "Commercial status", value: robot.commercial_status });
+  // Commercial maturity is a real canonical fact (kept distinct from
+  // obtainability) — but only asserted when it actually carries a value.
+  if (isAssertableFact(robot.commercial_status)) {
+    props.push({
+      "@type": "PropertyValue",
+      name: "Commercial status",
+      value: robot.commercial_status,
+    });
+  }
   for (const { key, name, unitText } of NUMERIC_SPECS) {
     const v = robot.specs[key];
-    if (v !== null && v !== undefined) {
+    if (isAssertableFact(v)) {
       props.push({ "@type": "PropertyValue", name, value: v, ...(unitText ? { unitText } : {}) });
     }
   }
   for (const { key, name } of TEXT_SPECS) {
     const v = robot.specs[key];
-    if (v !== null && v !== undefined) {
+    if (isAssertableFact(v)) {
       props.push({ "@type": "PropertyValue", name, value: v });
     }
   }
@@ -83,7 +110,7 @@ export function buildRobotJsonLd(robot: RobotDetail): Record<string, unknown> {
   };
 
   const description = robot.summary ?? robot.description ?? undefined;
-  if (description) product.description = description;
+  if (isAssertableFact(description)) product.description = description;
 
   // MEDIA-01: only display-eligible images reach the read; omit when none.
   const images = (robot.images ?? []).map((i) => absoluteUrl(i.image_url));

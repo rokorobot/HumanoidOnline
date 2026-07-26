@@ -1,7 +1,8 @@
 """Promotion gate + governed canonical write (DATA-D1 §7/§8/§18/§25-F/G/H).
 
 `build_proposal` is autonomous (no writes). `promote` is the ONE human-invoked
-canonical writer: it enforces gates P1-P8 and, only if they pass, creates/links the
+canonical writer: it enforces the promotion gates IMPLEMENTED HERE and, only if
+they pass, creates/links the
 canonical robot, writes VERIFIED claims into a small approved set of typed fields,
 records provenance THROUGH the existing G2 evidence model (R5 — no parallel evidence
 system), and records the promotion lineage (§19/Gate J). It never commits; the
@@ -41,7 +42,24 @@ _APPROVED_FIELDS: dict[str, tuple[str, str | None, Decimal]] = {
 
 
 def check_gates(session: Session, candidate: DiscoveryCandidate) -> list[str]:
-    """Return the list of FAILED promotion gates (empty = promotable)."""
+    """Return the list of FAILED promotion gates (empty = promotable).
+
+    WS8.3 / R12 (gap Q8a) — this docstring states only what is actually
+    enforced. Three call sites previously advertised "P1-P8" while the code
+    implemented a subset; documentation that overstates a governance gate is
+    worse than none, because a reviewer trusts it.
+
+    Enforced here: **P1** identity resolved · **P2** confirmed authoritative
+    trace · **P4** no conflict on the candidate or its claims · **P6** entity
+    type is ROBOT (v0.1) · readiness (`status == READY_FOR_PROMOTION`).
+    Enforced separately in `promote()`: **P8** human approval (`approved_by`),
+    plus idempotency.
+
+    **P3, P5 and P7 are NOT implemented.** They are DATA-D1 scope, dispositioned
+    ACCEPT-DEFER in the WS8 contract (§8.3 Q8b) and deliberately out of WS8's
+    hardening scope — WS8 does not add missing promotion gates, it stops the
+    documentation from claiming they exist.
+    """
     fails: list[str] = []
     # P1 — identity resolved
     if candidate.identity_status not in _PROMOTABLE_IDENTITY:

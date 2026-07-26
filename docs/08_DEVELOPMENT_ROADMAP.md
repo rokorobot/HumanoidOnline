@@ -1,8 +1,8 @@
 # HumanoidOnline — Development Roadmap
 
 > **Status:** Living delivery roadmap
-> **Current stage:** WS7 — Commercial Lead
-> **Last updated:** 2026-07-25
+> **Current stage:** WS8 — MVP Hardening / Release
+> **Last updated:** 2026-07-26
 
 This document defines **implementation sequencing and workstream boundaries**: in
 what order we build the product, what each workstream owns, what is already
@@ -36,9 +36,17 @@ WS3    Intelligence UI                    ✅ COMPLETE
 WS4    Advanced Compare / Decision        ✅ COMPLETE
 WS5    Buyer Intent                       ✅ COMPLETE
 WS6    Deterministic Matching             ✅ COMPLETE
-WS7    Commercial Lead                    🟠 CURRENT
-WS8    MVP Hardening / Release            ⏳ PLANNED
+WS7    Commercial Lead                    ✅ COMPLETE
+WS8    MVP Hardening / Release            🟠 CURRENT
 ```
+
+> **Post-WS7, pre-WS8 governance slices (merged out of the numbered sequence).**
+> Between WS7 and WS8, several governed quality/accessibility slices merged rather
+> than jumping straight to release hardening: **MEDIA-01** (verified product
+> imagery), **DATA-D1** (competitive discovery + governed promotion, fixture-only),
+> and **AGENT-01** (machine/agent read-only projections). They are live on `main`
+> but are **not** part of the numbered WS0–WS8 MVP delivery sequence; WS8 remains the
+> formal MVP release gate and has not yet been executed.
 
 Each workstream is PR-gated and lands with its tests (AGENTS.md rule 5). A stage
 begins only once the previous stage's exit gate is green on the exact PR head.
@@ -227,7 +235,19 @@ reasons · warnings · commercial constraints · supporting evidence.
 
 ---
 
-## 7. WS7 — Commercial Lead 🟠 CURRENT
+## 7. WS7 — Commercial Lead ✅ COMPLETE
+
+*Merged in #14 (`7056031`): the first commercial conversion — `POST /api/commercial-leads`
++ `app/services/leads/` (service + deterministic routing) writing `commercial_lead`,
+`commercial_lead_robot`, and PENDING `commercial_lead_provider` routes via the canonical
+`commercially_accessible()` function; four capture surfaces (per-card, whole-shortlist,
+zero-match, and Robot-Detail direct); `CommercialLead`/`CommercialLeadProvider` SQLAdmin
+triage; forward migration `0001_add_commercial_lead_message.sql`. Introduction-only — no
+custody, checkout, or Rent/Buy/Lease activation. Contract-hardened over an independent
+review pass (`df37d9d`): canonical accessibility routing, lead-only extension semantics,
+exactly-one-robot direct capture, genuine zero-match coverage, API-contract sync.
+Delivered as slices WS7.1 contract+lifecycle · WS7.2 service+API · WS7.3 entry points ·
+WS7.4 provider routing · WS7.5 SQLAdmin triage+audit · WS7.6 e2e+adversarial hardening.*
 
 Connect buyer demand to commercial action:
 ```
@@ -239,7 +259,7 @@ commercial action.
 
 ---
 
-## 8. WS8 — MVP Hardening / Release ⏳
+## 8. WS8 — MVP Hardening / Release 🟠 CURRENT
 
 Final release gate:
 ```
@@ -285,11 +305,18 @@ after this anchor and before the next branch is cut). The next workstream is cut
 from whatever `main` is at cut time and verified 0 ahead / 0 behind then.)*
 
 ```
-Last completed workstream merge:  f3c86643dab488e35d9b6d5cb8704931660607b8
-Current workstream:               WS7 — Commercial Lead
-Current branch:                   fm/ws7-commercial-lead
+Last completed workstream merge:  7056031d7f46b100ed5b35728791caaddd581dfb  (WS7, PR #14)
+Current workstream:               WS8 — MVP Hardening / Release
+Current branch:                   (cut from main at WS8 start)
 
-Completed:  ✅ WS0  ✅ WS1  ✅ WS2A  ✅ WS2B  ✅ UI-D1  ✅ WS3  ✅ WS4  ✅ WS5  ✅ WS6
-Current:    🟠 WS7
-Next:       WS8
+Completed:  ✅ WS0  ✅ WS1  ✅ WS2A  ✅ WS2B  ✅ UI-D1  ✅ WS3  ✅ WS4  ✅ WS5  ✅ WS6  ✅ WS7
+Current:    🟠 WS8
+Next:       (post-MVP) Commercial Architecture programme — Rent / Buy / Lease-RaaS
 ```
+
+**Note on `main` vs. the WS7 anchor.** Per this section's convention the anchor is the
+*last completed numbered-workstream merge* (WS7 @ `7056031`). `main` is deliberately
+**ahead** of that anchor: the post-WS7 governance slices (MEDIA-01 @ `5b40c86`/`162abfd`,
+DATA-D1 @ `d63f700`/`3dca8cc`, AGENT-01 @ `35c2576`/`217460a`) merged afterward, bringing
+`main` to `217460a`. WS8 is cut from whatever `main` is at cut time (verified 0-ahead /
+0-behind then), **not** from the WS7 anchor.

@@ -109,21 +109,37 @@ recur. No other existing assertion was modified.
 | Gate | Class | Status | Evidence |
 |---|---|---|---|
 | R16 Journeys A/B/C | Automated | **PASS** | `e2e/journeys.spec.ts` — explore→compare matrix, wizard→match→lead capture, use-case→suitable robot→detail; each asserts the governed result, not a page load |
-| R17 WCAG 2.2 AA (automated) | Automated | **PASS** | `e2e/accessibility-axe.spec.ts` — axe WCAG 2.2 AA on home/catalogue/detail/compare/wizard/matches/manufacturers/use-cases **plus** interactive states (dialog open, validation error), **zero violations**, on BOTH desktop and Pixel-7 projects |
+| R17 WCAG 2.2 AA (automated) | Automated | **PASS** | All **five** frozen obligations covered — not "axe reports zero violations": **(1) every §5.1 public route** — `e2e/accessibility-axe.spec.ts` axe WCAG 2.2 AA on `/`, `/robots`, `/robots/[slug]`, `/compare`, `/manufacturers`, `/manufacturers/[slug]`, `/use-cases`, `/use-cases/[slug]`, `/find-a-humanoid`, `/matches/[id]`, **404** + interactive states (dialog open, validation error), zero violations, desktop **and** Pixel-7; **(2) keyboard-only journeys** — `e2e/keyboard.spec.ts` skip-link→main focus, keyboard-only nav activation, open→submit the lead dialog by keyboard; **(3) focus behaviour** — dialog focus-trap (Tab/Shift+Tab stay inside), Escape closes + returns focus to opener, invalid field takes focus; **(4) semantic headings/forms/dialogs** — `e2e/semantics.spec.ts` one H1 + main landmark + named primary nav per route, programmatic form labels, dialog role/`aria-modal`/accessible-title, invalid↔alert wiring; **(5) mobile target size** — `e2e/responsive.spec.ts` direct ≥24×24 measurement of the deliberate controls **plus** axe's `target-size` rule by name on the Pixel-7 profile |
 | R18 screen-reader | **Attested** | **PENDING** | Checklist prepared: `docs/14_R18_SCREEN_READER_ATTESTATION.md`. Deliberately NOT self-attested — a person must complete the record. Axe green (R17) does not satisfy it |
 | R19 responsive | Automated | **PASS** | `e2e/responsive.spec.ts` on a real **mobile-chromium (Pixel 7)** project in CI + desktop: no horizontal overflow, cards not clipped, compare/spec tables scroll in-container, primary actions operable |
 | R20 empty/error states | Automated | **PASS** | `e2e/ux-states.spec.ts` — 404, compare<2 prompt, price trichotomy (never $0), availability-unknown≠unavailable, invalid-email announced, API-failure retains input; `__tests__/robot-gallery.test.tsx` for the missing-image state |
 | R21 lint / jsx-a11y | Automated | **PASS** | `.eslintrc.cjs` (jsx-a11y recommended at error, `--max-warnings=0`) wired into CI `web-build`; real defects fixed, not silenced |
 
 **R17 note — axe is an oracle for detectable defects, not for conformance.** That
-is why R18 is a separate Attested gate. The exploratory axe pass found and this
-slice fixed real defects: a critical `aria-pressed` on a link, keyboard-inaccessible
+is why R18 is a separate Attested gate, and why R17 is proven by four specs across
+all five obligations (above), not axe alone. The exploratory axe pass found and
+this slice fixed real defects: a critical `aria-pressed` on a link, keyboard-inaccessible
 scroll regions, a page-inflating off-screen skip-link, two mobile horizontal
 overflows (identity-header grid, evidence rows), and three contrast failures
 (muted-grey text, quote amber, and the illegible bright-orange validation error).
-Every fix was a minimal token nudge or markup correction — **UI-D1 layout and type
-are unchanged**; the palette's muted/amber/signal semantics are preserved, only
-their exact lightness meets AA.
+The broadened R17 suite then surfaced two more, also fixed minimally: the skip link
+scrolled but did **not** move focus (added `tabIndex={-1}` to `<main>` so activating
+it lands focus in the landmark), and the lead-dialog close button measured 22px wide
+(min-size raised to the 24×24 AA target-size minimum). Every fix was a minimal token
+nudge or markup correction — **UI-D1 layout and type are unchanged**; the palette's
+muted/amber/signal semantics are preserved, only their exact lightness meets AA.
+
+**R17 — robot-detail navigation is an intentional UI-D1 variance (not a WCAG
+waiver).** The every-route semantic suite makes explicit that `/robots/[slug]` is
+the only public route without a primary-nav landmark: it renders its frozen dark
+identity header (`idhead`) and does not repeat `SiteNav`, whereas the sibling detail
+pages (`/manufacturers/[slug]`, `/use-cases/[slug]`) do. This is **conformant**:
+WCAG 2.2 SC 3.2.3 (Consistent Navigation) governs the relative *order* of navigation
+mechanisms **when they are repeated** — it does not require the same navigation on
+every page. `e2e/semantics.spec.ts` asserts the absence on robot detail (locking the
+variance so it cannot drift accidentally) and, separately, that the nav which *is*
+repeated appears identically named on every browse surface. Recorded as a deliberate
+UI-D1 composition variance, decided by the design owner; **no `DarkNav` added in WS8.4.**
 
 **R21 note — narrow, documented exceptions only.** One `eslint-disable-next-line`
 (the lead-dialog backdrop pointer-dismiss, redundant with Escape + a labelled Close

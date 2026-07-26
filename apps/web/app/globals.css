@@ -751,8 +751,13 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-ink); padding: var(-
 .ho-dark .lead-modal { border-color: var(--ho-paper-ink); }
 .lead-modal__head { display: flex; align-items: flex-start; justify-content: space-between;
   gap: var(--ho-sp-4); margin-bottom: var(--ho-sp-4); }
+/* min 24x24 + centred glyph — WCAG 2.2 AA target size (2.5.8). The ✕ glyph alone
+   measured 22px wide; the min-size guarantees the AA minimum without changing the
+   visual weight. */
 .lead-modal__close { background: transparent; border: 0; cursor: pointer; line-height: 1;
-  font-size: 1.1rem; color: var(--ho-text-muted); padding: 4px; }
+  font-size: 1.1rem; color: var(--ho-text-muted); padding: 4px;
+  min-width: 24px; min-height: 24px; display: inline-flex; align-items: center;
+  justify-content: center; }
 .lead-modal__close:hover { color: var(--ho-ink); }
 .lead-modal .field input[type=email], .lead-modal .field input[type=text],
 .lead-modal .field textarea, .lead-modal .field select {

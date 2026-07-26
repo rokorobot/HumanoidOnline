@@ -1,12 +1,20 @@
 /**
- * WS8.4 / R17 — automated WCAG 2.2 AA checks (axe-core) across the major
- * rendered surfaces AND the interactive states where defects hide (dialog open,
- * a wizard step, a validation/error state).
+ * WS8.4 / R17 — automated WCAG 2.2 AA checks (axe-core) across EVERY public
+ * route (Product Contract §5.1) AND the interactive states where defects hide
+ * (dialog open, a wizard step, a validation/error state).
+ *
+ * §5.1 public surface, each covered below:
+ *   /  ·  /robots  ·  /robots/[slug]  ·  /compare  ·  /manufacturers  ·
+ *   /manufacturers/[slug]  ·  /use-cases  ·  /use-cases/[slug]  ·
+ *   /find-a-humanoid  ·  /matches/[id]  ·  404
  *
  * Honest about what this proves: axe detects a subset of WCAG failures — rule
  * violations, not total conformance. It is an oracle for *detectable* defects.
  * That is precisely why R18 (screen-reader) stays a separate, Attested gate and
- * is NOT satisfied by a green run here.
+ * is NOT satisfied by a green run here. The keyboard-only journeys, focus
+ * behaviour and semantic-structure obligations of R17 are proven in the
+ * companion specs keyboard.spec.ts and semantics.spec.ts; mobile target size in
+ * responsive.spec.ts. axe alone is NOT R17.
  *
  * Tagged @a11y so it runs on BOTH the desktop and mobile (Pixel 7) projects.
  */
@@ -94,5 +102,25 @@ test.describe("@a11y automated WCAG 2.2 AA", () => {
     await expectNoViolations(page, "manufacturers");
     await page.goto("/use-cases", { waitUntil: "networkidle" });
     await expectNoViolations(page, "use-cases");
+  });
+
+  test("manufacturer detail", async ({ page }) => {
+    await page.goto("/manufacturers/unitree", { waitUntil: "networkidle" });
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expectNoViolations(page, "manufacturer detail");
+  });
+
+  test("use-case detail", async ({ page }) => {
+    await page.goto("/use-cases/warehouse-logistics", { waitUntil: "networkidle" });
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expectNoViolations(page, "use-case detail");
+  });
+
+  test("404 not-found", async ({ page }) => {
+    // Unknown slug -> notFound() -> the 404 record, served with HTTP 404.
+    const res = await page.goto("/robots/no-such-robot-zzz", { waitUntil: "networkidle" });
+    expect(res?.status()).toBe(404);
+    await expect(page.getByRole("heading", { level: 1, name: /Not found/i })).toBeVisible();
+    await expectNoViolations(page, "404 not-found");
   });
 });

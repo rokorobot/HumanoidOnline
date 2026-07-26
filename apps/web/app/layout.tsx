@@ -16,7 +16,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <a className="skip-link" href="#main-content">
           Skip to content
         </a>
-        <main id="main-content">{children}</main>
+        {/* tabIndex={-1} so activating the skip link actually MOVES focus to the
+            main landmark (WS8.4 / R17 focus behaviour) — a fragment link only
+            scrolls to a non-focusable target; without this the keyboard user's
+            focus stays on the skip link. -1 keeps it out of the Tab order. */}
+        <main id="main-content" tabIndex={-1}>
+          {children}
+        </main>
       </body>
     </html>
   );

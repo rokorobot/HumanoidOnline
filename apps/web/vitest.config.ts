@@ -10,6 +10,16 @@ export default defineConfig({
     // (e.g. lib/jsonld) the same way the app does.
     alias: {
       "@": fileURLToPath(new URL(".", import.meta.url)),
+      // Server-only runtime markers used by the API client's correlation seam
+      // (lib/request-id.ts) have no meaning under vitest; stub them so unit tests
+      // that transitively import the client (e.g. lib/seo) still load. The guard
+      // remains real in the Next build.
+      "server-only": fileURLToPath(
+        new URL("./test/stubs/server-only.ts", import.meta.url),
+      ),
+      "next/headers": fileURLToPath(
+        new URL("./test/stubs/next-headers.ts", import.meta.url),
+      ),
     },
   },
   test: {

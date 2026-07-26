@@ -20,6 +20,10 @@ from app.admin import mount_admin
 from app.config import get_settings
 from app.db.migration_state import enforce_migration_state_at_startup
 from app.db.session import engine
+from app.observability import (
+    RequestObservabilityMiddleware,
+    configure_logging,
+)
 from app.routers import (
     buyer_requirements,
     commercial_leads,
@@ -34,6 +38,9 @@ from app.security.client_ip import validate_trusted_ingress_config
 from app.security.headers import SecurityHeadersMiddleware, configure_cors
 
 settings = get_settings()
+
+# WS8.6 / R25 — structured logging + request correlation before anything logs.
+configure_logging(settings.app_env)
 
 
 @asynccontextmanager
@@ -61,6 +68,12 @@ app = FastAPI(
 # same-origin, and `CORS_ALLOWED_ORIGINS` is the documented opt-in.
 app.add_middleware(SecurityHeadersMiddleware)
 CORS_ALLOWED_ORIGINS = configure_cors(app)
+
+# WS8.6 / R25 — added LAST so it is the OUTERMOST application middleware: it
+# assigns the correlation id first, logs every request, and contains any
+# exception propagating out — returning a sanitized, still-correlated 500 rather
+# than letting the framework emit a message-bearing (PII-capable) traceback.
+app.add_middleware(RequestObservabilityMiddleware)
 
 # DEP P1 — parse the trusted-ingress configuration at import so a malformed
 # value refuses to boot. Silently reinterpreting it as "trust nobody" would

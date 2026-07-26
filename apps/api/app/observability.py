@@ -7,18 +7,23 @@ path — no slugs/ids), the status and the duration.
 
 Two deliberate design constraints from the WS8.6 review:
 
-1. **Observe, don't handle.** Unhandled exceptions are LOGGED here (with the
-   correlation id) and then **re-raised** so the framework's existing error
-   machinery produces the response. This layer must never quietly become an
-   error-response layer; it does not translate exceptions into responses.
+1. **Contain the error's PII, then correlate.** The default framework/uvicorn
+   error handler emits the full traceback INCLUDING the exception message, which
+   can echo user input — a real leak demonstrated by the production uvicorn
+   no-PII probe (``tests/test_observability_probe.py``). That leak activates the
+   review's authorization to add the minimal sanitized unhandled-error mechanism:
+   this layer catches an unhandled exception, logs a MESSAGE-FREE record
+   (exception type + traceback frames only), and RETURNS a generic 500 that still
+   carries the correlation id — so no user-supplied text reaches any log AND
+   correlation survives the 5xx case. It handles ONLY genuine unhandled
+   exceptions; HTTPException / validation errors are turned into responses by the
+   framework before ever reaching this layer.
 
 2. **No PII (WS8-L6 / R5).** A request log record never contains a query string,
    request/response body, headers (no ``Authorization``/``Cookie``), the client
-   IP, or a raw exception *message* (which could echo user input). On an error
-   only the exception *type* and the correlation id are logged as structured
-   fields — never the message or a traceback. The full traceback for debugging is
-   emitted separately by the framework's own error handler once the re-raise
-   reaches it (standard operator logging, outside this structured line).
+   IP, or a raw exception *message*. The error record carries the exception type
+   and the traceback FRAMES only (file/line/func — never the message/args), so it
+   is provably free of request data.
 """
 from __future__ import annotations
 
@@ -27,12 +32,13 @@ import json
 import logging
 import re
 import time
+import traceback
 import uuid
 from collections.abc import Awaitable, Callable
 
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from starlette.responses import Response
+from starlette.responses import JSONResponse, Response
 
 #: The canonical correlation header, echoed on every response and propagated by
 #: the web tier (Next) on its governed API calls so a request can be traced
@@ -89,7 +95,15 @@ class JsonLogFormatter(logging.Formatter):
     """Compact JSON lines. Only whitelisted structured fields are emitted, so a
     stray ``extra`` can never leak request data into the log."""
 
-    _FIELDS = ("request_id", "method", "route", "status", "duration_ms", "exc_type")
+    _FIELDS = (
+        "request_id",
+        "method",
+        "route",
+        "status",
+        "duration_ms",
+        "exc_type",
+        "stack",
+    )
 
     def format(self, record: logging.LogRecord) -> str:
         payload: dict[str, object] = {
@@ -154,14 +168,18 @@ class RequestObservabilityMiddleware(BaseHTTPMiddleware):
             try:
                 response = await call_next(request)
             except Exception as exc:
-                # Observe only: log a CORRELATED line, then RE-RAISE so the
-                # framework's error handling produces the (sanitized) response.
-                # We deliberately log only the exception *type* — NOT its message
-                # or a traceback — because an exception message can echo user
-                # input (R5 / D9). The full traceback for debugging is emitted by
-                # the framework/uvicorn error handler when the re-raise reaches
-                # it; this structured line stays provably free of request data and
-                # correlates it by request_id + route.
+                # Handle the unhandled exception HERE rather than re-raising.
+                #
+                # Re-raising would let the framework/uvicorn error handler emit the
+                # full traceback INCLUDING the exception message, and an exception
+                # message can echo user input (R5 / D9). A production uvicorn probe
+                # demonstrated exactly that leak — which activates the WS8.6-review
+                # authorization to add the minimal sanitized unhandled-error
+                # mechanism. So we log a MESSAGE-FREE record (exception type + the
+                # traceback FRAMES only — file/line/func, never the message/args)
+                # and return a generic 500 that still carries the correlation id.
+                # Nothing user-supplied reaches any log, and correlation survives
+                # the 5xx case.
                 duration_ms = round((time.perf_counter() - start) * 1000, 1)
                 logger.error(
                     "request errored",
@@ -172,9 +190,20 @@ class RequestObservabilityMiddleware(BaseHTTPMiddleware):
                         "status": 500,
                         "duration_ms": duration_ms,
                         "exc_type": type(exc).__name__,
+                        # Location-only frames (file:line:func) — deliberately NOT
+                        # the source lines, so no source literal (nor the message)
+                        # can carry data into the log. Enough to locate the fault.
+                        "stack": " <- ".join(
+                            f"{f.filename}:{f.lineno}({f.name})"
+                            for f in traceback.extract_tb(exc.__traceback__)
+                        ),
                     },
                 )
-                raise
+                response = JSONResponse(
+                    status_code=500, content={"detail": "Internal Server Error"}
+                )
+                response.headers[REQUEST_ID_HEADER] = request_id
+                return response
             duration_ms = round((time.perf_counter() - start) * 1000, 1)
             response.headers[REQUEST_ID_HEADER] = request_id
             logger.info(

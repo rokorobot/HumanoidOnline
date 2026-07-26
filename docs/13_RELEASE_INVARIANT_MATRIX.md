@@ -262,7 +262,7 @@ that owns it has passed.
 | D5a checksum never compared | CLOSE | WS8.2 | **CLOSED** (R9) |
 | D6 divergent README bootstrap | CLOSE | WS8.2 | **CLOSED** (R10) |
 | D7 migration `0003` undocumented | CLOSE | WS8.2 | **CLOSED** (R10) |
-| D9 no app logging / error / metrics / correlation | CLOSE | WS8.6 | **CLOSED** (R25 — structured JSON request log + `X-Request-ID` correlation across Next↔FastAPI, no PII in output; uvicorn access log silenced in prod) |
+| D9 no app logging / error / metrics / correlation | CLOSE | WS8.6 | **CLOSED** (R25 — structured JSON request log + `X-Request-ID` correlation across Next↔FastAPI incl. **2xx/4xx/5xx**; **no PII proven over the COMPLETE uvicorn log stream** by a production probe. An unhandled 500 is sanitized in-middleware — generic body, message-free location-only stack, correlation id preserved — instead of letting the framework emit the PII-bearing traceback; uvicorn access log silenced in prod. `/health` + `/ready` preserved and correlated) |
 | D1–D4 deployment gaps | CLOSE | WS8.7 | open |
 | D8 `event_log` dead | NOT A RELEASE DEFECT | — | **documented dormant** (R25 — model docstring + no application writer proven + zero-write regression) |
 | R24 performance | CLOSE | WS8.6 | **CLOSED** — deterministic bundle budgets (`scripts/perf-budget.mjs`, gzipped First Load JS in CI) **+** built-route budget (`e2e/perf-budget.spec.ts`: document bytes / JS asset count+size vs the fixed catalogue). No timing/LCP thresholds; field CWV is post-release SLO (§11.1) |

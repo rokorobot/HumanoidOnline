@@ -174,24 +174,40 @@ def test_post_body_pii_never_appears_in_logs(probe: TestClient, logs: _Capture) 
 # --------------------------------------------------------------------------- #
 # Unexpected 5xx — logged (exc type only) + re-raised; response sanitized
 # --------------------------------------------------------------------------- #
-def test_5xx_logs_type_only_and_reraises_sanitized(
-    probe: TestClient, logs: _Capture
-) -> None:
+def test_5xx_is_sanitized_and_still_correlated(probe: TestClient, logs: _Capture) -> None:
     r = probe.get("/boom")
     assert r.status_code == 500
-    # Framework produced the response; it must not leak the exception message.
+    # The generic 500 body must not leak the exception message...
     assert "secret-boom" not in r.text
     assert "user@example.com" not in r.text
-    # Our structured line logged the TYPE and correlation — never the message.
+    # ...and correlation must SURVIVE the 5xx case (B2): the response carries the id.
+    assert re.fullmatch(r"[A-Za-z0-9._-]{1,128}", r.headers.get(REQUEST_ID_HEADER) or "")
+    # Our structured line logged the TYPE + a message-free stack + correlation.
     errored = [r for r in logs.records if getattr(r, "status", None) == 500]
     assert errored, "an error line must be logged"
     rec = errored[-1]
     assert rec.exc_type == "RuntimeError"
     assert getattr(rec, "request_id", None)
+    assert getattr(rec, "stack", "")  # frames present for debuggability
     blob = logs.rendered()
-    assert "secret-boom" not in blob
-    assert "user@example.com" not in blob
-    assert "token=abc123" not in blob
+    for secret in ("secret-boom", "user@example.com", "token=abc123"):
+        assert secret not in blob
+
+
+def test_health_and_ready_are_correlated_and_logged(
+    client: TestClient, logs: _Capture, database_url: str
+) -> None:
+    """R25 health observability: the preserved /health + /ready endpoints stay
+    functional and participate in correlation + structured logging."""
+    for path in ("/health", "/ready"):
+        r = client.get(path)
+        assert r.status_code == 200, f"{path} -> {r.status_code}"
+        assert re.fullmatch(
+            r"[A-Za-z0-9._-]{1,128}", r.headers.get(REQUEST_ID_HEADER) or ""
+        ), f"{path} missing correlation id"
+        assert any(
+            getattr(rec, "route", None) == path for rec in logs.records
+        ), f"{path} not logged"
 
 
 # --------------------------------------------------------------------------- #

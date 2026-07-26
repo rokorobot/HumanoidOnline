@@ -131,7 +131,11 @@ section.block { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid
 
 /* ---- ROBOT CARD (home + catalogue) --------------------------------------- */
 .card-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--ho-sp-4); }
-.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--ho-sp-4); }
+/* WS8.4 / R19: minmax(0, 1fr) so card tracks can shrink below their content's
+   min-content; plain 1fr tracks (min-width:auto) overflowed under wider fallback
+   fonts. Card inner content wraps rather than forcing width. */
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ho-sp-4); }
+.rcard, .rcard * { min-width: 0; overflow-wrap: anywhere; }
 .rcard { border: var(--ho-rule-hair) solid var(--ho-ink); background: var(--ho-paper-2);
   display: flex; flex-direction: column; min-height: 250px; color: inherit; }
 .rcard:hover, .rcard:focus-within { outline: var(--ho-rule-med) solid var(--ho-ink); outline-offset: -1px; }
@@ -171,8 +175,13 @@ section.block { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid
 .cmp:hover { background: var(--ho-ink); color: var(--ho-paper); }
 
 /* ---- CATALOGUE LAYOUT + FILTER RAIL -------------------------------------- */
-.layout { display: grid; grid-template-columns: 268px 1fr; gap: var(--ho-sp-6);
+/* WS8.4 / R19: minmax(0, 1fr) instead of 1fr so the results column can shrink
+   below its content's min-content (a plain 1fr track defaults to min-width:auto
+   and overflowed under wider fallback fonts). min-width:0 on the children is the
+   belt-and-suspenders form of the same fix. */
+.layout { display: grid; grid-template-columns: 268px minmax(0, 1fr); gap: var(--ho-sp-6);
   align-items: start; padding-bottom: var(--ho-sp-8); }
+.layout > * { min-width: 0; }
 .filters { border: var(--ho-rule-hair) solid var(--ho-ink); background: var(--ho-paper-2);
   position: sticky; top: 8px; }
 .filters .fhead { display: flex; align-items: center; justify-content: space-between;
@@ -193,7 +202,13 @@ section.block { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid
 .field select, .field input[type=number], .field input[type=text] {
   border: var(--ho-rule-hair) solid var(--ho-grey-400); background: var(--ho-paper);
   padding: 8px 10px; font-family: var(--ho-font-machine); font-size: var(--ho-fs-small); }
+/* WS8.4 / R19: flex items default to min-width:auto (= min-content), so the
+   min/max number inputs refused to shrink and overflowed the filter column when
+   fallback fonts (wider than the UI-D1 stack, e.g. on a runner without the
+   fonts installed) were used. min-width:0 + flex lets them shrink to fit. */
 .range { display: flex; gap: 8px; }
+.range > * { min-width: 0; flex: 1 1 0; }
+.range input { width: 100%; }
 .frow { display: flex; gap: 8px; padding: 12px 14px; }
 .fbtn { flex: 1; text-align: center; font-family: var(--ho-font-machine);
   font-size: var(--ho-fs-mono-s); letter-spacing: var(--ho-tracking-label);
@@ -265,9 +280,14 @@ section.block { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid
    tracks shrink, and `overflow-x: clip` keeps the decorative strip from ever
    propagating page scroll — the strip renders identically. */
 .idhead .in { max-width: var(--ho-maxw); margin: 0 auto; }
-.idhead .topbar,
-.idhead .topbar > * { min-width: 0; }
-.idhead .topbar .seg { overflow: hidden; }
+/* Applies to every machine-code header strip (identity header, hero, system
+   header), not just .idhead — the fixed-grid corners hold content that can be
+   wider than their track under fallback fonts, and grid/flex items default to
+   min-width:auto. min-width:0 lets the flexible tracks shrink; the seg clips so
+   the decorative strip never propagates page scroll. */
+.topbar,
+.topbar > * { min-width: 0; }
+.topbar .seg { overflow: hidden; }
 .idbody { position: relative; padding: var(--ho-sp-7) var(--ho-sp-7) var(--ho-sp-6); }
 .idside { position: absolute; top: 0; bottom: 0; width: 40px; display: flex;
   align-items: center; justify-content: center; }
@@ -525,7 +545,7 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-ink); padding: var(-
 
 /* ---- RESPONSIVE ---------------------------------------------------------- */
 @media (max-width: 1000px) {
-  .grid { grid-template-columns: repeat(2, 1fr); }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 900px) {
   .hero-tools, .card-row, .apps, .mfr-row, .snap-grid { grid-template-columns: 1fr 1fr; }

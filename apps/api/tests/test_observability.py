@@ -1,5 +1,5 @@
 """WS8.6 / R25 — observability: request correlation, structured logging with no
-PII, log-and-re-raise error handling, and `event_log` dormancy.
+PII, sanitized-500 error containment, and `event_log` dormancy.
 
 The request logger (`app.request`) does not propagate, so these tests attach
 their own capturing handler rather than relying on pytest's caplog.
@@ -172,7 +172,8 @@ def test_post_body_pii_never_appears_in_logs(probe: TestClient, logs: _Capture) 
 
 
 # --------------------------------------------------------------------------- #
-# Unexpected 5xx — logged (exc type only) + re-raised; response sanitized
+# Unexpected 5xx — contained: message-free log (exc type + location-only stack),
+# sanitized generic 500 response, and correlation preserved on that response.
 # --------------------------------------------------------------------------- #
 def test_5xx_is_sanitized_and_still_correlated(probe: TestClient, logs: _Capture) -> None:
     r = probe.get("/boom")

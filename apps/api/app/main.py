@@ -70,8 +70,9 @@ app.add_middleware(SecurityHeadersMiddleware)
 CORS_ALLOWED_ORIGINS = configure_cors(app)
 
 # WS8.6 / R25 — added LAST so it is the OUTERMOST application middleware: it
-# assigns the correlation id first and observes every request (and any exception
-# propagating out), then re-raises so the framework produces the response.
+# assigns the correlation id first, logs every request, and contains any
+# exception propagating out — returning a sanitized, still-correlated 500 rather
+# than letting the framework emit a message-bearing (PII-capable) traceback.
 app.add_middleware(RequestObservabilityMiddleware)
 
 # DEP P1 — parse the trusted-ingress configuration at import so a malformed

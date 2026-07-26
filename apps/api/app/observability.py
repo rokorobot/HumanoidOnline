@@ -153,8 +153,9 @@ def configure_logging(app_env: str) -> None:
 
 
 class RequestObservabilityMiddleware(BaseHTTPMiddleware):
-    """Assigns/propagates a correlation id, logs one line per request, and logs
-    (then re-raises) unexpected exceptions. See the module docstring."""
+    """Assigns/propagates a correlation id, logs one line per request, and
+    contains unexpected exceptions — logging a message-free record and returning a
+    sanitized, still-correlated 500. See the module docstring."""
 
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]]

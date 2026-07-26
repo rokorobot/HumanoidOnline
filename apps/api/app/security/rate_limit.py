@@ -37,6 +37,14 @@ from app.config import get_settings
 from app.security.client_ip import client_ip_for
 
 
+class UnknownRateLimitPolicyError(RuntimeError):
+    """Raised when a route references a rate-limit policy that is not registered.
+
+    Fails closed by design: an unprotected endpoint must never be the quiet
+    outcome of a misspelled policy name.
+    """
+
+
 class RateLimitStore(Protocol):
     """Counter storage behind which the limiter is insulated (DEP P3).
 
@@ -105,6 +113,9 @@ class RateLimiter:
     def policy(self, name: str) -> RateLimitPolicy | None:
         return self._policies.get(name)
 
+    def policy_names(self) -> tuple[str, ...]:
+        return tuple(self._policies)
+
     def load_from_settings(self) -> None:
         """(Re)load every policy from current settings."""
         s = get_settings()
@@ -132,10 +143,21 @@ class RateLimiter:
 
     # -- enforcement --------------------------------------------------------
     def check(self, policy_name: str, client_ip: str) -> None:
-        """Raise ``429`` with ``Retry-After`` when either tier is exceeded."""
+        """Raise ``429`` with ``Retry-After`` when either tier is exceeded.
+
+        An unknown policy name **fails closed**. Returning quietly would mean a
+        one-character typo in a route decorator silently switches R3 off for
+        that endpoint while the application keeps serving — precisely the
+        configuration drift WS8 exists to prevent. `rate_limited()` also
+        rejects unknown names at wiring time, so reaching this raise means the
+        registry changed after startup.
+        """
         policy = self._policies.get(policy_name)
         if policy is None:
-            return
+            raise UnknownRateLimitPolicyError(
+                f"no rate-limit policy registered for {policy_name!r}; "
+                "refusing the request rather than serving it unprotected"
+            )
 
         for tier, limit, window in (
             ("burst", policy.burst_limit, policy.burst_window_seconds),
@@ -163,11 +185,24 @@ RATE_LIMITER.load_from_settings()
 
 
 def rate_limited(policy_name: str) -> Callable[[Request], None]:
-    """FastAPI dependency enforcing `policy_name` for the decorated route."""
+    """FastAPI dependency enforcing `policy_name` for the decorated route.
+
+    The policy name is validated **here, at import/wiring time**, so a typo is a
+    boot failure rather than an endpoint quietly shipping without abuse control.
+
+    There is deliberately no global "disable" switch. R3 is a release-blocking
+    control; "limits are configurable per environment" means the *numbers* are
+    tunable, not that the control may be removed. Tests adjust behaviour by
+    installing permissive or tight policies through `RATE_LIMITER.set_policy`,
+    never by turning enforcement off.
+    """
+    if RATE_LIMITER.policy(policy_name) is None:
+        raise UnknownRateLimitPolicyError(
+            f"rate_limited({policy_name!r}) refers to an unregistered policy. "
+            f"Known policies: {sorted(RATE_LIMITER.policy_names())}."
+        )
 
     def dependency(request: Request) -> None:
-        if not get_settings().rate_limit_enabled:
-            return
         RATE_LIMITER.check(policy_name, client_ip_for(request))
 
     return dependency

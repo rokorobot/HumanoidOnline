@@ -158,7 +158,7 @@ def test_shipped_rate_limit_defaults_are_strict_and_endpoint_aware() -> None:
     that actually ship are asserted here instead — and they must differ per
     endpoint (§11 D7: never one arbitrary global number)."""
     s = Settings(_env_file=None)
-    assert s.rate_limit_enabled is True
+    # There is no enable/disable switch to assert: R3 cannot be turned off.
     assert 0 < s.buyer_requirements_burst <= 20
     assert 0 < s.commercial_leads_burst <= 20
     assert s.commercial_leads_sustained < s.buyer_requirements_sustained, (

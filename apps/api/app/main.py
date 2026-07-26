@@ -26,6 +26,7 @@ from app.routers import (
     stats,
     use_cases,
 )
+from app.security.client_ip import validate_trusted_ingress_config
 from app.security.headers import SecurityHeadersMiddleware, configure_cors
 
 settings = get_settings()
@@ -38,6 +39,12 @@ app = FastAPI(title=settings.api_title, version=settings.api_version)
 # same-origin, and `CORS_ALLOWED_ORIGINS` is the documented opt-in.
 app.add_middleware(SecurityHeadersMiddleware)
 CORS_ALLOWED_ORIGINS = configure_cors(app)
+
+# DEP P1 — parse the trusted-ingress configuration at import so a malformed
+# value refuses to boot. Silently reinterpreting it as "trust nobody" would
+# collapse every client behind the proxy onto one address and rate-limit them
+# as a single caller — an outage that looks nothing like a config error.
+TRUSTED_INGRESS = validate_trusted_ingress_config()
 
 app.include_router(health.router)
 app.include_router(robots.router)

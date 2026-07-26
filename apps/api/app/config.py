@@ -70,7 +70,10 @@ class Settings(BaseSettings):
     # egress and the sustained tier does the real anti-flood work. (An initial
     # 5/60s burst was rejected during WS8.1 verification: it returned 429 to
     # ordinary wizard traffic in the e2e run. Kept as a cautionary note.)
-    rate_limit_enabled: bool = True
+    # NOTE: there is intentionally no `rate_limit_enabled` switch. R3 is a
+    # release-blocking control; per-environment configuration tunes the numbers,
+    # it does not permit removing abuse protection from an anonymous mutation
+    # endpoint.
     buyer_requirements_burst: int = 20
     buyer_requirements_burst_window_s: int = 60
     buyer_requirements_sustained: int = 120

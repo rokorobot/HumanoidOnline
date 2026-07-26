@@ -34,7 +34,7 @@ a later slice) · `N/A` with a reason.
 | L2 | Whole-surface release candidate | WS8 §3 | Attested | WS8.9 sign-off covers every §2 surface | R33 | PENDING (WS8.9) |
 | L3 | Differentiated depth per surface | WS8 §3 | Attested | slice PRs map to §5 depth | R33 | PENDING (WS8.9) |
 | L4 | No law weakening to pass a gate | WS8 §3 | Attested | per-PR review; **WS8.1 note below** | R33 | IN PROGRESS |
-| L5 | Fail closed in production | WS8 §3 | Automated | `test_r1_admin_is_not_mounted_when_unconfigured`, `test_r1_partial_configuration_still_fails_closed` | R1, R7 | **PASS** (admin) · PENDING (config, WS8.2) |
+| L5 | Fail closed in production | WS8 §3 | Automated | `test_r1_admin_is_not_mounted_when_unconfigured`, `test_r1_partial_configuration_still_fails_closed`, `test_unknown_policy_fails_closed_at_check_time`, `test_unknown_policy_is_rejected_at_wiring_time`, `test_there_is_no_global_disable_switch`, `test_malformed_trusted_ingress_config_fails_loudly` | R1, R3, R7 | **PASS** (admin, abuse control, ingress config) · PENDING (DB/origin config, WS8.2) |
 | L6 | PII containment | WS8 §3 | Automated | `test_pii_containment.py` (5 tests) | R2, R5 | **PASS** |
 | L7 | Reversibility + schema rollback doctrine | WS8 §3 | Attested | rollback drill | R9, R30 | PENDING (WS8.2, WS8.8) |
 | L8 | Evidence of readiness by declared class | WS8 §3 | Attested | this matrix | R33 | IN PROGRESS |
@@ -53,7 +53,7 @@ recur. No other existing assertion was modified.
 
 | ID | Invariant | Class | Evidence | Gate | Status |
 |---|---|---|---|---|---|
-| P1 | Forwarding headers trusted only from configured trusted ingress | Automated | `test_forwarding_header_from_untrusted_peer_is_ignored`, `test_forwarding_header_ignored_when_no_ingress_is_trusted`, `test_chain_walks_right_to_left_skipping_trusted_hops`, `test_spoofed_forwarding_header_cannot_buy_a_fresh_budget` | R3 | **PASS** (pre-deployment) · deployed proof PENDING (R29) |
+| P1 | Forwarding headers trusted only from configured trusted ingress | Automated | `test_forwarding_header_from_untrusted_peer_is_ignored`, `test_forwarding_header_ignored_when_no_ingress_is_trusted`, `test_chain_walks_right_to_left_skipping_trusted_hops`, `test_spoofed_forwarding_header_cannot_buy_a_fresh_budget`, `test_malformed_trusted_ingress_config_fails_loudly` (+ boot-time validation in `app.main`) | R3 | **PASS** (pre-deployment) · deployed proof PENDING (R29) |
 | P2 | Singleton API instance for MVP | Attested | binding to infrastructure | R26 | PENDING (WS8.7) |
 | P3 | Process-local abuse state only behind a storage abstraction | Automated | `RateLimitStore` protocol + `InMemoryFixedWindowStore`; limiter constructed with an injected store | R3 | **PASS** |
 | P4 | Admin on a separate protected host/listener | Attested | boundary realized | R27 | PENDING (WS8.7) |
@@ -119,6 +119,12 @@ recur. No other existing assertion was modified.
 and R29 (external negative probe). Until both land, **B1 is not fully closed** —
 only its application layer is.
 
+### Carried to the deployment gates (R27 / R29)
+
+| Item | Why it is not WS8.1 | Owed by |
+|---|---|---|
+| **Admin session-cookie attributes.** The SQLAdmin session cookie must be proven to carry the intended production attributes (`Secure`, `HttpOnly`, `SameSite`) rather than inheriting Starlette defaults — `Secure` in particular is opt-in and only meaningful once TLS terminates at the ingress. | Redesigning the admin auth mechanism is outside the authorized WS8.1 scope, and the attribute that matters most (`Secure`) cannot be asserted without a deployed HTTPS surface. | **R27** (configuration) + **R29** (deployed assertion) |
+
 ## 5. Registered gaps still open (`12` §8)
 
 Carried forward so nothing is lost between slices. `CLOSED` here means the gate
@@ -127,7 +133,7 @@ that owns it has passed.
 | Gap | Disposition | Owing slice | Status |
 |---|---|---|---|
 | B1 `/admin` unauthenticated | CLOSE | WS8.1 → WS8.7 → WS8.8 | **stage 1 CLOSED**, stages 2–3 open |
-| B2 no abuse control / unstated posture | CLOSE | WS8.1 → WS8.8 | **pre-deployment CLOSED**, deployed probe open |
+| B2 no abuse control / unstated posture | CLOSE | WS8.1 → WS8.8 | **pre-deployment CLOSED** (fail-closed: no disable switch, unknown policy refuses, malformed ingress config refuses to boot), deployed probe open |
 | B3 `DATABASE_URL` dev default | CLOSE | WS8.2 | open |
 | B4 `NEXT_PUBLIC_SITE_URL` prod default | CLOSE | WS8.2 | open |
 | B5 audit not append-only | CLOSE | WS8.1 | **CLOSED** |

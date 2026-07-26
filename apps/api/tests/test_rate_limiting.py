@@ -10,17 +10,25 @@ Two things must both be true, and they pull in opposite directions:
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.testclient import TestClient
 
-from app.config import get_settings
-from app.security.client_ip import UNKNOWN_CLIENT, parse_trusted_networks, resolve_client_ip
+from app.config import Settings
+from app.security.client_ip import (
+    UNKNOWN_CLIENT,
+    InvalidTrustedIngressError,
+    parse_trusted_networks,
+    resolve_client_ip,
+)
 from app.security.rate_limit import (
     RATE_LIMITER,
     InMemoryFixedWindowStore,
     RateLimiter,
     RateLimitPolicy,
+    UnknownRateLimitPolicyError,
     rate_limited,
 )
 
@@ -71,9 +79,26 @@ def test_chain_walks_right_to_left_skipping_trusted_hops():
     assert resolved == "198.51.100.7"
 
 
+def test_malformed_trusted_ingress_config_fails_loudly():
+    """A mistyped CIDR must not be silently dropped.
+
+    Dropping it looks safe (it only narrows trust) but it converts "resolve
+    individual clients behind this proxy" into "trust nobody", collapsing every
+    user onto the proxy address and rate-limiting them as one client — the
+    shared-egress false positive, at proxy scale, presenting as an outage
+    rather than a configuration error.
+    """
+    with pytest.raises(InvalidTrustedIngressError) as exc:
+        parse_trusted_networks("10.0.0.0/8, garbage-not-an-ip")
+    assert "garbage-not-an-ip" in str(exc.value)
+
+    # Empty stays a deliberate, valid decision: trust no ingress.
+    assert parse_trusted_networks("") == ()
+    assert parse_trusted_networks("  ,  ") == ()
+
+
 def test_cidr_trust_and_fallbacks():
-    trusted = parse_trusted_networks("10.0.0.0/8, garbage-not-an-ip")
-    # Unparseable entries grant no trust rather than widening it.
+    trusted = parse_trusted_networks("10.0.0.0/8")
     assert len(trusted) == 1
     # All-trusted chain -> fall back to the peer, never to a trusted proxy.
     assert resolve_client_ip("10.1.2.3", "10.4.5.6", trusted) == "10.1.2.3"
@@ -145,13 +170,29 @@ def test_sustained_tier_catches_drip_flooding_under_the_burst_limit():
     assert exc.value.status_code == 429
 
 
-def test_unknown_policy_is_not_silently_enforced():
+def test_unknown_policy_fails_closed_at_check_time():
+    """A misspelled policy must refuse the request, not serve it unprotected."""
     limiter, _ = _limiter(
         name="ep", burst_limit=1, burst_window_seconds=60,
         sustained_limit=1, sustained_window_seconds=3600,
     )
-    for _ in range(50):
+    with pytest.raises(UnknownRateLimitPolicyError):
         limiter.check("no-such-policy", "203.0.113.1")
+
+
+def test_unknown_policy_is_rejected_at_wiring_time():
+    """Better still: the typo never reaches production, because declaring the
+    dependency raises at import. `rate_limited("commercial_lead")` (singular) is
+    exactly the mistake that would otherwise disable R3 for that route."""
+    with pytest.raises(UnknownRateLimitPolicyError) as exc:
+        rate_limited("commercial_lead")
+    assert "commercial_leads" in str(exc.value)
+
+
+def test_every_protected_route_declares_a_registered_policy():
+    """Guards against the same drift arriving via a new route later."""
+    for name in ("buyer_requirements", "commercial_leads"):
+        assert RATE_LIMITER.policy(name) is not None
 
 
 def test_429_body_and_headers_carry_no_pii():
@@ -212,15 +253,16 @@ def test_legitimate_repeat_submission_is_not_treated_as_abuse(tight_app):
     assert (first.status_code, retry.status_code) == (200, 200)
 
 
-def test_rate_limiting_can_be_disabled_per_environment(tight_app, monkeypatch):
-    monkeypatch.setenv("RATE_LIMIT_ENABLED", "false")
-    get_settings.cache_clear()
-    try:
-        for _ in range(10):
-            assert tight_app.post("/leads").status_code == 200
-    finally:
-        monkeypatch.delenv("RATE_LIMIT_ENABLED", raising=False)
-        get_settings.cache_clear()
+def test_there_is_no_global_disable_switch():
+    """R3 is release-blocking: environments tune the numbers, they do not get to
+    remove abuse control from an anonymous mutation endpoint. A previous
+    revision shipped `rate_limit_enabled` and a test that blessed turning
+    protection off; both are gone, and this asserts they stay gone."""
+    assert not hasattr(Settings(_env_file=None), "rate_limit_enabled")
+    source = (Path(__file__).resolve().parents[1] / "app" / "security" / "rate_limit.py").read_text(
+        encoding="utf-8"
+    )
+    assert "rate_limit_enabled" not in source
 
 
 def test_spoofed_forwarding_header_cannot_buy_a_fresh_budget(tight_app):

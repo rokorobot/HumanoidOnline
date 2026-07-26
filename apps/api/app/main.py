@@ -11,11 +11,15 @@ Run locally:  uv run python -m uvicorn app.main:app --reload
 """
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 import app.models  # noqa: F401  (register all ORM models on Base.metadata)
 from app.admin import mount_admin
 from app.config import get_settings
+from app.db.migration_state import enforce_migration_state_at_startup
+from app.db.session import engine
 from app.routers import (
     buyer_requirements,
     commercial_leads,
@@ -31,7 +35,25 @@ from app.security.headers import SecurityHeadersMiddleware, configure_cors
 
 settings = get_settings()
 
-app = FastAPI(title=settings.api_title, version=settings.api_version)
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    """WS8.2 / R9 — migration-before-app-start, enforced at application level.
+
+    Strict environments refuse to serve a database whose migration state does
+    not match this build; relaxed ones log and continue. The mechanism that
+    guarantees migrations have *run* before the process starts belongs to
+    WS8.7 — this is the contract it will bind to.
+    """
+    enforce_migration_state_at_startup(engine)
+    yield
+
+
+app = FastAPI(
+    title=settings.api_title,
+    version=settings.api_version,
+    lifespan=lifespan,
+)
 
 # WS8.1 / R4 — the security posture is now explicit and tested (WS8-L9) rather
 # than an accident of same-origin browser rules. `configure_cors` installs CORS

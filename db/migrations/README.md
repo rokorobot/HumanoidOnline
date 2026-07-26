@@ -42,3 +42,34 @@ Forward migrations:
   `robot_image` and its four enums (`docs/09_MEDIA_CONTRACT.md`). Idempotent
   (pg_type guards + `CREATE TABLE/INDEX IF NOT EXISTS`) so it is a no-op on fresh
   databases already built from `schema.sql`. `robot.hero_image_url` stays dormant.
+- `0003_add_discovery_layer.sql` — adds the DATA-D1 competitive-discovery layer
+  (`docs/11_DATA_D1_CONTRACT.md` §10): `discovery_source`, `discovery_candidate`,
+  `candidate_claim`, `candidate_image_ref`, `promotion_audit`, plus their enums
+  and the `ck_discovery_source_eligible` CHECK enforcing DATA-D1.9 affirmative
+  access review. **Structurally isolated** — foreign keys point candidate →
+  canonical only, never the reverse, so discovery data can never reach a public
+  read path. `promotion_audit` is append-only (enforced in the application by
+  WS8.1 / R6). Idempotent, so it is a no-op on databases already built from a
+  `schema.sql` that includes SECTION 10.
+
+## Checksum integrity (WS8.2 / R9)
+
+`schema_migrations` stores a `sha256` for every applied file, and
+`db/bootstrap.py` **verifies it** before treating a migration as already
+applied. Editing a migration after it has been applied is therefore a loud
+failure, not a silent no-op:
+
+```
+ERROR: migration checksum drift detected — these files changed after they were
+applied: 0002_add_robot_image (0002_add_robot_image.sql)
+```
+
+An applied migration is immutable history. To change the schema, edit
+`db/schema.sql` (canonical) and add a **new** forward migration. Per WS8's L7
+doctrine, migrations are additive/backward-compatible, destructive changes are
+prohibited without separate ratification, and synthetic down-migrations are
+deliberately **not** written — rollback is by restore or forward-fix.
+
+The running application enforces the same contract at startup
+(`apps/api/app/db/migration_state.py`): a strict environment refuses to serve a
+database whose migration state does not match the build.

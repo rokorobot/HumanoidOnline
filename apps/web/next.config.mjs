@@ -23,6 +23,72 @@ const securityHeaders = [
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
 ];
 
+/**
+ * WS8.2 / R7 — fail the BUILD, not the first request.
+ *
+ * `lib/site.ts` resolves the canonical origin lazily so importing it is safe.
+ * That alone would defer a misconfiguration to production traffic, so the same
+ * contract is evaluated here: a strict-environment build without an explicit
+ * `NEXT_PUBLIC_SITE_URL` stops with an actionable error instead of shipping.
+ *
+ * Duplicated deliberately and minimally — `next.config.mjs` cannot import the
+ * TypeScript module, so this mirrors the rule and `__tests__/site-origin.test.ts`
+ * pins the two together.
+ */
+function assertCanonicalOriginConfigured() {
+  const RELAXED = ["development", "test"];
+  const ALLOWED = ["development", "test", "staging", "production"];
+
+  const rawEnv = (process.env.APP_ENV ?? "").trim();
+  const env = rawEnv === "" ? "production" : rawEnv.toLowerCase();
+  if (!ALLOWED.includes(env)) {
+    throw new Error(
+      `[WS8.2/R7] APP_ENV="${rawEnv}" is not a recognised environment. ` +
+        `Use one of: ${ALLOWED.join(", ")}.`,
+    );
+  }
+
+  const origin = (process.env.NEXT_PUBLIC_SITE_URL ?? "").trim();
+  if (origin) {
+    let parsed;
+    try {
+      parsed = new URL(origin);
+    } catch {
+      throw new Error(
+        `[WS8.2/R7] NEXT_PUBLIC_SITE_URL="${origin}" is not a valid absolute URL.`,
+      );
+    }
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      throw new Error(
+        `[WS8.2/R7] NEXT_PUBLIC_SITE_URL="${origin}" must use http or https.`,
+      );
+    }
+    // Must match lib/site.ts: an origin carries no path, query or fragment.
+    // A build guard that accepts what the runtime rejects is worse than none.
+    if (
+      (parsed.pathname !== "" && parsed.pathname !== "/") ||
+      parsed.search ||
+      parsed.hash
+    ) {
+      throw new Error(
+        `[WS8.2/R7] NEXT_PUBLIC_SITE_URL="${origin}" must be a bare origin ` +
+          `(scheme + host + port). Use "${parsed.origin}".`,
+      );
+    }
+    return;
+  }
+
+  if (RELAXED.includes(env)) return;
+
+  throw new Error(
+    `[WS8.2/R7] NEXT_PUBLIC_SITE_URL is required to build for APP_ENV="${env}". ` +
+      "Refusing to fall back to a hard-coded production hostname — a staging or " +
+      "preview build must never publish production canonical URLs.",
+  );
+}
+
+assertCanonicalOriginConfigured();
+
 const nextConfig = {
   reactStrictMode: true,
   async headers() {

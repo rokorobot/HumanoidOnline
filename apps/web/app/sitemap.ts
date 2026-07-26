@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { listManufacturers, listRobots } from "@/lib/api-client";
-import { SITE_URL } from "@/lib/site";
+import { siteUrl } from "@/lib/site";
 
 // AGENT-01 (docs/10): the sitemap is a projection of the governed read, so it
 // lists ONLY is_published canonical entities (AGENT-01.7) — discovery candidates
@@ -17,6 +17,8 @@ function lastMod(value: string): { lastModified?: Date } {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // WS8.2 / R8 — one authoritative origin resolver for every machine surface.
+  const origin = siteUrl();
   // limit=100 is the API's max page; it covers the catalogue at current scale.
   // Pagination (loop until total) is the scale path when entities exceed 100.
   const [robots, manufacturers] = await Promise.all([
@@ -25,20 +27,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]);
 
   const core: MetadataRoute.Sitemap = [
-    { url: `${SITE_URL}/`, changeFrequency: "daily", priority: 1 },
-    { url: `${SITE_URL}/robots`, changeFrequency: "daily", priority: 0.9 },
-    { url: `${SITE_URL}/manufacturers`, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${origin}/`, changeFrequency: "daily", priority: 1 },
+    { url: `${origin}/robots`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${origin}/manufacturers`, changeFrequency: "weekly", priority: 0.7 },
   ];
 
   const robotPages: MetadataRoute.Sitemap = robots.items.map((r) => ({
-    url: `${SITE_URL}/robots/${r.slug}`,
+    url: `${origin}/robots/${r.slug}`,
     ...lastMod(r.updated_at),
     changeFrequency: "weekly",
     priority: 0.8,
   }));
 
   const mfrPages: MetadataRoute.Sitemap = manufacturers.items.map((m) => ({
-    url: `${SITE_URL}/manufacturers/${m.slug}`,
+    url: `${origin}/manufacturers/${m.slug}`,
     ...lastMod(m.updated_at),
     changeFrequency: "weekly",
     priority: 0.6,

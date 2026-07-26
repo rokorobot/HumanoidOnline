@@ -48,7 +48,7 @@ npm run build       # next build
 ## Integration gate (the `web-integration` CI job)
 
 Proves the frontend renders the **verified catalogue**, not seed/mock. The full
-chain — fresh Postgres → `db/schema.sql` → `db/import_catalogue.py` → FastAPI →
+chain — fresh Postgres → `db/bootstrap.py` → `db/import_catalogue.py` → FastAPI →
 Next (built) → Playwright:
 
 ```bash

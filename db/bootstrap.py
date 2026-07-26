@@ -13,7 +13,10 @@ in lexicographic order:
   2. db/migrations/NNNN_*.sql   forward migrations
 
 Every applied file is recorded in `public.schema_migrations` (version + sha256),
-so re-running against an existing database is a no-op. Optionally loads the seed
+so re-running against an existing database is a no-op. **WS8.2 / R9:** that
+sha256 is now actually compared before a file is treated as already applied, so
+editing an applied migration fails loudly instead of being silently skipped.
+Optionally loads the seed
 (`db/seed/seed.sql`), whose embedded G2 self-check aborts the load if any
 published commercial fact lacks evidence.
 
@@ -64,20 +67,71 @@ def _ensure_tracking_table(conn: psycopg.Connection) -> None:
     )
 
 
-def _applied_versions(conn: psycopg.Connection) -> set[str]:
-    rows = conn.execute("SELECT version FROM public.schema_migrations").fetchall()
-    return {row[0] for row in rows}
+class MigrationDriftError(RuntimeError):
+    """An already-applied migration file has changed since it was applied."""
+
+
+def _applied(conn: psycopg.Connection) -> dict[str, str]:
+    rows = conn.execute(
+        "SELECT version, checksum FROM public.schema_migrations"
+    ).fetchall()
+    return {row[0]: row[1] for row in rows}
+
+
+def _governed_files() -> list[tuple[str, Path]]:
+    """The canonical baseline plus every forward migration, in apply order."""
+    files = [(BASELINE_VERSION, SCHEMA_FILE)]
+    files += [(path.stem, path) for path in sorted(MIGRATIONS_DIR.glob("*.sql"))]
+    return files
+
+
+def verify_no_drift(applied: dict[str, str]) -> None:
+    """WS8.2 / R9 — actually compare the recorded sha256 before skipping a file.
+
+    The checksum was recorded from the first release but never read back, so an
+    edit to an already-applied migration was silently ignored: the file said one
+    thing, the database another, and `bootstrap.py` reported "up to date". Drift
+    must be loud — it is the difference between a schema you can reason about
+    and one you are guessing at.
+
+    This never rewrites history and never invents a down-migration (L7): it
+    reports and refuses.
+
+    **The baseline is deliberately excluded.** By this repo's convention
+    (db/migrations/README.md) `db/schema.sql` is canonical and is *edited* every
+    time the model changes — "schema wins", then a forward migration lets
+    existing databases converge. So the `0000_schema` checksum legitimately
+    differs from what any older database recorded, and comparing it would flag
+    every pre-existing environment as corrupt and refuse to apply the very
+    migrations meant to bring it up to date. Forward migrations are the
+    immutable history; those are what this verifies.
+    """
+    drifted: list[str] = []
+    for version, path in _governed_files():
+        if version == BASELINE_VERSION:
+            continue
+        recorded = applied.get(version)
+        if recorded is None:
+            continue  # not applied yet; it is simply pending
+        current = _sha256(path.read_text(encoding="utf-8"))
+        if current != recorded:
+            drifted.append(f"{version} ({path.name})")
+
+    if drifted:
+        raise MigrationDriftError(
+            "migration checksum drift detected — these files changed after they "
+            "were applied:\n  - "
+            + "\n  - ".join(drifted)
+            + "\n\nAn applied migration is immutable history. Revert the edit, or "
+            "add a NEW forward migration expressing the change (db/schema.sql "
+            "stays canonical). Nothing has been applied."
+        )
 
 
 def _pending(conn: psycopg.Connection) -> list[tuple[str, Path]]:
-    done = _applied_versions(conn)
-    pending: list[tuple[str, Path]] = []
-    if BASELINE_VERSION not in done:
-        pending.append((BASELINE_VERSION, SCHEMA_FILE))
-    for path in sorted(MIGRATIONS_DIR.glob("*.sql")):
-        if path.stem not in done:
-            pending.append((path.stem, path))
-    return pending
+    applied = _applied(conn)
+    verify_no_drift(applied)
+    return [(version, path) for version, path in _governed_files() if version not in applied]
 
 
 def _apply(conn: psycopg.Connection, version: str, path: Path) -> None:
@@ -131,7 +185,10 @@ def main(argv: list[str] | None = None) -> None:
     if args.seed_only:
         load_seed(url)
         return
-    run_migrations(url)
+    try:
+        run_migrations(url)
+    except MigrationDriftError as exc:
+        raise SystemExit(f"ERROR: {exc}") from exc
     if args.seed:
         load_seed(url)
 

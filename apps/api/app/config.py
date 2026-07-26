@@ -1,14 +1,66 @@
 """Application settings (Pydantic v2 foundation).
 
-Values come from the environment (or an optional local `.env`). The default
-`database_url` matches docker-compose.yml so a laptop works out of the box; CI
-overrides it via the DATABASE_URL environment variable.
+Values come from the environment (or an optional local `.env`).
+
+**WS8.2 / R7 — the environment contract.** Before WS8.2 `database_url` carried a
+development default, so an API booted without `DATABASE_URL` silently pointed at
+`humanoid:humanoid@localhost` instead of failing (gap B3). Convenience defaults
+now exist **only** when the environment is explicitly development or test.
+
+The detection itself is written to fail safe (WS8-L5):
+
+- `APP_ENV` unset or empty  -> **production** (strict). Never development.
+- `APP_ENV` unrecognised    -> **raises**. A typo is loud, not silently strict
+  and certainly not silently permissive.
+- development / test        -> convenience defaults allowed.
+- staging / production      -> every production-required value must be explicit.
+
+The dangerous design would be defaulting to development when the variable is
+absent: a production box with a missing or misspelled variable would quietly
+re-enable dev credentials. This does the opposite in both directions.
 """
 from __future__ import annotations
 
 from functools import lru_cache
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+#: Every environment the application recognises. Anything else is a typo.
+ALLOWED_APP_ENVS: tuple[str, ...] = ("development", "test", "staging", "production")
+
+#: Environments where developer-convenience defaults may be used.
+RELAXED_APP_ENVS: frozenset[str] = frozenset({"development", "test"})
+
+#: The laptop/docker-compose database. Only ever reachable in a relaxed env.
+DEVELOPMENT_DATABASE_URL = (
+    "postgresql+psycopg://humanoid:humanoid@localhost:5432/humanoidonline"
+)
+
+
+class ConfigurationError(RuntimeError):
+    """Raised when production-required configuration is missing or malformed.
+
+    Deliberately fatal at import: an application that cannot be configured
+    correctly must not start serving (WS8-L5).
+    """
+
+
+def normalize_app_env(raw: str | None) -> str:
+    """Resolve `APP_ENV`, failing safe in both directions."""
+    value = (raw or "").strip()
+    if not value:
+        # Unset means production. The safe direction: strictness by default,
+        # never accidental development.
+        return "production"
+    lowered = value.lower()
+    if lowered not in ALLOWED_APP_ENVS:
+        raise ConfigurationError(
+            f"APP_ENV={value!r} is not a recognised environment. "
+            f"Use one of: {', '.join(ALLOWED_APP_ENVS)}. "
+            "Leave it unset only if you intend production."
+        )
+    return lowered
 
 
 class Settings(BaseSettings):
@@ -16,22 +68,28 @@ class Settings(BaseSettings):
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
 
-    # SQLAlchemy URL (note the "+psycopg" driver token). Matches docker-compose.yml.
-    database_url: str = (
-        "postgresql+psycopg://humanoid:humanoid@localhost:5432/humanoidonline"
-    )
+    # WS8.2 / R7 — explicit environment contract. Unset resolves to production.
+    app_env: str = "production"
+
+    # SQLAlchemy URL (note the "+psycopg" driver token). NO default: in a strict
+    # environment this must be supplied, and in a relaxed one the development
+    # value is filled in by the validator below so the intent stays visible.
+    database_url: str | None = None
+
     # Canonical schema that db/schema.sql installs into.
     db_schema: str = "humanoid"
 
     api_title: str = "HumanoidOnline API"
     api_version: str = "0.1.0"
 
+    # WS8.2 / R9 — where the governed migration files live, so the application
+    # can verify the database is migrated before it serves. The mechanism that
+    # guarantees migrations have *run* is WS8.7's; this is the contract.
+    migrations_dir: str | None = None
+
     # ---------------------------------------------------------------- WS8.1 --
-    # Security boundaries. All of the following are governed by the ratified
-    # WS8 contract (docs/12) and its frozen Deployment Execution Profile (§6).
-    #
-    # NOTE: `database_url` above still carries a development default. That is
-    # gap B3 and it is deliberately NOT fixed here — B3/B4 belong to WS8.2.
+    # Security boundaries, governed by the ratified WS8 contract (docs/12) and
+    # its frozen Deployment Execution Profile (§6).
 
     # R1 / DEP P4 — internal admin. Absent credentials mean the admin surface is
     # NOT mounted at all (fail closed, WS8-L5) rather than mounted unprotected.
@@ -85,6 +143,42 @@ class Settings(BaseSettings):
     commercial_leads_burst_window_s: int = 60
     commercial_leads_sustained: int = 60
     commercial_leads_sustained_window_s: int = 3600
+
+    # -- derived / validated -------------------------------------------------
+
+    @model_validator(mode="after")
+    def _apply_environment_contract(self) -> Settings:
+        # Normalising here means an unrecognised APP_ENV fails at construction,
+        # i.e. at import, i.e. before anything serves a request.
+        object.__setattr__(self, "app_env", normalize_app_env(self.app_env))
+
+        if self.database_url is None or not self.database_url.strip():
+            if self.is_relaxed:
+                object.__setattr__(self, "database_url", DEVELOPMENT_DATABASE_URL)
+            else:
+                raise ConfigurationError(
+                    "DATABASE_URL is required when APP_ENV="
+                    f"{self.app_env!r}. Refusing to fall back to the development "
+                    "database. Set DATABASE_URL, or set APP_ENV=development for "
+                    "local work."
+                )
+        return self
+
+    @property
+    def is_relaxed(self) -> bool:
+        """True when developer-convenience defaults are permitted."""
+        return self.app_env in RELAXED_APP_ENVS
+
+    @property
+    def is_strict(self) -> bool:
+        """True for staging and production — everything must be explicit."""
+        return not self.is_relaxed
+
+    @property
+    def resolved_database_url(self) -> str:
+        """`database_url` after the environment contract has been applied."""
+        assert self.database_url is not None  # guaranteed by the validator
+        return self.database_url
 
 
 @lru_cache

@@ -1,5 +1,5 @@
 import { listRobots } from "@/lib/api-client";
-import { SITE_URL } from "@/lib/site";
+import { siteUrl } from "@/lib/site";
 
 // AGENT-01 (A6): `/llms.txt` — a concise, LLM-friendly description of the site.
 // CANONICAL-ONLY: built from the governed read, so it lists only is_published
@@ -9,6 +9,8 @@ import { SITE_URL } from "@/lib/site";
 export const dynamic = "force-dynamic";
 
 export async function GET(): Promise<Response> {
+  // WS8.2 / R8 — one authoritative origin resolver for every machine surface.
+  const origin = siteUrl();
   // limit=100 is the API's max page (covers the catalogue at current scale;
   // pagination is the scale path).
   const robots = await listRobots({ limit: 100 });
@@ -27,13 +29,13 @@ export async function GET(): Promise<Response> {
     "- Provenance is exposed where canonical evidence exists; it is never fabricated.",
     "",
     "## Canonical entry points",
-    `- Catalogue: ${SITE_URL}/robots`,
-    `- Manufacturers: ${SITE_URL}/manufacturers`,
-    `- Sitemap: ${SITE_URL}/sitemap.xml`,
+    `- Catalogue: ${origin}/robots`,
+    `- Manufacturers: ${origin}/manufacturers`,
+    `- Sitemap: ${origin}/sitemap.xml`,
     "",
     "## Robots (published, canonical)",
     ...robots.items.map(
-      (r) => `- ${r.name} (${r.manufacturer.name}): ${SITE_URL}/robots/${r.slug}`,
+      (r) => `- ${r.name} (${r.manufacturer.name}): ${origin}/robots/${r.slug}`,
     ),
     "",
   ];

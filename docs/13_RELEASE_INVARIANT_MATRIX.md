@@ -146,6 +146,16 @@ variance so it cannot drift accidentally) and, separately, that the nav which *i
 repeated appears identically named on every browse surface. Recorded as a deliberate
 UI-D1 composition variance, decided by the design owner; **no `DarkNav` added in WS8.4.**
 
+*Separately, manual R18 testing exposed a genuine **navigation/discoverability** weakness
+(distinct from the WCAG question): once on a robot record there was no visible return path
+to home or the catalogue. Fixed with the **smallest** UI-D1-preserving escape — a two-link
+breadcrumb `HumanoidOnline / Robot Catalogue` (→ `/` and `/robots`) inside the dark identity
+header, deliberately **not** wrapped in `<nav>` and **not** the full `SiteNav`, so the
+no-primary-nav variance holds exactly (the absence assertion still passes: zero navigation
+landmarks on robot detail). `semantics.spec.ts` asserts both escape links exist with
+meaningful accessible names ("HumanoidOnline home", "Robot Catalogue") and correct targets;
+the links use `--ho-paper-ink` on `--ho-ink` (AA) and pass axe contrast + target-size.*
+
 **R21 note — narrow, documented exceptions only.** One `eslint-disable-next-line`
 (the lead-dialog backdrop pointer-dismiss, redundant with Escape + a labelled Close
 button) and one precise rule *config* (`no-noninteractive-tabindex` allows the

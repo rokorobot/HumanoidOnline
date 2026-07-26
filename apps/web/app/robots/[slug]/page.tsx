@@ -142,6 +142,18 @@ export default async function RobotDetailPage({
       {/* DARK IDENTITY HEADER */}
       <div className="idhead ho-dark ho-scan">
         <div className="in">
+          {/* Minimal return path (WS8.4). Robot detail deliberately does NOT
+              repeat the primary SiteNav (intentional UI-D1 variance) — but a
+              record page still needs an obvious escape to home/catalogue. Two
+              links, NOT wrapped in <nav>, so no navigation landmark is added and
+              the no-SiteNav variance is preserved exactly. */}
+          <p className="idcrumb">
+            <Link href="/" aria-label="HumanoidOnline home">
+              HumanoidOnline
+            </Link>
+            <span aria-hidden="true">/</span>
+            <Link href="/robots">Robot Catalogue</Link>
+          </p>
           <div className="topbar">
             <div className="corner">
               <span className="ho-star">&#9733;</span>

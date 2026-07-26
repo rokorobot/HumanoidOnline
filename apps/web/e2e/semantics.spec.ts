@@ -91,6 +91,21 @@ test.describe("semantic structure — every public route", () => {
     });
   }
 
+  test("robot detail: identity-header escape links to home and catalogue", async ({ page }) => {
+    // Robot detail deliberately omits the primary nav (documented variance), so a
+    // record page must still offer an obvious return path. Two links inside the
+    // dark identity header — with meaningful accessible names — not a nav landmark.
+    await page.goto("/robots/unitree-g1", { waitUntil: "networkidle" });
+    const crumb = page.locator(".idcrumb");
+    await expect(crumb).toBeVisible();
+    const home = crumb.getByRole("link", { name: "HumanoidOnline home" });
+    await expect(home).toHaveAttribute("href", "/");
+    const catalogue = crumb.getByRole("link", { name: "Robot Catalogue" });
+    await expect(catalogue).toHaveAttribute("href", "/robots");
+    // The escape path must NOT reintroduce a nav landmark — the variance holds.
+    await expect(page.getByRole("navigation")).toHaveCount(0);
+  });
+
   test("match results: one H1, a main landmark, a named primary nav", async ({ page }) => {
     const id = await createRequirement(page);
     await page.goto(`/matches/${id}`, { waitUntil: "networkidle" });

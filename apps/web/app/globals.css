@@ -56,6 +56,16 @@
 .darknav a[aria-current="page"] { color: var(--ho-signal); }
 .darknav a:hover { color: var(--ho-signal); }
 
+/* Robot-detail return path (breadcrumb) inside the dark identity header. NOT the
+   primary nav — a minimal home/catalogue escape. Links use --ho-paper-ink
+   (#E7E3D8 on --ho-ink) for AA contrast; the "/" separator is decorative. */
+.idcrumb { display: flex; gap: var(--ho-sp-3); align-items: center; margin: 0;
+  padding: 10px 16px; font-family: var(--ho-font-machine);
+  font-size: var(--ho-fs-mono-s); letter-spacing: var(--ho-tracking-label);
+  text-transform: uppercase; color: var(--ho-text-muted); }
+.idcrumb a { color: var(--ho-paper-ink); text-decoration: none; }
+.idcrumb a:hover { color: var(--ho-signal); }
+
 /* ---- PAGE TITLE BAR ------------------------------------------------------- */
 .pagebar { display: flex; align-items: flex-end; justify-content: space-between;
   gap: var(--ho-sp-5); padding: var(--ho-sp-6) 0 var(--ho-sp-5); flex-wrap: wrap; }

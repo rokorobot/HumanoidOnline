@@ -174,7 +174,7 @@ Prereqs: schema present (`db/bootstrap.py`, **no seed**), `$DATABASE_URL` set
 ```bash
 # fresh DB, schema only (NO seed) — keep the catalogue distinct from the seeded DB
 export DATABASE_URL="postgresql://humanoid:humanoid@localhost:5432/catalogue_test"
-uv run db/bootstrap.py            # applies db/schema.sql
+uv run db/bootstrap.py            # schema baseline + forward migrations
 uv run db/import_catalogue.py     # UPSERTs the catalogue (idempotent)
 uv run db/validate_catalogue.py   # G2 gate: fails non-zero if any published fact lacks evidence
 ```

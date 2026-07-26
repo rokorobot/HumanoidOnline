@@ -47,11 +47,22 @@ tests/          cross-cutting/e2e tests
 
 ## Quick start (database)
 
+`db/bootstrap.py` is the **only** governed way to initialise or migrate a
+database. It applies `db/schema.sql` as the baseline, then every forward
+migration in `db/migrations/`, and records each one in `schema_migrations` with
+a checksum that is verified on later runs.
+
 ```bash
-createdb humanoidonline
-psql -d humanoidonline -f db/schema.sql
-psql -d humanoidonline -f db/seed/seed.sql
+docker compose up -d db
+export DATABASE_URL="postgresql+psycopg://humanoid:humanoid@localhost:5432/humanoidonline"
+uv run db/bootstrap.py            # schema baseline + all forward migrations
+uv run db/bootstrap.py --seed     # optional: load the seed dataset
 ```
+
+> **Do not** run `psql -f db/schema.sql` to set up a database. It applies the
+> baseline **without** the forward migrations and without the `schema_migrations`
+> tracking table, producing a schema that looks right, is silently out of date,
+> and cannot be verified. WS8.2 (R10) removed that path for exactly this reason.
 
 ## Three rules that must never regress
 

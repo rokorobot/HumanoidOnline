@@ -12,7 +12,7 @@ the pytest harness. No product features.
 - A reachable Postgres with the schema applied. From the repo root:
   ```bash
   docker compose up -d db
-  uv run db/bootstrap.py            # apply db/schema.sql
+  uv run db/bootstrap.py            # schema baseline + forward migrations
   uv run db/bootstrap.py --seed     # optional: load the seed dataset
   ```
 

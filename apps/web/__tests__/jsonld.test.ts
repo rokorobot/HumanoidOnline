@@ -1,7 +1,18 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 import { buildRobotJsonLd } from "@/lib/jsonld";
 import type { RobotDetail } from "@/lib/types";
+
+// WS8.2 / R8: the canonical origin is no longer defaulted to production
+// (gap B4), so this suite states the origin it is asserting against instead of
+// inheriting a hard-coded hostname. Stronger, not weaker: the assertions below
+// now prove the emitted URLs track the CONFIGURED origin rather than a constant
+// that happened to be baked into `lib/site.ts`.
+const ORIGIN = "https://jsonld.test.invalid";
+
+beforeAll(() => {
+  process.env.NEXT_PUBLIC_SITE_URL = ORIGIN;
+});
 
 function robot(overrides: Partial<RobotDetail> = {}): RobotDetail {
   return {
@@ -74,7 +85,7 @@ describe("buildRobotJsonLd", () => {
 
   it("includes images only when present, as absolute URLs (MEDIA-01)", () => {
     const { product } = graphOf(robot());
-    expect(product.image).toEqual(["https://humanoidonline.com/robots/test-bot.jpg"]);
+    expect(product.image).toEqual([`${ORIGIN}/robots/test-bot.jpg`]);
     const noImg = graphOf(robot({ images: [] }));
     expect(noImg.product.image).toBeUndefined();
   });

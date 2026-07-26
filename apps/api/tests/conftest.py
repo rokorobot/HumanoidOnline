@@ -3,10 +3,17 @@ from __future__ import annotations
 
 import os
 
-import pytest
-from fastapi.testclient import TestClient
+# WS8.2 / R7 — the suite IS the test environment, and it must say so before
+# anything imports the app. With APP_ENV unset the contract resolves to
+# production, which (correctly) refuses to start without an explicit
+# DATABASE_URL; declaring it here keeps a DB-less local run importable while
+# leaving the strict path fully exercised by test_config_contract.py.
+os.environ.setdefault("APP_ENV", "test")
 
-from app.main import app
+import pytest  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
+
+from app.main import app  # noqa: E402
 from app.security.rate_limit import RATE_LIMITER, RateLimitPolicy
 
 #: WS8.1 / R3. The limiter is a process-local singleton (DEP P2/P3), so state

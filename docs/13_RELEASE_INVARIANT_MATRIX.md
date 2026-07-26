@@ -34,9 +34,9 @@ a later slice) · `N/A` with a reason.
 | L2 | Whole-surface release candidate | WS8 §3 | Attested | WS8.9 sign-off covers every §2 surface | R33 | PENDING (WS8.9) |
 | L3 | Differentiated depth per surface | WS8 §3 | Attested | slice PRs map to §5 depth | R33 | PENDING (WS8.9) |
 | L4 | No law weakening to pass a gate | WS8 §3 | Attested | per-PR review; **WS8.1 note below** | R33 | IN PROGRESS |
-| L5 | Fail closed in production | WS8 §3 | Automated | `test_r1_admin_is_not_mounted_when_unconfigured`, `test_r1_partial_configuration_still_fails_closed`, `test_unknown_policy_fails_closed_at_check_time`, `test_unknown_policy_is_rejected_at_wiring_time`, `test_there_is_no_global_disable_switch`, `test_malformed_trusted_ingress_config_fails_loudly` | R1, R3, R7 | **PASS** (admin, abuse control, ingress config) · PENDING (DB/origin config, WS8.2) |
+| L5 | Fail closed in production | WS8 §3 | Automated | `test_r1_admin_is_not_mounted_when_unconfigured`, `test_r1_partial_configuration_still_fails_closed`, `test_unknown_policy_fails_closed_at_check_time`, `test_unknown_policy_is_rejected_at_wiring_time`, `test_there_is_no_global_disable_switch`, `test_malformed_trusted_ingress_config_fails_loudly` | R1, R3, R7 | **PASS** — admin, abuse control, ingress config (WS8.1) + database URL and canonical origin (WS8.2, `test_config_contract.py`, `__tests__/site-origin.test.ts`) |
 | L6 | PII containment | WS8 §3 | Automated | `test_pii_containment.py` (5 tests) | R2, R5 | **PASS** |
-| L7 | Reversibility + schema rollback doctrine | WS8 §3 | Attested | rollback drill | R9, R30 | PENDING (WS8.2, WS8.8) |
+| L7 | Reversibility + schema rollback doctrine | WS8 §3 | Attested | migrations remain additive; no destructive change and no synthetic down-migration introduced by WS8.2 (`db/migrations/README.md`); rollback drill still owed | R9, R30 | PARTIAL — doctrine conformance **PASS**, drill PENDING (WS8.8) |
 | L8 | Evidence of readiness by declared class | WS8 §3 | Attested | this matrix | R33 | IN PROGRESS |
 | L9 | Explicit policy over implicit default | WS8 §3 | Automated | `test_r4_default_posture_is_strict_same_origin`, `test_r4_wildcard_origin_is_not_an_accepted_policy`, `e2e/security-headers.spec.ts` | R4 | **PASS** |
 | L10 | Anonymity preserved under abuse control | WS8 §3 | Automated | `test_legitimate_repeat_submission_is_not_treated_as_abuse`; no auth dependency added to either write path | R3 | **PASS** |
@@ -104,7 +104,32 @@ recur. No other existing assertion was modified.
 | 01.6 projection only | Attested | no second source of truth introduced | R14 | PENDING (WS8.3) |
 | 01.7 published-canonical-only surface | Automated | — (no test asserts an unpublished entity is **absent**) | R14 | PENDING (Q9, WS8.3) |
 
-## 4. WS8.1 gate status (this slice)
+## 4. WS8.2 gate status
+
+| Gate | Class | Status | Evidence |
+|---|---|---|---|
+| R7 fail-closed production configuration | Automated | **PASS** | `test_config_contract.py` — 14 tests. B3 closed (production/staging refuse to start without `DATABASE_URL`; the development URL is unreachable in a strict env). B4 closed (`siteUrl()` refuses to invent an origin). The classifier is the adversarial part: unset/empty/whitespace resolve to **production**, and a typo raises — nothing can be misclassified as development |
+| R8 canonical-origin correctness | Automated | **PASS** | `__tests__/site-origin.test.ts` — 12 tests. One authoritative resolver (`lib/site.ts`); JSON-LD, sitemap, robots.txt and llms.txt all proven to emit a staging origin and **never** the production hostname; `next.config.mjs` build guard pinned to the same rule |
+| R9 migration integrity | Automated | **PASS** | `test_migration_integrity.py` — 13 tests. `db/bootstrap.py` now compares the recorded sha256 and refuses on drift (exit 1); `app/db/migration_state.py` enforces migration-before-app-start, strict environments refusing to serve. Baseline is presence-only by design (below) |
+| R10 one bootstrap truth | Attested | **PASS** | `README.md` divergent `psql -f` path removed and replaced with an explicit warning; `apps/web`, `apps/api` and `db/catalogue` READMEs reworded to `db/bootstrap.py`; migration `0003` documented plus a checksum-integrity section |
+
+**R9 design note — the baseline is deliberately exempt from checksum comparison.**
+`db/schema.sql` is canonical and is *edited* whenever the model changes ("schema
+wins", then a forward migration lets existing databases converge — see
+`db/migrations/README.md`). Its hash therefore differs legitimately from what any
+older database recorded. Verifying it would declare every pre-existing
+environment corrupt and, because bootstrap now refuses on drift, would block the
+very migrations meant to bring it up to date. **Forward migrations are the
+immutable history that is verified.** Both implementations are pinned to this by
+`test_baseline_checksum_is_exempt_on_both_sides`.
+
+**Deployment note carried to WS8.7.** `enforce_migration_state_at_startup` defines
+the contract; the mechanism guaranteeing migrations have *run* before the process
+starts (release phase, init container, deploy step) is R25/R26's. The app also
+expects the governed migration files to be reachable (`MIGRATIONS_DIR`), which is
+a binding point for whatever packaging WS8.7 chooses.
+
+## 5. WS8.1 gate status
 
 | Gate | Class | Status | Evidence |
 |---|---|---|---|
@@ -125,7 +150,7 @@ only its application layer is.
 |---|---|---|
 | **Admin session-cookie attributes.** The SQLAdmin session cookie must be proven to carry the intended production attributes (`Secure`, `HttpOnly`, `SameSite`) rather than inheriting Starlette defaults — `Secure` in particular is opt-in and only meaningful once TLS terminates at the ingress. | Redesigning the admin auth mechanism is outside the authorized WS8.1 scope, and the attribute that matters most (`Secure`) cannot be asserted without a deployed HTTPS surface. | **R27** (configuration) + **R29** (deployed assertion) |
 
-## 5. Registered gaps still open (`12` §8)
+## 6. Registered gaps still open (`12` §8)
 
 Carried forward so nothing is lost between slices. `CLOSED` here means the gate
 that owns it has passed.
@@ -134,10 +159,13 @@ that owns it has passed.
 |---|---|---|---|
 | B1 `/admin` unauthenticated | CLOSE | WS8.1 → WS8.7 → WS8.8 | **stage 1 CLOSED**, stages 2–3 open |
 | B2 no abuse control / unstated posture | CLOSE | WS8.1 → WS8.8 | **pre-deployment CLOSED** (fail-closed: no disable switch, unknown policy refuses, malformed ingress config refuses to boot), deployed probe open |
-| B3 `DATABASE_URL` dev default | CLOSE | WS8.2 | open |
-| B4 `NEXT_PUBLIC_SITE_URL` prod default | CLOSE | WS8.2 | open |
+| B3 `DATABASE_URL` dev default | CLOSE | WS8.2 | **CLOSED** |
+| B4 `NEXT_PUBLIC_SITE_URL` prod default | CLOSE | WS8.2 | **CLOSED** |
 | B5 audit not append-only | CLOSE | WS8.1 | **CLOSED** |
-| D1–D7, D9 | CLOSE | WS8.2 / WS8.6 / WS8.7 | open |
+| D5a checksum never compared | CLOSE | WS8.2 | **CLOSED** (R9) |
+| D6 divergent README bootstrap | CLOSE | WS8.2 | **CLOSED** (R10) |
+| D7 migration `0003` undocumented | CLOSE | WS8.2 | **CLOSED** (R10) |
+| D1–D4, D9 | CLOSE | WS8.6 / WS8.7 | open |
 | D8 `event_log` dead | NOT A RELEASE DEFECT | — | documented dormant at R25 (open) |
 | D10 scheduled re-verification | ACCEPT-DEFER | product owner | runbook entry at R30 (open) |
 | Q1–Q3a, Q4–Q14 | CLOSE | WS8.3 / WS8.4 / WS8.5 | open |

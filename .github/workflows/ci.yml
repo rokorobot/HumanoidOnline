@@ -107,6 +107,11 @@ jobs:
     defaults:
       run:
         working-directory: apps/web
+    env:
+      # WS8.2 / R7+R8: the canonical origin is explicit in every environment.
+      # There is no production-hostname fallback any more, so a build must say
+      # which origin it is building for.
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -142,6 +147,8 @@ jobs:
       # Fresh catalogue DB (schema only, then the VERIFIED WS2B catalogue).
       DATABASE_URL: postgresql+psycopg://humanoid:humanoid@localhost:5432/catalogue
       API_BASE_URL: http://127.0.0.1:8000
+      # WS8.2 / R8 — explicit canonical origin; never the production hostname.
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
@@ -221,6 +228,7 @@ jobs:
     env:
       DATABASE_URL: postgresql+psycopg://humanoid:humanoid@localhost:5432/zeromatch
       API_BASE_URL: http://127.0.0.1:8000
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
       PGPASSWORD: humanoid
     steps:
       - uses: actions/checkout@v4

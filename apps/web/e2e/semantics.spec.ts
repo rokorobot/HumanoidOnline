@@ -60,6 +60,13 @@ async function expectPageStructure(page: Page, where: string, hasNav: boolean) {
   ).toHaveCount(1);
   // A main landmark exists (the skip-link target).
   await expect(page.getByRole("main"), `${where}: missing main landmark`).toBeVisible();
+  // Exactly one contentinfo landmark — the footer is a SIBLING of <main>, not
+  // nested inside it (a footer within <main> exposes no landmark role). Rendered
+  // once by RootLayout, so every route has precisely one.
+  await expect(
+    page.getByRole("contentinfo"),
+    `${where}: expected exactly one contentinfo (footer) landmark`,
+  ).toHaveCount(1);
   // The navigation landmark — where the route composes it — is named "Primary"
   // and unique. An unnamed or misnamed nav landmark is a defect; two would be a
   // duplicate-landmark defect. Where the route carries no nav (robot detail),

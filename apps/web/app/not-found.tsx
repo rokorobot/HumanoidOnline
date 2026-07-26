@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { SectionIndex } from "@/components/SectionIndex";
-import { SiteFooter, SiteNav } from "@/components/SiteNav";
+import { SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 
 export default function NotFound() {
@@ -24,7 +24,6 @@ export default function NotFound() {
           .
         </p>
       </div>
-      <SiteFooter />
     </>
   );
 }

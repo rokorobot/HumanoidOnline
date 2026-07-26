@@ -9,7 +9,7 @@ import Link from "next/link";
 
 import { MatchesCommercial } from "@/components/MatchesCommercial";
 import { SectionIndex } from "@/components/SectionIndex";
-import { SiteFooter, SiteNav } from "@/components/SiteNav";
+import { SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 import { getMatches, listRegions } from "@/lib/api-client";
 
@@ -64,7 +64,6 @@ export default async function MatchesPage({
           adjustHref={adjustHref}
         />
       </div>
-      <SiteFooter />
     </>
   );
 }

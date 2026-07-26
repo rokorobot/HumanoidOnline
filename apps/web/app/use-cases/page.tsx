@@ -1,7 +1,7 @@
 // Use-cases index — from /api/use-cases.
 import { listUseCases } from "@/lib/api-client";
 import { SectionIndex } from "@/components/SectionIndex";
-import { SiteFooter, SiteNav } from "@/components/SiteNav";
+import { SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 import { UseCaseTile } from "@/components/UseCaseTile";
 
@@ -34,7 +34,6 @@ export default async function UseCasesPage() {
           <p className="empty-state">No use cases on record.</p>
         )}
       </div>
-      <SiteFooter />
     </>
   );
 }

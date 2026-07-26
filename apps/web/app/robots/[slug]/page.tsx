@@ -30,7 +30,6 @@ import { MachineCode } from "@/components/MachineCode";
 import { PriceStateLong } from "@/components/PricingState";
 import { SpecRow } from "@/components/DataCell";
 import { SectionIndex } from "@/components/SectionIndex";
-import { SiteFooter } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 import { SystemLabel } from "@/components/SystemLabel";
 
@@ -531,7 +530,6 @@ export default async function RobotDetailPage({
           />
         </div>
       </div>
-      <SiteFooter />
     </>
   );
 }

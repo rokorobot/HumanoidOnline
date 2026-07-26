@@ -109,7 +109,7 @@ recur. No other existing assertion was modified.
 | Gate | Class | Status | Evidence |
 |---|---|---|---|
 | R16 Journeys A/B/C | Automated | **PASS** | `e2e/journeys.spec.ts` — explore→compare matrix, wizard→match→lead capture, use-case→suitable robot→detail; each asserts the governed result, not a page load |
-| R17 WCAG 2.2 AA (automated) | Automated | **PASS** | All **five** frozen obligations covered — not "axe reports zero violations": **(1) every §5.1 public route** — `e2e/accessibility-axe.spec.ts` axe WCAG 2.2 AA on `/`, `/robots`, `/robots/[slug]`, `/compare`, `/manufacturers`, `/manufacturers/[slug]`, `/use-cases`, `/use-cases/[slug]`, `/find-a-humanoid`, `/matches/[id]`, **404** + interactive states (dialog open, validation error), zero violations, desktop **and** Pixel-7; **(2) keyboard-only journeys** — `e2e/keyboard.spec.ts` skip-link→main focus, keyboard-only nav activation, open→submit the lead dialog by keyboard; **(3) focus behaviour** — dialog focus-trap (Tab/Shift+Tab stay inside), Escape closes + returns focus to opener, invalid field takes focus; **(4) semantic headings/forms/dialogs** — `e2e/semantics.spec.ts` one H1 + main landmark + named primary nav per route, programmatic form labels, dialog role/`aria-modal`/accessible-title, invalid↔alert wiring; **(5) mobile target size** — `e2e/responsive.spec.ts` direct ≥24×24 measurement of the deliberate controls **plus** axe's `target-size` rule by name on the Pixel-7 profile |
+| R17 WCAG 2.2 AA (automated) | Automated | **PASS** | All **five** frozen obligations covered — not "axe reports zero violations": **(1) every §5.1 public route** — `e2e/accessibility-axe.spec.ts` axe WCAG 2.2 AA on `/`, `/robots`, `/robots/[slug]`, `/compare`, `/manufacturers`, `/manufacturers/[slug]`, `/use-cases`, `/use-cases/[slug]`, `/find-a-humanoid`, `/matches/[id]`, **404** + interactive states (dialog open, validation error), zero violations, desktop **and** Pixel-7; **(2) keyboard-only journeys** — `e2e/keyboard.spec.ts` skip-link→main focus, keyboard-only nav activation, open→submit the lead dialog by keyboard; **(3) focus behaviour** — dialog focus-trap (Tab/Shift+Tab stay inside), Escape closes + returns focus to opener, invalid field takes focus; **(4) semantic headings/forms/dialogs** — `e2e/semantics.spec.ts` one H1 + main landmark + one `contentinfo` (footer) landmark + named primary nav per route, programmatic form labels, dialog role/`aria-modal`/accessible-title, invalid↔alert wiring; **(5) mobile target size** — `e2e/responsive.spec.ts` direct ≥24×24 measurement of the deliberate controls **plus** axe's `target-size` rule by name on the Pixel-7 profile |
 | R18 screen-reader | **Attested** | **PENDING** | Checklist prepared: `docs/14_R18_SCREEN_READER_ATTESTATION.md`. Deliberately NOT self-attested — a person must complete the record. Axe green (R17) does not satisfy it |
 | R19 responsive | Automated | **PASS** | `e2e/responsive.spec.ts` on a real **mobile-chromium (Pixel 7)** project in CI + desktop: no horizontal overflow, cards not clipped, compare/spec tables scroll in-container, primary actions operable |
 | R20 empty/error states | Automated | **PASS** | `e2e/ux-states.spec.ts` — 404, compare<2 prompt, price trichotomy (never $0), availability-unknown≠unavailable, invalid-email announced, API-failure retains input; `__tests__/robot-gallery.test.tsx` for the missing-image state |
@@ -122,12 +122,17 @@ this slice fixed real defects: a critical `aria-pressed` on a link, keyboard-ina
 scroll regions, a page-inflating off-screen skip-link, two mobile horizontal
 overflows (identity-header grid, evidence rows), and three contrast failures
 (muted-grey text, quote amber, and the illegible bright-orange validation error).
-The broadened R17 suite then surfaced two more, also fixed minimally: the skip link
+The broadened R17 suite then surfaced three more, also fixed minimally: the skip link
 scrolled but did **not** move focus (added `tabIndex={-1}` to `<main>` so activating
-it lands focus in the landmark), and the lead-dialog close button measured 22px wide
-(min-size raised to the 24×24 AA target-size minimum). Every fix was a minimal token
-nudge or markup correction — **UI-D1 layout and type are unchanged**; the palette's
-muted/amber/signal semantics are preserved, only their exact lightness meets AA.
+it lands focus in the landmark); the lead-dialog close button measured 22px wide
+(min-size raised to the 24×24 AA target-size minimum); and the `<footer>` exposed **no**
+`contentinfo` landmark because it was rendered inside `<main>` (fixed by *composition*,
+not a faked `role`: the shared footer is now rendered once by `RootLayout` as a sibling
+of `<main>`, and the per-page instances were removed — `semantics.spec.ts` asserts
+exactly one `contentinfo` per route). Every fix was a minimal markup/composition
+correction — **UI-D1 layout and type are unchanged** (the footer renders identically,
+same place, same styles); the palette's muted/amber/signal semantics are preserved,
+only their exact lightness meets AA.
 
 **R17 — robot-detail navigation is an intentional UI-D1 variance (not a WCAG
 waiver).** The every-route semantic suite makes explicit that `/robots/[slug]` is

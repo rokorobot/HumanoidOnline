@@ -5,7 +5,7 @@
 // use-case catalogue; the COUNTRY step from the live canonical region list;
 // /find-a-humanoid?use_case=<slug> pre-selects a use case.
 import { SectionIndex } from "@/components/SectionIndex";
-import { SiteFooter, SiteNav } from "@/components/SiteNav";
+import { SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 import { getRequirement, listRegions, listUseCases } from "@/lib/api-client";
 import { answersFromRawInput, type Answers } from "@/lib/wizard";
@@ -75,7 +75,6 @@ export default async function FindAHumanoidPage({
           seedAnswers={seedAnswers}
         />
       </div>
-      <SiteFooter />
     </>
   );
 }

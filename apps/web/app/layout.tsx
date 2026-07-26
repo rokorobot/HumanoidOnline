@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { SiteFooter } from "@/components/SiteNav";
+
 import "./tokens.css";
 import "./globals.css";
 
@@ -23,6 +25,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <main id="main-content" tabIndex={-1}>
           {children}
         </main>
+        {/* Rendered once here as a SIBLING of <main> (not inside it) so the
+            <footer> exposes the contentinfo landmark — a footer nested in <main>
+            gets no landmark role (WS8.4 / R17). Pages no longer render their own. */}
+        <SiteFooter />
       </body>
     </html>
   );

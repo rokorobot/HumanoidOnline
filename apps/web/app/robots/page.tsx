@@ -13,7 +13,7 @@ import { CompareBar } from "@/components/CompareBar";
 import { FilterPanel } from "@/components/FilterPanel";
 import { RobotCard } from "@/components/RobotCard";
 import { SectionIndex } from "@/components/SectionIndex";
-import { SiteFooter, SiteNav } from "@/components/SiteNav";
+import { SiteNav } from "@/components/SiteNav";
 import { SortSelect } from "@/components/SortSelect";
 import { SystemHeader } from "@/components/SystemHeader";
 import { SystemLabel } from "@/components/SystemLabel";
@@ -122,7 +122,6 @@ export default async function RobotsPage({
         </div>
       </div>
       <CompareBar slugs={compareSlugs} />
-      <SiteFooter />
     </>
   );
 }

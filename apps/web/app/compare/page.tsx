@@ -16,7 +16,7 @@ import Link from "next/link";
 import { compareRobots } from "@/lib/api-client";
 import { isUnitSystem, type UnitSystem } from "@/lib/units";
 import { SectionIndex } from "@/components/SectionIndex";
-import { SiteFooter, SiteNav } from "@/components/SiteNav";
+import { SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 import { CompareView } from "./CompareView";
 
@@ -89,7 +89,6 @@ export default async function ComparePage({
           />
         )}
       </div>
-      <SiteFooter />
     </>
   );
 }

@@ -14,7 +14,7 @@ import { MachineCode } from "@/components/MachineCode";
 import { ManufacturerCard } from "@/components/ManufacturerCard";
 import { RobotCard } from "@/components/RobotCard";
 import { SectionIndex } from "@/components/SectionIndex";
-import { DarkNav, SiteFooter } from "@/components/SiteNav";
+import { DarkNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 import { SystemLabel } from "@/components/SystemLabel";
 import { UseCaseTile } from "@/components/UseCaseTile";
@@ -275,7 +275,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <SiteFooter />
     </>
   );
 }

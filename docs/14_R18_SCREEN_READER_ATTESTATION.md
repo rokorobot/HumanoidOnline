@@ -1,14 +1,18 @@
 # WS8.4 / R18 — Screen-reader attestation checklist
 
-> **STATUS: PREPARED — NOT ATTESTED.** This is the repeatable manual checklist
-> for the R18 gate. It is **Attested** by frozen contract (WS8 §9.4, WS8-L8): a
-> green automated axe run (R17) does **not** satisfy it. An automated tool is an
-> oracle for *detectable* defects, not for accessibility itself — a screen
-> reader driven by a person is the only way to confirm the experience is
-> coherent.
+> **STATUS: ATTESTED — PASS.** Completed by Robert Konecny / Product Owner on
+> 2026-07-26 against runtime head `5a3ca6a9d2266d31a4cc64580c79306b3cbcf8e4`
+> with NVDA + Chrome / Windows. See the completed record at the bottom. (The
+> checklist below remains the repeatable procedure for future heads.)
+>
+> This gate is **Attested** by frozen contract (WS8 §9.4, WS8-L8): a green
+> automated axe run (R17) does **not** satisfy it. An automated tool is an oracle
+> for *detectable* defects, not for accessibility itself — a screen reader driven
+> by a person is the only way to confirm the experience is coherent.
 >
 > **This gate is PASS only when the record at the bottom is completed by a named
-> operator with a date, against a specific commit.** No agent may self-attest it.
+> operator with a date, against a specific commit.** No agent may self-attest it —
+> this record was completed by the human operator named above, not by an agent.
 
 ## How to run
 
@@ -77,14 +81,40 @@ only. The items above are the human-judgement layer axe cannot check
 ## Attestation record (complete to PASS R18)
 
 ```
-Attested by:        (name / role — REQUIRED)
-Date:               (REQUIRED)
-Commit:             (the exact release head under test — REQUIRED)
-Screen readers:     (e.g. NVDA+Firefox; VoiceOver+Safari iOS)
-Result:             (PASS / FAIL)
-Notes / exceptions: (any Fail or N-A, with detail)
+Attested by:        Robert Konecny / Product Owner
+Date:               2026-07-26
+Commit:             5a3ca6a9d2266d31a4cc64580c79306b3cbcf8e4
+                    (runtime head under test; the docs-only commit that records
+                     this result does not change runtime behaviour)
+Screen readers:     NVDA + Chrome / Windows  (desktop attestation)
+Result:             PASS
+
+Result by section:
+  §1 Heading & landmark structure ....... PASS  (one H1 + main; skip link first
+       stop → focus #main-content; footer/contentinfo landmark now discoverable
+       and announced via landmark navigation)
+  §2 Accessible names ................... PASS  (logo/home, compare, close; the
+       robot-detail escape links announce "HumanoidOnline home" / "Robot Catalogue")
+  §3 Forms — labels & instructions ...... PASS
+  §4 Validation announcement ............ PASS  (empty email: invalid/required +
+       role=alert spoken, focus not lost)
+  §5 Focus progression .................. PASS  (order; dialog trap; return to opener)
+  §6 Dialog / modal entry & exit ........ PASS  (role/aria-modal/title; success
+       "Request received" announced)
+  §7 Results / status announcement ...... PASS  (compare matrix region + spec
+       table; match-results heading/scores/reasons/warnings)
+  §8 Imagery & IMAGE UNAVAILABLE ........ PASS
+  §9 Responsive / mobile screen reader .. N-A   (mobile screen reader not tested;
+       desktop attestation scope — not manufactured)
+
+Notes / exceptions: Overall R18 = PASS across the frozen §9.4 surfaces (nav,
+  catalogue, robot detail, wizard, matches, lead dialog). §9 mobile recorded N-A
+  by design. Robot detail deliberately omits the primary nav (intentional UI-D1
+  variance, SC 3.2.3-permitted); its added breadcrumb escape links were confirmed
+  reachable and announced.
 ```
 
-> Until this record is filled by a person, R18 is **PENDING**, and the Release
-> Invariant Matrix must show it as such. WS8.4 delivers the checklist and the
-> automated R17 layer; it does not — and cannot — self-certify R18.
+> This record is now completed by the named human operator above, so R18 is
+> **PASS** for head `5a3ca6a…`. WS8.4 delivered the checklist and the automated
+> R17 layer; the human operator — not an agent — certified R18. For any future
+> runtime head, re-run this checklist and add a fresh dated record.

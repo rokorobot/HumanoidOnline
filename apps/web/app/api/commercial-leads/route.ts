@@ -7,13 +7,13 @@
 // straight back through, status and all.
 import { NextResponse } from "next/server";
 
-import { API_BASE_URL } from "@/lib/server";
+import { apiBaseUrl } from "@/lib/server";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request): Promise<NextResponse> {
   const body = await request.text();
-  const upstream = await fetch(`${API_BASE_URL}/api/commercial-leads`, {
+  const upstream = await fetch(`${apiBaseUrl()}/api/commercial-leads`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body,

@@ -6,13 +6,13 @@
 // FastAPI response (201 {id} or 422 {detail}) is passed straight back through.
 import { NextResponse } from "next/server";
 
-import { API_BASE_URL } from "@/lib/server";
+import { apiBaseUrl } from "@/lib/server";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request): Promise<NextResponse> {
   const body = await request.text();
-  const upstream = await fetch(`${API_BASE_URL}/api/buyer-requirements`, {
+  const upstream = await fetch(`${apiBaseUrl()}/api/buyer-requirements`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body,

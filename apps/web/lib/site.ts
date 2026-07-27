@@ -56,7 +56,12 @@ export function resolveAppEnv(raw: string | undefined = process.env.APP_ENV): Ap
   return lowered as AppEnv;
 }
 
-function normalizeOrigin(raw: string, source: string): string {
+/**
+ * Validate a configured absolute origin. Exported so `lib/server.ts` reuses this
+ * one implementation for `API_BASE_URL` — a second copy would be exactly the
+ * drift this module warns about (and `lib/api.ts` was that drift, now removed).
+ */
+export function normalizeOrigin(raw: string, source: string): string {
   let parsed: URL;
   try {
     parsed = new URL(raw);

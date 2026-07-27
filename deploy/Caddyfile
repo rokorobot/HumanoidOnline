@@ -1,0 +1,91 @@
+# WS8.7 / R26 + R27 — ingress configuration.
+#
+# TWO listeners realize DEP P4 without a second FastAPI application (DEP P2):
+#
+#   PUBLIC    :80/:443           -> /admin* is 404 here. Never routes to admin.
+#   PROTECTED :8001 (loopback)   -> the ONLY path to /admin*, reached by
+#                                   `ssh -L 8001:127.0.0.1:8001 <vps>`.
+#
+# Both proxy to the SAME singleton FastAPI instance.
+
+{
+	email {$ACME_EMAIL}
+	# The admin listener is plain HTTP on loopback (SSH provides the encrypted
+	# channel); automatic HTTPS must not try to obtain a certificate for it.
+	auto_https disable_redirects
+}
+
+# ----------------------------------------------------------------- snippets --
+# DEP P1 — REPLACE X-Forwarded-For with the real remote host rather than
+# appending to whatever the client sent. Combined with `--no-proxy-headers` on
+# uvicorn and the API publishing no host port, a client-supplied forwarding
+# header can never reach `resolve_client_ip()` as truth.
+(to_api) {
+	reverse_proxy api:8000 {
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up Host {host}
+	}
+}
+
+# --------------------------------------------------------- PUBLIC listener ---
+{$SITE_DOMAIN} {
+	encode zstd gzip
+
+	# Deployment-level HSTS: applied to EVERY response on the public HTTPS
+	# surface, whether it came from Next.js or FastAPI. (FastAPI also sets it
+	# itself as defence in depth; this is the authority.)
+	header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+	# DEP P4 — the admin surface is NOT routable through public ingress. This
+	# single prefix covers SQLAdmin's static assets too: sqladmin mounts at
+	# base_url="/admin" and serves its files from "/admin/statics/*".
+	# NOTE: this rule is load-bearing. It is asserted by an automated config
+	# test and re-proven from outside the deployment by WS8.8 / R29.
+	handle /admin* {
+		respond 404
+	}
+
+	# Governed API + infrastructure probes.
+	handle /api/* {
+		import to_api
+	}
+	handle /health {
+		import to_api
+	}
+	handle /ready {
+		import to_api
+	}
+
+	# Everything else is the public web surface.
+	handle {
+		reverse_proxy web:3000 {
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+			header_up Host {host}
+		}
+	}
+}
+
+# www -> apex, 308 (permanent, method-preserving).
+www.{$SITE_DOMAIN} {
+	redir https://{$SITE_DOMAIN}{uri} 308
+}
+
+# ----------------------------------------- PROTECTED admin listener (:8001) --
+# Published by compose as 127.0.0.1:8001 ONLY, so this listener does not exist
+# on any public interface. Plain HTTP by design: the SSH tunnel is the encrypted
+# channel. HSTS is deliberately NOT emitted here — advertising it over
+# http://127.0.0.1 would poison the operator's browser for all of localhost.
+#
+# SQLAdmin's own authentication (WS8.1 / R1) still applies on top of this
+# network boundary; neither layer substitutes for the other (§11 D1).
+:8001 {
+	handle /admin* {
+		import to_api
+	}
+	# Nothing else is served on the admin plane.
+	handle {
+		respond 404
+	}
+}

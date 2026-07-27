@@ -1,0 +1,166 @@
+# WS8.7 / R26 + R27 — production topology for the HumanoidOnline MVP.
+#
+#                         INTERNET
+#                             |  80 / 443
+#                             v
+#                    caddy  172.30.0.2
+#         +-----------------------------------------+
+#         | PUBLIC LISTENER (:80/:443)              |
+#         |   /admin, /admin/*        -> 404        |
+#         |   /api/*, /health, /ready -> api        |
+#         |   everything else         -> web        |
+#         +-----------------------------------------+
+#         | PROTECTED ADMIN LISTENER                |
+#         |   published ONLY on 127.0.0.1:8001      |
+#         |   /admin*                 -> api        |
+#         +-----------------------------------------+
+#                     ^                    |
+#          ssh -L 8001:127.0.0.1:8001      v
+#                                     web / api / db  (NO published ports)
+#
+# Frozen DEP bindings:
+#   P1  Caddy is the only peer that can reach the API (the API publishes no host
+#       port). TRUSTED_PROXY_IPS is exactly Caddy's address on this network, and
+#       uvicorn runs --no-proxy-headers so resolve_client_ip() is the sole trust
+#       authority. Caddy REPLACES X-Forwarded-For with the real remote host, so a
+#       client-supplied value never survives to be believed.
+#   P2  Exactly ONE FastAPI application instance (`api`), one worker. There is no
+#       second admin application: the admin boundary is realized at the ingress.
+#   P3  Process-local abuse-control state stays valid because P2 holds. Never
+#       scale `api`; horizontal replication requires the shared-state work first.
+#   P4  /admin is unreachable through the public listener (404) and is served
+#       only through a listener published on host loopback, reachable via SSH
+#       tunnel. Application authentication (SQLAdmin) remains mandatory on top.
+#   P5  Every one of these semantics is operator-configured here + in
+#       deploy/Caddyfile, and externally testable (R29).
+#
+# Subnet note: 172.30.0.0/24 is PROPOSED. Before first `up`, run a collision
+# preflight on the host (`ip route`, `docker network ls` + `inspect`). If it
+# collides, choose another /24 and update TRUSTED_PROXY_IPS to match Caddy's
+# address on the replacement network.
+#
+# Secrets come from an operator-managed `.env.production` (root-owned, chmod 600,
+# never committed). See .env.production.example.
+
+name: humanoidonline
+
+services:
+  db:
+    image: ${POSTGRES_IMAGE:-postgres:16}
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Host-side destination for pg_dump output (primary DB recovery path).
+      - ./backups:/backups
+    # NO ports: — Postgres is never reachable from outside the compose network.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks:
+      ho_prod:
+        ipv4_address: 172.30.0.5
+
+  # WS8.2 / R9 — migration-before-app-start, as a real gate: this one-shot
+  # service must exit 0 before `api` is allowed to start. It runs the SAME
+  # governed bootstrap as CI and local dev (db/bootstrap.py) from the SAME image
+  # as the API — there is deliberately no second bootstrap path (gap D6 / R10).
+  migrate:
+    image: humanoidonline-api:${RELEASE_SHA:?RELEASE_SHA is required}
+    command: ["python", "/srv/db/bootstrap.py"]
+    environment:
+      APP_ENV: ${APP_ENV}
+      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - ho_prod
+
+  api:
+    image: humanoidonline-api:${RELEASE_SHA:?RELEASE_SHA is required}
+    restart: unless-stopped
+    environment:
+      APP_ENV: ${APP_ENV}
+      DATABASE_URL: ${DATABASE_URL}
+      # DEP P1 — exactly Caddy's address on this network, as FastAPI sees it.
+      TRUSTED_PROXY_IPS: ${TRUSTED_PROXY_IPS}
+      # Admin credentials live on the single API instance; the BOUNDARY is the
+      # ingress (see deploy/Caddyfile), not the absence of the surface.
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET}
+      # Strict same-origin unless an explicit allowlist is configured (R4).
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
+      # Defence in depth; Caddy is the deployment-level HSTS authority.
+      ENABLE_HSTS: ${ENABLE_HSTS:-true}
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    # NO ports: — only Caddy can reach the API.
+    networks:
+      ho_prod:
+        ipv4_address: 172.30.0.3
+
+  web:
+    image: humanoidonline-web:${RELEASE_SHA:?RELEASE_SHA is required}
+    restart: unless-stopped
+    environment:
+      APP_ENV: ${APP_ENV}
+      # WS8.7 / WS8-L5 — required in staging/production; the web tier refuses to
+      # fall back to localhost (apps/web/lib/server.ts).
+      API_BASE_URL: ${API_BASE_URL}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+    depends_on:
+      api:
+        condition: service_started
+    # NO ports: — only Caddy can reach the web tier.
+    networks:
+      ho_prod:
+        ipv4_address: 172.30.0.4
+
+  caddy:
+    image: ${CADDY_IMAGE:-caddy:2}
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      # DEP P4 — the protected admin listener is bound to host LOOPBACK only.
+      # It is not reachable from the internet; operators reach it with
+      #   ssh -L 8001:127.0.0.1:8001 <vps>
+      - "127.0.0.1:8001:8001"
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      api:
+        condition: service_started
+      web:
+        condition: service_started
+    networks:
+      ho_prod:
+        ipv4_address: 172.30.0.2
+
+networks:
+  ho_prod:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:

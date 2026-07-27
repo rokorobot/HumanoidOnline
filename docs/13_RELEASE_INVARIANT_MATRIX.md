@@ -54,10 +54,10 @@ recur. No other existing assertion was modified.
 | ID | Invariant | Class | Evidence | Gate | Status |
 |---|---|---|---|---|---|
 | P1 | Forwarding headers trusted only from configured trusted ingress | Automated | `test_forwarding_header_from_untrusted_peer_is_ignored`, `test_forwarding_header_ignored_when_no_ingress_is_trusted`, `test_chain_walks_right_to_left_skipping_trusted_hops`, `test_spoofed_forwarding_header_cannot_buy_a_fresh_budget`, `test_malformed_trusted_ingress_config_fails_loudly` (+ boot-time validation in `app.main`) | R3 | **PASS** (pre-deployment) · deployed proof PENDING (R29) |
-| P2 | Singleton API instance for MVP | Attested | binding to infrastructure | R26 | PENDING (WS8.7) |
+| P2 | Singleton API instance for MVP | Attested | Config prepared (WS8.7): one `api` service, `uvicorn --workers 1`, no replicas — asserted by `test_single_api_instance_and_worker`. **No second FastAPI process**: the admin boundary is realized at the ingress, not by an extra application instance | R26 | PENDING (binding requires the deployed VPS) |
 | P3 | Process-local abuse state only behind a storage abstraction | Automated | `RateLimitStore` protocol + `InMemoryFixedWindowStore`; limiter constructed with an injected store | R3 | **PASS** |
-| P4 | Admin on a separate protected host/listener | Attested | boundary realized | R27 | PENDING (WS8.7) |
-| P5 | Ingress trust + admin boundary operator-configurable and testable | Attested | provider acceptance filter | R26 | PENDING (WS8.7) |
+| P4 | Admin on a separate protected host/listener | Attested | Config prepared (WS8.7): public Caddy listener answers **404** for `/admin*` (covers `/admin/statics/*`); a second Caddy listener published **only** on `127.0.0.1:8001` proxies `/admin*` to the same singleton API, reached via SSH tunnel; SQLAdmin auth still mandatory — asserted by `test_public_listener_refuses_admin`, `test_admin_listener_is_published_on_loopback_only`, `test_only_caddy_publishes_ports` | R27 | PENDING (boundary realized only when deployed) |
+| P5 | Ingress trust + admin boundary operator-configurable and testable | Attested | Provider accepted: Hostinger KVM 4 (root VPS) satisfies the filter. Operator-owned `deploy/Caddyfile` + `docker-compose.prod.yml` make both semantics explicit and testable; externally re-proven at R29 | R26 | PENDING (capability accepted; realization requires deployment) |
 
 ## 3. Frozen laws inherited from earlier contracts
 
@@ -263,7 +263,9 @@ that owns it has passed.
 | D6 divergent README bootstrap | CLOSE | WS8.2 | **CLOSED** (R10) |
 | D7 migration `0003` undocumented | CLOSE | WS8.2 | **CLOSED** (R10) |
 | D9 no app logging / error / metrics / correlation | CLOSE | WS8.6 | **CLOSED** (R25 — structured JSON request log + `X-Request-ID` correlation across Next↔FastAPI incl. **2xx/4xx/5xx**; **no PII proven over the COMPLETE uvicorn log stream** by a production probe. An unhandled 500 is sanitized in-middleware — generic body, message-free location-only stack, correlation id preserved — instead of letting the framework emit the PII-bearing traceback; uvicorn access log silenced in prod. `/health` + `/ready` preserved and correlated) |
-| D1–D4 deployment gaps | CLOSE | WS8.7 | open |
+| D1–D4 deployment gaps | CLOSE | WS8.7 | artifacts prepared (Dockerfiles, `docker-compose.prod.yml`, `deploy/Caddyfile`, `.env.production.example`); **open until deployed + attested** |
+| R26 deployment shape / DEP bound | **Attested** | WS8.7 | **PENDING DEPLOYMENT / ATTESTATION** — checklist `docs/15_WS8_7_DEPLOYMENT_ATTESTATION.md`; repo-side config asserted by `tests/test_deployment_config.py`. Capability ≠ realized compliance; a named human operator must complete the record against the physical VPS |
+| R27 admin boundary realized | **Attested** | WS8.7 | **PENDING DEPLOYMENT / ATTESTATION** — same checklist; externally re-proven at R29 (WS8.8) |
 | D8 `event_log` dead | NOT A RELEASE DEFECT | — | **documented dormant** (R25 — model docstring + no application writer proven + zero-write regression) |
 | R24 performance | CLOSE | WS8.6 | **CLOSED** — deterministic bundle budgets (`scripts/perf-budget.mjs`, gzipped First Load JS in CI) **+** built-route budget (`e2e/perf-budget.spec.ts`: document bytes / JS asset count+size vs the fixed catalogue). No timing/LCP thresholds; field CWV is post-release SLO (§11.1) |
 | D10 scheduled re-verification | ACCEPT-DEFER | product owner | runbook entry at R30 (open) |

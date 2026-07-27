@@ -1,9 +1,10 @@
-// SuitableRobotThumb — MEDIA-01 governed thumbnail for the use-case "suitable
-// robots" ranked list. Renders ONLY the display-eligible primary image the API
-// already filtered (identity VERIFIED + rights cleared); when none exists it
-// renders the explicit IMAGE UNAVAILABLE state — never a generated, look-alike,
-// or placeholder fill (docs/09_MEDIA_CONTRACT.md). Same image truth + gate as the
-// catalogue RobotCard and Robot Detail, just the compact inline size for a row.
+// RobotThumb — MEDIA-01 governed thumbnail for a compact robot row: the use-case
+// "suitable robots" list and the manufacturer portfolio list. Renders ONLY the
+// display-eligible primary image the API already filtered (identity VERIFIED +
+// rights cleared); when none exists it renders the explicit IMAGE UNAVAILABLE
+// state — never a generated, look-alike, or placeholder fill
+// (docs/09_MEDIA_CONTRACT.md). Same image truth + gate as the catalogue RobotCard
+// and Robot Detail, just the compact inline size for a row.
 //
 // The image also links to the robot detail; the robot NAME remains the primary
 // clickable link in the row itself.
@@ -11,7 +12,7 @@ import Link from "next/link";
 
 import type { RobotImagePrimary } from "@/lib/types";
 
-export function SuitableRobotThumb({
+export function RobotThumb({
   slug,
   name,
   image,

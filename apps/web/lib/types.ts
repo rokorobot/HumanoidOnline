@@ -217,6 +217,8 @@ export interface ManufacturerRobot {
   slug: string;
   name: string;
   commercial_status: string;
+  // MEDIA-01 governed thumbnail (display-eligible primary; null -> unavailable).
+  primary_image?: RobotImagePrimary | null;
 }
 
 export interface Provider {

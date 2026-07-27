@@ -128,6 +128,25 @@ def test_manufacturers_list_and_detail(client, database_url) -> None:
     assert isinstance(detail["providers"], list)
 
 
+def test_manufacturer_robots_governed_thumbnail(client, database_url) -> None:
+    """MEDIA-01: the manufacturer portfolio thumbnail is the SAME governed primary
+    image as the catalogue card — identical display-eligibility gate, no alternate
+    or unverified image path. Present-or-null, never a fabricated fill."""
+    catalogue = {
+        it["slug"]: it["primary_image"]
+        for it in _get(client, "/api/robots", limit=100)["items"]
+    }
+    detail = _get(client, "/api/manufacturers/unitree")
+    assert detail["robots"]  # Unitree has published robots
+    for r in detail["robots"]:
+        assert "primary_image" in r
+        assert r["slug"] in catalogue
+        # The row image is byte-for-byte the catalogue card's governed selection.
+        assert r["primary_image"] == catalogue[r["slug"]]
+        if r["primary_image"] is not None:
+            assert r["primary_image"]["image_url"]
+
+
 def test_manufacturer_404(client, database_url) -> None:
     assert client.get("/api/manufacturers/nope").status_code == 404
 

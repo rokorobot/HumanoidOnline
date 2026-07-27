@@ -20,7 +20,10 @@ venv/
 # --- Environment & secrets ---
 .env
 .env.*
+# Templates carry NO values — only variable names and guidance — so they are
+# committed. The filled files (.env, .env.production) never are.
 !.env.example
+!.env.production.example
 
 # --- Database ---
 *.dump

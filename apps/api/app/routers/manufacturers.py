@@ -19,7 +19,7 @@ from app.schemas.manufacturer import (
     ManufacturerRobot,
     ProviderRead,
 )
-from app.services.reads import derive_portfolio_status
+from app.services.reads import _primary_image, derive_portfolio_status
 
 router = APIRouter(prefix="/api/manufacturers", tags=["manufacturers"])
 
@@ -78,7 +78,7 @@ def get_manufacturer(
     m = session.execute(
         select(Manufacturer)
         .where(Manufacturer.slug == slug)
-        .options(selectinload(Manufacturer.robots))
+        .options(selectinload(Manufacturer.robots).selectinload(Robot.images))
     ).scalars().first()
     if m is None:
         raise HTTPException(status_code=404, detail="manufacturer not found")
@@ -119,7 +119,14 @@ def get_manufacturer(
         is_public_company=m.is_public_company,
         ticker=m.ticker,
         robots=[
-            ManufacturerRobot(slug=r.slug, name=r.name, commercial_status=r.commercial_status)
+            ManufacturerRobot(
+                slug=r.slug,
+                name=r.name,
+                commercial_status=r.commercial_status,
+                # Reuse the exact catalogue-card MEDIA-01 selection (display-
+                # eligible gate); no unverified image can reach this surface.
+                primary_image=_primary_image(r),
+            )
             for r in sorted(m.robots, key=lambda r: r.name)
             if r.is_published
         ],

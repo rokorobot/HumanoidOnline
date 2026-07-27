@@ -9,7 +9,7 @@ import { findUseCase } from "@/lib/api-client";
 import { StatusBracket } from "@/components/StatusBadge";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteNav } from "@/components/SiteNav";
-import { SuitableRobotThumb } from "@/components/SuitableRobotThumb";
+import { RobotThumb } from "@/components/RobotThumb";
 import { SystemHeader } from "@/components/SystemHeader";
 import { SystemLabel } from "@/components/SystemLabel";
 
@@ -100,7 +100,7 @@ export default async function UseCaseDetailPage({
               {u.suitable_robots.map((r) => (
                 <div className="fit-row" key={r.slug}>
                   <div className="fit-lead">
-                    <SuitableRobotThumb
+                    <RobotThumb
                       slug={r.slug}
                       name={r.name}
                       image={r.primary_image}

@@ -6,6 +6,7 @@ import { cache } from "react";
 
 import { findManufacturer } from "@/lib/api-client";
 import { regionLabel } from "@/lib/format";
+import { RobotThumb } from "@/components/RobotThumb";
 import { StatusBracket } from "@/components/StatusBadge";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteNav } from "@/components/SiteNav";
@@ -104,10 +105,13 @@ export default async function ManufacturerDetailPage({
             <div className="fit-list">
               {m.robots.map((r) => (
                 <div className="fit-row" key={r.slug}>
-                  <div className="fit-name">
-                    <Link className="name" href={`/robots/${r.slug}`}>
-                      {r.name}
-                    </Link>
+                  <div className="fit-lead">
+                    <RobotThumb slug={r.slug} name={r.name} image={r.primary_image} />
+                    <div className="fit-name">
+                      <Link className="name" href={`/robots/${r.slug}`}>
+                        {r.name}
+                      </Link>
+                    </div>
                   </div>
                   <StatusBracket status={r.commercial_status} />
                 </div>

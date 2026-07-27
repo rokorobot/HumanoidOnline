@@ -1,5 +1,6 @@
 /**
- * MEDIA-01 governed thumbnail on the use-case "suitable robots" ranked list.
+ * MEDIA-01 governed thumbnail (RobotThumb) — used by the use-case "suitable
+ * robots" list and the manufacturer portfolio list.
  *
  * The eligibility gate itself lives on the backend (is_display_eligible); the API
  * hands the frontend either a display-eligible primary image or null. These tests
@@ -10,14 +11,14 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { SuitableRobotThumb } from "../components/SuitableRobotThumb";
+import { RobotThumb } from "../components/RobotThumb";
 
-describe("SuitableRobotThumb — MEDIA-01 governed row thumbnail", () => {
+describe("RobotThumb — MEDIA-01 governed row thumbnail", () => {
   afterEach(cleanup);
 
   it("renders IMAGE UNAVAILABLE with an accessible name, not a placeholder, when there is no eligible image", () => {
     const { container } = render(
-      <SuitableRobotThumb slug="test-bot" name="Test Bot" image={null} />,
+      <RobotThumb slug="test-bot" name="Test Bot" image={null} />,
     );
 
     expect(screen.getByText("IMAGE UNAVAILABLE")).toBeTruthy();
@@ -33,7 +34,7 @@ describe("SuitableRobotThumb — MEDIA-01 governed row thumbnail", () => {
 
   it("renders the governed verified image when the API supplies one", () => {
     const { container } = render(
-      <SuitableRobotThumb
+      <RobotThumb
         slug="test-bot"
         name="Test Bot"
         image={{
@@ -52,7 +53,7 @@ describe("SuitableRobotThumb — MEDIA-01 governed row thumbnail", () => {
 
   it("links the thumbnail to the robot detail (name remains the primary link in the row)", () => {
     const { container } = render(
-      <SuitableRobotThumb slug="test-bot" name="Test Bot" image={null} />,
+      <RobotThumb slug="test-bot" name="Test Bot" image={null} />,
     );
     const link = container.querySelector("a.fit-thumb");
     expect(link?.getAttribute("href")).toBe("/robots/test-bot");

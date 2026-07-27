@@ -9,6 +9,7 @@ import { findUseCase } from "@/lib/api-client";
 import { StatusBracket } from "@/components/StatusBadge";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteNav } from "@/components/SiteNav";
+import { SuitableRobotThumb } from "@/components/SuitableRobotThumb";
 import { SystemHeader } from "@/components/SystemHeader";
 import { SystemLabel } from "@/components/SystemLabel";
 
@@ -98,13 +99,20 @@ export default async function UseCaseDetailPage({
             <div className="fit-list">
               {u.suitable_robots.map((r) => (
                 <div className="fit-row" key={r.slug}>
-                  <div className="fit-name">
-                    <Link className="name" href={`/robots/${r.slug}`}>
-                      {r.name}
-                    </Link>
-                    {r.commercial_readiness && (
-                      <StatusBracket status={r.commercial_readiness} />
-                    )}
+                  <div className="fit-lead">
+                    <SuitableRobotThumb
+                      slug={r.slug}
+                      name={r.name}
+                      image={r.primary_image}
+                    />
+                    <div className="fit-name">
+                      <Link className="name" href={`/robots/${r.slug}`}>
+                        {r.name}
+                      </Link>
+                      {r.commercial_readiness && (
+                        <StatusBracket status={r.commercial_readiness} />
+                      )}
+                    </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                     {r.limitations && (

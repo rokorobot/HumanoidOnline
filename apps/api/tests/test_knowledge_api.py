@@ -173,6 +173,27 @@ def test_use_cases_list_and_detail(client, database_url) -> None:
     assert scores == sorted(scores, reverse=True)  # ordered by fit desc
 
 
+def test_use_case_suitable_robots_governed_thumbnail(client, database_url) -> None:
+    """MEDIA-01: the suitable-robots thumbnail is the SAME governed primary image
+    as the catalogue card — identical display-eligibility gate, no alternate or
+    unverified image path. Present-or-null, never a fabricated fill."""
+    catalogue = {
+        it["slug"]: it["primary_image"]
+        for it in _get(client, "/api/robots", limit=100)["items"]
+    }
+    detail = _get(client, "/api/use-cases/warehouse-logistics")
+    assert detail["suitable_robots"]  # the use case has ranked robots
+    for r in detail["suitable_robots"]:
+        assert "primary_image" in r
+        # Every suitable robot is published, so it appears in the catalogue read.
+        assert r["slug"] in catalogue
+        # The row image is byte-for-byte the catalogue card's governed selection.
+        assert r["primary_image"] == catalogue[r["slug"]]
+        # Where present it is a real URL through the gate; never an empty fill.
+        if r["primary_image"] is not None:
+            assert r["primary_image"]["image_url"]
+
+
 def test_use_case_404(client, database_url) -> None:
     assert client.get("/api/use-cases/nope").status_code == 404
 

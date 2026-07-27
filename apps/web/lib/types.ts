@@ -263,6 +263,8 @@ export interface SuitableRobot {
   fit_score?: number | null;
   commercial_readiness?: string | null;
   limitations?: string | null;
+  // MEDIA-01 governed thumbnail (display-eligible primary; null -> unavailable).
+  primary_image?: RobotImagePrimary | null;
 }
 
 export interface UseCaseDetail {

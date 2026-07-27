@@ -12,6 +12,7 @@ from app.models.robot import Robot
 from app.models.use_case import UseCase, UseCaseFit
 from app.schemas.common import Page
 from app.schemas.use_case import SuitableRobot, UseCaseDetail, UseCaseListItem
+from app.services.reads import _primary_image
 
 router = APIRouter(prefix="/api/use-cases", tags=["use-cases"])
 
@@ -54,7 +55,11 @@ def get_use_case(
     u = session.execute(
         select(UseCase)
         .where(UseCase.slug == slug)
-        .options(selectinload(UseCase.fits).selectinload(UseCaseFit.robot))
+        .options(
+            selectinload(UseCase.fits)
+            .selectinload(UseCaseFit.robot)
+            .selectinload(Robot.images)
+        )
     ).scalars().first()
     if u is None:
         raise HTTPException(status_code=404, detail="use case not found")
@@ -67,6 +72,9 @@ def get_use_case(
                 fit_score=float(f.fit_score) if f.fit_score is not None else None,
                 commercial_readiness=f.commercial_readiness,
                 limitations=f.limitations,
+                # Reuse the exact catalogue-card MEDIA-01 selection (display-
+                # eligible gate); no unverified image can reach this surface.
+                primary_image=_primary_image(f.robot),
             )
             for f in u.fits
             if f.robot.is_published

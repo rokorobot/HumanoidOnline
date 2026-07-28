@@ -10,9 +10,15 @@
 
 {
 	email {$ACME_EMAIL}
-	# The admin listener is plain HTTP on loopback (SSH provides the encrypted
-	# channel); automatic HTTPS must not try to obtain a certificate for it.
-	auto_https disable_redirects
+	# NOTE: automatic HTTPS is deliberately left FULLY ENABLED.
+	#
+	# An earlier revision carried a global `auto_https disable_redirects`, which
+	# would have switched off the automatic HTTP->HTTPS redirect for the PUBLIC
+	# site as well — a plain-HTTP entry point on the public internet. It was
+	# there only to stop Caddy trying to obtain a certificate for the admin
+	# listener, but that was never necessary: the admin site block is addressed
+	# by BARE PORT (`:8001`), which Caddy serves over HTTP without attempting
+	# ACME. So the global switch is removed and the public redirect stays on.
 }
 
 # ----------------------------------------------------------------- snippets --
@@ -20,11 +26,22 @@
 # appending to whatever the client sent. Combined with `--no-proxy-headers` on
 # uvicorn and the API publishing no host port, a client-supplied forwarding
 # header can never reach `resolve_client_ip()` as truth.
+#
+# Readiness is wired INTO the ingress (not merely exposed): Caddy actively polls
+# the API's dependency-aware `/ready` and takes the upstream out of rotation when
+# it stops returning 2xx — e.g. when Postgres is unreachable. `/health` remains
+# pure liveness (no dependencies) and is what the container HEALTHCHECK uses.
+# Intervals are bounded so a flapping backend cannot be probed unboundedly.
 (to_api) {
 	reverse_proxy api:8000 {
 		header_up X-Forwarded-For {remote_host}
 		header_up X-Forwarded-Proto {scheme}
 		header_up Host {host}
+
+		health_uri /ready
+		health_interval 10s
+		health_timeout 2s
+		health_status 2xx
 	}
 }
 

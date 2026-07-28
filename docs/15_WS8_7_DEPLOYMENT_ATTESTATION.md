@@ -36,9 +36,13 @@ this from outside the deployment. R26/R27 are not a substitute for it.
 Record the exact inputs and outputs; the rollback unit is an **image digest**,
 never "rebuild an old tag".
 
+All four pins are MANDATORY — the Dockerfiles declare their build args with no
+default and compose declares its image variables as required (`:?`), so a build
+or `compose up` without them stops rather than silently using a mutable tag.
+
 ```
 Release commit SHA:          ____________________
-Base image pins used:
+Base image pins used (all four REQUIRED, digest form):
   PYTHON_IMAGE               ____________________  (…@sha256:…)
   NODE_IMAGE                 ____________________  (…@sha256:…)
   POSTGRES_IMAGE             ____________________  (…@sha256:…)
@@ -59,6 +63,15 @@ Previous image digests retained for rollback:
       `api` starts (`service_completed_successfully`).
 - [ ] **Health/readiness**: `GET /health` → 200; `GET /ready` → 200.
 - [ ] **Readiness is real**: with the database stopped, `GET /ready` → **503**.
+- [ ] **Readiness is WIRED INTO the ingress**: with the database stopped, Caddy
+      takes the API upstream out of rotation (`health_uri /ready`), so the public
+      surface stops serving that upstream rather than proxying to a broken one.
+      Restore the database and confirm it returns to rotation.
+- [ ] **Ingress starts only after the app is healthy**: compose reports `caddy`
+      starting after `api`/`web` are healthy, and `api` only after `migrate`
+      exited 0.
+- [ ] **Public HTTP→HTTPS redirect**: `curl -I http://humanoidonline.com/robots`
+      → 301/308 to `https://`. Automatic HTTPS is deliberately NOT disabled.
 - [ ] **TLS**: `curl -I https://humanoidonline.com` → valid certificate, and
       `Strict-Transport-Security` present.
 - [ ] **www → apex**: `curl -I https://www.humanoidonline.com/robots` → **308**
@@ -91,11 +104,22 @@ use a login/redirect flow rather than a literal 401).
 
 ## Backup / rollback readiness (rehearsed in WS8.8 / R30)
 
-- [ ] Nightly `pg_dump -Fc` scheduled; **off-box destination configured**
-      (owner decision — must be resolved before production activation).
-- [ ] Hostinger automated backup active (secondary, whole-VPS recovery).
-- [ ] Manual snapshot taken immediately before this deployment, understood to be
-      a **temporary (~1-day) checkpoint**, never the recovery plan of record.
+- [ ] **Primary — `deploy/backup.py` installed** as the systemd timer (or cron
+      equivalent) documented in that file's header, and one run completed
+      successfully.
+- [ ] `BACKUP_UPLOAD_COMMAND` set to a real off-box destination. The script
+      **refuses to run** in a strict environment without it, so an unset value is
+      a hard failure rather than a local-only "backup". *(Vendor still an owner
+      decision; the code is provider-neutral.)*
+- [ ] `BACKUP_DIR` and `BACKUP_RETENTION_DAYS` set; retention verified to delete
+      only this script's own timestamped artifacts, and only after a successful
+      upload.
+- [ ] A dump has been **restored** into a scratch database
+      (`pg_restore --clean --if-exists`) — rehearsed for real in WS8.8 / R30.
+- [ ] Provider automated backup active (**secondary**, whole-VPS recovery).
+- [ ] Provider manual snapshot taken immediately before this deployment,
+      understood to be a **temporary (~1-day) checkpoint**, never the recovery
+      plan of record.
 - [ ] Rollback path confirmed: previous image digests still present on the host.
 
 ## Attestation record (complete to PASS R26 / R27)

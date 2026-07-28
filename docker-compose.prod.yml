@@ -46,7 +46,7 @@ name: humanoidonline
 
 services:
   db:
-    image: ${POSTGRES_IMAGE:-postgres:16}
+    image: ${POSTGRES_IMAGE:?POSTGRES_IMAGE is required — pin a digest, e.g. postgres:16@sha256:...}
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -119,16 +119,18 @@ services:
       # fall back to localhost (apps/web/lib/server.ts).
       API_BASE_URL: ${API_BASE_URL}
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+    # The web tier must not start against an API that has not yet passed its
+    # own startup checks (which include migration-state verification, R9).
     depends_on:
       api:
-        condition: service_started
+        condition: service_healthy
     # NO ports: — only Caddy can reach the web tier.
     networks:
       ho_prod:
         ipv4_address: 172.30.0.4
 
   caddy:
-    image: ${CADDY_IMAGE:-caddy:2}
+    image: ${CADDY_IMAGE:?CADDY_IMAGE is required — pin a digest, e.g. caddy:2@sha256:...}
     restart: unless-stopped
     ports:
       - "80:80"
@@ -144,11 +146,17 @@ services:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+    # Public ingress must not accept traffic before the application is actually
+    # ready. `api` reports healthy only after its lifespan ran the migration-state
+    # verification (WS8.2 / R9) and /health answers; `migrate` already had to exit
+    # 0 before `api` started at all. Caddy additionally polls /ready per-request-
+    # cycle (see deploy/Caddyfile health_uri) so a later database outage takes the
+    # upstream out of rotation.
     depends_on:
       api:
-        condition: service_started
+        condition: service_healthy
       web:
-        condition: service_started
+        condition: service_healthy
     networks:
       ho_prod:
         ipv4_address: 172.30.0.2

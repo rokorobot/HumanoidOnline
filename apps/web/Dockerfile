@@ -18,7 +18,10 @@
 # a wrong origin. API_BASE_URL is deliberately NOT a build arg — it is resolved
 # lazily at request time (WS8.7 / WS8-L5, lib/server.ts) and supplied as runtime
 # environment, so one image is not welded to one backend address.
-ARG NODE_IMAGE=node:20-bookworm-slim
+#
+# FAIL CLOSED: this ARG has NO default, for the same reason as the API image —
+# a mutable base tag would silently break the R26 reproducible-build promise.
+ARG NODE_IMAGE
 
 # ------------------------------------------------------------------- deps ----
 FROM ${NODE_IMAGE} AS deps

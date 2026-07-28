@@ -201,3 +201,122 @@ def test_env_template_ships_no_values_for_secrets() -> None:
             if line.startswith(f"{key}="):
                 value = line.split("=", 1)[1].split("#", 1)[0].strip()
                 assert value == "", f"{key} must ship empty in the template"
+
+
+# --------------------------------------------------------------------------- #
+# Automatic HTTPS on the public surface (review blocker 1)
+# --------------------------------------------------------------------------- #
+def test_automatic_https_redirects_are_not_globally_disabled(caddyfile: str) -> None:
+    """A global `auto_https disable_redirects` would switch off the automatic
+    HTTP->HTTPS redirect for the PUBLIC site too, leaving a plain-HTTP entry
+    point on the internet. The admin listener does not need it: a bare-port site
+    address (`:8001`) is served over HTTP without Caddy attempting ACME."""
+    directives = [
+        line for line in caddyfile.splitlines() if not line.lstrip().startswith("#")
+    ]
+    body = "\n".join(directives)
+    assert "auto_https" not in body, (
+        "automatic HTTPS (and its HTTP->HTTPS redirect) must stay enabled for the "
+        "public site"
+    )
+    assert "disable_redirects" not in body
+
+
+def test_admin_listener_is_a_bare_port_so_it_stays_plain_http(
+    caddyfile: str, admin_listener: str
+) -> None:
+    """Plain HTTP on loopback is intentional — SSH provides the channel — and it
+    must be achieved by addressing, not by weakening global TLS behaviour."""
+    assert "\n:8001 {" in caddyfile, "admin site address must be a bare port"
+    assert "tls " not in admin_listener
+    # Re-asserted here so the two halves of blocker 1 fail independently.
+    assert "Strict-Transport-Security" not in admin_listener
+
+
+# --------------------------------------------------------------------------- #
+# Readiness wired INTO the ingress (review blocker 4)
+# --------------------------------------------------------------------------- #
+def test_ingress_actively_health_checks_the_api_readiness_endpoint(
+    caddyfile: str,
+) -> None:
+    """Exposing /ready is not the same as using it: Caddy must poll it and take
+    the upstream out of rotation when a dependency (Postgres) is down."""
+    proxy = _block(caddyfile, "(to_api) {")
+    assert "health_uri /ready" in proxy, "ingress must probe /ready, not just /health"
+    assert "health_interval" in proxy and "health_timeout" in proxy, (
+        "health checking must be bounded"
+    )
+    assert "health_status 2xx" in proxy
+
+
+def test_liveness_and_readiness_keep_their_distinct_roles() -> None:
+    """/health stays dependency-free liveness (container HEALTHCHECK); /ready is
+    the dependency-aware probe the proxy uses."""
+    dockerfile = _read(API_DOCKERFILE)
+    directives = [
+        line for line in dockerfile.splitlines() if not line.lstrip().startswith("#")
+    ]
+    body = chr(10).join(directives)
+    assert "/health" in body, "container liveness probe should use /health"
+    assert "/ready" not in body, (
+        "the container HEALTHCHECK must not depend on the database"
+    )
+    caddyfile = _read(CADDYFILE)
+    assert "handle /ready" in caddyfile and "handle /health" in caddyfile
+
+
+def test_public_ingress_starts_only_after_the_application_is_healthy() -> None:
+    """Ingress must not accept traffic before the API passed its own startup
+    checks — which include the migration-state verification (WS8.2 / R9)."""
+    lines = _read(COMPOSE).splitlines()
+    started = [
+        i for i, line in enumerate(lines) if line.strip() == "condition: service_started"
+    ]
+    offenders = {_service_of(lines, i) for i in started}
+    assert offenders == set(), (
+        f"these services start before their dependency is healthy: {sorted(offenders)}"
+    )
+    compose = _read(COMPOSE)
+    # The migrate gate itself is unchanged.
+    assert "service_completed_successfully" in compose
+
+
+# --------------------------------------------------------------------------- #
+# Base-image pinning fails closed (review blocker 2)
+# --------------------------------------------------------------------------- #
+def test_build_args_have_no_mutable_default_base_image() -> None:
+    """A default like `python:3.12-slim` would let a production build succeed
+    against whatever that tag points at today."""
+    for path, arg in (
+        (API_DOCKERFILE, "PYTHON_IMAGE"),
+        (ROOT / "apps" / "web" / "Dockerfile", "NODE_IMAGE"),
+    ):
+        source = _read(path)
+        declarations = [
+            line.strip()
+            for line in source.splitlines()
+            if line.strip().startswith(f"ARG {arg}")
+        ]
+        assert declarations == [f"ARG {arg}"], (
+            f"{arg} must be declared with NO default, got: {declarations}"
+        )
+
+
+def test_compose_requires_explicit_runtime_image_pins() -> None:
+    compose = _read(COMPOSE)
+    for var in ("POSTGRES_IMAGE", "CADDY_IMAGE"):
+        assert f"${{{var}:?" in compose, (
+            f"{var} must be a REQUIRED compose variable (`:?`), not a default"
+        )
+        assert f"${{{var}:-" not in compose, f"{var} must not have a fallback default"
+
+
+def test_env_template_ships_all_four_image_pins_blank() -> None:
+    """Digest examples belong in comments; a real value here would be a mutable
+    tag waiting to be shipped."""
+    env = _read(ENV_EXAMPLE)
+    for key in ("PYTHON_IMAGE", "NODE_IMAGE", "POSTGRES_IMAGE", "CADDY_IMAGE"):
+        assigned = [
+            line for line in env.splitlines() if line.startswith(f"{key}=")
+        ]
+        assert assigned == [f"{key}="], f"{key} must ship blank, got: {assigned}"

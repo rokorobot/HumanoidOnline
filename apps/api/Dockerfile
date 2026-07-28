@@ -18,7 +18,12 @@
 # The resolved digest and the built image digest are recorded in the R26
 # attestation artifact (docs/15). Digests are deliberately NOT hard-coded here:
 # a fabricated or stale digest is worse than an explicit deployment-time pin.
-ARG PYTHON_IMAGE=python:3.12-slim-bookworm
+#
+# FAIL CLOSED: this ARG has NO default. A mutable default (e.g. python:3.12-slim)
+# would let a production build silently succeed against whatever that tag points
+# at today — exactly the reproducibility promise R26 makes. With no --build-arg
+# the FROM below resolves to an empty reference and the build stops.
+ARG PYTHON_IMAGE
 
 # ---------------------------------------------------------------- builder ----
 FROM ${PYTHON_IMAGE} AS builder

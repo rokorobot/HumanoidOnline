@@ -54,9 +54,10 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - pgdata:/var/lib/postgresql/data
-      # Host-side destination for pg_dump output (primary DB recovery path).
-      - ./backups:/backups
-    # NO ports: — Postgres is never reachable from outside the compose network.
+    # NO ports: — Postgres is never reachable from outside the compose network,
+    # so backups run pg_dump INSIDE this container and stream it to the host over
+    # `compose exec -T` (deploy/backup.py). The database is never exposed, and no
+    # host directory is mounted into it for a dump to be written into.
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s

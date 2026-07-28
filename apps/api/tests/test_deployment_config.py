@@ -265,6 +265,64 @@ def test_liveness_and_readiness_keep_their_distinct_roles() -> None:
     assert "handle /ready" in caddyfile and "handle /health" in caddyfile
 
 
+def _imports(block: str) -> set[str]:
+    """Snippet names imported inside a Caddy block, as exact tokens.
+
+    Substring matching would be wrong here: `import to_api_liveness` contains
+    `import to_api`, and confusing the two is precisely the defect under test.
+    """
+    names = set()
+    for line in block.splitlines():
+        parts = line.strip().split()
+        if len(parts) == 2 and parts[0] == "import":
+            names.add(parts[1])
+    return names
+
+
+def test_public_liveness_is_not_served_by_the_readiness_checked_upstream(
+    caddyfile: str, public_listener: str
+) -> None:
+    """Active `/ready` checking marks the upstream DOWN during a dependency
+    outage — and a marked-down upstream answers 502 for EVERY route in that pool.
+
+    If `/health` shared it, liveness and readiness would fail together and the
+    operator would lose the signal that separates "the API is gone" from "the API
+    is up, its database is not". `/health` therefore proxies through a separate
+    directive with no health checking at all.
+    """
+    liveness = _block(caddyfile, "(to_api_liveness) {")
+    assert "reverse_proxy api:8000" in liveness
+    assert "health_uri" not in liveness, (
+        "the liveness path must never be taken out of rotation by a dependency"
+    )
+    assert _imports(_block(public_listener, "handle /health {")) == {"to_api_liveness"}
+
+
+@pytest.mark.parametrize("route", ["handle /api/* {", "handle /ready {"])
+def test_dependent_routes_use_the_readiness_checked_upstream(
+    public_listener: str, route: str
+) -> None:
+    """Serving the governed API from a known-broken upstream is worse than
+    refusing it, so these routes DO ride the actively health-checked pool."""
+    assert _imports(_block(public_listener, route)) == {"to_api"}
+
+
+def test_the_protected_admin_route_is_also_readiness_checked(
+    admin_listener: str,
+) -> None:
+    assert _imports(_block(admin_listener, "handle /admin* {")) == {"to_api"}
+
+
+def test_the_two_proxy_paths_are_genuinely_separate_upstream_pools(
+    caddyfile: str,
+) -> None:
+    """Caddy tracks health per reverse_proxy directive, so the distinction only
+    holds if these really are two directives."""
+    dependent = _block(caddyfile, "(to_api) {")
+    assert "health_uri /ready" in dependent
+    assert caddyfile.count("reverse_proxy api:8000") == 2
+
+
 def test_public_ingress_starts_only_after_the_application_is_healthy() -> None:
     """Ingress must not accept traffic before the API passed its own startup
     checks — which include the migration-state verification (WS8.2 / R9)."""
@@ -309,6 +367,70 @@ def test_compose_requires_explicit_runtime_image_pins() -> None:
             f"{var} must be a REQUIRED compose variable (`:?`), not a default"
         )
         assert f"${{{var}:-" not in compose, f"{var} must not have a fallback default"
+
+
+def test_env_template_points_at_the_preflight_that_enforces_the_pins() -> None:
+    """`:?` and a missing ARG default only prove NON-EMPTY. The form check is
+    `deploy/preflight.py`, run first by `deploy/release.sh`; the template has to
+    say so, or an operator will believe a tag is acceptable."""
+    env = _read(ENV_EXAMPLE)
+    assert "preflight.py" in env
+    assert "release.sh" in env
+
+
+# --------------------------------------------------------------------------- #
+# Backups: reachable topology, no credentials in arguments, tight permissions
+# --------------------------------------------------------------------------- #
+def test_the_database_exposes_nothing_to_the_host_not_even_for_backups() -> None:
+    """The dump is streamed out through `compose exec`, so no host directory is
+    mounted into the database container and no port is published."""
+    compose = _read(COMPOSE)
+    assert "/backups" not in compose, (
+        "a host bind mount for dumps would put a writable host path inside the "
+        "database container; backups stream over `compose exec -T` instead"
+    )
+    assert "5432:5432" not in compose
+
+
+def test_env_template_carries_every_backup_setting_the_timer_needs() -> None:
+    env = _read(ENV_EXAMPLE)
+    for key in (
+        "BACKUP_UPLOAD_COMMAND",
+        "BACKUP_DIR",
+        "BACKUP_RETENTION_DAYS",
+        "BACKUP_COMPOSE_FILE",
+        "BACKUP_COMPOSE_ENV_FILE",
+        "BACKUP_COMPOSE_PROJECT",
+        "BACKUP_DB_SERVICE",
+    ):
+        assert any(line.startswith(f"{key}=") for line in env.splitlines()), (
+            f"{key} must be in the production template"
+        )
+    # The off-box destination is operator-specific: mandatory, but never shipped.
+    assert "BACKUP_UPLOAD_COMMAND=\n" in env
+
+
+def test_env_template_documents_quoting_for_values_containing_spaces() -> None:
+    """One file, three parsers (compose --env-file, systemd EnvironmentFile, sh).
+    All three end an unquoted value at whitespace, which would truncate the
+    upload command to `rclone`."""
+    env = _read(ENV_EXAMPLE)
+    assert "MUST BE DOUBLE-QUOTED" in env
+    assert 'BACKUP_UPLOAD_COMMAND="rclone copy {path}' in env
+
+
+def test_postgres_password_generator_is_uri_safe() -> None:
+    """POSTGRES_PASSWORD is embedded in DATABASE_URL. `openssl rand -base64` emits
+    `+`, `/` and `=`, which change meaning inside a URL userinfo field."""
+    env = _read(ENV_EXAMPLE)
+    section = env.split("POSTGRES_USER=")[1].split("DATABASE_URL=")[0]
+    assert "generate: openssl rand -hex 32" in section
+    assert "generate: openssl rand -base64" not in section, (
+        "a base64 password must not be suggested for a value that goes into a URL"
+    )
+    assert "percent-encode" in section, (
+        "an operator who uses a different generator must be told the rule"
+    )
 
 
 def test_env_template_ships_all_four_image_pins_blank() -> None:

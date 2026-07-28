@@ -36,9 +36,19 @@ this from outside the deployment. R26/R27 are not a substitute for it.
 Record the exact inputs and outputs; the rollback unit is an **image digest**,
 never "rebuild an old tag".
 
-All four pins are MANDATORY — the Dockerfiles declare their build args with no
-default and compose declares its image variables as required (`:?`), so a build
-or `compose up` without them stops rather than silently using a mutable tag.
+Use the supported path — `deploy/release.sh` — rather than hand-typed commands:
+
+```
+sudo ENV_FILE=/srv/humanoidonline/.env.production deploy/release.sh
+```
+
+It runs `deploy/preflight.py` **first**, before anything is pulled, built or
+started. All four pins are MANDATORY and, more than that, must be **immutable in
+form**: required-ness (`:?`, an ARG with no default) only proves *non-empty*, and
+`POSTGRES_IMAGE=postgres:16` is non-empty while meaning "whatever that tag points
+at today". The preflight accepts `<image>@sha256:<64 lower-case hex>` (or a bare
+`sha256:<64 hex>` image ID) and rejects `python:3.12-slim`, `node:20-bookworm-slim`,
+`postgres:16`, `caddy:2` and every other mutable tag.
 
 ```
 Release commit SHA:          ____________________
@@ -54,6 +64,11 @@ Previous image digests retained for rollback:
   api  sha256:______________   web  sha256:______________
 ```
 
+- [ ] `deploy/preflight.py` output captured: **"preflight ok: all four base images
+      are pinned to a digest"**. (Sanity-check the gate itself once: temporarily
+      set one pin to `postgres:16`, confirm the release **stops** with a
+      `MUTABLE TAG` error and that **nothing was built or started**, then restore
+      the digest.)
 - [ ] Images built from the exact commit above with `npm ci` / `uv sync --frozen`.
 - [ ] `docker compose -f docker-compose.prod.yml config` output captured.
 
@@ -62,11 +77,20 @@ Previous image digests retained for rollback:
 - [ ] **Migration-before-app-start**: logs show `migrate` exiting 0 **before**
       `api` starts (`service_completed_successfully`).
 - [ ] **Health/readiness**: `GET /health` → 200; `GET /ready` → 200.
-- [ ] **Readiness is real**: with the database stopped, `GET /ready` → **503**.
-- [ ] **Readiness is WIRED INTO the ingress**: with the database stopped, Caddy
-      takes the API upstream out of rotation (`health_uri /ready`), so the public
-      surface stops serving that upstream rather than proxying to a broken one.
-      Restore the database and confirm it returns to rotation.
+- [ ] **Simulated dependency outage** (`docker compose stop db`, wait for one
+      health interval — 10s — then measure at the PUBLIC surface):
+      - [ ] `curl -o /dev/null -w '%{http_code}' https://<domain>/health` → **200**.
+            Liveness must keep answering: it is what distinguishes "the API is
+            gone" from "the API is up, its database is not". It is served through
+            a separate, deliberately un-health-checked proxy path
+            (`to_api_liveness` in `deploy/Caddyfile`).
+      - [ ] `curl -o /dev/null -w '%{http_code}' https://<domain>/ready` →
+            **non-2xx** (503 from the API, or 502 once Caddy has marked the
+            upstream down — either proves the dependency is not being hidden).
+      - [ ] `https://<domain>/api/...` also fails rather than serving from a
+            known-broken upstream.
+      - [ ] `docker compose start db`; within ~10s `/ready` returns to 200 and the
+            upstream returns to rotation. `/health` never went down.
 - [ ] **Ingress starts only after the app is healthy**: compose reports `caddy`
       starting after `api`/`web` are healthy, and `api` only after `migrate`
       exited 0.
@@ -105,17 +129,34 @@ use a login/redirect flow rather than a literal 401).
 ## Backup / rollback readiness (rehearsed in WS8.8 / R30)
 
 - [ ] **Primary — `deploy/backup.py` installed** as the systemd timer (or cron
-      equivalent) documented in that file's header, and one run completed
-      successfully.
-- [ ] `BACKUP_UPLOAD_COMMAND` set to a real off-box destination. The script
-      **refuses to run** in a strict environment without it, so an unset value is
-      a hard failure rather than a local-only "backup". *(Vendor still an owner
-      decision; the code is provider-neutral.)*
-- [ ] `BACKUP_DIR` and `BACKUP_RETENTION_DAYS` set; retention verified to delete
-      only this script's own timestamped artifacts, and only after a successful
-      upload.
-- [ ] A dump has been **restored** into a scratch database
-      (`pg_restore --clean --if-exists`) — rehearsed for real in WS8.8 / R30.
+      equivalent) documented in that file's header, **`UMask=0077`** set on the
+      unit, and one run completed successfully.
+- [ ] The dump ran **inside the `db` container** (`docker compose … exec -T db sh
+      -c 'exec pg_dump …'`) and was streamed to the host. Postgres publishes no
+      port, so a host-side `pg_dump -h db:5432` cannot work — and must not be
+      made to work by exposing the database.
+- [ ] **No credential in any process argument**: `ps` during a run shows no
+      password and no `DATABASE_URL`; `pg_dump` reads `$POSTGRES_USER` /
+      `$POSTGRES_DB` from the container's own environment.
+- [ ] **Permissions**: `ls -ld $BACKUP_DIR` → `drwx------` (0700); `ls -l` on an
+      artifact → `-rw-------` (0600).
+- [ ] `BACKUP_UPLOAD_COMMAND` set to a real off-box destination, **quoted**
+      (it contains spaces; systemd, compose and `sh` all end an unquoted value at
+      whitespace). The script **refuses to run** in a strict environment without
+      it, so an unset value is a hard failure rather than a local-only "backup".
+      *(Vendor still an owner decision; the code is provider-neutral.)*
+- [ ] `BACKUP_DIR`, `BACKUP_RETENTION_DAYS` and the `BACKUP_COMPOSE_*` settings
+      match this deployment; retention verified to delete only this script's own
+      timestamped artifacts, and only after a successful upload.
+- [ ] **Atomic promotion observed**: an interrupted dump leaves only a `.part`
+      file, never something that looks like a finished `.dump`.
+- [ ] A dump has been **restored into a scratch database inside the container**
+      (`createdb` → `pg_restore --no-owner --no-acl --dbname <scratch>` over
+      stdin → row count → `dropdb`), exactly as documented in the header of
+      `deploy/backup.py`. Never a host `pg_restore -d "$DATABASE_URL"`: that URL
+      carries SQLAlchemy's `+psycopg` token, which is not libpq syntax, and the
+      port is unreachable from the host in any case. Rehearsed for real in
+      WS8.8 / R30.
 - [ ] Provider automated backup active (**secondary**, whole-VPS recovery).
 - [ ] Provider manual snapshot taken immediately before this deployment,
       understood to be a **temporary (~1-day) checkpoint**, never the recovery

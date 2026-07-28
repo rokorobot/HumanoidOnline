@@ -27,6 +27,8 @@ venv/
 
 # --- Database ---
 *.dump
+# Incomplete dumps (deploy/backup.py writes here before atomic promotion).
+*.dump.part
 pgdata/
 
 # --- Editors & OS ---

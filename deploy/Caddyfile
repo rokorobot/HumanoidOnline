@@ -29,9 +29,12 @@
 #
 # Readiness is wired INTO the ingress (not merely exposed): Caddy actively polls
 # the API's dependency-aware `/ready` and takes the upstream out of rotation when
-# it stops returning 2xx — e.g. when Postgres is unreachable. `/health` remains
-# pure liveness (no dependencies) and is what the container HEALTHCHECK uses.
-# Intervals are bounded so a flapping backend cannot be probed unboundedly.
+# it stops returning 2xx — e.g. when Postgres is unreachable. Intervals are
+# bounded so a flapping backend cannot be probed unboundedly.
+#
+# This snippet is for the DEPENDENT surface: /api/*, /ready itself, and the
+# protected /admin*. When a dependency is down, serving those from a known-broken
+# upstream is worse than refusing them.
 (to_api) {
 	reverse_proxy api:8000 {
 		header_up X-Forwarded-For {remote_host}
@@ -42,6 +45,24 @@
 		health_interval 10s
 		health_timeout 2s
 		health_status 2xx
+	}
+}
+
+# LIVENESS-ONLY path, used by exactly one route: the public `/health`.
+#
+# A separate reverse_proxy directive is a separate upstream pool, so this one is
+# never marked down by the readiness probe above. That distinction is the whole
+# point: `/health` answers "is the process alive", `/ready` answers "can it serve
+# requests". If /health were served from the readiness-checked pool, a database
+# outage would take liveness down WITH readiness — Caddy would answer 502 for
+# both — and the operator (and any external monitor) would lose the one signal
+# that separates "the API is gone" from "the API is up, its dependency is not".
+# Deliberately NO health_uri here.
+(to_api_liveness) {
+	reverse_proxy api:8000 {
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up Host {host}
 	}
 }
 
@@ -67,8 +88,9 @@
 	handle /api/* {
 		import to_api
 	}
+	# Liveness must keep answering while a dependency is down (see the snippet).
 	handle /health {
-		import to_api
+		import to_api_liveness
 	}
 	handle /ready {
 		import to_api

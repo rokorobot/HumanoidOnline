@@ -159,16 +159,68 @@ class CommercialLeadProviderAdmin(ModelView, model=CommercialLeadProvider):
 class DiscoverySourceAdmin(ModelView, model=DiscoverySource):
     # DATA-D1 radar registry. A source is crawler-eligible only when reviewed +
     # access-permitted + enabled (DATA-D1.9, enforced by a DB CHECK).
+    #
+    # This is the ONE discovery view that stays writable: registering a source and
+    # recording its ToS/robots review IS the operator's job, and the database
+    # CHECK `ck_discovery_source_eligible` remains the authoritative backstop —
+    # an enabled source without affirmative review cannot be stored at all.
     column_list = [
         DiscoverySource.key, DiscoverySource.name, DiscoverySource.source_class,
         DiscoverySource.tos_status, DiscoverySource.robots_status,
         DiscoverySource.eligibility_reviewed_by, DiscoverySource.is_enabled,
     ]
     column_searchable_list = [DiscoverySource.key, DiscoverySource.name]
+    # Deleting a source cascades into its candidates — i.e. it destroys research
+    # history. Retire a source with `is_enabled = False` instead.
+    can_delete = False
+    # Explicit allowlist: only registry + eligibility-review fields. Surrogate IDs
+    # and system timestamps are deliberately NOT editable, and neither are the
+    # `candidates` relationship (editing a parent must never rewrite its children).
+    form_columns = [
+        DiscoverySource.key,
+        DiscoverySource.name,
+        DiscoverySource.source_class,
+        DiscoverySource.homepage_url,
+        DiscoverySource.tos_status,
+        DiscoverySource.robots_status,
+        DiscoverySource.eligibility_reviewed_at,
+        DiscoverySource.eligibility_reviewed_by,
+        DiscoverySource.is_enabled,
+        DiscoverySource.notes,
+    ]
     name_plural = "Discovery sources (DATA-D1)"
 
 
-class DiscoveryCandidateAdmin(ModelView, model=DiscoveryCandidate):
+# ---------------------------------------------------------------------------
+# DATA-D1 research records — READ-ONLY in the admin (DATA-D1 integrity hotfix).
+#
+# An operational audit proved that leaving these views writable created a second,
+# ungoverned path into the discovery state machine. With the SQLAdmin defaults
+# (create/edit/delete all True and every column exposed in the form) an operator
+# could:
+#   * set `identity_status`, `status`, `trace_state` and `trace_verified_by`
+#     directly — reaching READY_FOR_PROMOTION without `resolve_identity()`,
+#     `record_trace()` or `advance()` ever running, after which `check_gates()`
+#     returned NO failures and the forged candidate promoted to canonical; and
+#   * silently DESTROY evidence: SQLAdmin renders `claims`/`images` as
+#     relationship fields, so an ordinary field edit that omits them dissociates
+#     the children — a candidate ingested with claims came back with none.
+#
+# These rows are therefore created and changed exclusively by the governed
+# services (`services.discovery.adapters.ingest`, `.pipeline`, `.promotion`).
+# The admin remains a full read/inspect surface. Governed *actions* (advance,
+# record trace, reject...) are a later, separately-ratified slice; until they
+# exist, promotion stays on the deliberate CLI.
+# ---------------------------------------------------------------------------
+class _ReadOnlyDiscoveryView(ModelView):
+    """Inspect-only: no create, edit or delete through the admin UI."""
+
+    can_create = False
+    can_edit = False
+    can_delete = False
+
+
+class DiscoveryCandidateAdmin(_ReadOnlyDiscoveryView, model=DiscoveryCandidate):
     # Noncanonical research triage. Promotion to canonical is NOT done here — it is
     # the governed CLI (app.cli.promote_candidate); the pipeline never promotes.
     column_list = [
@@ -181,23 +233,23 @@ class DiscoveryCandidateAdmin(ModelView, model=DiscoveryCandidate):
         DiscoveryCandidate.candidate_name, DiscoveryCandidate.candidate_manufacturer,
     ]
     column_sortable_list = [DiscoveryCandidate.status, DiscoveryCandidate.identity_status]
-    name_plural = "Discovery candidates (DATA-D1)"
+    name_plural = "Discovery candidates (DATA-D1, read-only)"
 
 
-class CandidateClaimAdmin(ModelView, model=CandidateClaim):
+class CandidateClaimAdmin(_ReadOnlyDiscoveryView, model=CandidateClaim):
     column_list = [
         CandidateClaim.candidate_id, CandidateClaim.field_key,
         CandidateClaim.claimed_value, CandidateClaim.claim_status,
     ]
-    name_plural = "Candidate claims (DATA-D1)"
+    name_plural = "Candidate claims (DATA-D1, read-only)"
 
 
-class CandidateImageRefAdmin(ModelView, model=CandidateImageRef):
+class CandidateImageRefAdmin(_ReadOnlyDiscoveryView, model=CandidateImageRef):
     column_list = [
         CandidateImageRef.candidate_id, CandidateImageRef.image_url,
         CandidateImageRef.credited_to, CandidateImageRef.media_status,
     ]
-    name_plural = "Candidate images (DATA-D1, reference-only)"
+    name_plural = "Candidate images (DATA-D1, reference-only, read-only)"
 
 
 class PromotionAuditAdmin(ModelView, model=PromotionAudit):

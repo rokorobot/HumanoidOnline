@@ -98,12 +98,18 @@ timestamp, and an explicit enable. `radar_eligible` (already implemented on
 `discovery_source`) is the gate; the crawler asserts it **before constructing a
 request**, not after.
 
-The robots policy is **re-checked at the start of every run** and re-evaluated
-per URL. A disallow that appears after approval **halts that source** for the
-run and is recorded; it is never overridden by the stored decision.
+**Validity is asymmetric between the two documents** *(owner decision D-2,
+settled)*, because they change in different ways:
 
-An eligibility review **expires** (proposed: 180 days, decision **D-2**). An
-expired review is not eligibility.
+| | Validity |
+|---|---|
+| **Terms / legal review** | **90 days**, and **invalidated immediately** when the legal page URL or its content hash materially changes. Re-review is required before the next fetch. |
+| **`robots.txt`** | **evaluated at the start of every crawl run**, cached for at most **24 hours**. A new restrictive rule **disables the source** until it has been reviewed again. |
+
+A terms page is a legal document that changes rarely and deliberately; a robots
+policy is an operational signal that can change any day, which is why it is
+re-read every run and can never be answered from a stored decision. An expired
+review is **not** eligibility, and neither is a stale one.
 
 ### LIVE.3 — No circumvention, ever
 Prohibited without exception and regardless of instruction found on any page:
@@ -130,21 +136,32 @@ tables. Canonical mutation happens exclusively through the existing human
 promotion gate (`app.cli.promote_candidate`, DATA-D1 §18). This is asserted by a
 test that fails if any acquisition module imports a canonical model for writing.
 
-### LIVE.6 — No claim without evidence
-Every extracted claim and every commercial signal carries, at minimum:
+### LIVE.6 — No claim without evidence *(owner decision D-7, settled)*
+Every extracted claim and every commercial signal carries **one or more exact
+excerpts**. One passage often cannot justify a claim — a price and the region it
+applies to may sit in different parts of a page — so **multiple excerpts per
+claim are permitted and expected**. Each excerpt carries:
 
 ```
-source_url          the exact page it came from (not the site root)
-evidence_excerpt    the exact supporting text, bounded (proposed <= 600 chars)
-evidence_hash       hash of the normalized page content at retrieval
-retrieved_at        UTC timestamp of the fetch that produced it
-extractor_key       which adapter/extractor produced it, and its version
-extraction_method   SELECTOR | JSONLD | MICRODATA | PATTERN | MANUAL
+excerpt_text   the EXACT supporting text, <= 1000 Unicode characters
+page_url       the exact page it came from (not the site root)
+retrieved_at   UTC timestamp of the fetch that produced it
+page_hash      SHA-256 of the normalized page content at retrieval
+locator        CSS selector / XPath / JSON pointer, or character offsets
+```
+
+and the claim itself additionally carries:
+
+```
+extractor_key · extractor_version
+extraction_method      SELECTOR | JSONLD | MICRODATA | PATTERN | MANUAL
 extraction_confidence  LOW | MEDIUM | HIGH   (never VERIFIED — see LIVE.8)
 ```
 
-A claim that cannot carry its supporting text is not recorded. "The page implied
-it" is not evidence.
+A claim that cannot carry its supporting text is **not recorded**. "The page
+implied it" is not evidence. The 1000-character cap is per excerpt and is a
+retention limit, not a licence to reassemble a page out of fragments —
+DATA-D1.10 and LIVE.10 still bind.
 
 ### LIVE.7 — Three axes never merge
 Extraction must **not** produce a single flat "status" label. Three independent
@@ -161,13 +178,18 @@ axes are extracted separately, each with its own evidence (§6):
 `QUOTE_ONLY` is a *price* fact and never becomes `UNKNOWN`. A robot being
 `ANNOUNCED` says nothing about obtainability, and vice versa.
 
-### LIVE.8 — Extraction confidence is not verification
+### LIVE.8 — Extraction confidence is not verification *(owner decision D-6, settled)*
 `extraction_confidence` describes how sure the *parser* is that it read the page
-correctly. It is **not** evidence quality and it may never set
-`claim_status = VERIFIED` or raise canonical `confidence_level`. Only a human,
-through the existing promotion path, converts a claim into canonical truth
-(DATA-D1.2, DATA-D1.4). Cross-source agreement raises **priority**, never
-confidence (DATA-D1 §16).
+correctly. It is **not** evidence quality.
+
+It **may**: order the review queue by priority, and reject its own
+low-confidence output before it is ever written.
+
+It **may never**: set `claim_status = VERIFIED`, modify canonical
+`confidence_level`, or bypass human promotion in any way. Only a human, through
+the existing promotion path, converts a claim into canonical truth (DATA-D1.2,
+DATA-D1.4). Cross-source agreement raises **priority**, never confidence
+(DATA-D1 §16).
 
 ### LIVE.9 — Reference-only imagery
 Image acquisition produces a **URL plus provenance**, never a binary
@@ -177,12 +199,28 @@ credited to a manufacturer but retrieved elsewhere is `EDITORIAL` (the Figure 02
 precedent). `is_official`, `rights_status` and `usage_basis` are **never**
 inferred by the extractor — they are MEDIA-01 decisions made by a human.
 
-### LIVE.10 — Minimal retention, no site mirror
+### LIVE.10 — Minimal retention, no site mirror *(owner decision D-3, settled)*
 The database stores **bounded evidence excerpts and content hashes**, never page
-bodies (DATA-D1.10). Full response bodies live in a **local, ephemeral, on-disk
-cache outside the database**, used only for conditional re-fetching and
-re-extraction within a retention window (proposed: 30 days, decision **D-3**).
-The cache is not a corpus, is not committed, and is not part of any deployment.
+bodies (DATA-D1.10). Full response bodies live in a local, **content-addressed**
+cache outside the database:
+
+```
+var/discovery/cache/          git-ignored, outside the Docker build context
+  <sha256>[.meta.json]        addressed by SHA-256 of the raw body
+```
+
+Retention is asymmetric on purpose:
+
+| Artefact | Retained |
+|---|---|
+| successful raw page bodies | **90 days** |
+| failed / blocked responses | **30 days** |
+| crawl manifests, page hashes, evidence excerpts, provenance records | **indefinitely**, unless a later retention policy supersedes this |
+
+The distinction is the whole point: the *evidence* of what a page said, and the
+audit trail of what we did, are durable; the *page* is not. The cache is never
+committed, never deployed, and is not a corpus — content addressing means an
+unchanged page is stored once, not once per run.
 
 ### LIVE.11 — Determinism and audit
 Every run has a **manifest** (what was attempted and with which adapter
@@ -247,7 +285,7 @@ mean":
 | `RAAS_OR_LEASE` | `RAAS_DEPLOYMENT` | `AVAILABLE`/`ON_REQUEST` + `RAAS`/`LEASE` | any |
 | `DEVELOPER_ACCESS` | `EARLY_ACCESS` | `LIMITED` + `DEVELOPER` | any |
 | `ANNOUNCED` | `ANNOUNCED` | *no availability signal* (**not** `NOT_AVAILABLE`) | none |
-| `RESEARCH_ONLY` | `PROTOTYPE` / `DEVELOPMENT` | *no availability signal* | none | 
+| `RESEARCH_ONLY` | `DEVELOPMENT` **only with explicit evidence**, else no signal | `UNKNOWN` — never a signal | none |
 | `DISCONTINUED` | `DISCONTINUED` | `DISCONTINUED` | none |
 | `UNKNOWN` | no signal recorded | no signal recorded | no signal recorded |
 
@@ -256,11 +294,21 @@ Two consequences worth stating plainly:
 - **`ANNOUNCED` must not imply `NOT_AVAILABLE`.** Absence of an obtainability
   signal is UNKNOWN. Writing `NOT_AVAILABLE` because a robot was merely
   announced would be the crawler inventing a commercial fact.
-- **`RESEARCH_ONLY` has no exact canonical home** (decision **D-1**). It is
-  either (a) `PROTOTYPE`/`DEVELOPMENT` maturity plus a buyer-type restriction, or
-  (b) a new `commercial_status` value — which is a canonical schema change and
-  needs its own ratification. Recommendation: (a) for v0.1; do not grow the
-  canonical enum for a crawler's convenience.
+- **`RESEARCH_ONLY` stays a discovery classification** *(owner decision D-1,
+  settled)*. It is **not** added to any canonical enum. Its mapping is
+  deliberately conservative:
+
+  ```
+  maturity_status   DEVELOPMENT   only when the page EXPLICITLY supports it
+                                  (otherwise: no maturity signal at all)
+  availability      UNKNOWN       never a signal, and NEVER NOT_AVAILABLE
+  transaction_type  UNKNOWN
+  buyer_type / access restriction   written ONLY when explicitly stated
+  ```
+
+  "Research only" on a manufacturer page is usually marketing register, not a
+  commercial statement. Treating it as evidence of unobtainability would be the
+  crawler inventing a fact — the exact failure this contract exists to prevent.
 
 Each extracted signal is one row with its own evidence, region and buyer type. A
 robot may legitimately be `AVAILABLE` for `PURCHASE` in one region and
@@ -321,9 +369,22 @@ extraction_result
   notes
 ```
 
-Existing `candidate_claim` gains provenance columns (additive, nullable):
-`evidence_excerpt`, `evidence_hash`, `retrieved_at`, `extraction_method`,
-`extraction_confidence`, `crawl_run_id`, `fetched_page_id`.
+Because a claim may need **several** passages (D-7), excerpts are their own rows
+rather than a column — one claim or signal, many excerpts:
+
+```
+discovery_evidence_excerpt
+  id · subject_type (CLAIM | COMMERCIAL_SIGNAL | IMAGE_REF) · subject_id
+  crawl_run_id · fetched_page_id
+  excerpt_text     <= 1000 Unicode characters, enforced by a CHECK
+  page_url · retrieved_at · page_hash
+  locator          selector / XPath / JSON pointer / "offset:START-END"
+  ordinal          stable ordering of the passages behind one claim
+```
+
+Existing `candidate_claim` gains (additive, nullable): `extraction_method`,
+`extraction_confidence`, `extractor_key`, `extractor_version`, `crawl_run_id`,
+`fetched_page_id`. Its evidence lives in the table above.
 
 New `candidate_commercial_signal` — because a commercial signal is not a
 scalar field/value pair and must not be forced into one:
@@ -336,9 +397,9 @@ candidate_commercial_signal
   availability_value availability_status (nullable)
   transaction_type · region_code · buyer_type
   price_type · price_amount · price_currency · billing_period  (all nullable)
-  evidence_url · evidence_excerpt · evidence_hash · retrieved_at
-  extraction_method · extraction_confidence
+  extractor_key · extractor_version · extraction_method · extraction_confidence
   claim_status       NOT_VERIFIED (default; only a human changes it)
+                     evidence: one or more discovery_evidence_excerpt rows
 ```
 
 Conflicting signals from different pages are **preserved as separate rows**
@@ -402,9 +463,17 @@ cannot opt out of etiquette because they never touch the network.
 
 ## 13. Etiquette (implements DATA-D1 §14)
 
-- **Identifiable user agent** naming the platform and a contact URL. The exact
-  string is owner-approved (decision **D-4**) and recorded in the run manifest.
-  Never a browser impersonation string.
+- **Identifiable user agent** *(owner decision D-4, settled)* — this exact
+  string, recorded in every run manifest, never a browser impersonation string:
+
+  ```
+  HumanoidOnlineMarketBot/0.1 (+https://humanoidonline.com/crawler-policy)
+  ```
+
+  **`/crawler-policy` must resolve, and must explain purpose, contact, rate
+  limits and opt-out, before the first product-page fetch.** A contact URL that
+  404s is worse than none: it advertises accountability that does not exist. The
+  page is a prerequisite of slice 2 (§21), not a follow-up.
 - **Conservative, per-host rate limiting**: proposed ≥ 2 s between requests to a
   host, concurrency 1 per host, and a per-run page cap (proposed 200).
 - **Conditional requests** (`If-None-Match` / `If-Modified-Since`) and local
@@ -469,20 +538,22 @@ New enums
   eligibility_decision  ALLOWED | RESTRICTED | PROHIBITED | UNKNOWN
 
 New tables
-  source_eligibility_review     append-only; the §5 record
+  source_eligibility_review     append-only; the §5 record (terms + robots)
   crawl_run                     §7
   fetched_page                  §8   (no body column)
   extraction_result             §9
   candidate_commercial_signal   §9
+  discovery_evidence_excerpt    §9   (<= 1000 chars, CHECK-enforced)
 
 Altered (additive, nullable) — existing behaviour unchanged
-  candidate_claim      + evidence_excerpt, evidence_hash, retrieved_at,
-                         extraction_method, extraction_confidence,
-                         crawl_run_id, fetched_page_id
+  candidate_claim      + extractor_key, extractor_version, extraction_method,
+                         extraction_confidence, crawl_run_id, fetched_page_id
   candidate_image_ref  + page_url, retrieved_at, declared_credit, alt_text,
                          crawl_run_id, fetched_page_id
-  discovery_source     + allowed_path_prefixes, eligibility_expires_at,
-                         last_robots_hash, last_crawled_at
+  discovery_source     + allowed_path_prefixes, tos_reviewed_at,
+                         tos_expires_at (90d), tos_page_hash,
+                         last_robots_hash, last_robots_checked_at (24h max),
+                         last_crawled_at
 ```
 
 ## 17. Operator review path
@@ -536,21 +607,23 @@ protects, printed on every run.
 | Gate | Assertion |
 |---|---|
 | **A** | No request is issued for a source without an approved, unexpired, enabled eligibility review — proven with a fake transport that records every attempt. |
-| **B** | Robots is re-evaluated at run start and per URL; a disallow halts the source and is recorded as `HALTED_BY_POLICY`. |
+| **B** | Robots is re-evaluated at run start and per URL, never answered from a cache older than 24 h; a disallow halts the source, records `HALTED_BY_POLICY` and disables it pending re-review. A terms review older than 90 days, or whose page hash changed, blocks the run. |
 | **C** | No acquisition module can write a canonical table (import-level assertion + a run that ends with `Canonical rows written = 0`). |
-| **D** | The user agent is the approved identifiable string; no browser impersonation string appears anywhere. |
+| **D** | The user agent is exactly `HumanoidOnlineMarketBot/0.1 (+https://humanoidonline.com/crawler-policy)`; no browser impersonation string appears anywhere in the codebase. |
 | **E** | Per-host rate limit and per-run page cap are honoured under a simulated fast source. |
 | **F** | Conditional requests are issued when validators exist; unchanged pages are not re-extracted. |
 | **G** | Retries are bounded, never applied to 4xx or to blocks, and backoff increases. |
 | **H** | A killed run resumes without re-fetching successfully fetched URLs, and links to its parent. |
 | **I** | Fixture replay of a recorded run produces byte-identical extraction output. |
-| **J** | Every persisted claim and signal has `source_url`, `evidence_excerpt`, `retrieved_at` and a confidence; one without is rejected at write time. |
+| **J** | Every persisted claim and signal has **at least one** evidence excerpt carrying page URL, `retrieved_at`, page hash and locator, plus a confidence; one without is rejected at write time. No excerpt exceeds 1000 Unicode characters (CHECK-enforced, tested with a multi-byte string so the limit is characters, not bytes). |
 | **K** | No merged status label exists: a maturity signal never sets availability, and `ANNOUNCED` never produces `NOT_AVAILABLE`. |
 | **L** | `UNKNOWN` is preserved end to end; `QUOTE_ONLY` never degrades to `UNKNOWN`. |
 | **M** | No image binary is stored anywhere; image rows carry retrieval provenance and no MEDIA-01 verdict. |
 | **N** | No page body column exists in any table; the on-disk cache is outside the database and outside the build context. |
 | **O** | The public API and all machine surfaces expose nothing from the new tables (extends DATA-D1 Gate I / AGENT-01.7). |
 | **P** | The test suite makes no network request (asserted by a transport guard active in CI). |
+| **Q** | The cache is content-addressed under `var/discovery/cache/`, git-ignored, excluded from the Docker build context, and enforces 90-day / 30-day retention — while manifests, hashes, excerpts and provenance survive cache expiry (proven by expiring a cache entry and re-reading the claim's evidence). |
+| **R** | `/crawler-policy` resolves and is non-empty before the first product-page fetch; slice 2 cannot run without it. |
 
 ## 20. Non-goals (v0.1)
 
@@ -564,8 +637,22 @@ a separate slice) · no more than three adapters.
 
 ## 21. Build sequence (on ratification)
 
-1. **Eligibility first.** Review the first source; nothing else may start
-   without it. (Owner + reviewer, no code.)
+**Execution model (owner-directed).** This workstream runs **in parallel with
+WS8.8 / WS8.9**, on isolated branches or worktrees. It does **not** enter or
+alter the WS8 release train — WS8-L1 forbids new product capability inside a
+release-hardening slice, and nothing here may appear in the MVP v0.1 release
+candidate.
+
+0. **Eligibility assessment (authorized now, read-only).** For the three
+   approved sources, fetch **only** `robots.txt`, terms of use, legal /
+   acceptable-use pages, and crawler-policy documents linked from those pages.
+   Record exact URLs, retrieval timestamps, HTTP status, hashes, relevant
+   excerpts and a provisional `ALLOWED / DISALLOWED / UNCLEAR` recommendation.
+   **This authorization does not extend to product pages, adapters, network
+   ingestion, database writes, or declaring any source eligible** — eligibility
+   remains an owner decision on the evidence.
+1. **Eligibility approval.** The owner accepts or rejects each assessment.
+   Nothing below may start for a source without an affirmative decision.
 2. **Slice 1 — infrastructure, no adapters.** Schema `0004`, fetcher with
    robots/rate/cache/retry/kill switch, crawl-run + report, CLI, gates A–H,
    N, P. Provable end to end against a **local fake server**, not the internet.
@@ -579,26 +666,31 @@ a separate slice) · no more than three adapters.
 Each slice is a separate PR under the existing ritual (branch from main →
 in-scope build → exact-head CI green → Draft PR → owner review).
 
-## 22. Open decisions for the owner
+## 22. Owner decisions — SETTLED (2026-07-29)
 
-| # | Decision | Recommendation |
-|---|---|---|
-| **D-1** | Where `RESEARCH_ONLY` lives | Map to `PROTOTYPE`/`DEVELOPMENT` + buyer-type restriction. Do not grow the canonical enum for a crawler. |
-| **D-2** | Eligibility review validity period | 180 days, re-review on expiry or on any robots hash change. |
-| **D-3** | Page cache location and retention | `./.crawl-cache/` (git-ignored, outside the build context), 30 days. |
-| **D-4** | Exact user-agent string | `HumanoidOnlineBot/0.1 (+https://humanoidonline.com/bot)` — owner approves the wording and the contact URL must resolve before first use. |
-| **D-5** | The first three sources | See §23. |
-| **D-6** | May extraction confidence ever auto-verify? | **No.** Recommend freezing LIVE.8 as written. |
-| **D-7** | Evidence excerpt maximum length | 600 characters, enough to justify a claim, far short of a page copy. |
+All seven were decided by the product owner before this contract was opened for
+review, and are folded into the sections named below. They are settled inputs to
+ratification, not open questions.
 
-## 23. Recommended first-source shortlist
+| # | Decision | Settled as | In |
+|---|---|---|---|
+| **D-1** | `RESEARCH_ONLY` | Discovery classification only, never a canonical enum value. `maturity = DEVELOPMENT` **only with explicit evidence**; availability and transaction stay `UNKNOWN`; buyer/access restriction written only when explicitly stated. **Never infer `NOT_AVAILABLE`.** | §6 |
+| **D-2** | Eligibility validity | Terms: **90 days**, invalidated immediately on material URL/content-hash change. `robots.txt`: **evaluated every run**, ≤ 24 h cache; a new restrictive rule disables the source until re-reviewed. | §5, LIVE.2 |
+| **D-3** | Cache | `var/discovery/cache/`, git-ignored, **SHA-256 content-addressed**. Successful bodies **90 d**, failed/blocked **30 d**; manifests, page hashes, evidence excerpts and provenance **indefinite**. | LIVE.10 |
+| **D-4** | User agent | `HumanoidOnlineMarketBot/0.1 (+https://humanoidonline.com/crawler-policy)` — the policy page must resolve and explain purpose, contact, rate limits and opt-out **before the first product-page fetch**. | §13 |
+| **D-5** | First sources | **1. Unitree Robotics → 2. Agility Robotics → 3. Engineered Arts**, each subject to affirmative eligibility. | §23 |
+| **D-6** | Extraction confidence | **Never auto-verifies.** May prioritise review or reject its own low-confidence output; may never set `VERIFIED`, alter canonical confidence, or bypass human promotion. | LIVE.8 |
+| **D-7** | Evidence excerpts | **≤ 1000 Unicode characters each**, multiple excerpts per claim permitted; each carries page URL, retrieval time, page hash and locator/offsets. | LIVE.6, §9 |
 
-**No robots.txt or terms page has been fetched for any of these.** They are
-recommendations for *which reviews to perform first*, chosen so the first three
-adapters exercise three genuinely different commercial shapes rather than three
-variations of one.
+## 23. First sources — APPROVED ORDER (D-5)
 
-| # | Source | Why first | What it exercises |
+**Approval of this order authorizes the eligibility ASSESSMENT only.** No source
+is eligible until its review returns an affirmative terms decision and a
+non-disallowing robots policy, recorded and attributed (§5). The order is chosen
+so the first three adapters exercise three genuinely different commercial shapes
+rather than three variations of one.
+
+| # | Source | Why in this order | What it exercises |
 |---|---|---|---|
 | **1** | **Unitree Robotics** — official site + official store | Already canonical in our catalogue (G1 at `$13,500 PUBLIC`, H1 `QUOTE_ONLY`), so identity matching has something real to match, and extraction can be checked against a fact we already verified by hand | `PUBLIC` price · `PURCHASE` availability · spec extraction · **regression against known truth** |
 | **2** | **Agility Robotics** — official site + press room | Digit is canonical with `RAAS_DEPLOYMENT` maturity and *no* price data — the case where a naive crawler invents a number or writes `NOT_AVAILABLE` | `RAAS` / deployment language · maturity vs obtainability separation · **UNKNOWN preservation** |
@@ -621,8 +713,14 @@ find it.
 STATUS:                     DRAFT — NOT RATIFIED
 Ratified by:                ____________________  (product owner)
 Date:                       ____________________
-Decisions D-1 … D-7 set:    ____________________
-First source approved:      ____________________  (separate from ratification)
+
+Decisions D-1 … D-7:        SETTLED by the product owner, 2026-07-29 (§22)
+First-source ORDER:         APPROVED — Unitree -> Agility -> Engineered Arts
+Eligibility ASSESSMENT:     AUTHORIZED (read-only: robots.txt, terms, legal /
+                            acceptable-use, linked crawler-policy documents)
+Source ELIGIBILITY:         NOT granted for any source — owner decision on the
+                            assessment evidence, per source, still required
+Product-page crawling:      NOT authorized
 ```
 
 Ratification freezes **principles**, not implementation, and authorizes the

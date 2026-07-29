@@ -236,6 +236,36 @@ a human as a lead. A lead may still point at an official URL, and the platform
 traces to that official URL directly — acquiring it does not make the
 aggregator's *page* the trace.
 
+**Where third-party sources sit in the pipeline** — they enter at RADAR, and
+every downstream stage is unchanged from the ratified DATA-D1 architecture:
+
+```
+  aggregator / directory / marketplace / editorial   ← eligible, §5-reviewed
+                        │
+                        ▼
+        robot, manufacturer or CHANGE discovered      ← the value they add
+                        │
+                        ▼
+              discovery candidate created             ← §11 identity resolution
+                        │
+                        ▼
+         official source traced where possible        ← §11.1 / DATA-D1 P2
+                        │                               (an official trace is
+                        │                                REQUIRED when an
+                        ▼                                official source exists)
+            claims verified INDIVIDUALLY              ← per claim, by a human;
+                        │                                never per candidate,
+                        ▼                                never in bulk
+                  human promotion                     ← DATA-D1 §18, unchanged
+```
+
+Two properties of that pipeline are what make aggregator acquisition safe rather
+than contaminating: the trace stage forces the platform *back* to an official
+source before anything is promotable, and verification is **per claim** — so a
+candidate discovered by an aggregator can be promoted with three manufacturer-
+verified facts and eleven still-unverified aggregator claims attached, and the
+catalogue shows only the three.
+
 *Why not official-only, as originally drafted:* the evidence hierarchy
 (`docs/11` §4, and §4.2 below) already ranks manufacturer sources above
 aggregators — that ranking is exactly what makes it **safe** to acquire from
@@ -664,6 +694,38 @@ Existing `candidate_claim` gains (additive, nullable): `extraction_method`,
 `extraction_confidence`, `extractor_key`, `extractor_version`, `crawl_run_id`,
 `fetched_page_id`. Its evidence lives in the table above.
 
+### 9.1 Claim-level provenance is per claim, and never blended
+
+Multi-source acquisition makes this load-bearing. **Every claim carries its own
+source identity**, and no operation anywhere in the system merges claims from
+different sources into one unattributed record.
+
+The anchor already exists: `candidate_claim.discovery_source_id` (shipped in
+migration `0003`) is a FK to `discovery_source`, which carries
+`source_class` — so every claim resolves to exactly one classified source, and
+`candidate_commercial_signal` (§9) and `discovery_evidence_excerpt` (§9) carry
+the same FK for the same reason. The class is therefore never *stored on* the
+claim redundantly; it is *always derivable from* the claim, which is what makes
+the following invariants assertable rather than aspirational:
+
+- **One claim, one source.** A claim row is never written from two sources'
+  evidence combined. Two sources asserting the same value produce **two rows**
+  (§6.1), which is what allows corroboration to be *counted* without being
+  *merged*.
+- **No unattributed claim.** A claim without a resolvable
+  `discovery_source_id` — and therefore without a `source_class` — is rejected
+  at write time. There is no "unknown source" fallback that would let
+  provenance be dropped for convenience.
+- **No re-classification by promotion.** Promoting a candidate does not
+  retroactively upgrade the class of the claims behind it. An aggregator claim
+  that a human independently verified against a manufacturer page results in a
+  *new* manufacturer-class claim plus the original aggregator claim, both
+  retained — never one row whose class was quietly rewritten.
+- **Display and API surfaces carry the class or carry nothing.** Any operator
+  surface that shows a claim shows which class it came from (§17). Stripping
+  provenance for presentation is how "an aggregator said so" silently becomes
+  "HumanoidOnline says so".
+
 New `candidate_commercial_signal` — because a commercial signal is not a
 scalar field/value pair and must not be forced into one:
 
@@ -1016,6 +1078,7 @@ protects, printed on every run.
 | **U** | *(multi-source, §10)* An aggregator- or marketplace-retrieved image is recorded with `retrieval_source_class` matching where it was actually seen, never `MANUFACTURER`, even when its claimed credit line names one. |
 | **V** | *(`MANUAL_BOOTSTRAP`, §2.1)* A manually recorded claim carries the same evidence shape as an automated one — excerpt, URL or document identifier, retrieved-at, `extraction_method = MANUAL` — and is rejected at write time if any is missing; it is discovery-layer-only, identically to Gate C. |
 | **W** | *(promotion trace, §11.1)* When an official-class (`MANUFACTURER` / `AUTHORIZED_DISTRIBUTOR` / `OFFICIAL_STORE`) source exists for an entity, promotion is refused unless the recorded trace (DATA-D1 P2) is to one of those classes — an aggregator-only trace does not satisfy P2 for that entity. |
+| **X** | *(claim provenance, §9.1)* Every claim, commercial signal and evidence excerpt resolves to exactly one classified source; a write without a resolvable `discovery_source_id` is rejected. Two sources asserting the same value produce two rows, never one merged row, and promotion never rewrites the class of an existing claim. |
 
 ## 20. Non-goals (v0.1)
 

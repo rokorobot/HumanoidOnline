@@ -1,20 +1,27 @@
 # DATA-D1.LIVE — Live Market Acquisition Contract
 
-> **STATUS: DRAFT — NOT RATIFIED. NOTHING IMPLEMENTED. NO NETWORK ACCESS HAS
-> OCCURRED.**
+> **STATUS: RATIFIED v0.1 — 2026-07-29, Robert Konecny (product owner).**
 >
-> This document is a proposal for owner review. No live adapter exists, no
-> robots.txt or terms page has been fetched for any candidate source, and no
-> code in this repository performs an outbound HTTP request to a manufacturer.
-> The discovery layer that exists today (`docs/11`, merged at `3dca8cc`) is
-> **fixture-only**.
+> **Implementation authorized: Slice A only** (schema + models + tests, §21).
+> **Per-source crawling authorization: none.**
 >
-> **Two separate approvals are required before any live fetch:**
-> 1. ratification of this contract, and
-> 2. an approved, attributed **per-source eligibility review** (§5) for each
->    individual source.
+> Ratification is **not** permission to fetch any product page automatically.
+> Two separate approvals are required before any live fetch, and only the first
+> of them has been given:
+> 1. ✅ ratification of this contract;
+> 2. ⬜ an approved, attributed **per-source eligibility review** (§5) — held by
+>    **no source**.
 >
-> Ratifying this contract does **not** authorize a crawl of any particular site.
+> **Factual standing (2026-07-29):**
+> - The first read-only eligibility assessment **was completed** on 2026-07-29,
+>   covering `robots.txt`, terms, legal / acceptable-use pages and the sitemaps
+>   needed to locate them, across fourteen hosts.
+> - **No manufacturer product page was fetched.**
+> - **No live adapter was executed.**
+> - **No discovery or canonical database row was written.**
+>
+> No live adapter exists, and the discovery layer shipped today (`docs/11`,
+> merged at `3dca8cc`) remains **fixture-only**.
 
 ---
 
@@ -106,9 +113,17 @@ are radar only · no direct crawler writes to canonical.
 
 **In scope (v0.1):**
 
-- an adapter framework for **official manufacturer sources**
-- a per-source eligibility review record, and the refusal that depends on it
-- a manually executed, local, resumable crawl with a full run report
+- an adapter framework for **official manufacturer sources first**, extensible
+  to eligible aggregators, directories, marketplaces and editorial sources once
+  each individually clears its own eligibility review (§4 amendment, below)
+- a per-source eligibility review record, and the refusal that depends on it —
+  identical discipline regardless of source class
+- **two acquisition modes** (§2.1): `AUTOMATED_LIVE` (adapter-driven, eligibility
+  gated) and `MANUAL_BOOTSTRAP` (a named human reading a source or reviewing
+  manufacturer-supplied material — no automated traversal, no eligibility review
+  required, same evidence and promotion discipline)
+- a manually executed, local, resumable crawl with a full run report (for
+  `AUTOMATED_LIVE`)
 - extraction of specification claims, commercial signals and image *references*,
   each bound to evidence
 - deterministic identity resolution and deduplication against the existing
@@ -116,22 +131,116 @@ are radar only · no direct crawler writes to canonical.
 - operator review through the **existing** SQLAdmin views and CLI
 
 **Explicitly out of scope (v0.1):** see §20. In particular: no scheduler, no
-crawler VPS, no headless browser, no third-party directory fetching, no
-canonical writes, no image binaries, no Operations Workbench.
+crawler VPS, no headless browser, no automated fetch of any source (official or
+otherwise) without a passed eligibility review, no canonical writes, no image
+binaries, no Operations Workbench.
+
+### 2.1 Acquisition modes
+
+Two modes reach the same destination — the discovery layer, then human
+promotion — by different, non-overlapping means. Neither is a shortcut around
+the other's discipline.
+
+```
+AUTOMATED_LIVE
+  performed by            an adapter (§12), over HTTP, from a named human's
+                           local machine (LIVE.4)
+  requires                an affirmative, unexpired, attributed per-source
+                           eligibility review (§5) — LIVE.2, no exceptions
+  governed by              etiquette (§13): rate limits, robots re-check every
+                           run, identifiable UA, bounded retries, kill switch
+  produces                 crawl_run / fetched_page / extraction_result rows,
+                           evidence excerpts with a locator (§7-§9)
+  evidence granularity      systematic — a defined page set, run to run
+
+MANUAL_BOOTSTRAP
+  performed by             a named human reading a source directly, or
+                           reviewing material supplied to us — no HTTP client,
+                           no adapter, no automated traversal of any kind
+  requires                 nothing beyond LIVE.6 (evidence) and LIVE.9
+                           (imagery) — see "why no eligibility review" below
+  governed by               the SAME evidence discipline as AUTOMATED_LIVE:
+                           exact excerpts ≤ 1000 chars (LIVE.6), the official
+                           URL or document identifier, retrieval timestamp,
+                           image REFERENCES only (LIVE.9), discovery-layer
+                           writes only (LIVE.5), human verification and
+                           promotion still required (LIVE.8, DATA-D1 §18)
+  produces                 the SAME discovery rows AUTOMATED_LIVE would,
+                           attributed to the human who entered them
+                           (extraction_method = MANUAL)
+  evidence granularity      opportunistic — one robot, one fact, one session
+```
+
+**Why `MANUAL_BOOTSTRAP` needs no per-source eligibility review.** LIVE.2 and
+DATA-D1.9 gate *automated access* — a program issuing requests at a rate and
+pattern a human does not. A person opening a public product page in a browser
+and typing what they read into a form is the same act that built the existing
+7-robot catalogue, and no terms-of-service reviewed during the first
+eligibility assessment (§ eligibility reports) prohibits a *human* from reading
+a public page. The line is not "official site vs. not" — it is **automated vs.
+manual**. The moment any part of the fetch, navigation or extraction is
+performed by code rather than a person, the activity is `AUTOMATED_LIVE` and
+LIVE.2 applies without exception, in full.
+
+**Authorized `MANUAL_BOOTSTRAP` evidence sources:**
+
+- a public official page, opened and read by a human;
+- **manufacturer-supplied evidence**, provided directly to HumanoidOnline by the
+  manufacturer or an authorized representative: datasheets, press kits,
+  catalogue exports, emails, official PDFs, price lists, partner feeds, API
+  exports. Provenance is recorded as `MANUFACTURER_SUPPLIED`, distinct from a
+  page the human retrieved themselves, because its evidence URL may be absent —
+  the sender and the transmission are the provenance instead.
+
+**Why this matters now.** `MANUAL_BOOTSTRAP` is how the general humanoid
+inventory grows **immediately**, independent of per-source automated-access
+permission. Permission negotiations (§23) and adapter development (Slice B/C,
+§21) proceed in parallel, on their own timeline, without blocking inventory
+growth on anyone else's response time.
 
 ## 3. Laws (frozen on ratification)
 
-### LIVE.1 — Official-first
-The live crawler fetches **official manufacturer sources only**: the
-manufacturer's own product pages, catalogue/store pages, specification
-documents, press room and official documentation. Third-party directories,
-marketplaces, aggregators and competitor databases remain **radar leads** under
-DATA-D1.1 and are **not fetched** by the live crawler in v0.1. A lead may point
-at an official URL; the crawler visits the official URL, not the lead.
+### LIVE.1 — Official-first, multi-source radar *(amended 2026-07-29)*
+Manufacturer sources remain the **preferred evidence authority** — nothing below
+demotes them. But manufacturer sites alone will miss robots not yet on our
+radar, model and manufacturer aliases, regional listings, discontinued models,
+price changes, and companies whose own web presence is thin. Restricting
+acquisition to official sources only would make the platform blind to exactly
+the market movement it exists to track.
 
-*Why:* the evidence hierarchy (`docs/11` §4) already says manufacturer sources
-outrank aggregators. Fetching aggregators first would optimise for volume of
-claims we cannot promote.
+**Eligible** aggregators, directories, marketplaces and editorial sources —
+individually reviewed and enabled under §5, on identical terms to a manufacturer
+site — may be acquired to:
+
+- discover candidates for robots or manufacturers not yet in our catalogue;
+- propose manufacturer/model **aliases** and identity links for a human to
+  confirm (§11);
+- add evidence-bound specification and commercial **claims**, carrying their own
+  source classification (§4);
+- surface **conflicts** between sources and **changes** since the last
+  observation;
+- provide **links to official sources**, which the platform then traces to
+  directly — a lead is never treated as the trace itself (DATA-D1 §9, H2).
+
+**Third-party evidence may never**: independently set a claim `VERIFIED`
+(LIVE.8 unchanged) · write a canonical row (LIVE.5 unchanged) · override a
+conflicting manufacturer claim (§6.1) · infer availability, maturity, image
+rights or official status (LIVE.7, LIVE.9 unchanged) · bypass human promotion
+(DATA-D1 §18 unchanged).
+
+This is **radar**, not a second evidence tier with equal standing: DATA-D1.1
+("competitors are discovery sources only") governs every non-manufacturer class
+exactly as before. What changes is that those sources may now be **acquired
+directly** (subject to their own eligibility review) rather than only entered by
+a human as a lead. A lead may still point at an official URL, and the platform
+traces to that official URL directly — acquiring it does not make the
+aggregator's *page* the trace.
+
+*Why not official-only, as originally drafted:* the evidence hierarchy
+(`docs/11` §4, and §4.2 below) already ranks manufacturer sources above
+aggregators — that ranking is exactly what makes it **safe** to acquire from
+aggregators too. Rank determines what a claim is worth, not whether it may be
+recorded.
 
 ### LIVE.2 — Eligibility precedes contact
 No HTTP request may be issued to a host until that source has an **approved
@@ -271,18 +380,74 @@ versions) and a **report** (§18). Runs are **resumable** without re-fetching wh
 succeeded. Replaying a run against recorded fixtures produces **identical**
 extraction output — that is what makes extraction changes reviewable.
 
-## 4. Source classes
+## 4. Source classes *(amended 2026-07-29 — official-first, multi-source radar)*
 
 | Class | v0.1 fetch? | Role |
 |---|---|---|
-| `OFFICIAL_MANUFACTURER` | **yes**, after eligibility | primary and only live source |
-| `OFFICIAL_STORE` (manufacturer-operated storefront) | **yes**, after eligibility | price / obtainability evidence |
-| `OFFICIAL_PRESS` (manufacturer press room) | **yes**, after eligibility | maturity / announcement evidence |
-| `DIRECTORY` / `AGGREGATOR` / `COMPETITOR` | **no** | radar leads only (DATA-D1.1) |
-| `NEWS` / `EDITORIAL` | **no** | may be recorded as a human-entered lead |
+| `MANUFACTURER` (site, store, press room, documentation) | **yes**, after eligibility | preferred evidence authority |
+| `AUTHORIZED_DISTRIBUTOR` | **yes**, after eligibility | price / obtainability, second-tier authority |
+| `OFFICIAL_STORE` (manufacturer-operated storefront, if distinct from the site) | **yes**, after eligibility | price / obtainability evidence |
+| `AGGREGATOR` (specialist humanoid-robot directory) | **yes**, after **its own** eligibility | discovery, aliases, cross-source conflict signal |
+| `MARKETPLACE` | **yes**, after **its own** eligibility | commercial / regional availability signal |
+| `EDITORIAL` / `NEWS` / `PRESS_RELEASE` | **yes**, after **its own** eligibility | maturity, announcement and change signal |
+| `COMMUNITY` (forums, social posts) | **no** — lead only | too unreliable to acquire; a human may still enter a lead |
+| `UNKNOWN` | **no** | unclassified; must be classified before any review can pass |
 
-Adding a class to the fetchable set is a contract amendment, not a
-configuration change.
+**Eligibility is per-host, not per-class.** A class being *fetchable in
+principle* is not a source being *eligible in fact* — every individual host,
+manufacturer or aggregator alike, still needs its own passed review under §5
+before a single request is issued (LIVE.2 unchanged). Nothing in this table
+grants access to any specific site; §23 records what has actually been
+reviewed, and as of ratification that is **zero** sources.
+
+Adding an entirely new *class* (one not listed above) to the fetchable set is a
+contract amendment. Reviewing and enabling a *specific site* within an existing
+class is an ordinary §5 procedure, not a contract change.
+
+### 4.1 What each class may do
+
+The eligibility gate controls *whether a source may be fetched at all*. This
+table controls *what its evidence may become* once fetched or entered —
+identical for `AUTOMATED_LIVE` and `MANUAL_BOOTSTRAP` — and is the more
+important one, because it is what actually protects the catalogue.
+
+| Source class | Create candidate | Add claims | Verify a claim | Canonical write |
+|---|---|---|---|---|
+| `MANUFACTURER` | Yes | Yes | Human only (promotion) | Promotion only |
+| `AUTHORIZED_DISTRIBUTOR` | Yes | Yes | Human only (promotion) | Promotion only |
+| `OFFICIAL_STORE` | Yes | Yes | Human only (promotion) | Promotion only |
+| `AGGREGATOR` | Yes | Yes | **Never automatic** | **Never** |
+| `MARKETPLACE` | Yes | Yes | **Never automatic** | **Never** |
+| `EDITORIAL` / `NEWS` / `PRESS_RELEASE` | Yes | Yes | **Never automatic** | **Never** |
+| `COMMUNITY` | Lead only | Limited (a human-entered lead, not a structured claim) | No | Never |
+
+No class ever writes canonical rows directly — that column exists to make the
+asymmetry visible, not to imply an official source gets one. **Every** class's
+path to canonical truth is the same human promotion gate (DATA-D1 §18); what
+differs is which classes may set `claim_status = VERIFIED` en route to it, and
+the answer for every non-manufacturer class is **none, ever, automatically**.
+
+### 4.2 Evidence hierarchy
+
+Extends `docs/11` §4 with the classes this amendment introduces. Rank affects
+**conflict resolution** (§6.1) and **review priority**, never automatic
+verification — verification stays human at every rank.
+
+```
+1. Manufacturer product page or official datasheet
+2. Manufacturer store, press room or documentation
+3. Authorized distributor or partner feed
+4. Reputable specialist aggregator
+5. Marketplace listing
+6. News / editorial source
+7. Community or social post          (lead only — never a structured claim)
+```
+
+An `AGGREGATOR`-only claim may enter the discovery database and stay useful and
+visible to an operator while it waits — it is never silently discarded — but it
+remains, always: `claim_status = NOT_VERIFIED`, `source_class = AGGREGATOR` (or
+whichever class it came from, preserved on the claim, never collapsed into an
+unattributed record), and it contributes **zero** canonical rows on its own.
 
 ## 5. Source eligibility review
 
@@ -307,6 +472,32 @@ audited and re-reviewed rather than silently overwritten.
 decision, with robots `ALLOWED`/`NOT_APPLICABLE`, an attributed and unexpired
 review, and an explicit enable, means **the source is not fetched**. Silence is
 not permission (DATA-D1.9).
+
+**Applies identically to every source class.** An aggregator, a marketplace or
+an editorial outlet is reviewed by the exact same procedure as a manufacturer —
+there is no lighter-touch path for "just a directory". The first eligibility
+assessment (§ eligibility reports, 2026-07-29) found the opposite of what
+intuition might suggest: official manufacturer sites had the *more* restrictive
+terms of the sources checked. Source class predicts nothing about eligibility;
+only reading the actual terms does.
+
+**Preferred acquisition mechanisms.** Before assuming a source must be crawled
+at all, check for a mechanism that makes the question moot — this applies with
+particular force to aggregators, who are often easier to work with than
+manufacturers precisely because indexing is closer to their business model:
+
+```
+a public API                          preferred over crawling entirely
+an RSS / Atom feed
+a downloadable CSV / JSON export
+a licensed dataset
+a partner feed
+explicit, written indexing permission
+```
+
+Any of these, once its own terms are reviewed under this same procedure,
+**outranks** building or running an adapter against rendered pages — less
+fragile, lower load on the source, and usually a clearer permission story.
 
 ## 6. Commercial state: the mapping that keeps the axes apart
 
@@ -357,6 +548,50 @@ Each extracted signal is one row with its own evidence, region and buyer type. A
 robot may legitimately be `AVAILABLE` for `PURCHASE` in one region and
 `ON_REQUEST` elsewhere; a single label cannot express that, which is precisely
 why the axes are separate.
+
+### 6.1 Conflicting evidence *(added 2026-07-29 — multi-source amendment)*
+
+Multi-source acquisition means the same field can now arrive with different
+values from different sources on the same run. **The system must not average,
+and must not simply take the majority value.** Concretely:
+
+```
+Manufacturer reports    payload = 30 kg
+Aggregator A reports    payload = 35 kg
+Aggregator B reports    payload = 30 kg
+
+Result:
+  30 kg   → the preferred candidate value (rank 1 in §4.2, and corroborated)
+  35 kg   → PRESERVED as a conflicting claim, not deleted, not overwritten
+  —       → flagged for human review
+```
+
+Both rows survive (DATA-D1.8, unchanged). **Cross-source agreement raises
+review priority — it never raises confidence, and it never verifies anything**
+(DATA-D1 §16, LIVE.8). Two aggregators agreeing with each other is worth a
+human's attention sooner; it is not evidence of the fact being true. The
+preferred value is read off the evidence hierarchy (§4.2) by the *human*
+reviewer — the system surfaces the ranking, it does not resolve the conflict for
+them.
+
+### 6.2 Pricing and availability need special handling
+
+A price or availability signal from an aggregator is often genuinely useful for
+*discovery* and routinely wrong for *fact*. It may be outdated, regional,
+distributor-specific, exclusive or inclusive of shipping and tax inconsistently
+with our convention, a deposit rather than the full price, an analyst estimate
+presented as fact, a rental or monthly RaaS figure mislabeled as a purchase
+price, or simply the launch price of a since-discontinued configuration. None of
+that makes the signal worthless — it makes it a **lead requiring the full
+`candidate_commercial_signal` shape** (§9) before it means anything:
+`price_type`, `price_amount`, `currency`, `region_code`, `buyer_type`,
+`transaction_type`, its evidence excerpt, retrieval date and `claim_status`.
+
+**An aggregator stating "available" must never automatically become canonical
+`AVAILABLE`.** It becomes a `candidate_commercial_signal` row with
+`claim_status = NOT_VERIFIED` and `source_class = AGGREGATOR`, exactly like any
+other unverified claim — §6.1's conflict handling and §4.1's "never automatic"
+rule apply to it without exception.
 
 ## 7. Crawl run model
 
@@ -452,13 +687,37 @@ Conflicting signals from different pages are **preserved as separate rows**
 
 `candidate_image_ref` gains: `page_url` (where it was seen), `retrieved_at`,
 `declared_credit` (the credit line as printed), `alt_text`, `crawl_run_id`,
-`fetched_page_id`. It keeps `media_status = 'CANDIDATE'`.
+`fetched_page_id`, and — for the multi-source amendment —
+**`retrieval_source_class`** (the `discovery_source_class`, §4, of the page the
+image was actually seen on) and **`attribution_claimed`** (the credit text
+exactly as printed, kept separate from any verified attribution). It keeps
+`media_status = 'CANDIDATE'`.
 
-The extractor sets **no** MEDIA-01 field. Promotion of an image to `robot_image`
-remains a human MEDIA-01 evaluation: exact-model identity, rights status, usage
-basis, attribution. For robots already in the catalogue with a verified image,
-acquisition may propose *additional* references; it may never replace or
-generate one (MEDIA-01 frozen law).
+**Retrieval provenance, not original provenance.** An image found on an
+aggregator is `retrieval_source_class = AGGREGATOR`, in accordance with the
+existing Figure 02 precedent (an image credited to an OEM but retrieved from an
+editorial page is recorded as `EDITORIAL` retrieval, never `MANUFACTURER`) —
+even when the aggregator's own credit line names the manufacturer. Credit is a
+*claim*, recorded in `attribution_claimed`; it is not itself proof. Until a
+human MEDIA-01 review establishes otherwise, an aggregator-retrieved image
+carries:
+
+```
+retrieval_source_class = AGGREGATOR (or MARKETPLACE / EDITORIAL, as retrieved)
+attribution_claimed     = the credit line as printed, unverified
+is_official              UNKNOWN  ← MEDIA-01 field, never set by the extractor
+rights_status            UNKNOWN  ← MEDIA-01 field, never set by the extractor
+usage_basis               NONE    ← pending MEDIA-01 review, never inferred
+```
+
+The extractor sets **no** MEDIA-01 field, from any source class. Promotion of an
+image to `robot_image` remains a human MEDIA-01 evaluation: exact-model
+identity, rights status, usage basis, attribution. For robots already in the
+catalogue with a verified image, acquisition may propose *additional*
+references from any eligible source; it may never replace or generate one
+(MEDIA-01 frozen law) — and an image originally from a manufacturer does not
+retroactively become manufacturer-provenance because it was *retrieved* via an
+aggregator. Retrieval path is the provenance that is recorded, full stop.
 
 ## 11. Identity resolution and deduplication
 
@@ -476,6 +735,29 @@ evidence-aware. Additions for live acquisition:
   is `AMBIGUOUS` for a human, never a guess.
 - **Variant discipline.** "G1 EDU" vs "G1" is a variant question a human
   decides; the extractor records both strings verbatim and does not merge them.
+- **Aliases are proposals, not merges.** An aggregator naming a robot
+  differently from our canonical name (a regional name, an older model name, a
+  colloquial name) is recorded as a *proposed alias* on the candidate, never
+  used to silently fold two candidates into one. A human confirms an alias
+  exactly as they confirm any other identity decision (DATA-D1.6).
+
+### 11.1 Promotion still requires an official trace when one exists
+
+Multi-source acquisition makes this explicit rather than incidental: DATA-D1's
+promotion gate P2 already requires a **confirmed authoritative trace**
+(`record_trace`, never inferred from a lead — H2) before promotion. This
+contract adds nothing to that mechanism; it states the consequence plainly so
+an aggregator-rich candidate is never mistaken for an official-source one.
+
+**When an official-class source exists for an entity** — `MANUFACTURER`,
+`AUTHORIZED_DISTRIBUTOR` or `OFFICIAL_STORE` — **the recorded trace must be to
+one of those classes.** A candidate that has accumulated ten corroborating
+aggregator claims and zero official ones is not closer to promotable than a
+candidate with none; it is exactly as far, because P2 is not a vote count. Where
+no official source exists at all (a very new company, a market with only
+aggregator coverage), a human may still trace to the best available source —
+that judgment call belongs to the human reviewer at promotion time, not to the
+acquisition layer.
 
 ## 12. Adapter interface
 
@@ -486,7 +768,12 @@ Extends the existing `SourceAdapter` protocol rather than replacing it, so
 class LiveSourceAdapter(Protocol):
     key: str                    # stable identifier, e.g. "unitree-official"
     version: str                # bump ⇒ re-extraction is meaningful
-    source_class: str           # OFFICIAL_MANUFACTURER | OFFICIAL_STORE | OFFICIAL_PRESS
+    source_class: str           # any §4 class — MANUFACTURER, AUTHORIZED_DISTRIBUTOR,
+                                 # OFFICIAL_STORE, AGGREGATOR, MARKETPLACE, EDITORIAL —
+                                 # the class does not change the adapter's obligations;
+                                 # §4.1's "never automatic" rule is enforced downstream
+                                 # of extract(), by claim_status defaults, not by the
+                                 # adapter self-reporting trust
     allowed_path_prefixes: tuple[str, ...]   # exactly what the review covered
 
     def plan(self, session, source) -> list[PlannedFetch]:
@@ -516,7 +803,7 @@ cannot opt out of etiquette because they never touch the network.
   **`/crawler-policy` must resolve, and must explain purpose, contact, rate
   limits and opt-out, before the first product-page fetch.** A contact URL that
   404s is worse than none: it advertises accountability that does not exist. The
-  page is a prerequisite of slice 2 (§21), not a follow-up.
+  page is a prerequisite of Slice B (§21), not a follow-up.
 - **Conservative, per-host rate limiting**: proposed ≥ 2 s between requests to a
   host, concurrency 1 per host, and a per-run page cap (proposed 200).
 - **Conditional requests** (`If-None-Match` / `If-Modified-Since`) and local
@@ -543,6 +830,14 @@ python -m app.cli.discovery crawl <key> --operator "…" [--limit N] [--dry-run]
 python -m app.cli.discovery crawl <key> --resume <run-id> --operator "…"
 python -m app.cli.discovery crawl <key> --fixtures <dir>   # replay, no network
 
+# manual bootstrap (§2.1) — NO network call is made by this command; the human
+# has already read the source, and is entering what they found
+python -m app.cli.discovery record-manual <candidate-key-or-"new"> \
+    --source-url … | --source-kind MANUFACTURER_SUPPLIED --evidence-file … \
+    --entered-by "…" --retrieved-at … \
+    --claim field=<key> value=<v> --excerpt "<= 1000 chars, exact>" \
+    --image-ref <url> --credited-to "…"
+
 # review
 python -m app.cli.discovery report <run-id>                # the §18 report
 python -m app.cli.discovery candidates --status READY_FOR_PROMOTION
@@ -550,7 +845,9 @@ python -m app.cli.promote_candidate <candidate-id> --show | --approve …
 ```
 
 `--dry-run` performs the robots evaluation and prints exactly what *would* be
-requested, without issuing a request.
+requested, without issuing a request. `record-manual` never touches the
+network at all — it is the `MANUAL_BOOTSTRAP` write path, and it is not part of
+Slice A (schema and models only); it lands with the CLI in a later slice.
 
 ## 15. Fixtures and determinism
 
@@ -592,11 +889,23 @@ Altered (additive, nullable) — existing behaviour unchanged
   candidate_claim      + extractor_key, extractor_version, extraction_method,
                          extraction_confidence, crawl_run_id, fetched_page_id
   candidate_image_ref  + page_url, retrieved_at, declared_credit, alt_text,
-                         crawl_run_id, fetched_page_id
+                         crawl_run_id, fetched_page_id, retrieval_source_class,
+                         attribution_claimed
   discovery_source     + allowed_path_prefixes, tos_reviewed_at,
                          tos_expires_at (90d), tos_page_hash,
                          last_robots_hash, last_robots_checked_at (24h max),
                          last_crawled_at
+  discovery_source_class (existing enum, migration 0003) gains ADDITIVE values
+                         AGGREGATOR, AUTHORIZED_DISTRIBUTOR, OFFICIAL_STORE,
+                         COMMUNITY — existing values (COMPETITOR_DIRECTORY,
+                         MARKETPLACE, EDITORIAL, SEARCH_RESULT, DISTRIBUTOR,
+                         MANUFACTURER, PRESS_RELEASE, OFFICIAL_DOCUMENT,
+                         OFFICIAL_VIDEO, OTHER) are RETAINED UNCHANGED — no
+                         rename, no removal, no re-mapping of existing rows.
+                         This is the §4 multi-source vocabulary layered onto
+                         the enum DATA-D1 already ships; it is additive to a
+                         NONCANONICAL discovery-layer type, not a canonical
+                         schema change.
 ```
 
 ### 16.1 Future-ready commercial routing fields — DECLARED, NOT IN `0004`
@@ -701,17 +1010,28 @@ protects, printed on every run.
 | **O** | The public API and all machine surfaces expose nothing from the new tables (extends DATA-D1 Gate I / AGENT-01.7). |
 | **P** | The test suite makes no network request (asserted by a transport guard active in CI). |
 | **Q** | The cache is content-addressed under `var/discovery/cache/`, git-ignored, excluded from the Docker build context, and enforces 90-day / 30-day retention — while manifests, hashes, excerpts and provenance survive cache expiry (proven by expiring a cache entry and re-reading the claim's evidence). |
-| **R** | `/crawler-policy` resolves and is non-empty before the first product-page fetch; slice 2 cannot run without it. |
+| **R** | `/crawler-policy` resolves and is non-empty before the first product-page fetch; slice B cannot run without it. |
+| **S** | *(multi-source, §4.1)* No source class other than `MANUFACTURER` / `AUTHORIZED_DISTRIBUTOR` / `OFFICIAL_STORE` can ever produce a row with `claim_status = VERIFIED` or a canonical write — exercised specifically against `AGGREGATOR`, `MARKETPLACE` and `EDITORIAL` fixtures, not just asserted in the abstract. |
+| **T** | *(multi-source, §6.1)* Conflicting claims from different sources are preserved as separate rows, never averaged and never silently overwritten by a later or higher-ranked one; the higher-ranked value is surfaced for a human, not substituted automatically. |
+| **U** | *(multi-source, §10)* An aggregator- or marketplace-retrieved image is recorded with `retrieval_source_class` matching where it was actually seen, never `MANUFACTURER`, even when its claimed credit line names one. |
+| **V** | *(`MANUAL_BOOTSTRAP`, §2.1)* A manually recorded claim carries the same evidence shape as an automated one — excerpt, URL or document identifier, retrieved-at, `extraction_method = MANUAL` — and is rejected at write time if any is missing; it is discovery-layer-only, identically to Gate C. |
+| **W** | *(promotion trace, §11.1)* When an official-class (`MANUFACTURER` / `AUTHORIZED_DISTRIBUTOR` / `OFFICIAL_STORE`) source exists for an entity, promotion is refused unless the recorded trace (DATA-D1 P2) is to one of those classes — an aggregator-only trace does not satisfy P2 for that entity. |
 
 ## 20. Non-goals (v0.1)
 
 No scheduler, cron, queue or worker · no crawler VPS or any production-hosted
-fetching · no headless browser or JavaScript execution · no third-party
-directory, marketplace or competitor fetching · no login-gated content · no
-canonical writes · no auto-promotion · no image binaries · no Operations
-Workbench · no LLM extraction, scoring or matching · no cross-source averaging ·
-no PDF/document parsing (deferred: specification sheets are attractive and worth
-a separate slice) · no more than three adapters.
+fetching · no headless browser or JavaScript execution · **no automated fetch of
+any source — official, aggregator, marketplace or editorial — without its own
+passed eligibility review** (multi-source acquisition is *permitted in
+principle*, §4; it is not *pre-approved* for any specific host, §5) · no
+login-gated content · no canonical writes from any source class · no
+auto-verification or auto-promotion from any source class · no image binaries ·
+no Operations Workbench · no LLM extraction, scoring or matching · no
+cross-source averaging, ever (§6.1) · no PDF/document parsing via automated
+fetch (deferred: specification sheets are attractive and worth a separate
+slice — `MANUAL_BOOTSTRAP` may still record facts read from a
+manufacturer-supplied PDF, §2.1) · no more than three `AUTOMATED_LIVE` adapters
+in v0.1, of any source class.
 
 ## 21. Build sequence (on ratification)
 
@@ -721,25 +1041,41 @@ alter the WS8 release train — WS8-L1 forbids new product capability inside a
 release-hardening slice, and nothing here may appear in the MVP v0.1 release
 candidate.
 
-0. **Eligibility assessment (authorized now, read-only).** For the three
-   approved sources, fetch **only** `robots.txt`, terms of use, legal /
-   acceptable-use pages, and crawler-policy documents linked from those pages.
-   Record exact URLs, retrieval timestamps, HTTP status, hashes, relevant
-   excerpts and a provisional `ALLOWED / DISALLOWED / UNCLEAR` recommendation.
-   **This authorization does not extend to product pages, adapters, network
-   ingestion, database writes, or declaring any source eligible** — eligibility
-   remains an owner decision on the evidence.
+**Status (2026-07-29):** step 0 is **complete** — the first read-only
+eligibility assessment ran across the three permission/truth-set targets (§23)
+plus a wider market scan; see the eligibility reports. Step 1's outcome so far:
+**zero** sources hold an affirmative eligibility decision. Step 2 (Slice A) is
+authorized to proceed regardless, per the owner-directed note below.
+
+0. **Eligibility assessment (read-only) — DONE for the initial pass, ongoing.**
+   For each candidate source, fetch **only** `robots.txt`, terms of use, legal /
+   acceptable-use pages, and crawler-policy documents linked from those pages —
+   **regardless of source class**: the same read-only scope applies to an
+   aggregator under review as to a manufacturer. Record exact URLs, retrieval
+   timestamps, HTTP status, hashes, relevant excerpts and a provisional
+   `ALLOWED / DISALLOWED / UNCLEAR` recommendation. **This authorization does
+   not extend to product pages, adapters, network ingestion, database writes,
+   or declaring any source eligible** — eligibility remains an owner decision on
+   the evidence, source by source.
 1. **Eligibility approval.** The owner accepts or rejects each assessment.
-   Nothing below may start for a source without an affirmative decision.
+   Nothing below may start `AUTOMATED_LIVE` acquisition for a source without an
+   affirmative decision. `MANUAL_BOOTSTRAP` (§2.1) is not gated by this step.
 2. **Slice A — infrastructure, no adapters** *(owner-directed: proceed
    immediately; it is source-agnostic, so no eligibility outcome blocks it).*
    Schema `0004`, fetcher with
    robots/rate/cache/retry/kill switch, crawl-run + report, CLI, gates A–H,
    N, P. Provable end to end against a **local fake server**, not the internet.
-3. **Slice 2 — first adapter** for the approved source. Gates I–M, O. First
-   real run is `--dry-run`, reviewed, then a capped live run.
-4. **Slice 3 — adapters two and three**, chosen to *differ* commercially
-   (see §22), generalizing only what real variation demands.
+3. **Slice B — first adapter(s).** May target **any** eligible source that has
+   cleared §5 by the time this slice starts — an official source, a high-value
+   aggregator, or both. §11.1's trace requirement is the safeguard, not source
+   restriction: whenever an official-class source exists for an entity,
+   promotion still requires a trace to it, so an aggregator-first adapter cannot
+   promote around a manufacturer that simply hasn't approved us yet. Gates
+   I–M, O, S–V. First real run is `--dry-run`, reviewed, then a capped live run.
+4. **Slice C — the remaining adapters**, chosen to *differ* commercially and,
+   where possible, by source class (see §22–23), generalizing only what real
+   variation demands. Gate W exercised end to end once an aggregator and an
+   official source coexist for the same entity.
 5. **Review.** Real acquired data drives the decision on the Operations
    Workbench, cadence, and whether P3/P5/P7 promotion gates need to change.
 
@@ -758,64 +1094,146 @@ ratification, not open questions.
 | **D-2** | Eligibility validity | Terms: **90 days**, invalidated immediately on material URL/content-hash change. `robots.txt`: **evaluated every run**, ≤ 24 h cache; a new restrictive rule disables the source until re-reviewed. | §5, LIVE.2 |
 | **D-3** | Cache | `var/discovery/cache/`, git-ignored, **SHA-256 content-addressed**. Successful bodies **90 d**, failed/blocked **30 d**; manifests, page hashes, evidence excerpts and provenance **indefinite**. | LIVE.10 |
 | **D-4** | User agent | `HumanoidOnlineMarketBot/0.1 (+https://humanoidonline.com/crawler-policy)` — the policy page must resolve and explain purpose, contact, rate limits and opt-out **before the first product-page fetch**. | §13 |
-| **D-5** | First sources | **1. Unitree Robotics → 2. Agility Robotics → 3. Engineered Arts**, each subject to affirmative eligibility. | §23 |
+| **D-5** | Permission and truth-set targets | **Unitree Robotics · Agility Robotics · Engineered Arts** — a priority list for the eligibility/permission conversation, *not* an enabled adapter sequence. **The first automated adapters are the first three official sources to receive an affirmative, attributed, unexpired eligibility approval** — which three, and in what order, is decided by who says yes first, not by this list alone. | §23 |
 | **D-6** | Extraction confidence | **Never auto-verifies.** May prioritise review or reject its own low-confidence output; may never set `VERIFIED`, alter canonical confidence, or bypass human promotion. | LIVE.8 |
 | **D-7** | Evidence excerpts | **≤ 1000 Unicode characters each**, multiple excerpts per claim permitted; each carries page URL, retrieval time, page hash and locator/offsets. | LIVE.6, §9 |
 
-## 23. First sources — APPROVED ORDER (D-5)
+## 23. Permission and truth-set targets (D-5)
 
-**Approval of this order authorizes the eligibility ASSESSMENT only.** No source
-is eligible until its review returns an affirmative terms decision and a
-non-disallowing robots policy, recorded and attributed (§5). The order is chosen
-so the first three adapters exercise three genuinely different commercial shapes
-rather than three variations of one.
+**This section names who we ask first, not what we may crawl first.** No source
+below is eligible until its own review returns an affirmative terms decision and
+a non-disallowing robots policy, recorded and attributed (§5) — and, as of the
+first assessment (2026-07-29), **none of the three has cleared that bar** (two
+expressly prohibit automated access in their terms; the third could not be
+fully read). **The first automated adapters are whichever official sources
+actually say yes first** — a priority list is not a guarantee of order, only of
+who gets asked, and in what sequence, while permission conversations run in
+parallel with Slice A/B engineering.
 
-| # | Source | Why in this order | What it exercises |
+| # | Target | Why prioritized for outreach | What it would exercise, once eligible |
 |---|---|---|---|
 | **1** | **Unitree Robotics** — official site + official store | Already canonical in our catalogue (G1 at `$13,500 PUBLIC`, H1 `QUOTE_ONLY`), so identity matching has something real to match, and extraction can be checked against a fact we already verified by hand | `PUBLIC` price · `PURCHASE` availability · spec extraction · **regression against known truth** |
 | **2** | **Agility Robotics** — official site + press room | Digit is canonical with `RAAS_DEPLOYMENT` maturity and *no* price data — the case where a naive crawler invents a number or writes `NOT_AVAILABLE` | `RAAS` / deployment language · maturity vs obtainability separation · **UNKNOWN preservation** |
 | **3** | **Engineered Arts** — official site | Ameca is canonical as `QUOTE_ONLY` / `ON_REQUEST` with UNKNOWN specs | `QUOTE_ONLY ≠ UNKNOWN` · quote-model extraction · sparse-spec pages |
 
-Deliberately **not** first: Figure AI (our own Figure 02 image provenance
+Deliberately **not** prioritized: Figure AI (our own Figure 02 image provenance
 correction shows how easily its media is misattributed — better once the image
 path is proven), Boston Dynamics and Tesla (heavy JS/marketing surfaces, low
-commercial-fact density), and every directory or marketplace (LIVE.1).
+commercial-fact density), and every aggregator or marketplace not individually
+reviewed under §5 (LIVE.1 amendment: *eligible* for acquisition in principle,
+but none is reviewed yet).
 
-The strongest argument for this trio: all three already exist in the verified
-catalogue, so the **first live run can be scored against hand-verified truth**.
-If the crawler disagrees with the catalogue on a fact a human already checked,
-that is a parser bug caught before any promotion — the cheapest possible place to
-find it.
+The strongest argument for this trio as the **outreach** priority: all three
+already exist in the verified catalogue, so once eligible, the **first live run
+can be scored against hand-verified truth** — a disagreement with a
+hand-checked fact is a parser bug caught before any promotion, the cheapest
+possible place to find it. Permission requests to all three are drafted and
+ready to send (see the eligibility reports); sending them is the owner's step,
+not an automated one.
+
+### 23.1 Provisional candidate — NEURA Robotics *(not approved, not in D-5)*
+
+The wider market scan run alongside the initial assessment surfaced
+**neura-robotics.com** as the most promising lead outside the three D-5 targets:
+its `robots.txt` carries an explicit `Allow: /` for all agents, a
+`Crawl-delay: 3`, individually blocked AI-training crawlers (GPTBot, ClaudeBot,
+CCBot, Google-Extended, Bytespider — a deliberate, informed policy, not an
+oversight), and a Cloudflare content-signal header
+(`search=yes, ai-train=no, use=reference`) that reads as close to
+machine-readable affirmative permission for search-style indexing specifically.
+
+**This is a lead, not a decision.** It is recorded here as the **leading
+provisional review candidate** for a *future* eligibility review — the terms
+page has not yet had the same full legal read the three D-5 targets received,
+and NEURA holds **no eligibility status of any kind** until that review is
+performed and the owner signs off on it. Nothing about this entry changes §5's
+procedure or its refusal semantics: a promising robots signal is still not a
+terms decision, and it is still not this contract's decision to make.
 
 ## 24. Ratification record
 
 ```
-STATUS:                     DRAFT — NOT RATIFIED
-Ratified by:                ____________________  (product owner)
-Date:                       ____________________
+STATUS:                      RATIFIED v0.1
+Ratified by:                 Robert Konecny
+Ratification date:           2026-07-29
+Implementation authorized:   Slice A only (schema `0004` + models + tests, §21)
+Per-source crawling
+  authorization:             none
 
-Decisions D-1 … D-7:        SETTLED by the product owner, 2026-07-29 (§22)
-First-source ORDER:         APPROVED — Unitree -> Agility -> Engineered Arts
-Eligibility ASSESSMENT:     AUTHORIZED (read-only: robots.txt, terms, legal /
-                            acceptable-use, linked crawler-policy documents)
-Source ELIGIBILITY:         NOT granted for any source — owner decision on the
-                            assessment evidence, per source, still required
-Product-page crawling:      NOT authorized
+Decisions D-1 … D-7:         SETTLED by the product owner, 2026-07-29 (§22)
+Permission/truth-set
+  targets (D-5):              Unitree Robotics · Agility Robotics ·
+                              Engineered Arts — NOT an enabled adapter order
+First automated adapters:     the first official sources to receive an
+                              affirmative, attributed, unexpired eligibility
+                              approval (undetermined as of ratification)
+NEURA Robotics:               provisional review candidate only (§23.1) —
+                              NOT approved, NOT reviewed, NOT in D-5
+Eligibility ASSESSMENT:       COMPLETED (first pass, 2026-07-29): robots.txt,
+                              terms, legal / acceptable-use pages, linked
+                              crawler-policy documents, across fourteen hosts
+Source ELIGIBILITY:           NOT granted for any source — owner decision on
+                              the assessment evidence, per source, still
+                              required
+Product-page crawling:        NOT authorized
+MANUAL_BOOTSTRAP (§2.1):      permitted under existing law (LIVE.5, LIVE.6,
+                              LIVE.9, DATA-D1 §18) — not gated by per-source
+                              eligibility, because it performs no automated
+                              access
+Multi-source radar (LIVE.1
+  amendment):                 RATIFIED — eligible aggregators, directories,
+                              marketplaces and editorial sources may be
+                              acquired once individually reviewed (§4-§6.1);
+                              none reviewed as of ratification
+§16.1 commercial routing
+  fields:                     DECLARED, NOT AUTHORIZED — excluded from
+                              Slice A and every slice until separately
+                              ratified with the commercial workstream
 ```
 
-Ratification freezes **principles**, not implementation, and authorizes the
-build sequence in §21. It does **not** authorize contact with any source: that
-requires the per-source eligibility review of §5, recorded and attributed.
+**Ratification is not permission to fetch any product page automatically.**
+It freezes **principles** and this document's amendments, and authorizes
+exactly one piece of implementation: **Slice A**, described in full in §21 —
+schema, models, and the tests proving discovery-only isolation. It does **not**
+authorize contact with any source, official or otherwise: that requires the
+per-source eligibility review of §5, recorded and attributed, source by source,
+regardless of class.
 
-> **Proposed ratification statement:**
+> **Ratification statement (in force, 2026-07-29):**
 >
-> DATA-D1.LIVE v0.1 is ratified. HumanoidOnline may acquire market facts from
-> official manufacturer sources only, after a recorded, attributed, per-source
-> terms and robots review, executed manually and locally, writing to the
-> discovery layer only. Every claim carries its source URL, exact supporting
-> text, retrieval timestamp and extraction confidence. Maturity, obtainability
-> and price semantics are extracted as separate evidence-bound signals and are
-> never merged; UNKNOWN remains UNKNOWN. Extraction confidence is never
-> verification, and no crawler writes canonical truth — promotion stays human.
-> Imagery remains reference-only under MEDIA-01. No scheduler, no hosted
-> crawler, and no circumvention of any access control, ever.
+> DATA-D1.LIVE v0.1 is ratified. HumanoidOnline is an independent
+> market-intelligence and buyer-intent referral platform, not the merchant of
+> record for any robot transaction (§0.1) — acquisition exists to build
+> accurate, attributed listings and route qualified buyers to official
+> channels, and that purpose confers no automated-access permission of its own.
+>
+> Acquisition follows **official-first, multi-source radar** (LIVE.1): official
+> manufacturer sources remain the preferred evidence authority; eligible
+> aggregators, directories, marketplaces and editorial sources may also be
+> acquired, individually reviewed on identical terms, to discover candidates,
+> aliases, links, conflicts and commercial signals — never to set a claim
+> `VERIFIED`, never to write canonical rows, never to override a conflicting
+> manufacturer claim, never to infer availability, maturity or image rights, and
+> never to bypass human promotion.
+>
+> Two acquisition modes are authorized in principle: `AUTOMATED_LIVE`, gated
+> per source by an affirmative, attributed, unexpired eligibility review before
+> a single request is issued; and `MANUAL_BOOTSTRAP`, a named human reading a
+> public source or reviewing manufacturer-supplied evidence directly, under the
+> same evidence and promotion discipline but no automated traversal and no
+> eligibility review, because no automated access occurs.
+>
+> Every claim carries its source URL, exact supporting text, retrieval
+> timestamp and extraction confidence. Maturity, obtainability and price
+> semantics are extracted as separate evidence-bound signals and are never
+> merged; UNKNOWN remains UNKNOWN; conflicting sources are preserved, never
+> averaged. Extraction confidence is never verification, and no source class
+> writes canonical truth — promotion stays human, and where an official source
+> exists for an entity, promotion requires a trace to it. Imagery remains
+> reference-only under MEDIA-01, with retrieval provenance recorded honestly
+> regardless of claimed attribution. No scheduler, no hosted crawler, and no
+> circumvention of any access control, ever.
+>
+> **This ratification authorizes Slice A only. It grants no per-source
+> crawling permission for any source, official or aggregator, and it is not to
+> be read as authorizing a single automated fetch of any product page.**

@@ -43,6 +43,49 @@ market claims, and the product's one differentiator — that every commercial fa
 carries evidence — quietly becomes false.* Every rule below is chosen against
 that outcome.
 
+### 0.1 Business model — FROZEN
+
+*(Numbered as a subsection so that every `§n` cross-reference in this document
+stays stable. Its standing is that of a frozen law, not an aside.)*
+
+**HumanoidOnline is an independent market-intelligence and buyer-intent referral
+platform. It is not the merchant of record for robot transactions in Phase 1 or
+Phase 2.** Robot purchases, quotation contracts, pilot agreements, RaaS
+agreements, payment, delivery, warranty and support remain between the **buyer**
+and the **manufacturer or authorized seller**.
+
+**Acquisition exists to create accurate, manufacturer-attributed listings and to
+route qualified buyers to official manufacturer channels.**
+
+**And that beneficial purpose grants nothing.** It does not override a source's
+terms, and it does not confer permission for automated access. A restricted
+source stays restricted until one of these exists:
+
+1. **written authorization** from the source, recorded as eligibility evidence;
+2. an **official feed or API** whose own terms permit the use; or
+3. **manufacturer-supplied evidence** (press kit, data sheet, direct
+   correspondence) provided for this purpose.
+
+This is stated as a law because it is the argument most likely to be used to
+justify an exception. "We are sending them customers" is a reason for a
+manufacturer to *grant* permission — an excellent one, and the basis of the
+partnership approach — but it is never a substitute for having been granted it.
+A platform whose entire value proposition is *verifiable, attributed truth*
+cannot acquire that truth by disregarding the terms of the people it attributes
+it to. The first eligibility review (2026-07-29) found two of three approved
+sources expressly prohibiting automated access; the answer is to **ask them**,
+not to reinterpret their terms in our favour.
+
+Two consequences bind the acquisition engine directly:
+
+- **Attribution is not optional.** Every listing names the manufacturer and
+  routes to their official channel. We are a directory that sends buyers *to*
+  them, never an intermediary that stands between them and the buyer.
+- **No transaction surface may be inferred from acquired data.** Discovering a
+  price or a purchase URL never makes HumanoidOnline a seller. The routing
+  fields in §16.1 exist so the platform can *point at* the official channel; the
+  transaction itself completes off-platform, and the schema says so explicitly.
+
 ## 1. Relationship to existing contracts
 
 DATA-D1.LIVE is **subordinate** to, not a replacement for:
@@ -556,6 +599,41 @@ Altered (additive, nullable) — existing behaviour unchanged
                          last_crawled_at
 ```
 
+### 16.1 Future-ready commercial routing fields — DECLARED, NOT IN `0004`
+
+These express §0.1 in the schema: the platform routes buyers to official
+channels and is not the merchant of record. They are **canonical** fields, so
+they are **not** part of migration `0004` and **not** authorized by this
+contract — each needs its own ratification alongside the commercial workstream
+(Rent → Buy → Lease/RaaS). They are declared here so that acquisition is built
+knowing where its output eventually lands, and so nobody invents a parallel
+vocabulary later.
+
+| Field | Lives on | Meaning | Default / discipline |
+|---|---|---|---|
+| `official_purchase_url` | robot / variant / availability offer | the manufacturer's own buy page | UNKNOWN when absent — never guessed, never a search link |
+| `official_quote_url` | robot / variant / availability offer | the manufacturer's own quote or contact-sales page | UNKNOWN when absent |
+| `lead_route_type` | commercial lead | how a qualified buyer is routed: `MANUFACTURER_DIRECT` · `AUTHORIZED_SELLER` · `PLATFORM_INTRODUCTION` · `UNROUTED` | `UNROUTED` until a route is evidenced |
+| `lead_recipient` | commercial lead | the manufacturer or authorized seller the lead was routed to | never HumanoidOnline |
+| `manufacturer_partner_status` | manufacturer | `NONE` · `CONTACTED` · `PERMISSION_GRANTED` · `PARTNER` · `DECLINED` | `NONE`. **Also the eligibility artefact** for §5 when it reaches `PERMISSION_GRANTED` |
+| `referral_tracking_code` | manufacturer / lead | the code a partner asked us to attach, if any | NULL — never fabricated, never appended without agreement |
+| `commission_model` | manufacturer partnership | `NONE` · `FLAT_FEE` · `PER_LEAD` · `REVENUE_SHARE` · `UNDISCLOSED` | `NONE`. **Disclosed on the surface** where it could bias ranking |
+| `merchant_of_record` | availability / pricing offer | who the buyer actually contracts with | `MANUFACTURER` or `AUTHORIZED_SELLER`. **`PLATFORM` is not a legal value in Phase 1–2** — a CHECK constraint, not a convention |
+| `transaction_completed_off_platform` | availability offer / lead | states plainly where the transaction happens | `true` in Phase 1–2 |
+
+**What acquisition may do with them:** propose `official_purchase_url` and
+`official_quote_url` as ordinary evidence-bound candidate claims — they are
+facts on a manufacturer page like any other, and they carry the same excerpt,
+timestamp and confidence. **Everything else on that list is a commercial
+relationship, not an observable fact**, and a crawler may never write it.
+`manufacturer_partner_status` in particular is set by a human recording an
+agreement; if a parser could set it, the eligibility gate would be forgeable.
+
+Two invariants worth testing the moment those fields exist: `merchant_of_record`
+never takes the value `PLATFORM`, and no ranking, match score or ordering reads
+`commission_model` or `manufacturer_partner_status`. The catalogue's neutrality
+is the product; a partnership must never be able to buy a better position in it.
+
 ## 17. Operator review path
 
 v0.1 deliberately ships **no new UI**. Review happens through:
@@ -653,7 +731,9 @@ candidate.
    remains an owner decision on the evidence.
 1. **Eligibility approval.** The owner accepts or rejects each assessment.
    Nothing below may start for a source without an affirmative decision.
-2. **Slice 1 — infrastructure, no adapters.** Schema `0004`, fetcher with
+2. **Slice A — infrastructure, no adapters** *(owner-directed: proceed
+   immediately; it is source-agnostic, so no eligibility outcome blocks it).*
+   Schema `0004`, fetcher with
    robots/rate/cache/retry/kill switch, crawl-run + report, CLI, gates A–H,
    N, P. Provable end to end against a **local fake server**, not the internet.
 3. **Slice 2 — first adapter** for the approved source. Gates I–M, O. First

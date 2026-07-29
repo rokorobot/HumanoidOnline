@@ -42,13 +42,29 @@ Use the supported path — `deploy/release.sh` — rather than hand-typed comman
 sudo ENV_FILE=/srv/humanoidonline/.env.production deploy/release.sh
 ```
 
-It runs `deploy/preflight.py` **first**, before anything is pulled, built or
-started. All four pins are MANDATORY and, more than that, must be **immutable in
-form**: required-ness (`:?`, an ARG with no default) only proves *non-empty*, and
+It runs `deploy/preflight.py` **first** — all three gates, before anything is
+pulled, built or started — then builds, then records a durable release manifest,
+then starts compose.
+
+**Gate 1 · pins.** All four are MANDATORY and must be **immutable in form**:
+required-ness (`:?`, an ARG with no default) only proves *non-empty*, and
 `POSTGRES_IMAGE=postgres:16` is non-empty while meaning "whatever that tag points
-at today". The preflight accepts `<image>@sha256:<64 lower-case hex>` (or a bare
-`sha256:<64 hex>` image ID) and rejects `python:3.12-slim`, `node:20-bookworm-slim`,
+at today". Accepted: `<image>@sha256:<64 lower-case hex>` or a bare
+`sha256:<64 hex>` image ID. Rejected: `python:3.12-slim`, `node:20-bookworm-slim`,
 `postgres:16`, `caddy:2` and every other mutable tag.
+
+**Gate 2 · source identity.** A pinned base proves nothing about the application
+layer. `RELEASE_SHA` must be a full 40-character lower-case commit id, must equal
+`git rev-parse HEAD` in this checkout, and the working tree must be clean — no
+staged changes, no modified tracked files, no non-ignored untracked files. A
+clean **detached HEAD is allowed** (deploying an exact commit is normal).
+Otherwise the images carry code the recorded commit does not describe, and the
+attestation below records a commit that never produced them.
+
+**Gate 3 · backup activation.** In staging/production the release refuses to
+build or start unless `BACKUP_UPLOAD_COMMAND` is set, its executable resolves on
+PATH, and the backup compose/env paths and backup directory are usable. Nothing
+is uploaded during preflight — a release check must not write to the destination.
 
 ```
 Release commit SHA:          ____________________
@@ -57,18 +73,23 @@ Base image pins used (all four REQUIRED, digest form):
   NODE_IMAGE                 ____________________  (…@sha256:…)
   POSTGRES_IMAGE             ____________________  (…@sha256:…)
   CADDY_IMAGE                ____________________  (…@sha256:…)
-Built image digests:
+Built image IDs (from the release manifest, NOT read off a tag):
   humanoidonline-api:<sha>   sha256:______________
   humanoidonline-web:<sha>   sha256:______________
-Previous image digests retained for rollback:
+Release manifest path:       ____________________  (0600, outside the repo)
+Previous release manifest retained for rollback:
+  path                       ____________________
   api  sha256:______________   web  sha256:______________
 ```
 
-- [ ] `deploy/preflight.py` output captured: **"preflight ok: all four base images
-      are pinned to a digest"**. (Sanity-check the gate itself once: temporarily
-      set one pin to `postgres:16`, confirm the release **stops** with a
-      `MUTABLE TAG` error and that **nothing was built or started**, then restore
-      the digest.)
+- [ ] `deploy/preflight.py` output captured: three lines, **`preflight ok [pins]`
+      / `[source]` / `[backup]`**. Sanity-check each gate once — the release must
+      **stop with nothing built or started** in every case:
+      - [ ] one pin set to `postgres:16` → `MUTABLE TAG`;
+      - [ ] `RELEASE_SHA` set to a different commit → `NOT the checked-out commit`;
+      - [ ] a stray file `touch`ed in the checkout → `untracked files`;
+      - [ ] `BACKUP_UPLOAD_COMMAND` emptied → refusal naming it.
+      Restore each afterwards.
 - [ ] Images built from the exact commit above with `npm ci` / `uv sync --frozen`.
 - [ ] `docker compose -f docker-compose.prod.yml config` output captured.
 
@@ -161,7 +182,32 @@ use a login/redirect flow rather than a literal 401).
 - [ ] Provider manual snapshot taken immediately before this deployment,
       understood to be a **temporary (~1-day) checkpoint**, never the recovery
       plan of record.
-- [ ] Rollback path confirmed: previous image digests still present on the host.
+### Release manifest + rollback (R26 — the rollback unit is an image ID)
+
+A tag is not a rollback record: `humanoidonline-api:<sha>` can be re-pointed at a
+rebuilt image with the same name and different content. `deploy/release.sh`
+therefore writes `$RELEASE_DIR/<sha>.json` after the build — schema version,
+release SHA, all four base pins, both tags, both **exact image IDs**, timestamp —
+`0600` in a `0700` directory, **outside the repository and the build context** so
+it cannot be swept into an image or removed by checking out the release it exists
+to undo.
+
+- [ ] Manifest written and readable: `ls -l $RELEASE_DIR/<sha>.json` → `-rw-------`.
+- [ ] Its `images.api.id` / `images.web.id` match `docker image inspect
+      --format '{{.Id}}'` for both tags (the release re-verifies this itself
+      before compose starts; capture the output).
+- [ ] `$RELEASE_DIR` is **not** inside the repository working tree.
+- [ ] **Previous** release manifest retained, and its two images still present on
+      the host (`docker image inspect <recorded id>` for each).
+- [ ] Rollback rehearsed: `deploy/rollback.sh <previous-manifest>` — it performs
+      **no build and no pull**, verifies both image IDs exist locally, verifies
+      both tags still resolve to the recorded IDs, confirms `docker compose
+      config --images` really resolves to the manifest's tags, and only then
+      restarts. Record the transcript.
+- [ ] Rollback **refusals** observed at least once (a rollback that has never
+      refused has not been tested): retag one image so its tag moves → `has
+      MOVED`; point at a manifest whose image was removed → `NOT present on this
+      host`. Both must stop before anything restarts.
 
 ## Attestation record (complete to PASS R26 / R27)
 

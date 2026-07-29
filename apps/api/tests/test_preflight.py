@@ -160,17 +160,43 @@ def test_cli_exits_non_zero_for_a_mutable_tag(tmp_path, capsys) -> None:
         f"CADDY_IMAGE=caddy:2@sha256:{HEX}\n",
         encoding="utf-8",
     )
-    assert preflight.main(["--env-file", str(env_file)]) == 1
+    assert preflight.main(["--env-file", str(env_file), "--gates", "pins"]) == 1
     assert "POSTGRES_IMAGE" in capsys.readouterr().err
 
 
 def test_cli_exits_zero_when_every_pin_is_a_digest(tmp_path) -> None:
+    """`--gates pins` isolates this gate: the source and backup gates read the
+    real repository and the real filesystem, which is not what is under test
+    here. `deploy/release.sh` runs the full set — asserted in
+    tests/test_release_gates.py."""
     env_file = tmp_path / "env"
     env_file.write_text(
         "".join(f"{var}=image@sha256:{HEX}\n" for var in preflight.PINNED_IMAGE_VARS),
         encoding="utf-8",
     )
+    assert preflight.main(["--env-file", str(env_file), "--gates", "pins"]) == 0
+
+
+def test_cli_rejects_an_unknown_gate_name(tmp_path, capsys) -> None:
+    env_file = tmp_path / "env"
+    env_file.write_text("PYTHON_IMAGE=x@sha256:" + HEX + "\n", encoding="utf-8")
+    assert preflight.main(["--env-file", str(env_file), "--gates", "pins,nope"]) == 1
+    assert "unknown gate" in capsys.readouterr().err
+
+
+def test_cli_runs_every_gate_by_default(tmp_path, monkeypatch) -> None:
+    """A default that silently checked only the pins would make the other two
+    gates decorative."""
+    ran: list[str] = []
+    monkeypatch.setattr(preflight, "check_pins", lambda env: ran.append("pins") or [])
+    monkeypatch.setattr(preflight, "check_source_identity",
+                        lambda env: ran.append("source") or [])
+    monkeypatch.setattr(preflight, "check_backup_activation",
+                        lambda env: ran.append("backup") or [])
+    env_file = tmp_path / "env"
+    env_file.write_text("APP_ENV=production\n", encoding="utf-8")
     assert preflight.main(["--env-file", str(env_file)]) == 0
+    assert ran == ["pins", "source", "backup"]
 
 
 def test_cli_reports_an_unreadable_env_file(tmp_path, capsys) -> None:

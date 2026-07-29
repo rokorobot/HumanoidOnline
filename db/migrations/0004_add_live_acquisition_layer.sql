@@ -243,6 +243,7 @@ CREATE TABLE IF NOT EXISTS discovery_evidence_excerpt (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     subject_type    evidence_subject_type NOT NULL,
     subject_id      UUID NOT NULL,
+    discovery_source_id UUID NOT NULL REFERENCES discovery_source(id) ON DELETE RESTRICT,
     crawl_run_id    UUID REFERENCES crawl_run(id) ON DELETE SET NULL,
     fetched_page_id UUID REFERENCES fetched_page(id) ON DELETE SET NULL,
     excerpt_text    TEXT NOT NULL,
@@ -270,6 +271,66 @@ ALTER TABLE candidate_claim
     ADD COLUMN IF NOT EXISTS extraction_confidence extraction_confidence,
     ADD COLUMN IF NOT EXISTS crawl_run_id          UUID REFERENCES crawl_run(id) ON DELETE SET NULL,
     ADD COLUMN IF NOT EXISTS fetched_page_id       UUID REFERENCES fetched_page(id) ON DELETE SET NULL;
+
+-- §9.1 fail-closed provenance. Order matters: BACKFILL first, then constrain.
+--
+-- The backfill is deterministic and non-inventive — a claim's source is its
+-- owning candidate's source, which is what `ingest` already writes. Any row that
+-- somehow cannot be resolved that way is left NULL so the ALTER below fails
+-- LOUDLY rather than a guessed value being written into an audit trail.
+UPDATE candidate_claim c
+   SET discovery_source_id = d.source_id
+  FROM discovery_candidate d
+ WHERE c.candidate_id = d.id
+   AND c.discovery_source_id IS NULL;
+
+DO $$
+DECLARE orphans BIGINT;
+BEGIN
+    SELECT count(*) INTO orphans FROM candidate_claim WHERE discovery_source_id IS NULL;
+    IF orphans > 0 THEN
+        RAISE EXCEPTION
+            'cannot make candidate_claim.discovery_source_id NOT NULL: % row(s) '
+            'have no resolvable source. Investigate rather than inventing one.',
+            orphans;
+    END IF;
+END$$;
+
+-- Nullable + ON DELETE SET NULL failed Gate X twice: an unattributed claim could
+-- be inserted, and deleting a source silently stripped provenance from claims
+-- already made. RESTRICT keeps a source undeletable while its claims live.
+ALTER TABLE candidate_claim
+    ALTER COLUMN discovery_source_id SET NOT NULL;
+
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM pg_constraint con
+        JOIN pg_class rel ON rel.oid = con.conrelid
+        JOIN pg_namespace n ON n.oid = rel.relnamespace
+        WHERE n.nspname = 'humanoid' AND rel.relname = 'candidate_claim'
+          AND con.contype = 'f' AND con.confdeltype = 'n'   -- 'n' = SET NULL
+          AND con.conkey = ARRAY[(
+              SELECT attnum FROM pg_attribute
+              WHERE attrelid = rel.oid AND attname = 'discovery_source_id')::SMALLINT]
+    ) THEN
+        EXECUTE (
+            SELECT format('ALTER TABLE candidate_claim DROP CONSTRAINT %I', con.conname)
+            FROM pg_constraint con
+            JOIN pg_class rel ON rel.oid = con.conrelid
+            JOIN pg_namespace n ON n.oid = rel.relnamespace
+            WHERE n.nspname = 'humanoid' AND rel.relname = 'candidate_claim'
+              AND con.contype = 'f' AND con.confdeltype = 'n'
+              AND con.conkey = ARRAY[(
+                  SELECT attnum FROM pg_attribute
+                  WHERE attrelid = rel.oid AND attname = 'discovery_source_id')::SMALLINT]
+        );
+        ALTER TABLE candidate_claim
+            ADD CONSTRAINT candidate_claim_discovery_source_id_fkey
+            FOREIGN KEY (discovery_source_id) REFERENCES discovery_source(id)
+            ON DELETE RESTRICT;
+    END IF;
+END$$;
 
 ALTER TABLE candidate_image_ref
     ADD COLUMN IF NOT EXISTS page_url               TEXT,
@@ -324,3 +385,164 @@ BEGIN
             FOR EACH ROW EXECUTE FUNCTION set_updated_at();
     END IF;
 END$$;
+
+-- ---------------------------------------------------------------------------
+-- 12. Integrity enforcement — the DATABASE refuses forbidden states
+--
+-- Mirrors db/schema.sql. `CREATE OR REPLACE FUNCTION` is idempotent by
+-- definition; the triggers are guarded on pg_trigger.
+--
+-- Why this is not left to the ORM: "the normal ORM path behaves correctly" is not
+-- "the database cannot represent a forbidden state". Raw SQL, Core bulk
+-- statements, psql and SQLAdmin's bulk paths all bypass ORM listeners — and the
+-- earlier SQLAdmin mutation bypass is that failure already having happened once
+-- in this very layer.
+-- ---------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION refuse_eligibility_review_mutation()
+RETURNS TRIGGER LANGUAGE plpgsql AS $fn$
+BEGIN
+    RAISE EXCEPTION
+        'source_eligibility_review is append-only (DATA-D1.LIVE §5): % refused. '
+        'Record a NEW review instead — an eligibility decision is evidence, and '
+        'evidence is not edited.', TG_OP
+        USING ERRCODE = 'restrict_violation';
+END$fn$;
+
+CREATE OR REPLACE FUNCTION assert_acquisition_lineage()
+RETURNS TRIGGER LANGUAGE plpgsql AS $fn$
+DECLARE
+    row_json  JSONB := to_jsonb(NEW);
+    v_run_id  UUID  := NULLIF(row_json->>'crawl_run_id', '')::UUID;
+    v_page_id UUID  := NULLIF(row_json->>'fetched_page_id', '')::UUID;
+    -- `fetched_page` names its source column `source_id`; everything else uses
+    -- `discovery_source_id`. Reading only the latter made the root-level check
+    -- (a page must belong to its run's source) silently skip — the trigger was
+    -- present and passing while enforcing nothing there.
+    v_src_id  UUID  := COALESCE(
+        NULLIF(row_json->>'discovery_source_id', '')::UUID,
+        NULLIF(row_json->>'source_id', '')::UUID
+    );
+    page_run  UUID;
+    page_src  UUID;
+    run_src   UUID;
+BEGIN
+    IF v_page_id IS NOT NULL THEN
+        SELECT crawl_run_id, source_id INTO page_run, page_src
+        FROM fetched_page WHERE id = v_page_id;
+
+        IF v_run_id IS NOT NULL AND page_run <> v_run_id THEN
+            RAISE EXCEPTION
+                '%.fetched_page_id % belongs to crawl run %, not %',
+                TG_TABLE_NAME, v_page_id, page_run, v_run_id
+                USING ERRCODE = 'foreign_key_violation';
+        END IF;
+        IF v_src_id IS NOT NULL AND page_src <> v_src_id THEN
+            RAISE EXCEPTION
+                '%.fetched_page_id % was fetched from source %, not %',
+                TG_TABLE_NAME, v_page_id, page_src, v_src_id
+                USING ERRCODE = 'foreign_key_violation';
+        END IF;
+    END IF;
+
+    IF v_run_id IS NOT NULL AND v_src_id IS NOT NULL THEN
+        SELECT source_id INTO run_src FROM crawl_run WHERE id = v_run_id;
+        IF run_src <> v_src_id THEN
+            RAISE EXCEPTION
+                '%.crawl_run_id % ran against source %, not %',
+                TG_TABLE_NAME, v_run_id, run_src, v_src_id
+                USING ERRCODE = 'foreign_key_violation';
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END$fn$;
+
+CREATE OR REPLACE FUNCTION assert_evidence_excerpt_subject()
+RETURNS TRIGGER LANGUAGE plpgsql AS $fn$
+DECLARE
+    subject_src UUID;
+    found       BOOLEAN := FALSE;
+BEGIN
+    CASE NEW.subject_type
+        WHEN 'CLAIM' THEN
+            SELECT discovery_source_id, TRUE INTO subject_src, found
+            FROM candidate_claim WHERE id = NEW.subject_id;
+        WHEN 'COMMERCIAL_SIGNAL' THEN
+            SELECT discovery_source_id, TRUE INTO subject_src, found
+            FROM candidate_commercial_signal WHERE id = NEW.subject_id;
+        WHEN 'IMAGE_REF' THEN
+            SELECT discovery_source_id, TRUE INTO subject_src, found
+            FROM candidate_image_ref WHERE id = NEW.subject_id;
+        ELSE
+            RAISE EXCEPTION 'unknown evidence subject_type %', NEW.subject_type
+                USING ERRCODE = 'check_violation';
+    END CASE;
+
+    IF NOT found THEN
+        RAISE EXCEPTION
+            'evidence excerpt subject %/% does not exist — an orphan excerpt is '
+            'indistinguishable from a fabricated one (DATA-D1.LIVE §9)',
+            NEW.subject_type, NEW.subject_id
+            USING ERRCODE = 'foreign_key_violation';
+    END IF;
+
+    IF subject_src IS NULL THEN
+        RAISE EXCEPTION
+            'evidence excerpt subject %/% has no source, so its evidence cannot '
+            'be attributed (DATA-D1.LIVE §9.1)', NEW.subject_type, NEW.subject_id
+            USING ERRCODE = 'not_null_violation';
+    END IF;
+
+    IF subject_src <> NEW.discovery_source_id THEN
+        RAISE EXCEPTION
+            'evidence excerpt source % does not match subject %/% source % — an '
+            'excerpt must be evidence FOR the claim it is attached to',
+            NEW.discovery_source_id, NEW.subject_type, NEW.subject_id, subject_src
+            USING ERRCODE = 'foreign_key_violation';
+    END IF;
+
+    RETURN NEW;
+END$fn$;
+
+DO $$
+DECLARE
+    spec RECORD;
+BEGIN
+    FOR spec IN
+        SELECT * FROM (VALUES
+            ('trg_source_eligibility_review_no_update', 'source_eligibility_review',
+             'BEFORE UPDATE', 'FOR EACH STATEMENT', 'refuse_eligibility_review_mutation'),
+            ('trg_source_eligibility_review_no_delete', 'source_eligibility_review',
+             'BEFORE DELETE', 'FOR EACH STATEMENT', 'refuse_eligibility_review_mutation'),
+            ('trg_evidence_excerpt_subject', 'discovery_evidence_excerpt',
+             'BEFORE INSERT OR UPDATE', 'FOR EACH ROW', 'assert_evidence_excerpt_subject'),
+            ('trg_fetched_page_lineage', 'fetched_page',
+             'BEFORE INSERT OR UPDATE', 'FOR EACH ROW', 'assert_acquisition_lineage'),
+            ('trg_extraction_result_lineage', 'extraction_result',
+             'BEFORE INSERT OR UPDATE', 'FOR EACH ROW', 'assert_acquisition_lineage'),
+            ('trg_candidate_claim_lineage', 'candidate_claim',
+             'BEFORE INSERT OR UPDATE', 'FOR EACH ROW', 'assert_acquisition_lineage'),
+            ('trg_commercial_signal_lineage', 'candidate_commercial_signal',
+             'BEFORE INSERT OR UPDATE', 'FOR EACH ROW', 'assert_acquisition_lineage'),
+            ('trg_evidence_excerpt_lineage', 'discovery_evidence_excerpt',
+             'BEFORE INSERT OR UPDATE', 'FOR EACH ROW', 'assert_acquisition_lineage')
+        ) AS t(trigger_name, table_name, timing, level, fn)
+    LOOP
+        IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = spec.trigger_name) THEN
+            EXECUTE format(
+                'CREATE TRIGGER %I %s ON %I %s EXECUTE FUNCTION %I()',
+                spec.trigger_name, spec.timing, spec.table_name, spec.level, spec.fn
+            );
+        END IF;
+    END LOOP;
+END$$;
+
+COMMENT ON FUNCTION refuse_eligibility_review_mutation() IS
+    'DATA-D1.LIVE §5: refuses UPDATE/DELETE on source_eligibility_review at the database '
+    'level, so raw SQL and bulk Core statements cannot bypass it.';
+COMMENT ON FUNCTION assert_acquisition_lineage() IS
+    'DATA-D1.LIVE: run/page/source lineage must agree. Postgres cannot express '
+    '"this page belongs to that run" as a foreign key, so this closes it.';
+COMMENT ON FUNCTION assert_evidence_excerpt_subject() IS
+    'DATA-D1.LIVE §9/§9.1: the polymorphic excerpt subject must exist, have a source, '
+    'and share it with the excerpt. No foreign key can express this.';

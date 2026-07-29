@@ -27,8 +27,14 @@ import uuid
 from datetime import UTC, datetime
 
 import pytest
-from sqlalchemy import inspect, select, text
-from sqlalchemy.exc import DataError, IntegrityError
+from sqlalchemy import delete, inspect, select, text, update
+from sqlalchemy.dialects import postgresql
+from sqlalchemy.exc import (
+    DataError,
+    IntegrityError,
+    InternalError,
+    ProgrammingError,
+)
 from sqlalchemy.orm import Session
 
 from app.db.session import engine
@@ -117,6 +123,40 @@ def _run(session: Session, source: DiscoverySource) -> CrawlRun:
     session.add(run)
     session.flush()
     return run
+
+
+def _page(session: Session, run: CrawlRun, source: DiscoverySource) -> FetchedPage:
+    page = FetchedPage(
+        crawl_run_id=run.id, source_id=source.id,
+        url="https://example.invalid/p", outcome="FETCHED", http_status=200,
+    )
+    session.add(page)
+    session.flush()
+    return page
+
+
+def _claim(session: Session, candidate: DiscoveryCandidate, source: DiscoverySource,
+           *, field_key: str = "payload_kg", value: str = "30") -> CandidateClaim:
+    """A claim is now always attributed — `discovery_source_id` is NOT NULL."""
+    claim = CandidateClaim(
+        candidate_id=candidate.id, field_key=field_key, claimed_value=value,
+        discovery_source_id=source.id,
+    )
+    session.add(claim)
+    session.flush()
+    return claim
+
+
+def _excerpt_kwargs(subject, source: DiscoverySource, **overrides) -> dict:
+    """Excerpt defaults that satisfy the subject/source trigger, so each test can
+    break exactly one thing."""
+    kwargs = dict(
+        subject_type="CLAIM", subject_id=subject.id, discovery_source_id=source.id,
+        excerpt_text="30 kg payload", page_url="https://example.invalid/p",
+        retrieved_at=datetime.now(UTC), ordinal=0,
+    )
+    kwargs.update(overrides)
+    return kwargs
 
 
 # --------------------------------------------------------------------------- #
@@ -208,12 +248,7 @@ def test_new_source_classes_are_usable(dsession: Session, source_class: str) -> 
 def test_a_claim_resolves_to_exactly_one_classified_source(dsession: Session) -> None:
     source = _source(dsession, key="prov-one", source_class="AGGREGATOR")
     candidate = _candidate(dsession, source, "prov-1")
-    claim = CandidateClaim(
-        candidate_id=candidate.id, field_key="payload_kg", claimed_value="30",
-        discovery_source_id=source.id,
-    )
-    dsession.add(claim)
-    dsession.flush()
+    claim = _claim(dsession, candidate, source)
 
     resolved = dsession.execute(
         select(DiscoverySource.source_class)
@@ -368,13 +403,11 @@ def test_excerpt_limit_is_one_thousand_unicode_characters(dsession: Session) -> 
     thousand characters the ratified limit promises, rather than a silently
     smaller allowance."""
     source = _source(dsession, key="exc-1")
-    run = _run(dsession, source)
+    claim = _claim(dsession, _candidate(dsession, source, "exc-1"), source)
     # 1000 multi-byte characters = 3000 bytes. Must be ACCEPTED.
     multibyte = "ä" * EVIDENCE_EXCERPT_MAX_CHARS
     excerpt = DiscoveryEvidenceExcerpt(
-        subject_type="CLAIM", subject_id=uuid.uuid4(), crawl_run_id=run.id,
-        excerpt_text=multibyte, page_url="https://example.invalid/p",
-        retrieved_at=datetime.now(UTC), ordinal=0,
+        **_excerpt_kwargs(claim, source, excerpt_text=multibyte)
     )
     dsession.add(excerpt)
     dsession.flush()
@@ -383,12 +416,9 @@ def test_excerpt_limit_is_one_thousand_unicode_characters(dsession: Session) -> 
 
 def test_an_over_length_excerpt_is_refused(dsession: Session) -> None:
     source = _source(dsession, key="exc-2")
-    run = _run(dsession, source)
-    dsession.add(DiscoveryEvidenceExcerpt(
-        subject_type="CLAIM", subject_id=uuid.uuid4(), crawl_run_id=run.id,
-        excerpt_text="x" * (EVIDENCE_EXCERPT_MAX_CHARS + 1),
-        page_url="https://example.invalid/p", retrieved_at=datetime.now(UTC),
-    ))
+    claim = _claim(dsession, _candidate(dsession, source, "exc-2"), source)
+    dsession.add(DiscoveryEvidenceExcerpt(**_excerpt_kwargs(
+        claim, source, excerpt_text="x" * (EVIDENCE_EXCERPT_MAX_CHARS + 1))))
     with pytest.raises((IntegrityError, DataError)):
         dsession.flush()
 
@@ -396,12 +426,9 @@ def test_an_over_length_excerpt_is_refused(dsession: Session) -> None:
 def test_a_blank_excerpt_is_refused(dsession: Session) -> None:
     """'The page implied it' is not evidence (LIVE.6)."""
     source = _source(dsession, key="exc-3")
-    run = _run(dsession, source)
+    claim = _claim(dsession, _candidate(dsession, source, "exc-3"), source)
     dsession.add(DiscoveryEvidenceExcerpt(
-        subject_type="CLAIM", subject_id=uuid.uuid4(), crawl_run_id=run.id,
-        excerpt_text="   ", page_url="https://example.invalid/p",
-        retrieved_at=datetime.now(UTC),
-    ))
+        **_excerpt_kwargs(claim, source, excerpt_text="   ")))
     with pytest.raises(IntegrityError):
         dsession.flush()
 
@@ -410,11 +437,18 @@ def test_one_claim_may_carry_several_ordered_excerpts(dsession: Session) -> None
     """A price and the region it applies to may sit in different parts of a page,
     so one passage often cannot justify a claim (D-7)."""
     source = _source(dsession, key="exc-4")
-    run = _run(dsession, source)
-    subject = uuid.uuid4()
+    candidate = _candidate(dsession, source, "exc-4")
+    signal = CandidateCommercialSignal(
+        candidate_id=candidate.id, discovery_source_id=source.id,
+        axis="PRICE", price_type="PUBLIC", price_amount=13500, price_currency="USD",
+    )
+    dsession.add(signal)
+    dsession.flush()
+    subject = signal.id
     for ordinal, body in enumerate(["$13,500", "Ships to US only"]):
         dsession.add(DiscoveryEvidenceExcerpt(
-            subject_type="COMMERCIAL_SIGNAL", subject_id=subject, crawl_run_id=run.id,
+            subject_type="COMMERCIAL_SIGNAL", subject_id=subject,
+            discovery_source_id=source.id,
             excerpt_text=body, page_url="https://example.invalid/p",
             retrieved_at=datetime.now(UTC), ordinal=ordinal,
         ))
@@ -429,14 +463,10 @@ def test_one_claim_may_carry_several_ordered_excerpts(dsession: Session) -> None
 
 def test_excerpt_ordinals_are_unique_per_subject(dsession: Session) -> None:
     source = _source(dsession, key="exc-5")
-    run = _run(dsession, source)
-    subject = uuid.uuid4()
+    claim = _claim(dsession, _candidate(dsession, source, "exc-5"), source)
     for _ in range(2):
         dsession.add(DiscoveryEvidenceExcerpt(
-            subject_type="CLAIM", subject_id=subject, crawl_run_id=run.id,
-            excerpt_text="same ordinal", page_url="https://example.invalid/p",
-            retrieved_at=datetime.now(UTC), ordinal=0,
-        ))
+            **_excerpt_kwargs(claim, source, excerpt_text="same ordinal")))
     with pytest.raises(IntegrityError):
         dsession.flush()
 
@@ -638,7 +668,8 @@ def test_recording_a_full_acquisition_run_writes_no_canonical_row(dsession: Sess
     dsession.add(signal)
     dsession.flush()
     dsession.add(DiscoveryEvidenceExcerpt(
-        subject_type="COMMERCIAL_SIGNAL", subject_id=signal.id, crawl_run_id=run.id,
+        subject_type="COMMERCIAL_SIGNAL", subject_id=signal.id,
+        discovery_source_id=source.id, crawl_run_id=run.id,
         fetched_page_id=page.id, excerpt_text="$13,500 USD",
         page_url=page.url, retrieved_at=datetime.now(UTC), locator=".price",
     ))
@@ -659,39 +690,106 @@ def test_recording_a_full_acquisition_run_writes_no_canonical_row(dsession: Sess
 # --------------------------------------------------------------------------- #
 # Schema <-> model drift
 # --------------------------------------------------------------------------- #
-@pytest.mark.parametrize("table", sorted(ACQUISITION_TABLES))
-def test_model_columns_match_the_database(database_url, table: str) -> None:
-    """`db/schema.sql` is canonical (AGENTS.md rule 2); the models mirror it. A
-    column present in one and not the other is drift, and drift is how a model
-    starts quietly lying about what is stored."""
-    from app.db.base import Base
-
-    model = next(
-        m.class_ for m in Base.registry.mappers if m.class_.__tablename__ == table
-    )
-    db_columns = {c["name"] for c in inspect(engine).get_columns(table, schema="humanoid")}
-    model_columns = {c.name for c in model.__table__.columns}
-    assert model_columns == db_columns, (
-        f"{table}: only in model {model_columns - db_columns}, "
-        f"only in database {db_columns - model_columns}"
-    )
-
-
-@pytest.mark.parametrize(
-    "table", ["discovery_source", "candidate_claim", "candidate_image_ref"]
+#: Tables whose ORM mapping must match the DDL exactly, not merely by name.
+MIRRORED_TABLES = sorted(
+    ACQUISITION_TABLES | {"discovery_source", "candidate_claim", "candidate_image_ref"}
 )
-def test_extended_discovery_models_match_the_database(database_url, table: str) -> None:
-    """The 0003 tables gained additive columns; the mirror must be exact there too."""
+
+
+def _pg_type(type_) -> str:
+    """A comparable type string, schema-qualification stripped.
+
+    Compiling both the reflected and the mapped type with the PostgreSQL dialect
+    is what makes `Integer` vs `BIGINT` and `TEXT` vs `CHAR(3)` visible — the
+    previous name-only comparison let both of those through.
+    """
+    rendered = str(type_.compile(dialect=postgresql.dialect()))
+    return rendered.split(".")[-1].upper()
+
+
+def _model_for(table: str):
     from app.db.base import Base
 
-    model = next(
-        m.class_ for m in Base.registry.mappers if m.class_.__tablename__ == table
+    return next(m.class_ for m in Base.registry.mappers if m.class_.__tablename__ == table)
+
+
+@pytest.mark.parametrize("table", MIRRORED_TABLES)
+def test_model_mirrors_the_database_exactly(database_url, table: str) -> None:
+    """`db/schema.sql` is canonical (AGENTS.md rule 2); the models mirror it.
+
+    The earlier version of this test compared column NAMES only, and two real type
+    mismatches passed unnoticed: `content_length` was BIGINT in the DDL and
+    Integer in the ORM, and `price_currency` was CHAR(3) versus Text. A name-only
+    mirror check is barely a check — it cannot see the difference between a model
+    that accepts what the database rejects and one that does not.
+    """
+    model = _model_for(table)
+    inspector = inspect(engine)
+    db_columns = {c["name"]: c for c in inspector.get_columns(table, schema="humanoid")}
+    model_columns = {c.name: c for c in model.__table__.columns}
+
+    assert set(model_columns) == set(db_columns), (
+        f"{table}: only in model {set(model_columns) - set(db_columns)}, "
+        f"only in database {set(db_columns) - set(model_columns)}"
     )
-    db_columns = {c["name"] for c in inspect(engine).get_columns(table, schema="humanoid")}
-    model_columns = {c.name for c in model.__table__.columns}
-    assert model_columns == db_columns, (
-        f"{table}: only in model {model_columns - db_columns}, "
-        f"only in database {db_columns - model_columns}"
+
+    mismatches: list[str] = []
+    for name, column in sorted(model_columns.items()):
+        db_column = db_columns[name]
+
+        # Type, including enum name, fixed length and numeric precision/scale.
+        model_type, db_type = _pg_type(column.type), _pg_type(db_column["type"])
+        if model_type != db_type:
+            mismatches.append(f"{name}: type model={model_type} db={db_type}")
+
+        # Nullability. A model that says NULL-able where the database says NOT NULL
+        # lets application code build a row the database will refuse.
+        if bool(column.nullable) != bool(db_column["nullable"]):
+            mismatches.append(
+                f"{name}: nullable model={column.nullable} db={db_column['nullable']}"
+            )
+
+        # Server defaults, where the contract depends on them (claim_status
+        # defaulting to NOT_VERIFIED, trigger defaults, etc.).
+        db_default = (db_column.get("default") or "").split("::")[0].strip("'") or None
+        model_default = None
+        if column.server_default is not None:
+            model_default = str(column.server_default.arg).split("::")[0].strip("'")
+        if (model_default is None) != (db_default is None):
+            mismatches.append(
+                f"{name}: server_default model={model_default!r} db={db_default!r}"
+            )
+
+    assert mismatches == [], f"{table} ORM/DDL drift: " + "; ".join(mismatches)
+
+
+@pytest.mark.parametrize("table", MIRRORED_TABLES)
+def test_model_foreign_keys_match_targets_and_delete_actions(
+    database_url, table: str
+) -> None:
+    """A wrong ON DELETE is invisible until the day a row is deleted.
+
+    `SET NULL` versus `RESTRICT` on `candidate_claim.discovery_source_id` is the
+    difference between silently stripping provenance from existing claims and
+    refusing to delete a source that has any — Gate X depends on the second.
+    """
+    model = _model_for(table)
+    db_fks = {
+        (tuple(fk["constrained_columns"]), fk["referred_table"],
+         (fk.get("options") or {}).get("ondelete", "").upper() or "NO ACTION")
+        for fk in inspect(engine).get_foreign_keys(table, schema="humanoid")
+    }
+    model_fks = set()
+    for constraint in model.__table__.foreign_key_constraints:
+        columns = tuple(c.name for c in constraint.columns)
+        target = next(iter(constraint.elements)).column.table.name
+        ondelete = (constraint.ondelete or "NO ACTION").upper()
+        model_fks.add((columns, target, ondelete))
+
+    assert model_fks == db_fks, (
+        f"{table} foreign-key drift — "
+        f"only in model: {sorted(model_fks - db_fks)}; "
+        f"only in db: {sorted(db_fks - model_fks)}"
     )
 
 
@@ -748,3 +846,318 @@ def test_commercial_routing_fields_are_not_implemented(database_url) -> None:
         "commission_model", "merchant_of_record", "transaction_completed_off_platform",
     ):
         assert field not in all_columns, f"§16.1 field {field} is out of Slice A scope"
+
+
+# --------------------------------------------------------------------------- #
+# ADVERSARIAL — the database must refuse forbidden states, not merely the ORM
+#
+# "The normal ORM path behaves correctly" is not "the database cannot represent a
+# forbidden state". Everything below goes around the ORM deliberately: raw SQL,
+# Core bulk statements, hand-built rows. That is the level at which a bypass
+# happens, and the earlier SQLAdmin mutation bypass is precisely that failure
+# already having occurred once in this layer.
+# --------------------------------------------------------------------------- #
+def test_raw_sql_cannot_insert_an_unattributed_claim(dsession: Session) -> None:
+    """Gate X, fail-closed: a claim with no resolvable source must be REJECTED."""
+    source = _source(dsession, key="raw-claim")
+    candidate = _candidate(dsession, source, "raw-claim")
+    with pytest.raises(IntegrityError):
+        dsession.execute(
+            text("INSERT INTO humanoid.candidate_claim (candidate_id, field_key,"
+                 " claimed_value) VALUES (:cid, 'payload_kg', '30')"),
+            {"cid": candidate.id},
+        )
+
+
+def test_deleting_a_source_with_claims_fails_rather_than_nulling_provenance(
+    dsession: Session,
+) -> None:
+    """ON DELETE RESTRICT, not SET NULL. Nulling would turn "an aggregator said
+    so" into an anonymous assertion at exactly the moment the audit trail
+    matters."""
+    source = _source(dsession, key="restrict-src", source_class="AGGREGATOR")
+    candidate = _candidate(dsession, source, "restrict-1")
+    _claim(dsession, candidate, source)
+
+    with pytest.raises(IntegrityError):
+        dsession.execute(
+            text("DELETE FROM humanoid.discovery_source WHERE id = :sid"),
+            {"sid": source.id},
+        )
+
+
+def test_an_excerpt_without_a_source_is_refused(dsession: Session) -> None:
+    source = _source(dsession, key="exc-nosrc")
+    claim = _claim(dsession, _candidate(dsession, source, "exc-nosrc"), source)
+    with pytest.raises(IntegrityError):
+        dsession.execute(
+            text("INSERT INTO humanoid.discovery_evidence_excerpt (subject_type,"
+                 " subject_id, excerpt_text, page_url, retrieved_at)"
+                 " VALUES ('CLAIM', :sid, 'x', 'https://e.invalid/p', now())"),
+            {"sid": claim.id},
+        )
+
+
+def test_an_excerpt_pointing_at_a_nonexistent_subject_is_refused(
+    dsession: Session,
+) -> None:
+    """The polymorphic subject cannot be a foreign key, so a trigger enforces it.
+    Left unchecked this accepted ANY random UUID — and an orphan quotation is
+    indistinguishable from a fabricated one."""
+    source = _source(dsession, key="exc-orphan")
+    dsession.add(DiscoveryEvidenceExcerpt(
+        subject_type="CLAIM", subject_id=uuid.uuid4(),
+        discovery_source_id=source.id, excerpt_text="quoted at nothing",
+        page_url="https://example.invalid/p", retrieved_at=datetime.now(UTC),
+    ))
+    with pytest.raises((IntegrityError, InternalError)):
+        dsession.flush()
+
+
+def test_an_excerpt_whose_source_differs_from_its_subject_is_refused(
+    dsession: Session,
+) -> None:
+    """An excerpt must be evidence FOR the claim it is attached to. Otherwise a
+    manufacturer-sourced passage could be quoted at an aggregator's claim, and the
+    provenance chain would read as sound while being false."""
+    manufacturer = _source(dsession, key="exc-mfr", source_class="MANUFACTURER")
+    aggregator = _source(dsession, key="exc-agg", source_class="AGGREGATOR")
+    claim = _claim(dsession, _candidate(dsession, aggregator, "exc-mix"), aggregator)
+
+    dsession.add(DiscoveryEvidenceExcerpt(
+        subject_type="CLAIM", subject_id=claim.id,
+        discovery_source_id=manufacturer.id,   # not the claim's source
+        excerpt_text="borrowed authority", page_url="https://example.invalid/p",
+        retrieved_at=datetime.now(UTC),
+    ))
+    with pytest.raises((IntegrityError, InternalError)):
+        dsession.flush()
+
+
+def test_an_excerpt_on_an_unattributed_image_ref_is_refused(dsession: Session) -> None:
+    """`candidate_image_ref.discovery_source_id` predates this contract and is
+    nullable; an excerpt still may not hang off an unattributed subject."""
+    source = _source(dsession, key="exc-img")
+    candidate = _candidate(dsession, source, "exc-img")
+    image_id = dsession.execute(
+        text("INSERT INTO humanoid.candidate_image_ref (candidate_id, image_url)"
+             " VALUES (:cid, 'https://example.invalid/i.jpg') RETURNING id"),
+        {"cid": candidate.id},
+    ).scalar_one()
+
+    dsession.add(DiscoveryEvidenceExcerpt(
+        subject_type="IMAGE_REF", subject_id=image_id,
+        discovery_source_id=source.id, excerpt_text="credit line",
+        page_url="https://example.invalid/p", retrieved_at=datetime.now(UTC),
+    ))
+    with pytest.raises((IntegrityError, InternalError)):
+        dsession.flush()
+
+
+def test_a_page_from_another_run_is_refused(dsession: Session) -> None:
+    """Postgres cannot express "this page belongs to that run" as a foreign key,
+    so without the lineage trigger a claim could cite a page fetched during a
+    different run and the chain would still look sound."""
+    source = _source(dsession, key="lineage-run")
+    run_a = _run(dsession, source)
+    run_b = _run(dsession, source)
+    page_of_a = _page(dsession, run_a, source)
+    candidate = _candidate(dsession, source, "lineage-run")
+
+    dsession.add(CandidateClaim(
+        candidate_id=candidate.id, field_key="height_cm", claimed_value="170",
+        discovery_source_id=source.id,
+        crawl_run_id=run_b.id, fetched_page_id=page_of_a.id,   # mismatched
+    ))
+    with pytest.raises((IntegrityError, InternalError)):
+        dsession.flush()
+
+
+def test_a_page_from_another_source_is_refused(dsession: Session) -> None:
+    source_a = _source(dsession, key="lineage-src-a")
+    source_b = _source(dsession, key="lineage-src-b", source_class="AGGREGATOR")
+    run_a = _run(dsession, source_a)
+    page_of_a = _page(dsession, run_a, source_a)
+    candidate = _candidate(dsession, source_b, "lineage-src")
+
+    dsession.add(CandidateClaim(
+        candidate_id=candidate.id, field_key="height_cm", claimed_value="170",
+        discovery_source_id=source_b.id, fetched_page_id=page_of_a.id,
+    ))
+    with pytest.raises((IntegrityError, InternalError)):
+        dsession.flush()
+
+
+def test_a_fetched_page_must_belong_to_its_runs_source(dsession: Session) -> None:
+    """Lineage is checked at the root too: a page recorded against a run must
+    share that run's source, or every downstream check is built on sand."""
+    source_a = _source(dsession, key="page-src-a")
+    source_b = _source(dsession, key="page-src-b")
+    run = _run(dsession, source_a)
+    dsession.add(FetchedPage(
+        crawl_run_id=run.id, source_id=source_b.id,
+        url="https://example.invalid/x", outcome="FETCHED",
+    ))
+    with pytest.raises((IntegrityError, InternalError)):
+        dsession.flush()
+
+
+def test_consistent_lineage_is_accepted(dsession: Session) -> None:
+    """The positive case, so the triggers are shown to PERMIT correct rows rather
+    than merely to reject."""
+    source = _source(dsession, key="lineage-ok")
+    run = _run(dsession, source)
+    page = _page(dsession, run, source)
+    candidate = _candidate(dsession, source, "lineage-ok")
+    claim = CandidateClaim(
+        candidate_id=candidate.id, field_key="height_cm", claimed_value="170",
+        discovery_source_id=source.id, crawl_run_id=run.id, fetched_page_id=page.id,
+    )
+    dsession.add(claim)
+    dsession.flush()
+    dsession.add(DiscoveryEvidenceExcerpt(
+        subject_type="CLAIM", subject_id=claim.id, discovery_source_id=source.id,
+        crawl_run_id=run.id, fetched_page_id=page.id,
+        excerpt_text="Height 170 cm", page_url=page.url,
+        retrieved_at=datetime.now(UTC), locator=".spec-height",
+    ))
+    dsession.flush()
+
+
+# --------------------------------------------------------------------------- #
+# §5 append-only — enforced by the DATABASE, not by cooperative sessions
+# --------------------------------------------------------------------------- #
+def _review(session: Session, source: DiscoverySource) -> SourceEligibilityReview:
+    review = SourceEligibilityReview(
+        source_id=source.id, reviewed_by="reviewer", tos_decision="PROHIBITED",
+    )
+    session.add(review)
+    session.flush()
+    return review
+
+
+def test_raw_sql_update_of_an_eligibility_review_is_refused(dsession: Session) -> None:
+    """The ORM listener is developer feedback; THIS is the integrity boundary. If
+    the record that authorizes contacting a third party could be edited, an
+    authorization could be backdated and DATA-D1.9 would be forgeable."""
+    source = _source(dsession, key="appendonly-1")
+    review = _review(dsession, source)
+    with pytest.raises((InternalError, ProgrammingError, IntegrityError)):
+        dsession.execute(
+            text("UPDATE humanoid.source_eligibility_review SET tos_decision ="
+                 " 'ALLOWED' WHERE id = :rid"),
+            {"rid": review.id},
+        )
+
+
+def test_raw_sql_delete_of_an_eligibility_review_is_refused(dsession: Session) -> None:
+    source = _source(dsession, key="appendonly-2")
+    review = _review(dsession, source)
+    with pytest.raises((InternalError, ProgrammingError, IntegrityError)):
+        dsession.execute(
+            text("DELETE FROM humanoid.source_eligibility_review WHERE id = :rid"),
+            {"rid": review.id},
+        )
+
+
+def test_core_bulk_update_of_an_eligibility_review_is_refused(dsession: Session) -> None:
+    """A Core bulk statement never fires ORM instance listeners — which is exactly
+    how the earlier SQLAdmin bypass got through on promotion_audit."""
+    source = _source(dsession, key="appendonly-3")
+    review = _review(dsession, source)
+    with pytest.raises((InternalError, ProgrammingError, IntegrityError)):
+        dsession.execute(
+            update(SourceEligibilityReview)
+            .where(SourceEligibilityReview.id == review.id)
+            .values(tos_decision="ALLOWED")
+        )
+
+
+def test_core_bulk_delete_of_an_eligibility_review_is_refused(dsession: Session) -> None:
+    source = _source(dsession, key="appendonly-4")
+    review = _review(dsession, source)
+    with pytest.raises((InternalError, ProgrammingError, IntegrityError)):
+        dsession.execute(
+            delete(SourceEligibilityReview).where(
+                SourceEligibilityReview.id == review.id
+            )
+        )
+
+
+def test_a_matchless_bulk_update_is_still_refused(dsession: Session) -> None:
+    """The trigger is FOR EACH STATEMENT: a row-level trigger never fires for a
+    statement that matches nothing, so `UPDATE ... WHERE <no match>` would appear
+    to succeed. Refusing the ATTEMPT is the honest semantics here."""
+    with pytest.raises((InternalError, ProgrammingError, IntegrityError)):
+        dsession.execute(
+            text("UPDATE humanoid.source_eligibility_review SET notes = 'x'"
+                 " WHERE id = '00000000-0000-0000-0000-000000000000'")
+        )
+
+
+def test_the_integrity_triggers_exist_in_the_database(database_url) -> None:
+    """Named explicitly, so removing one is a visible test failure rather than a
+    silent loss of the boundary."""
+    with engine.connect() as conn:
+        triggers = set(conn.execute(text(
+            "SELECT tgname FROM pg_trigger WHERE NOT tgisinternal"
+        )).scalars().all())
+    for name in (
+        "trg_source_eligibility_review_no_update",
+        "trg_source_eligibility_review_no_delete",
+        "trg_evidence_excerpt_subject",
+        "trg_fetched_page_lineage",
+        "trg_candidate_claim_lineage",
+        "trg_commercial_signal_lineage",
+        "trg_evidence_excerpt_lineage",
+        "trg_extraction_result_lineage",
+    ):
+        assert name in triggers, f"missing integrity trigger {name}"
+
+
+def test_the_orm_listener_remains_as_early_feedback(dsession: Session) -> None:
+    """Kept deliberately: it fails in Python with a clear message before the
+    statement reaches the database. It is simply no longer the boundary."""
+    source = _source(dsession, key="appendonly-5")
+    review = _review(dsession, source)
+    review.tos_decision = "ALLOWED"
+    with pytest.raises(EligibilityReviewImmutableError):
+        dsession.flush()
+
+
+# --------------------------------------------------------------------------- #
+# The specific drift a name-only comparison could not see
+# --------------------------------------------------------------------------- #
+def test_content_length_is_bigint_in_both_ddl_and_orm(database_url) -> None:
+    db_type = next(
+        c["type"] for c in inspect(engine).get_columns("fetched_page", schema="humanoid")
+        if c["name"] == "content_length"
+    )
+    assert _pg_type(db_type) == "BIGINT"
+    assert _pg_type(FetchedPage.__table__.c.content_length.type) == "BIGINT"
+
+
+def test_price_currency_is_char3_in_both_ddl_and_orm(database_url) -> None:
+    db_type = next(
+        c["type"] for c in inspect(engine).get_columns(
+            "candidate_commercial_signal", schema="humanoid")
+        if c["name"] == "price_currency"
+    )
+    assert _pg_type(db_type) == "CHAR(3)"
+    assert _pg_type(
+        CandidateCommercialSignal.__table__.c.price_currency.type
+    ) == "CHAR(3)"
+
+
+def test_price_amount_keeps_its_precision_and_scale(database_url) -> None:
+    """NUMERIC(14, 2): money must not silently become a float, and the scale is
+    what keeps a price from being rounded on the way in."""
+    db_type = next(
+        c["type"] for c in inspect(engine).get_columns(
+            "candidate_commercial_signal", schema="humanoid")
+        if c["name"] == "price_amount"
+    )
+    assert _pg_type(db_type) == "NUMERIC(14, 2)"
+    assert _pg_type(
+        CandidateCommercialSignal.__table__.c.price_amount.type
+    ) == "NUMERIC(14, 2)"

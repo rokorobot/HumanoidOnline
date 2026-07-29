@@ -1313,7 +1313,14 @@ CREATE TABLE candidate_claim (
     -- DATA-D1.LIVE §9.1: THE claim-level provenance anchor. Every claim resolves
     -- to exactly one classified source (discovery_source.source_class), so two
     -- sources asserting the same value are two rows and never one blended row.
-    discovery_source_id UUID REFERENCES discovery_source(id) ON DELETE SET NULL,
+    --
+    -- NOT NULL + RESTRICT, not nullable + SET NULL. Gate X requires a write with
+    -- no resolvable source to be REJECTED, and "nullable with SET NULL" fails that
+    -- twice over: an unattributed claim could be inserted, and deleting a source
+    -- would silently strip provenance from claims already made — turning "an
+    -- aggregator said so" into an anonymous assertion precisely when the audit
+    -- trail matters. RESTRICT makes the source undeletable while its claims live.
+    discovery_source_id UUID NOT NULL REFERENCES discovery_source(id) ON DELETE RESTRICT,
     evidence_url        TEXT,
     note                TEXT,
     -- DATA-D1.LIVE §9 (migration 0004). Extraction provenance; the exact
@@ -1440,6 +1447,13 @@ CREATE TABLE discovery_evidence_excerpt (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     subject_type    evidence_subject_type NOT NULL,
     subject_id      UUID NOT NULL,          -- soft ref: claim / signal / image_ref
+    -- §9.1: an excerpt is evidence FOR a claim, so it carries the same source FK
+    -- the claim does. Without it an excerpt could be quoted at a claim it did not
+    -- come from, which is the one thing an evidence table must make impossible.
+    -- The polymorphic subject cannot be a real FK, so a trigger
+    -- (assert_evidence_excerpt_subject) enforces that the subject exists, has a
+    -- source, and that its source is THIS one.
+    discovery_source_id UUID NOT NULL REFERENCES discovery_source(id) ON DELETE RESTRICT,
     crawl_run_id    UUID REFERENCES crawl_run(id) ON DELETE SET NULL,
     fetched_page_id UUID REFERENCES fetched_page(id) ON DELETE SET NULL,
     excerpt_text    TEXT NOT NULL,
@@ -1494,6 +1508,182 @@ CREATE INDEX idx_commercial_signal_candidate ON candidate_commercial_signal (can
 CREATE INDEX idx_commercial_signal_source    ON candidate_commercial_signal (discovery_source_id);
 CREATE INDEX idx_evidence_excerpt_subject    ON discovery_evidence_excerpt (subject_type, subject_id);
 CREATE INDEX idx_candidate_claim_source      ON candidate_claim (discovery_source_id);
+
+-- =============================================================================
+-- DATA-D1.LIVE integrity enforcement — the DATABASE refuses forbidden states
+-- =============================================================================
+-- The distinction these triggers exist to close: "the normal ORM path behaves
+-- correctly" is not the same as "the database cannot represent a forbidden
+-- state". ORM listeners are cooperative — raw SQL, a Core bulk statement, a psql
+-- session or SQLAdmin's bulk paths all bypass them, and the earlier SQLAdmin
+-- mutation bypass is exactly that failure already having happened once here.
+
+-- §5 — source_eligibility_review is append-only, enforced by the database.
+--
+-- FOR EACH STATEMENT, not FOR EACH ROW: a row-level trigger never fires for a
+-- statement that matches nothing, so `UPDATE ... WHERE <no match>` would appear
+-- to succeed. Statement level refuses the *attempt*, which is the honest
+-- semantics for a record that authorizes contacting a third party — if it could
+-- be edited, an authorization could be backdated and DATA-D1.9 would be
+-- forgeable.
+CREATE OR REPLACE FUNCTION refuse_eligibility_review_mutation()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+    RAISE EXCEPTION
+        'source_eligibility_review is append-only (DATA-D1.LIVE §5): % refused. '
+        'Record a NEW review instead — an eligibility decision is evidence, and '
+        'evidence is not edited.', TG_OP
+        USING ERRCODE = 'restrict_violation';
+END$$;
+COMMENT ON FUNCTION refuse_eligibility_review_mutation() IS
+    'DATA-D1.LIVE §5: refuses UPDATE/DELETE on source_eligibility_review at the database '
+    'level, so raw SQL and bulk Core statements cannot bypass it.';
+
+CREATE TRIGGER trg_source_eligibility_review_no_update
+    BEFORE UPDATE ON source_eligibility_review
+    FOR EACH STATEMENT EXECUTE FUNCTION refuse_eligibility_review_mutation();
+CREATE TRIGGER trg_source_eligibility_review_no_delete
+    BEFORE DELETE ON source_eligibility_review
+    FOR EACH STATEMENT EXECUTE FUNCTION refuse_eligibility_review_mutation();
+
+-- §9.1 / §8 — run / page / source lineage must agree.
+--
+-- A row may name a crawl run, a fetched page and a source. Postgres cannot
+-- express "this page belongs to that run" as a foreign key, so without this a
+-- claim could cite a page fetched during a different run, or from a different
+-- source, and the provenance chain would read as sound while being false.
+-- Reads NEW through to_jsonb so one function serves every table that carries
+-- some subset of the three columns.
+CREATE OR REPLACE FUNCTION assert_acquisition_lineage()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+DECLARE
+    row_json  JSONB := to_jsonb(NEW);
+    v_run_id  UUID  := NULLIF(row_json->>'crawl_run_id', '')::UUID;
+    v_page_id UUID  := NULLIF(row_json->>'fetched_page_id', '')::UUID;
+    -- `fetched_page` names its source column `source_id`; everything else uses
+    -- `discovery_source_id`. Reading only the latter made the root-level check
+    -- (a page must belong to its run's source) silently skip — the trigger was
+    -- present and passing while enforcing nothing there.
+    v_src_id  UUID  := COALESCE(
+        NULLIF(row_json->>'discovery_source_id', '')::UUID,
+        NULLIF(row_json->>'source_id', '')::UUID
+    );
+    page_run  UUID;
+    page_src  UUID;
+    run_src   UUID;
+BEGIN
+    IF v_page_id IS NOT NULL THEN
+        SELECT crawl_run_id, source_id INTO page_run, page_src
+        FROM fetched_page WHERE id = v_page_id;
+
+        IF v_run_id IS NOT NULL AND page_run <> v_run_id THEN
+            RAISE EXCEPTION
+                '%.fetched_page_id % belongs to crawl run %, not %',
+                TG_TABLE_NAME, v_page_id, page_run, v_run_id
+                USING ERRCODE = 'foreign_key_violation';
+        END IF;
+        IF v_src_id IS NOT NULL AND page_src <> v_src_id THEN
+            RAISE EXCEPTION
+                '%.fetched_page_id % was fetched from source %, not %',
+                TG_TABLE_NAME, v_page_id, page_src, v_src_id
+                USING ERRCODE = 'foreign_key_violation';
+        END IF;
+    END IF;
+
+    IF v_run_id IS NOT NULL AND v_src_id IS NOT NULL THEN
+        SELECT source_id INTO run_src FROM crawl_run WHERE id = v_run_id;
+        IF run_src <> v_src_id THEN
+            RAISE EXCEPTION
+                '%.crawl_run_id % ran against source %, not %',
+                TG_TABLE_NAME, v_run_id, run_src, v_src_id
+                USING ERRCODE = 'foreign_key_violation';
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END$$;
+COMMENT ON FUNCTION assert_acquisition_lineage() IS
+    'DATA-D1.LIVE: run/page/source lineage must agree. Postgres cannot express '
+    '"this page belongs to that run" as a foreign key, so this closes it.';
+
+-- §9 — an evidence excerpt must belong to a real subject, with the SAME source.
+--
+-- `subject_type + subject_id` is a polymorphic soft reference, so no foreign key
+-- can protect it. Left unchecked it accepts any random UUID, which would make the
+-- evidence table capable of holding excerpts attached to nothing at all — an
+-- orphan quotation is indistinguishable from a fabricated one.
+CREATE OR REPLACE FUNCTION assert_evidence_excerpt_subject()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+DECLARE
+    subject_src UUID;
+    found       BOOLEAN := FALSE;
+BEGIN
+    CASE NEW.subject_type
+        WHEN 'CLAIM' THEN
+            SELECT discovery_source_id, TRUE INTO subject_src, found
+            FROM candidate_claim WHERE id = NEW.subject_id;
+        WHEN 'COMMERCIAL_SIGNAL' THEN
+            SELECT discovery_source_id, TRUE INTO subject_src, found
+            FROM candidate_commercial_signal WHERE id = NEW.subject_id;
+        WHEN 'IMAGE_REF' THEN
+            SELECT discovery_source_id, TRUE INTO subject_src, found
+            FROM candidate_image_ref WHERE id = NEW.subject_id;
+        ELSE
+            RAISE EXCEPTION 'unknown evidence subject_type %', NEW.subject_type
+                USING ERRCODE = 'check_violation';
+    END CASE;
+
+    IF NOT found THEN
+        RAISE EXCEPTION
+            'evidence excerpt subject %/% does not exist — an orphan excerpt is '
+            'indistinguishable from a fabricated one (DATA-D1.LIVE §9)',
+            NEW.subject_type, NEW.subject_id
+            USING ERRCODE = 'foreign_key_violation';
+    END IF;
+
+    -- candidate_image_ref.discovery_source_id predates this contract and is
+    -- nullable; an excerpt may not hang off an unattributed subject regardless.
+    IF subject_src IS NULL THEN
+        RAISE EXCEPTION
+            'evidence excerpt subject %/% has no source, so its evidence cannot '
+            'be attributed (DATA-D1.LIVE §9.1)', NEW.subject_type, NEW.subject_id
+            USING ERRCODE = 'not_null_violation';
+    END IF;
+
+    IF subject_src <> NEW.discovery_source_id THEN
+        RAISE EXCEPTION
+            'evidence excerpt source % does not match subject %/% source % — an '
+            'excerpt must be evidence FOR the claim it is attached to',
+            NEW.discovery_source_id, NEW.subject_type, NEW.subject_id, subject_src
+            USING ERRCODE = 'foreign_key_violation';
+    END IF;
+
+    RETURN NEW;
+END$$;
+COMMENT ON FUNCTION assert_evidence_excerpt_subject() IS
+    'DATA-D1.LIVE §9/§9.1: the polymorphic excerpt subject must exist, have a source, '
+    'and share it with the excerpt. No foreign key can express this.';
+
+CREATE TRIGGER trg_evidence_excerpt_subject
+    BEFORE INSERT OR UPDATE ON discovery_evidence_excerpt
+    FOR EACH ROW EXECUTE FUNCTION assert_evidence_excerpt_subject();
+
+-- Lineage applies to every acquisition row that can name a run and a page.
+CREATE TRIGGER trg_fetched_page_lineage
+    BEFORE INSERT OR UPDATE ON fetched_page
+    FOR EACH ROW EXECUTE FUNCTION assert_acquisition_lineage();
+CREATE TRIGGER trg_extraction_result_lineage
+    BEFORE INSERT OR UPDATE ON extraction_result
+    FOR EACH ROW EXECUTE FUNCTION assert_acquisition_lineage();
+CREATE TRIGGER trg_candidate_claim_lineage
+    BEFORE INSERT OR UPDATE ON candidate_claim
+    FOR EACH ROW EXECUTE FUNCTION assert_acquisition_lineage();
+CREATE TRIGGER trg_commercial_signal_lineage
+    BEFORE INSERT OR UPDATE ON candidate_commercial_signal
+    FOR EACH ROW EXECUTE FUNCTION assert_acquisition_lineage();
+CREATE TRIGGER trg_evidence_excerpt_lineage
+    BEFORE INSERT OR UPDATE ON discovery_evidence_excerpt
+    FOR EACH ROW EXECUTE FUNCTION assert_acquisition_lineage();
 
 -- discovery_source / discovery_candidate / candidate_claim carry updated_at; give
 -- them the same maintenance trigger as the canonical tables above.

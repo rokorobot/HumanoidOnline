@@ -302,10 +302,14 @@ def test_r12_candidate_data_never_appears_in_any_public_response_body(
         m=sentinel_mfr,
     ).scalar_one()
     _exec(
-        "INSERT INTO candidate_claim (candidate_id, field_key, claimed_value) "
-        "VALUES (:c, 'height_cm', :v)",
+        # `discovery_source_id` is NOT NULL since DATA-D1.LIVE Slice A (§9.1): a
+        # claim must resolve to exactly one classified source, so the probe row
+        # is attributed like any real claim would be.
+        "INSERT INTO candidate_claim (candidate_id, field_key, claimed_value, "
+        "discovery_source_id) VALUES (:c, 'height_cm', :v, :s)",
         c=candidate_id,
         v=sentinel_claim,
+        s=source_id,
     )
     try:
         surfaces = _public_surfaces(client)

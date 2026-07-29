@@ -193,8 +193,14 @@ class CandidateClaim(Base):
     #: to exactly one classified source (`DiscoverySource.source_class`), so two
     #: sources asserting the same value are two rows, never one blended row, and
     #: corroboration can be counted without being merged.
-    discovery_source_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("discovery_source.id", ondelete="SET NULL")
+    #:
+    #: NOT NULL + RESTRICT (migration 0004). Nullable + SET NULL failed Gate X
+    #: twice: an unattributed claim could be inserted, and deleting a source would
+    #: silently strip provenance from claims already made.
+    discovery_source_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("discovery_source.id", ondelete="RESTRICT"),
+        nullable=False,
     )
     evidence_url: Mapped[str | None] = mapped_column(Text)
     note: Mapped[str | None] = mapped_column(Text)

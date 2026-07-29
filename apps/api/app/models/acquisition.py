@@ -25,6 +25,8 @@ from datetime import datetime
 from decimal import Decimal
 
 from sqlalchemy import (
+    CHAR,
+    BigInteger,
     CheckConstraint,
     DateTime,
     ForeignKey,
@@ -228,7 +230,9 @@ class FetchedPage(Base):
     canonical_url: Mapped[str | None] = mapped_column(Text)
     http_status: Mapped[int | None] = mapped_column(Integer)
     content_type: Mapped[str | None] = mapped_column(Text)
-    content_length: Mapped[int | None] = mapped_column(Integer)
+    #: BIGINT in the DDL — a page size must not overflow a 4-byte column, and a
+    #: model that says Integer would silently accept what the database rejects.
+    content_length: Mapped[int | None] = mapped_column(BigInteger)
     #: SHA-256 of the normalized body: dedup + change detection without storage.
     content_hash: Mapped[str | None] = mapped_column(Text)
     etag: Mapped[str | None] = mapped_column(Text)
@@ -344,7 +348,9 @@ class CandidateCommercialSignal(Base):
     buyer_type: Mapped[str | None] = mapped_column(buyer_type)
     price_type: Mapped[str | None] = mapped_column(price_type)
     price_amount: Mapped[Decimal | None] = mapped_column(Numeric(14, 2))
-    price_currency: Mapped[str | None] = mapped_column(Text)
+    #: CHAR(3) in the DDL: an ISO-4217 code, fixed width. Text here would let
+    #: the model accept 'US' or 'DOLLARS' and only fail at the database.
+    price_currency: Mapped[str | None] = mapped_column(CHAR(3))
     billing_period: Mapped[str | None] = mapped_column(billing_period)
     extractor_key: Mapped[str | None] = mapped_column(Text)
     extractor_version: Mapped[str | None] = mapped_column(Text)
@@ -392,8 +398,18 @@ class DiscoveryEvidenceExcerpt(Base):
     subject_type: Mapped[str] = mapped_column(evidence_subject_type, nullable=False)
     #: Soft reference to a claim / signal / image-ref row. Deliberately not three
     #: nullable FKs: one write path serves all three, and the (type, id) pair
-    #: keeps the target unambiguous.
+    #: keeps the target unambiguous. Because no foreign key can protect a
+    #: polymorphic reference, the `trg_evidence_excerpt_subject` DATABASE trigger
+    #: enforces that the subject exists, has a source, and shares it with this row.
     subject_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    #: §9.1 — an excerpt is evidence FOR a claim, so it carries the same source FK
+    #: the claim does. Without it an excerpt could be quoted at a claim it never
+    #: came from, which is the one thing an evidence table must make impossible.
+    discovery_source_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("discovery_source.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
     crawl_run_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("crawl_run.id", ondelete="SET NULL")
     )

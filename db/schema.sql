@@ -1051,10 +1051,17 @@ COMMENT ON VIEW robot_commercial_snapshot IS
 -- FROM a candidate TO canonical (possible_*/promoted_robot_id), never the reverse.
 -- Mirrored by db/migrations/0003_add_discovery_layer.sql.
 
+-- DATA-D1.LIVE §4 (docs/16, RATIFIED v0.1) widened this vocabulary ADDITIVELY for
+-- official-first, multi-source radar. Every value DATA-D1 shipped in migration
+-- 0003 is retained verbatim — no rename, no removal, no re-mapping of existing
+-- rows — and four classes are appended. Class predicts nothing about eligibility
+-- (§5): an aggregator is reviewed by exactly the same procedure as a manufacturer.
 CREATE TYPE discovery_source_class AS ENUM (
     'COMPETITOR_DIRECTORY', 'MARKETPLACE', 'EDITORIAL', 'SEARCH_RESULT',
     'DISTRIBUTOR', 'MANUFACTURER', 'PRESS_RELEASE', 'OFFICIAL_DOCUMENT',
-    'OFFICIAL_VIDEO', 'OTHER');
+    'OFFICIAL_VIDEO', 'OTHER',
+    -- DATA-D1.LIVE §4 additions (migration 0004).
+    'AGGREGATOR', 'AUTHORIZED_DISTRIBUTOR', 'OFFICIAL_STORE', 'COMMUNITY');
 
 -- DATA-D1.9: an AFFIRMATIVE decision that automated access is permitted — not
 -- merely that a review happened. PROHIBITED/RESTRICTED/UNKNOWN block enablement.
@@ -1079,6 +1086,51 @@ CREATE TYPE trace_state AS ENUM (
 CREATE TYPE claim_status AS ENUM (
     'NOT_VERIFIED', 'VERIFIED', 'CONFLICT', 'REJECTED', 'UNKNOWN');
 
+-- ---------------------------------------------------------------------------
+-- DATA-D1.LIVE (docs/16_DATA_D1_LIVE_MARKET_ACQUISITION_CONTRACT.md, RATIFIED
+-- v0.1) — live-acquisition types. Slice A is SCHEMA ONLY: these types and the
+-- tables below exist so an acquisition run can be recorded, but no adapter, HTTP
+-- client, robots fetcher or crawler exists in this slice. Mirrored by
+-- db/migrations/0004_add_live_acquisition_layer.sql.
+-- ---------------------------------------------------------------------------
+
+-- HALTED_BY_POLICY is first-class, not an error: robots changed, the terms review
+-- expired mid-run, or the source began denying access (§7).
+CREATE TYPE crawl_run_status AS ENUM (
+    'RUNNING', 'COMPLETED', 'FAILED', 'HALTED_BY_POLICY', 'CANCELLED');
+
+-- LIVE.4: v0.1 has exactly one trigger. No scheduler, cron, queue or worker may
+-- start a run; a named human does, locally. The enum has one value so that
+-- adding an automated trigger is a visible schema change, not a config flag.
+CREATE TYPE crawl_trigger AS ENUM ('MANUAL');
+
+CREATE TYPE fetch_outcome AS ENUM (
+    'FETCHED', 'NOT_MODIFIED', 'FROM_CACHE', 'BLOCKED_BY_ROBOTS',
+    'BLOCKED_BY_SOURCE', 'ERROR', 'SKIPPED_UNCHANGED');
+
+CREATE TYPE extraction_method AS ENUM (
+    'SELECTOR', 'JSONLD', 'MICRODATA', 'PATTERN', 'MANUAL');
+
+-- LIVE.8 / owner decision D-6: how sure the PARSER is that it read the page
+-- correctly. Deliberately has no VERIFIED value — verification is a human act on
+-- claim_status, and a parser must not be able to express it.
+CREATE TYPE extraction_confidence AS ENUM ('LOW', 'MEDIUM', 'HIGH');
+
+-- LIVE.7: the three axes that must never collapse into one status label.
+CREATE TYPE signal_axis AS ENUM ('MATURITY', 'OBTAINABILITY', 'PRICE');
+
+CREATE TYPE eligibility_decision AS ENUM (
+    'ALLOWED', 'RESTRICTED', 'PROHIBITED', 'UNKNOWN');
+
+CREATE TYPE extraction_status AS ENUM (
+    'EXTRACTED', 'NOTHING_FOUND', 'AMBIGUOUS', 'ERROR');
+
+-- Which discovery record an evidence excerpt belongs to (§9). A soft subject
+-- reference rather than three nullable FKs: the excerpt table is written by the
+-- same code path for all three, and a CHECK keeps the pair meaningful.
+CREATE TYPE evidence_subject_type AS ENUM (
+    'CLAIM', 'COMMERCIAL_SIGNAL', 'IMAGE_REF');
+
 -- Radar registry. DATA-D1.9: is_enabled requires an AFFIRMATIVE ToS-permits-
 -- automation decision, a robots decision that is not a disallow, and recorded
 -- review attribution + time. Reviewing a source is NOT the same as being allowed.
@@ -1094,6 +1146,18 @@ CREATE TABLE discovery_source (
     eligibility_reviewed_by TEXT,
     is_enabled              BOOLEAN NOT NULL DEFAULT FALSE,
     notes                   TEXT,
+    -- DATA-D1.LIVE §5 / LIVE.2 (migration 0004). Asymmetric validity is
+    -- deliberate: a terms page is a legal document that changes rarely and
+    -- deliberately (90 days, void on a material hash change), while a robots
+    -- policy is an operational signal that can change any day and is therefore
+    -- re-read every run and never answered from a stored decision (24h max).
+    allowed_path_prefixes   TEXT[],       -- exactly what the review covered
+    tos_reviewed_at         TIMESTAMPTZ,
+    tos_expires_at          TIMESTAMPTZ,  -- reviewed_at + 90d (owner decision D-2)
+    tos_page_hash           TEXT,         -- SHA-256; a change voids the review
+    last_robots_hash        TEXT,
+    last_robots_checked_at  TIMESTAMPTZ,  -- staler than 24h = must re-check
+    last_crawled_at         TIMESTAMPTZ,
     created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT ck_discovery_source_eligible CHECK (
@@ -1108,6 +1172,105 @@ CREATE TABLE discovery_source (
 COMMENT ON TABLE discovery_source IS
     'DATA-D1 radar registry. is_enabled requires an affirmative ToS-permits-automation '
     'decision + non-disallow robots decision + recorded review attribution (DATA-D1.9).';
+
+-- DATA-D1.LIVE §5 — APPEND-ONLY eligibility review record.
+--
+-- discovery_source carries the *effective* decision; this carries its *history*,
+-- so a decision can be audited and re-reviewed rather than silently overwritten.
+-- Append-only because an eligibility decision is the artefact that authorizes
+-- contacting a third party: if it could be edited, the authorization could be
+-- backdated. Enforced at ORM level (models/acquisition.py) and by ON DELETE
+-- RESTRICT here, exactly as promotion_audit is.
+--
+-- The first real use of this record (2026-07-29) found two of three official
+-- manufacturer sources PROHIBITING automated access while their robots.txt was
+-- permissive — which is why both axes are recorded separately, with their own
+-- URL, hash and excerpt.
+CREATE TABLE source_eligibility_review (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    source_id           UUID NOT NULL REFERENCES discovery_source(id) ON DELETE RESTRICT,
+    -- robots axis
+    robots_url          TEXT,
+    robots_decision     robots_status NOT NULL DEFAULT 'UNKNOWN',
+    robots_page_hash    TEXT,
+    robots_excerpt      TEXT,
+    -- terms / legal axis
+    tos_url             TEXT,
+    tos_decision        eligibility_decision NOT NULL DEFAULT 'UNKNOWN',
+    tos_page_hash       TEXT,
+    tos_excerpt         TEXT,
+    -- scope + attribution. reviewed_by is NOT NULL: an unattributed review is
+    -- not a review (DATA-D1.9).
+    path_prefixes       TEXT[],
+    reviewed_by         TEXT NOT NULL,
+    reviewed_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+    expires_at          TIMESTAMPTZ,
+    -- Provisional recommendation vs the owner's decision, kept separate: an
+    -- assessment is evidence, enabling the source is a human act (§5 step 5).
+    recommendation      eligibility_decision NOT NULL DEFAULT 'UNKNOWN',
+    notes               TEXT,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT ck_source_eligibility_review_excerpt_len CHECK (
+        (robots_excerpt IS NULL OR char_length(robots_excerpt) <= 1000)
+        AND (tos_excerpt IS NULL OR char_length(tos_excerpt) <= 1000)
+    )
+);
+COMMENT ON TABLE source_eligibility_review IS
+    'DATA-D1.LIVE §5 append-only eligibility history (robots axis + terms axis, each with '
+    'URL/hash/excerpt). Append-only: this record is what authorizes contacting a third party.';
+
+-- DATA-D1.LIVE §7 — one acquisition run.
+CREATE TABLE crawl_run (
+    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    source_id         UUID NOT NULL REFERENCES discovery_source(id) ON DELETE RESTRICT,
+    adapter_key       TEXT NOT NULL,
+    adapter_version   TEXT NOT NULL,   -- bump => re-extraction is meaningful (§8)
+    trigger           crawl_trigger NOT NULL DEFAULT 'MANUAL',
+    operator          TEXT NOT NULL,   -- the named human (LIVE.4)
+    status            crawl_run_status NOT NULL DEFAULT 'RUNNING',
+    started_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    finished_at       TIMESTAMPTZ,
+    resume_of_run_id  UUID REFERENCES crawl_run(id) ON DELETE SET NULL,
+    run_manifest      JSONB,           -- planned URLs, limits, rate policy, UA, robots hash
+    counters          JSONB,           -- the §18 report figures
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    -- A finished run must say when it finished; a RUNNING one must not.
+    CONSTRAINT ck_crawl_run_finished CHECK (
+        (status = 'RUNNING' AND finished_at IS NULL)
+        OR (status <> 'RUNNING' AND finished_at IS NOT NULL)
+    ),
+    CONSTRAINT ck_crawl_run_not_self_resume CHECK (resume_of_run_id IS DISTINCT FROM id)
+);
+COMMENT ON TABLE crawl_run IS
+    'DATA-D1.LIVE §7 acquisition run. trigger is MANUAL-only in v0.1 (LIVE.4): no scheduler, '
+    'queue or worker may start one. Slice A records runs; it cannot perform them.';
+
+-- DATA-D1.LIVE §8 — per-URL outcome. NO BODY COLUMN: bodies live in the
+-- content-addressed on-disk cache outside the database (LIVE.10 / decision D-3),
+-- and only the hash, the validators and the outcome are durable here. This table
+-- is also what makes a run resumable (§7): a resumed run skips URLs already
+-- FETCHED by its parent.
+CREATE TABLE fetched_page (
+    id                       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    crawl_run_id             UUID NOT NULL REFERENCES crawl_run(id) ON DELETE CASCADE,
+    source_id                UUID NOT NULL REFERENCES discovery_source(id) ON DELETE RESTRICT,
+    url                      TEXT NOT NULL,
+    canonical_url            TEXT,
+    http_status              INTEGER,
+    content_type             TEXT,
+    content_length           BIGINT,
+    content_hash             TEXT,       -- SHA-256 of the normalized body
+    etag                     TEXT,
+    last_modified            TEXT,
+    retrieved_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
+    outcome                  fetch_outcome NOT NULL,
+    robots_decision_at_fetch robots_status,   -- what robots said AT the request
+    error_class              TEXT,
+    created_at               TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+COMMENT ON TABLE fetched_page IS
+    'DATA-D1.LIVE §8 per-URL fetch outcome. Deliberately has NO body column (LIVE.10): the '
+    'evidence of what a page said is durable, the page itself is not.';
 
 CREATE TABLE discovery_candidate (
     id                        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -1147,14 +1310,26 @@ CREATE TABLE candidate_claim (
     claimed_value       TEXT,              -- NULL = UNKNOWN (never 0/false)
     unit                TEXT,
     claim_status        claim_status NOT NULL DEFAULT 'NOT_VERIFIED',
+    -- DATA-D1.LIVE §9.1: THE claim-level provenance anchor. Every claim resolves
+    -- to exactly one classified source (discovery_source.source_class), so two
+    -- sources asserting the same value are two rows and never one blended row.
     discovery_source_id UUID REFERENCES discovery_source(id) ON DELETE SET NULL,
     evidence_url        TEXT,
     note                TEXT,
+    -- DATA-D1.LIVE §9 (migration 0004). Extraction provenance; the exact
+    -- supporting passages live in discovery_evidence_excerpt, not here.
+    extractor_key         TEXT,
+    extractor_version     TEXT,
+    extraction_method     extraction_method,
+    extraction_confidence extraction_confidence,   -- never VERIFIED (LIVE.8)
+    crawl_run_id          UUID REFERENCES crawl_run(id) ON DELETE SET NULL,
+    fetched_page_id       UUID REFERENCES fetched_page(id) ON DELETE SET NULL,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 COMMENT ON TABLE candidate_claim IS
-    'Per-field claims. Conflicting values are retained side-by-side, never averaged (DATA-D1.8).';
+    'Per-field claims. Conflicting values are retained side-by-side, never averaged (DATA-D1.8). '
+    'discovery_source_id is the DATA-D1.LIVE §9.1 provenance anchor: one claim, one classified source.';
 
 -- Reference-only candidate imagery (R3): http/https URL + metadata, NO binary.
 CREATE TABLE candidate_image_ref (
@@ -1165,11 +1340,122 @@ CREATE TABLE candidate_image_ref (
     credited_to         TEXT,
     media_status        TEXT NOT NULL DEFAULT 'CANDIDATE',
     note                TEXT,
+    -- DATA-D1.LIVE §10 (migration 0004). RETRIEVAL provenance, which is not the
+    -- same as claimed authorship: an image credited to a manufacturer but seen on
+    -- an aggregator is retrieval_source_class = AGGREGATOR (the Figure 02
+    -- precedent). The extractor sets NO MEDIA-01 verdict — identity, rights and
+    -- usage basis stay human decisions, so there is deliberately no is_official,
+    -- rights_status or usage_basis column here.
+    page_url               TEXT,        -- the page it was seen on
+    retrieved_at           TIMESTAMPTZ,
+    declared_credit        TEXT,        -- the credit line as printed
+    attribution_claimed    TEXT,        -- who the page CLAIMS made it (claim only)
+    alt_text               TEXT,
+    retrieval_source_class discovery_source_class,
+    crawl_run_id           UUID REFERENCES crawl_run(id) ON DELETE SET NULL,
+    fetched_page_id        UUID REFERENCES fetched_page(id) ON DELETE SET NULL,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT ck_candidate_image_ref_scheme CHECK (image_url ~* '^https?://')
 );
 COMMENT ON TABLE candidate_image_ref IS
-    'DATA-D1 R3: reference-only imagery (http/https URL + metadata, no binary). MEDIA-01 authoritative.';
+    'DATA-D1 R3: reference-only imagery (http/https URL + metadata, no binary). MEDIA-01 authoritative. '
+    'DATA-D1.LIVE §10: retrieval_source_class records where it was SEEN, never claimed authorship.';
+
+-- DATA-D1.LIVE §9 — what one extractor pass over one page produced.
+CREATE TABLE extraction_result (
+    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    crawl_run_id      UUID NOT NULL REFERENCES crawl_run(id) ON DELETE CASCADE,
+    fetched_page_id   UUID NOT NULL REFERENCES fetched_page(id) ON DELETE CASCADE,
+    candidate_id      UUID REFERENCES discovery_candidate(id) ON DELETE SET NULL,
+    extractor_key     TEXT NOT NULL,
+    extractor_version TEXT NOT NULL,
+    entity_type       candidate_entity_type NOT NULL DEFAULT 'ROBOT',
+    status            extraction_status NOT NULL,
+    notes             TEXT,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+COMMENT ON TABLE extraction_result IS
+    'DATA-D1.LIVE §9: one extractor pass over one page. AMBIGUOUS is a real outcome for a human, '
+    'never a guess.';
+
+-- DATA-D1.LIVE §9 / LIVE.7 — a commercial signal is NOT a scalar field/value
+-- pair, so it is not forced into candidate_claim. The three axes are recorded
+-- separately and never merged into one status label: a robot may legitimately be
+-- AVAILABLE for PURCHASE in one region and ON_REQUEST elsewhere, which a single
+-- label cannot express. UNKNOWN is the absence of a signal and never becomes
+-- NOT_AVAILABLE; QUOTE_ONLY is a PRICE fact and never becomes UNKNOWN.
+CREATE TABLE candidate_commercial_signal (
+    id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    candidate_id          UUID NOT NULL REFERENCES discovery_candidate(id) ON DELETE CASCADE,
+    -- §9.1 provenance anchor, same rule as candidate_claim: one signal, one
+    -- classified source. NOT NULL here because this table is new — there is no
+    -- pre-existing unattributed row to accommodate.
+    discovery_source_id   UUID NOT NULL REFERENCES discovery_source(id) ON DELETE RESTRICT,
+    crawl_run_id          UUID REFERENCES crawl_run(id) ON DELETE SET NULL,
+    fetched_page_id       UUID REFERENCES fetched_page(id) ON DELETE SET NULL,
+    axis                  signal_axis NOT NULL,
+    maturity_value        commercial_status,     -- axis = MATURITY
+    availability_value    availability_status,   -- axis = OBTAINABILITY
+    transaction_type      transaction_type,
+    region_code           TEXT,
+    buyer_type            buyer_type,
+    price_type            price_type,            -- axis = PRICE
+    price_amount          NUMERIC(14, 2),
+    price_currency        CHAR(3),
+    billing_period        billing_period,
+    extractor_key         TEXT,
+    extractor_version     TEXT,
+    extraction_method     extraction_method,
+    extraction_confidence extraction_confidence,
+    -- Only a human moves this off NOT_VERIFIED (LIVE.8 / DATA-D1.2).
+    claim_status          claim_status NOT NULL DEFAULT 'NOT_VERIFIED',
+    note                  TEXT,
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    -- Each axis carries its OWN value and may not set another axis's. This is
+    -- the "three axes never merge" law expressed as a constraint rather than a
+    -- convention, so a maturity signal physically cannot write availability.
+    CONSTRAINT ck_commercial_signal_axis_value CHECK (
+        (axis = 'MATURITY'      AND availability_value IS NULL AND price_type IS NULL)
+     OR (axis = 'OBTAINABILITY' AND maturity_value     IS NULL AND price_type IS NULL)
+     OR (axis = 'PRICE'         AND maturity_value     IS NULL AND availability_value IS NULL)
+    ),
+    -- A price amount is meaningless without both a currency and a stated price
+    -- semantics; QUOTE_ONLY legitimately has no amount.
+    CONSTRAINT ck_commercial_signal_price CHECK (
+        price_amount IS NULL
+        OR (price_currency IS NOT NULL AND price_type IS NOT NULL)
+    )
+);
+COMMENT ON TABLE candidate_commercial_signal IS
+    'DATA-D1.LIVE §9/LIVE.7: maturity, obtainability and price semantics as SEPARATE '
+    'evidence-bound signals. A CHECK stops one axis writing another. Conflicts are separate rows.';
+
+-- DATA-D1.LIVE §9 / LIVE.6 (owner decision D-7) — the exact supporting passages.
+-- One claim or signal, MANY excerpts: a price and the region it applies to may
+-- sit in different parts of a page, so a single column could not honestly justify
+-- a claim. 1000 UNICODE CHARACTERS per excerpt, CHECK-enforced — char_length()
+-- counts characters, not bytes, which is what the ratified limit says.
+CREATE TABLE discovery_evidence_excerpt (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    subject_type    evidence_subject_type NOT NULL,
+    subject_id      UUID NOT NULL,          -- soft ref: claim / signal / image_ref
+    crawl_run_id    UUID REFERENCES crawl_run(id) ON DELETE SET NULL,
+    fetched_page_id UUID REFERENCES fetched_page(id) ON DELETE SET NULL,
+    excerpt_text    TEXT NOT NULL,
+    page_url        TEXT NOT NULL,
+    retrieved_at    TIMESTAMPTZ NOT NULL,
+    page_hash       TEXT,
+    locator         TEXT,                   -- selector / XPath / pointer / offset:A-B
+    ordinal         INTEGER NOT NULL DEFAULT 0,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT ck_evidence_excerpt_len CHECK (char_length(excerpt_text) <= 1000),
+    CONSTRAINT ck_evidence_excerpt_not_blank CHECK (btrim(excerpt_text) <> ''),
+    UNIQUE (subject_type, subject_id, ordinal)
+);
+COMMENT ON TABLE discovery_evidence_excerpt IS
+    'DATA-D1.LIVE §9/LIVE.6: exact supporting passages, <=1000 Unicode chars each, many per '
+    'claim. A claim that cannot carry its supporting text is not recorded.';
 
 -- Promotion lineage (§19 / Gate J). Durable: ON DELETE RESTRICT so a candidate
 -- with promotion history cannot be deleted out from under the audit trail.
@@ -1195,12 +1481,27 @@ CREATE INDEX idx_candidate_claim_candidate ON candidate_claim (candidate_id);
 CREATE INDEX idx_candidate_image_candidate ON candidate_image_ref (candidate_id);
 CREATE INDEX idx_promotion_audit_candidate ON promotion_audit (candidate_id);
 
+-- DATA-D1.LIVE §16 acquisition-layer indexes.
+CREATE INDEX idx_eligibility_review_source   ON source_eligibility_review (source_id, reviewed_at DESC);
+CREATE INDEX idx_crawl_run_source            ON crawl_run (source_id, started_at DESC);
+CREATE INDEX idx_crawl_run_status            ON crawl_run (status);
+CREATE INDEX idx_fetched_page_run            ON fetched_page (crawl_run_id);
+CREATE INDEX idx_fetched_page_url            ON fetched_page (source_id, url);
+CREATE INDEX idx_fetched_page_hash           ON fetched_page (content_hash);
+CREATE INDEX idx_extraction_result_run       ON extraction_result (crawl_run_id);
+CREATE INDEX idx_extraction_result_candidate ON extraction_result (candidate_id);
+CREATE INDEX idx_commercial_signal_candidate ON candidate_commercial_signal (candidate_id);
+CREATE INDEX idx_commercial_signal_source    ON candidate_commercial_signal (discovery_source_id);
+CREATE INDEX idx_evidence_excerpt_subject    ON discovery_evidence_excerpt (subject_type, subject_id);
+CREATE INDEX idx_candidate_claim_source      ON candidate_claim (discovery_source_id);
+
 -- discovery_source / discovery_candidate / candidate_claim carry updated_at; give
 -- them the same maintenance trigger as the canonical tables above.
 DO $$
 DECLARE t TEXT;
 BEGIN
-    FOR t IN SELECT unnest(ARRAY['discovery_source','discovery_candidate','candidate_claim'])
+    FOR t IN SELECT unnest(ARRAY['discovery_source','discovery_candidate','candidate_claim',
+                                 'candidate_commercial_signal'])
     LOOP
         EXECUTE format(
             'CREATE TRIGGER trg_%1$s_updated BEFORE UPDATE ON %1$s

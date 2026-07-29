@@ -30,6 +30,14 @@ from app.services.discovery.promotion import build_proposal, promote, reject
 DISCOVERY_TABLES = {
     "discovery_source", "discovery_candidate", "candidate_claim",
     "candidate_image_ref", "promotion_audit",
+    # DATA-D1.LIVE Slice A (migration 0004) grew the NONCANONICAL layer. These are
+    # discovery-layer tables by the ratified contract (docs/16 §16), so listing
+    # them here does not weaken Gate K — the invariant it asserts is unchanged:
+    # nothing OUTSIDE this set may hold a foreign key INTO it. Omitting them would
+    # have made the gate fail for the right reason (the set grew) while leaving
+    # the new tables unprotected by it.
+    "source_eligibility_review", "crawl_run", "fetched_page", "extraction_result",
+    "candidate_commercial_signal", "discovery_evidence_excerpt",
 }
 
 

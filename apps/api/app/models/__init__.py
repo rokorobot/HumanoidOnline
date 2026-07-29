@@ -8,7 +8,18 @@ WS2 covers the Knowledge Layer plus the commercial *read* models (pricing /
 availability / deployment). WS5 adds `buyer_requirement` and WS6 adds
 `match_result` (the Decision layer). WS7 adds the transaction layer
 (`commercial_lead` + `commercial_lead_robot` + `commercial_lead_provider`).
+
+DATA-D1 adds the discovery layer; DATA-D1.LIVE Slice A adds the acquisition
+layer (`app.models.acquisition`) — schema only, no adapter or crawler.
 """
+from app.models.acquisition import (
+    CandidateCommercialSignal,
+    CrawlRun,
+    DiscoveryEvidenceExcerpt,
+    ExtractionResult,
+    FetchedPage,
+    SourceEligibilityReview,
+)
 from app.models.buyer_requirement import BuyerRequirement
 from app.models.capability import Capability, RobotCapability
 from app.models.commercial import AvailabilityOffer, Deployment, PricingOffer
@@ -39,15 +50,20 @@ __all__ = [
     "BuyerRequirement",
     "Capability",
     "CandidateClaim",
+    "CandidateCommercialSignal",
     "CandidateImageRef",
     "CommercialLead",
     "CommercialLeadProvider",
     "CommercialLeadRobot",
+    "CrawlRun",
     "Deployment",
     "DiscoveryCandidate",
+    "DiscoveryEvidenceExcerpt",
     "DiscoverySource",
     "EventLog",
     "EvidenceSource",
+    "ExtractionResult",
+    "FetchedPage",
     "Manufacturer",
     "MatchResult",
     "PricingOffer",
@@ -59,6 +75,7 @@ __all__ = [
     "RobotImage",
     "RobotStatusHistory",
     "RobotVariant",
+    "SourceEligibilityReview",
     "SpecDefinition",
     "Specification",
     "UseCase",

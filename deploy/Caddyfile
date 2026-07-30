@@ -1,0 +1,130 @@
+# WS8.7 / R26 + R27 — ingress configuration.
+#
+# TWO listeners realize DEP P4 without a second FastAPI application (DEP P2):
+#
+#   PUBLIC    :80/:443           -> /admin* is 404 here. Never routes to admin.
+#   PROTECTED :8001 (loopback)   -> the ONLY path to /admin*, reached by
+#                                   `ssh -L 8001:127.0.0.1:8001 <vps>`.
+#
+# Both proxy to the SAME singleton FastAPI instance.
+
+{
+	email {$ACME_EMAIL}
+	# NOTE: automatic HTTPS is deliberately left FULLY ENABLED.
+	#
+	# An earlier revision carried a global `auto_https disable_redirects`, which
+	# would have switched off the automatic HTTP->HTTPS redirect for the PUBLIC
+	# site as well — a plain-HTTP entry point on the public internet. It was
+	# there only to stop Caddy trying to obtain a certificate for the admin
+	# listener, but that was never necessary: the admin site block is addressed
+	# by BARE PORT (`:8001`), which Caddy serves over HTTP without attempting
+	# ACME. So the global switch is removed and the public redirect stays on.
+}
+
+# ----------------------------------------------------------------- snippets --
+# DEP P1 — REPLACE X-Forwarded-For with the real remote host rather than
+# appending to whatever the client sent. Combined with `--no-proxy-headers` on
+# uvicorn and the API publishing no host port, a client-supplied forwarding
+# header can never reach `resolve_client_ip()` as truth.
+#
+# Readiness is wired INTO the ingress (not merely exposed): Caddy actively polls
+# the API's dependency-aware `/ready` and takes the upstream out of rotation when
+# it stops returning 2xx — e.g. when Postgres is unreachable. Intervals are
+# bounded so a flapping backend cannot be probed unboundedly.
+#
+# This snippet is for the DEPENDENT surface: /api/*, /ready itself, and the
+# protected /admin*. When a dependency is down, serving those from a known-broken
+# upstream is worse than refusing them.
+(to_api) {
+	reverse_proxy api:8000 {
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up Host {host}
+
+		health_uri /ready
+		health_interval 10s
+		health_timeout 2s
+		health_status 2xx
+	}
+}
+
+# LIVENESS-ONLY path, used by exactly one route: the public `/health`.
+#
+# A separate reverse_proxy directive is a separate upstream pool, so this one is
+# never marked down by the readiness probe above. That distinction is the whole
+# point: `/health` answers "is the process alive", `/ready` answers "can it serve
+# requests". If /health were served from the readiness-checked pool, a database
+# outage would take liveness down WITH readiness — Caddy would answer 502 for
+# both — and the operator (and any external monitor) would lose the one signal
+# that separates "the API is gone" from "the API is up, its dependency is not".
+# Deliberately NO health_uri here.
+(to_api_liveness) {
+	reverse_proxy api:8000 {
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up Host {host}
+	}
+}
+
+# --------------------------------------------------------- PUBLIC listener ---
+{$SITE_DOMAIN} {
+	encode zstd gzip
+
+	# Deployment-level HSTS: applied to EVERY response on the public HTTPS
+	# surface, whether it came from Next.js or FastAPI. (FastAPI also sets it
+	# itself as defence in depth; this is the authority.)
+	header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+	# DEP P4 — the admin surface is NOT routable through public ingress. This
+	# single prefix covers SQLAdmin's static assets too: sqladmin mounts at
+	# base_url="/admin" and serves its files from "/admin/statics/*".
+	# NOTE: this rule is load-bearing. It is asserted by an automated config
+	# test and re-proven from outside the deployment by WS8.8 / R29.
+	handle /admin* {
+		respond 404
+	}
+
+	# Governed API + infrastructure probes.
+	handle /api/* {
+		import to_api
+	}
+	# Liveness must keep answering while a dependency is down (see the snippet).
+	handle /health {
+		import to_api_liveness
+	}
+	handle /ready {
+		import to_api
+	}
+
+	# Everything else is the public web surface.
+	handle {
+		reverse_proxy web:3000 {
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+			header_up Host {host}
+		}
+	}
+}
+
+# www -> apex, 308 (permanent, method-preserving).
+www.{$SITE_DOMAIN} {
+	redir https://{$SITE_DOMAIN}{uri} 308
+}
+
+# ----------------------------------------- PROTECTED admin listener (:8001) --
+# Published by compose as 127.0.0.1:8001 ONLY, so this listener does not exist
+# on any public interface. Plain HTTP by design: the SSH tunnel is the encrypted
+# channel. HSTS is deliberately NOT emitted here — advertising it over
+# http://127.0.0.1 would poison the operator's browser for all of localhost.
+#
+# SQLAdmin's own authentication (WS8.1 / R1) still applies on top of this
+# network boundary; neither layer substitutes for the other (§11 D1).
+:8001 {
+	handle /admin* {
+		import to_api
+	}
+	# Nothing else is served on the admin plane.
+	handle {
+		respond 404
+	}
+}

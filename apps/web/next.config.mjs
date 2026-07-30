@@ -91,6 +91,16 @@ assertCanonicalOriginConfigured();
 
 const nextConfig = {
   reactStrictMode: true,
+  // WS8.7 / R26 — the production container image ships a self-contained server
+  // bundle (only the traced runtime dependencies, not the whole node_modules
+  // tree). Enabled ONLY for the image build (apps/web/Dockerfile sets the flag),
+  // deliberately NOT for ordinary builds: Next's standalone trace-copy step
+  // fails on Windows with ENOENT on `.next/routes-manifest.json`, and this
+  // project is developed on Windows. Local `npm run build`, the CI web-build job
+  // and the R24 perf budgets therefore behave exactly as before.
+  ...(process.env.NEXT_OUTPUT_STANDALONE === "1"
+    ? { output: "standalone" }
+    : {}),
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

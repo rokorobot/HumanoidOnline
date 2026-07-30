@@ -4,6 +4,7 @@
 |---|---|
 | **Status** | **OPEN — awaiting product-owner decision** |
 | **Raised** | 2026-07-30 |
+| **Revision** | 2 (2026-07-30) — owner review corrections: `AGGREGATOR`-only class precondition · restriction-applicability rules frozen · operational ceilings made an implementation precondition |
 | **Decision owner** | Robert Konecny (product owner) — sole ratifying authority |
 | **Amends** | `docs/16_DATA_D1_LIVE_MARKET_ACQUISITION_CONTRACT.md` (RATIFIED v0.1, main @ `6875a34`) |
 | **Normative text** | `docs/17_DATA_D1_LIVE_AMENDMENT_A1_NO_EXPRESS_PROHIBITION.md` |
@@ -101,13 +102,16 @@ slowly and does nothing for change detection.
 
 ### Option 4 — `NO_EXPRESS_PROHIBITION` *(the proposal)*
 
-A third state, strictly weaker than `ALLOWED`, authorizing bounded radar only.
+A third state, strictly weaker than `ALLOWED`, authorizing bounded radar only,
+**available to `AGGREGATOR`-class sources alone**.
 
 *For:* preserves the distinction between "they permitted" and "they said
-nothing" **in the record itself**; unblocks four sources immediately on review;
-keeps Gate W, Gate S, Gate T, Gate X, P2 and P8 untouched; scales change
-detection; and the capability matrix ends every authorized path in a human
-reviewing something.
+nothing" **in the record itself**; unblocks the qualifying aggregator candidates
+on review; keeps Gate W, Gate S, Gate T, Gate X, P2 and P8 untouched; scales
+change detection; and the capability matrix ends every authorized path in a
+human reviewing something. The class restriction confines the widening to the
+sources that motivated it, leaving manufacturers, official stores and authorized
+distributors on the unchanged `ALLOWED` bar.
 
 *Against:* a genuinely new state to implement, gate and test; it is a place where
 future carelessness could erode the standard; and it accepts a lower authority
@@ -154,12 +158,26 @@ search. When a review later proves defective, that distinction is what separates
 "the publisher changed" from "we looked badly" — and only the second is
 actionable.
 
+*Third, added at revision 2: the `AGGREGATOR` restriction may narrow the payoff
+below what motivated the proposal.* The four candidate sources were described in
+the 2026-07-30 assessment as "`COMPETITOR_DIRECTORY` / `AGGREGATOR`" without
+deciding between them, and those are distinct enum values. Honest
+classification — which §2.1 requires and adversarial example 16 protects — could
+exclude some of them, and the amendment must not be rescued by relabelling. If
+the reviews come back and the qualifying set is one source rather than four,
+that is a signal to write a second amendment naming `COMPETITOR_DIRECTORY`
+explicitly, with its own reasoning, rather than to stretch this one. The
+recommendation to adopt still stands: the state is correct in shape, and its
+scope is a separate question that should be decided on its own evidence.
+
 ## 5. Consequences if adopted
 
 | | |
 |---|---|
-| **Immediately** | Nothing. Ratification approves no source. Four candidates then need their own full reviews under the amended ten-requirement procedure; none of the 2026-07-30 assessments satisfies requirement 5. |
-| **Implementation** | A separately authorized slice: enum widening on `eligibility_decision` and `tos_status`, mode-aware `radar_eligible`, an extended DB `CHECK`, state-dependent expiry, new acceptance gates, run-report and `/discovery-review` display. Detailed in amendment §10. |
+| **Immediately** | Nothing. Ratification approves no source. Candidates then need their own full reviews under the amended ten-requirement procedure; none of the 2026-07-30 assessments satisfies requirement 5. **And each must first pass the `AGGREGATOR` class precondition on an honest classification — which may leave fewer than four.** |
+| **Implementation** | A separately authorized slice, and **not before per-host operational ceilings are frozen** (§10.3): enum widening on `eligibility_decision` and `tos_status`, mode-aware `radar_eligible`, an extended DB `CHECK` encoding the class condition, state-dependent expiry, new acceptance gates, run-report and `/discovery-review` display. Detailed in amendment §10. |
+| **Other source classes** | Unchanged. `MANUFACTURER`, `OFFICIAL_STORE` and `AUTHORIZED_DISTRIBUTOR` still require `ALLOWED` for automated acquisition; every other class keeps the pre-amendment rules. Widening needs a further amendment. |
+| **Training** | Prohibited on acquired content from every source under every directive — restated as a frozen rule (§4.1 rule 1) rather than left implied. |
 | **Canonical truth** | Unchanged. Gate W, Gate S, Gate T, Gate X, P2 and P8 all stand as ratified. |
 | **Public surfaces** | Unchanged. The state is invisible to the API, machine surfaces, sitemap and `llms.txt` (AGENT-01.7, Gate O). |
 | **Permission strategy** | Unchanged and still primary. `ALLOWED` remains the goal for every source worth a real relationship, and the four drafted emails should go out regardless. |
@@ -170,7 +188,10 @@ actionable.
 |---|---|
 | The state is mistaken for permission by a future reader | The name says otherwise; §3 of the amendment forbids mapping it to `ALLOWED` in any projection, report or UI; a proposed gate asserts it. |
 | A defective review records an absence that was never searched for | Requirement 5 (record where you looked) and requirement 8 (attribution) — both to be enforced at write time, not by convention. |
-| A publisher's silence ends and we do not notice | 30-day expiry rather than 90; `robots.txt` re-read every run; six immediate-revocation triggers including publisher objection on receipt. |
+| A publisher's silence ends and we do not notice | **`robots.txt` re-read at every run start** (24 h cache ceiling) and six immediate-revocation triggers, including publisher objection effective on receipt. **Note:** the 220-day expiry (owner decision) is longer than the 90-day `ALLOWED` validity, so it is a backstop rather than a control — the two continuous mechanisms carry this risk alone. Anyone later weakening either must account for that. |
+| A source is reclassified to `AGGREGATOR` to make it eligible | Prohibited explicitly (§2.1, adversarial example 16), and the class condition is to be enforced in the DB `CHECK` alongside the state, not left to convention. The honest-classification requirement may narrow the amendment to fewer than four candidate sources — recorded in §9 so the owner decides with it visible. |
+| A broad AI-use directive is read as training-only to gain eligibility | §4.1 rule 5: where scope cannot be determined, the restriction applies and the result is `UNKNOWN`. The review must record the rule applied and the scope determined, in a queryable form. |
+| An adapter ships with generous or unbounded rate limits | §10.3 makes frozen per-host ceilings a **precondition** of the implementation slice — concurrency, rate, pages per run, bytes per page and per run — contract- or database-governed, unlimited values prohibited, declared crawl delay honoured as a floor. No adapter code precedes the numbers. |
 | Scope creep from radar into fact-supply | The capability matrix is explicit on both sides, and the canonical refusal holds on two independent grounds — source class *and* eligibility state. |
 | `PROHIBITED` sources drift back in via a site redesign | No automatic downgrade; a fresh named review is required and must consider whether the prohibition genuinely ended. |
 | The Cloudflare template spreads and silently disqualifies sources mid-run | Already observed on two of seven hosts. Robots is re-read at every run start; an appearing agent-block halts the run `HALTED_BY_POLICY`. |

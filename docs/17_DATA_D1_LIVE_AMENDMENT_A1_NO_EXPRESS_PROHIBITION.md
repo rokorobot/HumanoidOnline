@@ -2,6 +2,12 @@
 
 > **STATUS: PROPOSED — NOT RATIFIED.**
 >
+> **Revision 2 (2026-07-30)** — incorporates the product owner's review
+> corrections: the state is restricted to `AGGREGATOR`-class sources (§2.1);
+> requirement 3 now turns on whether a restriction *applies to the proposed use*,
+> with the training-only distinction frozen (§4.1); and freezing hard per-host
+> operational ceilings becomes a precondition of any implementation (§10.3).
+>
 > This document amends `16_DATA_D1_LIVE_MARKET_ACQUISITION_CONTRACT.md`
 > (RATIFIED v0.1, 2026-07-29, main @ `6875a34`). It has **no force** until the
 > product owner ratifies it in §12.
@@ -59,6 +65,10 @@ Four of the seven radar sources assessed on 2026-07-30 match that profile
 exactly: **The Mimic, Lineroid, WhichHumanoid and RoboZaps** (§9). All four are
 refused today, and not one of them has said no.
 
+*How many of the four this amendment actually unblocks is not four by
+assumption.* It is decided by the `AGGREGATOR` class precondition (§2.1) and by
+fresh reviews under §4, and may be fewer — see §9.
+
 The consequence is concrete. The verified catalogue has stood at seven robots
 since MEDIA-01 completed. The discovery queue holds 43 candidates with **zero
 specifications, zero prices and zero images**, because no source has ever been
@@ -95,6 +105,49 @@ question and answers the second with an unconditional **no**.
 
 **It does not mean the publisher granted permission.**
 
+### 2.1 Class precondition — `AGGREGATOR` only *(amended, correction 1)*
+
+**`NO_EXPRESS_PROHIBITION` may be granted only to a source whose recorded
+`discovery_source_class` is `AGGREGATOR`.**
+
+This is deliberately narrow. Amendment A1 was motivated by competitor
+directories and aggregated robot-information sources, and it is scoped to
+exactly that. Under this amendment:
+
+| Source class | Automated acquisition requires |
+|---|---|
+| `AGGREGATOR` | `ALLOWED`, **or** `NO_EXPRESS_PROHIBITION` under this amendment |
+| `MANUFACTURER` | `ALLOWED` — unchanged |
+| `OFFICIAL_STORE` | `ALLOWED` — unchanged |
+| `AUTHORIZED_DISTRIBUTOR` | `ALLOWED` — unchanged |
+| every other class | the pre-amendment rules, unchanged |
+
+No other class is widened. A later need to broaden the state **requires another
+amendment**, not an interpretation of this one.
+
+**A source's class may never be rewritten to make it eligible.** Classification
+records what a source *is* — where its content was actually seen and what
+function it serves — and it is set by the same evidence discipline as everything
+else. Relabelling an editorial outlet, a competitor directory or a manufacturer
+as `AGGREGATOR` to bring it inside A1 is falsification of the record, and it is
+the single most likely way this amendment would be abused. `COMPETITOR_DIRECTORY`
+and `EDITORIAL` are distinct enum values from `AGGREGATOR`; a source honestly
+belonging to either **does not qualify** under A1 as written, and the correct
+response is a later amendment that names those classes explicitly, never a
+reclassification.
+
+**Within the eligible class, classification alone grants nothing.** Being an
+`AGGREGATOR` is a precondition, not a qualification: every source still requires
+its own complete review under §4 and the owner's explicit enablement under
+requirement 10.
+
+**Manual human research is unaffected by all of the above.** `MANUAL_BOOTSTRAP`
+(base contract §2.1) performs no automated access, is not gated by per-source
+eligibility, and remains available for every source of every class — including
+those A1 excludes and those that expressly prohibit automation.
+
+### 2.2 Why the name is long
+
 The name is deliberately long and deliberately negative. It was chosen over the
 shorter `NO_PROHIBITION` because the shorter form reads as a property of the
 source ("this source has no prohibition") rather than as a property of *our
@@ -121,7 +174,7 @@ assume:
 | State | What it asserts | Evidence required | Radar fetch | Path to canonical |
 |---|---|---|---|---|
 | **`ALLOWED`** | The publisher **affirmatively permits** the proposed automated access — an explicit clause, a published crawling/indexing policy, an API or feed whose terms cover the use, or written permission recorded as the eligibility artefact. | The exact permitting passage, quoted, with URL and hash; or the correspondence granting it. | ✅ Full, within reviewed path prefixes and rate policy. | ✅ Subject to source class, trace (P2), Gate W, human verification and P8 promotion — unchanged. |
-| **`NO_EXPRESS_PROHIBITION`** | A named reviewer searched six specified places at a recorded time and **found no prohibition**. The publisher has expressed nothing either way. | The six-axis search record of §5, including **where terms and licensing pages were looked for and not found**. | ⚠️ **Limited radar mode only** — §6 capability matrix. | ❌ **Never.** No canonical write, no `VERIFIED` claim, no satisfaction of Gate W, under any circumstances. |
+| **`NO_EXPRESS_PROHIBITION`** | A named reviewer searched six specified places at a recorded time and **found no prohibition**. The publisher has expressed nothing either way. **Available only to `AGGREGATOR`-class sources** (§2.1). | The six-axis search record of §5, including **where terms and licensing pages were looked for and not found**. | ⚠️ **Limited radar mode only** — §6 capability matrix. | ❌ **Never.** No canonical write, no `VERIFIED` claim, no satisfaction of Gate W, under any circumstances. |
 | **`UNKNOWN`** | The review is **incomplete, unattributed, expired, or could not be performed** — a terms page that would not render, a host that returned nothing, an assessment nobody finished. | Whatever was recorded, marked incomplete. | ❌ None. | ❌ None. |
 | **`PROHIBITED`** | A prohibition **was found** — an anti-robot clause, an agent-specific `Disallow`, a rights reservation, or a technical denial. | The exact prohibiting passage or directive, quoted, with URL and hash. | ❌ None. | ❌ None. |
 
@@ -145,21 +198,28 @@ unchanged by this amendment. Only a new, strictly weaker state is added.
 
 ## 4. Eligibility requirements
 
-A source may receive `NO_EXPRESS_PROHIBITION` **only when all ten are true**.
-Any one failing means the state is refused; the correct outcome is `UNKNOWN` or
-`PROHIBITED`, never a partial grant.
+**Precondition (§2.1): the source's recorded `discovery_source_class` is
+`AGGREGATOR`.** A source of any other class cannot receive this state however
+well it satisfies the ten requirements below, and the requirements are not
+assessed for it. The precondition is stated separately from the numbered
+requirements because it is a question about *what the source is*, answered before
+any review of *what the source says*.
+
+Given the precondition, a source may receive `NO_EXPRESS_PROHIBITION` **only when
+all ten are true**. Any one failing means the state is refused; the correct
+outcome is `UNKNOWN` or `PROHIBITED`, never a partial grant.
 
 | # | Requirement |
 |---|---|
 | **1** | **No applicable agent-specific `Disallow` exists.** Neither our agent nor the AI-crawler class it belongs to is named with a `Disallow` in `robots.txt`. A wildcard `Allow: /` does not cure a named `Disallow`. |
 | **2** | **The relevant paths are not disallowed.** Every path prefix the review covers is permitted for the group that applies to us — evaluated for the exact prefixes, not for the host in general. |
-| **3** | **No TDM, AI-use or database-extraction rights reservation applies.** No `Content-Signal` restriction, no Article 4 (EU 2019/790) reservation, no `noai`/`noimageai` directive, no sui-generis database-right notice, no licence term reserving extraction. |
+| **3** | **No rights reservation applies *to the proposed limited-radar use*.** The test is applicability, not the mere presence of a directive: a reservation covering automated access, scraping, extraction, text-and-data mining, database extraction or database reuse is disqualifying; a reservation covering **only** model training is binding but not, by itself, disqualifying. Resolved by §4.1, which is frozen. |
 | **4** | **No accessible terms or policy prohibits automation, scraping, data mining or systematic extraction.** Terms of use, acceptable-use policy, legal notice, licensing page and copyright notice — whichever exist and are reachable. |
 | **5** | **The review records where terms and licensing pages were searched.** The list of URLs tried, and their outcomes, including the ones that 404'd. "No terms page found" is a claim about a search, and the search must be reproducible by someone else. |
 | **6** | **Ordinary requests are accepted without bypassing access controls.** The declared user agent, at the declared rate, with no impersonation, no proxy rotation, no fingerprint evasion and no header manipulation beyond ordinary conditional-request validators. |
 | **7** | **No login, CAPTCHA, paywall, `403` block or other technical denial is present** on the paths under review. |
 | **8** | **The reviewer, timestamp, URLs, hashes and supporting excerpts are recorded** — for every axis, including the axes that came back empty. |
-| **9** | **The review has not expired** (§7: 30 days by default). |
+| **9** | **The review has not expired** (§7: 220 days by default). |
 | **10** | **The source is explicitly enabled for the limited radar mode.** Reviewing is not enabling — the base contract's §5 step 5, restated because it is the step most often skipped. Enablement names the mode; a source enabled for limited radar is not enabled for anything else. |
 
 **Silence must be recorded as silence, never rewritten as permission.** Where a
@@ -168,6 +228,52 @@ was sought. Where a document exists and is silent on automation, the record
 quotes enough of it to show the silence is real and not a missed clause. No
 field anywhere may be set to a value meaning "permitted" on the strength of an
 absence.
+
+### 4.1 Applicability of rights restrictions — FROZEN *(amended, correction 2)*
+
+Requirement 3 turns on **whether a restriction applies to the activity we
+propose**, not on whether a restriction exists. Without this distinction two
+reviewers can read the same directive and reach opposite decisions — which is
+the failure this subsection exists to prevent. The following rules are frozen.
+
+1. **A training-only restriction is binding.** Material acquired from such a
+   source must **never** be used to train or fine-tune any model. This holds
+   whether or not the source is ever enabled, and it is already the platform's
+   position independent of any directive.
+2. **A training-only restriction does not, by itself, prohibit limited
+   non-training radar retrieval.** A publisher who reserves training rights and
+   otherwise permits ordinary indexing has restricted a use we do not make.
+   Examples of the shape: `Disallow-Training: /`, `Content-Signal: ai-train=no`
+   *standing alone*, `noai` where its stated scope is training.
+3. **A prohibition on automated access is disqualifying.** Anti-robot clauses,
+   `Disallow` directives applying to us, "no automated device" terms.
+4. **A scraping, extraction, text-and-data-mining, database-extraction or
+   database-reuse reservation applicable to the proposed radar activity is
+   disqualifying.** This includes an Article 4 (EU 2019/790) reservation and any
+   sui-generis database-right notice covering systematic extraction. What we
+   propose *is* systematic extraction, and calling it "radar" does not move it
+   outside such a reservation.
+5. **A general AI-use restriction is interpreted conservatively.** Where a
+   directive restricts "AI use" without a determinable scope — and so might
+   cover retrieval, grounding or reference consumption rather than training
+   alone — the reviewer may **not** resolve the ambiguity in our favour. The
+   result is `UNKNOWN`, and `UNKNOWN` is never fetched. When it cannot be
+   determined whether a restriction applies, it applies.
+6. **`noimageai` authorizes nothing about images, in either direction.** Images
+   are outside this amendment entirely (§6.2): no download, no reuse, no
+   MEDIA-01 verdict, regardless of what any image directive says or omits.
+
+**Note the asymmetry, because it is deliberate.** Rule 2 is the only place this
+amendment declines to treat a restriction as disqualifying, and it is narrow: it
+applies where the restriction's scope is *determinably* limited to training. The
+moment scope is unclear, rule 5 sends the source to `UNKNOWN`. A reviewer who
+finds themselves constructing an argument for why a broad directive "probably
+means training" has already failed rule 5.
+
+**This is internal eligibility policy, not a legal conclusion.** It states how
+this platform resolves ambiguous machine-readable signals when deciding whether
+to send a request. It offers no view on what any directive means in law, and
+§12's disclaimer on legal opinions is unaffected.
 
 ## 5. Review evidence requirements
 
@@ -185,7 +291,7 @@ found, an explicit statement that nothing was found.
 |---|---|
 | `robots.txt` | Full file content, hashed and timestamped. The **entire** file — including every named-agent group. A review that quotes only the wildcard group has not read the file. |
 | Agent-specific directives | The named groups present, and an explicit finding that neither our agent nor its class appears in any of them. |
-| HTTP content signals | `Content-Signal` values if present; response headers bearing on reuse (`X-Robots-Tag` and equivalents); an explicit nil finding if absent. |
+| HTTP content signals | `Content-Signal` values if present; response headers bearing on reuse (`X-Robots-Tag` and equivalents); an explicit nil finding if absent. **Where any restriction is found, the review records the §4.1 rule applied and the scope determined** — a signal recorded without a scope determination is an incomplete review. |
 | Accessible terms of use | Every URL tried, with status. Where a terms page exists, its hash and the passage governing (or failing to govern) automated access. Where none exists, the list of paths tried and the footer/sitemap locations searched. |
 | Accessible licensing / copyright notices | Licence statements, copyright footers, per-page rights notices, dataset licences. Where a licence exists and permits reuse, that belongs on the `ALLOWED` axis, not here. |
 | Technical access behaviour | Observed status codes for ordinary requests to representative paths under review, the user agent used, and an explicit finding of no block, challenge, interstitial or login. |
@@ -208,7 +314,7 @@ expired review re-reviewable rather than merely stale.
 | Low-rate radar discovery | Within the declared per-host rate limit and per-run page cap. Slower than `ALLOWED`, never faster. |
 | Explicitly bounded public-page retrieval | Only the path prefixes named in the review, only pages reachable without any access control. An enumerated list or a bounded prefix — never "the site". |
 | Discovery-candidate enrichment | Writes to the discovery layer only (LIVE.5, Gate C). |
-| Candidate claims with source class `AGGREGATOR` | The class reflects **where the content was actually seen**, never what it claims to be about. An aggregator page reproducing a manufacturer's figure is `AGGREGATOR` (the Figure 02 precedent, MEDIA-01). |
+| Candidate claims with source class `AGGREGATOR` | Consistent by construction: §2.1 limits the state to `AGGREGATOR` sources, so a claim acquired under it is `AGGREGATOR` because the source is, not because the claim was labelled to fit. The class reflects **where the content was actually seen**, never what it claims to be about — an aggregator page reproducing a manufacturer's figure is `AGGREGATOR` (the Figure 02 precedent, MEDIA-01). |
 | Claim status `NOT_VERIFIED` | The only status such a claim may ever carry. |
 | Short attributed evidence excerpts | ≤1000 Unicode characters per excerpt (LIVE.6), retained as evidence, never republished (§6.2). |
 | Conflict detection | Surfacing that this source disagrees with another. Detection only — never resolution, never averaging (§6.1 of the base contract). |
@@ -240,12 +346,33 @@ looking at something. Nothing authorized ends in a published fact.
 
 ## 7. Expiry and revocation
 
-**Default expiry: 30 days.** Shorter than the 90-day terms validity of LIVE.2,
-deliberately. A 90-day validity suits a legal document that changed
-deliberately; this state rests on an *absence*, and an absence can be filled at
-any moment by a publisher who adds a terms page, a `Content-Signal` or a
-Cloudflare rule without ever telling anyone. The `robots.txt` re-read at every
-run start (LIVE.2) is unchanged and continues to apply.
+**Default expiry: 220 days** *(owner decision, 2026-07-30)*.
+
+The trade-off is recorded rather than smoothed over, because a later reader will
+otherwise assume it was an oversight. 220 days is **longer** than the 90-day
+terms validity LIVE.2 sets for `ALLOWED` — so the state resting on the *weaker*
+evidence carries the *longer* validity. The argument against it is direct: this
+state rests on an **absence**, and an absence can be filled at any moment by a
+publisher who adds a terms page, a `Content-Signal` or a Cloudflare rule without
+telling anyone, so a periodic re-read is the only thing that would catch a change
+nobody announced.
+
+The owner's decision stands, and the consequence is that **the expiry clock
+carries almost none of the safety here.** It is a backstop measured in months,
+not a control. What actually protects the state is continuous and unchanged:
+
+- **`robots.txt` is re-read at the start of every run** and cached at most 24
+  hours (LIVE.2). An agent-specific block or a new `Content-Signal` appearing in
+  that file halts the source on the next run, not in 220 days.
+- **The six revocation triggers below are immediate** and none of them waits for
+  expiry.
+- **Any access-denial response ends access on the spot** (§7.5), so a publisher
+  who begins refusing us is honoured the same day.
+
+Anyone later proposing to weaken the run-start robots re-read, or to soften the
+revocation triggers, must account for the fact that this expiry is not covering
+them. The two mechanisms were sized against a 30-day expiry and are now doing
+the work alone.
 
 **The state becomes unusable immediately when any of the following occurs.**
 Immediately means: the source is disabled, an in-flight run halts with
@@ -276,6 +403,48 @@ named, full review that examines whether the prohibition genuinely ended — a
 site redesign losing a legal page is not a publisher changing its mind. This
 rule exists because the alternative is an automated path from "they said no" to
 "we may fetch", which is exactly the reinterpretation §0.1 forbids.
+
+### 7.1 What expiry actually does — and what it does not
+
+Expiry governs **future access**, not the **record of past evidence**. The two
+are separated deliberately.
+
+**On the day the review expires:**
+
+- the source becomes ineligible and is disabled;
+- no new request may be constructed for it — the assertion happens *before* the
+  request is built (LIVE.2), so an expired review cannot produce a fetch that is
+  later noticed and cleaned up;
+- a run already in flight **halts** and records `HALTED_BY_POLICY`, which is a
+  first-class outcome and not an error to retry;
+- re-enablement requires a **fresh full review** — all six axes searched and
+  recorded again, the `AGGREGATOR` class precondition confirmed again, and the
+  owner's explicit enablement again. **There is no renewal, no extension and no
+  "re-confirm the previous finding" path.** A stale review is not evidence about
+  today, and 220 days is long enough that the site may have changed
+  substantially.
+
+**What expiry does *not* do:**
+
+- **It does not delete or invalidate what was already acquired.** Discovery
+  candidates, their `NOT_VERIFIED` claims, evidence excerpts, `retrieved_at`
+  timestamps and source attribution all remain. Those rows record *what a source
+  said on a date*, which stays true regardless of whether we may still visit.
+  Deleting them would destroy the audit trail the whole layer exists to keep.
+- **It does not make old claims more or less trustworthy.** They were
+  `NOT_VERIFIED` when acquired and they stay `NOT_VERIFIED`. Their
+  `retrieved_at` is what tells a reviewer how stale they are, and that field
+  already exists.
+- **It has no canonical consequence, because there can be none.** Nothing
+  acquired under this state ever reached canonical (§6.2, Gate W), so there is
+  nothing to withdraw, correct or re-verify in the published catalogue.
+- **It does not change cache retention**, which is governed independently by
+  LIVE.10 and Gate Q.
+
+**The practical shape, then:** after 220 days the platform keeps everything it
+learned and loses the right to learn more until a person re-does the review.
+That asymmetry is correct — the evidence record should survive, and the access
+permission should not.
 
 ## 8. Gate W is preserved, and the precedence order is unchanged
 
@@ -316,11 +485,29 @@ ratification each must be reviewed afresh against all ten requirements of §4 �
 in particular requirement 5, which none of the 2026-07-30 assessments satisfies,
 since they did not systematically record where terms pages were sought.
 
+**And each must first satisfy the §2.1 class precondition, which is not a
+formality.** The 2026-07-30 assessment described these four as
+"`COMPETITOR_DIRECTORY` / `AGGREGATOR` class" without deciding between the two,
+and those are **distinct enum values**. A1 admits `AGGREGATOR` only. So each
+review must first classify the source honestly on the merits — what its content
+actually is and where it was actually seen — and **any of the four that is
+properly `COMPETITOR_DIRECTORY` or `EDITORIAL` does not qualify under A1 as
+written**.
+
+This is stated plainly because the tempting move is the forbidden one: reaching
+for `AGGREGATOR` on all four because A1 was written with them in mind.
+Classification follows the evidence, and if the honest answer excludes a source
+the remedy is a later amendment naming the additional class — never a
+reclassification. It is possible that this correction narrows the amendment's
+practical effect to fewer than four sources; that is the correct outcome of
+taking the class rule seriously, and the owner should decide with it visible
+rather than discover it during implementation.
+
 | Source | Host | Observed 2026-07-30 | Outstanding before the state could be granted |
 |---|---|---|---|
 | **The Mimic** | `themimic.io` | `User-agent: * / Allow: /`, no agent-specific groups, no content signals, sitemap present. `/terms` returned `404`. | Full terms/licensing search with recorded locations; content-signal and header check; technical-behaviour check on representative paths. |
 | **Lineroid** | `lineroid.com` | `Allow: /` with `Crawl-delay: 1`; disallows `/admin`, `/auth`, `/api/*`; named groups for search engines and social crawlers only. `/terms` returned `404`. | As above. `Crawl-delay: 1` is a declared rate the limited mode must honour, and it is a floor, not a target. |
-| **WhichHumanoid** | `whichhumanoid.com` | `Allow: /` plus `LLM-Policy: /llms.txt`; the policy file adds the non-standard `Disallow-Training: /`. | As above, plus a careful read of the full `llms.txt`. `Disallow-Training` is not disqualifying — we do not train models on acquired content and the contract forbids it — but a publisher who has thought about machine access may have said more, and requirement 3 turns on exactly that. |
+| **WhichHumanoid** | `whichhumanoid.com` | `Allow: /` plus `LLM-Policy: /llms.txt`; the policy file adds the non-standard `Disallow-Training: /`. | As above, plus a careful read of the **full** `llms.txt`. `Disallow-Training` is resolved by **§4.1 rule 2**, not by an exception: it is a training-only restriction, so it **binds us absolutely against training** and does not by itself disqualify non-training radar. That determination holds only if the rest of the policy file confirms the scope is training. If any part of it restricts retrieval, extraction, mining or reuse, **§4.1 rule 4** disqualifies; if the scope cannot be determined, **§4.1 rule 5** gives `UNKNOWN`, not eligibility. |
 | **RoboZaps** | `robozaps.com` | `Allow: /`; disallows `/api/` except `/api/v1/`, and `/robots?`. A terms-of-service page **exists** and contains no clause on automated access, scraping, data mining or content reuse; IP stated as belonging to RoboZaps Inc. or manufacturers. | As above. The existing ToS must be read in full and the silence evidenced by excerpt, not by summary. The IP statement bears on republication (already prohibited, §6.2) and not on access. |
 
 **Deliberately excluded, and not eligible examples:**
@@ -354,11 +541,13 @@ has a specification rather than an inference.
 
 | Area | Consequence |
 |---|---|
+| **Class precondition (§2.1)** | Enforced, not documented. The new state is admissible **only** where `discovery_source.source_class = 'AGGREGATOR'`; the DB `CHECK` extension below must encode the class condition alongside the state, so a `MANUFACTURER` row physically cannot hold it. A test must assert the refusal for `MANUFACTURER`, `OFFICIAL_STORE`, `AUTHORIZED_DISTRIBUTOR`, `COMPETITOR_DIRECTORY` and `EDITORIAL` specifically, not in the abstract. |
+| **Restriction scope (§4.1)** | The review record must carry, per restriction found, the rule applied and the scope determined. A structured field is preferable to prose so that "training-only" versus "extraction" is queryable rather than buried in notes — an `UNKNOWN` produced by rule 5 must be visibly distinguishable from an `UNKNOWN` produced by an unreachable page. |
 | Enum widening | `eligibility_decision` and `tos_status` each gain `NO_EXPRESS_PROHIBITION`. Additive only; every existing value is retained verbatim. Note the PostgreSQL constraint: `ALTER TYPE ... ADD VALUE` cannot be used in the same transaction that then uses the new value, so the migration sequences the widening ahead of any data write. |
 | `discovery_source.radar_eligible` | Currently a boolean property requiring `tos_status == "ALLOWED"`. It must become **mode-aware**: a source in the new state is eligible for *limited radar* and for nothing else. The safest shape is an explicit radar-mode value rather than a widened boolean, so that every call site is forced to state which mode it means and no existing caller silently gains the new capability. |
 | DB-level `CHECK` on `is_enabled` | The existing constraint encoding DATA-D1.9 must be extended to admit the new state **only** in combination with the limited mode — the database, not the application, remains the place this is enforced (L7). |
 | `source_eligibility_review` | No new column is strictly required; the six-axis search record fits `notes` plus the existing per-axis URL/hash/excerpt fields. A dedicated structured column for the "where we searched" list would be better and should be considered in the slice. The table is append-only and stays so. |
-| Expiry | 30 days for this state against 90 for `ALLOWED` means `expires_at` becomes state-dependent at write time. It is already a column; only the default calculation changes. |
+| Expiry | 220 days for this state against 90 for `ALLOWED` means `expires_at` becomes state-dependent at write time. It is already a column; only the default calculation changes. Because this expiry is long (§7), the slice must not treat it as a safety control: the run-start `robots.txt` re-read and the immediate-revocation triggers are the enforcement, and both need explicit tests. |
 | New acceptance gates | At minimum: a source in this state can never produce `VERIFIED` or a canonical write (state-level, independent of Gate S); a technical denial disables the source within the same run; an expired review of this state blocks a run; the state is never mapped to `ALLOWED` in any projection, report or UI; and `PROHIBITED` cannot transition into this state without a new review record. |
 | Run report | The §18 report must print the eligibility **state** per source, not merely "eligible", so an operator reading a report can tell which authority a run was operating under. |
 | Rate policy | Limited mode carries its own, stricter rate ceiling, and honours any declared `Crawl-delay` as a floor. |
@@ -370,8 +559,58 @@ has a specification rather than an inference.
 Ratifying this amendment authorizes **no source**. On ratification the position
 is: a third state exists, and zero sources hold it. Each of the four candidates
 in §9 needs its own full review, its own owner enablement, and its own recorded
-artefact — reviewed in exactly the same way a manufacturer would be, because
-source class predicts nothing about eligibility (§5 of the base contract).
+artefact.
+
+**On source class and eligibility, stated precisely.** The base contract's §5
+holds that source class predicts nothing about eligibility — an aggregator is
+reviewed exactly as a manufacturer is, and the 2026-07-29 assessment showed why:
+the official manufacturer sites had the *more* restrictive terms. That remains
+true and A1 does not disturb it. What A1 adds is a distinction between two
+different questions:
+
+| Question | Answer |
+|---|---|
+| Does class determine whether a source's terms permit automated access? | **No** — unchanged. Only reading the actual terms determines that, identically for every class. |
+| Does class determine which *eligibility states are available* to a source? | **Yes, for this state only.** `NO_EXPRESS_PROHIBITION` is available to `AGGREGATOR` alone (§2.1). Every other class reaches automated acquisition only through `ALLOWED`, exactly as before. |
+
+So the correct rule is: **within the eligible `AGGREGATOR` class, classification
+alone grants nothing; every source still requires its own complete review and the
+owner's enablement.** Class opens a door; it never walks through it.
+
+### 10.3 Normative prerequisite — hard operational ceilings must be frozen first
+
+**Ratification of A1 authorizes no fetching and does not itself select
+operational limits.** Before any implementation code is written and before any
+source is enabled, the implementation contract must **freeze hard per-host
+ceilings** for:
+
+- **concurrency** — simultaneous in-flight requests per host;
+- **request rate** — requests per interval per host;
+- **pages per run** — total pages retrieved per host per run;
+- **response bytes per page**;
+- **total response bytes per run**.
+
+The frozen limits must:
+
+- be **database- or contract-governed**, never arbitrary adapter defaults — a
+  ceiling an adapter author can raise by editing a constant is not a ceiling;
+- **honour a publisher's declared crawl delay as a minimum delay**, never as a
+  target and never as a value to be optimised against (Lineroid's
+  `Crawl-delay: 1` is a floor, not a budget);
+- **refuse an adapter configuration that exceeds the frozen ceiling** — the
+  refusal is a startup failure, not a warning;
+- **prohibit unlimited values** in every dimension, including by absence: an
+  unset limit must fail closed rather than default to unbounded;
+- **remain manual-trigger-only** under LIVE.4.
+
+**No adapter code may precede that numerical decision.** The ordering is
+deliberate: limits chosen after an adapter exists get chosen to fit what the
+adapter already does.
+
+**This correction pass deliberately invents no numbers.** Choosing them is an
+explicit precondition of the separately authorized implementation slice, and it
+is a decision for the owner, informed by what each enabled source's own declared
+policy asks for.
 
 ## 11. Adversarial examples
 
@@ -391,6 +630,11 @@ Each is a case where a plausible reading gives the wrong answer.
 | **10** | A qualifying source's page says "Available now — $16,000". | One `NOT_VERIFIED` claim on the price axis with its excerpt, and **no** availability or maturity conclusion without their own separate evidence (§6.2, last row). One sentence is not evidence for three axes. |
 | **11** | Limited-mode radar surfaces a robot absent from the canonical catalogue and from all 43 candidates. | Exactly what the state is for: a new discovery candidate, `NOT_VERIFIED`, queued for a human. This is the amendment's actual value. |
 | **12** | An operator argues the source is "obviously fine" and asks to skip the recorded search. | Refused. Requirement 8 makes an unattributed review not a review (DATA-D1.9). The record is the artefact; without it the state does not exist. |
+| **13** | A **manufacturer** has a permissive `robots.txt`, no terms page, no rights reservation and no access denial — it would satisfy all ten requirements. | **Does not qualify.** A1 is limited to `AGGREGATOR` (§2.1), and `MANUFACTURER` is not widened. Automated acquisition still requires `ALLOWED`. Human research under `MANUAL_BOOTSTRAP` remains fully available and is the correct route. |
+| **14** | A source's policy says only *"Do not use this content to train AI models"*, while otherwise permitting ordinary indexing and retrieval. | **Training remains prohibited, absolutely and permanently.** The training-only statement does not by itself prohibit limited radar access (§4.1 rule 2) — **but every other A1 requirement must still pass**, including the class precondition, the full six-axis search and owner enablement. Rule 2 removes one obstacle; it grants nothing. |
+| **15** | A source's policy or notice reserves **text-and-data mining** or **systematic database extraction** — an Article 4 reservation, a sui-generis database-right notice, or a clause against systematic extraction. | **`PROHIBITED`** for the proposed radar activity (§4.1 rule 4). What A1 authorizes *is* systematic extraction; naming it "radar" does not place it outside such a reservation. |
+| **16** | A source qualifies on every axis, but an honest classification makes it `COMPETITOR_DIRECTORY`. Reclassifying it `AGGREGATOR` would make it eligible, and the content is arguably aggregated data. | **Does not qualify, and must not be reclassified** (§2.1). Class records what a source is, on the evidence. If the class is genuinely wrong, correcting it is a classification decision made on its own merits and recorded as such — never a step taken *because* it produces eligibility. If A1's scope proves too narrow, the remedy is a later amendment naming the class. |
+| **17** | A directive restricts "AI use" without stating whether it covers retrieval and grounding or only training. The permissive reading would qualify the source. | **`UNKNOWN`** (§4.1 rule 5), and `UNKNOWN` is never fetched. When scope cannot be determined, the restriction applies. A reviewer constructing an argument for why it "probably means training" has already failed the rule. |
 
 ## 12. Non-goals
 
@@ -398,6 +642,15 @@ This amendment explicitly does **not**:
 
 - authorize any fetch, of any source, official or otherwise;
 - approve any of the four candidate sources in §9;
+- extend the new state to any class other than `AGGREGATOR` — `MANUFACTURER`,
+  `OFFICIAL_STORE` and `AUTHORIZED_DISTRIBUTOR` continue to require `ALLOWED`,
+  and `COMPETITOR_DIRECTORY`, `EDITORIAL` and every other class remain governed
+  by the pre-amendment rules (§2.1);
+- authorize reclassifying any source to bring it inside the eligible class;
+- select any operational limit — concurrency, rate, page cap or byte ceiling.
+  Freezing those is a **precondition** of the implementation slice (§10.3), and
+  no adapter code may precede it;
+- permit training on acquired content, under any directive, from any source;
 - reopen `robotsguide.com`, `roboselect360.com`, or any source assessed as
   `PROHIBITED`;
 - weaken, qualify or create an exception to Gate W, Gate S, Gate T, Gate X, or
@@ -421,19 +674,41 @@ This amendment explicitly does **not**:
 ```
 STATUS:                      PROPOSED — NOT RATIFIED
 Proposed:                    2026-07-30
+Corrected:                   2026-07-30 — owner review, corrections 1-3
+                             (class precondition §2.1 · restriction
+                             applicability §4.1 · operational ceilings §10.3)
 Amends:                      docs/16_DATA_D1_LIVE_MARKET_ACQUISITION_CONTRACT.md
                              (RATIFIED v0.1, main @ 6875a34)
 Implementation authorized:   NONE — documentation only
 Sources approved:            NONE
+Eligible source class:       AGGREGATOR ONLY (§2.1). MANUFACTURER,
+                             OFFICIAL_STORE and AUTHORIZED_DISTRIBUTOR require
+                             ALLOWED; all other classes unchanged. Widening
+                             requires a further amendment. Reclassification to
+                             gain eligibility is prohibited.
 Candidate sources:           The Mimic · Lineroid · WhichHumanoid · RoboZaps
                              (candidates only; each requires its own full
-                             review under the amended procedure)
+                             review under the amended procedure, AND must first
+                             satisfy the AGGREGATOR class precondition on an
+                             honest classification — which may exclude some)
 Explicitly excluded:         robotsguide.com · roboselect360.com — disqualifying
                              directives and access behaviour on the recorded
                              assessment
+Training on acquired
+  content:                   PROHIBITED — always, under every directive, from
+                             every source (§4.1 rule 1)
+Operational ceilings:        NOT SELECTED. Freezing per-host concurrency, rate,
+                             page cap and byte ceilings is a PRECONDITION of
+                             the implementation slice (§10.3). No adapter code
+                             may precede it.
 Gate W:                      UNCHANGED
+Gates S / T / X, P2 / P8:    UNCHANGED
 Precedence order:            UNCHANGED
-Default expiry:              30 days
+Default expiry:              220 days (owner decision, 2026-07-30) — longer
+                             than the 90-day ALLOWED terms validity; the
+                             run-start robots re-read and the six immediate
+                             revocation triggers carry the safety, not the
+                             expiry clock (§7)
 
 Ratified by:                 ____________________
 Ratification date:           ____________________

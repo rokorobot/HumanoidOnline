@@ -45,7 +45,8 @@ ROBOTS_DIR = CATALOGUE_DIR / "robots"
 # Robot columns fed from a robot JSON's flat "specs" object (plus a few top-level
 # fields handled separately). Kept explicit for readability (AGENTS.md rule 10).
 SPEC_COLUMNS = [
-    "height_cm", "weight_kg", "payload_kg", "walk_speed_ms", "runtime_minutes",
+    "height_cm", "weight_kg", "arm_span_cm", "reach_cm", "payload_kg",
+    "walk_speed_ms", "runtime_minutes",
     "battery_wh", "mobility", "degrees_of_freedom", "hand_type", "hand_dof",
     "autonomy", "has_manipulation", "has_teleoperation", "has_vision",
     "has_language_ui", "has_sdk", "has_api", "ros_support", "developer_edition",

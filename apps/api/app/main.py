@@ -27,6 +27,7 @@ from app.observability import (
 from app.routers import (
     buyer_requirements,
     commercial_leads,
+    discovery_review,
     health,
     manufacturers,
     regions,
@@ -91,6 +92,18 @@ app.include_router(stats.router)
 app.include_router(buyer_requirements.router)
 # WS7 — commercial lead (first commercial conversion / monetization seam).
 app.include_router(commercial_leads.router)
+
+# DATA-D1 operator review surface — NOT PUBLIC, and mounted ONLY in relaxed
+# environments. In staging/production these routes do not exist: not disabled by
+# a flag someone could flip, simply absent. Same fail-closed shape as the admin
+# below, for the same reason — the safe state must be the default one.
+#
+# It serves NONCANONICAL candidates. Exposing them publicly would break DATA-D1
+# §22 / Gate I (no discovery data on the public API) and AGENT-01.7 (machine
+# surfaces are published-canonical-only), and would let a consumer read "a source
+# claims this robot exists" as HumanoidOnline asserting it.
+if settings.is_relaxed:
+    app.include_router(discovery_review.router)
 
 # Internal admin at /admin — WS8.1 / R1: authenticated at the application layer
 # and NOT mounted at all when unconfigured (fail closed). The production network

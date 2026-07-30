@@ -329,3 +329,24 @@ export interface MarketSnapshot {
   rental_offers_present: boolean;
   latest_observed_at?: string | null;
 }
+
+// ---- DATA-D1 operator review surface ---------------------------------------
+// NONCANONICAL. A discovery candidate is what a source CLAIMS exists; it is not a
+// catalogue robot and carries no verified fact. Deliberately no specs, price,
+// availability, maturity or imagery — see apps/api/app/schemas/discovery_review.py.
+export interface DiscoveryCandidateReview {
+  id: string;
+  candidate_name: string | null;
+  candidate_manufacturer: string | null;
+  external_ref: string;
+  discovery_url: string | null;
+  /** An official-URL LEAD, not a confirmed trace. `null` when there is none. */
+  official_url: string | null;
+  source_name: string;
+  source_class: string;
+  status: string;
+  identity_status: string;
+  trace_state: string;
+  discovered_at: string;
+  last_seen_at: string;
+}

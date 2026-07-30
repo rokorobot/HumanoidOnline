@@ -9,12 +9,13 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "e2e": "playwright test --grep-invert @zeromatch",
+    "e2e": "playwright test --grep-invert \"@zeromatch|@discovery\"",
     "e2e:zero": "playwright test --grep @zeromatch",
+    "e2e:discovery": "playwright test --project=desktop-chromium --grep @discovery",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx --max-warnings=0",
     "perf:budget": "node scripts/perf-budget.mjs",
-    "e2e:desktop": "playwright test --project=desktop-chromium --grep-invert @zeromatch",
-    "e2e:mobile": "playwright test --project=mobile-chromium --grep-invert @zeromatch"
+    "e2e:desktop": "playwright test --project=desktop-chromium --grep-invert \"@zeromatch|@discovery\"",
+    "e2e:mobile": "playwright test --project=mobile-chromium --grep-invert \"@zeromatch|@discovery\""
   },
   "dependencies": {
     "next": "^15.1.6",

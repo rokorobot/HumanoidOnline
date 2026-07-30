@@ -8,6 +8,7 @@ import { correlationHeader } from "./request-id";
 import { API_BASE_URL } from "./server";
 import type {
   CompareResponse,
+  DiscoveryCandidateReview,
   ManufacturerDetail,
   ManufacturerListItem,
   MarketSnapshot,
@@ -125,6 +126,19 @@ export async function compareRobots(
   if (res.status === 422 || res.status === 404) return null;
   if (!res.ok) throw new Error(`API ${res.status} for /api/robots/compare`);
   return (await res.json()) as CompareResponse;
+}
+
+// ---- DATA-D1 operator review (NONCANONICAL, dev/test only) -----------------
+// The API mounts this route only in relaxed environments, so a strict deployment
+// returns 404 and the review page renders its unavailable state rather than
+// crashing. Kept beside the catalogue reads but never mixed with them: nothing
+// here may be rendered as a verified robot.
+export function listDiscoveryCandidates(
+  params: { limit?: number; offset?: number } = {},
+): Promise<Page<DiscoveryCandidateReview>> {
+  return getJSON<Page<DiscoveryCandidateReview>>(
+    `/api/discovery-review${buildQuery(params as Record<string, QueryValue>)}`,
+  );
 }
 
 // ---- Manufacturers ---------------------------------------------------------

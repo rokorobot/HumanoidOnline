@@ -10,6 +10,8 @@
   "specs": {
     "height_cm": 167.6,
     "weight_kg": 29.9,
+    "arm_span_cm": null,
+    "reach_cm": null,
     "payload_kg": 24.9,
     "walk_speed_ms": null,
     "runtime_minutes": 240,

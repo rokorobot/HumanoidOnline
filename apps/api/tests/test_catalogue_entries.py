@@ -104,16 +104,40 @@ def test_a_stub_is_never_published():
 
 
 def test_every_shipped_stub_is_unpublished_and_specless():
-    """Guards the 36 files actually in the tree, not just the constructor."""
-    unpublished_stubs = [
+    """Guards the files actually in the tree, not just the constructor.
+
+    Deliberately not a fixed count: stubs become populated robots as their
+    specifications are read, and a hard `>= 36` would fail on the good news.
+    What must hold is the property — anything still carrying the unverified note
+    has no specifications and is not published.
+    """
+    stubs = [
         (slug, r) for slug, r in ce.existing_robots().items()
         if r.get("specs_note") == ce.UNVERIFIED_NOTE
     ]
-    assert len(unpublished_stubs) >= 36
-    for slug, robot in unpublished_stubs:
+    assert stubs, "expected at least one unpopulated stub"
+    for slug, robot in stubs:
         assert robot["is_published"] is False, slug
         assert all(v is None for v in robot["specs"].values()), slug
         assert robot["commercial_status_evidence"] == [], slug
+
+
+def test_a_populated_robot_records_where_its_specs_came_from():
+    """The converse: anything that HAS specifications must say where they came
+    from, since the canonical model carries no per-field evidence."""
+    for slug, robot in ce.existing_robots().items():
+        specs = robot.get("specs") or {}
+        if all(v is None for v in specs.values()):
+            continue
+        note = robot.get("specs_note") or ""
+        assert note and note != ce.UNVERIFIED_NOTE, slug
+
+
+def test_every_catalogue_file_carries_the_full_field_set():
+    """A file missing a field would silently import as NULL, which is
+    indistinguishable from a source that did not state it."""
+    for slug, robot in ce.existing_robots().items():
+        assert set(robot["specs"]) == set(ce.SPEC_FIELDS), slug
 
 
 def test_write_refuses_to_overwrite_an_existing_robot():

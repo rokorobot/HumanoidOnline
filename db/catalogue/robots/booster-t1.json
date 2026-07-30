@@ -10,6 +10,8 @@
   "specs": {
     "height_cm": null,
     "weight_kg": null,
+    "arm_span_cm": null,
+    "reach_cm": null,
     "payload_kg": null,
     "walk_speed_ms": null,
     "runtime_minutes": null,

@@ -52,15 +52,17 @@ WORKSHEET_VERSION = 1
 #: The specification fields a canonical robot carries, in the order they appear
 #: in an existing catalogue file. Numeric unless noted.
 SPEC_FIELDS: tuple[str, ...] = (
-    "height_cm", "weight_kg", "payload_kg", "walk_speed_ms", "runtime_minutes",
+    "height_cm", "weight_kg", "arm_span_cm", "reach_cm", "payload_kg",
+    "walk_speed_ms", "runtime_minutes",
     "battery_wh", "mobility", "degrees_of_freedom", "hand_type", "hand_dof",
     "autonomy", "has_manipulation", "has_teleoperation", "has_vision",
     "has_language_ui", "has_sdk", "has_api", "ros_support", "developer_edition",
     "simulation_support",
 )
 _NUMERIC = {
-    "height_cm", "weight_kg", "payload_kg", "walk_speed_ms", "runtime_minutes",
-    "battery_wh", "degrees_of_freedom", "hand_dof",
+    "height_cm", "weight_kg", "arm_span_cm", "reach_cm", "payload_kg",
+    "walk_speed_ms", "runtime_minutes", "battery_wh", "degrees_of_freedom",
+    "hand_dof",
 }
 _BOOLEAN = {
     "has_manipulation", "has_teleoperation", "has_vision", "has_language_ui",

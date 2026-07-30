@@ -46,6 +46,10 @@ class Robot(Base):
     # First-class physical specs.
     height_cm: Mapped[Decimal | None] = mapped_column(Numeric(6, 1))
     weight_kg: Mapped[Decimal | None] = mapped_column(Numeric(6, 1))
+    #: Horizontal extent. Distinct measurements: span is fingertip-to-fingertip,
+    #: reach is one arm from its shoulder. Neither is derived from the other.
+    arm_span_cm: Mapped[Decimal | None] = mapped_column(Numeric(6, 1))
+    reach_cm: Mapped[Decimal | None] = mapped_column(Numeric(6, 1))
     payload_kg: Mapped[Decimal | None] = mapped_column(Numeric(6, 1))
     walk_speed_ms: Mapped[Decimal | None] = mapped_column(Numeric(5, 2))
     runtime_minutes: Mapped[int | None] = mapped_column(Integer)

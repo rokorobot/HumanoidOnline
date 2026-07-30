@@ -361,6 +361,10 @@ CREATE TABLE robot (
     -- The long tail of specs lives in `specification`.
     height_cm             NUMERIC(6,1) CHECK (height_cm > 0),
     weight_kg             NUMERIC(6,1) CHECK (weight_kg > 0),
+    -- Horizontal extent. Two measurements, never derived from one another:
+    -- span is fingertip-to-fingertip, reach is one arm from its shoulder.
+    arm_span_cm           NUMERIC(6,1) CHECK (arm_span_cm > 0),
+    reach_cm              NUMERIC(6,1) CHECK (reach_cm > 0),
     payload_kg            NUMERIC(6,1) CHECK (payload_kg >= 0),
     walk_speed_ms         NUMERIC(5,2) CHECK (walk_speed_ms >= 0),   -- m/s
     runtime_minutes       INT CHECK (runtime_minutes >= 0),

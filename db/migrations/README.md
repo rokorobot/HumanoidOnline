@@ -73,6 +73,16 @@ Forward migrations:
   fetcher, crawler or scheduler, and applying it does not make the system capable
   of fetching anything. Per-source crawling remains unauthorized until an
   affirmative, attributed eligibility review exists for that source (§5).
+- `0005_add_robot_span_and_reach.sql` — adds `robot.arm_span_cm` and
+  `robot.reach_cm`, both `NUMERIC(6,1)` in centimetres to match `height_cm`.
+  The catalogue could record how tall and how heavy a robot is but had nowhere
+  to put how wide it works, so published figures were being discarded on entry
+  (Astribot states "Arm span: 194cm", Robotera "Arm Span 2.1 m"). **Two columns,
+  not one**, because they are different measurements: span is fingertip to
+  fingertip, reach is one arm from its shoulder. Roughly span ≈ 2 × reach, and
+  that relationship is explicitly **not** a licence to derive one from the
+  other — a derived number would be an inference presented as a manufacturer's
+  figure. Additive and idempotent.
 
 ## Checksum integrity (WS8.2 / R9)
 

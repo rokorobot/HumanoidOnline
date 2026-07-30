@@ -288,3 +288,93 @@ jobs:
           name: playwright-report-zero-match
           path: apps/web/playwright-report/
           retention-days: 7
+
+  web-discovery-review:
+    name: Frontend discovery review (relaxed env, bootstrapped candidates)
+    # DATA-D1 §22 / Gate I: the operator review surface is FAIL-CLOSED. The API
+    # mounts /api/discovery-review only when APP_ENV is relaxed, the page
+    # notFound()s otherwise, and the candidates it renders exist only after
+    # MANUAL_BOOTSTRAP has run. None of that is true in web-integration, by
+    # design — that job proves the PUBLIC catalogue in a production-default
+    # environment, and relaxing it to accommodate this surface would weaken the
+    # gate it exists to be. So this suite gets its own job and its own database,
+    # exactly as the zero-match acceptance does.
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: humanoid
+          POSTGRES_PASSWORD: humanoid
+          POSTGRES_DB: discovery
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U humanoid -d discovery"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DATABASE_URL: postgresql+psycopg://humanoid:humanoid@localhost:5432/discovery
+      API_BASE_URL: http://127.0.0.1:8000
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
+      # The whole point of this job: a relaxed environment, where the surface exists.
+      APP_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      # 1) schema -> verified catalogue -> the MANUAL_BOOTSTRAP candidates
+      - name: Apply canonical schema (NO seed)
+        run: uv run db/bootstrap.py
+      - name: Import the verified catalogue
+        run: uv run db/import_catalogue.py
+      - name: Install API dependencies
+        working-directory: apps/api
+        run: uv sync --frozen
+      - name: Load the MANUAL_BOOTSTRAP candidates (DATA-D1.LIVE §2.1)
+        working-directory: apps/api
+        run: |
+          uv run python -m app.cli.bootstrap_inventory humanoid_radar_v1 \
+            --operator "ci@humanoidonline.invalid"
+
+      # 2) FastAPI in the relaxed environment (background)
+      - name: Start FastAPI (uvicorn)
+        working-directory: apps/api
+        run: |
+          nohup uv run python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 \
+            > "$RUNNER_TEMP/api.log" 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:8000/api/discovery-review > /dev/null; then
+              echo "API up, review surface mounted"; break
+            fi
+            sleep 2
+          done
+          curl -sf http://127.0.0.1:8000/api/discovery-review > /dev/null \
+            || (cat "$RUNNER_TEMP/api.log"; exit 1)
+
+      # 3) Next (built) + 4) the isolated discovery-review spec only
+      - name: Install web dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Install Playwright browsers
+        working-directory: apps/web
+        run: npx playwright install --with-deps chromium
+      - name: Build web
+        working-directory: apps/web
+        run: npm run build
+      - name: Run the isolated discovery-review suite
+        working-directory: apps/web
+        run: npm run e2e:discovery
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-discovery-review
+          path: apps/web/playwright-report/
+          retention-days: 7

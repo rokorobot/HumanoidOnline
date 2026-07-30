@@ -6,7 +6,14 @@
 // nothing crosses.
 import { expect, test } from "@playwright/test";
 
-test.describe("discovery review", () => {
+// Tagged @discovery and run by its OWN CI job, for the same reason the
+// zero-match suite is: this surface is fail-closed. The API mounts
+// /api/discovery-review only when APP_ENV is relaxed, the page notFound()s
+// otherwise, and the candidates it renders exist only after MANUAL_BOOTSTRAP has
+// run. The verified-catalogue job has none of that by design, so these specs
+// cannot pass there — and making them pass there would mean relaxing the
+// environment the catalogue suite deliberately tests in.
+test.describe("discovery review @discovery", () => {
   test("renders the review surface with its unverified warning", async ({ page }) => {
     await page.goto("/discovery-review");
 

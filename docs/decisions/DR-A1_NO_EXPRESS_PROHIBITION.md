@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | **OPEN — awaiting product-owner decision** |
+| **Status** | **DECIDED — ADOPTED, 2026-07-30, Robert Konecny (product owner)** |
 | **Raised** | 2026-07-30 |
 | **Revision** | 3 (2026-07-30) — default validity set to **90 days**, aligned with the `ALLOWED` terms review; expiry stated as a fail-closed suspension that triggers nothing |
 | | 2 (2026-07-30) — owner review corrections: `AGGREGATOR`-only class precondition · restriction-applicability rules frozen · operational ceilings made an implementation precondition |
@@ -198,24 +198,50 @@ scope is a separate question that should be decided on its own evidence.
 | `PROHIBITED` sources drift back in via a site redesign | No automatic downgrade; a fresh named review is required and must consider whether the prohibition genuinely ended. |
 | The Cloudflare template spreads and silently disqualifies sources mid-run | Already observed on two of seven hosts. Robots is re-read at every run start; an appearing agent-block halts the run `HALTED_BY_POLICY`. |
 
-## 7. What is explicitly not being asked
+## 7. What was explicitly not asked
 
-This record does not ask for approval to fetch anything, to enable any source,
-to write any code, or to reopen `robotsguide.com` or `roboselect360.com`. It
-asks for one thing: whether the third state should exist.
+This record did not ask for approval to fetch anything, to enable any source, to
+write any code, or to reopen `robotsguide.com` or `roboselect360.com`. It asked
+one thing: whether the third state should exist. **The decision below answers
+that question and nothing wider.**
 
 ## 8. Decision
 
 ```
-DECISION:            ____________________   (ADOPT / REJECT / AMEND)
-Decided by:          ____________________
-Date:                ____________________
-Notes:
+DECISION:            ADOPT
+Decided by:          Robert Konecny (product owner)
+Date:                2026-07-30
+Decided at:          docs/17 revision 3 — head
+                     1dfc48ac44e69ba57c9ec7dcc749de115710e2d8
+                     (6/6 CI green, two documentation files, no
+                     implementation change)
+
+Adopted with:        90-day eligibility validity, aligned to the ALLOWED
+                     terms-review validity
+                     AGGREGATOR-only scope (§2.1)
+                     frozen restriction-applicability rules (§4.1)
+                     operational-ceiling prerequisite (§10.3)
+
+Notes:               Expiry is a fail-closed access-suspension event that
+                     triggers zero requests; acquired evidence is retained; a
+                     fresh complete review is required before any later
+                     acquisition; and content acquisition remains a separate
+                     manual-trigger decision under LIVE.4. The weaker
+                     NO_EXPRESS_PROHIBITION state no longer outlives ALLOWED.
+                     All six immediate revocation triggers remain active.
+                     No source is approved by this decision.
 ```
 
-If **ADOPT**: `docs/17` moves to RATIFIED, and the implementation slice is
-scoped and authorized separately.
-If **REJECT**: `docs/17` is marked REJECTED and retained — the reasoning stays
-on the record so the question is not re-litigated from scratch, and
-human-in-the-loop acquisition (Option 3) plus permission requests (Option 2)
-remain the only routes.
+**Authorized sequence following adoption** (see `docs/17` §13.1): a separate
+implementation contract covering enums, limited-radar mode, database
+constraints, expiry behaviour and numerical ceilings → fresh individual reviews
+of The Mimic, Lineroid, WhichHumanoid and RoboZaps → enablement of only those
+honestly classified `AGGREGATOR` and passing every requirement.
+**Source-data extraction tooling remains paused** until that sequence is
+reached.
+
+*Had the decision been REJECT, `docs/17` would have been marked REJECTED and
+retained so the reasoning stayed on the record — with human-in-the-loop
+acquisition (Option 3) and permission requests (Option 2) as the only routes.
+That path was not taken; Option 2 continues in parallel regardless, as
+recommended.*

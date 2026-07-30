@@ -1,30 +1,32 @@
 # DATA-D1.LIVE — Amendment A1: `NO_EXPRESS_PROHIBITION`
 
-> **STATUS: PROPOSED — NOT RATIFIED.**
->
-> **Revision 3 (2026-07-30)** — default eligibility validity set to **90 days**,
-> aligned with the `ALLOWED` terms-review validity (§7), and expiry stated
-> explicitly as a **fail-closed access-suspension event that triggers nothing**
-> (§7.1).
->
-> **Revision 2 (2026-07-30)** — incorporates the product owner's review
-> corrections: the state is restricted to `AGGREGATOR`-class sources (§2.1);
-> requirement 3 now turns on whether a restriction *applies to the proposed use*,
-> with the training-only distinction frozen (§4.1); and freezing hard per-host
-> operational ceilings becomes a precondition of any implementation (§10.3).
+> **STATUS: RATIFIED — 2026-07-30, Robert Konecny (product owner).**
+> Laws and definitions in this document are **FROZEN**. See §13.
 >
 > This document amends `16_DATA_D1_LIVE_MARKET_ACQUISITION_CONTRACT.md`
-> (RATIFIED v0.1, 2026-07-29, main @ `6875a34`). It has **no force** until the
-> product owner ratifies it in §12.
+> (RATIFIED v0.1, 2026-07-29, main @ `6875a34`).
 >
-> **Nothing in this amendment authorizes a fetch.** It defines a third
-> eligibility state and the narrow capability that state may carry. Every source
-> still requires its own recorded review (§5 of the base contract) before any
-> request is issued, and this amendment approves **no source**.
+> **Ratification changes what is *permitted in principle*. It authorizes no
+> fetch, approves no source, and authorizes no implementation.** It defines a
+> third eligibility state and the narrow capability that state may carry. Every
+> source still requires its own recorded review (§5 of the base contract, plus
+> §2.1 and §4 here) before any request is issued, and this amendment approves
+> **no source**.
 >
-> **Implementation authorized by this document: none.** It is a docs-only
-> proposal. Schema, models, migrations, adapters, extraction tooling, APIs and UI
-> are untouched and must remain so until a later, separately authorized slice.
+> **Implementation authorized by this document: none.** Schema, models,
+> migrations, adapters, extraction tooling, APIs and UI are untouched and remain
+> so until a **separate implementation contract** is ratified — covering enums,
+> limited-radar mode, database constraints, expiry behaviour and the numerical
+> ceilings required by §10.3.
+>
+> **Revision history.** Revision 3 (2026-07-30) — default eligibility validity
+> set to **90 days**, aligned with the `ALLOWED` terms-review validity (§7), and
+> expiry stated explicitly as a **fail-closed access-suspension event that
+> triggers nothing** (§7.1); ratified at this revision. Revision 2 (2026-07-30) —
+> product-owner review corrections: the state restricted to `AGGREGATOR`-class
+> sources (§2.1); requirement 3 turned on whether a restriction *applies to the
+> proposed use*, with the training-only distinction frozen (§4.1); hard per-host
+> operational ceilings made a precondition of any implementation (§10.3).
 
 ---
 
@@ -696,7 +698,7 @@ This amendment explicitly does **not**:
 ## 13. Ratification record
 
 ```
-STATUS:                      PROPOSED — NOT RATIFIED
+STATUS:                      RATIFIED (revision 3)
 Proposed:                    2026-07-30
 Corrected:                   2026-07-30 — owner review, corrections 1-3
                              (class precondition §2.1 · restriction
@@ -738,12 +740,34 @@ Expiry semantics:            FAIL-CLOSED ACCESS SUSPENSION. Never a crawl,
                              fetch, refresh, retry, scheduling or acquisition
                              trigger. Expiry starts nothing (§7.1)
 
-Ratified by:                 ____________________
-Ratification date:           ____________________
+Ratified by:                 Robert Konecny (product owner)
+Ratification date:           2026-07-30
+Ratified at:                 revision 3 — amendment content as reviewed at
+                             head 1dfc48ac44e69ba57c9ec7dcc749de115710e2d8
+                             (6/6 CI green, documentation only)
 ```
 
-**On ratification this document freezes principles only.** Implementing the
-state — enum widening, mode-aware eligibility, gates, run-report and review-UI
-changes — requires a separately authorized slice, and enabling any individual
-source requires that source's own recorded review and the owner's explicit
-enablement, source by source, exactly as the base contract requires today.
+**This document freezes principles only.** Implementing the state — enum
+widening, mode-aware eligibility, database constraints, expiry behaviour, gates,
+run-report and review-UI changes — requires a **separate implementation
+contract**, and enabling any individual source requires that source's own
+recorded review and the owner's explicit enablement, source by source, exactly
+as the base contract requires today.
+
+### 13.1 Authorized sequence following ratification
+
+Ratified as the order of work, so that no step is taken out of turn:
+
+1. **A separate implementation contract** covering enums, limited-radar mode,
+   database constraints, expiry behaviour and the numerical ceilings of §10.3.
+   It is ratified before any code is written.
+2. **Fresh individual eligibility reviews** of The Mimic, Lineroid,
+   WhichHumanoid and RoboZaps, each under the complete amended procedure —
+   §2.1 class precondition first, then all ten requirements of §4, with the
+   §5 evidence record.
+3. **Enablement of only those honestly classified `AGGREGATOR` and passing
+   every requirement.** A candidate that fails either test is not enabled, and
+   is not reclassified.
+
+**Source-data extraction tooling remains paused** until steps 1–3 above are
+reached in order. Ratification does not restart it.

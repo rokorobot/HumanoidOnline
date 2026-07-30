@@ -4,13 +4,14 @@
 |---|---|
 | **Status** | **OPEN — awaiting product-owner decision on the contract as a whole.** The `MANUAL_ONLY` sub-decision is **RESOLVED: ADOPTED**, 2026-07-30. |
 | **Raised** | 2026-07-30 |
-| **Revision** | 4 (2026-07-30) — revocation exit split by cause: a direct publisher objection cannot be cleared by our own review |
+| **Revision** | 5 (2026-07-30) — rebased onto `main @ 2573da9`; stack prerequisite discharged; cross-source communication lineage and migration statement order corrected |
+| | 4 (2026-07-30) — revocation exit split by cause: a direct publisher objection cannot be cleared by our own review |
 | | 3 (2026-07-30) — `PROHIBITED` persistence corrected: the historical record is permanent and append-only; the current status changes only through a fresh complete attributed review |
 | | 2 (2026-07-30) — `MANUAL_ONLY` adopted; eligibility-to-mode contradiction resolved; revocation scoped; PR #36 rebase consequence recorded |
 | **Decision owner** | Robert Konecny (product owner) — sole ratifying authority |
 | **Implements** | `docs/17` §13.1 step 1 (Amendment A1, RATIFIED, `main @ 626d1ce`) |
 | **Normative text** | `docs/18_DATA_D1_LIVE_A1_LIMITED_RADAR_IMPLEMENTATION_CONTRACT.md` |
-| **Base** | `main @ 626d1ce873d650a3f3a46381b33a3f970e9e8648` |
+| **Base** | `main @ 2573da9` (rebased; originally drafted against `626d1ce`) |
 
 This record captures **why the contract is shaped the way it is and what turns
 on ratifying it**. The contract carries the normative text; nothing here binds.
@@ -42,20 +43,29 @@ Ratification authorizes **no source, no fetch and no code**. It authorizes the
 Three findings materially shaped the contract, and none of them was assumable
 from the conversation.
 
-**`AGGREGATOR` is not on `main`.** A1's central rule names an enum value that
-arrives with migration `0004` — PR #35, still an unmerged Draft. The
-implementation migration is therefore `0005`, strictly dependent on `0004`. This
-is the hard reason the existing stack must be rebased and merged before A1-I1
-begins, and it converts a sequencing preference into a build dependency.
+**`AGGREGATOR` was not on `main` when this contract was drafted.** A1's central
+rule names an enum value that arrives with migration `0004`, which was then an
+unmerged Draft. That converted a sequencing preference into a hard build
+dependency: the implementation migration is `0005`, and `0005` cannot exist
+before `0004`.
 
-**`main` is thinner than the working tree suggested.** No acquisition layer, no
-`MANUAL_BOOTSTRAP`, no `/discovery-review` — all three live only in the unmerged
-stack. The contract records the inventory explicitly (§1) so a later reader does
-not mistake stack state for `main` state.
+**That dependency is now discharged.** The stack merged on 2026-07-30 —
+`d174abc` (#35) → `9d802c2` (#41, replacing auto-closed #36) → `0f2fb44` (#37) →
+`2573da9` (#40). `AGGREGATOR`, the acquisition layer, `MANUAL_BOOTSTRAP`,
+`/discovery-review` and the batch review CLI are all on `main`, and §1 of the
+contract has been re-inspected against `main @ 2573da9` rather than left
+describing a repository that no longer exists. **A1-I1 is now the next slice
+once this contract is ratified.**
+
+**`main` was thinner than the working tree suggested**, and that was worth
+recording at the time: a working tree sitting on the tip of a four-deep stack
+looks exactly like a `main` that contains all of it. The contract keeps the
+inventory explicit for the same reason it did then — so a later reader never
+mistakes branch state for `main` state.
 
 **`radar_eligible` is load-bearing for `MANUAL_BOOTSTRAP`.** Replacing it with a
 three-value mode enum would force bootstrap sources to declare `FULL_RADAR`.
-That is the one open decision — §6 below.
+That produced the `MANUAL_ONLY` mode, since adopted — §6 below.
 
 ## 4. Options considered on the central design question
 
@@ -116,9 +126,26 @@ would make the run report useless exactly where it matters.
 **Byte ceilings count decompressed bytes, measured while streaming.** A limit
 applied after decompression is not a limit.
 
-**Gates A1-G31 … A1-G41 were added** beyond the thirty requested, covering
-`MANUAL_ONLY` and scoped revocation. They are normative, not conditional —
-`MANUAL_ONLY` is adopted (§6).
+**Gates A1-G31 … A1-G57 were added** beyond the thirty requested, covering
+`MANUAL_ONLY`, scoped revocation, `PROHIBITED` persistence, publisher-objection
+exit, cross-source communication lineage and the migration statement order. They
+are normative, not conditional — `MANUAL_ONLY` is adopted (§6).
+
+**Communication lineage may never cross sources**, and the fix is declarative
+rather than a trigger. `UNIQUE (id, source_id)` plus a **composite** foreign key
+`(supersedes_id, source_id) → (id, source_id)` makes it impossible for a
+withdrawal recorded against one publisher to supersede an objection recorded
+against another — which would otherwise silently lift a stranger's objection
+through a foreign key that looked correct. The same shape closes
+`discovery_source.revoking_communication_id` (§9.2.1, gates G55–G56).
+
+**Migration `0005`'s statement order is frozen** (§5.1.1). PostgreSQL refuses to
+reference a value added by `ALTER TYPE … ADD VALUE` in the transaction that
+added it, while `CREATE TYPE` has no such rule — an asymmetry that fails only on
+first application to a real database, never in review. The enum widening
+therefore commits before anything uses it, `source_communication` is created
+before the `discovery_source` columns that reference it, and the old
+`ck_discovery_source_eligible` is dropped before `radar_mode` is populated.
 
 ## 6. The sub-decision — RESOLVED
 
@@ -151,8 +178,8 @@ boolean.
 
 ### 6.2 Why this matters beyond the schema
 
-The old arrangement required PR #36 to write `tos_status = ALLOWED` — a claim
-that affirmative permission had been found — in order to do something entirely
+The old arrangement required `MANUAL_BOOTSTRAP` to write `tos_status = ALLOWED`
+— a claim that affirmative permission had been found — in order to do something entirely
 legitimate that needed no permission at all. **A gate that can only be passed by
 making a false statement is measuring the wrong thing.** That is the strongest
 argument for the correction, and it is worth remembering the next time a gate
@@ -161,7 +188,8 @@ right question.
 
 Two consequences follow, both now frozen:
 
-- **PR #36's rebase must stop writing `ALLOWED`** (contract §5.5). Its truthful
+- **The `MANUAL_BOOTSTRAP` path must stop writing `ALLOWED`** (contract §5.5),
+  a change belonging to A1-I1 now that the code is on `main`. Its truthful
   default is `radar_mode = MANUAL_ONLY`, `tos_status = UNKNOWN`,
   `robots_status = NOT_APPLICABLE`, `is_enabled = true`. Nobody should later
   "fix" the resulting test failure by reinstating `ALLOWED`, which is why gates
@@ -261,7 +289,7 @@ Three supporting decisions:
 | | |
 |---|---|
 | **Immediately** | Nothing. No source, no fetch, no code. |
-| **Next** | The existing stack is rebased and merged (#35 → #36 → #37), because `0004` must precede `0005`. Then A1-I1. |
+| **Next** | **A1-I1**, directly. The stack merged on 2026-07-30, so `0004` already precedes `0005`. |
 | **Implementation** | Five slices, in order: state and database enforcement → bounded transport against a local fake → discovery extraction → fresh source reviews → a single-source bounded proof. |
 | **First live proof** | **One** qualifying `AGGREGATOR`, a small named candidate subset, reviewed before a second source is enabled. A four-source bulk run is not authorized. |
 | **Canonical truth** | Unchanged. Gates W, S, T, X and P2/P8 all stand. |

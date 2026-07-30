@@ -2,6 +2,16 @@
 
 > **STATUS: PROPOSED — NOT RATIFIED.**
 >
+> **Revision 5 (2026-07-30)** — rebased onto `main @ 2573da9`. §1 re-inspected:
+> the acquisition stack has **merged**, so migration `0004` and `AGGREGATOR` are
+> on `main`, `MANUAL_BOOTSTRAP`, `/discovery-review` and the batch review CLI
+> exist, PR #36 was replaced by merged #41, and **the stack prerequisite is
+> satisfied** — A1-I1 is the next slice once this contract is ratified (§17).
+> Two pre-ratification corrections applied: communication lineage may never
+> cross sources, enforced by a composite foreign key (§9.2.1), and migration
+> `0005`'s statement order is frozen against the `ALTER TYPE ADD VALUE`
+> transaction rule (§5.1.1). Gates A1-G55…G57 added.
+>
 > **Revision 4 (2026-07-30)** — revocation exit split by cause (§9.1). A policy
 > or technical revocation may be cleared by a fresh complete attributed review;
 > **a direct publisher objection may not** — it stands until the publisher
@@ -23,8 +33,8 @@
 > automated eligibility states govern only the automated modes, and the mapping
 > is now two tables (§4.2). `MANUAL_ONLY` requires no `tos_status = ALLOWED`, no
 > expiry and no user agent (§5.4); revocation is scoped so an automated-access
-> revocation never bans human research; PR #36's rebase must stop writing
-> `tos_status = ALLOWED` (§5.5); eleven `MANUAL_ONLY` gates are normative
+> revocation never bans human research; the MANUAL_BOOTSTRAP path must stop
+> writing `tos_status = ALLOWED` (§5.5); eleven `MANUAL_ONLY` gates are normative
 > (A1-G31…G41). **No open decisions remain**; ratification of the contract as a
 > whole is still outstanding.
 >
@@ -48,41 +58,49 @@
 ## 1. Repository truth as inspected
 
 Recorded because the contract must bind to what the repository actually
-contains, not to what a conversation asserted. Inspected at
-`main @ 626d1ce873d650a3f3a46381b33a3f970e9e8648`.
+contains, not to what a conversation asserted. **Re-inspected at
+`main @ 2573da9` after the acquisition stack merged.**
 
 ### 1.1 What is on `main` today
 
 | Object | State on `main` |
 |---|---|
-| Migrations | `0001`, `0002`, `0003` only. **`0004` is not on `main`.** |
-| `discovery_source_class` | Ten values: `COMPETITOR_DIRECTORY`, `MARKETPLACE`, `EDITORIAL`, `SEARCH_RESULT`, `DISTRIBUTOR`, `MANUFACTURER`, `PRESS_RELEASE`, `OFFICIAL_DOCUMENT`, `OFFICIAL_VIDEO`, `OTHER`. **`AGGREGATOR` DOES NOT EXIST.** |
+| Migrations | `0001`, `0002`, `0003`, **`0004_add_live_acquisition_layer.sql`** |
+| `discovery_source_class` | Fourteen values — the original ten plus **`AGGREGATOR`**, `AUTHORIZED_DISTRIBUTOR`, `OFFICIAL_STORE`, `COMMUNITY`. **`AGGREGATOR` EXISTS.** |
 | `tos_status` | `UNKNOWN`, `ALLOWED`, `RESTRICTED`, `PROHIBITED` |
 | `robots_status` | `UNKNOWN`, `ALLOWED`, `DISALLOWED`, `NOT_APPLICABLE` |
-| `discovery_source` | `key`, `name`, `source_class`, `homepage_url`, `tos_status`, `robots_status`, `eligibility_reviewed_at`, `eligibility_reviewed_by`, `is_enabled`, `notes`, timestamps |
-| `ck_discovery_source_eligible` | `NOT is_enabled OR (tos_status = 'ALLOWED' AND robots_status IN ('ALLOWED','NOT_APPLICABLE') AND eligibility_reviewed_at IS NOT NULL AND eligibility_reviewed_by IS NOT NULL)` — `db/schema.sql:1099` |
-| `candidate_claim.discovery_source_id` | **nullable**, `ON DELETE SET NULL` |
-| Discovery services | `adapters.py` (`FixtureAdapter` + `ingest`), `identity.py`, `pipeline.py`, `promotion.py` |
-| CLI | `promote_candidate.py` only |
-| Gate tests | `apps/api/tests/test_discovery.py` — gates A–K plus H1–H5 |
-| Acquisition layer | **absent** — no `acquisition.py`, no `crawl_run`, no `fetched_page`, no `source_eligibility_review`, no `discovery_evidence_excerpt` |
-| `MANUAL_BOOTSTRAP` | **absent** — no `bootstrap.py`, no `bootstrap_inventory` CLI |
-| `/discovery-review` | **absent** |
+| `discovery_source` | the `0003` columns plus `allowed_path_prefixes`, `tos_reviewed_at`, `tos_expires_at`, `tos_page_hash`, `last_robots_hash`, `last_robots_checked_at`, `last_crawled_at` |
+| `ck_discovery_source_eligible` | `NOT is_enabled OR (tos_status = 'ALLOWED' AND robots_status IN ('ALLOWED','NOT_APPLICABLE') AND eligibility_reviewed_at IS NOT NULL AND eligibility_reviewed_by IS NOT NULL)` — unchanged by `0004` |
+| `candidate_claim.discovery_source_id` | **`NOT NULL`, `ON DELETE RESTRICT`** (tightened by `0004`) |
+| Acquisition layer | **present** — `source_eligibility_review`, `crawl_run`, `fetched_page`, `extraction_result`, `candidate_commercial_signal`, `discovery_evidence_excerpt`, plus `crawl_run_status`, `crawl_trigger` (`MANUAL` only), `fetch_outcome`, `extraction_method`, `extraction_confidence`, `signal_axis`, `eligibility_decision`, `extraction_status`, `evidence_subject_type` |
+| Trigger functions | `refuse_eligibility_review_mutation()`, `assert_acquisition_lineage()`, `assert_evidence_excerpt_subject()` |
+| `MANUAL_BOOTSTRAP` | **present** — `services/discovery/bootstrap.py`, `cli/bootstrap_inventory.py`, `db/discovery/bootstrap/humanoid_radar_v1.json` (43 candidates / 29 manufacturers) |
+| `/discovery-review` | **present** — `routers/discovery_review.py` mounted only under `if settings.is_relaxed:`; the page `notFound()`s outside relaxed |
+| Batch review | **present** — `services/discovery/batch_review.py` + `cli/batch_review.py` (worksheet export/apply, snapshot-hash bound, savepoint per action) |
+| Discovery services | `adapters.py`, `identity.py`, `pipeline.py`, `promotion.py`, `bootstrap.py`, `batch_review.py` |
+| CLI | `promote_candidate.py`, `bootstrap_inventory.py`, `batch_review.py` |
+| Gate tests | `test_discovery.py` (A–K, H1–H5) · `test_acquisition_schema.py` · `test_acquisition_migration.py` · `test_bootstrap_inventory.py` · `test_discovery_review.py` · `test_batch_review.py` |
+| CI | **seven jobs** — the sixth-and-seventh being `web-zero-match` and `web-discovery-review` (relaxed env, bootstrapped candidates) |
 
-### 1.2 What the unmerged stack adds
+### 1.2 How the stack landed
 
-| PR | Adds |
+| PR | Outcome |
 |---|---|
-| **#35** `fm/data-d1-live-slice-a-schema` | Migration `0004_add_live_acquisition_layer.sql`. Widens `discovery_source_class` with `AGGREGATOR`, `AUTHORIZED_DISTRIBUTOR`, `OFFICIAL_STORE`, `COMMUNITY` (line 83–86, `ADD VALUE IF NOT EXISTS`). Adds `discovery_source.allowed_path_prefixes TEXT[]`, `tos_reviewed_at`, `tos_expires_at`, `tos_page_hash`, `last_robots_hash`, `last_robots_checked_at`, `last_crawled_at`. Creates `source_eligibility_review`, `crawl_run`, `fetched_page`, `extraction_result`, `candidate_commercial_signal`, `discovery_evidence_excerpt`. Creates enums `crawl_run_status`, `crawl_trigger` (`MANUAL` only), `fetch_outcome`, `extraction_method`, `extraction_confidence`, `signal_axis`, `eligibility_decision`, `extraction_status`, `evidence_subject_type`. Promotes `candidate_claim.discovery_source_id` to `NOT NULL` + `ON DELETE RESTRICT`. Adds trigger functions `refuse_eligibility_review_mutation()`, `assert_acquisition_lineage()`, `assert_evidence_excerpt_subject()`. Tests in `test_acquisition_schema.py`, `test_acquisition_migration.py`, including `test_slice_a_adds_no_http_client_or_crawler`. |
-| **#36** `fm/data-d1-live-slice-b-manual-bootstrap` | `services/discovery/bootstrap.py`, `cli/bootstrap_inventory.py`, `db/discovery/bootstrap/humanoid_radar_v1.json` (43 candidates / 29 manufacturers). Registers a `MANUAL_BOOTSTRAP` source with `source_class = OTHER`, `tos_status = ALLOWED`, `robots_status = NOT_APPLICABLE`, `is_enabled = true`. |
-| **#37** `fm/data-d1-discovery-review-ui` | `routers/discovery_review.py`, `schemas/discovery_review.py`, `app/discovery-review/page.tsx`. Router mounted **only** under `if settings.is_relaxed:` (`main.py:105`); the page `notFound()`s outside relaxed. |
+| **#35** Slice A — acquisition schema | **MERGED** at `d174abc` |
+| **#36** Slice B — MANUAL_BOOTSTRAP | **CLOSED, replaced by #41.** GitHub auto-closed it when its base branch was deleted on the merge of #35, and a PR whose base branch is gone cannot be reopened. Recreated from the same rebased branch. |
+| **#41** Slice B — MANUAL_BOOTSTRAP (43 humanoids) | **MERGED** at `9d802c2` |
+| **#37** discovery review surface | **MERGED** at `0f2fb44`, after a real defect was fixed: its e2e specs asserted a fail-closed surface that the production-default `web-integration` job could not serve, so they had never passed. Now tagged `@discovery` and run by their own `web-discovery-review` job. |
+| **#40** batch trace + promotion review | **MERGED** at `2573da9` |
 
-### 1.3 The consequence that orders everything
+### 1.3 The prerequisite is satisfied
 
-**A1 names `AGGREGATOR`, and `AGGREGATOR` arrives with migration `0004`.** This
-contract's migration is therefore **`0005`**, and it cannot be written, applied
-or tested until `0004` is on `main`. That is not a preference; it is a hard
-dependency, and it is why §21 sequences the existing stack ahead of A1-I1.
+**A1 names `AGGREGATOR`, and `AGGREGATOR` arrived with migration `0004`, which
+is now on `main`.** The dependency that ordered the original draft is therefore
+**discharged**: this contract's migration remains **`0005`**, and it can now be
+written against a `main` that already contains everything it builds on.
+
+**The next implementation slice after this contract is ratified is A1-I1**
+(§16). Nothing else in the stack blocks it.
 
 ## 2. Frozen scope
 
@@ -289,10 +307,30 @@ CREATE TYPE eligibility_check_result AS ENUM (
 CREATE TYPE revocation_scope AS ENUM ('AUTOMATED_ACCESS','ENTIRE_RELATIONSHIP');
 ```
 
-**PostgreSQL constraint, stated because it dictates migration shape:**
-`ALTER TYPE … ADD VALUE` cannot be used and then referenced in the same
-transaction. Migration `0005` therefore performs all enum widening first, in its
-own committed step, before any DDL or data write references a new value.
+### 5.1.1 Migration `0005` statement order — FROZEN
+
+**PostgreSQL will not let a value added by `ALTER TYPE … ADD VALUE` be
+referenced in the same transaction that added it.** `CREATE TYPE` carries no
+such restriction. That asymmetry dictates the migration's shape, and getting it
+wrong produces an error only when the migration is first applied to a real
+database — never in review. So the order is frozen rather than left to the
+implementer:
+
+| Step | Statements | Transaction |
+|---|---|---|
+| **1** | `ALTER TYPE tos_status ADD VALUE 'NO_EXPRESS_PROHIBITION'` · `ALTER TYPE eligibility_decision ADD VALUE 'NO_EXPRESS_PROHIBITION'` · `ALTER TYPE fetch_outcome ADD VALUE` ×4 (`NOT_FOUND`, `TOO_LARGE`, `BLOCKED_BY_SCOPE`, `BUDGET_EXHAUSTED`) | **its own, committed before step 2** |
+| **2** | `CREATE TYPE radar_mode` · `eligibility_axis` · `eligibility_check_result` · `revocation_scope` · `revocation_cause` · `source_communication_kind` | may share a transaction with step 3 |
+| **3** | `CREATE TABLE source_communication` (with its composite FK, §9.2.1) → `CREATE TABLE source_eligibility_check` → `ALTER TABLE discovery_source ADD COLUMN …` (including the FK to `source_communication`, which must therefore exist already) → drop and recreate `ck_discovery_source_eligible` → triggers | one transaction |
+
+Two ordering constraints inside step 3, both easy to get backwards:
+`source_communication` must be created **before** the `discovery_source` columns
+that reference it; and `ck_discovery_source_eligible` must be dropped **before**
+`radar_mode` is populated, or the old constraint will reject rows the new one
+would accept.
+
+The `0004` migration on `main` already uses `ADD VALUE IF NOT EXISTS` for its
+own widening, and `0005` follows that idiom so a partially applied migration can
+be re-run.
 
 `RESTRICTION_FOUND_NOT_APPLICABLE` is the `docs/17` §4.1 rule-2 outcome — a
 training-only restriction, found, recorded, binding against training, and not
@@ -439,13 +477,14 @@ on `crawl_run` and `fetched_page`** that refuses a row whose source is expired
 or revoked. Stating this is not a caveat — it is the reason the expiry gate must
 be tested behaviourally rather than assumed structural.
 
-### 5.5 Required consequence for PR #36 at its rebase
+### 5.5 Required change to `MANUAL_BOOTSTRAP` in A1-I1
 
 **A `MANUAL_BOOTSTRAP` source that has not undergone an automated-access review
 must no longer set `tos_status = ALLOWED` merely to reach `ingest()`.**
 
-PR #36 registers its source today with `tos_status = ALLOWED` on the reasoning
-that no automated access occurs, and that value is what carries it through
+`services/discovery/bootstrap.py` is **now on `main`** (merged as #41), and it
+registers its source with `tos_status = ALLOWED` on the reasoning that no
+automated access occurs — that value is what carries it through
 `radar_eligible`. Before A1 that was loose; after A1 it is false. `ALLOWED` now
 means *an affirmative permission was found*, and manual entry must not
 manufacture that finding for a publisher who was never asked.
@@ -464,10 +503,10 @@ real `tos_status` is recorded — `ALLOWED`, `NO_EXPRESS_PROHIBITION`,
 `PROHIBITED`, whatever was found — and **`MANUAL_ONLY` still authorizes zero
 network requests**. The two facts coexist without interacting.
 
-**The exact code change belongs to the later PR #36 rebase, not to this
-docs-only PR.** It is recorded here so the rebase is a specified change rather
-than a discovery, and so nobody "fixes" the resulting test failure by
-reinstating `ALLOWED`.
+**The exact code change belongs to A1-I1 — the slice that removes
+`radar_eligible` — not to this docs-only PR.** It is recorded here so the change
+is specified rather than discovered, and so nobody "fixes" the resulting
+`test_bootstrap_inventory` failure by reinstating `ALLOWED`.
 
 ## 6. Operational ceilings — FROZEN
 
@@ -703,14 +742,19 @@ CREATE TABLE source_communication (
     summary        TEXT NOT NULL,
     excerpt        TEXT,                   -- their words, bounded
     scope_claimed  revocation_scope,       -- NULL when ambiguous -> ENTIRE_RELATIONSHIP
-    supersedes_id  UUID REFERENCES source_communication(id) ON DELETE RESTRICT,
+    supersedes_id  UUID,
     created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT ck_source_communication_excerpt_len
         CHECK (excerpt IS NULL OR char_length(excerpt) <= 1000),
     CONSTRAINT ck_source_communication_attributed
         CHECK (btrim(recorded_by) <> '' AND btrim(channel) <> '' AND btrim(summary) <> ''),
     CONSTRAINT ck_source_communication_not_self_superseding
-        CHECK (supersedes_id IS DISTINCT FROM id)
+        CHECK (supersedes_id IS DISTINCT FROM id),
+    -- Lineage may never cross sources (§9.2.1).
+    CONSTRAINT uq_source_communication_id_source UNIQUE (id, source_id),
+    CONSTRAINT fk_source_communication_supersedes
+        FOREIGN KEY (supersedes_id, source_id)
+        REFERENCES source_communication (id, source_id) ON DELETE RESTRICT
 );
 
 CREATE TRIGGER trg_refuse_source_communication_mutation
@@ -723,14 +767,35 @@ altering it**, so both remain separately queryable — which is what makes "the
 publisher objected, then later withdrew" a readable history rather than a field
 that once said something else.
 
-Two further columns on `discovery_source`:
+### 9.2.1 Communication lineage may never cross sources — FROZEN
+
+A plain `REFERENCES source_communication(id)` would let a withdrawal recorded
+against **one publisher** supersede an objection recorded against **another**.
+That is the worst available failure of this table: it would silently lift a
+stranger's objection, produce an audit trail that reads as legitimate, and do it
+through a foreign key that appears correct.
+
+The fix is declarative rather than a trigger, so it cannot be bypassed by any
+write path. `UNIQUE (id, source_id)` makes the pair addressable, and the
+**composite** foreign key `(supersedes_id, source_id) → (id, source_id)` forces
+a superseding communication to share the source of the one it supersedes. The
+database refuses the cross-source link; nothing has to remember to check.
+
+The same hazard applies to `discovery_source.revoking_communication_id` — a
+source could otherwise cite another source's communication as the cause of its
+own revocation — and it is closed the same way:
 
 ```
 ALTER TABLE discovery_source
     ADD COLUMN IF NOT EXISTS revocation_cause        revocation_cause,
-    ADD COLUMN IF NOT EXISTS revoking_communication_id UUID
-        REFERENCES source_communication(id) ON DELETE RESTRICT;
+    ADD COLUMN IF NOT EXISTS revoking_communication_id UUID,
+    ADD CONSTRAINT fk_discovery_source_revoking_communication
+        FOREIGN KEY (revoking_communication_id, id)
+        REFERENCES source_communication (id, source_id) ON DELETE RESTRICT;
 ```
+
+An acceptance gate asserts both refusals directly, against two real sources —
+not in the abstract.
 
 ```
 CREATE TYPE revocation_cause AS ENUM ('POLICY_OR_TECHNICAL','PUBLISHER_OBJECTION');
@@ -866,7 +931,7 @@ conditional on any further decision; `MANUAL_ONLY` is adopted (§4.1.1).
 | **G35** | `MANUAL_ONLY` **cannot satisfy** a limited-radar or full-radar eligibility check, by any property, projection or boolean conversion |
 | **G36** | Moving from `MANUAL_ONLY` to `LIMITED_RADAR` or `FULL_RADAR` requires the corresponding eligibility review **and** a fresh attributed owner enablement; neither alone suffices |
 | **G37** | **`tos_status = ALLOWED` is never synthesized because an operation is manual** — no code path writes `ALLOWED` on the grounds that no automated access occurred |
-| **G38** | PR #36's rebased bootstrap remains functional **without `radar_eligible`**, ingesting under `MANUAL_ONLY` with `tos_status = UNKNOWN` |
+| **G38** | The `MANUAL_BOOTSTRAP` path on `main` remains functional **without `radar_eligible`**, ingesting under `MANUAL_ONLY` with `tos_status = UNKNOWN` |
 | **G39** | Every manual ingest is attributed to a **named operator**; an unattributed ingest is refused |
 | **G40** | A `MANUAL_ONLY` ingest leaves **canonical row counts unchanged** |
 | **G41** | An `AUTOMATED_ACCESS` revocation disables the automated modes and **leaves `MANUAL_ONLY` available**; an `ENTIRE_RELATIONSHIP` revocation forces `DISABLED`. An automated-access prohibition is never silently widened into a ban on human research |
@@ -883,6 +948,9 @@ conditional on any further decision; `MANUAL_ONLY` is adopted (§4.1.1).
 | **G52** | **An entire-relationship objection forces `DISABLED`** — no mode survives it |
 | **G53** | **Fresh owner enablement is required after any revocation is cleared**, by either path; a cleared revocation alone never re-enables a source |
 | **G54** | A withdrawn objection **does not by itself produce `ALLOWED`** — the resulting status is whatever the fresh review honestly finds, which may be `UNKNOWN` |
+| **G55** | **A communication cannot supersede one belonging to a different source** — refused by the composite foreign key, exercised against two real sources |
+| **G56** | **`discovery_source.revoking_communication_id` cannot cite another source's communication** — same refusal, same mechanism |
+| **G57** | Migration `0005` applies cleanly to a database at `0004`, and **re-applies cleanly** (`ADD VALUE IF NOT EXISTS`), proving the §5.1.1 statement order |
 
 ## 16. Implementation slices
 
@@ -915,22 +983,27 @@ bounded proof against a small named candidate subset. Review the result before
 enabling another source. **A four-source bulk run is not authorized as the first
 live proof.**
 
-## 17. Existing PR stack — sequencing dependency
+## 17. Stack prerequisite — SATISFIED
 
-`AGGREGATOR` does not exist on `main`; it arrives with `0004` (PR #35). A1-I1's
-migration is `0005` and cannot be written until `0004` lands.
+The original draft required the acquisition stack to land before A1-I1, because
+`AGGREGATOR` did not exist on `main`. **That sequence is complete.**
 
-1. Ratify and merge **this** implementation contract.
-2. **Rebase PR #35** onto the resulting `main` (it is based on pre-A1 `main` and
-   currently reports non-mergeable).
-3. Rerun its **exact-head gates** and review.
-4. **Rebase PR #36** onto refreshed #35.
-5. **Rebase PR #37** onto refreshed #36.
-6. Clear and merge **#35 → #36 → #37** in order.
-7. Begin **A1-I1** from the resulting clean `main`.
+```
+2573da9  #40  batch trace + promotion review
+0f2fb44  #37  discovery review surface (+ its own relaxed-env e2e job)
+9d802c2  #41  Slice B — 43 humanoids   (replaced closed #36)
+d174abc  #35  Slice A — acquisition schema
+626d1ce  #38  Amendment A1 — RATIFIED
+```
 
-**Those PRs are not altered by this contract-drafting branch.** PR #32 (WS8.7)
-is independent and untouched.
+**Remaining order:** ratify this contract → begin **A1-I1** from `main`. No
+other PR blocks it. PR #32 (WS8.7) is independent and untouched.
+
+**One operational lesson worth keeping**, because it cost a PR: **never merge
+with `--delete-branch` while another PR is based on that branch.** Deleting it
+auto-closes the child, and a PR whose base branch is gone cannot be reopened —
+#36 had to be recreated as #41. Merge without deleting, rebase the child from
+its *original* fork point, retarget it to `main`, then delete the branch.
 
 ## 18. Non-goals
 
@@ -951,7 +1024,8 @@ Base:                        main @ 626d1ce873d650a3f3a46381b33a3f970e9e8648
 Implementation authorized:   NONE — documentation only
 Sources approved:            NONE
 Eligible source class:       AGGREGATOR ONLY — unchanged from A1 §2.1
-Migration:                   0005, DEPENDS ON 0004 (PR #35, unmerged)
+Migration:                   0005. Depends on 0004, which is NOW ON MAIN
+                             (#35, merged) — prerequisite SATISFIED
 Default expiry:              90 days — unchanged from A1 §7
 Gate W / S / T / X, P2 / P8: UNCHANGED
 
@@ -987,7 +1061,7 @@ modes** — they were never the right instrument for deciding whether a human ma
 type a record — and the mapping is now two tables rather than one.
 
 That correction is what makes §5.5 possible: because `MANUAL_ONLY` needs no
-eligibility finding, PR #36 can record `tos_status = UNKNOWN` truthfully instead
-of claiming `ALLOWED` to get past a gate. The old arrangement quietly required a
+eligibility finding, the MANUAL_BOOTSTRAP path can record `tos_status = UNKNOWN`
+truthfully instead of claiming `ALLOWED` to get past a gate. The old arrangement quietly required a
 false statement in order to do something entirely legitimate, which is the
 clearest sign a gate is measuring the wrong thing.

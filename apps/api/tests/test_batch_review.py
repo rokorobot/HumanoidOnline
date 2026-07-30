@@ -26,8 +26,10 @@ from app.services.discovery.batch_review import (
     WORKSHEET_VERSION,
     ApplyResult,
     apply_worksheet,
+    candidate_snapshot,
     export_worksheet,
     read_worksheet,
+    snapshot_hash,
     validate_worksheet,
     write_worksheet,
 )
@@ -66,7 +68,19 @@ def _source(session: Session) -> DiscoverySource:
 
 
 def _candidate(session: Session, name: str, manufacturer: str, *, lead: str | None = None,
-               claims: list[dict] | None = None) -> DiscoveryCandidate:
+               claims: list[dict] | None = None,
+               exact_manufacturer: bool = False) -> DiscoveryCandidate:
+    """A fixture candidate.
+
+    The manufacturer is made unique by default. Identity resolution matches on
+    manufacturer AND model, so a fixture named after a real robot would collide
+    with whatever candidates the database happens to hold — the 43 bootstrap
+    entries, say — and the test would then pass or fail depending on data it
+    never created. `exact_manufacturer=True` opts out where a test is
+    deliberately arranging a collision.
+    """
+    if not exact_manufacturer:
+        manufacturer = f"{manufacturer} Fixture {_uniq()}"
     record: dict = {
         "external_ref": f"ref-{_uniq()}", "name": name, "manufacturer": manufacturer,
     }
@@ -83,7 +97,9 @@ def _sheet(rows: list[dict]) -> dict:
 
 def _row(cand: DiscoveryCandidate, **over) -> dict:
     base = {
-        "candidate_id": str(cand.id), "decision": "", "trace_url": "",
+        "candidate_id": str(cand.id),
+        "snapshot_hash": snapshot_hash(candidate_snapshot(cand)),
+        "decision": "", "trace_url": "",
         "trace_source_type": "MANUFACTURER_SITE", "reject_reason": "",
         "_name": cand.candidate_name, "_manufacturer": cand.candidate_manufacturer,
     }
@@ -129,6 +145,110 @@ def test_a_stale_worksheet_version_is_refused(tmp_path):
     p.write_text('{"worksheet_version": 0, "rows": []}', encoding="utf-8")
     with pytest.raises(DiscoveryError, match="worksheet version"):
         read_worksheet(p)
+
+
+def test_a_version_one_worksheet_is_refused(tmp_path):
+    """v1 rows carry decisions that were never bound to what was reviewed, so
+    they are refused outright rather than upgraded."""
+    p = tmp_path / "v1.json"
+    p.write_text('{"worksheet_version": 1, "rows": []}', encoding="utf-8")
+    with pytest.raises(DiscoveryError, match="worksheet version"):
+        read_worksheet(p)
+
+
+# --- the decision is bound to the candidate as reviewed ----------------------
+
+CHANGED = "candidate changed since worksheet export"
+
+
+def _apply_one(session, row) -> dict | None:
+    result = apply_worksheet(session, _sheet([row]), reviewed_by=REVIEWER, dry_run=False)
+    return result.blocked[0] if result.blocked else None
+
+
+def test_export_binds_a_snapshot_hash_to_every_row(dsession):
+    cand = _candidate(dsession, "H1", "Unitree", lead="https://oem.invalid/h1")
+    row = next(
+        r for r in export_worksheet(dsession)["rows"] if r["candidate_id"] == str(cand.id)
+    )
+    assert row["snapshot_hash"] == snapshot_hash(candidate_snapshot(cand))
+
+
+def test_a_decision_without_a_snapshot_hash_is_refused(dsession):
+    cand = _candidate(dsession, "X", "Maker")
+    with pytest.raises(DiscoveryError, match="snapshot_hash is missing"):
+        validate_worksheet(_sheet([
+            _row(cand, decision="confirm", trace_url="https://o.invalid/x", snapshot_hash="")
+        ]))
+
+
+def test_retargeting_a_row_to_another_candidate_is_refused(dsession):
+    """The attack this closes: edit candidate_id so a confirmation made about one
+    robot lands on a different one."""
+    reviewed = _candidate(dsession, "T1", "Booster Robotics")
+    other = _candidate(dsession, "Atlas", "Boston Dynamics")
+    row = _row(reviewed, decision="confirm", trace_url="https://oem.invalid/t1")
+    row["candidate_id"] = str(other.id)  # hash still describes `reviewed`
+
+    blocked = _apply_one(dsession, row)
+
+    assert blocked and CHANGED in blocked["why"]
+    dsession.refresh(other)
+    assert other.trace_state == "NOT_TRACED"
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        pytest.param(lambda c: setattr(c, "candidate_name", "Renamed"), id="name"),
+        pytest.param(lambda c: setattr(c, "candidate_manufacturer", "Other Co"), id="manufacturer"),
+        pytest.param(lambda c: setattr(c, "identity_status", "AMBIGUOUS"), id="identity_status"),
+        pytest.param(lambda c: setattr(c, "status", "RECHECK_REQUIRED"), id="status"),
+        pytest.param(lambda c: setattr(c, "trace_state", "TRACE_FAILED"), id="trace_state"),
+        pytest.param(
+            lambda c: setattr(c, "candidate_data", {"official_url": "https://moved.invalid/"}),
+            id="official_url_lead",
+        ),
+    ],
+)
+def test_a_material_change_since_export_is_detected(dsession, mutate):
+    cand = _candidate(dsession, "G1", "Unitree", lead="https://oem.invalid/g1")
+    row = _row(cand, decision="confirm", trace_url="https://oem.invalid/g1")
+
+    mutate(cand)          # the candidate moves on after the human reviewed it
+    dsession.flush()
+
+    blocked = _apply_one(dsession, row)
+
+    assert blocked and CHANGED in blocked["why"]
+    dsession.refresh(cand)
+    assert cand.trace_verified_by is None  # the stale decision was NOT applied
+
+
+def test_an_unchanged_candidate_applies_normally(dsession):
+    cand = _candidate(dsession, "Ameca", "Engineered Arts", lead="https://oem.invalid/a")
+    row = _row(cand, decision="confirm", trace_url="https://oem.invalid/a")
+
+    result = apply_worksheet(dsession, _sheet([row]), reviewed_by=REVIEWER, dry_run=False)
+
+    assert result.blocked == [] and result.confirmed == [str(cand.id)]
+
+
+def test_a_terminal_candidate_stays_idempotent_despite_a_stale_hash(dsession):
+    """Promoting necessarily changes the candidate, so its hash necessarily goes
+    stale. Re-running must still report 'already done', not 'go review again'."""
+    cand = _candidate(dsession, "Twice", "Maker")
+    row = _row(cand, decision="confirm", trace_url="https://oem.invalid/t")
+    apply_worksheet(
+        dsession, _sheet([row]), reviewed_by=REVIEWER, promote_confirmed=True, dry_run=False
+    )
+
+    again = apply_worksheet(
+        dsession, _sheet([row]), reviewed_by=REVIEWER, promote_confirmed=True, dry_run=False
+    )
+
+    assert again.blocked == []
+    assert any("already PROMOTED" in s["why"] for s in again.skipped)
 
 
 # --- the prefilled lead is not a confirmation (H2) ---------------------------
@@ -279,7 +399,7 @@ def test_an_ambiguous_identity_still_blocks_promotion(dsession):
         dsession.add(Robot(slug=f"r-{_uniq()}", manufacturer_id=mfr.id, name=n))
     dsession.flush()
 
-    cand = _candidate(dsession, "Ambig Robotics", "Ambig Robotics")
+    cand = _candidate(dsession, "Ambig Robotics", "Ambig Robotics", exact_manufacturer=True)
     sheet = _sheet([_row(cand, decision="confirm", trace_url="https://oem.invalid/z")])
 
     result = apply_worksheet(
@@ -344,7 +464,7 @@ def test_reapplying_a_worksheet_is_safe(dsession):
 
 def test_a_missing_candidate_is_reported_not_raised(dsession):
     sheet = _sheet([{
-        "candidate_id": str(uuid.uuid4()), "decision": "confirm",
+        "candidate_id": str(uuid.uuid4()), "snapshot_hash": "deadbeef", "decision": "confirm",
         "trace_url": "https://oem.invalid/x", "trace_source_type": "MANUFACTURER_SITE",
         "reject_reason": "",
     }])
@@ -355,7 +475,7 @@ def test_a_missing_candidate_is_reported_not_raised(dsession):
 def test_one_blocked_row_does_not_abort_the_batch(dsession):
     good = _candidate(dsession, "Good", "Maker")
     sheet = _sheet([
-        {"candidate_id": str(uuid.uuid4()), "decision": "confirm",
+        {"candidate_id": str(uuid.uuid4()), "snapshot_hash": "deadbeef", "decision": "confirm",
          "trace_url": "https://oem.invalid/missing", "trace_source_type": "MANUFACTURER_SITE",
          "reject_reason": ""},
         _row(good, decision="confirm", trace_url="https://oem.invalid/good"),
@@ -365,6 +485,131 @@ def test_one_blocked_row_does_not_abort_the_batch(dsession):
 
     assert len(result.blocked) == 1
     assert result.confirmed == [str(good.id)]
+
+
+# --- transaction semantics ---------------------------------------------------
+
+def test_an_expected_database_refusal_does_not_poison_the_session(dsession, monkeypatch):
+    """A row-level DB refusal rolls back its savepoint only. The session must
+    stay usable, and a later valid row must still succeed."""
+    from sqlalchemy.exc import IntegrityError
+
+    import app.services.discovery.batch_review as br
+
+    bad = _candidate(dsession, "Bad", "Maker")
+    good = _candidate(dsession, "Good", "Maker")
+    real_record_trace = br.record_trace
+
+    def flaky(session, candidate, **kw):
+        if candidate.id == bad.id:
+            raise IntegrityError("INSERT ...", {}, Exception("simulated constraint violation"))
+        return real_record_trace(session, candidate, **kw)
+
+    monkeypatch.setattr(br, "record_trace", flaky)
+
+    result = apply_worksheet(
+        dsession,
+        _sheet([
+            _row(bad, decision="confirm", trace_url="https://oem.invalid/b"),
+            _row(good, decision="confirm", trace_url="https://oem.invalid/g"),
+        ]),
+        reviewed_by=REVIEWER,
+        dry_run=False,
+    )
+
+    assert len(result.blocked) == 1 and result.blocked[0]["candidate_id"] == str(bad.id)
+    assert result.confirmed == [str(good.id)]  # the session survived
+    dsession.refresh(good)
+    assert good.trace_state == "TRACE_CONFIRMED"
+    dsession.refresh(bad)
+    assert bad.trace_state == "NOT_TRACED"
+
+
+def test_an_unexpected_exception_aborts_the_whole_batch(dsession, monkeypatch):
+    """A bug or an infrastructure failure must NOT be downgraded into a blocked
+    row: that would report a clean run that never happened."""
+    import app.services.discovery.batch_review as br
+
+    cand = _candidate(dsession, "Boom", "Maker")
+
+    def explode(*a, **kw):
+        raise RuntimeError("connection reset")
+
+    monkeypatch.setattr(br, "record_trace", explode)
+
+    with pytest.raises(RuntimeError, match="connection reset"):
+        apply_worksheet(
+            dsession,
+            _sheet([_row(cand, decision="confirm", trace_url="https://oem.invalid/x")]),
+            reviewed_by=REVIEWER,
+            dry_run=False,
+        )
+
+
+def test_a_valid_trace_survives_a_blocked_promotion(dsession):
+    """Tracing and promoting are two decisions. A trace confirmed by a human is
+    real work and must not be discarded because a gate refused the promotion."""
+    cand = _candidate(
+        dsession, "Conflicted2", "Maker",
+        claims=[
+            {"field_key": "payload_kg", "claimed_value": "30", "unit": "kg",
+             "evidence_url": "https://a.invalid/1"},
+            {"field_key": "payload_kg", "claimed_value": "35", "unit": "kg",
+             "evidence_url": "https://b.invalid/1"},
+        ],
+    )
+
+    result = apply_worksheet(
+        dsession,
+        _sheet([_row(cand, decision="confirm", trace_url="https://oem.invalid/c")]),
+        reviewed_by=REVIEWER, promote_confirmed=True, dry_run=False,
+    )
+
+    assert result.confirmed == [str(cand.id)]  # the trace stood
+    assert result.promoted == [] and len(result.blocked) == 1
+    dsession.refresh(cand)
+    assert cand.trace_state == "TRACE_CONFIRMED"
+    assert cand.trace_verified_by == REVIEWER
+
+
+def test_dry_run_leaves_every_row_unchanged(dsession):
+    a = _candidate(dsession, "A", "Maker")
+    b = _candidate(dsession, "B", "Maker")
+    before = _robots(dsession)
+
+    apply_worksheet(
+        dsession,
+        _sheet([
+            _row(a, decision="confirm", trace_url="https://oem.invalid/a"),
+            _row(b, decision="reject", reject_reason="not a humanoid"),
+        ]),
+        reviewed_by=REVIEWER, promote_confirmed=True, dry_run=True,
+    )
+
+    # the outer transaction was rolled back entirely
+    assert dsession.get(DiscoveryCandidate, a.id) is None
+    assert dsession.get(DiscoveryCandidate, b.id) is None
+    assert _robots(dsession) == before
+
+
+def test_a_write_run_keeps_successful_rows_and_leaves_blocked_rows_alone(dsession):
+    good = _candidate(dsession, "Keeper", "Maker")
+    missing_id = str(uuid.uuid4())
+
+    result = apply_worksheet(
+        dsession,
+        _sheet([
+            {"candidate_id": missing_id, "snapshot_hash": "deadbeef", "decision": "confirm",
+             "trace_url": "https://oem.invalid/x", "trace_source_type": "MANUFACTURER_SITE",
+             "reject_reason": ""},
+            _row(good, decision="confirm", trace_url="https://oem.invalid/k"),
+        ]),
+        reviewed_by=REVIEWER, promote_confirmed=True, dry_run=False,
+    )
+
+    assert len(result.blocked) == 1 and len(result.promoted) == 1
+    dsession.refresh(good)
+    assert good.status == "PROMOTED"
 
 
 def test_apply_result_counts_only_real_actions(dsession):

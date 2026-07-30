@@ -16,7 +16,20 @@ separated by a file you edit:
         var/discovery/review/worksheet.json --reviewed-by "robert@..." --promote --write
 
 `apply` is a DRY RUN unless `--write` is given: it reports exactly what would
-happen and rolls back. Re-running a partially applied worksheet is safe.
+happen and rolls the whole transaction back. Re-running a partially applied
+worksheet is safe.
+
+**Transaction semantics.** The whole worksheet runs in ONE transaction, with a
+savepoint per action. An expected refusal — a gate saying no, or a database
+constraint — rolls back only that savepoint and is reported as BLOCKED; anything
+else aborts the run. **Each row is validated and isolated within the batch
+transaction; successful rows become durable only at the final `--write`
+commit.**
+
+Every row carries a `snapshot_hash` binding the decision to the candidate as
+exported. Editing `candidate_id`, or a candidate changing between export and
+apply, makes the row refuse rather than apply your decision to a different or
+newer record.
 
 Promoted robots are created UNPUBLISHED with every specification UNKNOWN.
 Publishing is the separate canonical catalogue workflow, never a side effect of

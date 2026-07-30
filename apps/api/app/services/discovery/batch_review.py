@@ -32,6 +32,7 @@ arrives with every specification UNKNOWN, which is the honest result.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
@@ -39,6 +40,7 @@ from pathlib import Path
 from typing import Any
 
 from sqlalchemy import select
+from sqlalchemy.exc import DataError, IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models.discovery import DiscoveryCandidate
@@ -47,8 +49,17 @@ from app.services.discovery.pipeline import advance, record_trace
 from app.services.discovery.promotion import promote, reject
 
 #: Worksheet format version. Bumped when a field changes meaning, so an old
-#: worksheet is refused rather than silently misread.
-WORKSHEET_VERSION = 1
+#: worksheet is refused rather than silently misread. v2 added `snapshot_hash`:
+#: a v1 worksheet carries decisions that were never bound to what was reviewed,
+#: so it is refused rather than upgraded.
+WORKSHEET_VERSION = 2
+
+#: Row-level failures that are FINDINGS: a gate refused, or the database refused.
+#: They roll back that row's savepoint and become BLOCKED. Everything else — a
+#: bug, a dropped connection, a disk error — aborts the whole batch, because a
+#: batch that silently downgrades an infrastructure failure into "1 blocked row"
+#: reports a clean run that never happened.
+ROW_LEVEL_FAILURES = (DiscoveryError, PromotionError, IntegrityError, DataError)
 
 #: The only decisions a reviewer may record. An empty string means "not yet
 #: reviewed" and is the default for every exported row.
@@ -70,15 +81,66 @@ OFFICIAL_SOURCE_TYPES = frozenset(
 DEFAULT_SOURCE_TYPE = "MANUFACTURER_SITE"
 
 
+#: The fields whose values the reviewer's decision is ABOUT. Ordered, because the
+#: hash is over a deterministic serialization of exactly these.
+SNAPSHOT_FIELDS = (
+    "candidate_id",
+    "external_ref",
+    "candidate_name",
+    "candidate_manufacturer",
+    "identity_status",
+    "status",
+    "trace_state",
+    "official_url_lead",
+    "updated_at",
+)
+
+
+def candidate_snapshot(candidate: DiscoveryCandidate) -> dict[str, str | None]:
+    """The canonical description of what a reviewer was looking at."""
+    updated = candidate.updated_at
+    return {
+        "candidate_id": str(candidate.id),
+        "external_ref": candidate.external_ref,
+        "candidate_name": candidate.candidate_name,
+        "candidate_manufacturer": candidate.candidate_manufacturer,
+        "identity_status": candidate.identity_status,
+        "status": candidate.status,
+        "trace_state": candidate.trace_state,
+        "official_url_lead": (candidate.candidate_data or {}).get("official_url"),
+        "updated_at": updated.astimezone(UTC).isoformat() if updated else None,
+    }
+
+
+def snapshot_hash(snapshot: dict[str, str | None]) -> str:
+    """SHA-256 over a deterministic JSON serialization of `SNAPSHOT_FIELDS`.
+
+    Deterministic means: the fields in the fixed order above, no whitespace
+    variation, explicit `null` rather than an omitted key, and UTF-8 without
+    ASCII escaping — so the same candidate always hashes the same way on any
+    machine, and a changed candidate never hashes the same way twice.
+    """
+    ordered = [[k, snapshot.get(k)] for k in SNAPSHOT_FIELDS]
+    payload = json.dumps(ordered, ensure_ascii=False, separators=(",", ":"))
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 @dataclass
 class WorksheetRow:
     """One candidate awaiting a human decision.
 
-    The `_*` fields are context for the reviewer and are ignored on apply; only
-    `decision`, `trace_url`, `trace_source_type` and `reject_reason` are inputs.
+    `snapshot_hash` binds the decision to the candidate AS REVIEWED. Without it
+    the `_*` context is decorative: `candidate_id` alone selects the live record,
+    so editing one row's id would land its confirmation on a different robot, and
+    a candidate that changed between export and apply would receive a decision
+    made about its older self. The hash makes both impossible to do silently.
+
+    The `_*` fields remain context for the reviewer and are never written back —
+    the worksheet is integrity evidence, not a source of truth.
     """
 
     candidate_id: str
+    snapshot_hash: str = ""
     decision: str = ""
     trace_url: str = ""
     trace_source_type: str = DEFAULT_SOURCE_TYPE
@@ -118,6 +180,7 @@ def export_worksheet(session: Session, *, limit: int | None = None) -> dict[str,
     rows = [
         WorksheetRow(
             candidate_id=str(c.id),
+            snapshot_hash=snapshot_hash(candidate_snapshot(c)),
             # Prefilled from the LEAD to save typing. This is not a confirmation
             # (H2); the `decision` field is what attests, and only a human writes it.
             trace_url=(c.candidate_data or {}).get("official_url", "") or "",
@@ -144,6 +207,9 @@ def export_worksheet(session: Session, *, limit: int | None = None) -> dict[str,
             "Confirming establishes the robot EXISTS and this is its source.",
             "It verifies no specification: promoted robots arrive with specs UNKNOWN.",
             "Fields beginning with '_' are context only and are ignored on apply.",
+            "DO NOT edit candidate_id or snapshot_hash. The hash binds your decision",
+            "to the candidate as exported; if either is altered, or the candidate",
+            "changed since export, the row is refused and must be reviewed again.",
         ],
         "rows": [asdict(r) for r in rows],
     }
@@ -187,6 +253,11 @@ def validate_worksheet(worksheet: dict[str, Any]) -> None:
                 f"{where}: decision {decision!r} is not one of "
                 f"{sorted(d for d in DECISIONS if d)} (or empty for unreviewed)"
             )
+        if decision and not str(raw.get("snapshot_hash") or "").strip():
+            raise DiscoveryError(
+                f"{where}: snapshot_hash is missing. A decision must be bound to "
+                "the candidate it was made about; re-export the worksheet."
+            )
         if decision == DECISION_CONFIRM and not str(raw.get("trace_url") or "").strip():
             raise DiscoveryError(
                 f"{where}: 'confirm' requires a trace_url — a confirmed trace "
@@ -213,6 +284,14 @@ def apply_worksheet(
     Idempotent and re-runnable: an already-terminal candidate is reported as
     skipped rather than raising, so a partially applied worksheet can be
     corrected and applied again.
+
+    **Transaction semantics.** Each actionable row runs inside its own SAVEPOINT.
+    An expected row-level failure — a gate refusing, or the database refusing —
+    rolls back only that savepoint, records the row as BLOCKED, and leaves the
+    session usable for the rows that follow. Any other exception aborts the whole
+    operation and is not converted into a blocked row. **Each row is validated and
+    isolated within the batch transaction; successful rows become durable only at
+    the caller's final commit.**
     """
     if not reviewed_by or not reviewed_by.strip():
         raise DiscoveryError(
@@ -240,57 +319,80 @@ def apply_worksheet(
                 {"candidate_id": cid, "label": label, "why": "candidate not found"}
             )
             continue
+        # Terminal FIRST, and deliberately before the snapshot check: a candidate
+        # that is already PROMOTED/REJECTED has necessarily changed since export,
+        # and reporting "you must re-review" for work that is already done would
+        # make re-running a partially applied worksheet impossible.
         if candidate.status in TERMINAL:
             result.skipped.append(
                 {"candidate_id": cid, "label": label, "why": f"already {candidate.status}"}
             )
             continue
 
+        # The decision must be about THIS candidate, as exported (correction 1).
+        current = snapshot_hash(candidate_snapshot(candidate))
+        if current != str(raw.get("snapshot_hash") or "").strip():
+            result.blocked.append({
+                "candidate_id": cid, "label": label,
+                "why": "candidate changed since worksheet export; re-export and review again",
+            })
+            continue
+
+        # Savepoints are per ACTION, not per row. Tracing and promoting are two
+        # decisions: when a trace is validly confirmed but promotion is refused by
+        # a gate (an ambiguous identity, a claim conflict), the trace is real work
+        # and must survive. Sharing one savepoint would discard it and make the
+        # operator confirm the same page twice.
         if decision == DECISION_REJECT:
             try:
-                reject(session, candidate, reviewed_by, str(raw["reject_reason"]).strip())
-                session.flush()
-            except PromotionError as exc:
+                with session.begin_nested():
+                    reject(session, candidate, reviewed_by, str(raw["reject_reason"]).strip())
+                    session.flush()
+            except ROW_LEVEL_FAILURES as exc:
                 result.blocked.append({"candidate_id": cid, "label": label, "why": str(exc)})
                 continue
             result.rejected.append(cid)
             continue
 
-        # DECISION_CONFIRM
+        # DECISION_CONFIRM — savepoint 1: the trace itself.
         try:
-            record_trace(
-                session,
-                candidate,
-                trace_url=str(raw["trace_url"]).strip(),
-                trace_source_type=(raw.get("trace_source_type") or DEFAULT_SOURCE_TYPE).strip(),
-                verified_by=reviewed_by,
-                # Deliberately empty: a trace confirms the ENTITY, never its
-                # specifications. Per-field verification is a per-field decision.
-                confirmed_fields=frozenset(),
-            )
-            advance(session, candidate)
-            # Flush per row so each candidate's outcome is durable and visible
-            # before the next is attempted: a batch must not leave one row's
-            # state pending while another row decides whether to fail.
-            session.flush()
-        except DiscoveryError as exc:
+            with session.begin_nested():
+                record_trace(
+                    session,
+                    candidate,
+                    trace_url=str(raw["trace_url"]).strip(),
+                    trace_source_type=(
+                        raw.get("trace_source_type") or DEFAULT_SOURCE_TYPE
+                    ).strip(),
+                    verified_by=reviewed_by,
+                    # Deliberately empty: a trace confirms the ENTITY, never its
+                    # specifications. Per-field verification is a per-field decision.
+                    confirmed_fields=frozenset(),
+                )
+                advance(session, candidate)
+                session.flush()
+        except ROW_LEVEL_FAILURES as exc:
             result.blocked.append({"candidate_id": cid, "label": label, "why": str(exc)})
             continue
         result.confirmed.append(cid)
 
-        if promote_confirmed:
-            try:
+        if not promote_confirmed:
+            continue
+
+        # savepoint 2: the promotion, which may be refused while the trace stands.
+        try:
+            with session.begin_nested():
                 robot = promote(session, candidate, reviewed_by)
                 session.flush()
-            except PromotionError as exc:
-                result.blocked.append(
-                    {"candidate_id": cid, "label": label, "why": f"promotion blocked: {exc}"}
-                )
-                continue
-            result.promoted.append(
-                {"candidate_id": cid, "label": label, "robot_slug": robot.slug,
-                 "robot_id": str(robot.id)}
+        except ROW_LEVEL_FAILURES as exc:
+            result.blocked.append(
+                {"candidate_id": cid, "label": label, "why": f"promotion blocked: {exc}"}
             )
+            continue
+        result.promoted.append(
+            {"candidate_id": cid, "label": label, "robot_slug": robot.slug,
+             "robot_id": str(robot.id)}
+        )
 
     if dry_run:
         session.rollback()

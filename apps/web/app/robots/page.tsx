@@ -9,9 +9,12 @@ import {
   toRobotListParams,
   type RawSearchParams,
 } from "@/lib/search-params";
+import { resolveAppEnv } from "@/lib/site";
 import { CompareBar } from "@/components/CompareBar";
 import { FilterPanel } from "@/components/FilterPanel";
 import { RobotCard } from "@/components/RobotCard";
+import Link from "next/link";
+
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteNav } from "@/components/SiteNav";
 import { SortSelect } from "@/components/SortSelect";
@@ -19,6 +22,10 @@ import { SystemHeader } from "@/components/SystemHeader";
 import { SystemLabel } from "@/components/SystemLabel";
 
 export const dynamic = "force-dynamic";
+
+// The review surface exists only in relaxed environments (the API does not mount
+// its route elsewhere), so the link is rendered only where it would work.
+const DISCOVERY_REVIEW_VISIBLE = ["development", "test"].includes(resolveAppEnv());
 
 // WS8.5 / R22 — specific per-route title (no generic root inheritance).
 export const metadata = {
@@ -83,6 +90,20 @@ export default async function RobotsPage({
             3 DIMENSIONS: MATURITY / OBTAINABILITY / EVIDENCE — INDEPENDENT
           </span>
         </div>
+
+        {/* DATA-D1 operator review link. Deliberately here rather than in
+            SiteNav: the review queue holds UNVERIFIED candidates, and giving it
+            equal navigation authority to the catalogue would blur the canonical /
+            noncanonical boundary this page is the canonical side of. Rendered only
+            where the surface exists (relaxed environments), so production shows
+            nothing. */}
+        {DISCOVERY_REVIEW_VISIBLE && (
+          <p className="meta" style={{ marginBottom: "var(--ho-sp-4)" }}>
+            <Link href="/discovery-review">
+              DISCOVERY REVIEW — UNVERIFIED CANDIDATES (INTERNAL) →
+            </Link>
+          </p>
+        )}
 
         <div className="layout">
           <FilterPanel params={sp} resultCount={page.total} />

@@ -1,0 +1,160 @@
+[
+  { "external_ref": "unitree/g1", "name": "G1", "manufacturer": "Unitree Robotics",
+    "discovery_url": "https://www.unitree.com/g1/",
+    "data": { "official_url": "https://www.unitree.com/g1/" } },
+  { "external_ref": "unitree/h1", "name": "H1", "manufacturer": "Unitree Robotics",
+    "discovery_url": "https://www.unitree.com/h1/",
+    "data": { "official_url": "https://www.unitree.com/h1/" } },
+  { "external_ref": "unitree/h2", "name": "H2", "manufacturer": "Unitree Robotics",
+    "discovery_url": "https://www.unitree.com/",
+    "data": { "official_url": "https://www.unitree.com/" } },
+  { "external_ref": "unitree/r1", "name": "R1", "manufacturer": "Unitree Robotics",
+    "discovery_url": "https://www.unitree.com/",
+    "data": { "official_url": "https://www.unitree.com/" } },
+
+  { "external_ref": "agility/digit", "name": "Digit", "manufacturer": "Agility Robotics",
+    "discovery_url": "https://www.agilityrobotics.com/",
+    "data": { "official_url": "https://www.agilityrobotics.com/" } },
+
+  { "external_ref": "figure/figure-01", "name": "Figure 01", "manufacturer": "Figure AI",
+    "discovery_url": "https://www.figure.ai/",
+    "data": { "official_url": "https://www.figure.ai/" } },
+  { "external_ref": "figure/figure-02", "name": "Figure 02", "manufacturer": "Figure AI",
+    "discovery_url": "https://www.figure.ai/",
+    "data": { "official_url": "https://www.figure.ai/" } },
+  { "external_ref": "figure/figure-03", "name": "Figure 03", "manufacturer": "Figure AI",
+    "discovery_url": "https://www.figure.ai/",
+    "data": { "official_url": "https://www.figure.ai/" } },
+
+  { "external_ref": "tesla/optimus", "name": "Optimus", "manufacturer": "Tesla",
+    "discovery_url": "https://www.tesla.com/",
+    "data": { "official_url": "https://www.tesla.com/" } },
+
+  { "external_ref": "bostondynamics/atlas", "name": "Atlas", "manufacturer": "Boston Dynamics",
+    "discovery_url": "https://bostondynamics.com/atlas/",
+    "data": { "official_url": "https://bostondynamics.com/atlas/" } },
+
+  { "external_ref": "apptronik/apollo", "name": "Apollo", "manufacturer": "Apptronik",
+    "discovery_url": "https://apptronik.com/",
+    "data": { "official_url": "https://apptronik.com/" } },
+
+  { "external_ref": "1x/neo", "name": "NEO", "manufacturer": "1X Technologies",
+    "discovery_url": "https://www.1x.tech/",
+    "data": { "official_url": "https://www.1x.tech/" } },
+  { "external_ref": "1x/eve", "name": "EVE", "manufacturer": "1X Technologies",
+    "discovery_url": "https://www.1x.tech/",
+    "data": { "official_url": "https://www.1x.tech/" } },
+
+  { "external_ref": "sanctuary/phoenix", "name": "Phoenix", "manufacturer": "Sanctuary AI",
+    "discovery_url": "https://sanctuary.ai/",
+    "data": { "official_url": "https://sanctuary.ai/" } },
+
+  { "external_ref": "engineeredarts/ameca", "name": "Ameca", "manufacturer": "Engineered Arts",
+    "discovery_url": "https://engineeredarts.com/robot/ameca/",
+    "data": { "official_url": "https://engineeredarts.com/robot/ameca/" } },
+  { "external_ref": "engineeredarts/ameca-desktop", "name": "Ameca Desktop",
+    "manufacturer": "Engineered Arts",
+    "discovery_url": "https://engineeredarts.com/",
+    "data": { "official_url": "https://engineeredarts.com/" } },
+  { "external_ref": "engineeredarts/mesmer", "name": "Mesmer", "manufacturer": "Engineered Arts",
+    "discovery_url": "https://engineeredarts.com/",
+    "data": { "official_url": "https://engineeredarts.com/" } },
+
+  { "external_ref": "neura/4ne-1", "name": "4NE-1", "manufacturer": "Neura Robotics",
+    "discovery_url": "https://neura-robotics.com/",
+    "data": { "official_url": "https://neura-robotics.com/" } },
+
+  { "external_ref": "pal/talos", "name": "TALOS", "manufacturer": "PAL Robotics",
+    "discovery_url": "https://pal-robotics.com/",
+    "data": { "official_url": "https://pal-robotics.com/" } },
+  { "external_ref": "pal/kangaroo", "name": "Kangaroo", "manufacturer": "PAL Robotics",
+    "discovery_url": "https://pal-robotics.com/",
+    "data": { "official_url": "https://pal-robotics.com/" } },
+  { "external_ref": "pal/reem-c", "name": "REEM-C", "manufacturer": "PAL Robotics",
+    "discovery_url": "https://pal-robotics.com/",
+    "data": { "official_url": "https://pal-robotics.com/" } },
+
+  { "external_ref": "fourier/gr-1", "name": "GR-1", "manufacturer": "Fourier Intelligence",
+    "discovery_url": "https://www.fourierintelligence.com/",
+    "data": { "official_url": "https://www.fourierintelligence.com/" } },
+  { "external_ref": "fourier/gr-2", "name": "GR-2", "manufacturer": "Fourier Intelligence",
+    "discovery_url": "https://www.fourierintelligence.com/",
+    "data": { "official_url": "https://www.fourierintelligence.com/" } },
+
+  { "external_ref": "ubtech/walker-s1", "name": "Walker S1", "manufacturer": "UBTECH Robotics",
+    "discovery_url": "https://www.ubtrobot.com/",
+    "data": { "official_url": "https://www.ubtrobot.com/" } },
+  { "external_ref": "ubtech/walker-s2", "name": "Walker S2", "manufacturer": "UBTECH Robotics",
+    "discovery_url": "https://www.ubtrobot.com/",
+    "data": { "official_url": "https://www.ubtrobot.com/" } },
+
+  { "external_ref": "kepler/k2", "name": "K2 Forerunner", "manufacturer": "Kepler Robotics",
+    "discovery_url": "https://www.gotokepler.com/",
+    "data": { "official_url": "https://www.gotokepler.com/" } },
+
+  { "external_ref": "galbot/g1", "name": "G1", "manufacturer": "Galbot",
+    "discovery_url": "https://www.galbot.com/",
+    "data": { "official_url": "https://www.galbot.com/" } },
+
+  { "external_ref": "agibot/a2", "name": "A2", "manufacturer": "AgiBot",
+    "discovery_url": "https://www.agibot.com/",
+    "data": { "official_url": "https://www.agibot.com/" } },
+
+  { "external_ref": "robotera/star1", "name": "STAR1", "manufacturer": "Robotera",
+    "discovery_url": "https://www.robotera.com/",
+    "data": { "official_url": "https://www.robotera.com/" } },
+  { "external_ref": "robotera/l7", "name": "L7", "manufacturer": "Robotera",
+    "discovery_url": "https://www.robotera.com/",
+    "data": { "official_url": "https://www.robotera.com/" } },
+
+  { "external_ref": "booster/t1", "name": "T1", "manufacturer": "Booster Robotics",
+    "discovery_url": "https://www.boosterobotics.com/",
+    "data": { "official_url": "https://www.boosterobotics.com/" } },
+
+  { "external_ref": "xpeng/iron", "name": "IRON", "manufacturer": "XPeng Robotics",
+    "discovery_url": "https://www.xpeng.com/",
+    "data": { "official_url": "https://www.xpeng.com/" } },
+
+  { "external_ref": "xiaomi/cyberone", "name": "CyberOne", "manufacturer": "Xiaomi",
+    "discovery_url": "https://www.mi.com/global/",
+    "data": { "official_url": "https://www.mi.com/global/" } },
+
+  { "external_ref": "limx/cl-1", "name": "CL-1", "manufacturer": "LimX Dynamics",
+    "discovery_url": "https://www.limxdynamics.com/",
+    "data": { "official_url": "https://www.limxdynamics.com/" } },
+
+  { "external_ref": "astribot/s1", "name": "S1", "manufacturer": "Astribot",
+    "discovery_url": "https://www.astribot.com/",
+    "data": { "official_url": "https://www.astribot.com/" } },
+
+  { "external_ref": "clone/protoclone", "name": "Protoclone", "manufacturer": "Clone Robotics",
+    "discovery_url": "https://clonerobotics.com/",
+    "data": { "official_url": "https://clonerobotics.com/" } },
+
+  { "external_ref": "hanson/sophia", "name": "Sophia", "manufacturer": "Hanson Robotics",
+    "discovery_url": "https://www.hansonrobotics.com/",
+    "data": { "official_url": "https://www.hansonrobotics.com/" } },
+
+  { "external_ref": "realbotix/aria", "name": "Aria", "manufacturer": "Realbotix",
+    "discovery_url": "https://realbotix.com/",
+    "data": { "official_url": "https://realbotix.com/" } },
+
+  { "external_ref": "softbank/pepper", "name": "Pepper", "manufacturer": "SoftBank Robotics",
+    "discovery_url": "https://www.softbankrobotics.com/",
+    "data": { "official_url": "https://www.softbankrobotics.com/" } },
+  { "external_ref": "softbank/nao", "name": "NAO", "manufacturer": "SoftBank Robotics",
+    "discovery_url": "https://www.softbankrobotics.com/",
+    "data": { "official_url": "https://www.softbankrobotics.com/" } },
+
+  { "external_ref": "honda/asimo", "name": "ASIMO", "manufacturer": "Honda",
+    "discovery_url": "https://global.honda/",
+    "data": { "official_url": "https://global.honda/" } },
+
+  { "external_ref": "kaist/hubo", "name": "HUBO", "manufacturer": "Rainbow Robotics",
+    "discovery_url": "https://www.rainbow-robotics.com/",
+    "data": { "official_url": "https://www.rainbow-robotics.com/" } },
+
+  { "external_ref": "toyota/t-hr3", "name": "T-HR3", "manufacturer": "Toyota",
+    "discovery_url": "https://global.toyota/",
+    "data": { "official_url": "https://global.toyota/" } }
+]

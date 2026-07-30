@@ -51,6 +51,28 @@ Forward migrations:
   read path. `promotion_audit` is append-only (enforced in the application by
   WS8.1 / R6). Idempotent, so it is a no-op on databases already built from a
   `schema.sql` that includes SECTION 10.
+- `0004_add_live_acquisition_layer.sql` — adds the DATA-D1.LIVE acquisition layer
+  (`docs/16_DATA_D1_LIVE_MARKET_ACQUISITION_CONTRACT.md` §16, RATIFIED v0.1):
+  `source_eligibility_review` (append-only, §5), `crawl_run` (§7),
+  `fetched_page` (§8 — deliberately **no body column**; bodies live in the
+  content-addressed cache outside the database, LIVE.10), `extraction_result`,
+  `candidate_commercial_signal` (§9 — a CHECK keeps the maturity / obtainability
+  / price axes from writing each other, LIVE.7) and
+  `discovery_evidence_excerpt` (§9 — `char_length <= 1000`, so the limit is
+  Unicode characters rather than bytes, LIVE.6/D-7), plus nine enums.
+  `discovery_source_class` is widened **additively** (`ADD VALUE IF NOT EXISTS`
+  only): every value `0003` shipped survives unrenamed and unremoved.
+  `discovery_source`, `candidate_claim` and `candidate_image_ref` gain nullable
+  provenance columns. **Structurally isolated** exactly as `0003`: no acquisition
+  table references a canonical row and no canonical table references back.
+  Idempotent, so it is a no-op on databases already built from a `schema.sql`
+  that includes these objects.
+
+  **Scope note.** This migration is *Slice A* of DATA-D1.LIVE: it creates the
+  records an acquisition run would write. It adds no adapter, HTTP client, robots
+  fetcher, crawler or scheduler, and applying it does not make the system capable
+  of fetching anything. Per-source crawling remains unauthorized until an
+  affirmative, attributed eligibility review exists for that source (§5).
 
 ## Checksum integrity (WS8.2 / R9)
 

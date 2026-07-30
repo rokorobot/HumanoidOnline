@@ -15,7 +15,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Text, UniqueConstraint, event, text
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -25,6 +25,8 @@ from app.models.enums import (
     candidate_status,
     claim_status,
     discovery_source_class,
+    extraction_confidence,
+    extraction_method,
     robots_status,
     source_type,
     tos_status,
@@ -58,6 +60,18 @@ class DiscoverySource(Base):
         Boolean, nullable=False, server_default=text("false")
     )
     notes: Mapped[str | None] = mapped_column(Text)
+    # DATA-D1.LIVE §5 / LIVE.2 / owner decision D-2 (migration 0004). The two
+    # axes expire differently on purpose: a terms page is a legal document that
+    # changes rarely and deliberately (90 days, void on a material hash change),
+    # while a robots policy is an operational signal that can change any day and
+    # is therefore re-read every run, never answered from a stored decision.
+    allowed_path_prefixes: Mapped[list[str] | None] = mapped_column(ARRAY(Text))
+    tos_reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    tos_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    tos_page_hash: Mapped[str | None] = mapped_column(Text)
+    last_robots_hash: Mapped[str | None] = mapped_column(Text)
+    last_robots_checked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_crawled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("now()"), nullable=False
     )
@@ -175,11 +189,35 @@ class CandidateClaim(Base):
     claim_status: Mapped[str] = mapped_column(
         claim_status, nullable=False, server_default=text("'NOT_VERIFIED'")
     )
-    discovery_source_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("discovery_source.id", ondelete="SET NULL")
+    #: DATA-D1.LIVE §9.1 — THE claim-level provenance anchor. Every claim resolves
+    #: to exactly one classified source (`DiscoverySource.source_class`), so two
+    #: sources asserting the same value are two rows, never one blended row, and
+    #: corroboration can be counted without being merged.
+    #:
+    #: NOT NULL + RESTRICT (migration 0004). Nullable + SET NULL failed Gate X
+    #: twice: an unattributed claim could be inserted, and deleting a source would
+    #: silently strip provenance from claims already made.
+    discovery_source_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("discovery_source.id", ondelete="RESTRICT"),
+        nullable=False,
     )
     evidence_url: Mapped[str | None] = mapped_column(Text)
     note: Mapped[str | None] = mapped_column(Text)
+    # DATA-D1.LIVE §9 (migration 0004) — extraction provenance. The exact
+    # supporting passages live in `discovery_evidence_excerpt`, not here: one
+    # claim may need several, and a column could hold only one.
+    extractor_key: Mapped[str | None] = mapped_column(Text)
+    extractor_version: Mapped[str | None] = mapped_column(Text)
+    extraction_method: Mapped[str | None] = mapped_column(extraction_method)
+    #: LIVE.8: parser confidence, never verification. Has no VERIFIED value.
+    extraction_confidence: Mapped[str | None] = mapped_column(extraction_confidence)
+    crawl_run_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("crawl_run.id", ondelete="SET NULL")
+    )
+    fetched_page_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("fetched_page.id", ondelete="SET NULL")
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("now()"), nullable=False
     )
@@ -214,6 +252,25 @@ class CandidateImageRef(Base):
         Text, nullable=False, server_default=text("'CANDIDATE'")
     )
     note: Mapped[str | None] = mapped_column(Text)
+    # DATA-D1.LIVE §10 (migration 0004) — RETRIEVAL provenance, which is not the
+    # same as claimed authorship. An image credited to a manufacturer but seen on
+    # an aggregator is `retrieval_source_class = AGGREGATOR` (the Figure 02
+    # precedent). Note what is deliberately ABSENT: no is_official, no
+    # rights_status, no usage_basis. Those are MEDIA-01 verdicts made by a human,
+    # and an extractor that could set them would bypass MEDIA-01 entirely.
+    page_url: Mapped[str | None] = mapped_column(Text)
+    retrieved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    declared_credit: Mapped[str | None] = mapped_column(Text)
+    #: Who the page CLAIMS made it — a claim, never an attribution we assert.
+    attribution_claimed: Mapped[str | None] = mapped_column(Text)
+    alt_text: Mapped[str | None] = mapped_column(Text)
+    retrieval_source_class: Mapped[str | None] = mapped_column(discovery_source_class)
+    crawl_run_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("crawl_run.id", ondelete="SET NULL")
+    )
+    fetched_page_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("fetched_page.id", ondelete="SET NULL")
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("now()"), nullable=False
     )

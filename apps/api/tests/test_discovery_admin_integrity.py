@@ -133,9 +133,20 @@ def committed_candidate(database_url):
         yield ids
     finally:
         with Session(engine) as s:
+            # Order matters since DATA-D1.LIVE Slice A: `candidate_claim`
+            # .discovery_source_id is NOT NULL with ON DELETE RESTRICT, so a
+            # source cannot be deleted while any claim still cites it. Delete the
+            # CANDIDATE first — that cascades its claims and images — and only
+            # then the source. Deleting the source first now fails, which is the
+            # constraint doing its job: provenance is never silently stripped
+            # from a claim that has already been made.
+            candidate = s.get(DiscoveryCandidate, ids["candidate"])
+            if candidate is not None:
+                s.delete(candidate)
+                s.commit()
             obj = s.get(DiscoverySource, ids["source"])
             if obj is not None:
-                s.delete(obj)  # cascades to candidate/claims/images
+                s.delete(obj)
                 s.commit()
 
 

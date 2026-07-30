@@ -113,11 +113,16 @@ lead_status = _pg_enum(
 # Discovery layer (DATA-D1 / docs/11_DATA_D1_CONTRACT.md). Noncanonical research
 # queue — competitors are radar only; nothing here is a canonical fact until it
 # passes the promotion gate (§7). Mirrors db/migrations/0003_add_discovery_layer.sql.
+# DATA-D1.LIVE §4 widened this ADDITIVELY (migration 0004): every value DATA-D1
+# shipped in 0003 is retained verbatim and four classes are appended. Source class
+# predicts nothing about eligibility — an aggregator is reviewed exactly as a
+# manufacturer is (§5).
 discovery_source_class = _pg_enum(
     "discovery_source_class",
     "COMPETITOR_DIRECTORY", "MARKETPLACE", "EDITORIAL", "SEARCH_RESULT",
     "DISTRIBUTOR", "MANUFACTURER", "PRESS_RELEASE", "OFFICIAL_DOCUMENT",
     "OFFICIAL_VIDEO", "OTHER",
+    "AGGREGATOR", "AUTHORIZED_DISTRIBUTOR", "OFFICIAL_STORE", "COMMUNITY",
 )
 # DATA-D1.9: affirmative access decisions (reviewing != being allowed).
 tos_status = _pg_enum(
@@ -146,6 +151,40 @@ trace_state = _pg_enum(
 )
 claim_status = _pg_enum(
     "claim_status", "NOT_VERIFIED", "VERIFIED", "CONFLICT", "REJECTED", "UNKNOWN"
+)
+
+# --- DATA-D1.LIVE (docs/16, RATIFIED v0.1) — live-acquisition types ----------
+# Slice A is schema only: these exist so a run can be RECORDED. No adapter, HTTP
+# client, robots fetcher or crawler exists in this slice.
+crawl_run_status = _pg_enum(
+    "crawl_run_status",
+    "RUNNING", "COMPLETED", "FAILED", "HALTED_BY_POLICY", "CANCELLED",
+)
+# LIVE.4: exactly one legal trigger. A single value means adding an automated
+# trigger is a visible schema change rather than a configuration flag.
+crawl_trigger = _pg_enum("crawl_trigger", "MANUAL")
+fetch_outcome = _pg_enum(
+    "fetch_outcome",
+    "FETCHED", "NOT_MODIFIED", "FROM_CACHE", "BLOCKED_BY_ROBOTS",
+    "BLOCKED_BY_SOURCE", "ERROR", "SKIPPED_UNCHANGED",
+)
+extraction_method = _pg_enum(
+    "extraction_method", "SELECTOR", "JSONLD", "MICRODATA", "PATTERN", "MANUAL"
+)
+# LIVE.8 / owner decision D-6: deliberately has NO VERIFIED value. How sure the
+# parser is is not evidence quality, and a parser must not be able to express
+# verification — that is a human act on claim_status.
+extraction_confidence = _pg_enum("extraction_confidence", "LOW", "MEDIUM", "HIGH")
+# LIVE.7: the three axes that must never collapse into one status label.
+signal_axis = _pg_enum("signal_axis", "MATURITY", "OBTAINABILITY", "PRICE")
+eligibility_decision = _pg_enum(
+    "eligibility_decision", "ALLOWED", "RESTRICTED", "PROHIBITED", "UNKNOWN"
+)
+extraction_status = _pg_enum(
+    "extraction_status", "EXTRACTED", "NOTHING_FOUND", "AMBIGUOUS", "ERROR"
+)
+evidence_subject_type = _pg_enum(
+    "evidence_subject_type", "CLAIM", "COMMERCIAL_SIGNAL", "IMAGE_REF"
 )
 
 # Autonomy ordered low->high, for the `autonomy_min` catalogue filter.

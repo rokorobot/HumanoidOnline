@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+# /// script
+# requires-python = ">=3.12"
+# dependencies = ["truststore>=0.10"]
+# ///
 """Author canonical catalogue entries, and fill their specifications by hand.
 
 The verified catalogue is hand-authored JSON under `db/catalogue/`, imported by
@@ -594,7 +599,17 @@ def rights_for(source_type: str) -> tuple[str, str, bool]:
 
 def apply_image_worksheet(worksheet: dict, *, dry_run: bool = True) -> dict:
     """Record confirmed images. Downloads only what a named human confirmed."""
+    import ssl
     import urllib.request
+
+    # Windows/uv ships no CA bundle for urllib, so certificate verification
+    # fails on every https URL. `truststore` delegates to the operating
+    # system's own trust store — the same certificates the browser uses.
+    # Verification stays ON: an unverified download is how you fetch something
+    # other than what you asked for.
+    import truststore
+
+    ssl_context = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 
     rows = worksheet.get("images", [])
     for row in rows:
@@ -623,7 +638,9 @@ def apply_image_worksheet(worksheet: dict, *, dry_run: bool = True) -> dict:
             row["image_url"],
             headers={"User-Agent": "HumanoidOnlineCatalogue/0.1 (+https://humanoidonline.com)"},
         )
-        with urllib.request.urlopen(req, timeout=45) as resp:  # noqa: S310 - explicit https URL
+        with urllib.request.urlopen(  # noqa: S310 - explicit https URL
+            req, timeout=45, context=ssl_context
+        ) as resp:
             ctype = (resp.headers.get("Content-Type") or "").split(";")[0].strip().lower()
             if ctype not in IMAGE_CONTENT_TYPES:
                 raise AuthoringError(

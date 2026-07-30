@@ -40,5 +40,21 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": []
+  "images": [
+    {
+      "image_url": "/robots/robotera-l7.png",
+      "source_url": "https://robotera.com/#/product/L7",
+      "source_name": "ROBOTERA",
+      "source_type": "MANUFACTURER",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "UNKNOWN",
+      "usage_basis": "OFFICIAL_MANUFACTURER_MEDIA",
+      "is_official": true,
+      "is_primary": true,
+      "attribution": "© ROBOTERA",
+      "last_verified_at": "2026-07-30T21:56:37+00:00",
+      "identity_confirmed_by": "robert@humanoid.company"
+    }
+  ]
 }

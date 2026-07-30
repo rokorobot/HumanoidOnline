@@ -40,5 +40,21 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": []
+  "images": [
+    {
+      "image_url": "/robots/pal-talos.webp",
+      "source_url": "https://pal-robotics.com/robot/talos/",
+      "source_name": "PAL Robotics",
+      "source_type": "MANUFACTURER",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "UNKNOWN",
+      "usage_basis": "OFFICIAL_MANUFACTURER_MEDIA",
+      "is_official": true,
+      "is_primary": true,
+      "attribution": "© PAL Robotics",
+      "last_verified_at": "2026-07-30T21:56:33+00:00",
+      "identity_confirmed_by": "robert@humanoid.company"
+    }
+  ]
 }

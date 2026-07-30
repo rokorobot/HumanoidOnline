@@ -40,5 +40,21 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": []
+  "images": [
+    {
+      "image_url": "/robots/pal-reem-c.webp",
+      "source_url": "https://pal-robotics.com/robot/reem-c/",
+      "source_name": "PAL Robotics",
+      "source_type": "MANUFACTURER",
+      "image_type": "DETAIL",
+      "identity_status": "VERIFIED",
+      "rights_status": "UNKNOWN",
+      "usage_basis": "OFFICIAL_MANUFACTURER_MEDIA",
+      "is_official": true,
+      "is_primary": false,
+      "attribution": "© PAL Robotics",
+      "last_verified_at": "2026-07-30T21:56:33+00:00",
+      "identity_confirmed_by": "robert@humanoid.company"
+    }
+  ]
 }

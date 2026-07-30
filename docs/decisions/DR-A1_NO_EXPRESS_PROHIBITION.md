@@ -4,7 +4,8 @@
 |---|---|
 | **Status** | **OPEN — awaiting product-owner decision** |
 | **Raised** | 2026-07-30 |
-| **Revision** | 2 (2026-07-30) — owner review corrections: `AGGREGATOR`-only class precondition · restriction-applicability rules frozen · operational ceilings made an implementation precondition |
+| **Revision** | 3 (2026-07-30) — default validity set to **90 days**, aligned with the `ALLOWED` terms review; expiry stated as a fail-closed suspension that triggers nothing |
+| | 2 (2026-07-30) — owner review corrections: `AGGREGATOR`-only class precondition · restriction-applicability rules frozen · operational ceilings made an implementation precondition |
 | **Decision owner** | Robert Konecny (product owner) — sole ratifying authority |
 | **Amends** | `docs/16_DATA_D1_LIVE_MARKET_ACQUISITION_CONTRACT.md` (RATIFIED v0.1, main @ `6875a34`) |
 | **Normative text** | `docs/17_DATA_D1_LIVE_AMENDMENT_A1_NO_EXPRESS_PROHIBITION.md` |
@@ -175,7 +176,7 @@ scope is a separate question that should be decided on its own evidence.
 | | |
 |---|---|
 | **Immediately** | Nothing. Ratification approves no source. Candidates then need their own full reviews under the amended ten-requirement procedure; none of the 2026-07-30 assessments satisfies requirement 5. **And each must first pass the `AGGREGATOR` class precondition on an honest classification — which may leave fewer than four.** |
-| **Implementation** | A separately authorized slice, and **not before per-host operational ceilings are frozen** (§10.3): enum widening on `eligibility_decision` and `tos_status`, mode-aware `radar_eligible`, an extended DB `CHECK` encoding the class condition, state-dependent expiry, new acceptance gates, run-report and `/discovery-review` display. Detailed in amendment §10. |
+| **Implementation** | A separately authorized slice, and **not before per-host operational ceilings are frozen** (§10.3): enum widening on `eligibility_decision` and `tos_status`, mode-aware `radar_eligible`, an extended DB `CHECK` encoding the class condition, a fail-closed `REVIEW_EXPIRED` path that starts nothing, new acceptance gates, run-report and `/discovery-review` display. Detailed in amendment §10. |
 | **Other source classes** | Unchanged. `MANUFACTURER`, `OFFICIAL_STORE` and `AUTHORIZED_DISTRIBUTOR` still require `ALLOWED` for automated acquisition; every other class keeps the pre-amendment rules. Widening needs a further amendment. |
 | **Training** | Prohibited on acquired content from every source under every directive — restated as a frozen rule (§4.1 rule 1) rather than left implied. |
 | **Canonical truth** | Unchanged. Gate W, Gate S, Gate T, Gate X, P2 and P8 all stand as ratified. |
@@ -188,7 +189,8 @@ scope is a separate question that should be decided on its own evidence.
 |---|---|
 | The state is mistaken for permission by a future reader | The name says otherwise; §3 of the amendment forbids mapping it to `ALLOWED` in any projection, report or UI; a proposed gate asserts it. |
 | A defective review records an absence that was never searched for | Requirement 5 (record where you looked) and requirement 8 (attribution) — both to be enforced at write time, not by convention. |
-| A publisher's silence ends and we do not notice | **`robots.txt` re-read at every run start** (24 h cache ceiling) and six immediate-revocation triggers, including publisher objection effective on receipt. **Note:** the 220-day expiry (owner decision) is longer than the 90-day `ALLOWED` validity, so it is a backstop rather than a control — the two continuous mechanisms carry this risk alone. Anyone later weakening either must account for that. |
+| A publisher's silence ends and we do not notice | **`robots.txt` re-read at every run start** (24 h cache ceiling) and six immediate-revocation triggers, including publisher objection effective on receipt, plus a **90-day maximum validity** matching the `ALLOWED` terms review — so the silence-based state never outlives affirmative permission. The three work at different timescales and none substitutes for another. |
+| Expiry is misread as a signal to go and re-check the source | §7.1 states it first and in the strongest terms: expiry is a **fail-closed access-suspension event**, never a crawl, fetch, refresh, retry, scheduling or acquisition trigger. It starts nothing — not a re-review, not a request. Re-enablement is a human act, and a later run is a second, separate human act under LIVE.4. |
 | A source is reclassified to `AGGREGATOR` to make it eligible | Prohibited explicitly (§2.1, adversarial example 16), and the class condition is to be enforced in the DB `CHECK` alongside the state, not left to convention. The honest-classification requirement may narrow the amendment to fewer than four candidate sources — recorded in §9 so the owner decides with it visible. |
 | A broad AI-use directive is read as training-only to gain eligibility | §4.1 rule 5: where scope cannot be determined, the restriction applies and the result is `UNKNOWN`. The review must record the rule applied and the scope determined, in a queryable form. |
 | An adapter ships with generous or unbounded rate limits | §10.3 makes frozen per-host ceilings a **precondition** of the implementation slice — concurrency, rate, pages per run, bytes per page and per run — contract- or database-governed, unlimited values prohibited, declared crawl delay honoured as a floor. No adapter code precedes the numbers. |

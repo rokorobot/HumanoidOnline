@@ -2,6 +2,11 @@
 
 > **STATUS: PROPOSED — NOT RATIFIED.**
 >
+> **Revision 3 (2026-07-30)** — default eligibility validity set to **90 days**,
+> aligned with the `ALLOWED` terms-review validity (§7), and expiry stated
+> explicitly as a **fail-closed access-suspension event that triggers nothing**
+> (§7.1).
+>
 > **Revision 2 (2026-07-30)** — incorporates the product owner's review
 > corrections: the state is restricted to `AGGREGATOR`-class sources (§2.1);
 > requirement 3 now turns on whether a restriction *applies to the proposed use*,
@@ -219,7 +224,7 @@ outcome is `UNKNOWN` or `PROHIBITED`, never a partial grant.
 | **6** | **Ordinary requests are accepted without bypassing access controls.** The declared user agent, at the declared rate, with no impersonation, no proxy rotation, no fingerprint evasion and no header manipulation beyond ordinary conditional-request validators. |
 | **7** | **No login, CAPTCHA, paywall, `403` block or other technical denial is present** on the paths under review. |
 | **8** | **The reviewer, timestamp, URLs, hashes and supporting excerpts are recorded** — for every axis, including the axes that came back empty. |
-| **9** | **The review has not expired** (§7: 220 days by default). |
+| **9** | **The review has not expired** (§7: 90 days by default). |
 | **10** | **The source is explicitly enabled for the limited radar mode.** Reviewing is not enabling — the base contract's §5 step 5, restated because it is the step most often skipped. Enablement names the mode; a source enabled for limited radar is not enabled for anything else. |
 
 **Silence must be recorded as silence, never rewritten as permission.** Where a
@@ -346,33 +351,32 @@ looking at something. Nothing authorized ends in a published fact.
 
 ## 7. Expiry and revocation
 
-**Default expiry: 220 days** *(owner decision, 2026-07-30)*.
+**Default expiry: 90 days** *(product-owner decision, 2026-07-30)*.
 
-The trade-off is recorded rather than smoothed over, because a later reader will
-otherwise assume it was an oversight. 220 days is **longer** than the 90-day
-terms validity LIVE.2 sets for `ALLOWED` — so the state resting on the *weaker*
-evidence carries the *longer* validity. The argument against it is direct: this
-state rests on an **absence**, and an absence can be filled at any moment by a
-publisher who adds a terms page, a `Content-Signal` or a Cloudflare rule without
-telling anyone, so a periodic re-read is the only thing that would catch a change
-nobody announced.
+The rationale, recorded so it is not re-litigated:
 
-The owner's decision stands, and the consequence is that **the expiry clock
-carries almost none of the safety here.** It is a backstop measured in months,
-not a control. What actually protects the state is continuous and unchanged:
+- **It aligns with the existing `ALLOWED` terms-review validity** set by LIVE.2.
+  One validity period across both states means one rule to implement, one rule
+  to test and one rule to remember.
+- **It avoids giving the weaker, silence-based state a longer lifetime than
+  affirmative permission.** A review that found *nothing* must not outlive a
+  review that found an explicit grant. Any expiry beyond 90 days would invert
+  the evidence hierarchy this amendment otherwise maintains everywhere.
+- **It is a maximum validity period, not a guarantee.** Ninety days is the
+  longest a finding may stand before it must be redone. It is not an assertion
+  that access remains acceptable throughout — only that the finding is not
+  automatically stale before then.
+- **It does not replace run-start policy checks or the immediate revocation
+  triggers.** Those are the continuous protections and they are unchanged:
+  `robots.txt` is re-read at the start of every run and cached at most 24 hours
+  (LIVE.2), so an agent-specific block or a new `Content-Signal` halts the
+  source on the next run rather than waiting for any expiry; the six triggers
+  below take effect on occurrence; and any access-denial response ends access on
+  the spot (§7.5).
 
-- **`robots.txt` is re-read at the start of every run** and cached at most 24
-  hours (LIVE.2). An agent-specific block or a new `Content-Signal` appearing in
-  that file halts the source on the next run, not in 220 days.
-- **The six revocation triggers below are immediate** and none of them waits for
-  expiry.
-- **Any access-denial response ends access on the spot** (§7.5), so a publisher
-  who begins refusing us is honoured the same day.
-
-Anyone later proposing to weaken the run-start robots re-read, or to soften the
-revocation triggers, must account for the fact that this expiry is not covering
-them. The two mechanisms were sized against a 30-day expiry and are now doing
-the work alone.
+The expiry and the continuous checks answer different questions. The checks ask
+*has anything changed since we last looked?* The expiry asks *is this finding
+still recent enough to rely on at all?* Neither substitutes for the other.
 
 **The state becomes unusable immediately when any of the following occurs.**
 Immediately means: the source is disabled, an in-flight run halts with
@@ -406,23 +410,43 @@ rule exists because the alternative is an automated path from "they said no" to
 
 ### 7.1 What expiry actually does — and what it does not
 
+**Eligibility expiry is a fail-closed access-suspension event. It is never a
+crawl, fetch, refresh, retry, scheduling or content-acquisition trigger.**
+
+This is stated first because it is the most dangerous available
+misunderstanding. An expiry is a deadline that *removes* a permission. Nothing
+about it initiates work: it does not schedule a re-review, it does not queue a
+refresh, it does not cause a single page to be requested. A system in which an
+expiry sets something running has inverted the rule — expiry is the moment
+activity stops, and it stays stopped until a person acts.
+
 Expiry governs **future access**, not the **record of past evidence**. The two
 are separated deliberately.
 
-**On the day the review expires:**
+**On the day the review expires (after 90 days):**
 
-- the source becomes ineligible and is disabled;
-- no new request may be constructed for it — the assertion happens *before* the
-  request is built (LIVE.2), so an expired review cannot produce a fetch that is
-  later noticed and cleaned up;
-- a run already in flight **halts** and records `HALTED_BY_POLICY`, which is a
-  first-class outcome and not an error to retry;
-- re-enablement requires a **fresh full review** — all six axes searched and
-  recorded again, the `AGGREGATOR` class precondition confirmed again, and the
-  owner's explicit enablement again. **There is no renewal, no extension and no
-  "re-confirm the previous finding" path.** A stale review is not evidence about
-  today, and 220 days is long enough that the site may have changed
-  substantially.
+- the source enters `REVIEW_EXPIRED` — or whichever existing fail-closed state
+  the implementation uses — and is disabled;
+- **new acquisition is blocked.** No new request may be constructed for the
+  source; the assertion happens *before* the request is built (LIVE.2), so an
+  expired review cannot produce a fetch that is noticed and cleaned up
+  afterwards;
+- **an in-flight run halts** and records `HALTED_BY_POLICY` if expiry is
+  detected mid-run — a first-class outcome, not an error to retry;
+- **no automatic eligibility review begins.** The expiry does not schedule,
+  queue or start a re-review. A named human starts one, or none happens;
+- **no robot page is fetched because the review expired.** Expiry causes zero
+  requests of any kind;
+- existing candidates, claims, evidence excerpts and provenance **remain
+  retained**;
+- **re-enablement requires a fresh complete eligibility review** — all six axes
+  searched and recorded again, the `AGGREGATOR` class precondition confirmed
+  again, and the owner's explicit enablement again. **There is no renewal, no
+  extension and no "re-confirm the previous finding" path.** A stale review is
+  not evidence about today;
+- **any later content-acquisition run remains a separate manual-trigger
+  decision under LIVE.4.** Passing a fresh review restores eligibility; it does
+  not start a run. Those are two decisions and two human acts.
 
 **What expiry does *not* do:**
 
@@ -441,7 +465,7 @@ are separated deliberately.
 - **It does not change cache retention**, which is governed independently by
   LIVE.10 and Gate Q.
 
-**The practical shape, then:** after 220 days the platform keeps everything it
+**The practical shape, then:** after 90 days the platform keeps everything it
 learned and loses the right to learn more until a person re-does the review.
 That asymmetry is correct — the evidence record should survive, and the access
 permission should not.
@@ -547,7 +571,7 @@ has a specification rather than an inference.
 | `discovery_source.radar_eligible` | Currently a boolean property requiring `tos_status == "ALLOWED"`. It must become **mode-aware**: a source in the new state is eligible for *limited radar* and for nothing else. The safest shape is an explicit radar-mode value rather than a widened boolean, so that every call site is forced to state which mode it means and no existing caller silently gains the new capability. |
 | DB-level `CHECK` on `is_enabled` | The existing constraint encoding DATA-D1.9 must be extended to admit the new state **only** in combination with the limited mode — the database, not the application, remains the place this is enforced (L7). |
 | `source_eligibility_review` | No new column is strictly required; the six-axis search record fits `notes` plus the existing per-axis URL/hash/excerpt fields. A dedicated structured column for the "where we searched" list would be better and should be considered in the slice. The table is append-only and stays so. |
-| Expiry | 220 days for this state against 90 for `ALLOWED` means `expires_at` becomes state-dependent at write time. It is already a column; only the default calculation changes. Because this expiry is long (§7), the slice must not treat it as a safety control: the run-start `robots.txt` re-read and the immediate-revocation triggers are the enforcement, and both need explicit tests. |
+| Expiry | 90 days, matching the `ALLOWED` terms validity, so `expires_at` keeps a single rule across both states rather than becoming state-dependent. The column already exists; nothing about its calculation changes. The slice must assert that expiry is **fail-closed and inert** (§7.1): an expired review blocks a run and starts nothing — no scheduled re-review, no refresh, no request of any kind. A test that proves zero requests result from an expiry belongs in the same suite as the block itself. |
 | New acceptance gates | At minimum: a source in this state can never produce `VERIFIED` or a canonical write (state-level, independent of Gate S); a technical denial disables the source within the same run; an expired review of this state blocks a run; the state is never mapped to `ALLOWED` in any projection, report or UI; and `PROHIBITED` cannot transition into this state without a new review record. |
 | Run report | The §18 report must print the eligibility **state** per source, not merely "eligible", so an operator reading a report can tell which authority a run was operating under. |
 | Rate policy | Limited mode carries its own, stricter rate ceiling, and honours any declared `Crawl-delay` as a floor. |
@@ -704,11 +728,15 @@ Operational ceilings:        NOT SELECTED. Freezing per-host concurrency, rate,
 Gate W:                      UNCHANGED
 Gates S / T / X, P2 / P8:    UNCHANGED
 Precedence order:            UNCHANGED
-Default expiry:              220 days (owner decision, 2026-07-30) — longer
-                             than the 90-day ALLOWED terms validity; the
-                             run-start robots re-read and the six immediate
-                             revocation triggers carry the safety, not the
-                             expiry clock (§7)
+Default expiry:              90 days (owner decision, 2026-07-30) — aligned
+                             with the ALLOWED terms-review validity, so the
+                             weaker silence-based state never outlives
+                             affirmative permission. A MAXIMUM validity, not a
+                             guarantee, and no substitute for run-start policy
+                             checks or the immediate revocation triggers (§7)
+Expiry semantics:            FAIL-CLOSED ACCESS SUSPENSION. Never a crawl,
+                             fetch, refresh, retry, scheduling or acquisition
+                             trigger. Expiry starts nothing (§7.1)
 
 Ratified by:                 ____________________
 Ratification date:           ____________________

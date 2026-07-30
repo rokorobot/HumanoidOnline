@@ -2,8 +2,9 @@
 
 | | |
 |---|---|
-| **Status** | **OPEN — awaiting product-owner decision** |
+| **Status** | **OPEN — awaiting product-owner decision on the contract as a whole.** The `MANUAL_ONLY` sub-decision is **RESOLVED: ADOPTED**, 2026-07-30. |
 | **Raised** | 2026-07-30 |
+| **Revision** | 2 (2026-07-30) — `MANUAL_ONLY` adopted; eligibility-to-mode contradiction resolved; revocation scoped; PR #36 rebase consequence recorded |
 | **Decision owner** | Robert Konecny (product owner) — sole ratifying authority |
 | **Implements** | `docs/17` §13.1 step 1 (Amendment A1, RATIFIED, `main @ 626d1ce`) |
 | **Normative text** | `docs/18_DATA_D1_LIVE_A1_LIMITED_RADAR_IMPLEMENTATION_CONTRACT.md` |
@@ -113,29 +114,66 @@ would make the run report useless exactly where it matters.
 **Byte ceilings count decompressed bytes, measured while streaming.** A limit
 applied after decompression is not a limit.
 
-**Gate G31 was added** beyond the thirty requested: a `MANUAL_ONLY` source
-constructs zero HTTP requests. It exists only because of the open decision
-below; if `MANUAL_ONLY` is rejected, G31 goes with it.
+**Gates A1-G31 … A1-G41 were added** beyond the thirty requested, covering
+`MANUAL_ONLY` and scoped revocation. They are normative, not conditional —
+`MANUAL_ONLY` is adopted (§6).
 
-## 6. The one open decision
+## 6. The sub-decision — RESOLVED
 
-**`radar_mode` needs a fourth value, `MANUAL_ONLY`, or PR #36 breaks.**
+**`MANUAL_ONLY`: ADOPTED by product-owner instruction, 2026-07-30.**
 
-`MANUAL_BOOTSTRAP` registers its source with `tos_status = ALLOWED`,
-`robots_status = NOT_APPLICABLE`, `is_enabled = true`, and reaches `ingest()`
-through `radar_eligible` — which this contract removes. With only `DISABLED` /
-`LIMITED_RADAR` / `FULL_RADAR` available, a bootstrap source would have to be
-recorded as `FULL_RADAR`: an assertion of automated-access capability for a
-source that makes no requests at all.
+`MANUAL_BOOTSTRAP` reaches `ingest()` through `radar_eligible`, which this
+contract removes. With only `DISABLED` / `LIMITED_RADAR` / `FULL_RADAR`
+available, a bootstrap source would have to be recorded as `FULL_RADAR`: an
+assertion of automated-access capability for a source that makes no requests at
+all. `MANUAL_ONLY` says the true thing — enabled for attributed human-entered
+ingest, permitted zero requests — and the §5.4 `CHECK` plus gates A1-G31…G41
+make it enforced rather than asserted.
 
-That is a false record in the exact place the project has been most careful to
-keep records true. `MANUAL_ONLY` says the true thing — enabled for
-human-entered ingest, permitted zero requests — and the §5.4 `CHECK` plus gate
-G31 make it enforced rather than asserted.
+### 6.1 The contradiction the owner's review caught
 
-**Recommendation: adopt `MANUAL_ONLY`.** The alternatives are to write a
-capability the source does not have, or to make the mode nullable and
-reintroduce the ambiguity the column exists to remove.
+Revision 1 contained two rules that could not both hold. The §4.2 mapping table
+said `UNKNOWN`, `PROHIBITED`, expired and missing reviews permit only
+`DISABLED`; the §5.4 `CHECK` permitted `MANUAL_ONLY` whenever `robots_status =
+NOT_APPLICABLE`, regardless of `tos_status`. Left alone, one of them would have
+been "fixed" during implementation — and the likely fix was the wrong one:
+tightening the `CHECK` to require `ALLOWED`, which would have locked manual
+research behind an automated-access permission.
+
+**The resolution is that automated eligibility states govern only the automated
+modes.** `tos_status` records an assessment of whether *this platform may send a
+publisher a request*. It was never the right instrument for deciding whether *a
+named human may type a record*, and using it that way was a category error that
+happened to be invisible while `radar_eligible` collapsed everything into one
+boolean.
+
+### 6.2 Why this matters beyond the schema
+
+The old arrangement required PR #36 to write `tos_status = ALLOWED` — a claim
+that affirmative permission had been found — in order to do something entirely
+legitimate that needed no permission at all. **A gate that can only be passed by
+making a false statement is measuring the wrong thing.** That is the strongest
+argument for the correction, and it is worth remembering the next time a gate
+proves inconvenient: the question to ask first is whether the gate is asking the
+right question.
+
+Two consequences follow, both now frozen:
+
+- **PR #36's rebase must stop writing `ALLOWED`** (contract §5.5). Its truthful
+  default is `radar_mode = MANUAL_ONLY`, `tos_status = UNKNOWN`,
+  `robots_status = NOT_APPLICABLE`, `is_enabled = true`. Nobody should later
+  "fix" the resulting test failure by reinstating `ALLOWED`, which is why gates
+  G37 and G38 exist.
+- **Revocation is scoped** (`revocation_scope`: `AUTOMATED_ACCESS` or
+  `ENTIRE_RELATIONSHIP`). A publisher who blocks our crawler has not necessarily
+  objected to a person reading their public pages, and revision 1's blunt
+  `revoked_at IS NULL OR radar_mode = 'DISABLED'` would have silently widened
+  the first into the second. Gate G41 asserts the distinction.
+
+A source may now hold `tos_status = PROHIBITED` **permanently and truthfully**
+while remaining manually usable — which is exactly the position of the five
+manufacturers whose terms prohibit automation, and the reason the seven-robot
+catalogue was legitimate in the first place.
 
 ## 7. Consequences if ratified
 
@@ -164,14 +202,27 @@ reintroduce the ambiguity the column exists to remove.
 
 Approval to fetch anything, to enable any source, to write any code, to reopen
 `robotsguide.com` or `roboselect360.com`, or to widen A1's `AGGREGATOR`-only
-scope. This record asks two things: whether the frozen specification is right,
-and whether `MANUAL_ONLY` should exist.
+scope. **One question remains: whether the frozen specification as a whole is
+right.** The `MANUAL_ONLY` sub-decision is settled and is no longer part of the
+ask.
 
 ## 10. Decision
 
 ```
+MANUAL_ONLY radar_mode:   ADOPT
+Decided by:               Robert Konecny (product owner)
+Date:                     2026-07-30
+Notes:                    MANUAL_ONLY is an operating mode, not an eligibility
+                          finding. Automated eligibility states govern only the
+                          automated modes; a manual, zero-request path needs no
+                          automated-access permission and must not manufacture
+                          one. An existing automation prohibition is recorded
+                          honestly and is never weakened because a human is
+                          doing the work.
+
+--- contract as a whole: OUTSTANDING ---
+
 DECISION:                 ____________________   (ADOPT / REJECT / AMEND)
-MANUAL_ONLY radar_mode:   ____________________   (ADOPT / REJECT)
 Decided by:               ____________________
 Date:                     ____________________
 Notes:

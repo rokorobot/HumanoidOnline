@@ -422,6 +422,12 @@ def main(argv: list[str] | None = None) -> int:
     ex.add_argument("--out", help="worksheet path; omit for stdout")
     ex.add_argument("--all", action="store_true", help="include already-complete robots")
 
+    sub.add_parser("images-pending", help="list robots with no image yet")
+
+    ia = sub.add_parser("images-apply", help="record confirmed images (downloads them)")
+    ia.add_argument("worksheet")
+    ia.add_argument("--write", action="store_true", help="download and write; else dry run")
+
     apl = sub.add_parser("apply", help="apply an edited worksheet")
     apl.add_argument("worksheet")
     apl.add_argument("--operator", required=True)
@@ -444,6 +450,29 @@ def main(argv: list[str] | None = None) -> int:
             print(f"wrote {len(done['robots'])} robot file(s), "
                   f"added {len(done['manufacturers'])} manufacturer(s)")
             print("All stubs are is_published=false. Publishing is a separate decision.")
+            return 0
+
+        if args.command == "images-pending":
+            pending = robots_without_images()
+            print(f"{len(pending)} robot(s) without an image")
+            for slug in pending:
+                print(f"  {slug}")
+            return 0
+
+        if args.command == "images-apply":
+            sheet = json.loads(Path(args.worksheet).read_text(encoding="utf-8"))
+            result = apply_image_worksheet(sheet, dry_run=not args.write)
+            mode = "DRY RUN - nothing downloaded" if result["dry_run"] else "WRITTEN"
+            print(f"[{mode}]")
+            for a in result["applied"]:
+                size = f" ({a['bytes']} bytes)" if a["bytes"] else ""
+                print(f"  IMAGE   {a['slug']} -> {a['image_url']}{size}")
+            for r in result["rejected"]:
+                print(f"  REJECT  {r['slug']}: {r['why']}")
+            for s_ in result["skipped"]:
+                print(f"  PENDING {s_['slug']}: {s_['why']}")
+            if result["dry_run"] and result["applied"]:
+                print("Re-run with --write to download and record.")
             return 0
 
         if args.command == "export":
@@ -475,6 +504,164 @@ def main(argv: list[str] | None = None) -> int:
         print(f"REFUSED: {exc}", file=sys.stderr)
         return 2
 
+
+
+# --------------------------------------------------------------- images -----
+# MEDIA-01. The catalogue self-hosts images under apps/web/public/robots/, with
+# provenance recorded per file. Six of the original seven are
+# MANUFACTURER / OFFICIAL_MANUFACTURER_MEDIA taken from the maker's own site;
+# Figure 02 is the EDITORIAL / ATTRIBUTION_REQUIRED exception and still displays.
+#
+# The gate this tool exists to protect: `identity_status = VERIFIED` means a
+# HUMAN looked at the picture and confirmed it shows THAT model. Software cannot
+# establish that — a correctly licensed, properly attributed photo of the wrong
+# robot is the failure mode this catalogue has already met once, when a licensed
+# image search offered an Istanbul tram for Booster's T1. So a candidate carries
+# `confirmed_by` empty, and nothing is downloaded or recorded until a named
+# person fills it in.
+
+PUBLIC_ROBOT_IMAGES = REPO_ROOT / "apps" / "web" / "public" / "robots"
+
+IMAGE_SOURCE_TYPES = {"MANUFACTURER", "PRESS_KIT", "DISTRIBUTOR", "EDITORIAL", "VIDEO_FRAME"}
+IMAGE_TYPES = {"FRONT", "SIDE", "REAR", "ACTION", "WORKPLACE", "DETAIL", "DIMENSIONS"}
+RIGHTS_STATUSES = {"UNKNOWN", "ATTRIBUTION_REQUIRED", "LICENSED", "PERMISSION_GRANTED"}
+USAGE_BASES = {"OFFICIAL_MANUFACTURER_MEDIA", "PRESS_KIT_TERMS", "LICENCE", "PERMISSION", "NONE"}
+
+#: Content types we will store, and the extension each becomes on disk.
+IMAGE_CONTENT_TYPES = {
+    "image/jpeg": ".jpg", "image/png": ".png",
+    "image/webp": ".webp", "image/avif": ".avif",
+}
+MAX_IMAGE_BYTES = 8 * 1024 * 1024
+
+
+def robots_without_images() -> list[str]:
+    return [slug for slug, r in existing_robots().items() if not (r.get("images") or [])]
+
+
+def image_candidate(*, slug: str, image_url: str, source_url: str, source_name: str,
+                    source_type: str = "MANUFACTURER", image_type: str = "FRONT",
+                    attribution: str = "", note: str = "") -> dict:
+    """One proposal, awaiting a human identity decision."""
+    return {
+        "slug": slug,
+        "image_url": image_url,
+        "source_url": source_url,
+        "source_name": source_name,
+        "source_type": source_type,
+        "image_type": image_type,
+        "attribution": attribution,
+        "note": note,
+        # --- the human gate ---
+        "confirmed_by": "",          # a named person, or nothing happens
+        "decision": "",              # confirm | reject
+        "reject_reason": "",
+    }
+
+
+def _validate_image_row(row: dict) -> None:
+    where = f"{row.get('slug', '?')}"
+    for field in ("slug", "image_url", "source_url", "source_name"):
+        if not str(row.get(field) or "").strip():
+            raise AuthoringError(f"{where}: {field} is required")
+    if row["source_type"] not in IMAGE_SOURCE_TYPES:
+        raise AuthoringError(f"{where}: source_type must be one of {sorted(IMAGE_SOURCE_TYPES)}")
+    if row["image_type"] not in IMAGE_TYPES:
+        raise AuthoringError(f"{where}: image_type must be one of {sorted(IMAGE_TYPES)}")
+    decision = (row.get("decision") or "").strip().lower()
+    if decision not in {"", "confirm", "reject"}:
+        raise AuthoringError(f"{where}: decision must be 'confirm', 'reject' or empty")
+    if decision == "confirm" and not str(row.get("confirmed_by") or "").strip():
+        raise AuthoringError(
+            f"{where}: 'confirm' requires confirmed_by — identity_status VERIFIED "
+            "means a NAMED PERSON looked at the picture and recognised the robot. "
+            "Software cannot establish that."
+        )
+    if decision == "reject" and not str(row.get("reject_reason") or "").strip():
+        raise AuthoringError(f"{where}: 'reject' requires a reject_reason")
+    if not str(row.get("image_url", "")).lower().startswith(("http://", "https://")):
+        raise AuthoringError(f"{where}: image_url must be an http(s) URL")
+
+
+def rights_for(source_type: str) -> tuple[str, str, bool]:
+    """`(rights_status, usage_basis, is_official)` by the catalogue's own precedent."""
+    if source_type in {"MANUFACTURER", "PRESS_KIT"}:
+        return "UNKNOWN", "OFFICIAL_MANUFACTURER_MEDIA", True
+    # The Figure 02 precedent: an editorially retrieved image that merely credits
+    # the maker is EDITORIAL with attribution required, never OFFICIAL.
+    return "ATTRIBUTION_REQUIRED", "NONE", False
+
+
+def apply_image_worksheet(worksheet: dict, *, dry_run: bool = True) -> dict:
+    """Record confirmed images. Downloads only what a named human confirmed."""
+    import urllib.request
+
+    rows = worksheet.get("images", [])
+    for row in rows:
+        _validate_image_row(row)
+
+    robots = existing_robots()
+    applied, rejected, skipped = [], [], []
+
+    for row in rows:
+        slug = row["slug"]
+        decision = (row.get("decision") or "").strip().lower()
+        if slug not in robots:
+            raise AuthoringError(f"{slug}: no such catalogue robot")
+        if decision == "":
+            skipped.append({"slug": slug, "why": "awaiting identity decision"})
+            continue
+        if decision == "reject":
+            rejected.append({"slug": slug, "why": row["reject_reason"]})
+            continue
+
+        if dry_run:
+            applied.append({"slug": slug, "image_url": row["image_url"], "bytes": None})
+            continue
+
+        req = urllib.request.Request(
+            row["image_url"],
+            headers={"User-Agent": "HumanoidOnlineCatalogue/0.1 (+https://humanoidonline.com)"},
+        )
+        with urllib.request.urlopen(req, timeout=45) as resp:  # noqa: S310 - explicit https URL
+            ctype = (resp.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+            if ctype not in IMAGE_CONTENT_TYPES:
+                raise AuthoringError(
+                    f"{slug}: served {ctype!r}, not an image type we store "
+                    f"({sorted(IMAGE_CONTENT_TYPES)})"
+                )
+            body = resp.read(MAX_IMAGE_BYTES + 1)
+        if len(body) > MAX_IMAGE_BYTES:
+            raise AuthoringError(f"{slug}: image exceeds {MAX_IMAGE_BYTES} bytes")
+
+        ext = IMAGE_CONTENT_TYPES[ctype]
+        PUBLIC_ROBOT_IMAGES.mkdir(parents=True, exist_ok=True)
+        (PUBLIC_ROBOT_IMAGES / f"{slug}{ext}").write_bytes(body)
+
+        rights, basis, official = rights_for(row["source_type"])
+        block = {
+            "image_url": f"/robots/{slug}{ext}",
+            "source_url": row["source_url"],
+            "source_name": row["source_name"],
+            "source_type": row["source_type"],
+            "image_type": row["image_type"],
+            # VERIFIED only ever because a named human said so.
+            "identity_status": "VERIFIED",
+            "rights_status": rights,
+            "usage_basis": basis,
+            "is_official": official,
+            "is_primary": True,
+            "attribution": row.get("attribution") or "",
+            "last_verified_at": datetime.now(UTC).replace(microsecond=0).isoformat(),
+            "identity_confirmed_by": row["confirmed_by"].strip(),
+        }
+        path = ROBOTS_DIR / f"{slug}.json"
+        robot = json.loads(path.read_text(encoding="utf-8"))
+        robot["images"] = [block]
+        path.write_text(json.dumps(robot, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        applied.append({"slug": slug, "image_url": block["image_url"], "bytes": len(body)})
+
+    return {"applied": applied, "rejected": rejected, "skipped": skipped, "dry_run": dry_run}
 
 if __name__ == "__main__":
     raise SystemExit(main())

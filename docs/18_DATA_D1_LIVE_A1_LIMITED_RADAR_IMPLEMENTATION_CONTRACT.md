@@ -2,6 +2,14 @@
 
 > **STATUS: PROPOSED — NOT RATIFIED.**
 >
+> **Revision 4 (2026-07-30)** — revocation exit split by cause (§9.1). A policy
+> or technical revocation may be cleared by a fresh complete attributed review;
+> **a direct publisher objection may not** — it stands until the publisher
+> explicitly withdraws, narrows or supersedes it in a recorded communication.
+> Ambiguous objections default to `ENTIRE_RELATIONSHIP`. New append-only
+> `source_communication` table (§9.2) plus `revocation_cause`. Gates
+> A1-G46…G54 added.
+>
 > **Revision 3 (2026-07-30)** — `PROHIBITED` persistence corrected (§4.1.2). The
 > *historical prohibition record* is permanent and append-only; the *current
 > eligibility result* remains effective until a fresh, complete, attributed
@@ -615,11 +623,130 @@ transitions to `NO_EXPRESS_PROHIBITION` or to any weaker state. Every state
 transition requires a new attributed review or an explicit owner action; no
 transition is a side effect of a run.
 
-**A revocation is exited the same way a prohibition is** (§4.1.2): the recorded
-finding remains effective until a fresh, complete, attributed review establishes
-that the cause genuinely ended, and the original revocation record — its reason,
-scope, timestamp and evidence — is permanently retained. Re-enablement appends;
-it never edits.
+### 9.1 Exiting a revocation depends on what caused it — FROZEN
+
+A revocation is not one thing. Some causes are facts about a website, which we
+can re-examine ourselves. One cause is a statement made to us by a person, which
+we cannot re-examine at all. **Reading a publisher's public pages can never
+establish that they have withdrawn something they told us directly.** The exit
+paths are therefore different, and `revocation_cause` records which applies.
+
+#### 9.1.1 Policy or technical revocation
+
+For revocation caused by: a changed `robots.txt` · changed terms or licensing ·
+a new applicable rights reservation · an agent-specific block · a
+technical-access denial · eligibility expiry.
+
+**A fresh, complete and attributed eligibility review may establish that the
+cause genuinely ended.** Re-enablement requires all three of: the new review ·
+preservation of the original revocation record · explicit owner enablement.
+
+#### 9.1.2 Direct publisher objection
+
+For revocation caused by a publisher communicating an objection directly to us.
+
+> **The revocation remains effective until the publisher explicitly withdraws,
+> narrows or supersedes that objection in a recorded communication.**
+
+**Not sufficient, individually or together:** a later public-policy change · a
+missing legal page · a permissive `robots.txt` · a successful request · elapsed
+time · **an internal review of any depth**. A six-axis review examines what a
+website says; an objection is what a person said. The second cannot be answered
+by the first, and a reviewer who concludes otherwise has substituted our reading
+for their statement.
+
+After an explicit withdrawal or superseding permission is received:
+
+1. **retain the original objection and communication permanently**;
+2. **record the new communication as a separate append-only artefact** (§9.2);
+3. **perform a fresh complete eligibility review**;
+4. **determine the resulting eligibility status honestly** — a withdrawn
+   objection is not by itself an affirmative permission, and may well leave the
+   source at `UNKNOWN`;
+5. **require fresh explicit owner enablement.**
+
+Note step 4. "They stopped objecting" and "they granted permission" are
+different findings, and only the second supports `ALLOWED`.
+
+#### 9.1.3 Scope of an objection
+
+| The publisher objects to | `revocation_scope` | Effect |
+|---|---|---|
+| automated access only | `AUTOMATED_ACCESS` | automated modes disabled; **`MANUAL_ONLY` may remain available** unless the communication also objects to human use or data entry |
+| all use, inclusion, research or relationship with HumanoidOnline | `ENTIRE_RELATIONSHIP` | **every mode disabled**, until the publisher explicitly withdraws or supersedes |
+
+**Ambiguity defaults to `ENTIRE_RELATIONSHIP` until clarified.** The narrower
+scope is never inferred from an unclear communication. Someone who writes
+"please stop using our content" has not told us they are content with continued
+human research, and reading them as if they had would be resolving their
+ambiguity in our own favour — the same move §4.1 rule 5 forbids for machine
+directives. The cost of over-applying is a conversation; the cost of
+under-applying is doing something a publisher asked us not to do.
+
+### 9.2 Recording the communication
+
+A direct objection and any later withdrawal are **communications**, not review
+findings, and need their own append-only home rather than a `notes` field:
+
+```
+CREATE TYPE source_communication_kind AS ENUM (
+    'OBJECTION','WITHDRAWAL','PERMISSION','CLARIFICATION','OTHER');
+
+CREATE TABLE source_communication (
+    id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    source_id      UUID NOT NULL REFERENCES discovery_source(id) ON DELETE RESTRICT,
+    kind           source_communication_kind NOT NULL,
+    received_at    TIMESTAMPTZ NOT NULL,
+    channel        TEXT NOT NULL,          -- email, web form, letter, call notes
+    counterparty   TEXT,                   -- as stated by them; never inferred
+    recorded_by    TEXT NOT NULL,          -- the named human who logged it
+    summary        TEXT NOT NULL,
+    excerpt        TEXT,                   -- their words, bounded
+    scope_claimed  revocation_scope,       -- NULL when ambiguous -> ENTIRE_RELATIONSHIP
+    supersedes_id  UUID REFERENCES source_communication(id) ON DELETE RESTRICT,
+    created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT ck_source_communication_excerpt_len
+        CHECK (excerpt IS NULL OR char_length(excerpt) <= 1000),
+    CONSTRAINT ck_source_communication_attributed
+        CHECK (btrim(recorded_by) <> '' AND btrim(channel) <> '' AND btrim(summary) <> ''),
+    CONSTRAINT ck_source_communication_not_self_superseding
+        CHECK (supersedes_id IS DISTINCT FROM id)
+);
+
+CREATE TRIGGER trg_refuse_source_communication_mutation
+    BEFORE UPDATE OR DELETE ON source_communication
+    FOR EACH ROW EXECUTE FUNCTION refuse_eligibility_review_mutation();
+```
+
+`supersedes_id` links a withdrawal to the objection it withdraws **without
+altering it**, so both remain separately queryable — which is what makes "the
+publisher objected, then later withdrew" a readable history rather than a field
+that once said something else.
+
+Two further columns on `discovery_source`:
+
+```
+ALTER TABLE discovery_source
+    ADD COLUMN IF NOT EXISTS revocation_cause        revocation_cause,
+    ADD COLUMN IF NOT EXISTS revoking_communication_id UUID
+        REFERENCES source_communication(id) ON DELETE RESTRICT;
+```
+
+```
+CREATE TYPE revocation_cause AS ENUM ('POLICY_OR_TECHNICAL','PUBLISHER_OBJECTION');
+```
+
+with a `CHECK` binding the two together, so an objection-caused revocation
+cannot exist without the communication that caused it:
+
+```
+    AND (revocation_cause <> 'PUBLISHER_OBJECTION'
+         OR revoking_communication_id IS NOT NULL)
+```
+
+**Re-enablement appends; it never edits.** The original revocation record — its
+cause, reason, scope, timestamp, evidence and communication — is permanently
+retained in every case.
 
 ## 10. Extraction outputs
 
@@ -747,6 +874,15 @@ conditional on any further decision; `MANUAL_ONLY` is adopted (§4.1.1).
 | **G43** | **A publisher's later explicit permission CAN produce `ALLOWED`** through a new attributed review — the transition is possible, not merely permitted in prose |
 | **G44** | **The historical prohibition review survives that transition unaltered** — `UPDATE` and `DELETE` are refused by `refuse_eligibility_review_mutation()`, the superseding finding is a new row, and both rows remain queryable with their evidence |
 | **G45** | **Manual use never mutates `tos_status`** — an arbitrarily long series of `MANUAL_ONLY` ingests against a `PROHIBITED` source leaves the field, the review rows and the check rows byte-identical |
+| **G46** | **An internal fresh review alone cannot clear a direct publisher objection** — a complete six-axis review returning `NO_RESTRICTION_FOUND` on every axis leaves a `PUBLISHER_OBJECTION` revocation in force |
+| **G47** | **A policy-based revocation *can* be cleared** by a fresh complete review when the cause genuinely ended — the two exit paths are proven distinct, not merely described |
+| **G48** | **A direct objection requires a recorded withdrawal or superseding permission** — a `source_communication` row of kind `WITHDRAWAL` or `PERMISSION` linked via `supersedes_id`; nothing else lifts it |
+| **G49** | **The original objection and the later withdrawal remain separately queryable and append-only** — `UPDATE` and `DELETE` refused on both; the withdrawal is a new row |
+| **G50** | **An ambiguous publisher objection defaults to `ENTIRE_RELATIONSHIP`** — a communication with `scope_claimed IS NULL` disables every mode |
+| **G51** | **An automated-access-only objection may leave `MANUAL_ONLY` available** |
+| **G52** | **An entire-relationship objection forces `DISABLED`** — no mode survives it |
+| **G53** | **Fresh owner enablement is required after any revocation is cleared**, by either path; a cleared revocation alone never re-enables a source |
+| **G54** | A withdrawn objection **does not by itself produce `ALLOWED`** — the resulting status is whatever the fresh review honestly finds, which may be `UNKNOWN` |
 
 ## 16. Implementation slices
 

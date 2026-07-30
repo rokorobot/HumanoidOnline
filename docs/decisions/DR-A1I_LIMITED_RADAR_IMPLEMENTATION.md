@@ -4,7 +4,8 @@
 |---|---|
 | **Status** | **OPEN — awaiting product-owner decision on the contract as a whole.** The `MANUAL_ONLY` sub-decision is **RESOLVED: ADOPTED**, 2026-07-30. |
 | **Raised** | 2026-07-30 |
-| **Revision** | 3 (2026-07-30) — `PROHIBITED` persistence corrected: the historical record is permanent and append-only; the current status changes only through a fresh complete attributed review |
+| **Revision** | 4 (2026-07-30) — revocation exit split by cause: a direct publisher objection cannot be cleared by our own review |
+| | 3 (2026-07-30) — `PROHIBITED` persistence corrected: the historical record is permanent and append-only; the current status changes only through a fresh complete attributed review |
 | | 2 (2026-07-30) — `MANUAL_ONLY` adopted; eligibility-to-mode contradiction resolved; revocation scoped; PR #36 rebase consequence recorded |
 | **Decision owner** | Robert Konecny (product owner) — sole ratifying authority |
 | **Implements** | `docs/17` §13.1 step 1 (Amendment A1, RATIFIED, `main @ 626d1ce`) |
@@ -205,6 +206,55 @@ recorded truthfully, which is the entire point of asking. Gates G42–G45 prove
 the pair: the status does not move on its own, it *can* move on a real
 permission, the old record survives the move intact, and manual use never
 touches it.
+
+### 6.4 Not every revocation can be cleared the same way
+
+Revision 3 gave revocation a single exit: a fresh complete attributed review
+establishing that the cause ended. The owner's review found the flaw. §9 lists a
+**direct publisher objection** among the revocation triggers, and no amount of
+reading that publisher's public pages can establish that a person has withdrawn
+something they said to us.
+
+The distinction now frozen in §9.1:
+
+- **Policy or technical causes** — changed `robots.txt`, changed terms or
+  licensing, a new rights reservation, an agent-specific block, a
+  technical-access denial, expiry — are facts about a website. We observed them
+  ourselves, so we can re-observe them, and a fresh complete review may clear
+  them.
+- **A direct publisher objection** is not a fact about a website. It stands
+  until the publisher **explicitly withdraws, narrows or supersedes it in a
+  recorded communication**. A later public-policy change, a missing legal page,
+  a permissive `robots.txt`, a successful request, elapsed time, and an internal
+  review of any depth are each insufficient, and so is all of them together.
+
+**The failure mode this closes is specific and plausible.** A publisher emails
+"please stop". Eighteen months later their site is rebuilt, the robots file is
+permissive, no terms page mentions automation, and a diligent reviewer completes
+a six-axis review that honestly finds no restriction anywhere. Under revision 3
+that review cleared the revocation — and the platform would have resumed
+crawling someone who had asked it not to, having followed its own process
+correctly at every step. A process that can produce that outcome is wrong
+regardless of how carefully it is followed.
+
+Three supporting decisions:
+
+- **`source_communication`** (§9.2), append-only, because an objection is a
+  communication rather than a review finding and a `notes` field cannot hold it
+  auditably. `supersedes_id` links a withdrawal to the objection it withdraws
+  *without altering it*, so "objected, then later withdrew" is a readable
+  history rather than a field that used to say something else.
+- **Ambiguity defaults to `ENTIRE_RELATIONSHIP`.** "Please stop using our
+  content" does not tell us the author is comfortable with continued human
+  research. Reading it as the narrower scope resolves their ambiguity in our
+  favour — the same move §4.1 rule 5 already forbids for machine-readable
+  directives. The cost of over-applying is a conversation; the cost of
+  under-applying is doing something a publisher asked us not to do.
+- **A withdrawn objection is not a permission** (gate G54). "They stopped
+  objecting" and "they granted permission" are different findings, and only the
+  second supports `ALLOWED`. Step 4 of the §9.1.2 sequence exists so the
+  resulting status is whatever the fresh review honestly finds — often
+  `UNKNOWN`.
 
 ## 7. Consequences if ratified
 

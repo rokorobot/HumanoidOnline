@@ -4,7 +4,8 @@
 |---|---|
 | **Status** | **OPEN — awaiting product-owner decision on the contract as a whole.** The `MANUAL_ONLY` sub-decision is **RESOLVED: ADOPTED**, 2026-07-30. |
 | **Raised** | 2026-07-30 |
-| **Revision** | 2 (2026-07-30) — `MANUAL_ONLY` adopted; eligibility-to-mode contradiction resolved; revocation scoped; PR #36 rebase consequence recorded |
+| **Revision** | 3 (2026-07-30) — `PROHIBITED` persistence corrected: the historical record is permanent and append-only; the current status changes only through a fresh complete attributed review |
+| | 2 (2026-07-30) — `MANUAL_ONLY` adopted; eligibility-to-mode contradiction resolved; revocation scoped; PR #36 rebase consequence recorded |
 | **Decision owner** | Robert Konecny (product owner) — sole ratifying authority |
 | **Implements** | `docs/17` §13.1 step 1 (Amendment A1, RATIFIED, `main @ 626d1ce`) |
 | **Normative text** | `docs/18_DATA_D1_LIVE_A1_LIMITED_RADAR_IMPLEMENTATION_CONTRACT.md` |
@@ -170,10 +171,40 @@ Two consequences follow, both now frozen:
   `revoked_at IS NULL OR radar_mode = 'DISABLED'` would have silently widened
   the first into the second. Gate G41 asserts the distinction.
 
-A source may now hold `tos_status = PROHIBITED` **permanently and truthfully**
-while remaining manually usable — which is exactly the position of the five
-manufacturers whose terms prohibit automation, and the reason the seven-robot
-catalogue was legitimate in the first place.
+A source may now hold `tos_status = PROHIBITED` **truthfully** while remaining
+manually usable — which is exactly the position of the five manufacturers whose
+terms prohibit automation, and the reason the seven-robot catalogue was
+legitimate in the first place.
+
+### 6.3 What "permanent" does and does not mean
+
+Revision 2 said such a source keeps `PROHIBITED` *permanently*. That was too
+absolute, and the owner's review corrected it: it would have implied that a
+publisher who later grants explicit permission could never have that recorded —
+which would make the four drafted permission requests pointless, since a *yes*
+would have nowhere truthful to go.
+
+**Two things are permanent, and only one of them is the current status:**
+
+- **The historical prohibition record is permanent and append-only.** The review
+  row, its per-axis checks, excerpts, hashes and attribution are retained
+  forever; `refuse_eligibility_review_mutation()` refuses `UPDATE` and `DELETE`.
+  A later finding is a **new row**, never an edit.
+- **The current eligibility result may change — only through a new complete,
+  attributed review.** Not through a disappeared terms page, a site redesign,
+  elapsed time, or a run that completed without incident.
+
+The frozen rule (contract §4.1.2): *`PROHIBITED` remains effective until a
+fresh, complete and attributed eligibility review establishes that the
+prohibition genuinely ended, was superseded, or was replaced by an affirmative
+permission. It never downgrades automatically.*
+
+This keeps both requirements the project actually has. No automatic downgrade
+because a legal page vanished — and a future publisher permission can still be
+recorded truthfully, which is the entire point of asking. Gates G42–G45 prove
+the pair: the status does not move on its own, it *can* move on a real
+permission, the old record survives the move intact, and manual use never
+touches it.
 
 ## 7. Consequences if ratified
 

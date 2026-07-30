@@ -2,6 +2,14 @@
 
 > **STATUS: PROPOSED — NOT RATIFIED.**
 >
+> **Revision 3 (2026-07-30)** — `PROHIBITED` persistence corrected (§4.1.2). The
+> *historical prohibition record* is permanent and append-only; the *current
+> eligibility result* remains effective until a fresh, complete, attributed
+> review establishes the prohibition genuinely ended, was superseded, or was
+> replaced by an affirmative permission. It never downgrades automatically, and
+> a publisher's later explicit permission can still be recorded. Gates
+> A1-G42…G45 added.
+>
 > **Revision 2 (2026-07-30)** — product-owner correction pass. `MANUAL_ONLY` is
 > **ADOPTED** (§4.1.1). The eligibility-to-mode contradiction is resolved:
 > automated eligibility states govern only the automated modes, and the mapping
@@ -148,12 +156,44 @@ manual path. Manual entry therefore neither needs nor manufactures a permission
 finding.
 
 **An existing automated-access prohibition is never erased or weakened because
-manual ingestion is in use.** A source whose terms prohibit automation keeps
-`tos_status = PROHIBITED` on the record, permanently, and remains manually
-usable — anti-robot clauses govern automated access, not a person reading a
-public page (`docs/16` §2.1). Rewriting that field to something softer because a
-human is doing the work would destroy the very finding that keeps the crawler
-out.
+manual ingestion is in use.** A source whose terms prohibit automation remains
+`PROHIBITED` for automated purposes and remains manually usable — anti-robot
+clauses govern automated access, not a person reading a public page
+(`docs/16` §2.1). Rewriting that field to something softer because a human is
+doing the work would destroy the very finding that keeps the crawler out.
+
+### 4.1.2 The persistence of `PROHIBITED` — FROZEN
+
+Two different things are permanent, and only one of them is the current status.
+
+> **`PROHIBITED` remains effective until a fresh, complete and attributed
+> eligibility review establishes that the prohibition genuinely ended, was
+> superseded, or was replaced by an affirmative permission. It never downgrades
+> automatically. The historical prohibition review and its evidence remain
+> permanently retained and are never overwritten or deleted.**
+
+| | |
+|---|---|
+| **The historical prohibition record** | **Permanent and append-only.** The `source_eligibility_review` row, its `source_eligibility_check` children, the excerpts, hashes and attribution are retained forever. `refuse_eligibility_review_mutation()` refuses `UPDATE` and `DELETE`, so a later finding is a *new row*, never an edit of the old one. |
+| **The current eligibility result** | **May change — only through a new complete review.** It is not frozen for all time; it is frozen against everything except a fresh, attributed, six-axis review. |
+
+What is **not** sufficient to change it: the disappearance of a terms page · a
+site redesign · the passage of time · the absence of complaints · a run
+completing without incident. A prohibition that vanishes from a website has not
+necessarily been withdrawn by its publisher, and `docs/17` §7 already forbids the
+automatic downgrade.
+
+What **is** sufficient: a fresh, complete, attributed review under §4 and §5.3
+that finds the prohibition genuinely ended or superseded — and, in the strongest
+case, **a publisher's explicit later permission, which may support `ALLOWED`
+through a new attributed review**. That is the intended outcome of the permission
+requests already drafted for Unitree, Agility Robotics, Engineered Arts and IEEE
+Robots Guide, and this contract must not make it unrecordable.
+
+**`MANUAL_ONLY` may remain in use throughout**, whatever the current automated
+status. **Manual use never softens, replaces or suppresses the prohibition
+record** — it does not touch it at all, because the manual path does not consult
+`tos_status` (§4.2.2).
 
 ### 4.2 Required mapping — FROZEN
 
@@ -571,9 +611,15 @@ an agent-specific block appears · technical access denial occurs · the publish
 objects · the review expires.
 
 **Disable first; investigate later.** `PROHIBITED` never automatically
-transitions to `NO_EXPRESS_PROHIBITION`. Every state transition requires a new
-attributed review or an explicit owner action; no transition is a side effect of
-a run.
+transitions to `NO_EXPRESS_PROHIBITION` or to any weaker state. Every state
+transition requires a new attributed review or an explicit owner action; no
+transition is a side effect of a run.
+
+**A revocation is exited the same way a prohibition is** (§4.1.2): the recorded
+finding remains effective until a fresh, complete, attributed review establishes
+that the cause genuinely ended, and the original revocation record — its reason,
+scope, timestamp and evidence — is permanently retained. Re-enablement appends;
+it never edits.
 
 ## 10. Extraction outputs
 
@@ -697,6 +743,10 @@ conditional on any further decision; `MANUAL_ONLY` is adopted (§4.1.1).
 | **G39** | Every manual ingest is attributed to a **named operator**; an unattributed ingest is refused |
 | **G40** | A `MANUAL_ONLY` ingest leaves **canonical row counts unchanged** |
 | **G41** | An `AUTOMATED_ACCESS` revocation disables the automated modes and **leaves `MANUAL_ONLY` available**; an `ENTIRE_RELATIONSHIP` revocation forces `DISABLED`. An automated-access prohibition is never silently widened into a ban on human research |
+| **G42** | **`PROHIBITED` does not downgrade without a fresh complete attributed review** — a disappeared terms page, a site redesign, elapsed time and a clean run each leave the status unchanged |
+| **G43** | **A publisher's later explicit permission CAN produce `ALLOWED`** through a new attributed review — the transition is possible, not merely permitted in prose |
+| **G44** | **The historical prohibition review survives that transition unaltered** — `UPDATE` and `DELETE` are refused by `refuse_eligibility_review_mutation()`, the superseding finding is a new row, and both rows remain queryable with their evidence |
+| **G45** | **Manual use never mutates `tos_status`** — an arbitrarily long series of `MANUAL_ONLY` ingests against a `PROHIBITED` source leaves the field, the review rows and the check rows byte-identical |
 
 ## 16. Implementation slices
 

@@ -2,7 +2,7 @@
 
 These rules are binding for any autonomous or semi-autonomous coding agent working in this repository. They exist because the product contract, not the agent, owns product-level decisions.
 
-**Before starting a new workstream, read [`docs/08_DEVELOPMENT_ROADMAP.md`](docs/08_DEVELOPMENT_ROADMAP.md).** The roadmap controls delivery sequencing; frozen product contracts remain authoritative.
+**Before starting a new workstream, read [`docs/08_DEVELOPMENT_ROADMAP.md`](docs/08_DEVELOPMENT_ROADMAP.md).** Before architecture-sensitive or cross-system work, read [`docs/18_SYSTEM_ARCHITECTURE.md`](docs/18_SYSTEM_ARCHITECTURE.md). The roadmap controls delivery sequencing; frozen product contracts and ratified system architecture remain authoritative.
 
 1. **Do not alter product scope without explicit approval.** Scope is `docs/01_PRODUCT_CONTRACT.md`. If a task seems to require scope change, stop and ask.
 

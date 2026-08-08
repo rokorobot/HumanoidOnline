@@ -1,8 +1,8 @@
 {
-  "slug": "boston-dynamics-atlas",
-  "name": "Atlas",
+  "slug": "boston-dynamics-atlas-electric",
+  "name": "Atlas (Electric)",
   "manufacturer_slug": "boston-dynamics",
-  "model_code": null,
+  "model_code": "Atlas Electric",
   "summary": null,
   "announced_year": null,
   "commercial_status": "ANNOUNCED",

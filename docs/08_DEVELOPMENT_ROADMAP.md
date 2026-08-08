@@ -17,9 +17,10 @@ It **does not override** the frozen contracts:
 - [`05_ACCEPTANCE_CRITERIA.md`](05_ACCEPTANCE_CRITERIA.md)
 - [`06_WIREFRAMES.md`](06_WIREFRAMES.md)
 - [`07_VISUAL_SYSTEM.md`](07_VISUAL_SYSTEM.md)
+- [`18_SYSTEM_ARCHITECTURE.md`](18_SYSTEM_ARCHITECTURE.md) (Cross-system topology & integration architecture)
 
 **Where this roadmap conflicts with a frozen contract, the frozen contract wins.**
-`01–07` define *what the product is and how it behaves*; this file defines *the
+`01–07` and `18` define *what the product is, its architecture, and how it behaves*; this file defines *the
 order in which we build it*.
 
 ---

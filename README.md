@@ -21,6 +21,7 @@ MVP v0.1 implements Phases 1–2; Phases 3–5 exist dormant in the data model.
 | [`docs/05_ACCEPTANCE_CRITERIA.md`](docs/05_ACCEPTANCE_CRITERIA.md) | Given/When/Then completion tests |
 | [`docs/06_WIREFRAMES.md`](docs/06_WIREFRAMES.md) | Rough structural wireframes (appearance deliberately unspecified) |
 | [`docs/07_VISUAL_SYSTEM.md`](docs/07_VISUAL_SYSTEM.md) | Frozen visual system (UI-D1): palette, typography, primitives, UI laws |
+| [`docs/18_SYSTEM_ARCHITECTURE.md`](docs/18_SYSTEM_ARCHITECTURE.md) | End-to-end system architecture & cross-service integration topology |
 | [`AGENTS.md`](AGENTS.md) | Binding operating rules for coding agents |
 | [`db/seed/seed.sql`](db/seed/seed.sql) | Stress-test seed dataset (schema-validated) |
 

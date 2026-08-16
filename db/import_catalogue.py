@@ -223,8 +223,29 @@ def _reset_robot_children(cur, robot_id) -> None:
         cur.execute(f"DELETE FROM {table} WHERE robot_id = %s", (robot_id,))
 
 
+# Columns the importer owns outright: catalogue FACTS, refreshed from JSON on
+# every run. `is_published` is deliberately NOT among them — see below.
+EDITORIAL_COLUMNS = ("is_published",)
+
+
 def import_robot(cur, robot: dict, region_id, manufacturer_id,
-                 capability_id, use_case_id) -> None:
+                 capability_id, use_case_id, *,
+                 apply_publication_state: bool = False) -> None:
+    """Upsert one robot.
+
+    The master catalogue (what we know about a robot) and the public catalogue
+    (what is currently approved for display) are two different things. This
+    importer owns the first and must not silently rewrite the second: a routine
+    fact refresh must never change what the public sees. So `is_published` is
+    written when the row is FIRST created and preserved on every later import,
+    unless a deliberate publishing operation opts in via
+    `apply_publication_state`.
+
+    Without this, `is_published` behaves like disposable importer-controlled
+    data: stub entries carry `"is_published": false`, so any editorial decision
+    to display them is silently reverted by the next import. That is exactly how
+    46 stored robots once collapsed to 7 on screen.
+    """
     specs = robot.get("specs", {})
     cols = ["slug", "manufacturer_id", "name", "model_code", "summary",
             "announced_year", "commercial_status", "is_published"] + SPEC_COLUMNS
@@ -234,8 +255,13 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
         robot.get("commercial_status", "ANNOUNCED"), robot.get("is_published", False),
     ] + [specs.get(c) for c in SPEC_COLUMNS]
 
+    # On INSERT every column is written: a brand-new record has no editorial
+    # state to preserve. On UPDATE the editorial columns are held back.
+    preserved = () if apply_publication_state else EDITORIAL_COLUMNS
     placeholders = ",".join(["%s"] * len(cols))
-    updates = ",".join(f"{c} = EXCLUDED.{c}" for c in cols if c != "slug")
+    updates = ",".join(
+        f"{c} = EXCLUDED.{c}" for c in cols if c != "slug" and c not in preserved
+    )
     robot_id = cur.execute(
         f"INSERT INTO robot ({','.join(cols)}) VALUES ({placeholders}) "
         f"ON CONFLICT (slug) DO UPDATE SET {updates} RETURNING id",
@@ -436,7 +462,7 @@ def _refresh_lowest_price(cur, robot_id) -> None:
 
 
 # --------------------------------------------------------------------------- #
-def run(url: str) -> None:
+def run(url: str, *, apply_publication_state: bool = False) -> None:
     regions = _load(CATALOGUE_DIR / "regions.json")
     providers = _load(CATALOGUE_DIR / "providers.json")
     capabilities = _load(CATALOGUE_DIR / "capabilities.json")
@@ -489,22 +515,42 @@ def run(url: str) -> None:
             for path in robot_files:
                 robot = _load(path)
                 import_robot(cur, robot, region_id, manufacturer_id,
-                             capability_id, use_case_id)
+                             capability_id, use_case_id,
+                             apply_publication_state=apply_publication_state)
                 n_robots += 1
+
+            stored, displayed = cur.execute(
+                "SELECT count(*), count(*) FILTER (WHERE is_published) FROM robot"
+            ).fetchone()
 
         conn.commit()
 
     print(f"Catalogue import OK: {len(manufacturers['manufacturers'])} manufacturers, "
           f"{len(providers['providers'])} providers, {n_robots} robots.")
+    # Stored vs displayed, always reported: the master catalogue is cumulative,
+    # the public view is a subset of it, and a surprising gap should be visible
+    # the moment it appears rather than discovered later in a browser.
+    print(f"Catalogue state: {stored} stored, {displayed} displayed.")
+    if apply_publication_state:
+        print("Publication state was REWRITTEN from JSON (--apply-publication-state).")
 
 
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description="Import the WS2B verified catalogue")
     ap.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    ap.add_argument(
+        "--apply-publication-state",
+        action="store_true",
+        help="ALSO rewrite is_published from the JSON files. This is a publishing "
+             "operation, not a fact refresh: it changes what the public sees. "
+             "Omitted (the default), an import updates catalogue facts and leaves "
+             "the existing publication state of every known robot untouched.",
+    )
     args = ap.parse_args(argv)
     if not args.database_url:
         ap.error("no database URL: pass --database-url or set DATABASE_URL")
-    run(normalize_url(args.database_url))
+    run(normalize_url(args.database_url),
+        apply_publication_state=args.apply_publication_state)
 
 
 if __name__ == "__main__":

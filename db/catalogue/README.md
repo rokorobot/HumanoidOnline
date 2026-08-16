@@ -182,6 +182,8 @@ uv run db/validate_catalogue.py   # G2 gate: fails non-zero if any published fac
 - **Idempotent:** parents (regions/manufacturers/providers/capabilities/use_cases/
   robots) UPSERT by natural key; each robot's fact rows + evidence are replaced on
   re-import. Running the importer N times yields identical row counts.
+- **An import refreshes facts, never visibility.** `is_published` is written when a
+  robot row is first created and **preserved on every later import** — see §6.
 - **`validate_catalogue.py`** asserts the catalogue-level G2: every published robot's
   `commercial_status`, and every `pricing_offer` / `availability_offer` / `deployment`
   attached to a published robot, has a backing `evidence_source` row. It prints a
@@ -189,3 +191,47 @@ uv run db/validate_catalogue.py   # G2 gate: fails non-zero if any published fac
 
 CI runs exactly this chain in the `catalogue-validate` job
 (`.github/workflows/ci.yml`), against a Postgres 16 service, **schema only, no seed**.
+
+## 6. Master catalogue vs public catalogue (binding — `docs/decisions/DR-C1_MASTER_VS_PUBLIC_CATALOGUE.md`)
+
+Two distinct concepts:
+
+| | |
+|---|---|
+| **Master catalogue** | everything we know about — **cumulative, never reduced** |
+| **Public catalogue** | the currently approved **view** of the master catalogue |
+
+1. **Robot records are never deleted** for being sparse, discontinued,
+   pre-production, unavailable, or image-less.
+2. **Visibility is a separate editorial decision.** A robot may be *stored but not
+   currently displayed*.
+3. **`is_published` is not importer-controlled data.** A routine import must never
+   silently change what the public sees.
+4. **Image availability never determines whether a record exists.** Rich profiles and
+   image-less sparse records belong to the same catalogue; improving the former
+   creates no pressure to remove the latter.
+5. **Production lifecycle should eventually be modelled separately** (`announced`,
+   `prototype`, `pre_production`, `in_production`, `discontinued`, `historical`)
+   rather than encoded in `is_published`.
+6. **Until the public-display policy is formally defined**, no agent may
+   independently decide that pre-production or discontinued robots should disappear.
+
+A store of 46 robots displaying 42, 39 or 30 is legitimate *once a display policy
+says so*. 46 stored records becoming 7 because an import, media check or UI change
+hid them is not.
+
+### What the importer does
+
+`is_published` is written on **INSERT** (a new row has no editorial history to
+protect) and **held back on UPDATE**. All catalogue *facts* still refresh normally.
+Every run reports `Catalogue state: N stored, M displayed.`
+
+To deliberately publish/unpublish from the JSON — a **publishing operation, not a
+fact refresh**:
+
+```bash
+uv run db/import_catalogue.py --apply-publication-state
+```
+
+This regression is pinned by `apps/api/tests/test_catalogue_publication_state.py`
+(no database required, so it always runs).

@@ -1,0 +1,95 @@
+{
+  "slug": "booster-k1-geek",
+  "name": "K1 GEEK",
+  "manufacturer_slug": "booster-robotics",
+  "model_code": "K1 Geek",
+  "summary": "Entry-level configuration of Booster Robotics' K1 humanoid platform: Qualcomm QCS8550 compute (48 TOPS dense), a 2Ah battery giving ~30 min runtime at 0.4 m/s, and a 3-month manufacturer warranty. Won the RoboCup 2025 KidSize championship. Source: RobotShop EU listing, 2026-08-16.",
+  "announced_year": null,
+  "commercial_status": "COMMERCIAL",
+  "is_published": false,
+  "specs": {
+    "height_cm": 95.0,
+    "weight_kg": 19.5,
+    "arm_span_cm": null,
+    "reach_cm": null,
+    "payload_kg": null,
+    "walk_speed_ms": 0.4,
+    "runtime_minutes": 30,
+    "battery_wh": null,
+    "mobility": "BIPEDAL",
+    "degrees_of_freedom": 22,
+    "hand_type": null,
+    "hand_dof": null,
+    "autonomy": null,
+    "has_manipulation": null,
+    "has_teleoperation": null,
+    "has_vision": true,
+    "has_language_ui": true,
+    "has_sdk": true,
+    "has_api": true,
+    "ros_support": true,
+    "developer_edition": null,
+    "simulation_support": true
+  },
+  "specs_note": "Entered by robert@humanoid.company from https://eu.robotshop.com/collections/booster-robotics (retrieved 2026-08-16). 10 field(s) not stated by the source and left UNKNOWN. ros_support and simulation_support are recorded TRUE per the source's own comparison table, which states 'Yes' for both -- but the same page's 'Open Software Stack' section qualifies this: 'ROS 2 or Isaac-Sim support may require developer integration rather than being fully built in.' Treat both as SDK-level capability, not out-of-the-box support. AI compute (Qualcomm QCS8550, 48 TOPS) and warranty (3 months) have no dedicated catalogue field and are recorded in `summary` instead. NOTE: source_url is RobotShop EU's Booster Robotics COLLECTION page, not the exact per-SKU product URL -- the precise product-page URL has been requested from the owner and should replace this citation once supplied.",
+  "official_url": null,
+  "commercial_status_evidence": [
+    {
+      "source_url": "https://eu.robotshop.com/collections/booster-robotics",
+      "source_type": "OTHER",
+      "source_title": "Booster Robotics K1 GEEK Humanoid Robot -- RobotShop EU (third-party distributor, not manufacturer's own store)",
+      "excerpt": "SKU: RB-Boo-11. Sale price EUR11,731.49, tax included. On Demand -- not normally stocked; ordered along with RobotShop's next purchase from the supplier. Add to cart / Request a quote.",
+      "published_at": null,
+      "observed_at": "2026-08-16",
+      "verified_at": "2026-08-16",
+      "confidence": "MEDIUM",
+      "note": "COMMERCIAL is justified by a real SKU and a stated public price on an active distributor storefront, not merely an announcement. Confidence MEDIUM, not VERIFIED/HIGH: source is a third-party retailer (not Booster Robotics' own site), the exact product-page URL is still pending, and a live retail price/SKU can change without notice."
+    }
+  ],
+  "variants": [],
+  "pricing_offers": [
+    {
+      "provider_slug": "robotshop-eu",
+      "region_code": "EU",
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "EUR",
+      "price": 11731.49,
+      "billing_period": "ONE_TIME",
+      "note": "RobotShop EU 'Sale price', tax included, SKU RB-Boo-11. Not necessarily list/MSRP -- it is the storefront's current sale price.",
+      "evidence": [
+        {
+          "source_url": "https://eu.robotshop.com/collections/booster-robotics",
+          "source_type": "OTHER",
+          "excerpt": "Sale price EUR11,731.49. Tax included. Shipping calculated at checkout.",
+          "observed_at": "2026-08-16",
+          "confidence": "MEDIUM",
+          "note": "Third-party distributor price, not manufacturer MSRP. Exact product URL pending."
+        }
+      ]
+    }
+  ],
+  "availability_offers": [
+    {
+      "provider_slug": "robotshop-eu",
+      "region_code": "EU",
+      "transaction_type": "PURCHASE",
+      "availability_status": "ON_REQUEST",
+      "note": "Listed 'On Demand': not normally stocked; RobotShop orders it with their next purchase from the supplier. No specific lead time was stated (\"delays depend on the order frequency from each supplier\").",
+      "evidence": [
+        {
+          "source_url": "https://eu.robotshop.com/collections/booster-robotics",
+          "source_type": "OTHER",
+          "excerpt": "This is an On Demand item and is not normally stocked. We will order it for you along with our next purchase from the supplier.",
+          "observed_at": "2026-08-16",
+          "confidence": "MEDIUM",
+          "note": "ON_REQUEST chosen over PREORDER: the product already exists and ships, it is simply not held in standing stock."
+        }
+      ]
+    }
+  ],
+  "deployments": [],
+  "capabilities": [],
+  "use_case_fits": [],
+  "images": []
+}

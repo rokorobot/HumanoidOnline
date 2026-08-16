@@ -2,6 +2,9 @@
 from __future__ import annotations
 
 import uuid
+from collections.abc import Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from datetime import datetime
 from decimal import Decimal
 
@@ -13,6 +16,7 @@ from sqlalchemy import (
     Integer,
     Numeric,
     Text,
+    event,
     text,
 )
 from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR, UUID
@@ -166,3 +170,75 @@ class RobotStatusHistory(Base):
     )
 
     robot: Mapped[Robot] = relationship("Robot", back_populates="status_history")
+
+
+# ----------------------------------------------------------------- DR-C1 --
+# The master catalogue can only ACCUMULATE knowledge; the public view may
+# change. A robot record is therefore never removed as a consequence of
+# publication status, missing images, sparse data, lifecycle state,
+# availability, discontinued status, or importer synchronisation.
+#
+# This is the enforcement of that rule rather than a restatement of it.
+# `is_published` already survives an ordinary import; this closes the harder
+# case — a record disappearing outright. Deleting a robot must be a separate,
+# explicit, human-authorised destructive act, so it has to name itself:
+#
+#     with authorized_robot_deletion(authorized_by="robert@…", reason="…"):
+#         session.delete(robot)
+#
+# The escape hatch exists because a *documented* rule with no way to comply
+# invites someone to reach past it. Requiring an author and a reason means the
+# deliberate case stays possible and the accidental case cannot happen quietly.
+#
+# Honest scope (same as the promotion_audit guard above): this is ORM-level.
+# It stops `session.delete(...)`, cascade-driven ORM deletes and SQLAdmin's
+# delete path. It does NOT stop raw SQL issued against the table — the test
+# suite legitimately does exactly that to clean up its own fixtures. A
+# database-level guarantee would need a trigger, i.e. new DDL.
+
+_DELETION_AUTHORISATION: ContextVar[tuple[str, str] | None] = ContextVar(
+    "robot_deletion_authorisation", default=None
+)
+
+
+class RobotRecordDeletionError(RuntimeError):
+    """Raised when a robot record would be removed without explicit authority."""
+
+
+@contextmanager
+def authorized_robot_deletion(*, authorized_by: str, reason: str) -> Iterator[None]:
+    """Permit robot-record deletion for one explicitly authorised operation.
+
+    `authorized_by` names a PERSON accountable for the removal, and `reason`
+    records why the record should stop existing at all — as opposed to merely
+    stop being displayed, which is what `is_published` is for and is almost
+    always what was actually wanted.
+    """
+    if not authorized_by.strip():
+        raise RobotRecordDeletionError(
+            "authorized_by must name a person: deleting a catalogue record is a "
+            "human decision, not an automated one"
+        )
+    if not reason.strip():
+        raise RobotRecordDeletionError(
+            "reason is required: if a robot should merely stop being displayed, "
+            "change its publication state instead of deleting the record"
+        )
+    token = _DELETION_AUTHORISATION.set((authorized_by.strip(), reason.strip()))
+    try:
+        yield
+    finally:
+        _DELETION_AUTHORISATION.reset(token)
+
+
+@event.listens_for(Robot, "before_delete", propagate=True)
+def _robot_block_unauthorised_delete(_mapper, _connection, target: Robot) -> None:
+    if _DELETION_AUTHORISATION.get() is None:
+        raise RobotRecordDeletionError(
+            f"refusing to delete robot {target.slug!r}: the master catalogue is "
+            "cumulative and records are never removed for being unpublished, "
+            "image-less, sparse, discontinued, unavailable, or out of sync with "
+            "an import. If a robot should stop being DISPLAYED, change its "
+            "publication state. If the record genuinely must be destroyed, do it "
+            "through authorized_robot_deletion(authorized_by=…, reason=…)."
+        )

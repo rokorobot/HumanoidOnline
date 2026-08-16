@@ -133,3 +133,91 @@ def test_preservation_is_independent_of_the_authored_value(authored):
         use_case_id=lambda slug: 1,
     )
     assert "is_published" not in _update_clause(cur.upsert_sql())
+
+
+def test_an_import_never_deletes_a_robot_record():
+    """The master catalogue is cumulative — synchronisation only ever adds.
+
+    The importer legitimately replaces a robot's *child* rows (offers, evidence,
+    images) so re-import is idempotent. It must never reach the parent record.
+    """
+    cur = _RecordingCursor()
+    ic.import_robot(
+        cur, ROBOT,
+        region_id=lambda code: 1,
+        manufacturer_id=lambda slug: 1,
+        capability_id=lambda slug: 1,
+        use_case_id=lambda slug: 1,
+    )
+    deletes = [s for s in cur.statements if s.upper().startswith("DELETE FROM ROBOT ")]
+    assert deletes == [], f"the importer deleted a robot record: {deletes}"
+
+
+# --- DR-C1: destroying a record is a separate, authorised act ----------------
+
+def test_deleting_a_robot_requires_explicit_authorisation():
+    """An ordinary `session.delete(robot)` must not be able to remove a record."""
+    from app.models.robot import Robot, RobotRecordDeletionError
+
+    with pytest.raises(RobotRecordDeletionError) as excinfo:
+        _fire_before_delete(Robot(slug="test-robot"))
+    # The message has to point at the thing the caller almost certainly wanted.
+    assert "publication state" in str(excinfo.value)
+
+
+def test_an_authorised_deletion_is_permitted():
+    """The rule is enforceable without being a dead end."""
+    from app.models.robot import Robot, authorized_robot_deletion
+
+    with authorized_robot_deletion(
+        authorized_by="robert@humanoid.company", reason="duplicate record"
+    ):
+        _fire_before_delete(Robot(slug="test-robot"))  # must not raise
+
+
+def test_authorisation_lapses_after_the_operation():
+    """Authority is scoped to one operation, never left switched on."""
+    from app.models.robot import Robot, RobotRecordDeletionError, authorized_robot_deletion
+
+    with authorized_robot_deletion(
+        authorized_by="robert@humanoid.company", reason="duplicate record"
+    ):
+        pass
+    with pytest.raises(RobotRecordDeletionError):
+        _fire_before_delete(Robot(slug="test-robot"))
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"authorized_by": "", "reason": "duplicate record"},
+        {"authorized_by": "   ", "reason": "duplicate record"},
+        {"authorized_by": "robert@humanoid.company", "reason": ""},
+        {"authorized_by": "robert@humanoid.company", "reason": "   "},
+    ],
+)
+def test_authorisation_requires_a_named_person_and_a_reason(kwargs):
+    """Deleting a catalogue record is a human decision and must be attributable."""
+    from app.models.robot import RobotRecordDeletionError, authorized_robot_deletion
+
+    with pytest.raises(RobotRecordDeletionError):
+        with authorized_robot_deletion(**kwargs):
+            pass
+
+
+def test_the_admin_does_not_offer_robot_deletion():
+    """DR-C1 must not be one mis-click away in a list view."""
+    from app.admin import RobotAdmin
+
+    assert RobotAdmin.can_delete is False
+
+
+def _fire_before_delete(robot) -> None:
+    """Invoke the mapper-level guard directly.
+
+    The listener is what SQLAlchemy calls on flush, so exercising it needs no
+    database — which keeps this invariant provable everywhere the suite runs.
+    """
+    from app.models.robot import _robot_block_unauthorised_delete
+
+    _robot_block_unauthorised_delete(None, None, robot)

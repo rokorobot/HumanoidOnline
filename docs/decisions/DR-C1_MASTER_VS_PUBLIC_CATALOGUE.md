@@ -54,6 +54,22 @@ Adopted as permanent policy:
    independently decide** that pre-production or discontinued robots should
    disappear.
 
+### 2.1 The deletion rule (strengthened, 2026-08-16)
+
+> **NEVER DELETE OR DROP A ROBOT RECORD** as a consequence of publication
+> status, missing images, sparse data, lifecycle state, availability,
+> discontinued status, or importer synchronisation. Record deletion requires a
+> **separate explicit destructive operation and human authorisation.**
+
+This protects the thing that matters most: **HumanoidOnline's master catalogue
+can only accumulate knowledge; the public view may change.**
+
+Deletion is not forbidden outright — a genuine duplicate or a mistaken entry
+must still be removable. It is forbidden as a *side effect*. The distinction the
+rule enforces is between a record that should stop being **displayed** (change
+its publication state) and one that should stop **existing** (a deliberate,
+attributable act).
+
 ### Two clean concepts
 
 | | |
@@ -82,11 +98,38 @@ UI change discarded or hid them.
   gap surfaces at the moment it appears rather than being found later in a
   browser.
 
-`apps/api/tests/test_catalogue_publication_state.py` pins the invariant: a
-routine import must not emit `is_published` in its UPDATE clause, must still
-refresh the facts, and an explicit publishing operation must still be able to
-move visibility. The tests need no database, so they cannot be skipped into
-uselessness.
+`apps/api/app/models/robot.py` — enforcement of §2.1, following the existing
+`promotion_audit` append-only precedent:
+
+* a `before_delete` listener on `Robot` refuses the deletion and names the
+  alternative the caller almost certainly wanted (change the publication state);
+* `authorized_robot_deletion(authorized_by=…, reason=…)` is the explicit
+  destructive operation. Both arguments are required and must be non-blank: a
+  deletion has to be attributable to a **person**, with a stated reason. The
+  escape hatch exists deliberately — a documented rule with no way to comply
+  invites someone to reach past it;
+* authority is scoped to the one operation and lapses immediately after.
+
+`apps/api/app/admin.py` — `RobotAdmin.can_delete = False`, so the destructive
+path is not one mis-click away in a list view.
+
+**Honest scope:** ORM-level, exactly like the `promotion_audit` guard. It stops
+`session.delete(...)`, ORM cascades and the SQLAdmin delete path. It does **not**
+stop raw SQL against the table — the test suite legitimately does that to clean
+up its own fixtures. A database-level guarantee would need a trigger (new DDL).
+
+`apps/api/tests/test_catalogue_publication_state.py` pins both halves: a routine
+import must not emit `is_published` in its UPDATE clause, must still refresh the
+facts, must never issue a `DELETE FROM robot`, and an explicit publishing
+operation must still be able to move visibility; deletion must be refused
+unauthorised, permitted when authorised, attributable, and must not stay
+switched on afterwards. The tests need no database, so they cannot be skipped
+into uselessness.
+
+Verified additionally against a live seeded session: an ordinary
+`session.delete(robot)` + `flush()` raised and left all 20 seed robots intact; an
+authorised deletion was permitted. A passing unit test on a listener proves the
+function raises — it does not prove SQLAlchemy calls it.
 
 ## 4. Deliberately left open
 
@@ -95,6 +138,13 @@ uselessness.
 * **A `production_status` / lifecycle enum** (invariant 5). Recorded as the
   intended direction; not yet designed, migrated, or scheduled.
 * **The 39 stub robots' publication state** currently lives only in the
-  database, not in the JSON. It now survives imports, but it is not yet
-  reproducible from a clean bootstrap. Resolving that belongs with the display
-  policy, since it is the same question: what should the public catalogue show?
+  database, not in the JSON. It now survives imports, but a **clean bootstrap
+  will produce a different displayed count** (46 stored / 7 displayed), because
+  the source JSON still carries the authoring defaults.
+
+  Under this architecture that is **not a defect** — it is the Public Catalogue
+  Policy showing up as an unanswered question. It must **not** be "fixed" by
+  setting `is_published: true` across the source files: that would answer a
+  product-policy question by accident, in the course of tidying up an importer
+  defect. The local `46 / 46` is editorial state, not a target for the JSON to
+  reproduce.

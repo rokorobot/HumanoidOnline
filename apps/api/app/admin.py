@@ -55,6 +55,11 @@ class RobotAdmin(ModelView, model=Robot):
     column_list = [Robot.slug, Robot.name, Robot.commercial_status, Robot.is_published]
     column_searchable_list = [Robot.slug, Robot.name]
     name_plural = "Robots"
+    # DR-C1: the master catalogue is cumulative. Editing a robot (including its
+    # publication state) is ordinary editorial work; DESTROYING the record is
+    # not, and must not be one mis-click away in a list view. The model layer
+    # refuses it too — this removes the button that would only ever raise.
+    can_delete = False
 
 
 class RobotVariantAdmin(ModelView, model=RobotVariant):

@@ -201,8 +201,15 @@ Two distinct concepts:
 | **Master catalogue** | everything we know about — **cumulative, never reduced** |
 | **Public catalogue** | the currently approved **view** of the master catalogue |
 
-1. **Robot records are never deleted** for being sparse, discontinued,
-   pre-production, unavailable, or image-less.
+1. **NEVER DELETE OR DROP A ROBOT RECORD** as a consequence of publication
+   status, missing images, sparse data, lifecycle state, availability,
+   discontinued status, or importer synchronisation. Deletion requires a
+   **separate explicit destructive operation and human authorisation** — it is
+   forbidden as a *side effect*, not forbidden outright. Enforced in
+   `apps/api/app/models/robot.py`: an ordinary `session.delete(robot)` raises
+   `RobotRecordDeletionError`, and the deliberate path is
+   `authorized_robot_deletion(authorized_by=…, reason=…)`. The admin offers no
+   delete button (`RobotAdmin.can_delete = False`).
 2. **Visibility is a separate editorial decision.** A robot may be *stored but not
    currently displayed*.
 3. **`is_published` is not importer-controlled data.** A routine import must never
@@ -219,6 +226,12 @@ Two distinct concepts:
 A store of 46 robots displaying 42, 39 or 30 is legitimate *once a display policy
 says so*. 46 stored records becoming 7 because an import, media check or UI change
 hid them is not.
+
+**A clean bootstrap currently yields 46 stored / 7 displayed**, because the source
+JSON carries authoring defaults while today's fuller local view is editorial state.
+That is **not a defect** — it is the unwritten display policy surfacing. Do **not**
+"fix" it by setting `is_published: true` across the robot files: that answers a
+product-policy question by accident.
 
 ### What the importer does
 

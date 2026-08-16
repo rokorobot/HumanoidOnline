@@ -91,5 +91,21 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": []
+  "images": [
+    {
+      "image_url": "/robots/booster-k1-geek.webp",
+      "source_url": "https://eu.robotshop.com/collections/booster-robotics",
+      "source_name": "RobotShop EU (Booster Robotics product render)",
+      "source_type": "DISTRIBUTOR",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "ATTRIBUTION_REQUIRED",
+      "usage_basis": "NONE",
+      "is_official": false,
+      "is_primary": true,
+      "attribution": "© Booster Robotics",
+      "last_verified_at": "2026-08-16T22:31:00+00:00",
+      "identity_confirmed_by": "robert@humanoid.company"
+    }
+  ]
 }

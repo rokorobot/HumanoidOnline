@@ -547,14 +547,31 @@ td .v { color: var(--ho-verified); }
   font-size: var(--ho-fs-mono); }
 
 /* ---- FOOTER -------------------------------------------------------------- */
-footer.foot { border-top: var(--ho-rule-med) solid var(--ho-ink); padding: var(--ho-sp-6) 0; margin-top: var(--ho-sp-7); }
+/* The footer carries its own .ho-dark (same token-flip mechanism the Market
+   Snapshot section uses) rather than inheriting page theme — a deliberate,
+   permanent "closing" surface, not a light/dark mode. Deliberately NOT paired
+   with .ho-scan: the snapshot's scanline texture marks a data-dense moment,
+   and the footer wants a clean, plain close instead — same family, quieter
+   layer. border-top reads --ho-line (not the constant --ho-ink) so it inverts
+   to an off-white divider now that the footer itself is dark. */
+footer.foot { border-top: var(--ho-rule-med) solid var(--ho-line); padding: var(--ho-sp-6) 0; margin-top: var(--ho-sp-7); }
 .foot-grid { display: flex; justify-content: space-between; gap: var(--ho-sp-5);
   flex-wrap: wrap; align-items: center; }
 .foot-grid b { font-family: var(--ho-font-display-grotesk); font-weight: 800; font-stretch: 75%; }
+/* Small signal-orange accent ahead of the wordmark — the one splash of colour
+   in an otherwise near-black/off-white footer, per "accent, not everywhere". */
+.foot-mark { display: inline-block; width: 8px; height: 8px; margin-right: var(--ho-sp-2);
+  background: var(--ho-signal); vertical-align: middle; }
 .foot-brand { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
   letter-spacing: var(--ho-tracking-code); color: var(--ho-text-muted); }
-.foot-brand-link { color: var(--ho-ink); text-decoration: underline; }
-.ho-dark .foot-brand-link { color: var(--ho-paper-ink); }
+.foot-brand-link { color: var(--ho-paper-ink); text-decoration: underline; }
+/* Corporate line, set below the footer grid and separated by a hairline so it
+   reads as legal boilerplate rather than another navigation row. */
+.foot-legal { margin-top: var(--ho-sp-5); padding-top: var(--ho-sp-4);
+  border-top: var(--ho-rule-hair) solid var(--ho-line-soft);
+  font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-code); color: var(--ho-text-muted); }
+.foot-legal p { margin: 0; }
 
 /* ---- TRIAD (CommercialTriad) --------------------------------------------- */
 .triad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;

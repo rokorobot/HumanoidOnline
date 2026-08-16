@@ -82,9 +82,10 @@ export function DarkNav({ active = null }: { active?: NavSection }) {
 
 export function SiteFooter() {
   return (
-    <footer className="foot">
+    <footer className="foot ho-dark">
       <div className="wrap foot-grid">
         <div>
+          <span className="foot-mark" aria-hidden="true" />
           <b>HUMANOIDONLINE</b>
           <span className="foot-brand">
             {" "}· A{" "}
@@ -99,6 +100,16 @@ export function SiteFooter() {
           INDEPENDENT
         </span>
         <span className="ho-chip">WS3 / INTELLIGENCE UI</span>
+      </div>
+      <div className="wrap foot-legal">
+        <p>&copy; 2026 Humanoid Company. All rights reserved.</p>
+        <p>
+          <b>HumanoidOnline</b> is a{" "}
+          <a className="foot-brand-link" href="https://humanoid.company/">
+            <b>Humanoid.Company</b>
+          </a>{" "}
+          brand.
+        </p>
       </div>
     </footer>
   );

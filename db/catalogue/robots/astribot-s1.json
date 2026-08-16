@@ -42,8 +42,8 @@
   "use_case_fits": [],
   "images": [
     {
-      "image_url": "/robots/astribot-s1.png",
-      "source_url": "https://www.astribot.com/en/product",
+      "image_url": "/robots/astribot-s1.webp",
+      "source_url": "https://www.astribot.com/en",
       "source_name": "Astribot",
       "source_type": "MANUFACTURER",
       "image_type": "FRONT",
@@ -53,7 +53,7 @@
       "is_official": true,
       "is_primary": true,
       "attribution": "© Astribot",
-      "last_verified_at": "2026-07-30T21:56:38+00:00",
+      "last_verified_at": "2026-07-31T10:32:10+00:00",
       "identity_confirmed_by": "robert@humanoid.company"
     }
   ]

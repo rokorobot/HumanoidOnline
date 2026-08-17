@@ -723,7 +723,7 @@ A conceptual robot-search result should expose enough information for an agent t
     {
       "transaction_type": "PURCHASE",
       "currency": "EUR",
-      "amount": 0,
+      "amount": null,
       "price_type": "QUOTE_ONLY",
       "provider": "provider-id",
       "evidence_id": "evidence-id"

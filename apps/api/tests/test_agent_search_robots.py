@@ -20,8 +20,10 @@ import pytest
 from sqlalchemy import text
 
 from app.db.session import SessionLocal, engine
+from app.models import enums as pg_enums
 from app.services.agent_tools import (
     InvalidArgument,
+    InvalidEnum,
     InvalidPagination,
     search_robots,
 )
@@ -346,3 +348,110 @@ def test_warning_codes_are_not_transport_errors() -> None:
     for w in res.warnings:
         assert w.startswith("price_max_excluded_")
         assert w not in {"INVALID_ARGUMENT", "INVALID_PAGINATION", "NOT_FOUND"}
+
+
+# --------------------------------------------------------------------------
+# VOCABULARY — AGENT-02.1a (docs/20 §5 enum errors, §16 sort allowlist)
+# --------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"commercial_status": ["NOT_A_MEMBER"]},
+        {"transaction_type": ["NOT_A_MEMBER"]},
+        {"availability_status": ["NOT_A_MEMBER"]},
+        {"mobility": "NOT_A_MEMBER"},
+        {"autonomy_min": "NOT_A_MEMBER"},
+    ],
+    ids=["commercial_status", "transaction_type", "availability_status",
+         "mobility", "autonomy_min"],
+)
+def test_unknown_enum_member_raises_invalid_enum(kwargs) -> None:
+    """`docs/20` §5: "Unknown enum member → INVALID_ENUM". Not INVALID_ARGUMENT —
+    the codes are distinct and §21.12 requires each to be reachable."""
+    with pytest.raises(InvalidEnum) as exc:
+        _result(limit=100, **kwargs)
+    assert exc.value.code == "INVALID_ENUM"
+
+
+def test_invalid_enum_is_genuinely_reachable() -> None:
+    """Before AGENT-02.1a the class existed and was exported but was raised
+    nowhere, so the contract code was unreachable."""
+    with pytest.raises(InvalidEnum):
+        _result(mobility="NOT_A_MEMBER", limit=100)
+
+
+def test_mixed_valid_and_invalid_members_reject_the_entire_call() -> None:
+    """No partial acceptance and no silent dropping: either would answer a
+    different question than the caller asked, and report success."""
+    with pytest.raises(InvalidEnum):
+        _result(commercial_status=["COMMERCIAL", "NOT_A_MEMBER"], limit=100)
+    with pytest.raises(InvalidEnum):
+        _result(commercial_status=["NOT_A_MEMBER", "COMMERCIAL"], limit=100)
+
+
+def test_an_invalid_hard_constraint_never_degrades_to_no_constraint() -> None:
+    """The regression that motivated this slice: `autonomy_min` used to be
+    silently ignored, returning the FULL catalogue as a success."""
+    unfiltered = _result(limit=100).total
+    assert unfiltered > 0
+    with pytest.raises(InvalidEnum):
+        _result(autonomy_min="NOT_AN_AUTONOMY", limit=100)
+
+
+@pytest.mark.parametrize("member", tuple(pg_enums.commercial_status.enums))
+def test_every_commercial_status_member_remains_accepted(member) -> None:
+    assert _result(commercial_status=[member], limit=100).total >= 0
+
+
+@pytest.mark.parametrize("member", tuple(pg_enums.transaction_type.enums))
+def test_every_transaction_type_member_remains_accepted(member) -> None:
+    assert _result(transaction_type=[member], limit=100).total >= 0
+
+
+@pytest.mark.parametrize("member", tuple(pg_enums.availability_status.enums))
+def test_every_availability_status_member_remains_accepted(member) -> None:
+    assert _result(availability_status=[member], limit=100).total >= 0
+
+
+@pytest.mark.parametrize("member", tuple(pg_enums.mobility_type.enums))
+def test_every_mobility_member_remains_accepted(member) -> None:
+    assert _result(mobility=member, limit=100).total >= 0
+
+
+@pytest.mark.parametrize("member", tuple(pg_enums.autonomy_level.enums))
+def test_every_autonomy_member_remains_accepted(member) -> None:
+    assert _result(autonomy_min=member, limit=100).total >= 0
+
+
+@pytest.mark.parametrize(
+    "sort", ["garbage", "pric", "lowest_purchase_price", "-", "", "-garbage"]
+)
+def test_invalid_sort_raises_invalid_argument(sort) -> None:
+    """`sort` is a contract allowlist, not a `db/schema.sql` enum, so it fails as
+    INVALID_ARGUMENT (`docs/20` §17) — never a silent fallback to `name`."""
+    with pytest.raises(InvalidArgument) as exc:
+        _result(sort=sort, limit=100)
+    assert exc.value.code == "INVALID_ARGUMENT"
+
+
+def test_invalid_sort_is_not_reported_as_an_enum_error() -> None:
+    """The two codes stay disjoint: sort carries no schema vocabulary."""
+    with pytest.raises(InvalidArgument) as exc:
+        _result(sort="garbage", limit=100)
+    assert not isinstance(exc.value, InvalidEnum)
+
+
+@pytest.mark.parametrize(
+    "sort",
+    ["name", "price", "payload", "newest", "-name", "-price", "-payload", "-newest"],
+)
+def test_every_valid_sort_form_still_works(sort) -> None:
+    assert _result(sort=sort, limit=100).limit == 100
+
+
+def test_valid_descending_sort_actually_reverses() -> None:
+    asc = [i.slug for i in _result(sort="name", limit=100).items]
+    desc = [i.slug for i in _result(sort="-name", limit=100).items]
+    assert asc and asc == list(reversed(desc))

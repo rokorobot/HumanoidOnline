@@ -13,16 +13,13 @@ from app.models.robot import Robot
 from app.schemas.common import Page
 from app.schemas.robot import CompareResponse, CompareRow, RobotDetail, RobotListItem
 from app.services import reads
-from app.services.robot_filters import apply_catalogue_filters
+from app.services.robot_filters import (
+    InvalidFilterValue,
+    apply_catalogue_filters,
+    resolve_sort,
+)
 
 router = APIRouter(prefix="/api/robots", tags=["robots"])
-
-_SORTS = {
-    "name": Robot.name,
-    "price": Robot.lowest_purchase_price,
-    "payload": Robot.payload_kg,
-    "newest": Robot.created_at,
-}
 
 
 # The governed predicates now live in services/robot_filters.py so the AGENT-02
@@ -64,21 +61,23 @@ def list_robots(
         developer_edition=developer_edition, has_manipulation=has_manipulation,
     )
 
-    total = session.execute(
-        _apply_filters(select(func.count(Robot.id)), **filters)
-    ).scalar_one()
+    # Vocabulary validation happens inside the shared governed filter, so an
+    # unknown enum member or sort key becomes a structured 422 here instead of a
+    # PostgreSQL DataError (500) or a silently-unfiltered result. Both statements
+    # are built before either is executed, so a bad input costs no query.
+    try:
+        count_stmt = _apply_filters(select(func.count(Robot.id)), **filters)
+        order = resolve_sort(sort)
+        stmt = _apply_filters(
+            select(Robot).options(
+                selectinload(Robot.pricing_offers), selectinload(Robot.images)
+            ),
+            **filters,
+        ).order_by(order, Robot.slug).limit(limit).offset(offset)
+    except InvalidFilterValue as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    desc = sort.startswith("-")
-    key = sort[1:] if desc else sort
-    col = _SORTS.get(key, Robot.name)
-    order = col.desc().nullslast() if desc else col.asc().nullslast()
-
-    stmt = _apply_filters(
-        select(Robot).options(
-            selectinload(Robot.pricing_offers), selectinload(Robot.images)
-        ),
-        **filters,
-    ).order_by(order, Robot.slug).limit(limit).offset(offset)
+    total = session.execute(count_stmt).scalar_one()
     robots = list(session.execute(stmt).scalars())
 
     snapshot = reads.snapshot_for(session, [r.id for r in robots])

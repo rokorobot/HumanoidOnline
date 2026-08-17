@@ -30,23 +30,26 @@ from sqlalchemy.orm import Session, selectinload
 from app.models.robot import Robot
 from app.schemas.robot import RobotListItem
 from app.services import reads
-from app.services.agent_tools.errors import InvalidArgument, InvalidPagination
+from app.services.agent_tools.errors import (
+    InvalidArgument,
+    InvalidEnum,
+    InvalidPagination,
+)
 from app.services.agent_tools.pricing import evaluate_price_ceiling
 from app.services.regions import applicable_region_ids
-from app.services.robot_filters import apply_catalogue_filters
+from app.services.robot_filters import (
+    InvalidFilterEnum,
+    InvalidSortKey,
+    apply_catalogue_filters,
+    resolve_sort,
+    validate_filter_vocabulary,
+)
 
 #: Canonical pagination bounds, inherited from `docs/04` — not agent-specific.
 DEFAULT_LIMIT = 24
 MAX_LIMIT = 100
 
 CONTRACT_VERSION = "agent-tools/0.1"
-
-_SORTS = {
-    "name": Robot.name,
-    "price": Robot.lowest_purchase_price,
-    "payload": Robot.payload_kg,
-    "newest": Robot.created_at,
-}
 
 
 @dataclass(frozen=True)
@@ -116,6 +119,28 @@ def search_robots(
     if height_min is not None and height_max is not None and height_min > height_max:
         raise InvalidArgument("height_min must not exceed height_max")
 
+    # ---- vocabulary (docs/20 §5, §17) --------------------------------------
+    # Mapped onto the two distinct contract codes: an enum-backed filter carries
+    # a `db/schema.sql` vocabulary and fails as INVALID_ENUM, while `sort` is a
+    # contract allowlist rather than a schema enum and fails as INVALID_ARGUMENT.
+    # The shared filter re-validates independently, so this mapping cannot be
+    # bypassed by a future caller — it exists to name the failure correctly.
+    try:
+        validate_filter_vocabulary(
+            commercial_status=commercial_status,
+            transaction_type=transaction_type,
+            availability_status=availability_status,
+            mobility=mobility,
+            autonomy_min=autonomy_min,
+        )
+    except InvalidFilterEnum as exc:
+        raise InvalidEnum(str(exc)) from exc
+
+    try:
+        order = resolve_sort(sort)
+    except InvalidSortKey as exc:
+        raise InvalidArgument(str(exc)) from exc
+
     # ---- geography: ratified applicability (docs/20 §12) -------------------
     region_ids = None
     if region:
@@ -147,11 +172,6 @@ def search_robots(
         developer_edition=developer_edition,
         has_manipulation=has_manipulation,
     )
-
-    desc = sort.startswith("-")
-    key = sort[1:] if desc else sort
-    col = _SORTS.get(key, Robot.name)
-    order = col.desc().nullslast() if desc else col.asc().nullslast()
 
     base = apply_catalogue_filters(
         select(Robot).options(

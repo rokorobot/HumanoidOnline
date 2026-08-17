@@ -21,6 +21,11 @@ const COMMERCIAL_STATUS = [
   "DEVELOPMENT",
   "ANNOUNCED",
   "DISCONTINUED",
+  // Last, and off the maturity ladder: UNKNOWN is not a rung between ANNOUNCED
+  // and DISCONTINUED, it is the absence of a verified maturity. Selecting any
+  // other status excludes it, exactly as selecting COMMERCIAL excludes PILOT;
+  // with no status selected the catalogue still shows every published robot.
+  "UNKNOWN",
 ];
 const TRANSACTION_TYPES = [
   "PURCHASE",

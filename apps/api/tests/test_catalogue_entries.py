@@ -89,8 +89,10 @@ def test_a_stub_asserts_identity_and_nothing_else():
     stub = ce.make_stub(slug="x-1", name="1", mfr_slug="x", official_url="https://x.invalid/")
     assert all(v is None for v in stub["specs"].values())
     assert stub["specs_note"] == ce.UNVERIFIED_NOTE
-    # no commercial claim => nothing for G2 to demand evidence of
-    assert stub["commercial_status"] == "ANNOUNCED"
+    # no commercial claim => nothing for G2 to demand evidence of. UNKNOWN, not
+    # ANNOUNCED: ANNOUNCED is itself a claim ("publicly revealed, no hardware
+    # shipping") and G2 would rightly demand evidence for it once published.
+    assert stub["commercial_status"] == "UNKNOWN"
     assert stub["commercial_status_evidence"] == []
     assert stub["pricing_offers"] == stub["availability_offers"] == stub["deployments"] == []
     assert stub["images"] == []
@@ -103,13 +105,31 @@ def test_a_stub_is_never_published():
     assert stub["is_published"] is False
 
 
-def test_every_shipped_stub_is_unpublished_and_specless():
+def test_every_shipped_stub_keeps_unknown_truly_unknown():
     """Guards the files actually in the tree, not just the constructor.
 
     Deliberately not a fixed count: stubs become populated robots as their
     specifications are read, and a hard `>= 36` would fail on the good news.
-    What must hold is the property — anything still carrying the unverified note
-    has no specifications and is not published.
+
+    **`is_published` is deliberately NOT asserted here.** Specification
+    completeness is not a prerequisite for publication (ratified product rule):
+    a profile may go live on confirmed identity and provenanced imagery alone,
+    with everything unverified left UNKNOWN. Requiring the opposite would force
+    the site to withhold a robot it can describe truthfully, purely because it
+    cannot yet describe it fully.
+
+    What must still hold is that such a record **fabricates nothing**. A stub
+    carrying the unverified note asserts no specification and no commercial
+    fact, published or not — every spec stays NULL, never coerced to 0, false
+    or "", because in this dataset 0 kg payload and "unknown payload" are
+    completely different claims.
+
+    The surrounding guarantees are pinned elsewhere and are not weakened:
+    authoring still never publishes by itself (`test_a_stub_is_never_published`
+    pins the constructor default); the publication gate itself is proven by
+    `test_tracked_vs_published.py` and `test_truth_regressions.py` R14; and
+    non-canonical discovery rows are kept off public surfaces by
+    `test_discovery_review.py`.
     """
     stubs = [
         (slug, r) for slug, r in ce.existing_robots().items()
@@ -117,8 +137,13 @@ def test_every_shipped_stub_is_unpublished_and_specless():
     ]
     assert stubs, "expected at least one unpopulated stub"
     for slug, robot in stubs:
-        assert robot["is_published"] is False, slug
-        assert all(v is None for v in robot["specs"].values()), slug
+        for field, value in robot["specs"].items():
+            # `is None` rather than a falsiness check: 0, False and "" are all
+            # falsy but each would be an invented claim, not an absent one.
+            assert value is None, (
+                f"{slug}.specs.{field} = {value!r} — a stub still carrying "
+                f"{ce.UNVERIFIED_NOTE!r} must leave UNKNOWN as NULL"
+            )
         assert robot["commercial_status_evidence"] == [], slug
 
 

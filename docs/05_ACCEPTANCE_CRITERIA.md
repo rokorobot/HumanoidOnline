@@ -55,7 +55,8 @@
 ## G. Data integrity & provenance
 
 - **G1.** Given the seed dataset, when loaded into a fresh database created from `db/schema.sql`, then it loads with zero constraint violations.
-- **G2.** Given a commercially sensitive published fact (price / availability / status / deployment), then at least one `evidence_source` row exists for it. The seed satisfies this **by construction** — it ends with a self-check `DO` block that aborts the load if any published fact lacks evidence; admin warns on violations at runtime.
+- **G2.** Given a commercially sensitive published **asserted** fact (price / availability / status / deployment), then at least one `evidence_source` row exists for it. The seed satisfies this **by construction** — it ends with a self-check `DO` block that aborts the load if any published fact lacks evidence; admin warns on violations at runtime.
+  - **G2.1.** `commercial_status = UNKNOWN` is the explicit absence of a verified maturity claim (Data Dictionary §1), not a fact, and therefore requires no `COMMERCIAL_STATUS` evidence row. This exempts nothing else: every other `commercial_status` value — `ANNOUNCED` included — and every price, availability and deployment claim keeps its evidence requirement in full. A published robot asserting a maturity without evidence still fails G2.
 - **G3.** Given any robot, `robot.lowest_purchase_price` (cache) never contradicts `pricing_offer` (source of truth) after offer writes.
 
 ## H. Non-goals (must NOT exist — reviewer checks)

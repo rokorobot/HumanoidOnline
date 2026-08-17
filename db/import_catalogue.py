@@ -252,7 +252,9 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
     vals = [
         robot["slug"], manufacturer_id(robot["manufacturer_slug"]), robot["name"],
         robot.get("model_code"), robot.get("summary"), robot.get("announced_year"),
-        robot.get("commercial_status", "ANNOUNCED"), robot.get("is_published", False),
+        # Absent maturity means UNVERIFIED, not ANNOUNCED: an omitted key must
+        # not become a factual claim the file never made.
+        robot.get("commercial_status", "UNKNOWN"), robot.get("is_published", False),
     ] + [specs.get(c) for c in SPEC_COLUMNS]
 
     # On INSERT every column is written: a brand-new record has no editorial

@@ -21,8 +21,15 @@ Ordered ladder. Says how far the *product* has progressed — **not** whether yo
 | `COMMERCIAL` | Generally commercially available | purchasable-by-you (check `availability_offer`) |
 | `RAAS_DEPLOYMENT` | Commercially deployed as a service; units not sold | discontinued or unavailable — this is a *success* state |
 | `DISCONTINUED` | No longer offered | never-launched |
+| `UNKNOWN` | Current maturity **not yet verified** — the absence of a claim | `ANNOUNCED`; `NOT_AVAILABLE`; `DISCONTINUED`; `false`; `0` |
 
 **Canonical example:** Agility Digit = `RAAS_DEPLOYMENT`: formal commercial deployments and $300M+ contracted orders, yet no `PURCHASE` availability offer. Maturity, obtainability, and evidence are three independent dimensions.
+
+**`UNKNOWN` is off the ladder.** It is not a rung between `ANNOUNCED` and `DISCONTINUED` and carries no position in the ordering — it records that HumanoidOnline has *not yet verified* this platform's maturity. It is the maturity equivalent of a NULL `payload_kg`, which means "payload unknown" and never "payload of 0" (§6). In particular:
+
+- **`UNKNOWN` is not `ANNOUNCED`.** `ANNOUNCED` is a factual claim about the world — publicly revealed, no hardware shipping — and must be evidenced like any other. Using it as a stand-in for "we don't know" asserts something nobody checked.
+- **`UNKNOWN` is not an availability statement.** Obtainability is DIMENSION 2 and is read from `availability_offer` rows; an unverified maturity says nothing about whether a robot can be obtained, exactly as `ANNOUNCED` says nothing about it.
+- **`UNKNOWN` carries no evidence requirement** (§7), because it asserts no commercial fact. The moment a concrete maturity is asserted in its place, the normal commercial-status evidence requirement applies in full.
 
 ## 2. `transaction_type` — the commercial mode of an offer
 
@@ -116,5 +123,7 @@ Unknown must never silently become zero or false — in matching (Product Contra
 Commercially sensitive fields — **price, availability, commercial status, deployment claims, regional availability** — require an `evidence_source` row carrying `source_url`, `source_type`, `observed_at`, `verified_at` (when checked), `confidence`.
 
 > **Core rule: no commercial fact without evidence.**
+
+The rule binds *asserted* facts. `commercial_status = UNKNOWN` is the explicit absence of a maturity claim (§1), so there is nothing for evidence to support and none is required — the alternative would be fabricating a source to justify saying "not verified", which is the failure this rule exists to prevent. Every other `commercial_status` value, `ANNOUNCED` included, requires its `evidence_source` row unchanged, as do price, availability, deployment and regional claims.
 
 Operationally: a value with no evidence may exist in the database (e.g. freshly scraped) but must not be *published* (`robot.is_published` gate) until evidence is attached. Stale evidence (`verified_at` older than a policy window) downgrades display confidence; it does not delete the fact.

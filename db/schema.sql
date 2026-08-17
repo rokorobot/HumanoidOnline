@@ -43,6 +43,12 @@ SET search_path TO humanoid, public;
 
 -- Commercial MATURITY of a robot platform. Independent of whether you can buy it.
 CREATE TYPE commercial_status AS ENUM (
+    'UNKNOWN',            -- maturity NOT YET VERIFIED. Asserts nothing: it is not
+                          -- ANNOUNCED, not NOT_AVAILABLE, not DISCONTINUED, not
+                          -- false and not zero. Because it makes no commercial
+                          -- claim, G2 demands no evidence for it (every other
+                          -- value does). First in the enum so an unverified
+                          -- profile never sorts above one with a real claim.
     'ANNOUNCED',          -- publicly revealed, no hardware shipping
     'DEVELOPMENT',        -- actively engineered, internal only
     'PROTOTYPE',          -- working prototype(s), not sold
@@ -355,7 +361,9 @@ CREATE TABLE robot (
     announced_year        INT CHECK (announced_year BETWEEN 1900 AND 2100),
 
     -- DIMENSION 1: commercial MATURITY (current). History in robot_status_history.
-    commercial_status     commercial_status NOT NULL DEFAULT 'ANNOUNCED',
+    -- Defaults to UNKNOWN, not ANNOUNCED: a row inserted without an explicit
+    -- maturity has not had one verified, and must not silently claim one.
+    commercial_status     commercial_status NOT NULL DEFAULT 'UNKNOWN',
 
     -- First-class PHYSICAL specs — the common filter columns from the catalogue.
     -- The long tail of specs lives in `specification`.

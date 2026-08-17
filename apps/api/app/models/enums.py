@@ -18,6 +18,9 @@ region_type = _pg_enum(
 )
 commercial_status = _pg_enum(
     "commercial_status",
+    # UNKNOWN asserts nothing — maturity not yet verified. First, matching
+    # db/schema.sql and migration 0006 (added BEFORE 'ANNOUNCED').
+    "UNKNOWN",
     "ANNOUNCED", "DEVELOPMENT", "PROTOTYPE", "PILOT", "EARLY_ACCESS",
     "LIMITED_COMMERCIAL", "COMMERCIAL", "RAAS_DEPLOYMENT", "DISCONTINUED",
 )

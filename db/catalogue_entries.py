@@ -23,7 +23,7 @@ Two commands, for the two halves of that job:
         --operator "robert@humanoid.company"
 
 **Stubs are honest, not empty.** A stub asserts identity, manufacturer and an
-official URL, sets `commercial_status = ANNOUNCED`, leaves every specification
+official URL, sets `commercial_status = UNKNOWN`, leaves every specification
 `null`, and says so in `specs_note`. It makes no commercial claim, so there is
 no commercial fact for G2 to demand evidence of — verified by importing one.
 
@@ -154,9 +154,13 @@ def make_stub(*, slug: str, name: str, mfr_slug: str, official_url: str | None) 
         "model_code": None,
         "summary": None,
         "announced_year": None,
-        # ANNOUNCED is the absence of a maturity claim, not a claim of immaturity
-        # (docs/16 §6): it must never be read as NOT_AVAILABLE.
-        "commercial_status": "ANNOUNCED",
+        # UNKNOWN, because a stub has not had its maturity verified. ANNOUNCED
+        # was used here as a stand-in for "no claim", but ANNOUNCED is itself a
+        # claim ("publicly revealed, no hardware shipping", docs/03 §2) and G2
+        # rightly demands evidence for it the moment such a profile is
+        # published. UNKNOWN asserts nothing, so there is nothing to evidence.
+        # It must never be read as NOT_AVAILABLE (docs/16 §6).
+        "commercial_status": "UNKNOWN",
         # Authoring is not publishing. See the module docstring.
         "is_published": False,
         "specs": dict.fromkeys(SPEC_FIELDS),

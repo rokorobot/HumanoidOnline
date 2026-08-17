@@ -83,6 +83,28 @@ Forward migrations:
   that relationship is explicitly **not** a licence to derive one from the
   other — a derived number would be an inference presented as a manufacturer's
   figure. Additive and idempotent.
+- `0006_add_unknown_commercial_status.sql` — adds `UNKNOWN` to the
+  `commercial_status` enum, **before** `ANNOUNCED`. The catalogue could say a
+  robot's maturity was ANNOUNCED, PILOT or COMMERCIAL but had no way to say it
+  did not know yet, so sparse profiles were written as `ANNOUNCED` — a factual
+  claim ("publicly revealed, no hardware shipping") asserted without evidence
+  purely for want of an honest alternative. That collides with G2 the moment
+  such a profile is published. `UNKNOWN` means *maturity not yet verified*: not
+  `ANNOUNCED`, not `NOT_AVAILABLE`, not `DISCONTINUED`, not `false`, not zero —
+  the same discipline a NULL `payload_kg` already gets. Because it asserts
+  nothing it is the one status needing no evidence; every other value keeps its
+  G2 obligation unchanged. Declares the label only: PostgreSQL forbids *using* a
+  new enum label in the transaction that added it, and the bootstrap runs each
+  migration file in its own transaction. Additive and idempotent.
+- `0007_default_commercial_status_unknown.sql` — sets
+  `robot.commercial_status` `DEFAULT 'UNKNOWN'` (was `'ANNOUNCED'`). Separate
+  from `0006` by that same PostgreSQL rule, not by style. `commercial_status` is
+  `NOT NULL`, so a row inserted without one takes the default — and DATA-D1
+  promotion inserts canonical robots without setting it, inheriting an
+  unevidenced claim. Existing rows are deliberately **not** rewritten: a default
+  governs future inserts, and changing stored, evidence-backed maturities would
+  be an editorial act this migration has no authority to perform. Additive and
+  idempotent.
 
 ## Checksum integrity (WS8.2 / R9)
 

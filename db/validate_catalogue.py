@@ -28,10 +28,16 @@ import psycopg
 
 # (label, SQL returning the offending rows for published robots lacking evidence)
 GAP_QUERIES = {
+    # G2 demands evidence for an ASSERTED maturity. `UNKNOWN` asserts nothing —
+    # it is the explicit "not yet verified" value — so it is the one status with
+    # nothing for evidence to support. Every other value, ANNOUNCED included,
+    # keeps its obligation in full: the exclusion is `<> 'UNKNOWN'`, never a
+    # relaxation of the rule itself.
     "commercial_status": """
         SELECT r.slug
         FROM robot r
         WHERE r.is_published
+          AND r.commercial_status <> 'UNKNOWN'
           AND NOT EXISTS (SELECT 1 FROM evidence_source e
                           WHERE e.subject_type='COMMERCIAL_STATUS' AND e.subject_id=r.id)
     """,

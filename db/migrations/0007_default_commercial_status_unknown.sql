@@ -1,0 +1,21 @@
+-- 0007 — a row with no stated maturity defaults to UNKNOWN, not ANNOUNCED.
+--
+-- Separate from 0006 by necessity, not style: 0006 adds the 'UNKNOWN' label to
+-- the commercial_status enum, and PostgreSQL forbids USING a new enum label in
+-- the same transaction that added it. The bootstrap applies each migration file
+-- in its own transaction, so this is the first point at which 'UNKNOWN' may be
+-- referenced.
+--
+-- Why the default moves at all: `robot.commercial_status` is NOT NULL, so a row
+-- inserted without one takes the column default. That default was 'ANNOUNCED' —
+-- a factual claim ("publicly revealed, no hardware shipping") asserted purely
+-- because the caller said nothing. DATA-D1 promotion inserts canonical robots
+-- without setting the column and so inherited exactly that unevidenced claim.
+--
+-- Existing rows are deliberately NOT rewritten. A default governs future
+-- inserts; changing stored maturities would be an editorial act on records whose
+-- statuses are evidence-backed, and this migration has no authority to do that.
+--
+-- Additive and idempotent: re-running sets the same default.
+
+ALTER TABLE robot ALTER COLUMN commercial_status SET DEFAULT 'UNKNOWN';

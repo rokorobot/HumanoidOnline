@@ -1,0 +1,37 @@
+-- 0006 — UNKNOWN commercial maturity.
+--
+-- The catalogue could say a robot's maturity was ANNOUNCED, PILOT or COMMERCIAL,
+-- but had no way to say it did not know yet. So every sparse profile was written
+-- as ANNOUNCED — "publicly revealed, no hardware shipping" (docs/03 §2) — which
+-- is a factual claim about the world, made without evidence, purely because the
+-- vocabulary offered no honest alternative.
+--
+-- That collided with G2 the moment such a profile was published: G2 requires a
+-- COMMERCIAL_STATUS evidence row for every published robot, and there is no
+-- honest evidence to attach to a claim nobody verified. The fix is not to relax
+-- G2 but to stop making the claim.
+--
+--   UNKNOWN = current commercial maturity has NOT YET been verified.
+--
+-- It is not ANNOUNCED, not NOT_AVAILABLE, not DEVELOPMENT, not DISCONTINUED,
+-- not false and not zero — the same discipline this catalogue already applies to
+-- a NULL payload_kg, which means "unknown payload", never "payload of 0".
+--
+-- Because UNKNOWN asserts nothing, it is the one commercial_status that needs no
+-- evidence. Every other value keeps its G2 obligation unchanged.
+--
+-- Placed BEFORE 'ANNOUNCED' so the enum's own ordering keeps an unverified
+-- profile below one carrying a real claim, and so a database migrated forward
+-- has the identical enum order to one created fresh from db/schema.sql.
+--
+-- Additive and idempotent: no value is renamed or removed, and re-running is
+-- safe.
+--
+-- This migration DECLARES the label and does nothing else. PostgreSQL permits
+-- ALTER TYPE ... ADD VALUE inside a transaction, but the new label cannot be
+-- USED until that transaction commits — and the bootstrap runs each migration
+-- file in its own transaction (db/bootstrap.py::run_migrations). Setting the
+-- column default to 'UNKNOWN' therefore lives in 0007, not here; combining them
+-- would fail with "unsafe use of new value of enum type".
+
+ALTER TYPE commercial_status ADD VALUE IF NOT EXISTS 'UNKNOWN' BEFORE 'ANNOUNCED';

@@ -44,7 +44,9 @@ class Robot(Base):
     announced_year: Mapped[int | None] = mapped_column(Integer)
 
     commercial_status: Mapped[str] = mapped_column(
-        commercial_status, nullable=False, server_default=text("'ANNOUNCED'")
+        # UNKNOWN, not ANNOUNCED: an unstated maturity has not been verified and
+        # must not silently claim one (migration 0007).
+        commercial_status, nullable=False, server_default=text("'UNKNOWN'")
     )
 
     # First-class physical specs.

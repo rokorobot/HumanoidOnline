@@ -458,6 +458,8 @@ export default async function RobotDetailPage({
               <h3>Physical</h3>
               <SpecRow label="Height" value={s.height_cm} unit="cm" />
               <SpecRow label="Weight" value={s.weight_kg} unit="kg" />
+              <SpecRow label="Arm span" value={s.arm_span_cm} unit="cm" />
+              <SpecRow label="Reach" value={s.reach_cm} unit="cm" />
               <SpecRow label="Payload" value={s.payload_kg} unit="kg" />
               <SpecRow label="Walk speed" value={s.walk_speed_ms} unit="m/s" />
               <SpecRow label="Runtime" value={s.runtime_minutes} unit="min" />

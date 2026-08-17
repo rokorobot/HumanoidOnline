@@ -20,7 +20,8 @@ router = APIRouter(prefix="/api", tags=["market"])
 _SNAPSHOT_SQL = text(
     """
     SELECT
-      (SELECT count(*) FROM robot WHERE is_published) AS total_tracked,
+      (SELECT count(*) FROM robot) AS total_tracked,
+      (SELECT count(*) FROM robot WHERE is_published) AS total_published,
       (SELECT count(*) FROM robot_commercial_snapshot s
          JOIN robot r ON r.id = s.id AND r.is_published
          WHERE s.is_obtainable) AS commercially_accessible,
@@ -29,7 +30,9 @@ _SNAPSHOT_SQL = text(
            AND (r.commercial_status IN ('PILOT', 'RAAS_DEPLOYMENT')
                 OR EXISTS (SELECT 1 FROM deployment d WHERE d.robot_id = r.id))
       ) AS in_deployment_or_pilot,
-      (SELECT count(DISTINCT manufacturer_id) FROM robot WHERE is_published) AS manufacturers,
+      (SELECT count(*) FROM manufacturer) AS manufacturers_tracked,
+      (SELECT count(DISTINCT manufacturer_id) FROM robot WHERE is_published)
+        AS manufacturers_published,
       EXISTS (SELECT 1 FROM availability_offer a
               JOIN robot r ON r.id = a.robot_id
               WHERE r.is_published AND a.is_current
@@ -47,9 +50,11 @@ def market_snapshot(
     row = session.execute(_SNAPSHOT_SQL).one()
     return MarketSnapshot(
         total_tracked=row.total_tracked,
+        total_published=row.total_published,
         commercially_accessible=row.commercially_accessible,
         in_deployment_or_pilot=row.in_deployment_or_pilot,
-        manufacturers=row.manufacturers,
+        manufacturers_tracked=row.manufacturers_tracked,
+        manufacturers_published=row.manufacturers_published,
         rental_offers_present=row.rental_offers_present,
         latest_observed_at=row.latest_observed_at,
     )

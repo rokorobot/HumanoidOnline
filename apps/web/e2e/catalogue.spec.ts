@@ -8,11 +8,32 @@ test("home renders live market-snapshot counts (not illustrative)", async ({ pag
   await page.goto("/");
   // Hero claim is fixed and exact.
   await expect(page.getByRole("heading", { name: /Find the right/i })).toBeVisible();
-  // 7 verified robots are tracked; the seed set (20) must never appear.
+  // TRACKED counts every catalogue record; PUBLISHED counts approved profiles.
+  // The published total moves whenever the product owner publishes a record, so
+  // this asserts the SHAPE — a real number against the "published profiles"
+  // label — rather than freezing a figure that a legitimate publication breaks.
+  // The seed set (20) and mock values are still caught by the checks below.
   await expect(page.getByText("Humanoids tracked")).toBeVisible();
   const snapshot = page.locator(".snap", { hasText: "Humanoids tracked" });
-  await expect(snapshot.locator(".num")).toHaveText("7");
+  await expect(snapshot).toContainText(/\d+\s+published profiles/i);
+  const tracked = Number(await snapshot.locator(".num").innerText());
+  expect(tracked).toBeGreaterThanOrEqual(7);
   await expect(page.locator("body")).not.toContainText("20 PLATFORMS TRACKED");
+});
+
+test("robot detail: stored reach reaches the public surface, span stays UNKNOWN", async ({
+  page,
+}) => {
+  // Migration 0005 added arm_span_cm/reach_cm and the importer writes them, but
+  // the read layer omitted both, so a stored value was invisible publicly. G1
+  // Basic carries reach 45 cm and no span (0.45 m is a single-arm measure and
+  // must never be presented as a fingertip-to-fingertip span).
+  await page.goto("/robots/unitree-g1");
+  const physical = page.locator(".spectbl", { hasText: "Physical" });
+  await expect(physical.locator(".srow", { hasText: "Reach" })).toContainText("45");
+  await expect(physical.locator(".srow", { hasText: "Arm span" })).toContainText(
+    "UNKNOWN",
+  );
 });
 
 test("home: EXPLORE BY USE CASE and WHO BUILDS THEM render live data in the frozen order", async ({

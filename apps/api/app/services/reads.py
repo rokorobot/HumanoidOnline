@@ -220,6 +220,8 @@ def _specs_block(robot: Robot) -> SpecsBlock:
     return SpecsBlock(
         height_cm=_f(robot.height_cm),
         weight_kg=_f(robot.weight_kg),
+        arm_span_cm=_f(robot.arm_span_cm),
+        reach_cm=_f(robot.reach_cm),
         payload_kg=_f(robot.payload_kg),
         walk_speed_ms=_f(robot.walk_speed_ms),
         runtime_minutes=robot.runtime_minutes,

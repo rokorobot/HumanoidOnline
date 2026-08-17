@@ -73,6 +73,10 @@ export interface StatusHistoryEntry {
 export interface SpecsBlock {
   height_cm?: number | null;
   weight_kg?: number | null;
+  // Span is fingertip-to-fingertip, reach is one arm from its shoulder. Two
+  // different measurements; a missing one stays null, never borrowed from the other.
+  arm_span_cm?: number | null;
+  reach_cm?: number | null;
   payload_kg?: number | null;
   walk_speed_ms?: number | null;
   runtime_minutes?: number | null;
@@ -206,7 +210,10 @@ export interface ManufacturerListItem {
   slug: string;
   name: string;
   country?: string | null;
-  robot_count: number;
+  // Tracked = all catalogue records for this maker; published = those with a
+  // public profile. Kept apart so a card can never claim a maker has no robots.
+  tracked_robot_count: number;
+  published_robot_count: number;
   deployment_status?: string | null;
   // Derived from published robots' commercial_status (not the deployment column).
   portfolio_status?: string | null;
@@ -321,11 +328,16 @@ export interface RequirementRead {
   raw_input?: Record<string, unknown> | null;
 }
 
+// TRACKED = everything the intelligence catalogue holds. PUBLISHED = the
+// editorially approved subset with a public profile. Never label one as the
+// other. Obtainability and pilot/deployment stay published-scoped.
 export interface MarketSnapshot {
   total_tracked: number;
+  total_published: number;
   commercially_accessible: number;
   in_deployment_or_pilot: number;
-  manufacturers: number;
+  manufacturers_tracked: number;
+  manufacturers_published: number;
   rental_offers_present: boolean;
   latest_observed_at?: string | null;
 }

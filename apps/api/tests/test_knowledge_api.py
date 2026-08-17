@@ -120,7 +120,8 @@ def test_manufacturers_list_and_detail(client, database_url) -> None:
     body = _get(client, "/api/manufacturers", limit=100)
     assert body["total"] >= 10
     slug = body["items"][0]["slug"]
-    assert "robot_count" in body["items"][0]
+    assert "tracked_robot_count" in body["items"][0]
+    assert "published_robot_count" in body["items"][0]
 
     detail = _get(client, f"/api/manufacturers/{slug}")
     assert detail["slug"] == slug

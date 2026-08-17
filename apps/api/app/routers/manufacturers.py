@@ -33,20 +33,32 @@ def list_manufacturers(
     limit = max(1, min(limit, 100))
     total = session.execute(select(func.count(Manufacturer.id))).scalar_one()
 
+    # Aggregate counts only — no unpublished robot identity or content is
+    # selected here, so an unpublished record can raise a number without ever
+    # reaching a public surface.
+    tracked_robot_count = (
+        select(func.count(Robot.id))
+        .where(Robot.manufacturer_id == Manufacturer.id)
+        .scalar_subquery()
+    )
     published_robot_count = (
         select(func.count(Robot.id))
         .where(Robot.manufacturer_id == Manufacturer.id, Robot.is_published.is_(True))
         .scalar_subquery()
     )
     rows = session.execute(
-        select(Manufacturer, published_robot_count.label("robot_count"))
+        select(
+            Manufacturer,
+            tracked_robot_count.label("tracked_robot_count"),
+            published_robot_count.label("published_robot_count"),
+        )
         .order_by(Manufacturer.name)
         .limit(limit)
         .offset(offset)
     ).all()
 
     # Published robots' commercial_status per manufacturer, for portfolio_status.
-    mfr_ids = [m.id for m, _ in rows]
+    mfr_ids = [m.id for m, _, _ in rows]
     statuses: dict[object, list[str]] = {}
     if mfr_ids:
         for mid, status in session.execute(
@@ -61,12 +73,13 @@ def list_manufacturers(
             slug=m.slug,
             name=m.name,
             country=m.country.code if m.country else None,
-            robot_count=int(count),
+            tracked_robot_count=int(tracked),
+            published_robot_count=int(published),
             deployment_status=m.deployment_status,
             portfolio_status=derive_portfolio_status(statuses.get(m.id, [])),
             updated_at=m.updated_at,
         )
-        for m, count in rows
+        for m, tracked, published in rows
     ]
     return Page(items=items, total=total, limit=limit, offset=offset)
 

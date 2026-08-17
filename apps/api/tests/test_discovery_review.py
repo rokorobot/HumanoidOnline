@@ -377,13 +377,20 @@ def test_the_canonical_robot_api_is_unchanged(client, seeded_candidates) -> None
 
 def test_candidates_do_not_reach_the_market_snapshot(client, seeded_candidates) -> None:
     """Snapshot counts drive the public homepage. A candidate counted there would
-    make the site advertise robots it has not verified."""
+    make the site advertise robots it has not verified.
+
+    `total_tracked` counts CATALOGUE robots — published or not — so the bound
+    asserted here is the robot table, not the published subset. A discovery
+    candidate lives in its own table and must raise neither figure.
+    """
     snapshot = client.get("/api/market-snapshot").json()
     with Session(engine) as s:
+        tracked = s.execute(select(func.count(Robot.id))).scalar_one()
         published = s.execute(
             select(func.count(Robot.id)).where(Robot.is_published.is_(True))
         ).scalar_one()
-    assert snapshot["total_tracked"] == published
+    assert snapshot["total_tracked"] == tracked
+    assert snapshot["total_published"] == published
 
 
 def test_candidate_manufacturers_do_not_reach_the_manufacturer_api(

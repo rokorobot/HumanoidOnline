@@ -8,7 +8,7 @@ import {
   listRobots,
   listUseCases,
 } from "@/lib/api-client";
-import { formatObservedDate } from "@/lib/format";
+import { formatObservedDate, formatRobotCoverage } from "@/lib/format";
 import { DotMatrix, GraphicMarker } from "@/components/GraphicMarker";
 import { MachineCode } from "@/components/MachineCode";
 import { ManufacturerCard } from "@/components/ManufacturerCard";
@@ -128,11 +128,14 @@ export default async function HomePage() {
               <div className="readout">
                 <Leader
                   k="ROBOTS"
-                  v={`${snapshot.total_tracked} TRACKED`}
+                  v={formatRobotCoverage(snapshot.total_tracked, snapshot.total_published)}
                 />
                 <Leader
                   k="MAKERS"
-                  v={`${snapshot.manufacturers} MANUFACTURERS`}
+                  v={formatRobotCoverage(
+                    snapshot.manufacturers_tracked,
+                    snapshot.manufacturers_published,
+                  )}
                 />
                 <Leader
                   k="ACCESSIBLE"
@@ -249,14 +252,22 @@ export default async function HomePage() {
         <div className="wrap">
           <SectionIndex>04 — MARKET SNAPSHOT</SectionIndex>
           <div className="snap-grid">
-            <Snap n={snapshot.total_tracked} label="Humanoids tracked" />
+            <Snap
+              n={snapshot.total_tracked}
+              label="Humanoids tracked"
+              sub={`${snapshot.total_published} published profiles`}
+            />
             <Snap
               n={snapshot.commercially_accessible}
               label="Commercially accessible"
               signal
             />
             <Snap n={snapshot.in_deployment_or_pilot} label="In pilot / deployment" />
-            <Snap n={snapshot.manufacturers} label="Manufacturers" />
+            <Snap
+              n={snapshot.manufacturers_tracked}
+              label="Manufacturers tracked"
+              sub={`${snapshot.manufacturers_published} with published profiles`}
+            />
           </div>
           <hr
             className="ho-rule"
@@ -289,11 +300,23 @@ function Leader({ k, v }: { k: string; v: string }) {
   );
 }
 
-function Snap({ n, label, signal }: { n: number; label: string; signal?: boolean }) {
+function Snap({
+  n,
+  label,
+  signal,
+  sub,
+}: {
+  n: number;
+  label: string;
+  signal?: boolean;
+  // Optional second line: the published subset behind a tracked headline.
+  sub?: string;
+}) {
   return (
     <div className="snap">
       <div className={signal ? "num sig" : "num"}>{n}</div>
       <div className="lbl ho-syslabel">{label}</div>
+      {sub ? <div className="lbl ho-syslabel">{sub}</div> : null}
     </div>
   );
 }

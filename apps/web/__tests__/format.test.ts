@@ -4,6 +4,7 @@ import {
   boolLabel,
   countryName,
   formatRobotCount,
+  formatRobotCoverage,
   maturityIndex,
   regionLabel,
   resolveAvailabilitySummary,
@@ -110,6 +111,20 @@ describe("formatRobotCount — singular/plural grammar", () => {
     expect(formatRobotCount(0)).toBe("0 ROBOTS");
     expect(formatRobotCount(2)).toBe("2 ROBOTS");
     expect(formatRobotCount(11)).toBe("11 ROBOTS");
+  });
+});
+
+describe("formatRobotCoverage — tracked and published are separate facts", () => {
+  it("states both counts for a maker with no published profiles", () => {
+    // The regression case: records exist, none are published. The old single
+    // count rendered "0 ROBOTS", which claims the maker builds no robots.
+    expect(formatRobotCoverage(4, 0)).toBe("4 TRACKED · 0 PUBLISHED");
+  });
+  it("states both counts when some profiles are published", () => {
+    expect(formatRobotCoverage(3, 2)).toBe("3 TRACKED · 2 PUBLISHED");
+  });
+  it("never renders a bare robot count that could be read as the whole truth", () => {
+    expect(formatRobotCoverage(0, 0)).toBe("0 TRACKED · 0 PUBLISHED");
   });
 });
 

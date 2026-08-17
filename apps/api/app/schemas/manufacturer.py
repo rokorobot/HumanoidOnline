@@ -12,7 +12,14 @@ class ManufacturerListItem(BaseModel):
     slug: str
     name: str
     country: str | None = None
-    robot_count: int
+    # Two different facts, never collapsed into one "robot count". `tracked`
+    # is every catalogue record for this manufacturer, published or not;
+    # `published` is the subset with a public profile. A single count forced
+    # the card to render "0 ROBOTS" for a manufacturer whose robots we hold
+    # records for but have not published — a false claim about the maker
+    # rather than a statement about our own publication state.
+    tracked_robot_count: int
+    published_robot_count: int
     deployment_status: str | None = None
     # Derived from published robots' commercial_status (see reads.derive_portfolio_status).
     # Distinct from the coarse `deployment_status` company column.

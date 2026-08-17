@@ -49,6 +49,12 @@ class StatusHistoryEntry(BaseModel):
 class SpecsBlock(BaseModel):
     height_cm: float | None = None
     weight_kg: float | None = None
+    #: Horizontal extent, in the ORM's own order and naming. Two distinct
+    #: measurements: span is fingertip-to-fingertip, reach is one arm from its
+    #: shoulder. Neither is derived from the other, so they are reported
+    #: separately and a missing one stays null rather than borrowing the other.
+    arm_span_cm: float | None = None
+    reach_cm: float | None = None
     payload_kg: float | None = None
     walk_speed_ms: float | None = None
     runtime_minutes: int | None = None

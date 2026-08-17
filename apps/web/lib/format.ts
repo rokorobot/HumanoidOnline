@@ -243,6 +243,18 @@ export function formatRobotCount(n: number): string {
   return `${n} ROBOT${n === 1 ? "" : "S"}`;
 }
 
+/**
+ * Manufacturer coverage: catalogue records held vs public profiles published.
+ *
+ * Rendered as two labelled facts because one number cannot carry both. A bare
+ * "0 ROBOTS" on a maker whose robots we hold unpublished records for asserts
+ * something false about that maker; "4 TRACKED · 0 PUBLISHED" states what we
+ * hold and what we have approved, which is the actual truth.
+ */
+export function formatRobotCoverage(tracked: number, published: number): string {
+  return `${tracked} TRACKED · ${published} PUBLISHED`;
+}
+
 const COUNTRY_NAMES: Record<string, string> = {
   US: "United States",
   CN: "China",

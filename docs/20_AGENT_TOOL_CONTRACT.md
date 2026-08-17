@@ -419,17 +419,14 @@ Otherwise the implementation must evaluate `pricing_offer` rows directly.
 server-side SQL, in `services/pricing.py` — a shared catalogue service, not an
 agent-owned one, so both surfaces can reach the same answer.
 
-- **AGENT `search_robots` — CONVERGED.** It evaluates the ceiling through
-  `services/pricing.py` in SQL: exact-currency, `pricing_offer` only, with
-  `COUNT` and `LIMIT`/`OFFSET` applied to the price-filtered set. The cache is
-  not read on this path.
-- **HTTP `/api/robots` — CONVERGENCE PENDING.** It still compares
-  `Robot.lowest_purchase_price <= price_max` with no currency predicate. That
-  behaviour cannot satisfy this contract and remains open drift. `docs/04` has
-  been amended (owner-approved) to specify the `price_max` + `price_currency`
-  pair and these exact-currency semantics; the HTTP implementation has not yet
-  been changed to match. Until it is, the two surfaces can return different
-  robot sets for the same price question.
+**CLOSED — both surfaces converged.** AGENT `search_robots` and HTTP
+`/api/robots` apply the identical exact-currency predicate from
+`services/pricing.py`, with `COUNT` and `LIMIT`/`OFFSET` over the price-filtered
+set. `/api/robots` takes `price_max` + `price_currency` as a required pair
+(`docs/04`) and no longer compares against `Robot.lowest_purchase_price`; the
+cache-based hard-constraint path was removed from the shared filter rather than
+left dormant, so no caller can reach it. The cache retains only its sanctioned
+sort/badge role (§10.5).
 
 ### 10.4 No synthesized best price
 No tool returns a single invented "best price" for a robot. `price_display` is
@@ -471,9 +468,11 @@ amounts are comparable.
 its §5 meaning — valid only alongside `price_max` — and is not accepted merely
 to select a sort denomination.
 
-**Implementation status.** Not yet implemented on either surface; both currently
-sort by the cache in all cases. Tracked as open work, not as a semantic
-question.
+**Implementation status — IMPLEMENTED on both surfaces.** The constrained
+ordering figure is `services/pricing.py::comparable_price_order_column`, derived
+from the same `comparable_amount()` that decides qualification, so the two
+cannot disagree about a robot's price. `robot_filters.py::resolve_sort` selects
+the mode; it does not define either.
 
 ## 11. Availability semantics
 
@@ -839,10 +838,14 @@ Drift status at this amendment:
 
 - **§12 region — CLOSED.** Both the HTTP catalogue and `search_robots` resolve
   applicability through the one canonical shared resolver.
-- **§10.3.1 price — PARTIALLY CLOSED.** `search_robots` evaluates the ceiling in
-  exact-currency SQL via `services/pricing.py`; **`/api/robots` has not yet
-  converged** and still compares against the cache.
-- **§10.5 price sort — SPECIFIED, NOT YET IMPLEMENTED** on either surface.
+- **§10.3.1 price — CLOSED.** Both surfaces apply the same exact-currency
+  predicate from `services/pricing.py`; the cache-based hard constraint has been
+  removed from the shared filter.
+- **§10.5 price sort — CLOSED.** Implemented on both surfaces from the same
+  comparable-amount definition.
+
+§21.2 semantic parity therefore holds for the region and price dimensions, on
+identities and on order.
 
 Remaining work is tracked as implementation status in the sections above, not as
 unresolved semantics.

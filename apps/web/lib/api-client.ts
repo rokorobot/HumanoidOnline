@@ -88,6 +88,9 @@ export interface RobotListParams {
   height_min?: number;
   height_max?: number;
   price_max?: number;
+  // Required by the API whenever price_max is set, and rejected without it.
+  // Derived in toRobotListParams — never set independently.
+  price_currency?: string;
   mobility?: string;
   autonomy_min?: string;
   has_sdk?: boolean;

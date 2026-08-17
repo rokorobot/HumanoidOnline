@@ -13,6 +13,11 @@ from app.models.robot import Robot
 from app.schemas.common import Page
 from app.schemas.robot import CompareResponse, CompareRow, RobotDetail, RobotListItem
 from app.services import reads
+from app.services.pricing import (
+    InvalidPriceQuery,
+    apply_price_ceiling,
+    validate_price_pair,
+)
 from app.services.robot_filters import (
     InvalidFilterValue,
     apply_catalogue_filters,
@@ -43,6 +48,7 @@ def list_robots(
     height_min: float | None = None,
     height_max: float | None = None,
     price_max: float | None = None,
+    price_currency: str | None = None,
     mobility: str | None = None,
     autonomy_min: str | None = None,
     has_sdk: bool | None = None,
@@ -66,25 +72,43 @@ def list_robots(
         # happens in this router.
         region_ids = resolve_region_filter(session, region) if region else None
 
+        # AGENT-02.1d — `price_max` and `price_currency` are a required pair, and
+        # the constraint is the shared currency-safe predicate AGENT-02 uses
+        # (`services/pricing.py`), never the cross-currency `lowest_purchase_price`
+        # cache. There is no default currency: a bare `price_max` is rejected.
+        validate_price_pair(price_max, price_currency)
+        constrained = price_max is not None
+
         filters = dict(
             q=q, manufacturer=manufacturer, commercial_status=commercial_status,
             transaction_type=transaction_type, availability_status=availability_status,
             region_ids=region_ids, use_case=use_case, payload_min=payload_min,
-            height_min=height_min, height_max=height_max, price_max=price_max,
+            height_min=height_min, height_max=height_max,
             mobility=mobility, autonomy_min=autonomy_min, has_sdk=has_sdk,
             ros_support=ros_support, developer_edition=developer_edition,
             has_manipulation=has_manipulation,
         )
 
         count_stmt = _apply_filters(select(func.count(Robot.id)), **filters)
-        order = resolve_sort(sort)
         stmt = _apply_filters(
             select(Robot).options(
                 selectinload(Robot.pricing_offers), selectinload(Robot.images)
             ),
             **filters,
-        ).order_by(order, Robot.slug).limit(limit).offset(offset)
-    except InvalidFilterValue as exc:
+        )
+        if constrained:
+            ceiling = dict(price_max=price_max, price_currency=price_currency)
+            count_stmt = apply_price_ceiling(count_stmt, **ceiling)
+            stmt = apply_price_ceiling(stmt, **ceiling)
+
+        # `sort=price` follows the qualifying amount only while a currency
+        # constraint is active (docs/20 §10.5); otherwise the sort/badge cache
+        # remains the sanctioned basis.
+        order = resolve_sort(
+            sort, price_currency=price_currency if constrained else None
+        )
+        stmt = stmt.order_by(order, Robot.slug).limit(limit).offset(offset)
+    except (InvalidFilterValue, InvalidPriceQuery) as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     total = session.execute(count_stmt).scalar_one()

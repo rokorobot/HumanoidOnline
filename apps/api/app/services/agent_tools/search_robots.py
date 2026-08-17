@@ -36,7 +36,12 @@ from app.services.agent_tools.errors import (
     InvalidPagination,
 )
 from app.services.agent_tools.pricing import warning_codes
-from app.services.pricing import apply_price_ceiling, ceiling_exclusions
+from app.services.pricing import (
+    InvalidPriceQuery,
+    apply_price_ceiling,
+    ceiling_exclusions,
+    validate_price_pair,
+)
 from app.services.robot_filters import (
     InvalidFilterEnum,
     InvalidRegion,
@@ -108,16 +113,12 @@ def search_robots(
     if offset < 0:
         raise InvalidPagination(f"offset must be >= 0; got {offset}")
 
-    if price_max is not None and price_currency is None:
-        raise InvalidArgument(
-            "price_max requires price_currency: a bare number cannot be "
-            "compared to money that carries a denomination"
-        )
-    if price_currency is not None and price_max is None:
-        raise InvalidArgument(
-            "price_currency has no independent meaning in v0.1; supply it only "
-            "with price_max"
-        )
+    # The pair rule is shared with `/api/robots` so both surfaces reject the
+    # same inputs; only the transport code differs.
+    try:
+        validate_price_pair(price_max, price_currency)
+    except InvalidPriceQuery as exc:
+        raise InvalidArgument(str(exc)) from exc
     if height_min is not None and height_max is not None and height_min > height_max:
         raise InvalidArgument("height_min must not exceed height_max")
 
@@ -139,7 +140,11 @@ def search_robots(
         raise InvalidEnum(str(exc)) from exc
 
     try:
-        order = resolve_sort(sort)
+        # `sort=price` follows the qualifying comparable amount while a currency
+        # constraint is active (docs/20 §10.5), otherwise the sort/badge cache.
+        order = resolve_sort(
+            sort, price_currency=price_currency if price_max is not None else None
+        )
     except InvalidSortKey as exc:
         raise InvalidArgument(str(exc)) from exc
 
@@ -162,9 +167,6 @@ def search_robots(
         payload_min=payload_min,
         height_min=height_min,
         height_max=height_max,
-        # `price_max` is NOT delegated: the cache behind it is cross-currency
-        # unsafe. Currency-safe evaluation happens below.
-        price_max=None,
         mobility=mobility,
         autonomy_min=autonomy_min,
         has_sdk=has_sdk,

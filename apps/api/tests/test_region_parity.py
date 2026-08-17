@@ -232,7 +232,7 @@ def test_9_an_empty_resolved_region_set_matches_nothing(database_url, robot_fact
     base = dict(
         q=None, manufacturer=None, commercial_status=None, transaction_type=None,
         availability_status=None, use_case=None, payload_min=None, height_min=None,
-        height_max=None, price_max=None, mobility=None, autonomy_min=None,
+        height_max=None, mobility=None, autonomy_min=None,
         has_sdk=None, ros_support=None, developer_edition=None,
         has_manipulation=None,
     )

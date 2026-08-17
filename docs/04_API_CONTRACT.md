@@ -66,9 +66,10 @@ the cache's sanctioned purpose. Ordering is stable for a given `sort`.
 *Amended 2026-08-18 by product-owner decision; supersedes the previous
 `price_max`-against-cache behaviour. Semantics are shared with
 `docs/20_AGENT_TOOL_CONTRACT.md` §10.3/§10.5 so the public API and the AGENT-02
-tool answer the same price question identically. **Implementation status:** the
-AGENT tool has converged; this endpoint has not yet, and still applies the older
-bare-`price_max`-against-cache behaviour until its convergence slice lands.*
+tool answer the same price question identically. **Implementation status:
+converged** — both surfaces apply the one shared predicate in
+`apps/api/app/services/pricing.py`, and the cache-based hard-price path has been
+removed.*
 
 Response `200`:
 ```json

@@ -8,7 +8,12 @@
 import { useRouter } from "next/navigation";
 import { useRef, type FormEvent } from "react";
 
-import { asArray, asString, type RawSearchParams } from "@/lib/search-params";
+import {
+  PRICE_CURRENCY,
+  asArray,
+  asString,
+  type RawSearchParams,
+} from "@/lib/search-params";
 import { GraphicMarker } from "./GraphicMarker";
 
 const COMMERCIAL_STATUS = [
@@ -72,6 +77,12 @@ export function FilterPanel({
       const val = String(v);
       if (val !== "") usp.append(k, val);
     }
+    // `price_max` and `price_currency` are a contract pair: the API rejects
+    // either alone. Appending the denomination here rather than rendering a
+    // hidden field keeps them inseparable — a hidden input is never "empty", so
+    // it would survive the filter above and emit a lone `price_currency` the
+    // moment the price box is cleared. Clearing the price therefore drops both.
+    if (usp.has("price_max")) usp.set("price_currency", PRICE_CURRENCY);
     router.push(`/robots?${usp.toString()}`, { scroll: false });
   }
 

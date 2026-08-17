@@ -5,6 +5,14 @@ import type { RobotListParams } from "./api-client";
 
 export type RawSearchParams = Record<string, string | string[] | undefined>;
 
+// The catalogue price filter is denominated in USD, which the control states
+// visibly ("Max purchase price (USD)"). The API requires `price_max` and
+// `price_currency` as a pair and applies no default currency, so the
+// denomination is sent explicitly rather than assumed server-side.
+// A multi-currency selector is a later UI enhancement; this constant is the one
+// place the current single currency is declared.
+export const PRICE_CURRENCY = "USD";
+
 export function asArray(v: string | string[] | undefined): string[] {
   if (v == null) return [];
   return Array.isArray(v) ? v : [v];
@@ -30,8 +38,17 @@ function asBool(v: string | string[] | undefined): boolean | undefined {
 }
 
 // Map raw URL params -> the typed API list params (the API is the source of facts).
+//
+// `price_currency` is DERIVED from `price_max`, never read from the URL: the API
+// rejects either half of the pair alone, so deriving it here makes an invalid
+// request unrepresentable regardless of how the URL was formed — a hand-typed
+// `?price_currency=USD`, a stale bookmark, or a no-JS form submission that
+// carried only `price_max`.
 export function toRobotListParams(sp: RawSearchParams): RobotListParams {
+  const priceMax = asNumber(sp.price_max);
   return {
+    price_max: priceMax,
+    price_currency: priceMax != null ? PRICE_CURRENCY : undefined,
     q: asString(sp.q),
     manufacturer: asString(sp.manufacturer),
     commercial_status: asArray(sp.commercial_status),
@@ -42,7 +59,6 @@ export function toRobotListParams(sp: RawSearchParams): RobotListParams {
     payload_min: asNumber(sp.payload_min),
     height_min: asNumber(sp.height_min),
     height_max: asNumber(sp.height_max),
-    price_max: asNumber(sp.price_max),
     mobility: asString(sp.mobility),
     autonomy_min: asString(sp.autonomy_min),
     has_sdk: asBool(sp.has_sdk),

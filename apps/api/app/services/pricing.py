@@ -37,6 +37,34 @@ from app.models.robot import Robot
 POINT_TYPES = ("PUBLIC", "FROM", "ESTIMATED")
 
 
+class InvalidPriceQuery(ValueError):
+    """`price_max` and `price_currency` supplied as anything but a pair.
+
+    Transport-independent, like the filter errors in `robot_filters.py`: the
+    binding maps it to HTTP 422 or `INVALID_ARGUMENT`.
+    """
+
+
+def validate_price_pair(price_max, price_currency) -> None:
+    """`price_max` and `price_currency` are a required pair (`docs/20` §5).
+
+    Neither half means anything alone. A bare number cannot be compared to money
+    that carries a denomination, and the server never supplies the missing
+    denomination itself — there is no default currency, so a caller who omits it
+    gets an error rather than a silent assumption about which money they meant.
+    """
+    if price_max is not None and price_currency is None:
+        raise InvalidPriceQuery(
+            "price_max requires price_currency: a bare number cannot be "
+            "compared to money that carries a denomination"
+        )
+    if price_currency is not None and price_max is None:
+        raise InvalidPriceQuery(
+            "price_currency has no independent meaning in v0.1; supply it only "
+            "with price_max"
+        )
+
+
 @dataclass(frozen=True)
 class CeilingExclusions:
     """Why robots are absent from a ceiling-constrained result, as presence flags.
@@ -110,6 +138,32 @@ def apply_price_ceiling(stmt, *, price_max: float, price_currency: str):
     alike, which is what keeps `total` truthful while pagination stays in SQL.
     """
     return stmt.where(Robot.id.in_(robots_under_ceiling(price_currency, price_max)))
+
+
+def comparable_price_order_column(price_currency: str):
+    """Per-robot ordering figure for `sort=price` under a currency constraint.
+
+    `docs/20` §10.5: a robot must never qualify on its EUR price and then be
+    ordered by an unrelated cached USD amount. The figure is therefore the
+    **lowest comparable amount in `price_currency`** — derived from the *same*
+    `comparable_amount()` the ceiling uses, so qualification and ordering can
+    never disagree about what a robot's price is.
+
+    `MIN` ignores NULLs, so `QUOTE_ONLY` rows contribute nothing and a `RANGE`
+    contributes its upper bound, exactly as in the ceiling. Any robot that
+    survived the ceiling has a non-NULL figure by construction — it could not
+    have qualified otherwise — so this ordering has no null case.
+    """
+    return (
+        select(func.min(comparable_amount()))
+        .where(
+            PricingOffer.robot_id == Robot.id,
+            PricingOffer.is_current.is_(True),
+            PricingOffer.transaction_type == "PURCHASE",
+            PricingOffer.currency == price_currency.upper(),
+        )
+        .scalar_subquery()
+    )
 
 
 def ceiling_exclusions(

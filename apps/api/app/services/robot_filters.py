@@ -13,13 +13,18 @@ answered 0 while the agent answered 8 for the same catalogue. Removing the
 parameter rather than leaving it unused is deliberate — a dormant exact-code
 path is an invitation to reintroduce the divergence.
 
-One dimension is still deliberately parameterised, because the router and the
-agent contract legitimately differ today:
+**Price is single-sourced too (AGENT-02.1d).** This module no longer accepts
+`price_max` at all. It once applied `Robot.lowest_purchase_price <= price_max`,
+a cache whose derivation takes a cross-currency minimum across `PUBLIC`/`FROM`
+only — neither currency-safe nor complete (`docs/20` §10.3.1). The hard price
+constraint now lives entirely in `services/pricing.py` and is applied by the
+caller via `apply_price_ceiling`, so there is no second price interpretation for
+a future caller to reach for.
 
-* **price_max** — the router still filters on the `lowest_purchase_price` cache.
-  The agent passes `price_max=None` and applies currency-safe filtering in
-  `agent_tools/search_robots.py`, because that cache is cross-currency unsafe
-  (`docs/20` §10.3.1).
+The cache keeps its one legitimate role: `SORT_COLUMNS["price"]`, the sort/badge
+use `docs/01` §7 and `db/schema.sql` sanction. Under an active
+`price_max` + `price_currency` pair even ordering switches to the comparable
+amount (`docs/20` §10.5, `resolve_sort`).
 
 `Robot.is_published.is_(True)` is unconditional here and is the publication gate
 (AGENT-01.7). No caller may bypass it.
@@ -45,6 +50,7 @@ from app.models.enums import AUTONOMY_ORDER
 from app.models.manufacturer import Manufacturer
 from app.models.robot import Robot
 from app.models.use_case import UseCase, UseCaseFit
+from app.services.pricing import comparable_price_order_column
 from app.services.regions import applicable_region_ids
 
 
@@ -159,13 +165,19 @@ def validate_filter_vocabulary(
             _check_enum(field, value)
 
 
-def resolve_sort(sort: str):
+def resolve_sort(sort: str, *, price_currency: str | None = None):
     """Ordering expression for a v0.1 sort key, `-` prefix for descending.
 
     Raises `InvalidSortKey` rather than falling back to `name`: a silent
     fallback hands the caller a different ordering than the one requested while
     reporting success, which is undetectable downstream (`docs/20` §16 —
     "no client-controlled sort key outside the four enumerated values").
+
+    `price_currency` selects the *mode* of `sort=price` (`docs/20` §10.5) and is
+    passed only when the query carries an active `price_max` + `price_currency`
+    pair. This function chooses between modes; it does not define either —
+    the constrained figure comes from `services/pricing.py`, the same module
+    that defines qualification, so the two cannot drift apart.
     """
     if not isinstance(sort, str):
         raise InvalidSortKey("sort", sort, tuple(SORT_COLUMNS))
@@ -176,6 +188,9 @@ def resolve_sort(sort: str):
         # Covers the bare "-" and the empty string, both of which previously
         # resolved to `name`.
         raise InvalidSortKey("sort", sort, tuple(SORT_COLUMNS))
+    if key == "price" and price_currency:
+        # Constrained: order by the comparable amount that qualified the robot.
+        column = comparable_price_order_column(price_currency)
     return column.desc().nullslast() if descending else column.asc().nullslast()
 
 
@@ -191,7 +206,6 @@ def apply_catalogue_filters(
     payload_min,
     height_min,
     height_max,
-    price_max,
     mobility,
     autonomy_min,
     has_sdk,
@@ -255,8 +269,6 @@ def apply_catalogue_filters(
         stmt = stmt.where(Robot.height_cm >= height_min)
     if height_max is not None:
         stmt = stmt.where(Robot.height_cm <= height_max)
-    if price_max is not None:
-        stmt = stmt.where(Robot.lowest_purchase_price <= price_max)
     if mobility:
         stmt = stmt.where(Robot.mobility == mobility)
     if autonomy_min:

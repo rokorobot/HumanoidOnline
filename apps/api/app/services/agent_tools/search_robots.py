@@ -35,7 +35,8 @@ from app.services.agent_tools.errors import (
     InvalidEnum,
     InvalidPagination,
 )
-from app.services.agent_tools.pricing import evaluate_price_ceiling
+from app.services.agent_tools.pricing import warning_codes
+from app.services.pricing import apply_price_ceiling, ceiling_exclusions
 from app.services.robot_filters import (
     InvalidFilterEnum,
     InvalidRegion,
@@ -179,29 +180,36 @@ def search_robots(
         **filters,
     ).order_by(order, Robot.slug)
 
+    count_stmt = apply_catalogue_filters(select(func.count(Robot.id)), **filters)
+
     if price_max is None:
-        total = session.execute(
-            apply_catalogue_filters(select(func.count(Robot.id)), **filters)
-        ).scalar_one()
+        total = session.execute(count_stmt).scalar_one()
         robots = list(session.execute(base.limit(limit).offset(offset)).scalars())
     else:
-        # The price ceiling is evaluated per robot against pricing_offer, so it
-        # cannot be pushed into the count query. Resolve the filtered set first,
-        # then paginate the surviving rows — `total` stays truthful.
-        candidates = list(session.execute(base).scalars())
-        verdicts = evaluate_price_ceiling(
-            session,
-            [r.id for r in candidates],
-            price_max=price_max,
-            price_currency=price_currency or "",
+        # The ceiling is a SQL predicate (services/pricing.py), so it composes
+        # into the count and the paged query alike. Nothing is filtered in
+        # Python and no candidate set is materialised: `total` counts the
+        # price-filtered set server-side, and LIMIT/OFFSET stay in SQL.
+        ceiling = dict(price_max=price_max, price_currency=price_currency or "")
+        total = session.execute(
+            apply_price_ceiling(count_stmt, **ceiling)
+        ).scalar_one()
+        robots = list(
+            session.execute(
+                apply_price_ceiling(base, **ceiling).limit(limit).offset(offset)
+            ).scalars()
         )
-        reasons = {
-            v.reason for v in verdicts.values() if v.reason is not None
-        }
-        warnings.extend(sorted(reasons))
-        survivors = [r for r in candidates if verdicts[r.id].qualifies]
-        total = len(survivors)
-        robots = survivors[offset : offset + limit]
+        # Reasons describe the whole filtered query, not the visible page, and
+        # come back as one bounded aggregate row over the pre-ceiling candidates.
+        warnings.extend(
+            warning_codes(
+                ceiling_exclusions(
+                    session,
+                    apply_catalogue_filters(select(Robot.id), **filters),
+                    **ceiling,
+                )
+            )
+        )
 
     snapshot = reads.snapshot_for(session, [r.id for r in robots])
     items = [reads.serialize_list_item(r, snapshot) for r in robots]

@@ -14,6 +14,12 @@ dependencies = [
     # WS8.1 / R1 — Starlette's SessionMiddleware (used by the SQLAdmin
     # authentication backend) signs the session cookie with itsdangerous.
     "itsdangerous>=2.2",
+    # AGENT-02 / docs/20 §7.1.1 — AES-SIV (RFC 5297) for opaque, deterministic,
+    # authenticated evidence references. A vetted misuse-resistant AEAD is
+    # required: a signing-only token would leave the identifier readable, and a
+    # nonce-critical mode must never be driven deterministically. Floor is 42
+    # because AESSIV/AESGCMSIV are both present from that line onward.
+    "cryptography>=42",
 ]
 
 [dependency-groups]

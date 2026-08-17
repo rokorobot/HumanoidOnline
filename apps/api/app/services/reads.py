@@ -84,7 +84,17 @@ def _spec_value(spec: Specification) -> float | bool | str | None:
 def load_evidence(
     session: Session, subject_ids: set[uuid.UUID]
 ) -> dict[tuple[str, uuid.UUID], EvidenceRead]:
-    """Best evidence per (subject_type, subject_id): verified first, then newest."""
+    """Best evidence per (subject_type, subject_id): verified first, then newest,
+    then a deterministic internal tie-break (`docs/20` §13.1).
+
+    The third key is not decoration. Verified-ness and `observed_at` can tie
+    exactly — the seeded catalogue imports every row with one timestamp — and a
+    stable sort then falls back to the order an unordered query happened to
+    return, which PostgreSQL does not guarantee. Since an `evidence_ref`
+    addresses the *selected row*, an unbroken tie would let a published citation
+    point somewhere else after a replan. The row id orders ties and nothing else;
+    it is never exposed (§8, §20).
+    """
     if not subject_ids:
         return {}
     rows = list(
@@ -92,7 +102,9 @@ def load_evidence(
             select(EvidenceSource).where(EvidenceSource.subject_id.in_(subject_ids))
         ).scalars()
     )
-    rows.sort(key=lambda e: (1 if e.verified_at else 0, e.observed_at), reverse=True)
+    rows.sort(
+        key=lambda e: (1 if e.verified_at else 0, e.observed_at, str(e.id)), reverse=True
+    )
     best: dict[tuple[str, uuid.UUID], EvidenceRead] = {}
     for e in rows:
         key = (e.subject_type, e.subject_id)

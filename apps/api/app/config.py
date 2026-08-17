@@ -100,6 +100,23 @@ class Settings(BaseSettings):
     admin_password: str | None = None
     admin_session_secret: str | None = None
 
+    # ------------------------------------------------------------- AGENT-02 --
+    # Evidence references (docs/20 §7.1.1). A DEDICATED key: deliberately not the
+    # admin session secret, a credential or the database password, so that
+    # rotating or compromising one never implicates the other. Base64url of
+    # exactly 64 raw bytes (512-bit AES-SIV).
+    #
+    # Absent by default and fail-closed: without it the agent evidence-reference
+    # path raises rather than emitting an unauthenticated token or a raw
+    # identifier. There is intentionally no development default — a shipped
+    # default key is the same as no key, but harder to notice.
+    #
+    # `evidence_ref_previous_keys` is "<key_id>:<base64url>[,...]" and exists so a
+    # rotation can accept references issued under the outgoing key for a window.
+    evidence_ref_key: str | None = None
+    evidence_ref_key_id: str = "1"
+    evidence_ref_previous_keys: str = ""
+
     # DEP P1 — trusted ingress. Comma-separated IPs/CIDRs whose forwarding
     # headers may be believed. EMPTY (the default) means *no* ingress is trusted
     # and every forwarding header is ignored, so a client cannot spoof its

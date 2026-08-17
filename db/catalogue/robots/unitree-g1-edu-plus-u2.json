@@ -1,0 +1,162 @@
+{
+  "slug": "unitree-g1-edu-plus-u2",
+  "name": "G1 EDU Plus (U2)",
+  "manufacturer_slug": "unitree",
+  "model_code": "G1-EDU-U2",
+  "summary": "The Plus tier of Unitree's G1 EDU line: 29 degrees of freedom (a 3-DoF waist against the base G1's 1) and an NVIDIA Jetson Orin NX development module at 100 TOPS, which the base G1 does not carry at all. Perception is a Livox MID-360 3D LiDAR with 360-degree horizontal coverage plus an Intel RealSense D435i depth camera, with a 4-microphone array and 5 W speaker for voice interaction. A 9000 mAh quick-release battery gives about 2 hours of runtime. Ships with fixed, non-articulating hands -- dexterous 3- and 5-finger hands exist on other EDU-tier configurations, not this one. Secondary development (SDK access) is supported, which the base G1 does not offer.",
+  "announced_year": null,
+  "commercial_status": "COMMERCIAL",
+  "is_published": true,
+  "specs": {
+    "height_cm": 132.0,
+    "weight_kg": 35.0,
+    "arm_span_cm": null,
+    "reach_cm": 45.0,
+    "payload_kg": 3.0,
+    "walk_speed_ms": null,
+    "runtime_minutes": 120,
+    "battery_wh": null,
+    "mobility": "BIPEDAL",
+    "degrees_of_freedom": 29,
+    "hand_type": "Fixed non-dexterous hand (non-articulating; cannot grasp). Dexterous three- and five-finger hands exist on other EDU-tier configurations, not this one.",
+    "hand_dof": 0,
+    "autonomy": null,
+    "has_manipulation": false,
+    "has_teleoperation": true,
+    "has_vision": true,
+    "has_language_ui": true,
+    "has_sdk": true,
+    "has_api": true,
+    "ros_support": true,
+    "developer_edition": true,
+    "simulation_support": true
+  },
+  "specs_note": "Entered by robert@humanoid.company from the G1 EDU Plus (U2) product listing he supplied (retrieved 2026-08-16); the listing states 'Values shown are from the manufacturer's reference'. Judgement calls, each deliberate:\n\n* reach_cm 45, arm_span_cm NULL. The source labels 'Arm Span: about 0.45 m', but this schema defines arm_span_cm as fingertip-to-fingertip and reach_cm as one arm from its shoulder. A 132 cm-tall humanoid cannot have a 45 cm fingertip-to-fingertip span, so the figure is a single-arm measure and is recorded as REACH. Copying it into arm_span_cm would have put a real number in the wrong field. Actual fingertip-to-fingertip span is not stated anywhere in the source and stays UNKNOWN -- and must not be derived from reach.\n* weight_kg 35.0 is a FLOOR, not an exact figure: the source says 'About 35 kg+'.\n* height_cm 132.0 from the stand dimensions 1320 x 450 x 200 mm. Folded (690 mm) is a different measurement and is not height.\n* payload_kg 3.0 is the ARM maximum load ('About 3 kg arm payload'). The listing's headline 'Payload 3 kg' is the same figure; there is no separate whole-body payload rating.\n* hand_dof 0 is a stated fact, not a gap: 'The fingers do not move or actuate.' has_manipulation is FALSE for the same reason -- the source is explicit that 'this hand cannot grasp or manipulate objects'. The arms themselves are 5 DoF each and rated to ~3 kg; it is the end effector that cannot manipulate. This flips to true on a dexterous-hand configuration, which is a different SKU.\n* battery_wh left UNKNOWN. The source gives 9000 mAh and a 13-string lithium pack, not watt-hours. Converting would require assuming a nominal cell voltage, which would be a derived number presented as a measured one.\n* walk_speed_ms, announced_year and autonomy are not stated in the source and stay UNKNOWN. Note the base G1 record carries autonomy TELEOPERATED; that is a different configuration and is not inherited here.\n* Not modelled by any current schema field, so recorded in `summary` instead: Jetson Orin NX / 100 TOPS (16 GB RAM, 2 TB storage, 1024 Ampere cores), Livox MID-360 LiDAR, RealSense D435i, 120 N.m peak knee torque, 5 DoF per arm / 6 DoF per leg / 3 DoF waist, WiFi 6 + Bluetooth 5.2.\n\nRelationship to `unitree-g1`: that record is the BASE G1 platform (23 DoF, no Jetson module, no secondary-development access) and carries a general `g1-edu` variant. This is a specific EDU SKU with its own spec sheet, so it is its own record rather than an edit to the base one -- the same shape as the Booster K1 family. NOTE: the listing text supplied for this SKU contains no price and no SKU code, unlike the Booster K1 pages, so no pricing_offer is recorded. The exact source URL was subsequently supplied and attested by the product owner and is now recorded on the evidence and image rows.",
+  "official_url": "https://www.unitree.com/g1/",
+  "commercial_status_evidence": [
+    {
+      "source_url": "https://eu.robotshop.com/products/unitree-g1-edu-plus-u2-humanoid-robot-eu",
+      "source_type": "OTHER",
+      "source_title": "Unitree G1 EDU Plus (U2) Humanoid Robot -- EU retail product listing supplied by the product owner, who also supplied and attested the exact product URL recorded here",
+      "excerpt": "Estimated Lead Time: Orders placed today are expected to ship within ~6-8 weeks.",
+      "published_at": null,
+      "observed_at": "2026-08-16",
+      "verified_at": null,
+      "confidence": "MEDIUM",
+      "note": "COMMERCIAL because the configuration is presented as orderable with a concrete shipping lead time, not merely announced. Confidence MEDIUM and verified_at deliberately NULL: the listing is a third-party retailer rather than Unitree's own store, and the exact product URL recorded here was supplied and attested by the product owner rather than independently re-checked at source. No price or SKU appears in the supplied text, so no pricing_offer is recorded -- an unknown price is no row, never a zero and never QUOTE_ONLY."
+    }
+  ],
+  "variants": [],
+  "pricing_offers": [],
+  "availability_offers": [],
+  "deployments": [],
+  "capabilities": [
+    {
+      "slug": "dynamic-walking",
+      "supported": true,
+      "detail": "Bipedal locomotion with 6 DoF per leg and 120 N.m peak knee torque; 3 DoF waist adds trunk mobility over the base G1's 1 DoF."
+    },
+    {
+      "slug": "teleoperation",
+      "supported": true,
+      "detail": "Unitree publishes an xr_teleoperate repository for this platform alongside the SDK."
+    },
+    {
+      "slug": "voice-interaction",
+      "supported": true,
+      "detail": "4-microphone array and 5 W speaker; the listing describes two-way listen-and-respond interaction during collaborative tasks."
+    },
+    {
+      "slug": "object-recognition",
+      "supported": true,
+      "detail": "Livox MID-360 3D LiDAR (360 degrees horizontal, 59 degrees vertical) and Intel RealSense D435i RGB-D camera feeding the onboard AI stack for obstacle, person and terrain sensing."
+    },
+    {
+      "slug": "dexterous-hands",
+      "supported": false,
+      "detail": "This SKU ships fixed, non-articulating hands that cannot grasp. Dexterous three- and five-finger hands are available on other EDU-tier configurations."
+    }
+  ],
+  "use_case_fits": [
+    {
+      "use_case_slug": "research-education",
+      "fit_score": 0.85,
+      "is_primary": true,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "Explicitly positioned for university labs, robotics startups and technical demonstration. Open SDK, ROS-compatible workflows, unitree_rl_gym and sim-to-real transfer, plus a 100 TOPS onboard development module, make it a full research platform rather than a demonstration unit.",
+      "limitations": "Ships without a working gripper, so manipulation research needs a different hand configuration. ~3 kg arm load and ~2 h runtime.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "use_case_slug": "events-entertainment",
+      "fit_score": 0.5,
+      "is_primary": false,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "The listing cites trade shows and technology expos, where coordinated bipedal movement and balance recovery are demonstrated to live audiences.",
+      "limitations": "A research platform used for demonstration, not a purpose-built entertainment product; requires an operator running structured routines.",
+      "confidence": "LOW"
+    }
+  ],
+  "images": [
+    {
+      "image_url": "/robots/unitree-g1-edu-plus-u2.webp",
+      "source_url": "https://eu.robotshop.com/products/unitree-g1-edu-plus-u2-humanoid-robot-eu",
+      "source_name": "EU retail product listing (Unitree product render)",
+      "source_type": "DISTRIBUTOR",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "ATTRIBUTION_REQUIRED",
+      "usage_basis": "NONE",
+      "is_official": false,
+      "is_primary": true,
+      "attribution": "© Unitree Robotics",
+      "last_verified_at": "2026-08-17T00:07:00+00:00",
+      "identity_confirmed_by": "robert@humanoid.company"
+    },
+    {
+      "image_url": "/robots/unitree-g1-edu-plus-u2-side.webp",
+      "source_url": "https://eu.robotshop.com/products/unitree-g1-edu-plus-u2-humanoid-robot-eu",
+      "source_name": "EU retail product listing (Unitree product render)",
+      "source_type": "DISTRIBUTOR",
+      "image_type": "SIDE",
+      "identity_status": "VERIFIED",
+      "rights_status": "ATTRIBUTION_REQUIRED",
+      "usage_basis": "NONE",
+      "is_official": false,
+      "is_primary": false,
+      "attribution": "© Unitree Robotics",
+      "last_verified_at": "2026-08-17T00:07:00+00:00",
+      "identity_confirmed_by": "robert@humanoid.company"
+    },
+    {
+      "image_url": "/robots/unitree-g1-edu-plus-u2-action.webp",
+      "source_url": "https://eu.robotshop.com/products/unitree-g1-edu-plus-u2-humanoid-robot-eu",
+      "source_name": "EU retail product listing (Unitree product render)",
+      "source_type": "DISTRIBUTOR",
+      "image_type": "ACTION",
+      "identity_status": "VERIFIED",
+      "rights_status": "ATTRIBUTION_REQUIRED",
+      "usage_basis": "NONE",
+      "is_official": false,
+      "is_primary": false,
+      "attribution": "© Unitree Robotics",
+      "last_verified_at": "2026-08-17T00:07:00+00:00",
+      "identity_confirmed_by": "robert@humanoid.company"
+    },
+    {
+      "image_url": "/robots/unitree-g1-edu-plus-u2-detail.webp",
+      "source_url": "https://eu.robotshop.com/products/unitree-g1-edu-plus-u2-humanoid-robot-eu",
+      "source_name": "EU retail product listing (Unitree product render)",
+      "source_type": "DISTRIBUTOR",
+      "image_type": "DETAIL",
+      "identity_status": "VERIFIED",
+      "rights_status": "ATTRIBUTION_REQUIRED",
+      "usage_basis": "NONE",
+      "is_official": false,
+      "is_primary": false,
+      "attribution": "© Unitree Robotics",
+      "last_verified_at": "2026-08-17T00:07:00+00:00",
+      "identity_confirmed_by": "robert@humanoid.company"
+    }
+  ]
+}

@@ -1,10 +1,13 @@
 // Catalogue /robots — controlled band. Filter rail + result RobotCards + sort,
 // all wired to /api/robots. URL-addressable: filters live in searchParams and
 // are forwarded verbatim to the API. No facts are computed here.
+import { notFound, redirect } from "next/navigation";
+
 import { listRobots } from "@/lib/api-client";
 import {
   asArray,
   asString,
+  canonicalizePriceParams,
   toQueryString,
   toRobotListParams,
   type RawSearchParams,
@@ -40,6 +43,20 @@ export default async function RobotsPage({
   searchParams: Promise<RawSearchParams>;
 }) {
   const sp = await searchParams;
+
+  // Canonicalize the price pair BEFORE querying, so the address bar and the API
+  // request can never state different denominations. An incomplete pair is
+  // redirected once into canonical form (notably the no-JS GET form, which
+  // submits `price_max` with no currency field); a currency this USD-only UI
+  // cannot honour is refused outright rather than reinterpreted as USD or
+  // dropped — dropping it would silently widen the result set, which is the
+  // failure mode the whole price contract exists to prevent.
+  const priceUrl = canonicalizePriceParams(sp);
+  if (priceUrl.action === "reject") notFound();
+  if (priceUrl.action === "redirect") {
+    redirect(`/robots${toQueryString(priceUrl.params)}`);
+  }
+
   const apiParams = toRobotListParams(sp);
   const page = await listRobots({ ...apiParams, limit: 100 });
 

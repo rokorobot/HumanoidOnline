@@ -42,8 +42,18 @@ describe("price_max / price_currency pairing", () => {
     expect(params.price_max).toBeUndefined();
   });
 
-  it("ignores a conflicting currency in the URL rather than trusting it", () => {
+  it("honours an explicit URL currency rather than overwriting it", () => {
+    // AGENT-02.1e reverses the earlier behaviour deliberately. Substituting USD
+    // here would make the API request disagree with the address bar; the route
+    // rejects a non-USD URL up front (see the canonicalization suite), so this
+    // path is the guarantee that no silent reinterpretation happens even if a
+    // caller reaches it directly.
     const params = toRobotListParams({ price_max: "30000", price_currency: "EUR" });
+    expect(params.price_currency).toBe("EUR");
+  });
+
+  it("still defaults the denomination when the URL states none", () => {
+    const params = toRobotListParams({ price_max: "30000" });
     expect(params.price_currency).toBe(PRICE_CURRENCY);
   });
 

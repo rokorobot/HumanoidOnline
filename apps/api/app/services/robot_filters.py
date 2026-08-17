@@ -41,7 +41,7 @@ from __future__ import annotations
 import uuid
 from collections.abc import Collection
 
-from sqlalchemy import false, func, select
+from sqlalchemy import false, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.models import enums as pg_enums
@@ -194,6 +194,115 @@ def resolve_sort(sort: str, *, price_currency: str | None = None):
     return column.desc().nullslast() if descending else column.asc().nullslast()
 
 
+def _nullable_fact_constraints(
+    *,
+    payload_min,
+    height_min,
+    height_max,
+    mobility,
+    autonomy_min,
+    has_sdk,
+    ros_support,
+    developer_edition,
+    has_manipulation,
+) -> list[tuple]:
+    """Active hard constraints on **nullable first-class robot facts**.
+
+    Each is returned as `(satisfied, is_unknown)` so the two consumers cannot
+    drift apart: `apply_catalogue_filters` requires `satisfied`, and
+    `unknown_exclusion_query` asks whether a robot would have qualified but for
+    `is_unknown`. Writing the second interpretation separately is exactly how a
+    notice ends up describing a filter that behaves differently.
+
+    Scope is deliberately these nine inputs over eight nullable columns:
+
+    * `commercial_status` is **excluded** — it is `NOT NULL` with `UNKNOWN` as an
+      explicit enum member (`docs/20` §9.1), so filtering it out is an ordinary
+      enum exclusion, not the exclusion of an unrecorded fact.
+    * `price_max` is **excluded** — it has its own ratified reason codes
+      (`docs/20` §10.3), which distinguish *unprovable* from *above limit* more
+      precisely than a generic notice could.
+    * `q`, `manufacturer`, `use_case`, `transaction_type`, `availability_status`
+      and `region` are relational or textual, not nullable facts on the robot.
+
+    SQL three-valued logic is what excludes UNKNOWN in the first place: `NULL >=
+    10` and `NULL IS TRUE` are both not-true, so a robot with no recorded value
+    never satisfies an explicit requirement. That is the ratified rule (§9.2);
+    this helper only makes the same predicate available to the detector.
+    """
+    constraints: list[tuple] = []
+    if payload_min is not None:
+        constraints.append(
+            (Robot.payload_kg >= payload_min, Robot.payload_kg.is_(None))
+        )
+    if height_min is not None:
+        constraints.append((Robot.height_cm >= height_min, Robot.height_cm.is_(None)))
+    if height_max is not None:
+        constraints.append((Robot.height_cm <= height_max, Robot.height_cm.is_(None)))
+    if mobility:
+        constraints.append((Robot.mobility == mobility, Robot.mobility.is_(None)))
+    if autonomy_min:
+        allowed = AUTONOMY_ORDER[AUTONOMY_ORDER.index(autonomy_min):]
+        constraints.append((Robot.autonomy.in_(allowed), Robot.autonomy.is_(None)))
+    for column, value in (
+        (Robot.has_sdk, has_sdk),
+        (Robot.ros_support, ros_support),
+        (Robot.developer_edition, developer_edition),
+        (Robot.has_manipulation, has_manipulation),
+    ):
+        if value is not None:
+            constraints.append((column.is_(value), column.is_(None)))
+    return constraints
+
+
+#: The `apply_catalogue_filters` keywords `_nullable_fact_constraints` owns.
+_NULLABLE_FACT_INPUTS = (
+    "payload_min", "height_min", "height_max", "mobility", "autonomy_min",
+    "has_sdk", "ros_support", "developer_edition", "has_manipulation",
+)
+
+
+def unknown_exclusion_query(**filters):
+    """Robots excluded **only** because a constrained fact is UNKNOWN.
+
+    `docs/20` §9.2 excludes an UNKNOWN value from satisfying an explicit positive
+    requirement, and §9.4 requires the response to say so where a consumer could
+    misread the absence. This builds the set that notice is about: a published
+    robot that
+
+    1. satisfies every other active constraint,
+    2. holds no **known** value contradicting an active nullable-fact
+       constraint, and
+    3. is UNKNOWN on at least one of them.
+
+    Point 2 is what keeps the notice honest. A robot already failing a different
+    requirement on a recorded value was not excluded by uncertainty, and must not
+    imply that it was — so the constraints are *relaxed* to "satisfied or
+    unknown" rather than dropped.
+
+    Returns `None` when no nullable-fact constraint is active, because then no
+    robot can have been excluded for being UNKNOWN and there is nothing to
+    report. Returns a `select(Robot.id)` otherwise — the caller decides how to
+    ask (an `EXISTS`, never a materialised list).
+    """
+    constraints = _nullable_fact_constraints(
+        **{k: filters[k] for k in _NULLABLE_FACT_INPUTS}
+    )
+    if not constraints:
+        return None
+
+    # Every OTHER active constraint, applied by the governed filter itself — so
+    # publication, geography, availability and vocabulary all behave identically
+    # here and in the real query.
+    stmt = apply_catalogue_filters(
+        select(Robot.id),
+        **{**filters, **{k: None for k in _NULLABLE_FACT_INPUTS}},
+    )
+    for satisfied, is_unknown in constraints:
+        stmt = stmt.where(or_(satisfied, is_unknown))
+    return stmt.where(or_(*(is_unknown for _, is_unknown in constraints)))
+
+
 def apply_catalogue_filters(
     stmt,
     *,
@@ -263,29 +372,23 @@ def apply_catalogue_filters(
                 .where(UseCase.slug == use_case)
             )
         )
-    if payload_min is not None:
-        stmt = stmt.where(Robot.payload_kg >= payload_min)
-    if height_min is not None:
-        stmt = stmt.where(Robot.height_cm >= height_min)
-    if height_max is not None:
-        stmt = stmt.where(Robot.height_cm <= height_max)
-    if mobility:
-        stmt = stmt.where(Robot.mobility == mobility)
-    if autonomy_min:
-        # No membership guard here any more. It used to read `if autonomy_min in
-        # AUTONOMY_ORDER:` with no else, so an unrecognised value applied NO
-        # constraint and returned the unfiltered catalogue as a success.
-        # `validate_filter_vocabulary` above now guarantees membership.
-        allowed = AUTONOMY_ORDER[AUTONOMY_ORDER.index(autonomy_min):]
-        stmt = stmt.where(Robot.autonomy.in_(allowed))
-    for flag, value in (
-        (Robot.has_sdk, has_sdk),
-        (Robot.ros_support, ros_support),
-        (Robot.developer_edition, developer_edition),
-        (Robot.has_manipulation, has_manipulation),
+    # Nullable first-class facts. The predicates come from the shared helper so
+    # the UNKNOWN-exclusion notice describes exactly this filter and not a second
+    # reading of it. `autonomy_min` no longer needs a membership guard —
+    # `validate_filter_vocabulary` above guarantees it, where it once silently
+    # applied no constraint at all for an unrecognised value.
+    for satisfied, _is_unknown in _nullable_fact_constraints(
+        payload_min=payload_min,
+        height_min=height_min,
+        height_max=height_max,
+        mobility=mobility,
+        autonomy_min=autonomy_min,
+        has_sdk=has_sdk,
+        ros_support=ros_support,
+        developer_edition=developer_edition,
+        has_manipulation=has_manipulation,
     ):
-        if value is not None:
-            stmt = stmt.where(flag.is_(value))
+        stmt = stmt.where(satisfied)
 
     # Availability-derived filters, all gated by is_current + canonical predicate.
     # Geography is active only when the caller resolved a region; an absent or

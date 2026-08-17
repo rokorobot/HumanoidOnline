@@ -612,10 +612,29 @@ Derived from `docs/04` conventions, not a parallel shape.
 ```
 
 `data` holds the tool payload (`items` for list tools). `pagination` appears
-only for paged tools. `warnings[]` carries machine-readable notices — absence of
-pricing rows, a `price_max` filter excluding quote-only robots (§10.3), a hard
-constraint excluding UNKNOWN-valued robots (§9.2) — and is **never** used to
-smuggle a value that belongs in `data`.
+only for paged tools. `warnings[]` carries machine-readable notices and is
+**never** used to smuggle a value that belongs in `data`.
+
+The v0.1 reason-code vocabulary, returned sorted and deduplicated:
+
+| Code | Meaning | Source |
+|---|---|---|
+| `price_max_excluded_unprovable` | No comparable numeric price in the requested currency could be established | §10.3 |
+| `price_max_excluded_above_limit` | A comparable price **in the requested currency** exceeded the ceiling | §10.3 |
+| `hard_constraint_excluded_unknown` | At least one published robot that was otherwise eligible under this query was excluded because a constrained nullable catalogue fact is **UNKNOWN** | §9.2, §9.4 |
+
+`hard_constraint_excluded_unknown` is a notice about excluded *uncertainty* and
+nothing more. It never asserts that an `UNKNOWN` value is `false`, never claims
+the robot failed the substantive requirement, and never identifies or counts the
+robots concerned — an excluded robot still reports `null` for that field when
+fetched (§9.2). It does not change the result set or `total`. It applies to
+nullable first-class robot facts only: `commercial_status = UNKNOWN` is an
+explicit enum member on a non-nullable column (§9.1), not an unrecorded fact, and
+`price_max` has its own two codes above, which separate *unprovable* from *above
+limit* more precisely than a generic notice could.
+
+Each code describes the **whole filtered query**, not the visible page, so the
+same filters return the same reason codes at any `limit` or `offset`.
 
 ## 16. Pagination and bounded queries
 

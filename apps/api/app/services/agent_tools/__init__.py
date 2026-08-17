@@ -17,6 +17,7 @@ from app.services.agent_tools.errors import (
 from app.services.agent_tools.search_robots import (
     CONTRACT_VERSION,
     DEFAULT_LIMIT,
+    HARD_CONSTRAINT_EXCLUDED_UNKNOWN,
     MAX_LIMIT,
     SearchResult,
     search_robots,
@@ -30,6 +31,7 @@ __all__ = [
     "NotFound",
     "CONTRACT_VERSION",
     "DEFAULT_LIMIT",
+    "HARD_CONSTRAINT_EXCLUDED_UNKNOWN",
     "MAX_LIMIT",
     "SearchResult",
     "search_robots",

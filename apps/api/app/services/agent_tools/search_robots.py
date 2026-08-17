@@ -49,6 +49,7 @@ from app.services.robot_filters import (
     apply_catalogue_filters,
     resolve_region_filter,
     resolve_sort,
+    unknown_exclusion_query,
     validate_filter_vocabulary,
 )
 
@@ -57,6 +58,15 @@ DEFAULT_LIMIT = 24
 MAX_LIMIT = 100
 
 CONTRACT_VERSION = "agent-tools/0.1"
+
+#: `docs/20` §9.2/§9.4/§15 — at least one published robot that was otherwise
+#: eligible under this query was excluded because a constrained fact is UNKNOWN.
+#:
+#: A notice about excluded *uncertainty*, nothing more. It never says an UNKNOWN
+#: value is `false`, never claims the robot failed the substantive requirement,
+#: never identifies or counts the robots, and never alters the result set — an
+#: excluded robot still reports `null` for that field if fetched directly.
+HARD_CONSTRAINT_EXCLUDED_UNKNOWN = "hard_constraint_excluded_unknown"
 
 
 @dataclass(frozen=True)
@@ -213,6 +223,20 @@ def search_robots(
             )
         )
 
+    # UNKNOWN-exclusion notice (docs/20 §9.2, §9.4, §15). One bounded EXISTS over
+    # the whole query — never the visible page, and never a materialised list of
+    # excluded robots. The price ceiling is composed in when active so a robot
+    # already failing on a *known* price is not reported as excluded by
+    # uncertainty; the price reason codes stay solely responsible for that.
+    unknown_stmt = unknown_exclusion_query(**filters)
+    if unknown_stmt is not None:
+        if price_max is not None:
+            unknown_stmt = apply_price_ceiling(
+                unknown_stmt, price_max=price_max, price_currency=price_currency or ""
+            )
+        if session.execute(select(unknown_stmt.exists())).scalar_one():
+            warnings.append(HARD_CONSTRAINT_EXCLUDED_UNKNOWN)
+
     snapshot = reads.snapshot_for(session, [r.id for r in robots])
     items = [reads.serialize_list_item(r, snapshot) for r in robots]
 
@@ -221,5 +245,7 @@ def search_robots(
         total=total,
         limit=limit,
         offset=offset,
-        warnings=warnings,
+        # Deterministic and deduplicated: a caller diffing two responses should
+        # see a change in meaning, never a change in ordering.
+        warnings=sorted(set(warnings)),
     )

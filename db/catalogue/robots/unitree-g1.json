@@ -1,9 +1,9 @@
 {
   "slug": "unitree-g1",
-  "name": "G1",
+  "name": "G1 Basic",
   "manufacturer_slug": "unitree",
-  "model_code": "G1",
-  "summary": "Compact, affordably priced bipedal humanoid sold directly from the Unitree store.",
+  "model_code": "G1-Basic",
+  "summary": "The base commercial configuration of Unitree's G1 line: 23 degrees of freedom across legs, arms and waist, a depth camera and 3D LiDAR for onboard perception, and a quick-release 9000 mAh battery giving about 2 hours of runtime. It ships with fixed, non-dexterous hands that cannot grasp, and does not offer secondary development (SDK) access -- it is the entry configuration rather than the EDU developer tier, which is covered by its own catalogue records.",
   "announced_year": 2024,
   "commercial_status": "COMMERCIAL",
   "is_published": true,
@@ -11,27 +11,27 @@
     "height_cm": 132,
     "weight_kg": 35,
     "arm_span_cm": null,
-    "reach_cm": null,
-    "payload_kg": null,
+    "reach_cm": 45.0,
+    "payload_kg": 2.0,
     "walk_speed_ms": null,
     "runtime_minutes": 120,
     "battery_wh": null,
     "mobility": "BIPEDAL",
     "degrees_of_freedom": 23,
-    "hand_type": "optional dexterous hands (EDU)",
-    "hand_dof": null,
+    "hand_type": "fixed non-dexterous hands (non-articulating; cannot grasp)",
+    "hand_dof": 0,
     "autonomy": "TELEOPERATED",
-    "has_manipulation": true,
+    "has_manipulation": false,
     "has_teleoperation": true,
     "has_vision": true,
-    "has_language_ui": null,
-    "has_sdk": true,
+    "has_language_ui": true,
+    "has_sdk": false,
     "has_api": null,
     "ros_support": true,
-    "developer_edition": true,
+    "developer_edition": false,
     "simulation_support": true
   },
-  "specs_note": "height (1320 mm), weight (~35 kg with battery), 23 base joints, ~2 h runtime and EDU dexterous-hand option from the official spec page https://www.unitree.com/g1/ (observed 2026-07-24). Walking speed and battery Wh not stated there -> left NULL. SDK/ROS/simulation are documented developer features of the G1 platform.",
+  "specs_note": "height (1320 mm), weight (~35 kg with battery), 23 base joints, ~2 h runtime and EDU dexterous-hand option from the official spec page https://www.unitree.com/g1/ (observed 2026-07-24). Walking speed and battery Wh not stated there -> left NULL. SDK/ROS/simulation are documented developer features of the G1 platform.\n\nPhysical specs enriched 2026-08-17 from the G1 Basic retail listing text (Manufacturer # G1-Basic, SKU RB-Unt-51) supplied by the product owner; the listing states 'Values shown are from the manufacturer's reference'. The exact RobotShop US product URL was subsequently supplied and attested by the product owner and is now recorded on the RobotShop US pricing, availability and image rows; that capture was not independently re-checked at source by HumanoidOnline, which is why those rows carry confidence MEDIUM and a NULL verified_at. The existing OEM-store pricing, availability and evidence rows are untouched and remain the VERIFIED manufacturer-store observation. Judgement calls, each deliberate:\n* payload_kg 2.0 is the ARM maximum load ('About 2 kg arm payload'), not a whole-body rating.\n* reach_cm 45, arm_span_cm still NULL. The source labels 'Arm Span: about 0.45 m', but this schema defines arm_span_cm as fingertip-to-fingertip and reach_cm as one arm from its shoulder. A 132 cm-tall humanoid cannot have a 45 cm fingertip-to-fingertip span, so the figure is a single-arm measure and is recorded as REACH. Actual fingertip-to-fingertip span is not stated anywhere in the source and stays UNKNOWN -- and must not be derived from reach.\n* hand_dof 0 is a stated fact, not a gap: 'The fingers do not move or actuate.' This describes the G1 Basic end effector.\n* SCOPE RESOLVED 2026-08-17: this canonical record is now normalized to the commercial G1 Basic SKU (Manufacturer # G1-Basic), not the wider G1 platform. name, model_code, hand_type, has_manipulation, has_sdk, developer_edition and the dexterous-hands capability are aligned to Basic, and the embedded g1-edu variant was removed -- EDU-tier configurations are represented by their own catalogue records. The slug stays `unitree-g1` because it is a published canonical URL. ros_support and simulation_support are deliberately UNCHANGED: the captured Basic listing is silent on both (it denies SDK access while still linking unitree_sdk2, unitree_rl_gym and xr_teleoperate), so no safe contrary value is established and flipping them would assert something the evidence does not say.\n* battery_wh stays UNKNOWN. The source gives 9000 mAh and a 13-string lithium pack but no authoritative nominal pack voltage. Converting would require assuming a voltage, which would present a derived number as a measured one.\n* has_language_ui TRUE from the stated 4-microphone array and 5 W speaker with two-way listen-and-respond interaction.\n* Not modelled by any current schema field, so recorded here rather than lost: 8-core high-performance CPU with NO dedicated AI compute module, Livox MID-360 3D LiDAR (360 degree horizontal, 59 degree vertical), Intel RealSense D435i RGB-D camera, 4-microphone array, 5 W speaker, WiFi 6 + Bluetooth 5.2.",
   "commercial_status_evidence": [
     {
       "source_url": "https://shop.unitree.com/products/unitree-g1",
@@ -45,14 +45,7 @@
       "note": "G1 is generally commercially available: listed for direct purchase on the OEM store (observed 2026-07-24)."
     }
   ],
-  "variants": [
-    {
-      "slug": "g1-edu",
-      "name": "G1 EDU",
-      "is_developer": true,
-      "description": "Education/developer configuration with expandable DoF (23-43) and optional force-controlled three-fingered hands."
-    }
-  ],
+  "variants": [],
   "pricing_offers": [
     {
       "transaction_type": "PURCHASE",
@@ -79,6 +72,32 @@
           "note": "Store list price observed directly on the OEM store (2026-07-24)."
         }
       ]
+    },
+    {
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "USD",
+      "price": 17900,
+      "price_min": null,
+      "price_max": null,
+      "billing_period": "ONE_TIME",
+      "region_code": "US",
+      "provider_slug": "robotshop-us",
+      "variant_slug": null,
+      "note": "Third-party US retailer list price for the G1 Basic SKU (Manufacturer # G1-Basic, SKU RB-Unt-51). The listing states the price includes tariffs in the USA, which is why it sits above the OEM store price rather than contradicting it -- these are two different sellers in two different regions, and both offers are current.",
+      "evidence": [
+        {
+          "source_url": "https://www.robotshop.com/products/unitree-g1-humanoid-robot-us?qd=307beb76f020b2ba8d275daa7fbf6b0e",
+          "source_type": "OTHER",
+          "source_title": "Unitree G1 Humanoid Robot (G1-Basic, SKU RB-Unt-51) -- RobotShop US product listing",
+          "excerpt": "Sale price$17,900.00 -- Price includes Tariffs (in USA).",
+          "published_at": null,
+          "observed_at": "2026-08-17",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "Confidence MEDIUM and verified_at deliberately NULL: this is a third-party retailer rather than Unitree's own store, and the listing text was captured locally by the product owner, who also supplied and attested the product URL recorded here -- it was not independently re-checked at source."
+        }
+      ]
     }
   ],
   "availability_offers": [
@@ -103,6 +122,28 @@
           "note": "Listed and orderable on the OEM store; page indicated backorder, mapped to LIMITED (obtainable with constraints)."
         }
       ]
+    },
+    {
+      "transaction_type": "PURCHASE",
+      "availability_status": "AVAILABLE",
+      "region_code": "US",
+      "provider_slug": "robotshop-us",
+      "variant_slug": null,
+      "lead_time_days": 56,
+      "note": "Retailer wording is 'On Demand' with 'Estimated Lead Time: Orders placed today are expected to ship within ~6-8 weeks'. Mapped to AVAILABLE because the listing is orderable now with a stated shipping window, not gated behind a quote or a waitlist; no new enum was introduced to reproduce the retailer's own wording. lead_time_days 56 is the UPPER bound of the stated 6-8 week range ('within ~6-8 weeks'), not a midpoint -- the schema holds a single integer, so the outer commitment is recorded rather than a derived average. This is a separate seller observation and does not replace the OEM-store backorder observation above.",
+      "evidence": [
+        {
+          "source_url": "https://www.robotshop.com/products/unitree-g1-humanoid-robot-us?qd=307beb76f020b2ba8d275daa7fbf6b0e",
+          "source_type": "OTHER",
+          "source_title": "Unitree G1 Humanoid Robot (G1-Basic, SKU RB-Unt-51) -- RobotShop US product listing",
+          "excerpt": "On Demand -- Estimated Lead Time: Orders placed today are expected to ship within ~6-8 weeks.",
+          "published_at": null,
+          "observed_at": "2026-08-17",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "Confidence MEDIUM and verified_at deliberately NULL: third-party retailer, captured locally by the product owner, who supplied and attested the product URL recorded here; not independently re-checked at source."
+        }
+      ]
     }
   ],
   "deployments": [],
@@ -119,8 +160,8 @@
     },
     {
       "slug": "dexterous-hands",
-      "supported": true,
-      "detail": "Optional force-controlled three-fingered hands on the EDU configuration."
+      "supported": false,
+      "detail": "G1 Basic ships fixed, non-articulating hands that cannot grasp or manipulate objects. Force-controlled three- and five-finger dexterous hands belong to higher EDU-tier configurations, which are separate records."
     }
   ],
   "use_case_fits": [
@@ -148,6 +189,36 @@
       "is_primary": true,
       "attribution": "© Unitree Robotics",
       "last_verified_at": "2026-07-25T00:00:00Z"
+    },
+    {
+      "image_url": "/robots/unitree-g1-action.webp",
+      "source_url": "https://www.robotshop.com/products/unitree-g1-humanoid-robot-us?qd=307beb76f020b2ba8d275daa7fbf6b0e",
+      "source_name": "RobotShop US product listing (Unitree product render)",
+      "source_type": "DISTRIBUTOR",
+      "image_type": "ACTION",
+      "identity_status": "VERIFIED",
+      "rights_status": "ATTRIBUTION_REQUIRED",
+      "usage_basis": "NONE",
+      "is_official": false,
+      "is_primary": false,
+      "attribution": "© Unitree Robotics",
+      "last_verified_at": "2026-08-17T00:00:00Z",
+      "identity_confirmed_by": "robert@humanoid.company"
+    },
+    {
+      "image_url": "/robots/unitree-g1-action-02.webp",
+      "source_url": "https://www.robotshop.com/products/unitree-g1-humanoid-robot-us?qd=307beb76f020b2ba8d275daa7fbf6b0e",
+      "source_name": "RobotShop US product listing (Unitree product render)",
+      "source_type": "DISTRIBUTOR",
+      "image_type": "ACTION",
+      "identity_status": "VERIFIED",
+      "rights_status": "ATTRIBUTION_REQUIRED",
+      "usage_basis": "NONE",
+      "is_official": false,
+      "is_primary": false,
+      "attribution": "© Unitree Robotics",
+      "last_verified_at": "2026-08-17T00:00:00Z",
+      "identity_confirmed_by": "robert@humanoid.company"
     }
   ]
 }

@@ -21,13 +21,54 @@ region               region code (e.g. EU, US, DE)
 use_case             use_case slug
 payload_min          number (kg)
 height_min|height_max  number (cm)
-price_max            number  → against lowest_purchase_price cache
+price_max            number  → REQUIRES price_currency (see "Price filtering")
+price_currency       ISO-4217 code (e.g. USD) — required with price_max, rejected without it
 mobility             enum
 autonomy_min         enum (ordered)
 has_sdk|ros_support|developer_edition|has_manipulation ... boolean flags
 sort                 name | price | payload | newest   (+ "-" prefix for desc)
 limit, offset
 ```
+
+**Price filtering (`price_max` + `price_currency`).** The two are a **required
+pair**: `price_max` without `price_currency` and `price_currency` without
+`price_max` both return `422`. A bare number cannot be compared to money that
+carries a denomination, and the server never assumes one — there is **no default
+currency**.
+
+Given `price_max = X` and `price_currency = C`, a robot matches only when it has
+a current `PURCHASE` `pricing_offer` **denominated in C** whose comparable amount
+is ≤ X:
+
+| `price_type` | Comparable amount |
+|---|---|
+| `PUBLIC` / `FROM` / `ESTIMATED` | `price` |
+| `RANGE` | `price_max` (the **upper bound** — the whole span must be under the ceiling) |
+| `QUOTE_ONLY` | none — never comparable |
+| no pricing rows | none — never comparable |
+| priced only in another currency | none — **incomparable, not expensive** |
+
+**No FX.** No conversion, no rates, no base currency, no normalisation. `USD
+29,000` and `EUR 29,000` are different amounts and are never treated as
+equivalent. A robot excluded for any reason above is never reported as `0`,
+free, or unavailable — failing the filter is not a claim about the robot.
+
+`pricing_offer` is authoritative. `robot.lowest_purchase_price` is a sort/badge
+cache and **must not** be the basis of this constraint: its derivation takes a
+cross-currency minimum across `PUBLIC`/`FROM` only.
+
+**`sort=price`.** With `price_max` + `price_currency` present, ordering uses the
+same comparable amount in `price_currency` that qualified the robot (lowest such
+amount per robot; `RANGE` by upper bound) — never the cross-currency cache. With
+no currency-constrained price query, `sort=price` uses `lowest_purchase_price`,
+the cache's sanctioned purpose. Ordering is stable for a given `sort`.
+
+*Amended 2026-08-18 by product-owner decision; supersedes the previous
+`price_max`-against-cache behaviour. Semantics are shared with
+`docs/20_AGENT_TOOL_CONTRACT.md` §10.3/§10.5 so the public API and the AGENT-02
+tool answer the same price question identically. **Implementation status:** the
+AGENT tool has converged; this endpoint has not yet, and still applies the older
+bare-`price_max`-against-cache behaviour until its convergence slice lands.*
 
 Response `200`:
 ```json

@@ -1,17 +1,21 @@
 # HumanoidOnline — AGENT-02 Tool Contract
 
-> ## STATUS: RATIFIED v0.1 — 2026-08-17 — NO IMPLEMENTATION until a separate build trigger
+> ## STATUS: RATIFIED v0.1 — 2026-08-17 — implementation underway under an owner build trigger
 >
 > Defines the **transport-independent semantic contract** for the AGENT-02
 > *Query & Decide* read-only interface. This document adds no law. Every rule
 > below is inherited from an existing frozen or ratified contract and cited to
 > it; where this document appears to say something new, the cited source wins.
 >
-> Ratification freezes the **semantics** below. It authorizes **no code**: no
-> MCP server, no tool implementation, no change to the governed read layer, and
-> no repair of the two implementation drifts this document records (§12 region
-> resolution, §10.3.1 price-currency). Building requires an explicit owner
-> trigger, per the pattern in `docs/10`.
+> **The governance rule is unchanged: ratification freezes semantics and
+> authorizes no code.** It never did. Building AGENT-02 required an explicit
+> owner build trigger, per the pattern in `docs/10`; that trigger was
+> subsequently given and implementation is underway. Ratification and
+> authorization remain two separate acts, and a future slice still needs its own
+> trigger.
+>
+> Implementation status is tracked per section rather than here (§5, §10.3.1,
+> §10.5, §12). This document is a contract, not a changelog.
 
 **Document:** `docs/20_AGENT_TOOL_CONTRACT.md`
 **Semantic contract version:** **v0.1** (the one normative version)
@@ -95,9 +99,18 @@ Deferred: see §22.
 **Purpose.** Find published canonical robots matching structured constraints.
 
 **Canonical read path (implementation must reuse).**
-`apps/api/app/routers/robots.py::_apply_filters` → `services/reads.py::serialize_list_item`.
-The unconditional `Robot.is_published.is_(True)` predicate in `_apply_filters`
-**is** the publication gate; it must not be re-implemented or bypassed.
+`apps/api/app/services/robot_filters.py::apply_catalogue_filters` →
+`services/reads.py::serialize_list_item`. The governed predicates were moved out
+of `routers/robots.py::_apply_filters` (which remains only as an alias) so the
+public API and the tool layer share one implementation rather than two
+interpretations. The unconditional `Robot.is_published.is_(True)` predicate in
+`apply_catalogue_filters` **is** the publication gate; it must not be
+re-implemented or bypassed.
+
+Geography resolves through `services/robot_filters.py::resolve_region_filter` →
+`services/regions.py::applicable_region_ids` (§12), and the comparable-purchase-price
+rule through `services/pricing.py` (§10.3). Both are shared services, not
+agent-owned SQL.
 
 **Required inputs.** None. An empty call returns the first page of all published
 robots.
@@ -120,7 +133,7 @@ robots.
 | `mobility` | string | `mobility_type` enum |
 | `autonomy_min` | string | `autonomy_level` enum (ordered) |
 | `has_sdk`, `ros_support`, `developer_edition`, `has_manipulation` | boolean | tri-state source (§9.2) |
-| `sort` | string | `name` \| `price` \| `payload` \| `newest`, `-` prefix for desc |
+| `sort` | string | `name` \| `price` \| `payload` \| `newest`, `-` prefix for desc — see §10.5 for `price` under a currency-constrained query |
 | `limit`, `offset` | integer | §16 |
 
 **`price_max` and `price_currency` are a pair.** `price_max` without
@@ -402,17 +415,65 @@ The cache may be used as an optimisation **only** when both hold:
 
 Otherwise the implementation must evaluate `pricing_offer` rows directly.
 
-**Implementation drift (not repaired here).** The current governed read path
-`routers/robots.py::_apply_filters` compares
-`Robot.lowest_purchase_price <= price_max` with **no currency predicate**, and
-`docs/04` defines `price_max` as a bare number. That behaviour cannot satisfy
-this contract and is recorded as drift to be corrected during AGENT-02
-implementation. This document changes no code.
+**Implementation status.** The comparable-price rule is implemented once, as
+server-side SQL, in `services/pricing.py` — a shared catalogue service, not an
+agent-owned one, so both surfaces can reach the same answer.
+
+- **AGENT `search_robots` — CONVERGED.** It evaluates the ceiling through
+  `services/pricing.py` in SQL: exact-currency, `pricing_offer` only, with
+  `COUNT` and `LIMIT`/`OFFSET` applied to the price-filtered set. The cache is
+  not read on this path.
+- **HTTP `/api/robots` — CONVERGENCE PENDING.** It still compares
+  `Robot.lowest_purchase_price <= price_max` with no currency predicate. That
+  behaviour cannot satisfy this contract and remains open drift. `docs/04` has
+  been amended (owner-approved) to specify the `price_max` + `price_currency`
+  pair and these exact-currency semantics; the HTTP implementation has not yet
+  been changed to match. Until it is, the two surfaces can return different
+  robot sets for the same price question.
 
 ### 10.4 No synthesized best price
 No tool returns a single invented "best price" for a robot. `price_display` is
 returned only because it is an **existing governed read** (`price_display_for`);
 it is a display projection of real offers, not a new pricing concept.
+
+### 10.5 `sort=price` under a currency-constrained query (ratified)
+
+`sort` has always been one of four keys (§5, §16); this section specifies a case
+the original draft left under-specified — **what `price` orders by when the query
+also carries a price constraint.**
+
+**When `price_max` *and* `price_currency` are both present**, `sort=price` /
+`sort=-price` order by **the same comparable purchase price in `price_currency`
+that qualified the robot** (§10.3).
+
+> A robot must never qualify on its EUR price and then be ordered by an
+> unrelated cached USD amount.
+
+- The per-robot sort figure is the **lowest comparable amount in
+  `price_currency`**, where "comparable" is exactly §10.3's rule: `price` for
+  `PUBLIC`/`FROM`/`ESTIMATED`, the **upper bound** for `RANGE`, and nothing at
+  all for `QUOTE_ONLY`.
+- Ascending: lowest comparable amount first. Descending: highest of those
+  per-robot minima first.
+- The stable `Robot.slug` tiebreak of §16 still applies, so paging remains
+  deterministic.
+
+Every robot in such a result has a comparable amount by construction — a robot
+without one cannot have passed the ceiling — so this ordering has no null case.
+
+**When there is no currency-constrained price query**, `sort=price` may continue
+to use `robot.lowest_purchase_price`, the sort/badge cache `docs/01` §7 and
+`db/schema.sql` sanction for exactly this purpose. The cache remains forbidden as
+the *hard-constraint* basis (§10.3.1); ordering a list is not asserting that two
+amounts are comparable.
+
+**No standalone `price_currency` for sorting in v0.1.** `price_currency` keeps
+its §5 meaning — valid only alongside `price_max` — and is not accepted merely
+to select a sort denomination.
+
+**Implementation status.** Not yet implemented on either surface; both currently
+sort by the cache in all cases. Tracked as open work, not as a semantic
+question.
 
 ## 11. Availability semantics
 
@@ -476,17 +537,28 @@ A region-scoped answer is never generalised in the other direction either: an
 offer scoped to one region is not evidence of availability in a **sibling**
 region.
 
-**Implementation drift (not resolved here).** The existing `_apply_filters`
-region clause matches `region.code` **exactly**, walking neither `parent_id` nor
-`GLOBAL` — narrower than every source above. The semantic contract follows the
-frozen schema and data-dictionary rule, **not** that current behaviour, which is
-treated as implementation drift to be corrected in a later, separate WorkOrder.
-This document does not fix it and no code changes to conform.
+**Implementation status — CLOSED.** The catalogue previously matched
+`region.code` **exactly**, walking neither `parent_id` nor `GLOBAL`, so
+`/api/robots?region=DE` and the agent tool answered the same question
+differently. That drift is resolved: **both the HTTP catalogue and AGENT
+`search_robots` now resolve geography through one canonical shared path**,
+`services/robot_filters.py::resolve_region_filter` →
+`services/regions.py::applicable_region_ids`. The exact-code branch was removed
+rather than left dormant, so the divergence cannot reappear by a caller choosing
+the older parameter.
 
-When it is corrected, the implementation must reuse **one governed, shared
-region-applicability resolver**. Two independent walks already exist
+An unresolvable region code is **invalid input** on both surfaces — a structured
+client error over HTTP, `INVALID_ARGUMENT` for the tool (§17). It is never
+treated as `GLOBAL`, never silently dropped, and never widened to
+region-agnostic offers: an unknown region must fail, not return more than a
+known one.
+
+The semantics above are unchanged by this convergence; only the implementation
+moved. Two independent region walks still exist in other subsystems
 (`matching/repository.py` and `leads/routing.py`, the latter explicitly
-mirroring the former); a third interpretation must not be created for agents.
+mirroring the former). Migrating them onto the canonical resolver is separately
+scoped work; their parity with it is pinned by tests so a third interpretation
+cannot drift in unnoticed.
 
 ## 13. Evidence and provenance semantics
 
@@ -728,13 +800,14 @@ Before AGENT-02 v0.1 may be considered complete:
 
 ## 23. Ratification decisions (all resolved)
 
-The seven decisions this contract was drafted around have been taken by the
-product owner. They are recorded here as the reasoning behind the sections
-above, so a future reader can see what was chosen and what was rejected.
+The decisions this contract was drafted around (1–7) have been taken by the
+product owner, and decision 8 was taken at the 2026-08-18 amendment. They are
+recorded here as the reasoning behind the sections above, so a future reader can
+see what was chosen and what was rejected.
 
 | # | Decision | Resolution | Where it lives |
 |---|---|---|---|
-| 1 | Region eligibility | **Ratified applicability semantics**: exact region, applicable ancestor, or `GLOBAL`. Specificity stays observable; a `GLOBAL` offer may satisfy a narrower query but is never relabelled region-specific. The contract follows the frozen schema/dictionary rule, **not** `_apply_filters`' current exact-code behaviour, which is implementation drift to be corrected in a separate WorkOrder using **one shared resolver** | §12 |
+| 1 | Region eligibility | **Ratified applicability semantics**: exact region, applicable ancestor, or `GLOBAL`. Specificity stays observable; a `GLOBAL` offer may satisfy a narrower query but is never relabelled region-specific. The contract follows the frozen schema/dictionary rule rather than the exact-code behaviour the catalogue then had; that drift is now **closed**, both surfaces resolving through **one shared resolver** | §12 |
 | 2 | `price_max` + `QUOTE_ONLY` | **Hard numeric constraint.** Satisfied only by a governed comparable numeric price ≤ X. `QUOTE_ONLY` and unpriced/UNKNOWN do not satisfy it, are never coerced to `0`/`false`/unavailable. **Warn-and-exclude**, with two distinct warning codes separating *unprovable* from *above limit*. **No `include_quote_only` override in v0.1** | §10.3 |
 | 2a | Numeric price currency | **`price_currency` required with `price_max`** (and rejected without it) → otherwise `INVALID_ARGUMENT`. **Exact currency match, no FX** — no rates, base currency, normalisation or conversion. Other-currency prices are *incomparable*, excluded as **`unprovable`, never `above_limit`**. The `lowest_purchase_price` cache is **not** the canonical basis: its derivation takes a cross-currency minimum (§10.3.1) | §5, §10.3, §10.3.1 |
 | 3 | Evidence addressing | **Opaque `evidence_ref`**, issued by the governed read layer, accepted by `get_evidence`, never constructed or parsed by a client, never a raw database identifier. Internal resolution deliberately not frozen. Unevidenced facts carry no `evidence_ref` | §7.1, §8, §13 |
@@ -742,23 +815,34 @@ above, so a future reader can see what was chosen and what was rejected.
 | 5 | Tool names | **Frozen for v0.1**: `search_robots`, `get_robot`, `get_evidence`. **No aliases.** `match_robots` → v0.2; `compare_robots`, `get_manufacturer` later; `get_current_offers` / `get_availability` stay inside the robot-detail projection | §4, §22 |
 | 6 | Rate limiting | Permitted at the transport/application boundary. **No numeric quota frozen in v0.1.** `RATE_LIMITED` is a valid error with retry metadata where known. Throttling must never change catalogue semantics or results | §19.1, §17 |
 | 7 | Contract version | **Semantic version is `v0.1`** — the single normative answer. `agent-tools/0.1` is the wire identifier for that same version, not a second scheme. Enumerated breaking-change surface may never be altered silently | §18 |
+| 8 | `sort=price` under a price constraint | **Ordering follows the qualifying price.** When `price_max` + `price_currency` are present, `price` orders by the lowest comparable amount in that currency (`RANGE` by upper bound), never by the cross-currency cache. Without a currency-constrained query the cache remains a legitimate sort basis. No standalone `price_currency` for sorting in v0.1 | §10.5 |
 
 **No open ratification decisions remain in this contract.**
 
 ### Status
 
-**RATIFIED v0.1 — 2026-08-17.** The decisions above are closed and the semantics
-of this document are frozen. Changing any of them requires a new contract
-version (§18).
+**RATIFIED v0.1 — 2026-08-17.** Amended **2026-08-18** by product-owner decision
+(§10.5 sort-under-constraint, plus factual implementation-status corrections in
+§5, §10.3.1 and §12, and the aligned `docs/04` price input). The semantic version
+remains **v0.1**: §18 enumerates the breaking surface exhaustively, and ordering
+is not among it — the result *set* of every query is unchanged, the four sort
+keys are unchanged, and §16's stability requirement is preserved. §10.5 specifies
+a case the original draft left under-specified rather than altering a settled
+one.
 
-Ratification authorizes **no implementation**. A separate build trigger is
-required, per the pattern in `docs/10`. In particular, ratifying this document
-does **not** repair the two implementation drifts it records:
+Ratification authorizes **no implementation** — it never did, and that rule
+stands for every future slice. A separate owner build trigger is required, per
+the pattern in `docs/10`; one was given for AGENT-02, and implementation is
+underway.
 
-- **§12** — `_apply_filters` resolves `region` by exact code only, without
-  ancestor or `GLOBAL` applicability;
-- **§10.3.1** — `price_max` compares against a `lowest_purchase_price` cache
-  whose derivation takes a cross-currency minimum, with no currency predicate.
+Drift status at this amendment:
 
-Both are to be corrected during AGENT-02 implementation, reusing governed shared
-resolvers rather than new interpretations.
+- **§12 region — CLOSED.** Both the HTTP catalogue and `search_robots` resolve
+  applicability through the one canonical shared resolver.
+- **§10.3.1 price — PARTIALLY CLOSED.** `search_robots` evaluates the ceiling in
+  exact-currency SQL via `services/pricing.py`; **`/api/robots` has not yet
+  converged** and still compares against the cache.
+- **§10.5 price sort — SPECIFIED, NOT YET IMPLEMENTED** on either surface.
+
+Remaining work is tracked as implementation status in the sections above, not as
+unresolved semantics.

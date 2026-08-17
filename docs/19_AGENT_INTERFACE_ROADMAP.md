@@ -546,11 +546,10 @@ CURRENT
 │   └── maturity/availability separation
 │
 ▼
-AGENT INTERFACE DESIGN PACKAGE
+AGENT-02 DESIGN PACKAGE
 │
-├── Agent Interface Architecture
-├── Agent Tool Contract v0.1
-└── Agent Action Governance v0.1
+├── Agent Tool Contract v0.1   (docs/20 — RATIFIED)
+└── Agent Interface Architecture
 │
 ▼
 AGENT-02 v0.1
@@ -576,6 +575,7 @@ LIVE AGENT VALIDATION
 ▼
 AGENT-03 v0.1
 │
+├── Agent Action Governance v0.1   (prerequisite for writes)
 ├── authentication / scopes
 ├── idempotency / audit
 ├── submit_buyer_requirement
@@ -605,9 +605,12 @@ AGENT-04
 
 ---
 
-# 9. Documentation Package to Create Before AGENT-02 Coding
+# 9. Documentation Package
 
-This overview should lead to three narrower ratified contracts.
+This overview leads to three narrower contracts. They are **not** all
+prerequisites for AGENT-02: only §9.2 governs read-only tools, and it is now
+ratified as `docs/20_AGENT_TOOL_CONTRACT.md`. §9.3 governs writes and is an
+**AGENT-03** prerequisite, not an AGENT-02 one.
 
 ## 9.1 Agent Interface Architecture
 
@@ -624,9 +627,10 @@ Defines:
 - publication/evidence boundaries,
 - protocol adapter rules.
 
-## 9.2 Agent Tool Contract v0.1
+## 9.2 Agent Tool Contract v0.1 — RATIFIED as `docs/20_AGENT_TOOL_CONTRACT.md`
 
-Defines every AGENT-02 tool:
+Ratified v0.1. It, not this overview, governs AGENT-02 read-only semantics;
+where the two differ, `docs/20` wins. Defines every AGENT-02 tool:
 
 - exact tool name,
 - purpose,
@@ -642,9 +646,12 @@ Defines every AGENT-02 tool:
 - examples,
 - versioning/deprecation policy.
 
-## 9.3 Agent Action Governance v0.1
+## 9.3 Agent Action Governance v0.1 — an AGENT-03 prerequisite, not an AGENT-02 one
 
-Defines AGENT-03 and future AGENT-04 authorization boundaries:
+AGENT-02 v0.1 is read-only and creates, mutates and authorizes nothing, so it
+does not depend on this contract. AGENT-03 is the first write/action-capable
+layer and may not be implemented until this is ratified. Defines AGENT-03 and
+future AGENT-04 authorization boundaries:
 
 - which actions are read-only,
 - which actions may be proposed,
@@ -868,11 +875,15 @@ Once the current catalogue branch is complete, validated and safely integrated, 
 
 > **AGENT-02 v0.1 — Governed Query & Decision Interface**
 
-Before implementation, create and ratify:
+Before implementation:
 
-1. the Agent Interface Architecture,
-2. the Agent Tool Contract v0.1,
-3. the Agent Action Governance v0.1.
+1. the Agent Tool Contract v0.1 — **ratified** as `docs/20_AGENT_TOOL_CONTRACT.md`;
+2. the Agent Interface Architecture — deployment boundary, versioning, observability.
+
+The Agent Action Governance contract (§9.3) is **not** required for AGENT-02: it
+governs writes and is a prerequisite for AGENT-03. AGENT-02 v0.1 stays
+read-only, and publication, mutation and action governance remain
+human-controlled and separately ratified.
 
 Then implement the smallest read-only MCP slice against the existing governed service/read layer.
 

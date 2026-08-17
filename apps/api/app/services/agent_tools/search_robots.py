@@ -28,7 +28,6 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.models.robot import Robot
-from app.schemas.robot import RobotListItem
 from app.services import reads
 from app.services.agent_tools.errors import (
     InvalidArgument,
@@ -36,6 +35,10 @@ from app.services.agent_tools.errors import (
     InvalidPagination,
 )
 from app.services.agent_tools.pricing import warning_codes
+from app.services.agent_tools.projections import (
+    AgentRobotListItem,
+    project_list_item,
+)
 from app.services.pricing import (
     InvalidPriceQuery,
     apply_price_ceiling,
@@ -73,7 +76,7 @@ HARD_CONSTRAINT_EXCLUDED_UNKNOWN = "hard_constraint_excluded_unknown"
 class SearchResult:
     """`docs/20` §15 envelope, transport-independent."""
 
-    items: list[RobotListItem]
+    items: list[AgentRobotListItem]
     total: int
     limit: int
     offset: int
@@ -237,8 +240,13 @@ def search_robots(
         if session.execute(select(unknown_stmt.exists())).scalar_one():
             warnings.append(HARD_CONSTRAINT_EXCLUDED_UNKNOWN)
 
+    # Governed read first, then the agent projection: catalogue serialization is
+    # never duplicated, and the internal row id stops here rather than crossing
+    # the agent boundary (docs/20 §8, §20, §21.10).
     snapshot = reads.snapshot_for(session, [r.id for r in robots])
-    items = [reads.serialize_list_item(r, snapshot) for r in robots]
+    items = [
+        project_list_item(reads.serialize_list_item(r, snapshot)) for r in robots
+    ]
 
     return SearchResult(
         items=items,

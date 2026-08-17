@@ -14,6 +14,12 @@ from app.services.agent_tools.errors import (
     InvalidPagination,
     NotFound,
 )
+from app.services.agent_tools.projections import (
+    AgentManufacturerRef,
+    AgentRobotListItem,
+    canonical_robot_url,
+    project_list_item,
+)
 from app.services.agent_tools.search_robots import (
     CONTRACT_VERSION,
     DEFAULT_LIMIT,
@@ -24,6 +30,10 @@ from app.services.agent_tools.search_robots import (
 )
 
 __all__ = [
+    "AgentManufacturerRef",
+    "AgentRobotListItem",
+    "canonical_robot_url",
+    "project_list_item",
     "AgentToolError",
     "InvalidArgument",
     "InvalidEnum",

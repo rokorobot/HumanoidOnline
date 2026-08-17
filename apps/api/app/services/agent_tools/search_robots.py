@@ -36,11 +36,12 @@ from app.services.agent_tools.errors import (
     InvalidPagination,
 )
 from app.services.agent_tools.pricing import evaluate_price_ceiling
-from app.services.regions import applicable_region_ids
 from app.services.robot_filters import (
     InvalidFilterEnum,
+    InvalidRegion,
     InvalidSortKey,
     apply_catalogue_filters,
+    resolve_region_filter,
     resolve_sort,
     validate_filter_vocabulary,
 )
@@ -142,11 +143,12 @@ def search_robots(
         raise InvalidArgument(str(exc)) from exc
 
     # ---- geography: ratified applicability (docs/20 §12) -------------------
-    region_ids = None
-    if region:
-        region_ids = applicable_region_ids(session, code=region)
-        if not region_ids:
-            raise InvalidArgument(f"unknown region code: {region!r}")
+    # Resolved through the shared catalogue resolver, which `/api/robots` now
+    # uses too — so both surfaces answer `region=DE` identically (§21.2 parity).
+    try:
+        region_ids = resolve_region_filter(session, region) if region else None
+    except InvalidRegion as exc:
+        raise InvalidArgument(str(exc)) from exc
 
     filters: dict[str, Any] = dict(
         q=q,
@@ -154,9 +156,6 @@ def search_robots(
         commercial_status=commercial_status,
         transaction_type=transaction_type,
         availability_status=availability_status,
-        # `region` is passed as None; geography is expressed via region_ids so the
-        # exact-code path is never used by the agent contract.
-        region=None,
         region_ids=region_ids,
         use_case=use_case,
         payload_min=payload_min,

@@ -2,17 +2,20 @@
 
 Moved verbatim out of `routers/robots.py` so the AGENT-02 tool layer reuses the
 same predicates instead of writing a second interpretation of "which robots
-match". The HTTP router's behaviour is unchanged: it still passes `region` as a
-bare code and `price_max` as a bare number.
+match".
 
-Two dimensions are deliberately parameterised rather than shared, because the
-router and the agent contract legitimately differ today:
+**Geography is now single-sourced (AGENT-02.1b).** This layer accepts only
+`region_ids` — an already-resolved applicability set from the canonical
+`services/regions.py::applicable_region_ids`. The old `region=<bare code>`
+parameter and its exact-code `WHERE region.code = :code` branch are gone: they
+were the `docs/20` §12 implementation drift, under which `/api/robots?region=DE`
+answered 0 while the agent answered 8 for the same catalogue. Removing the
+parameter rather than leaving it unused is deliberate — a dormant exact-code
+path is an invitation to reintroduce the divergence.
 
-* **region** — the router passes `region=<code>` (exact-code match, the
-  behaviour `docs/20` §12 records as implementation drift). The agent passes
-  `region_ids=<applicable set>` resolved by `services/regions.py`, which is the
-  ratified applicability rule. Both funnel through the same availability
-  sub-select, so nothing else diverges.
+One dimension is still deliberately parameterised, because the router and the
+agent contract legitimately differ today:
+
 * **price_max** — the router still filters on the `lowest_purchase_price` cache.
   The agent passes `price_max=None` and applies currency-safe filtering in
   `agent_tools/search_robots.py`, because that cache is cross-currency unsafe
@@ -33,15 +36,16 @@ from __future__ import annotations
 import uuid
 from collections.abc import Collection
 
-from sqlalchemy import func, select
+from sqlalchemy import false, func, select
+from sqlalchemy.orm import Session
 
 from app.models import enums as pg_enums
 from app.models.commercial import AvailabilityOffer
 from app.models.enums import AUTONOMY_ORDER
 from app.models.manufacturer import Manufacturer
-from app.models.region import Region
 from app.models.robot import Robot
 from app.models.use_case import UseCase, UseCaseFit
+from app.services.regions import applicable_region_ids
 
 
 class InvalidFilterValue(ValueError):
@@ -53,7 +57,9 @@ class InvalidFilterValue(ValueError):
     `INVALID_ARGUMENT`). It must not depend on FastAPI.
     """
 
-    def __init__(self, field: str, value: object, allowed: Collection[str]) -> None:
+    def __init__(
+        self, field: str, value: object, allowed: Collection[str] = ()
+    ) -> None:
         self.field = field
         self.value = value
         #: The governed vocabulary, exposed so a binding can help a caller
@@ -68,6 +74,29 @@ class InvalidFilterEnum(InvalidFilterValue):
 
 class InvalidSortKey(InvalidFilterValue):
     """Sort key outside the v0.1 contract allowlist (`docs/20` §5, §16)."""
+
+
+class InvalidRegion(InvalidFilterValue):
+    """Requested region code resolves to no governed region."""
+
+
+def resolve_region_filter(session: Session, code: str) -> set[uuid.UUID]:
+    """Applicable region ids for a requested region code (`docs/20` §12).
+
+    The one place the catalogue turns a caller-supplied region code into
+    geography, for both `/api/robots` and AGENT-02 `search_robots`, so the two
+    cannot answer `region=DE` differently. The walk itself is not reimplemented
+    here — it is the canonical `services/regions.py::applicable_region_ids`.
+
+    An unrecognised code raises `InvalidRegion` rather than returning an empty
+    set for the caller to interpret. That is the safety-critical half: a typo
+    must fail, never widen. See `apply_catalogue_filters` for why an empty set
+    could otherwise become "region-agnostic offers only".
+    """
+    ids = applicable_region_ids(session, code=code)
+    if not ids:
+        raise InvalidRegion("region", code)
+    return ids
 
 
 #: Enum-backed filters mapped to their vocabulary, read straight off the ORM
@@ -158,7 +187,6 @@ def apply_catalogue_filters(
     commercial_status,
     transaction_type,
     availability_status,
-    region,
     use_case,
     payload_min,
     height_min,
@@ -174,10 +202,20 @@ def apply_catalogue_filters(
 ):
     """Apply the governed catalogue predicates to `stmt`.
 
-    `region_ids`, when given, replaces the `region` code lookup with an explicit
-    set of applicable region ids (see module docstring). Passing an empty
-    collection means "no region applies" and matches nothing, which is the
-    correct answer for an unknown region rather than a silently unfiltered one.
+    Geography is expressed only as `region_ids`, resolved by the caller through
+    `resolve_region_filter`. The three states are exhaustive and distinct:
+
+    * `None`            — no region filter was requested; geography is inactive.
+    * non-empty         — match offers scoped to those applicable regions, plus
+                          region-agnostic (`NULL`) offers, which apply anywhere.
+    * **empty**         — **match nothing.**
+
+    The empty case is the one worth stating explicitly. It previously fell
+    through to `region_id IS NULL`, i.e. "region-agnostic offers only" — so an
+    unresolvable region produced a *result set* rather than no result, and could
+    return robots a narrower, resolvable region would not. That is the wrong
+    direction to fail in. It was masked in the seeded dataset only because no
+    current availability offer has a NULL region.
 
     Raises `InvalidFilterEnum` before touching SQL when an enum-backed input is
     outside its governed vocabulary.
@@ -238,10 +276,10 @@ def apply_catalogue_filters(
             stmt = stmt.where(flag.is_(value))
 
     # Availability-derived filters, all gated by is_current + canonical predicate.
-    # `bool(region)`, not `region is not None`: the router historically treats an
-    # empty string as "no region filter", and moving this must not change that.
-    geo_active = bool(region) or region_ids is not None
-    if transaction_type or availability_status or geo_active:
+    # Geography is active only when the caller resolved a region; an absent or
+    # empty `region` query param resolves to None and leaves it inactive, exactly
+    # as before.
+    if transaction_type or availability_status or region_ids is not None:
         avail = (
             select(AvailabilityOffer.robot_id)
             .where(AvailabilityOffer.is_current.is_(True))
@@ -253,7 +291,9 @@ def apply_catalogue_filters(
             avail = avail.where(AvailabilityOffer.availability_status.in_(availability_status))
         if region_ids is not None:
             # Ratified applicability: exact + ancestors + GLOBAL, resolved by the
-            # caller. Region-agnostic (NULL) offers apply everywhere.
+            # caller. Region-agnostic (NULL) offers apply everywhere. Each offer
+            # keeps its own region identity — nothing here relabels a GLOBAL
+            # offer as the queried region (`docs/20` §12).
             ids = list(region_ids)
             if ids:
                 avail = avail.where(
@@ -261,12 +301,9 @@ def apply_catalogue_filters(
                     | (AvailabilityOffer.region_id.is_(None))
                 )
             else:
-                avail = avail.where(AvailabilityOffer.region_id.is_(None))
-        elif region:
-            avail = avail.where(
-                AvailabilityOffer.region_id.in_(
-                    select(Region.id).where(Region.code == region)
-                )
-            )
+                # No region applies -> match nothing. Never fall through to
+                # region-agnostic offers: an unresolvable region must not return
+                # more than a resolvable one.
+                avail = avail.where(false())
         stmt = stmt.where(Robot.id.in_(avail))
     return stmt

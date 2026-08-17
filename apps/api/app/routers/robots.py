@@ -16,6 +16,7 @@ from app.services import reads
 from app.services.robot_filters import (
     InvalidFilterValue,
     apply_catalogue_filters,
+    resolve_region_filter,
     resolve_sort,
 )
 
@@ -52,20 +53,29 @@ def list_robots(
     limit: int = Query(24, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ) -> Page[RobotListItem]:
-    filters = dict(
-        q=q, manufacturer=manufacturer, commercial_status=commercial_status,
-        transaction_type=transaction_type, availability_status=availability_status,
-        region=region, use_case=use_case, payload_min=payload_min, height_min=height_min,
-        height_max=height_max, price_max=price_max, mobility=mobility,
-        autonomy_min=autonomy_min, has_sdk=has_sdk, ros_support=ros_support,
-        developer_edition=developer_edition, has_manipulation=has_manipulation,
-    )
-
     # Vocabulary validation happens inside the shared governed filter, so an
     # unknown enum member or sort key becomes a structured 422 here instead of a
     # PostgreSQL DataError (500) or a silently-unfiltered result. Both statements
     # are built before either is executed, so a bad input costs no query.
     try:
+        # AGENT-02.1b — `region` is resolved to the ratified applicability set
+        # (exact + ancestors + GLOBAL) by the SAME canonical resolver AGENT-02
+        # uses, so `?region=DE` now matches an EU-scoped or GLOBAL offer instead
+        # of demanding a literal DE row. An unknown code is invalid input (422),
+        # never a silently unfiltered or widened result. No ancestor walking
+        # happens in this router.
+        region_ids = resolve_region_filter(session, region) if region else None
+
+        filters = dict(
+            q=q, manufacturer=manufacturer, commercial_status=commercial_status,
+            transaction_type=transaction_type, availability_status=availability_status,
+            region_ids=region_ids, use_case=use_case, payload_min=payload_min,
+            height_min=height_min, height_max=height_max, price_max=price_max,
+            mobility=mobility, autonomy_min=autonomy_min, has_sdk=has_sdk,
+            ros_support=ros_support, developer_edition=developer_edition,
+            has_manipulation=has_manipulation,
+        )
+
         count_stmt = _apply_filters(select(func.count(Robot.id)), **filters)
         order = resolve_sort(sort)
         stmt = _apply_filters(

@@ -6,7 +6,7 @@
   "summary": null,
   "announced_year": null,
   "commercial_status": "ANNOUNCED",
-  "is_published": false,
+  "is_published": true,
   "specs": {
     "height_cm": null,
     "weight_kg": null,
@@ -40,5 +40,21 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": []
+  "images": [
+    {
+      "image_url": "/robots/hanson-sophia.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Robot_Sophie.jpg",
+      "source_name": "Wikimedia Commons",
+      "source_type": "EDITORIAL",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "PERMITTED",
+      "usage_basis": "NONE",
+      "is_official": false,
+      "is_primary": true,
+      "attribution": "ITU / CC BY 2.0",
+      "last_verified_at": "2026-08-05T00:00:00+00:00",
+      "identity_confirmed_by": "robert@humanoid.company"
+    }
+  ]
 }

@@ -9,15 +9,11 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.db.session import get_session
-from app.models.commercial import AvailabilityOffer
-from app.models.enums import AUTONOMY_ORDER
-from app.models.manufacturer import Manufacturer
-from app.models.region import Region
 from app.models.robot import Robot
-from app.models.use_case import UseCase, UseCaseFit
 from app.schemas.common import Page
 from app.schemas.robot import CompareResponse, CompareRow, RobotDetail, RobotListItem
 from app.services import reads
+from app.services.robot_filters import apply_catalogue_filters
 
 router = APIRouter(prefix="/api/robots", tags=["robots"])
 
@@ -29,71 +25,10 @@ _SORTS = {
 }
 
 
-def _apply_filters(stmt, *, q, manufacturer, commercial_status, transaction_type,
-                   availability_status, region, use_case, payload_min, height_min,
-                   height_max, price_max, mobility, autonomy_min, has_sdk, ros_support,
-                   developer_edition, has_manipulation):
-    stmt = stmt.where(Robot.is_published.is_(True))
-    if q:
-        stmt = stmt.where(Robot.search_vector.op("@@")(func.plainto_tsquery("english", q)))
-    if manufacturer:
-        stmt = stmt.where(
-            Robot.manufacturer_id.in_(
-                select(Manufacturer.id).where(Manufacturer.slug == manufacturer)
-            )
-        )
-    if commercial_status:
-        stmt = stmt.where(Robot.commercial_status.in_(commercial_status))
-    if use_case:
-        stmt = stmt.where(
-            Robot.id.in_(
-                select(UseCaseFit.robot_id)
-                .join(UseCase, UseCase.id == UseCaseFit.use_case_id)
-                .where(UseCase.slug == use_case)
-            )
-        )
-    if payload_min is not None:
-        stmt = stmt.where(Robot.payload_kg >= payload_min)
-    if height_min is not None:
-        stmt = stmt.where(Robot.height_cm >= height_min)
-    if height_max is not None:
-        stmt = stmt.where(Robot.height_cm <= height_max)
-    if price_max is not None:
-        stmt = stmt.where(Robot.lowest_purchase_price <= price_max)
-    if mobility:
-        stmt = stmt.where(Robot.mobility == mobility)
-    if autonomy_min:
-        if autonomy_min in AUTONOMY_ORDER:
-            allowed = AUTONOMY_ORDER[AUTONOMY_ORDER.index(autonomy_min):]
-            stmt = stmt.where(Robot.autonomy.in_(allowed))
-    for flag, value in (
-        (Robot.has_sdk, has_sdk),
-        (Robot.ros_support, ros_support),
-        (Robot.developer_edition, developer_edition),
-        (Robot.has_manipulation, has_manipulation),
-    ):
-        if value is not None:
-            stmt = stmt.where(flag.is_(value))
-
-    # Availability-derived filters, all gated by is_current + canonical predicate.
-    if transaction_type or availability_status or region:
-        avail = (
-            select(AvailabilityOffer.robot_id)
-            .where(AvailabilityOffer.is_current.is_(True))
-            .where(func.commercially_accessible(AvailabilityOffer.availability_status))
-        )
-        if transaction_type:
-            avail = avail.where(AvailabilityOffer.transaction_type.in_(transaction_type))
-        if availability_status:
-            avail = avail.where(AvailabilityOffer.availability_status.in_(availability_status))
-        if region:
-            avail = avail.where(
-                AvailabilityOffer.region_id.in_(
-                    select(Region.id).where(Region.code == region)
-                )
-            )
-        stmt = stmt.where(Robot.id.in_(avail))
-    return stmt
+# The governed predicates now live in services/robot_filters.py so the AGENT-02
+# tool layer reuses them instead of writing a second interpretation. This alias
+# keeps the router's call sites and behaviour unchanged.
+_apply_filters = apply_catalogue_filters
 
 
 @router.get("", response_model=Page[RobotListItem])

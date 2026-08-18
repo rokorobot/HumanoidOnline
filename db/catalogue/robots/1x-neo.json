@@ -157,7 +157,7 @@
   "images": [
     {
       "image_url": "/robots/1x-neo.jpg",
-      "source_url": "https://www.1x.tech/neo",
+      "source_url": "https://www.1x.tech/order",
       "source_name": "1X Technologies",
       "source_type": "MANUFACTURER",
       "image_type": "FRONT",
@@ -167,7 +167,8 @@
       "is_official": true,
       "is_primary": true,
       "attribution": "© 1X Technologies",
-      "last_verified_at": "2026-07-25T00:00:00Z"
+      "last_verified_at": "2026-08-19T00:00:00Z",
+      "identity_confirmed_by": "robert@humanoid.company"
     }
   ]
 }

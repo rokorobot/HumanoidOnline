@@ -6,7 +6,7 @@
   "summary": "Education/research configuration of Booster Robotics' K1 humanoid platform: Jetson Orin NX 8GB compute (117 TOPS), a 5Ah battery giving ~80 min runtime at 0.4 m/s, and a 12-month manufacturer warranty with 24h technical support. Positioned for university programs and STEM curricula. Source: RobotShop EU listing, 2026-08-16.",
   "announced_year": null,
   "commercial_status": "COMMERCIAL",
-  "is_published": false,
+  "is_published": true,
   "specs": {
     "height_cm": 95.0,
     "weight_kg": 19.5,

@@ -6,7 +6,7 @@
   "summary": "Top-tier configuration of Booster Robotics' K1 humanoid platform: NVIDIA Jetson AGX Orin 32GB compute (200 TOPS), a 5Ah battery giving ~80 min runtime at 0.4 m/s, and a 12-month manufacturer warranty with 1-year technical support plus access to the Education Solution. Positioned for research teams, advanced development programs, and professional real-world deployment. Source: RobotShop EU listing, 2026-08-16.",
   "announced_year": null,
   "commercial_status": "COMMERCIAL",
-  "is_published": false,
+  "is_published": true,
   "specs": {
     "height_cm": 95.0,
     "weight_kg": 19.5,

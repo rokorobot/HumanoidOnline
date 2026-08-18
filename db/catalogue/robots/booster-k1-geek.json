@@ -6,7 +6,7 @@
   "summary": "Entry-level configuration of Booster Robotics' K1 humanoid platform: Qualcomm QCS8550 compute (48 TOPS dense), a 2Ah battery giving ~30 min runtime at 0.4 m/s, and a 3-month manufacturer warranty. Won the RoboCup 2025 KidSize championship. Source: RobotShop EU listing, 2026-08-16.",
   "announced_year": null,
   "commercial_status": "COMMERCIAL",
-  "is_published": false,
+  "is_published": true,
   "specs": {
     "height_cm": 95.0,
     "weight_kg": 19.5,

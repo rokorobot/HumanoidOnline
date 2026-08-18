@@ -5,7 +5,7 @@
   "model_code": null,
   "summary": "Research/rehabilitation humanoid sold to institutions.",
   "announced_year": null,
-  "commercial_status": "UNKNOWN",
+  "commercial_status": "PROTOTYPE",
   "is_published": true,
   "specs": {
     "height_cm": 175.0,
@@ -13,11 +13,11 @@
     "arm_span_cm": null,
     "reach_cm": null,
     "payload_kg": 10.0,
-    "walk_speed_ms": null,
-    "runtime_minutes": null,
+    "walk_speed_ms": 1.39,
+    "runtime_minutes": 120,
     "battery_wh": null,
     "mobility": "BIPEDAL",
-    "degrees_of_freedom": null,
+    "degrees_of_freedom": 53,
     "hand_type": null,
     "hand_dof": null,
     "autonomy": null,
@@ -31,14 +31,42 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Specifications not yet verified. Additional fields (height_cm, weight_kg, payload_kg, mobility, has_sdk, ros_support) filled from the pre-catalogue internal record pending confirmation against a primary source -- not yet manufacturer-verified.",
-  "official_url": "https://www.fourierintelligence.com/",
-  "commercial_status_evidence": [],
+  "specs_note": "height_cm, weight_kg, degrees_of_freedom, walk_speed_ms and runtime_minutes confirmed by the product owner against Fourier's own official GR-2 documentation (2026-08-19); height_cm and weight_kg were already on file and independently match that documentation. walk_speed_ms converted from the source's stated 5 km/h (5 / 3.6 = 1.39 m/s); this schema has no km/h field. payload_kg (10 kg) is unchanged and remains separately sourced -- Fourier's documentation separately states an approximately 3 kg SINGLE-HAND load capacity, a distinct measurement this schema has no field for, recorded here rather than conflated with payload_kg or dropped.",
+  "official_url": "https://www.fftai.com/products-gr2",
+  "commercial_status_evidence": [
+    {
+      "source_url": "https://humanoid.guide/product/gr-2/",
+      "source_type": "OTHER",
+      "source_title": "Humanoid Guide — Fourier GR-2",
+      "excerpt": null,
+      "published_at": null,
+      "observed_at": "2026-08-19",
+      "verified_at": "2026-08-19",
+      "confidence": "MEDIUM",
+      "note": "PROTOTYPE per the product owner's explicit editorial verification of this Humanoid Guide page for catalogue use. The page's own internal flag reads \"Verified: Verified\" (unlike the comparable pages used for other records), but it remains a third-party editorial source rather than a manufacturer citation; the product owner's review of this specific material is the verification basis for this status."
+    }
+  ],
   "variants": [],
   "pricing_offers": [],
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": []
+  "images": [
+    {
+      "image_url": "/robots/fourier-intelligence-gr-2.jpg",
+      "source_url": "https://humanoid.guide/product/gr-2/",
+      "source_name": "Humanoid Guide",
+      "source_type": "EDITORIAL",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "ATTRIBUTION_REQUIRED",
+      "usage_basis": "NONE",
+      "is_official": false,
+      "is_primary": true,
+      "attribution": "Fourier Intelligence",
+      "last_verified_at": "2026-08-19T00:00:00Z",
+      "identity_confirmed_by": "robert@humanoid.company"
+    }
+  ]
 }

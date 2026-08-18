@@ -8,7 +8,7 @@
   "commercial_status": "COMMERCIAL",
   "is_published": true,
   "specs": {
-    "height_cm": null,
+    "height_cm": 187.0,
     "weight_kg": null,
     "arm_span_cm": null,
     "reach_cm": null,
@@ -16,11 +16,11 @@
     "walk_speed_ms": null,
     "runtime_minutes": null,
     "battery_wh": null,
-    "mobility": null,
+    "mobility": "STATIONARY",
     "degrees_of_freedom": null,
     "hand_type": null,
     "hand_dof": null,
-    "autonomy": null,
+    "autonomy": "ASSISTED",
     "has_manipulation": null,
     "has_teleoperation": null,
     "has_vision": true,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Ameca is an expressive upper-body/interaction robot (base configuration does not walk); physical specs and mobility were not confirmed against an Engineered Arts primary source in this pass -> left NULL. Vision + conversational interaction are core Ameca features -> has_vision/has_language_ui true.",
+  "specs_note": "Ameca is an expressive upper-body/interaction robot (base configuration does not walk); physical specs and mobility were not confirmed against an Engineered Arts primary source in this pass -> left NULL. Vision + conversational interaction are core Ameca features -> has_vision/has_language_ui true. Fields (height_cm, mobility, autonomy) were subsequently verified and ratified by the product owner during the 2026-08-18 duplicate-reconciliation review, superseding the earlier note that left them NULL pending a primary source.",
   "commercial_status_evidence": [
     {
       "source_url": "https://engineeredarts.com",

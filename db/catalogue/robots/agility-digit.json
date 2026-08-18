@@ -8,11 +8,11 @@
   "commercial_status": "RAAS_DEPLOYMENT",
   "is_published": true,
   "specs": {
-    "height_cm": null,
-    "weight_kg": null,
+    "height_cm": 175.0,
+    "weight_kg": 65.0,
     "arm_span_cm": null,
     "reach_cm": null,
-    "payload_kg": null,
+    "payload_kg": 16.0,
     "walk_speed_ms": null,
     "runtime_minutes": null,
     "battery_wh": null,
@@ -26,12 +26,12 @@
     "has_vision": true,
     "has_language_ui": null,
     "has_sdk": null,
-    "has_api": null,
+    "has_api": true,
     "ros_support": null,
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Physical spec figures were not confirmed against an Agility primary source in this pass, so they are left NULL rather than copied from aggregators. Digit performs autonomous tote-handling tasks in live operation -> autonomy TASK_AUTONOMOUS, has_manipulation/has_vision true.",
+  "specs_note": "Physical spec figures were not confirmed against an Agility primary source in this pass, so they are left NULL rather than copied from aggregators. Digit performs autonomous tote-handling tasks in live operation -> autonomy TASK_AUTONOMOUS, has_manipulation/has_vision true. Fields (height_cm, weight_kg, payload_kg, has_api) were subsequently verified and ratified by the product owner during the 2026-08-18 duplicate-reconciliation review, superseding the earlier note that left them NULL pending a primary source.",
   "commercial_status_evidence": [
     {
       "source_url": "https://www.agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics",

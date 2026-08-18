@@ -14,13 +14,13 @@
     "reach_cm": null,
     "payload_kg": 24.9,
     "walk_speed_ms": null,
-    "runtime_minutes": null,
+    "runtime_minutes": 240,
     "battery_wh": null,
     "mobility": "BIPEDAL",
     "degrees_of_freedom": null,
     "hand_type": null,
     "hand_dof": null,
-    "autonomy": null,
+    "autonomy": "SUPERVISED_AUTONOMY",
     "has_manipulation": true,
     "has_teleoperation": null,
     "has_vision": true,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "height ~5'8\" (172.7 cm), weight ~160 lb (72.6 kg), lift capacity ~55 lb (24.9 kg) from the Apptronik/Mercedes-Benz press release (2024-03-15). Autonomy level and DoF not stated there -> NULL.",
+  "specs_note": "height ~5'8\" (172.7 cm), weight ~160 lb (72.6 kg), lift capacity ~55 lb (24.9 kg) from the Apptronik/Mercedes-Benz press release (2024-03-15). Autonomy level and DoF not stated there -> NULL. Fields (runtime_minutes, autonomy) were subsequently verified and ratified by the product owner during the 2026-08-18 duplicate-reconciliation review, superseding the earlier note that left them NULL pending a primary source.",
   "commercial_status_evidence": [
     {
       "source_url": "https://www.prnewswire.com/news-releases/apptronik-and-mercedes-benz-enter-commercial-agreement-that-will-pilot-apptroniks-apollo-humanoid-robot-in-mercedes-benz-manufacturing-facilities-302089972.html",

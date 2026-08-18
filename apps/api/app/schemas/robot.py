@@ -157,6 +157,11 @@ class RobotDetail(BaseModel):
     id: str
     slug: str
     name: str
+    #: Manufacturer's own designation for this model. A canonical `robot` column
+    #: that reached neither read path until AGENT-02 required it (`docs/20` §6).
+    #: Additive under §18, and served here — through the SHARED detail read — so
+    #: the website and the agent surface can only ever report one value.
+    model_code: str | None = None
     manufacturer: ManufacturerRef
     commercial_status: str
     summary: str | None = None

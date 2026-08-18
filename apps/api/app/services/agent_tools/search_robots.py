@@ -36,6 +36,7 @@ from app.services.agent_tools.errors import (
 )
 from app.services.agent_tools.pricing import warning_codes
 from app.services.agent_tools.projections import (
+    CONTRACT_VERSION,
     AgentRobotListItem,
     project_list_item,
 )
@@ -59,8 +60,6 @@ from app.services.robot_filters import (
 #: Canonical pagination bounds, inherited from `docs/04` — not agent-specific.
 DEFAULT_LIMIT = 24
 MAX_LIMIT = 100
-
-CONTRACT_VERSION = "agent-tools/0.1"
 
 #: `docs/20` §9.2/§9.4/§15 — at least one published robot that was otherwise
 #: eligible under this query was excluded because a constrained fact is UNKNOWN.

@@ -119,23 +119,11 @@ def list_robots(
     return Page(items=items, total=total, limit=limit, offset=offset)
 
 
-def _load_detail(session: Session, slug: str) -> Robot | None:
-    stmt = (
-        select(Robot)
-        .where(Robot.slug == slug, Robot.is_published.is_(True))
-        .options(
-            selectinload(Robot.variants),
-            selectinload(Robot.status_history),
-            selectinload(Robot.specifications),
-            selectinload(Robot.robot_capabilities),
-            selectinload(Robot.use_case_fits),
-            selectinload(Robot.pricing_offers),
-            selectinload(Robot.availability_offers),
-            selectinload(Robot.deployments),
-            selectinload(Robot.images),
-        )
-    )
-    return session.execute(stmt).scalars().first()
+# The detail load — publication predicate and eager-load set together — now lives
+# in services/reads.py so AGENT-02's `get_robot` inherits one implementation
+# instead of importing a router private (`docs/20` §6). This alias keeps the
+# router's call sites and behaviour unchanged.
+_load_detail = reads.load_detail
 
 
 @router.get("/compare", response_model=CompareResponse)

@@ -4,8 +4,10 @@ Transport-independent callables. No MCP, no HTTP routing and no agent-specific
 database access live here: every tool terminates in the same governed
 service/read layer the website and public API use.
 
-v0.1 surface is exactly three tools. Only `search_robots` is implemented so far
-(AGENT-02.1); `get_robot` and `get_evidence` follow in their own slices.
+v0.1 surface is exactly three tools. `search_robots` (AGENT-02.1) and
+`get_robot` (AGENT-02.2c) are implemented; `get_evidence` follows in its own
+slice, and until it does an `evidence_ref` is issued but not yet redeemable
+through a tool.
 """
 from app.services.agent_tools.errors import (
     AgentToolError,
@@ -14,14 +16,28 @@ from app.services.agent_tools.errors import (
     InvalidPagination,
     NotFound,
 )
+from app.services.agent_tools.get_robot import (
+    NO_CURRENT_AVAILABILITY_OFFER,
+    NO_CURRENT_PRICING_OFFER,
+    NO_DISPLAY_ELIGIBLE_IMAGE,
+    NO_RECORDED_DEPLOYMENT,
+    RobotResult,
+    get_robot,
+)
 from app.services.agent_tools.projections import (
+    CONTRACT_VERSION,
+    AgentAvailabilityOffer,
+    AgentDeployment,
+    AgentEvidence,
     AgentManufacturerRef,
+    AgentPricingOffer,
+    AgentRobotDetail,
     AgentRobotListItem,
     canonical_robot_url,
+    project_detail,
     project_list_item,
 )
 from app.services.agent_tools.search_robots import (
-    CONTRACT_VERSION,
     DEFAULT_LIMIT,
     HARD_CONSTRAINT_EXCLUDED_UNKNOWN,
     MAX_LIMIT,
@@ -30,9 +46,15 @@ from app.services.agent_tools.search_robots import (
 )
 
 __all__ = [
+    "AgentAvailabilityOffer",
+    "AgentDeployment",
+    "AgentEvidence",
     "AgentManufacturerRef",
+    "AgentPricingOffer",
+    "AgentRobotDetail",
     "AgentRobotListItem",
     "canonical_robot_url",
+    "project_detail",
     "project_list_item",
     "AgentToolError",
     "InvalidArgument",
@@ -43,6 +65,12 @@ __all__ = [
     "DEFAULT_LIMIT",
     "HARD_CONSTRAINT_EXCLUDED_UNKNOWN",
     "MAX_LIMIT",
+    "NO_CURRENT_AVAILABILITY_OFFER",
+    "NO_CURRENT_PRICING_OFFER",
+    "NO_DISPLAY_ELIGIBLE_IMAGE",
+    "NO_RECORDED_DEPLOYMENT",
+    "RobotResult",
     "SearchResult",
+    "get_robot",
     "search_robots",
 ]

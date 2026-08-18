@@ -9,6 +9,8 @@ These require the seed; they skip when DATABASE_URL is unset (see conftest).
 """
 from __future__ import annotations
 
+import pytest
+
 
 def _get(client, url, **params):
     resp = client.get(url, params=params)
@@ -78,6 +80,73 @@ def test_robot_detail_three_dimensions(client, database_url) -> None:
 def test_robot_detail_404(client, database_url) -> None:
     resp = client.get("/api/robots/does-not-exist")
     assert resp.status_code == 404
+
+
+# ---- AGENT-02.2c non-regression -----------------------------------------
+# The detail load moved into services/reads.py so `get_robot` could share it.
+# These prove the HTTP surface did not move with it.
+
+def test_robot_detail_still_excludes_unpublished(client, database_url) -> None:
+    """The publication predicate travelled *inside* the shared loader, so it
+    cannot have been left behind at the router's call site."""
+    from sqlalchemy import text
+
+    from app.db.session import engine
+
+    with engine.connect() as conn:
+        conn.execute(text("SET search_path TO humanoid, public"))
+        slug = conn.execute(
+            text("SELECT slug FROM robot WHERE NOT is_published LIMIT 1")
+        ).scalar_one_or_none()
+    if slug is None:
+        pytest.skip("catalogue has no unpublished robot to probe")
+    assert client.get(f"/api/robots/{slug}").status_code == 404
+
+
+def test_robot_detail_gains_model_code_and_nothing_else(client, database_url) -> None:
+    """`model_code` is the one additive field of this slice (docs/20 §6, §18).
+
+    Everything else the detail carried, it still carries — and the agent-only
+    additions (`evidence_ref`, `subject_type`, a warnings envelope) stay off the
+    HTTP surface, where no consumer asked for them.
+    """
+    body = _get(client, "/api/robots/digit")
+    assert "model_code" in body
+
+    for existing in (
+        "id", "slug", "name", "manufacturer", "commercial_status", "summary",
+        "description", "hero_image_url", "announced_year", "status_history",
+        "specs", "extended_specs", "capabilities", "variants", "use_case_fits",
+        "pricing_offers", "availability_offers", "deployments", "images",
+    ):
+        assert existing in body, existing
+    assert "warnings" not in body
+
+    for offers in ("pricing_offers", "availability_offers", "deployments"):
+        for item in body[offers]:
+            evidence = item.get("evidence")
+            if evidence is not None:
+                assert "evidence_ref" not in evidence
+                assert "subject_type" not in evidence
+                assert "id" not in evidence
+                assert "subject_id" not in evidence
+
+
+def test_compare_uses_the_same_publication_gated_loader(
+    client, database_url
+) -> None:
+    """`compare` reads through the shared loader too, so an unpublished slug is
+    simply not a valid member — and `model_code` reaches it by the same path."""
+    body = _get(client, "/api/robots/compare", ids="unitree-g1,digit")
+    assert {r["slug"] for r in body["robots"]} == {"unitree-g1", "digit"}
+    for robot in body["robots"]:
+        assert "model_code" in robot
+
+    resp = client.get(
+        "/api/robots/compare", params={"ids": "unitree-g1,digit,does-not-exist"}
+    )
+    assert resp.status_code == 200
+    assert len(resp.json()["robots"]) == 2
 
 
 def test_evidence_exposes_observed_at(client, database_url) -> None:

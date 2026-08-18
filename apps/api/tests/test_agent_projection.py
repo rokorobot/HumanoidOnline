@@ -16,7 +16,6 @@ database identifier appears anywhere in the serialized result, at any depth.
 """
 from __future__ import annotations
 
-import re
 import uuid
 
 import pytest
@@ -25,17 +24,9 @@ from sqlalchemy import text
 from app.db.session import SessionLocal, engine
 from app.services.agent_tools import canonical_robot_url, search_robots
 
-UUID_PATTERN = re.compile(
-    r"\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b",
-    re.IGNORECASE,
-)
-
-#: Key names that would carry a database selector if present at any depth.
-FORBIDDEN_KEYS = {
-    "id", "robot_id", "manufacturer_id", "provider_id", "region_id",
-    "subject_id", "variant_id", "use_case_id", "image_id", "offer_id",
-    "country_region_id", "parent_id",
-}
+# One gate, shared with the `get_robot` tests: a second, subtly weaker copy of a
+# security assertion is worse than no second copy at all.
+from tests.agent_identifier_gate import UUID_PATTERN, assert_no_database_identifier
 
 
 def _exec(sql: str, **params):
@@ -44,25 +35,6 @@ def _exec(sql: str, **params):
         result = conn.execute(text(sql), params)
         conn.commit()
         return result
-
-
-def _walk(node, path="items"):
-    """Yield every (path, key, value) pair in a nested JSON-ish structure."""
-    if isinstance(node, dict):
-        for key, value in node.items():
-            yield f"{path}.{key}", key, value
-            yield from _walk(value, f"{path}.{key}")
-    elif isinstance(node, list):
-        for index, value in enumerate(node):
-            yield from _walk(value, f"{path}[{index}]")
-
-
-def assert_no_database_identifier(payload) -> None:
-    """Recursive projection-safety gate (§8, §20, §21.10)."""
-    for path, key, value in _walk(payload):
-        assert key not in FORBIDDEN_KEYS, f"database selector key at {path}"
-        if isinstance(value, str):
-            assert not UUID_PATTERN.search(value), f"UUID value at {path}: {value!r}"
 
 
 def dumped(**kw) -> list[dict]:

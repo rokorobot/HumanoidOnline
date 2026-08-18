@@ -10,8 +10,9 @@ import uuid
 from decimal import Decimal
 
 from sqlalchemy import select, text
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
+from app.models.commercial import AvailabilityOffer, Deployment, PricingOffer
 from app.models.evidence import EvidenceSource
 from app.models.robot import Robot
 from app.models.spec import Specification
@@ -81,19 +82,28 @@ def _spec_value(spec: Specification) -> float | bool | str | None:
     return spec.value_text
 
 
-def load_evidence(
+def load_evidence_rows(
     session: Session, subject_ids: set[uuid.UUID]
-) -> dict[tuple[str, uuid.UUID], EvidenceRead]:
+) -> dict[tuple[str, uuid.UUID], EvidenceSource]:
     """Best evidence per (subject_type, subject_id): verified first, then newest,
     then a deterministic internal tie-break (`docs/20` §13.1).
 
-    The third key is not decoration. Verified-ness and `observed_at` can tie
+    **This function owns the one canonical selection rule.** It is stated here
+    and nowhere else: the agent surface must cite the same row the website
+    displays, so a second implementation would eventually mean two catalogues
+    disagreeing about their own provenance.
+
+    The third sort key is not decoration. Verified-ness and `observed_at` can tie
     exactly — the seeded catalogue imports every row with one timestamp — and a
     stable sort then falls back to the order an unordered query happened to
     return, which PostgreSQL does not guarantee. Since an `evidence_ref`
     addresses the *selected row*, an unbroken tie would let a published citation
     point somewhere else after a replan. The row id orders ties and nothing else;
     it is never exposed (§8, §20).
+
+    Returns the ORM rows, because AGENT-02 needs the selected row's identity to
+    issue an `evidence_ref` for it (§7.1). Callers that only need the public
+    metadata use `load_evidence`, which is this function plus one projection.
     """
     if not subject_ids:
         return {}
@@ -105,19 +115,43 @@ def load_evidence(
     rows.sort(
         key=lambda e: (1 if e.verified_at else 0, e.observed_at, str(e.id)), reverse=True
     )
-    best: dict[tuple[str, uuid.UUID], EvidenceRead] = {}
+    best: dict[tuple[str, uuid.UUID], EvidenceSource] = {}
     for e in rows:
-        key = (e.subject_type, e.subject_id)
-        if key not in best:
-            best[key] = EvidenceRead(
-                source_type=e.source_type,
-                confidence=e.confidence,
-                observed_at=e.observed_at,
-                verified_at=e.verified_at,
-                published_at=e.published_at,
-                source_url=e.source_url,
-            )
+        best.setdefault((e.subject_type, e.subject_id), e)
     return best
+
+
+def evidence_read(row: EvidenceSource) -> EvidenceRead:
+    """The public HTTP provenance metadata of one evidence row.
+
+    Exactly the fields `docs/20` §7 lists. Notably absent: `id` and `subject_id`
+    (§8, §20 — never public on any surface), and `subject_type`/`evidence_ref`,
+    which belong to the *agent* evidence object (§9.5) and are added by the agent
+    projection rather than pushed into the shared HTTP schema.
+    """
+    return EvidenceRead(
+        source_type=row.source_type,
+        confidence=row.confidence,
+        observed_at=row.observed_at,
+        verified_at=row.verified_at,
+        published_at=row.published_at,
+        source_url=row.source_url,
+    )
+
+
+def load_evidence(
+    session: Session, subject_ids: set[uuid.UUID]
+) -> dict[tuple[str, uuid.UUID], EvidenceRead]:
+    """`load_evidence_rows` projected onto the public metadata.
+
+    The long-standing interface, unchanged for its callers. Selection is not
+    reimplemented here — this is one call plus one projection, so HTTP and AGENT
+    can never diverge on *which* row is the best evidence for a fact.
+    """
+    return {
+        key: evidence_read(row)
+        for key, row in load_evidence_rows(session, subject_ids).items()
+    }
 
 
 def snapshot_for(
@@ -255,12 +289,97 @@ def _specs_block(robot: Robot) -> SpecsBlock:
     )
 
 
-def serialize_detail(session: Session, robot: Robot) -> RobotDetail:
-    subject_ids: set[uuid.UUID] = {robot.id}
-    subject_ids |= {p.id for p in robot.pricing_offers}
-    subject_ids |= {a.id for a in robot.availability_offers}
-    subject_ids |= {d.id for d in robot.deployments}
-    ev = load_evidence(session, subject_ids)
+def load_detail(session: Session, slug: str) -> Robot | None:
+    """The one governed detail load: a *published* robot by canonical slug.
+
+    Moved here from the HTTP router (`docs/20` §6) so the detail route, `compare`
+    and AGENT-02's `get_robot` share one implementation. Critically, the
+    publication predicate lives *inside* this function rather than at each call
+    site: a caller cannot forget it, and there is no parameter with which to ask
+    for an unpublished robot (AGENT-01.7, §14).
+
+    Slug matching is exact and case-sensitive, and there are no aliases (§6), so
+    an unknown slug, an unpublished one and a case variant are all simply
+    ``None`` — indistinguishable, which is the point.
+    """
+    stmt = (
+        select(Robot)
+        .where(Robot.slug == slug, Robot.is_published.is_(True))
+        .options(
+            selectinload(Robot.variants),
+            selectinload(Robot.status_history),
+            selectinload(Robot.specifications),
+            selectinload(Robot.robot_capabilities),
+            selectinload(Robot.use_case_fits),
+            selectinload(Robot.pricing_offers),
+            selectinload(Robot.availability_offers),
+            selectinload(Robot.deployments),
+            selectinload(Robot.images),
+        )
+    )
+    return session.execute(stmt).scalars().first()
+
+
+# ---------------------------------------------------------------------------
+# Which commercial facts a detail response actually exposes.
+#
+# Stated once, because two consumers must agree on it *exactly*. `serialize_detail`
+# uses these to build the public lists; AGENT-02 uses them to walk the matching
+# ORM rows and attach each fact's evidence. Attaching provenance by zipping two
+# lists is only sound while both are built from one definition of "exposed, in
+# this order" — so that definition is a function, not a repeated comprehension.
+# ---------------------------------------------------------------------------
+
+
+def current_pricing_offers(robot: Robot) -> list[PricingOffer]:
+    """Pricing offers a detail response exposes: current ones, in relation order."""
+    return [p for p in robot.pricing_offers if p.is_current]
+
+
+def current_availability_offers(robot: Robot) -> list[AvailabilityOffer]:
+    """Availability offers a detail response exposes: current ones, in order."""
+    return [a for a in robot.availability_offers if a.is_current]
+
+
+def recorded_deployments(robot: Robot) -> list[Deployment]:
+    """Deployments a detail response exposes. No currency filter exists here —
+    a deployment is a historical fact, not a standing offer."""
+    return list(robot.deployments)
+
+
+def detail_subject_ids(robot: Robot) -> set[uuid.UUID]:
+    """Every subject whose evidence a detail response may cite.
+
+    Deliberately wider than the exposed facts: it spans *all* loaded offers, not
+    just current ones, so the evidence query is a single round trip over the
+    whole detail. Evidence for a non-exposed offer is simply never looked up
+    again — nothing attaches provenance to a fact the response does not carry.
+    """
+    return (
+        {robot.id}
+        | {p.id for p in robot.pricing_offers}
+        | {a.id for a in robot.availability_offers}
+        | {d.id for d in robot.deployments}
+    )
+
+
+def serialize_detail(
+    session: Session,
+    robot: Robot,
+    *,
+    evidence_rows: dict[tuple[str, uuid.UUID], EvidenceSource] | None = None,
+) -> RobotDetail:
+    """The governed detail projection.
+
+    `evidence_rows` lets a caller that has *already* run the canonical selection
+    hand those rows in, so `get_robot` selects once and serializes once instead
+    of running best-evidence twice over the same subjects. Omitted (the HTTP
+    path), behaviour is exactly as before: this function selects for itself.
+    Either way the rows come from `load_evidence_rows`, so there is one rule.
+    """
+    if evidence_rows is None:
+        evidence_rows = load_evidence_rows(session, detail_subject_ids(robot))
+    ev = {key: evidence_read(row) for key, row in evidence_rows.items()}
 
     extended = [
         ExtendedSpec(
@@ -311,8 +430,7 @@ def serialize_detail(session: Session, robot: Robot) -> RobotDetail:
             provider=p.provider.slug if p.provider else None,
             evidence=ev.get(("PRICING_OFFER", p.id)),
         )
-        for p in robot.pricing_offers
-        if p.is_current
+        for p in current_pricing_offers(robot)
     ]
     availability = [
         AvailabilityOfferRead(
@@ -324,8 +442,7 @@ def serialize_detail(session: Session, robot: Robot) -> RobotDetail:
             lead_time_days=a.lead_time_days,
             evidence=ev.get(("AVAILABILITY_OFFER", a.id)),
         )
-        for a in robot.availability_offers
-        if a.is_current
+        for a in current_availability_offers(robot)
     ]
     deployments = [
         DeploymentRead(
@@ -338,7 +455,7 @@ def serialize_detail(session: Session, robot: Robot) -> RobotDetail:
             summary=d.summary,
             evidence=ev.get(("DEPLOYMENT", d.id)),
         )
-        for d in robot.deployments
+        for d in recorded_deployments(robot)
     ]
     status_history = [
         StatusHistoryEntry(status=h.status, effective_at=h.effective_at, note=h.note)
@@ -365,6 +482,7 @@ def serialize_detail(session: Session, robot: Robot) -> RobotDetail:
         id=str(robot.id),
         slug=robot.slug,
         name=robot.name,
+        model_code=robot.model_code,
         manufacturer=ManufacturerRef(
             slug=robot.manufacturer.slug,
             name=robot.manufacturer.name,

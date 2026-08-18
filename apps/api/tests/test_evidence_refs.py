@@ -465,6 +465,49 @@ def test_unpublishing_revokes_an_already_issued_ref(
     assert resolve(ref) is ResolutionFailure.UNRESOLVED, subject_type
 
 
+@pytest.mark.parametrize(
+    "table,maker,subject",
+    [
+        ("pricing_offer", "pricing_offer", "PRICING_OFFER"),
+        ("availability_offer", "availability_offer", "AVAILABILITY_OFFER"),
+    ],
+)
+def test_a_superseded_offer_revokes_its_evidence(
+    fixtures, database_url, table, maker, subject
+):
+    """AGENT-02.2d — reachability is the *governed* read model, not the table.
+
+    A reference is a revocable capability, so it stops resolving when the fact it
+    cites stops being served — and an offer that is no longer current is no
+    longer served. The row still exists; that alone is not authorization, or an
+    old reference would keep disclosing the source behind a withdrawn price.
+    """
+    robot_id = fixtures.robot(published=True)
+    offer_id = getattr(fixtures, maker)(robot_id)
+    row = fixtures.row(fixtures.evidence(subject, offer_id))
+    ref = issue_evidence_ref(row, KEYRING)
+    assert not isinstance(resolve(ref), ResolutionFailure), "fixture sanity"
+
+    _exec(f"UPDATE {table} SET is_current = FALSE WHERE id = :i", i=offer_id)
+    assert resolve(ref) is ResolutionFailure.UNRESOLVED
+
+    # The row is untouched — revocation came from the reachability rule.
+    assert _exec(
+        f"SELECT count(*) FROM {table} WHERE id = :i", i=offer_id
+    ).scalar_one() == 1
+
+    _exec(f"UPDATE {table} SET is_current = TRUE WHERE id = :i", i=offer_id)
+    assert not isinstance(resolve(ref), ResolutionFailure), "restoring did not restore"
+
+
+def test_a_deployment_has_no_currency_condition(fixtures, database_url):
+    """A deployment is a historical fact rather than a standing offer, so it
+    carries no `is_current` flag and publication is the whole test."""
+    robot_id = fixtures.robot(published=True)
+    row = fixtures.row(fixtures.evidence("DEPLOYMENT", fixtures.deployment(robot_id)))
+    assert not isinstance(resolve(issue_evidence_ref(row, KEYRING)), ResolutionFailure)
+
+
 def test_an_unsupported_subject_class_does_not_resolve(fixtures, database_url):
     robot_id = fixtures.robot()
     row = fixtures.row(fixtures.evidence("SPECIFICATION", robot_id))

@@ -18,9 +18,10 @@ into deterministic service here.
 primary-key lookup and never re-runs best-evidence selection, so ingesting newer
 provenance cannot silently re-point a citation that has already been published.
 
-**Publication is re-checked at resolve time** (§7.2). A reference proves issuance,
-never continued eligibility: if the owning robot is unpublished afterwards, every
-reference to its facts stops resolving.
+**Reachability is re-checked at resolve time** (§7.2). A reference proves
+issuance, never continued eligibility: if the owning robot is unpublished
+afterwards — or the offer it cites is superseded — every reference to that fact
+stops resolving. The row continuing to exist is not authorization.
 
 Transport-independent: no FastAPI, no HTTP status, no agent error vocabulary.
 The binding maps `ResolutionFailure.MALFORMED` → `INVALID_ARGUMENT` and
@@ -291,22 +292,40 @@ def _decrypt(
     return uuid.UUID(bytes=payload[1:])
 
 
-def _subject_is_published(session: Session, subject_type: str, subject_id: uuid.UUID) -> bool:
-    """Is this evidence's subject reachable from a currently published robot?
+def _subject_is_reachable(session: Session, subject_type: str, subject_id: uuid.UUID) -> bool:
+    """Is this evidence's subject still exposed by the governed read model?
 
-    Evaluated now, never trusted from issuance time (§7.2) — unpublishing a robot
-    must revoke every reference already handed out for its facts.
+    Evaluated now, never trusted from issuance time (§7.2) — a reference is proof
+    of issuance, never of continued eligibility, so unpublishing a robot must
+    revoke every reference already handed out for its facts.
+
+    **A reference is a revocable capability, not a pointer to a row.** The row
+    continuing to exist is not authorization: an offer that has been superseded
+    is no longer part of what the catalogue publishes, so provenance for it stops
+    being redeemable at the same moment the offer itself stops being served. That
+    is why the two offer classes require `is_current` and not merely a published
+    robot — the same predicate `reads.current_pricing_offers` and
+    `current_availability_offers` apply when deciding what a detail response
+    exposes. `is_current` is a column-level fact, expressed here in SQL exactly as
+    the other governed layers (`services/pricing.py`, `robot_filters.py`,
+    `leads/routing.py`) express it.
+
+    Deployments carry no currency flag — a deployment is a historical fact rather
+    than a standing offer — so publication of the owning robot is the whole test.
     """
     if subject_type == "COMMERCIAL_STATUS":
         stmt = select(Robot.id).where(Robot.id == subject_id)
     elif subject_type == "PRICING_OFFER":
         stmt = select(Robot.id).join(
             PricingOffer, PricingOffer.robot_id == Robot.id
-        ).where(PricingOffer.id == subject_id)
+        ).where(PricingOffer.id == subject_id, PricingOffer.is_current.is_(True))
     elif subject_type == "AVAILABILITY_OFFER":
         stmt = select(Robot.id).join(
             AvailabilityOffer, AvailabilityOffer.robot_id == Robot.id
-        ).where(AvailabilityOffer.id == subject_id)
+        ).where(
+            AvailabilityOffer.id == subject_id,
+            AvailabilityOffer.is_current.is_(True),
+        )
     elif subject_type == "DEPLOYMENT":
         stmt = select(Robot.id).join(
             Deployment, Deployment.robot_id == Robot.id
@@ -340,6 +359,6 @@ def resolve_evidence_ref(
         return ResolutionFailure.UNRESOLVED
     if evidence.subject_type not in SUPPORTED_SUBJECT_TYPES:
         return ResolutionFailure.UNRESOLVED
-    if not _subject_is_published(session, evidence.subject_type, evidence.subject_id):
+    if not _subject_is_reachable(session, evidence.subject_type, evidence.subject_id):
         return ResolutionFailure.UNRESOLVED
     return evidence

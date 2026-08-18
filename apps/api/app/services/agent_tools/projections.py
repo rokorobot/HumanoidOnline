@@ -250,8 +250,21 @@ def _agent_evidence(
     no evidence at all (`docs/05` G2.1), and filling the field for symmetry would
     invent provenance the catalogue does not have.
     """
-    if row is None:
-        return None
+    return None if row is None else build_agent_evidence(row, issue_ref)
+
+
+def build_agent_evidence(
+    row: EvidenceSource, issue_ref: Callable[[EvidenceSource], str]
+) -> AgentEvidence:
+    """One evidence row as the agent object (`docs/20` §9.5).
+
+    Shared with `get_evidence`, so provenance has exactly one shape whether it
+    arrives embedded in a robot detail or redeemed from a reference — and so the
+    field list can only be widened in one place. What it omits is as deliberate
+    as what it carries: `id` and `subject_id` are database selectors (§8, §20),
+    and `source_title`, `excerpt` and `note` are internal record detail the
+    contract has never published (§7).
+    """
     return AgentEvidence(
         source_type=row.source_type,
         confidence=row.confidence,

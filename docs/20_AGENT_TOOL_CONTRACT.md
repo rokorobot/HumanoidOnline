@@ -348,22 +348,38 @@ contract has never published.
 **Evidence existence ≠ confidence.** A returned row proves a claim is sourced;
 `confidence` grades that source. Neither implies the other (§13).
 
-### 7.2 Publication reachability (ratified)
+### 7.2 Reachability through the governed read model (ratified)
 
-`get_evidence` returns an evidence row **only** if its subject is reachable from
-a currently **published** canonical robot. Resolution verifies reachability
-through the subject relationship itself, not through the reference — a reference
-is proof of issuance, never of continued eligibility, so unpublishing a robot
-must revoke access through references already handed out.
+`get_evidence` returns an evidence row **only** if its subject is still exposed
+by the governed read model. Resolution verifies reachability through the subject
+relationship itself, not through the reference — a reference is proof of
+issuance, never of continued eligibility, so unpublishing a robot must revoke
+access through references already handed out.
+
+**A reference is a revocable capability, not a pointer to a row.** The row
+continuing to exist is not authorization. An offer that has been superseded is no
+longer part of what the catalogue serves, so provenance for it stops being
+redeemable at the same moment the offer itself stops being exposed — otherwise a
+held reference would keep disclosing the source behind a price the catalogue has
+withdrawn, and `get_evidence` would answer for facts `get_robot` no longer
+returns.
 
 Supported subject classes for references issued by `get_robot` in v0.1:
 
 | `subject_type` | Reachability check |
 |---|---|
 | `COMMERCIAL_STATUS` | subject is the published robot |
-| `PRICING_OFFER` | offer's robot is published |
-| `AVAILABILITY_OFFER` | offer's robot is published |
+| `PRICING_OFFER` | offer's robot is published **and the offer is current** |
+| `AVAILABILITY_OFFER` | offer's robot is published **and the offer is current** |
 | `DEPLOYMENT` | deployment's robot is published |
+
+The two offer classes carry the currency condition because the governed detail
+exposes only current offers (§6). A deployment carries none: it is a historical
+fact rather than a standing offer, and has no currency flag to test.
+
+Reachability is re-evaluated on every call and no revocation state is stored, so
+restoring publication — or restoring an offer to current — restores access
+through the same reference.
 
 Any other subject class is **unsupported** in v0.1 and does not resolve.
 
@@ -377,7 +393,7 @@ Exactly two outcomes, and the boundary between them is structural, not semantic:
 | Well-formed reference that fails to authenticate or decrypt | `NOT_FOUND` |
 | Unknown key/version, or outside the rotation window | `NOT_FOUND` |
 | Evidence row no longer exists | `NOT_FOUND` |
-| Subject not reachable from a published robot (§7.2) | `NOT_FOUND` |
+| Subject no longer exposed by the governed read model — unpublished robot, or superseded offer (§7.2) | `NOT_FOUND` |
 | Unsupported subject class | `NOT_FOUND` |
 
 Every `NOT_FOUND` case is **indistinguishable** — same response, no detail about
@@ -992,8 +1008,9 @@ Before AGENT-02 v0.1 may be considered complete:
 
 The decisions this contract was drafted around (1–7) have been taken by the
 product owner; decision 8 was taken at the first 2026-08-18 amendment and
-decisions 9–15 at the second. They are recorded here as the reasoning behind the
-sections above, so a future reader can see what was chosen and what was rejected.
+decisions 9–15 at the second, and decision 16 at the third. They are recorded
+here as the reasoning behind the sections above, so a future reader can see what
+was chosen and what was rejected.
 
 | # | Decision | Resolution | Where it lives |
 |---|---|---|---|
@@ -1013,19 +1030,21 @@ sections above, so a future reader can see what was chosen and what was rejected
 | 13 | `commercial_status_evidence` | Robot-level `COMMERCIAL_STATUS` evidence was already loaded and discarded. Ratified as a **sibling field**; `commercial_status` stays a plain enum and is never turned into an object. `UNKNOWN` fabricates nothing | §6, §9.5 |
 | 14 | `get_robot` detail breadth | Carries the governed `summary`, `description`, `hero_image_url`, `announced_year`, `status_history[]` in addition to the §6 groups — it is the full-detail tool, not the compact search projection. Additive under §18 | §6 |
 | 15 | Absence notices | Four frozen codes, each stating what it does **not** mean; `no_display_eligible_image` in particular claims only that nothing passed the MEDIA-01 gate, never that no image record exists | §6.1, §15 |
+| 16 | Evidence reachability | **Published *and* current.** A reference is a revocable capability, not a pointer to a row: pricing and availability evidence resolves only while the owning robot is published **and** the offer is current, so `get_evidence` never answers for a fact `get_robot` no longer exposes. Deployments keep the publication-only test. Narrowing only — no new disclosure — and no revocation state is stored, so access returns if the fact does | §7.2, §7.3 |
 
 **No open ratification decisions remain in this contract.**
 
 ### Status
 
-**RATIFIED v0.1 — 2026-08-17.** Amended twice on **2026-08-18** by product-owner
-decision: first §10.5 sort-under-constraint plus factual implementation-status
-corrections (§5, §10.3.1, §12) and the aligned `docs/04` price input; then the
-evidence-reference seam and `get_robot` shape (§6, §6.1, §7.1.1, §7.2, §7.3,
-§9.5, §13.1, §15).
+**RATIFIED v0.1 — 2026-08-17.** Amended three times on **2026-08-18** by
+product-owner decision: first §10.5 sort-under-constraint plus factual
+implementation-status corrections (§5, §10.3.1, §12) and the aligned `docs/04`
+price input; then the evidence-reference seam and `get_robot` shape (§6, §6.1,
+§7.1.1, §7.2, §7.3, §9.5, §13.1, §15); then the evidence **reachability**
+refinement found while implementing `get_evidence` (§7.2, §7.3, decision 16).
 
-The semantic version remains **v0.1** in both cases. §18 enumerates the breaking
-surface exhaustively, and each amendment falls outside it:
+The semantic version remains **v0.1** in all three cases. §18 enumerates the
+breaking surface exhaustively, and each amendment falls outside it:
 
 - **Ordering** (§10.5) is not among the enumerated surface; result sets, the four
   sort keys and §16's stability requirement are unchanged.
@@ -1040,6 +1059,17 @@ surface exhaustively, and each amendment falls outside it:
   identifier prohibition already existed in §8/§20/§21.10.
 - **Warning codes and additional governed detail fields** are named additive by
   §18 itself.
+- **Evidence reachability** (§7.2, decision 16) narrows what a reference may
+  redeem; it widens nothing. It is stated plainly rather than argued away: a
+  reference to a since-superseded offer that would previously have resolved now
+  returns `NOT_FOUND`. That is not a change to *publication visibility
+  semantics* but an alignment with them — `get_robot` never exposed a superseded
+  offer, so the previous behaviour let `get_evidence` answer for a fact no other
+  surface served. No client could have relied on it: such a reference is only
+  obtainable while the offer is current, and this contract has never promised
+  continued redemption after a fact stops being served. Removing a disclosure
+  that exceeded the governed read model does not require a version bump; adding
+  one would.
 
 No enumerated breaking item — tool names, input schemas, `UNKNOWN` semantics,
 filtering semantics, publication visibility — is touched. The surface is still

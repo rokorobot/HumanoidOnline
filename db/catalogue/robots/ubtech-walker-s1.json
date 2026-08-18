@@ -40,5 +40,20 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": []
+  "images": [
+    {
+      "image_url": "/robots/ubtech-walker-s1.webp",
+      "source_url": "https://humanoid.guide/product/walker-s1/",
+      "source_name": "Humanoid Guide",
+      "source_type": "EDITORIAL",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "ATTRIBUTION_REQUIRED",
+      "usage_basis": "NONE",
+      "is_official": false,
+      "is_primary": true,
+      "attribution": "© UBTECH Robotics",
+      "last_verified_at": "2026-08-18T00:00:00Z"
+    }
+  ]
 }

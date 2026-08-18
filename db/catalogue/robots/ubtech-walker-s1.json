@@ -53,7 +53,8 @@
       "is_official": false,
       "is_primary": true,
       "attribution": "© UBTECH Robotics",
-      "last_verified_at": "2026-08-18T00:00:00Z"
+      "last_verified_at": "2026-08-18T00:00:00Z",
+      "identity_confirmed_by": "robert@humanoid.company"
     }
   ]
 }

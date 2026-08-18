@@ -3,10 +3,10 @@
   "name": "TALOS",
   "manufacturer_slug": "pal-robotics",
   "model_code": null,
-  "summary": null,
+  "summary": "High-performance torque-controlled research humanoid.",
   "announced_year": null,
-  "commercial_status": "ANNOUNCED",
-  "is_published": false,
+  "commercial_status": "UNKNOWN",
+  "is_published": true,
   "specs": {
     "height_cm": 175.0,
     "weight_kg": 95.0,

@@ -3,21 +3,21 @@
   "name": "K2 Forerunner",
   "manufacturer_slug": "kepler-robotics",
   "model_code": null,
-  "summary": null,
+  "summary": "Industrial/commercial humanoid for manufacturing, logistics and hazardous environments, with cloud-based AI for task planning and autonomous learning.",
   "announced_year": null,
-  "commercial_status": "ANNOUNCED",
-  "is_published": false,
+  "commercial_status": "PROTOTYPE",
+  "is_published": true,
   "specs": {
-    "height_cm": null,
-    "weight_kg": null,
+    "height_cm": 178.0,
+    "weight_kg": 85.0,
     "arm_span_cm": null,
     "reach_cm": null,
-    "payload_kg": null,
-    "walk_speed_ms": null,
-    "runtime_minutes": null,
+    "payload_kg": 15.0,
+    "walk_speed_ms": 1.11,
+    "runtime_minutes": 180,
     "battery_wh": null,
     "mobility": null,
-    "degrees_of_freedom": null,
+    "degrees_of_freedom": 52,
     "hand_type": null,
     "hand_dof": null,
     "autonomy": null,
@@ -31,14 +31,42 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Specifications not yet verified.",
-  "official_url": "https://www.gotokepler.com/",
-  "commercial_status_evidence": [],
+  "specs_note": "height_cm, weight_kg, degrees_of_freedom, payload_kg and runtime_minutes verified by the product owner from Humanoid Guide's Kepler Forerunner K2 page for catalogue use. walk_speed_ms converted from the source's stated 4 km/h (4 / 3.6 = 1.11 m/s); this schema has no km/h field. All fields the source marked N/A remain null/UNKNOWN -- not copied as zero or false.",
+  "official_url": "https://www.gotokepler.com/home",
+  "commercial_status_evidence": [
+    {
+      "source_url": "https://humanoid.guide/product/kepler-k2/",
+      "source_type": "NEWS_ARTICLE",
+      "source_title": "Humanoid Guide — Kepler Forerunner K2",
+      "excerpt": null,
+      "published_at": null,
+      "observed_at": "2026-08-18",
+      "verified_at": "2026-08-18",
+      "confidence": "MEDIUM",
+      "note": "PROTOTYPE per the product owner's explicit verification of this Humanoid Guide page for catalogue use. The source itself is self-labelled \"Verified: Not verified\" and is not a manufacturer citation; the product owner's review of this specific material is the verification basis for this record."
+    }
+  ],
   "variants": [],
   "pricing_offers": [],
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": []
+  "images": [
+    {
+      "image_url": "/robots/kepler-k2-forerunner.webp",
+      "source_url": "https://humanoid.guide/product/kepler-k2/",
+      "source_name": "Humanoid Guide",
+      "source_type": "EDITORIAL",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "ATTRIBUTION_REQUIRED",
+      "usage_basis": "NONE",
+      "is_official": false,
+      "is_primary": true,
+      "attribution": "Kepler Robotics",
+      "last_verified_at": "2026-08-18T00:00:00Z",
+      "identity_confirmed_by": "robert@humanoid.company"
+    }
+  ]
 }

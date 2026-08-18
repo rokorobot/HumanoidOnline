@@ -292,9 +292,9 @@
     {
       "slug": "kepler-robotics",
       "name": "Kepler Robotics",
-      "legal_name": null,
-      "country_region_code": null,
-      "website_url": "https://www.gotokepler.com",
+      "legal_name": "Kepler Exploration Robot Co.",
+      "country_region_code": "CN",
+      "website_url": "https://www.gotokepler.com/home",
       "founded_year": null,
       "description": null,
       "target_markets": [],

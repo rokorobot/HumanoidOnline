@@ -241,6 +241,48 @@ def test_a_tampered_key_id_does_not_resolve(fixtures, database_url):
     assert resolve(f"{marker}.99.{body}") is ResolutionFailure.UNRESOLVED
 
 
+def test_a_key_id_cannot_be_rewritten_even_between_identical_keys(
+    fixtures, database_url
+):
+    """The regression the ordinary tampering test cannot catch.
+
+    A rewritten key id normally fails because the named key decrypts nothing —
+    but that is a property of the *material*, not of the envelope. If two ids are
+    ever configured with the same key (a rotation typo, a copied secret), a token
+    could be relabelled from one to the other and still authenticate. The key id
+    travels in cleartext and steers interpretation, so it must be authenticated
+    in its own right, whatever the key material happens to be.
+    """
+    shared = bytes([5]) * 64
+    ring = EvidenceRefKeyring(active_id="a", keys={"a": shared, "b": shared})
+    robot_id = fixtures.robot()
+    row = fixtures.row(fixtures.evidence("COMMERCIAL_STATUS", robot_id))
+
+    marker, key_id, body = issue_evidence_ref(row, ring).split(".")
+    assert key_id == "a"
+    with SessionLocal() as s:
+        issued = resolve_evidence_ref(s, f"{marker}.a.{body}", ring)
+        relabelled = resolve_evidence_ref(s, f"{marker}.b.{body}", ring)
+    assert not isinstance(issued, ResolutionFailure), "fixture sanity"
+    assert relabelled is ResolutionFailure.UNRESOLVED, "key id is not authenticated"
+
+
+def test_identical_key_material_under_two_ids_yields_different_refs(
+    fixtures, database_url
+):
+    """The same consequence seen from the issuing side."""
+    shared = bytes([5]) * 64
+    under_a = EvidenceRefKeyring(active_id="a", keys={"a": shared})
+    under_b = EvidenceRefKeyring(active_id="b", keys={"b": shared})
+    robot_id = fixtures.robot()
+    row = fixtures.row(fixtures.evidence("COMMERCIAL_STATUS", robot_id))
+
+    assert (
+        issue_evidence_ref(row, under_a).split(".")[-1]
+        != issue_evidence_ref(row, under_b).split(".")[-1]
+    )
+
+
 def test_a_ref_from_another_key_does_not_resolve(fixtures, database_url):
     robot_id = fixtures.robot()
     row = fixtures.row(fixtures.evidence("COMMERCIAL_STATUS", robot_id))
@@ -287,6 +329,78 @@ def test_rotation_keeps_the_new_active_key_issuing(fixtures, database_url):
 )
 def test_structurally_broken_refs_are_malformed(ref, database_url):
     assert resolve(ref) is ResolutionFailure.MALFORMED
+
+
+@pytest.mark.parametrize(
+    "noise",
+    ["!!", "  ", "\n", "\t", "*", "%20", "\u00a0"],
+    ids=["bang", "spaces", "newline", "tab", "star", "percent", "nbsp"],
+)
+def test_characters_outside_the_alphabet_never_decode_away(
+    fixtures, database_url, noise
+):
+    """The decisive parser regression.
+
+    Python's base64 decoder *discards* characters outside the alphabet rather
+    than rejecting them, so an otherwise valid body with junk spliced into it
+    decodes to exactly the original ciphertext — and a permissive parser would
+    resolve it, handing out an unbounded family of spellings for one reference
+    and blurring the malformed/unresolved split §7.3 rests on. The grammar has to
+    be judged before decoding, never inferred from decoding having worked.
+    """
+    robot_id = fixtures.robot()
+    row = fixtures.row(fixtures.evidence("COMMERCIAL_STATUS", robot_id))
+    marker, key_id, body = issue_evidence_ref(row, KEYRING).split(".")
+    assert not isinstance(resolve(f"{marker}.{key_id}.{body}"), ResolutionFailure)
+
+    spliced = body[:4] + noise + body[4:]
+    assert resolve(f"{marker}.{key_id}.{spliced}") is ResolutionFailure.MALFORMED
+
+
+def test_a_padded_body_is_malformed(fixtures, database_url):
+    """The issued form is unpadded, so the padded spelling is a different string."""
+    robot_id = fixtures.robot()
+    row = fixtures.row(fixtures.evidence("COMMERCIAL_STATUS", robot_id))
+    marker, key_id, body = issue_evidence_ref(row, KEYRING).split(".")
+    assert resolve(f"{marker}.{key_id}.{body}==") is ResolutionFailure.MALFORMED
+
+
+@pytest.mark.parametrize("body", ["QUJD+w", "QUJD/w"], ids=["plus", "slash"])
+def test_standard_base64_punctuation_is_malformed(body, database_url):
+    """base64url is the only accepted alphabet; "+" and "/" are not aliases."""
+    assert resolve(f"er1.1.{body}") is ResolutionFailure.MALFORMED
+
+
+def test_a_noncanonical_body_is_malformed(database_url):
+    """Base64 leaves the final character's unused bits free, so many spellings
+    decode to identical bytes. Only the one this service emits is a reference."""
+    canonical = base64.urlsafe_b64encode(bytes(40)).decode().rstrip("=")
+    variant = canonical[:-1] + "B"
+    assert variant != canonical
+    assert base64.urlsafe_b64decode(variant + "==") == bytes(40), "fixture sanity"
+
+    assert resolve(f"er1.1.{canonical}") is ResolutionFailure.UNRESOLVED
+    assert resolve(f"er1.1.{variant}") is ResolutionFailure.MALFORMED
+
+
+def test_surrounding_whitespace_is_malformed(fixtures, database_url):
+    robot_id = fixtures.robot()
+    row = fixtures.row(fixtures.evidence("COMMERCIAL_STATUS", robot_id))
+    ref = issue_evidence_ref(row, KEYRING)
+    for spelling in (f" {ref}", f"{ref} ", f"\n{ref}", f"{ref}\n"):
+        assert resolve(spelling) is ResolutionFailure.MALFORMED
+
+
+@pytest.mark.parametrize(
+    "key_id",
+    ["a b", "a+b", "a/b", "a=", "a\n", "ké", "a%2eb"],
+    ids=["space", "plus", "slash", "equals", "newline", "non-ascii", "escaped-dot"],
+)
+def test_a_key_id_outside_its_grammar_is_malformed(key_id, database_url):
+    """A key id is authenticated, so it must have exactly one spelling. Anything
+    outside [A-Za-z0-9_-] is rejected as grammar, before any key is consulted."""
+    body = base64.urlsafe_b64encode(bytes(40)).decode().rstrip("=")
+    assert resolve(f"er1.{key_id}.{body}") is ResolutionFailure.MALFORMED
 
 
 def test_a_wellformed_but_unauthentic_ref_is_unresolved(database_url):
@@ -403,6 +517,44 @@ def test_a_malformed_previous_key_entry_fails_closed():
     for previous in ("garbage", "kid:", ":material", "kid:!!!"):
         with pytest.raises(EvidenceRefKeyUnavailable):
             EvidenceRefKeyring.from_settings(_Settings(key=_key(), previous=previous))
+
+
+@pytest.mark.parametrize(
+    "previous",
+    [f"b:{_key(2)},b:{_key(3)}", f"a:{_key(2)}", f"b:{_key(2)},b:{_key(2)}"],
+    ids=["repeated-previous", "shadows-active", "repeated-identical-material"],
+)
+def test_a_duplicate_key_id_fails_closed(previous):
+    """Never settled by keeping one silently: which key a token authenticates
+    under would then depend on the order the configuration happened to parse in.
+    Identical material is a duplicate too — the id is what gets authenticated."""
+    with pytest.raises(EvidenceRefKeyUnavailable):
+        EvidenceRefKeyring.from_settings(
+            _Settings(key=_key(), key_id="a", previous=previous)
+        )
+
+
+@pytest.mark.parametrize(
+    "key_id",
+    ["a.b", "a b", "a+b", "a/b", "a=", "ké"],
+    ids=["dot", "space", "plus", "slash", "equals", "non-ascii"],
+)
+def test_an_active_key_id_outside_its_grammar_fails_closed(key_id):
+    with pytest.raises(EvidenceRefKeyUnavailable):
+        EvidenceRefKeyring.from_settings(_Settings(key=_key(), key_id=key_id))
+
+
+def test_a_previous_key_id_outside_its_grammar_fails_closed():
+    """Dead configuration fails closed too: no valid token could ever name it."""
+    with pytest.raises(EvidenceRefKeyUnavailable):
+        EvidenceRefKeyring.from_settings(
+            _Settings(key=_key(), key_id="a", previous=f"b.c:{_key(2)}")
+        )
+
+
+def test_the_keyring_constructor_rejects_a_bad_key_id_directly():
+    with pytest.raises(EvidenceRefKeyUnavailable):
+        EvidenceRefKeyring(active_id="a.b", keys={"a.b": bytes([1]) * 64})
 
 
 def test_a_valid_keyring_builds_from_settings():

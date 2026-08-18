@@ -36,6 +36,7 @@ from __future__ import annotations
 
 import base64
 import binascii
+import re
 import uuid
 from dataclasses import dataclass
 from enum import Enum
@@ -56,6 +57,20 @@ TOKEN_FORMAT = "er1"
 #: Envelope separator; therefore forbidden inside a key id.
 _SEPARATOR = "."
 
+#: The only shape a key id may take. Deliberately narrower than "anything
+#: without a separator": a key id is authenticated below, so it must have exactly
+#: one byte-level representation. Restricting it to the base64url alphabet also
+#: keeps it safe in a URL, a log line and a header without any escaping.
+_KEY_ID_PATTERN = re.compile(r"\A[A-Za-z0-9_-]+\Z")
+
+#: Strict, canonical, unpadded base64url — the exact form `issue_evidence_ref`
+#: emits. No "=", no "+", no "/", no whitespace, no other punctuation. Python's
+#: decoder silently *discards* characters outside the alphabet, so a body such as
+#: "YW!!Jj" would otherwise decode as if the "!!" were never typed; the grammar
+#: must be judged before decoding, not inferred from whether decoding happened to
+#: succeed.
+_BODY_PATTERN = re.compile(r"\A[A-Za-z0-9_-]+\Z")
+
 #: Inner payload version, inside the ciphertext. Distinct from the envelope
 #: marker so the payload can evolve without changing the outer grammar.
 _PAYLOAD_VERSION = 1
@@ -67,11 +82,29 @@ _PAYLOAD_LEN = 17
 #: structurally impossible rather than merely unauthentic.
 _MIN_CIPHERTEXT_LEN = 16 + _PAYLOAD_LEN
 
-#: Domain separator, authenticated as associated data. It binds a token to *this*
-#: protocol, so ciphertext issued here can never be replayed into some future use
-#: of the same primitive and key. Constant by necessity: anything varying —
-#: a timestamp, a nonce — would destroy the determinism §7.1 requires.
-_ASSOCIATED_DATA = b"humanoidonline:evidence-ref:v1"
+#: Domain separator: it binds a token to *this* protocol, so ciphertext issued
+#: here can never be replayed into some future use of the same primitive and key.
+_PROTOCOL_LABEL = b"humanoidonline:evidence-ref:v1"
+
+
+def _associated_data(key_id: str) -> list[bytes]:
+    """The authenticated context a reference is bound to.
+
+    Two components, and RFC 5297's S2V takes a vector natively, so no delimiter
+    is needed and no concatenation ambiguity exists.
+
+    The protocol label binds a token to *this* use of the primitive. The key id
+    is included because it travels in cleartext in the envelope, and anything
+    cleartext that steers interpretation must be authenticated: without it, two
+    key ids accidentally configured with identical material would let a token be
+    rewritten from one id to the other and still authenticate. Rewriting the key
+    id must fail, whatever the key material happens to be.
+
+    Both components are constant per token — a timestamp or nonce here would
+    destroy the determinism §7.1 requires.
+    """
+    return [_PROTOCOL_LABEL, key_id.encode("ascii")]
+
 
 #: The only evidence classes v0.1 references can address (`docs/20` §7.2).
 SUPPORTED_SUBJECT_TYPES = (
@@ -141,10 +174,13 @@ class EvidenceRefKeyring:
     def __post_init__(self) -> None:
         if self.active_id not in self.keys:
             raise EvidenceRefKeyUnavailable("active evidence-ref key id is not in the keyring")
-        if _SEPARATOR in self.active_id:
-            raise EvidenceRefKeyUnavailable(
-                f"evidence-ref key id must not contain {_SEPARATOR!r}"
-            )
+        for key_id in self.keys:
+            if not _KEY_ID_PATTERN.fullmatch(key_id):
+                # Previous keys included: an id no valid token could ever name is
+                # dead configuration, and dead key configuration fails closed.
+                raise EvidenceRefKeyUnavailable(
+                    "evidence-ref key ids must match [A-Za-z0-9_-]+"
+                )
 
     @classmethod
     def from_settings(cls, settings) -> EvidenceRefKeyring:
@@ -169,7 +205,13 @@ class EvidenceRefKeyring:
                 raise EvidenceRefKeyUnavailable(
                     "EVIDENCE_REF_PREVIOUS_KEYS entries must be '<key_id>:<base64url>'"
                 )
-            keys.setdefault(key_id, _decode_key(previous))
+            if key_id in keys:
+                # Never settled by quietly keeping one of them: which key a token
+                # authenticates under would then depend on parse order.
+                raise EvidenceRefKeyUnavailable(
+                    "EVIDENCE_REF_PREVIOUS_KEYS declares a duplicate key id"
+                )
+            keys[key_id] = _decode_key(previous)
         return cls(active_id=active_id, keys=keys)
 
 
@@ -183,7 +225,9 @@ def issue_evidence_ref(evidence: EvidenceSource, keyring: EvidenceRefKeyring) ->
     raw identifier outside one.
     """
     payload = bytes([_PAYLOAD_VERSION]) + evidence.id.bytes
-    ciphertext = AESSIV(keyring.keys[keyring.active_id]).encrypt(payload, [_ASSOCIATED_DATA])
+    ciphertext = AESSIV(keyring.keys[keyring.active_id]).encrypt(
+        payload, _associated_data(keyring.active_id)
+    )
     encoded = base64.urlsafe_b64encode(ciphertext).decode("ascii").rstrip("=")
     return f"{TOKEN_FORMAT}{_SEPARATOR}{keyring.active_id}{_SEPARATOR}{encoded}"
 
@@ -198,15 +242,28 @@ def _parse_envelope(ref: object) -> tuple[str, bytes] | ResolutionFailure:
     """
     if not isinstance(ref, str):
         return ResolutionFailure.MALFORMED
-    parts = ref.strip().split(_SEPARATOR)
+    parts = ref.split(_SEPARATOR)
     if len(parts) != 3:
         return ResolutionFailure.MALFORMED
     marker, key_id, encoded = parts
-    if marker != TOKEN_FORMAT or not key_id or not encoded:
+    if marker != TOKEN_FORMAT:
+        return ResolutionFailure.MALFORMED
+    if not _KEY_ID_PATTERN.fullmatch(key_id) or not _BODY_PATTERN.fullmatch(encoded):
+        return ResolutionFailure.MALFORMED
+    # A final quantum of one character encodes no whole byte, so no issued token
+    # has that length; rejecting it here keeps the decoder off the edge case.
+    if len(encoded) % 4 == 1:
         return ResolutionFailure.MALFORMED
     try:
         ciphertext = base64.urlsafe_b64decode(encoded + "=" * (-len(encoded) % 4))
     except (binascii.Error, ValueError):
+        return ResolutionFailure.MALFORMED
+    # Canonicality: base64 leaves unused trailing bits in the final character
+    # free, so several spellings can decode to identical bytes and Python accepts
+    # them all. Re-encoding and comparing admits exactly the one spelling this
+    # service issues, which is what makes a reference a single stable string
+    # rather than a family of equivalent ones.
+    if base64.urlsafe_b64encode(ciphertext).decode("ascii").rstrip("=") != encoded:
         return ResolutionFailure.MALFORMED
     if len(ciphertext) < _MIN_CIPHERTEXT_LEN:
         return ResolutionFailure.MALFORMED
@@ -225,7 +282,7 @@ def _decrypt(
     if key is None:
         return ResolutionFailure.UNRESOLVED
     try:
-        payload = AESSIV(key).decrypt(ciphertext, [_ASSOCIATED_DATA])
+        payload = AESSIV(key).decrypt(ciphertext, _associated_data(key_id))
     except InvalidTag:
         # Deliberately no detail: the exception text is never surfaced.
         return ResolutionFailure.UNRESOLVED

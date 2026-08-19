@@ -203,15 +203,25 @@ def _build_email(session: Session, lead: CommercialLead, created: bool) -> tuple
     return subject, "\n".join(lines)
 
 
+def _readiness_reason(settings: Settings) -> str | None:
+    """`None` means ready to send. Otherwise a short machine-readable reason
+    for why not — distinguishes "off on purpose" from "on but incomplete",
+    which is a real (and different) production misconfiguration to spot."""
+    if not settings.lead_notification_enabled:
+        return "disabled"
+    if not (
+        settings.lead_notification_to
+        and settings.lead_notification_from
+        and settings.email_api_key
+    ):
+        return "incomplete_config"
+    return None
+
+
 def _notification_ready(settings: Settings) -> bool:
     """All four of enabled/to/from/key must be set. Anything less is treated
     as "feature not configured", never a boot-time failure (see config.py)."""
-    return bool(
-        settings.lead_notification_enabled
-        and settings.lead_notification_to
-        and settings.lead_notification_from
-        and settings.email_api_key
-    )
+    return _readiness_reason(settings) is None
 
 
 def _send_email(
@@ -246,13 +256,28 @@ def _send_email(
 def notify_lead_captured(session: Session, lead: CommercialLead, created: bool) -> None:
     """Best-effort operational notification. NEVER raises: a failure here must
     never affect the already-committed lead or the HTTP response. Call this
-    only AFTER `capture_lead()` has returned (i.e. already committed)."""
-    settings = get_settings()
-    if not _notification_ready(settings):
-        return  # disabled or incompletely configured: zero network calls
+    only AFTER `capture_lead()` has returned (i.e. already committed).
 
+    Every outcome is logged as exactly one of four distinguishable states —
+    skipped (disabled), skipped (incomplete_config), attempting, then either
+    accepted or failed — so a production log can tell "the feature is off"
+    apart from "it's on but broken" apart from "it tried and the provider
+    rejected it". No PII, subject, body, recipient or API key ever appears in
+    any of these lines; only lead_id, the NEW/UPDATED event, the skip reason,
+    a coarse provider status class, and the exception TYPE (never str(exc))."""
+    settings = get_settings()
     event = "NEW" if created else "UPDATED"
     lead_id = str(lead.id)
+
+    reason = _readiness_reason(settings)
+    if reason is not None:
+        logger.info(
+            "lead notification skipped lead_id=%s event=%s reason=%s",
+            lead_id, event, reason,
+        )
+        return
+
+    logger.info("lead notification attempting lead_id=%s event=%s", lead_id, event)
     try:
         # `expire_on_commit=False` (app/db/session.py) means the in-memory
         # `updated_at` was not refreshed by the DB trigger that just fired on
@@ -269,7 +294,7 @@ def notify_lead_captured(session: Session, lead: CommercialLead, created: bool) 
             subject=subject,
             text=body,
         )
-        logger.info("lead notification sent lead_id=%s event=%s", lead_id, event)
+        logger.info("lead notification accepted lead_id=%s event=%s", lead_id, event)
     except urllib.error.HTTPError as exc:
         logger.error(
             "lead notification failed lead_id=%s event=%s status_class=%sxx exc_type=%s",

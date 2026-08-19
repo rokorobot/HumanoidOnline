@@ -9,6 +9,7 @@ email (`app.services.lead_notifications._send_email` is monkeypatched).
 from __future__ import annotations
 
 import logging
+import urllib.error
 import uuid
 
 from sqlalchemy import text
@@ -303,6 +304,76 @@ def test_failure_logs_contain_no_pii(client, database_url, monkeypatch, caplog):
     assert "please do not leak this message" not in logged
     # and the failure really did log something (the assertion above isn't vacuous)
     assert "lead notification failed" in logged
+
+
+# ---- observability — four distinguishable outcomes in the logs ------------
+
+
+def test_log_distinguishes_disabled_from_incomplete_config(
+    client, database_url, monkeypatch, caplog
+):
+    """Both are "no email sent", but a different production misconfiguration —
+    the log line must say which, not just that nothing happened."""
+    _enable(monkeypatch, _DisabledSettings())
+    _record_sends(monkeypatch)
+    with caplog.at_level(logging.INFO):
+        resp = client.post("/api/commercial-leads", json={
+            "contact_email": "notif-obs-disabled@example.com",
+            "robot_slugs": [_any_published_slug()],
+        })
+    assert resp.status_code == 201, resp.text
+    logged = "\n".join(r.getMessage() for r in caplog.records)
+    assert "lead notification skipped" in logged
+    assert "reason=disabled" in logged
+
+    caplog.clear()
+    _enable(monkeypatch, _MissingKeySettings())
+    with caplog.at_level(logging.INFO):
+        resp = client.post("/api/commercial-leads", json={
+            "contact_email": "notif-obs-incomplete@example.com",
+            "robot_slugs": [_any_published_slug()],
+        })
+    assert resp.status_code == 201, resp.text
+    logged = "\n".join(r.getMessage() for r in caplog.records)
+    assert "lead notification skipped" in logged
+    assert "reason=incomplete_config" in logged
+
+
+def test_log_records_attempt_before_outcome(client, database_url, monkeypatch, caplog):
+    _enable(monkeypatch)
+    _record_sends(monkeypatch)  # succeeds
+    with caplog.at_level(logging.INFO):
+        resp = client.post("/api/commercial-leads", json={
+            "contact_email": "notif-obs-attempt@example.com",
+            "robot_slugs": [_any_published_slug()],
+        })
+    assert resp.status_code == 201, resp.text
+    logged = [r.getMessage() for r in caplog.records]
+    assert any("lead notification attempting" in m for m in logged)
+    assert any("lead notification accepted" in m for m in logged)
+    # attempting must precede accepted, not just both appear somewhere
+    attempt_idx = next(i for i, m in enumerate(logged) if "lead notification attempting" in m)
+    accepted_idx = next(i for i, m in enumerate(logged) if "lead notification accepted" in m)
+    assert attempt_idx < accepted_idx
+
+
+def test_log_reports_provider_status_class_on_http_error(client, database_url, monkeypatch, caplog):
+    """A rejected send (e.g. an unverified Resend sender domain, 403) must be
+    distinguishable from a network/timeout failure by its status class."""
+    _enable(monkeypatch)
+    http_error = urllib.error.HTTPError(
+        "https://api.resend.example/emails", 403, "Forbidden", None, None
+    )
+    _record_sends(monkeypatch, raise_exc=http_error)
+    with caplog.at_level(logging.INFO):
+        resp = client.post("/api/commercial-leads", json={
+            "contact_email": "notif-obs-4xx@example.com",
+            "robot_slugs": [_any_published_slug()],
+        })
+    assert resp.status_code == 201, resp.text
+    logged = "\n".join(r.getMessage() for r in caplog.records)
+    assert "lead notification failed" in logged
+    assert "status_class=4xx" in logged
 
 
 # ---- 10 — both capture surfaces share the one governed path ----------------

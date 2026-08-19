@@ -127,3 +127,14 @@ deliberately **not** written — rollback is by restore or forward-fix.
 The running application enforces the same contract at startup
 (`apps/api/app/db/migration_state.py`): a strict environment refuses to serve a
 database whose migration state does not match the build.
+
+**Bundled fallback for deployments that ship only `apps/api`.** Some
+deployments (e.g. Vercel with Root Directory=apps/api) bundle only the
+`apps/api` tree, so the canonical repo-root `db/schema.sql` and
+`db/migrations/` are not reachable at runtime. `migration_state.py` falls back
+to a small, generated, checked-in manifest
+(`apps/api/app/db/migration_manifest.py`, regenerated with
+`uv run db/generate_migration_manifest.py`) in that case, so strict
+verification still runs instead of being skipped. The manifest is never an
+independent source of truth: `test_migration_manifest.py` recomputes the
+canonical set from these files on every CI run and fails on any drift.

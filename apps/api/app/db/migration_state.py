@@ -122,6 +122,24 @@ def schema_file() -> Path:
     return _REPO_ROOT / "db" / "schema.sql"
 
 
+def _bundled_manifest() -> dict[str, str | None] | None:
+    """The generated fallback shipped inside `apps/api` (`db/generate_migration_manifest.py`).
+
+    Returns ``None`` when the manifest module is absent — repository/local
+    execution has no need for it and need not ship it. Never an independent
+    source of truth: `test_migration_manifest.py` recomputes the canonical set
+    from `db/schema.sql` + `db/migrations/*.sql` on every CI run and fails on
+    any drift from what this returns.
+    """
+    try:
+        from app.db import migration_manifest
+    except ImportError:
+        return None
+    expected: dict[str, str | None] = {migration_manifest.BASELINE_VERSION: None}
+    expected.update(migration_manifest.MIGRATIONS)
+    return expected
+
+
 def expected_migrations() -> dict[str, str | None]:
     """version -> sha256 for every forward migration, plus the baseline.
 
@@ -136,20 +154,34 @@ def expected_migrations() -> dict[str, str | None]:
     Mirrors `db/bootstrap.py` exactly: the same versions, hashed the same way.
     If the two ever disagree the checks here become meaningless, so
     `test_migration_integrity.py` pins them together.
+
+    Repository/local execution reads the canonical files directly. Some
+    deployments (e.g. Vercel with Root Directory=apps/api) bundle only the
+    `apps/api` tree, so the repo-root `db/schema.sql` and `db/migrations/` are
+    not reachable there — in that case this falls back to the bundled,
+    generated manifest (`app/db/migration_manifest.py`), so strict startup
+    verification still runs rather than being skipped or weakened.
     """
     root = migrations_root()
     baseline = schema_file()
-    if not baseline.is_file() or not root.is_dir():
-        raise MigrationStateError(
-            "cannot verify migration state: expected the governed migration "
-            f"files at {baseline} and {root}. Set MIGRATIONS_DIR, or run the "
-            "application from a deployment that ships them."
-        )
+    if baseline.is_file() and root.is_dir():
+        expected: dict[str, str | None] = {BASELINE_VERSION: None}
+        for path in sorted(root.glob("*.sql")):
+            expected[path.stem] = sha256_text(path.read_text(encoding="utf-8"))
+        return expected
 
-    expected: dict[str, str | None] = {BASELINE_VERSION: None}
-    for path in sorted(root.glob("*.sql")):
-        expected[path.stem] = sha256_text(path.read_text(encoding="utf-8"))
-    return expected
+    bundled = _bundled_manifest()
+    if bundled is not None:
+        return bundled
+
+    raise MigrationStateError(
+        "cannot verify migration state: expected the governed migration "
+        f"files at {baseline} and {root}, and no bundled fallback manifest "
+        "(app/db/migration_manifest.py) is present either. Set MIGRATIONS_DIR, "
+        "run the application from a deployment that ships db/schema.sql and "
+        "db/migrations/, or bundle the generated manifest "
+        "(db/generate_migration_manifest.py)."
+    )
 
 
 def applied_migrations(connection: Connection) -> dict[str, str]:

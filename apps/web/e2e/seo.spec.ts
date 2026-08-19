@@ -39,6 +39,12 @@ test.describe("R22 — per-page metadata (no generic-root inheritance)", () => {
     expect(title).toMatch(/ — HumanoidOnline$/);
   });
 
+  test("root route exposes a favicon link", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    const icon = page.locator('link[rel="icon"]');
+    await expect(icon).toHaveAttribute("href", /\/icon\.svg/);
+  });
+
   test("both 404 cases carry a specific 'Not found' title", async ({ page }) => {
     const unknownSlug = await page.goto("/robots/no-such-robot-zzz", {
       waitUntil: "domcontentloaded",

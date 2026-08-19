@@ -65,13 +65,13 @@ commercial lead — see `app/services/lead_notifications.py`.
   deliberately not a fire-and-forget background task after the response, kept
   simple rather than adding a queue/worker dependency for v0.1.
 
-HumanoidOnline's deployment split: this FastAPI backend runs on **Koyeb**, the
-frontend on **Netlify**, and the database on **Neon**. This notification runs
-entirely server-side in the FastAPI backend, so its configuration (see
-`.env.example` for the full documented block) belongs in **Koyeb's**
-production environment variables (Koyeb Console -> service -> Settings ->
-Environment variables) — **never in source control, and never in Netlify or
-as a `NEXT_PUBLIC_*` variable**:
+HumanoidOnline's deployment split: this FastAPI backend runs on **Vercel**,
+the frontend on **Netlify**, and the database on **Neon**. This notification
+runs entirely server-side in the FastAPI backend, so its configuration (see
+`.env.example` for the full documented block) belongs in the **Vercel
+backend project's** production environment variables (Vercel Project
+Settings -> Environment Variables) — **never in source control, and never in
+Netlify or as a `NEXT_PUBLIC_*` variable**:
 
 - `LEAD_NOTIFICATION_ENABLED` — off by default; the feature is fully inert
   until this and the other three are all set.

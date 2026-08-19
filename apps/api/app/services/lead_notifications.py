@@ -8,7 +8,7 @@ operations.
 
 Delivery is synchronous and blocking, with a short fixed timeout, and runs
 inline in the request path rather than being deferred to a background task
-after the response. This FastAPI backend deploys to Koyeb (frontend on
+after the response. This FastAPI backend deploys to Vercel (frontend on
 Netlify, database on Neon) — synchronous delivery is simply the smallest way
 to guarantee a real attempt happens for every request, without adding a
 queue/background-worker dependency for v0.1.

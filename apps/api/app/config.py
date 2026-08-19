@@ -161,6 +161,28 @@ class Settings(BaseSettings):
     commercial_leads_sustained: int = 60
     commercial_leads_sustained_window_s: int = 3600
 
+    # ------------------------------------------------ lead notification -----
+    # Operational email to the HumanoidOnline owner when POST /api/commercial-
+    # leads creates or extends a lead (app/services/lead_notifications.py). The
+    # database write is authoritative and already committed before this ever
+    # runs; a notification is a best-effort side channel, never a gate.
+    #
+    # OFF by default, and only ever active when ALL FOUR of enabled/to/from/key
+    # are set — same fail-closed-per-feature doctrine as the admin credentials
+    # above (partial/missing config disables the feature, it never blocks the
+    # API from starting; see `lead_notifications._notification_ready`).
+    lead_notification_enabled: bool = False
+    # Comma-separated recipient address(es). Never hard-code an address here.
+    lead_notification_to: str | None = None
+    lead_notification_from: str | None = None
+    # Provider API key. Never logged, never echoed in an error.
+    email_api_key: str | None = None
+    # Non-secret: the provider's HTTPS endpoint. Defaults to Resend's single
+    # send endpoint (https://resend.com/docs/api-reference/emails/send-email) —
+    # chosen because a plain POST + Bearer token needs no SDK dependency.
+    # Override only when migrating to a different provider.
+    email_api_endpoint: str = "https://api.resend.com/emails"
+
     # -- derived / validated -------------------------------------------------
 
     @model_validator(mode="after")

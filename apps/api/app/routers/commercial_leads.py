@@ -20,6 +20,7 @@ from sqlalchemy.orm import Session
 from app.db.session import get_session
 from app.schemas.commercial_lead import CommercialLeadCreate, CommercialLeadCreated
 from app.security.rate_limit import rate_limited
+from app.services.lead_notifications import notify_lead_captured
 from app.services.leads import capture_lead
 
 router = APIRouter(prefix="/api/commercial-leads", tags=["commercial-lead"])
@@ -41,5 +42,9 @@ def create_commercial_lead(
     """Create a lead (`201`) or extend the requirement's existing lead (`200`).
     The public path always creates/keeps `lead_status='NEW'`."""
     lead, created = capture_lead(session, payload)
+    # Persist wins over delivery: capture_lead() has already committed by the
+    # time we reach this line, and notify_lead_captured() never raises — a
+    # notification failure can only affect the email, never this response.
+    notify_lead_captured(session, lead, created)
     response.status_code = 201 if created else 200
     return CommercialLeadCreated(id=str(lead.id), lead_status=lead.lead_status)

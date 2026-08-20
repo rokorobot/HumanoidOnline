@@ -115,6 +115,9 @@ test("@perf built-route budget: /robots (scales with rendered cards)", async ({
 test("@perf built-route budget: /matches/[id]", async ({ page, request }) => {
   const created = await request.post("/api/buyer-requirements", {
     data: {
+      contact_name: "Test Buyer",
+      organization: "Test Org",
+      contact_email: "buyer@example.com",
       country: "US",
       preferred_transaction: "UNKNOWN",
       raw_input: {

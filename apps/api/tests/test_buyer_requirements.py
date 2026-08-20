@@ -4,8 +4,11 @@ Locks the acceptance criteria (05_ACCEPTANCE_CRITERIA §D) and the data/contract
 laws that must never regress on the platform's first write path:
   D1 Germany -> DE + full raw_input · D2 RENT persists · D3 no lead required
   UNKNOWN != SKIPPED (raw_input) · known FALSE survives · no-budget -> NULL currency
-  canonical COUNTRY-only resolution (EU/GLOBAL/ZZ -> 422) · anonymous (no contact)
-  versioned raw_input required · >=1 signal · create writes zero match_result/lead.
+  canonical COUNTRY-only resolution (EU/GLOBAL/ZZ -> 422) · contact identity
+  required (full name / organization / business email; telephone optional) ·
+  versioned raw_input required · >=1 signal · create writes zero match_result/lead ·
+  identity never leaks through the public requirement read and never affects
+  matching.
 
 These require the seed; they skip when DATABASE_URL is unset (see conftest).
 """
@@ -18,6 +21,16 @@ from sqlalchemy import text
 from app.db.session import SessionLocal, engine
 from app.models.buyer_requirement import BuyerRequirement
 
+#: Merged into every `_post`/`_created_id` call so the many pre-existing
+#: requirement-shape tests below don't each need their own identity — only
+#: the tests specifically exercising identity requiredness bypass this by
+#: calling `client.post(...)` directly with a deliberately incomplete body.
+DEFAULT_IDENTITY = {
+    "contact_name": "Test Buyer",
+    "organization": "Test Org",
+    "contact_email": "buyer@example.com",
+}
+
 
 def rawv(answers: dict | None = None) -> dict:
     """A valid versioned raw_input wrapper (WS5 requires this on every POST)."""
@@ -25,7 +38,7 @@ def rawv(answers: dict | None = None) -> dict:
 
 
 def _post(client, body):
-    return client.post("/api/buyer-requirements", json=body)
+    return client.post("/api/buyer-requirements", json={**DEFAULT_IDENTITY, **body})
 
 
 def _created_id(client, body) -> str:
@@ -205,18 +218,192 @@ def test_country_resolves_only_to_canonical_country_rows(client, database_url) -
     assert _req_count() == before  # no partial persistence on rejected requests
 
 
-# ---- anonymous: no contact identity in WS5 ------------------------------
+# ---- contact identity: required (Find a Humanoid contact step) ---------
+# WS5's original "anonymous intent" design was reversed by explicit product
+# decision: the questionnaire now ends with a contact step before submission.
+# contact_name/organization/contact_email are required; contact_phone stays
+# optional. extra="forbid" still blocks genuinely unknown/server-owned fields.
 
-def test_contact_fields_are_rejected(client, database_url) -> None:
+def test_contact_identity_persists_on_submission(client, database_url) -> None:
+    req_id = _created_id(client, {
+        "contact_name": "Valid Buyer", "organization": "Valid Org",
+        "contact_email": "valid@example.com", "contact_phone": " +1 (555) 123-4567 ",
+        "use_case": "warehouse-logistics",
+        "raw_input": rawv({"task": {"state": "ANSWERED", "use_case": "warehouse-logistics"}}),
+    })
+    row = _fetch(req_id)
+    assert row.contact_name == "Valid Buyer"
+    assert row.organization == "Valid Org"
+    assert row.contact_email == "valid@example.com"
+    # trimmed, not otherwise reformatted/normalized
+    assert row.contact_phone == "+1 (555) 123-4567"
+
+
+def test_missing_full_name_is_422(client, database_url) -> None:
     before = _req_count()
-    for field in ("contact_email", "contact_name", "organization"):
-        resp = _post(client, {
-            "use_case": "warehouse-logistics",
-            field: "someone@example.com" if field == "contact_email" else "Someone",
-            "raw_input": rawv({"task": {"state": "ANSWERED", "use_case": "warehouse-logistics"}}),
-        })
-        assert resp.status_code == 422, (field, resp.status_code, resp.text)
+    resp = client.post("/api/buyer-requirements", json={
+        "organization": "Some Org", "contact_email": "someone@example.com",
+        "raw_input": rawv(),
+    })
+    assert resp.status_code == 422, resp.text
     assert _req_count() == before
+
+
+def test_blank_full_name_is_422(client, database_url) -> None:
+    resp = client.post("/api/buyer-requirements", json={
+        "contact_name": "   ", "organization": "Some Org",
+        "contact_email": "someone@example.com", "raw_input": rawv(),
+    })
+    assert resp.status_code == 422, resp.text
+
+
+def test_missing_organization_is_422(client, database_url) -> None:
+    before = _req_count()
+    resp = client.post("/api/buyer-requirements", json={
+        "contact_name": "Someone", "contact_email": "someone@example.com",
+        "raw_input": rawv(),
+    })
+    assert resp.status_code == 422, resp.text
+    assert _req_count() == before
+
+
+def test_blank_organization_is_422(client, database_url) -> None:
+    resp = client.post("/api/buyer-requirements", json={
+        "contact_name": "Someone", "organization": "   ",
+        "contact_email": "someone@example.com", "raw_input": rawv(),
+    })
+    assert resp.status_code == 422, resp.text
+
+
+def test_missing_email_is_422(client, database_url) -> None:
+    before = _req_count()
+    resp = client.post("/api/buyer-requirements", json={
+        "contact_name": "Someone", "organization": "Some Org", "raw_input": rawv(),
+    })
+    assert resp.status_code == 422, resp.text
+    assert _req_count() == before
+
+
+def test_invalid_email_is_422(client, database_url) -> None:
+    resp = _post(client, {"contact_email": "not-an-email", "raw_input": rawv()})
+    assert resp.status_code == 422, resp.text
+
+
+def test_telephone_omitted_succeeds(client, database_url) -> None:
+    req_id = _created_id(client, {"raw_input": rawv()})
+    assert _fetch(req_id).contact_phone is None
+
+
+def test_telephone_accepts_international_formatting(client, database_url) -> None:
+    for phone in ("+44 20 7946 0958", "+1-555-0123", "(020) 7946 0958 ext. 12"):
+        req_id = _created_id(client, {"contact_phone": phone, "raw_input": rawv()})
+        assert _fetch(req_id).contact_phone == phone
+
+
+def test_telephone_over_max_length_is_422(client, database_url) -> None:
+    resp = _post(client, {"contact_phone": "1" * 41, "raw_input": rawv()})
+    assert resp.status_code == 422, resp.text
+
+
+def test_server_owned_field_is_still_forbidden(client, database_url) -> None:
+    """extra="forbid" remains intact — only genuinely-new identity fields were
+    added to the schema; a made-up/server-owned field is still rejected."""
+    resp = _post(client, {"lead_status": "WON", "raw_input": rawv()})
+    assert resp.status_code == 422, resp.text
+
+
+def test_historical_anonymous_requirement_rows_remain_valid(client, database_url) -> None:
+    """A row written before this change (all four identity columns NULL, as the
+    API used to allow) must still be a perfectly valid, selectable row — the
+    required-field rule is enforced only at the API edge, never by a DB
+    constraint that would invalidate history."""
+    req_id = str(uuid.uuid4())
+    with engine.begin() as conn:
+        conn.execute(text("SET search_path TO humanoid, public"))
+        conn.execute(
+            text(
+                "INSERT INTO buyer_requirement (id, contact_name, contact_email, "
+                "organization, contact_phone, raw_input) "
+                "VALUES (:id, NULL, NULL, NULL, NULL, :raw)"
+            ),
+            {"id": req_id, "raw": '{"wizard_version": 1, "answers": {}}'},
+        )
+    try:
+        row = _fetch(req_id)
+        assert row.contact_name is None
+        assert row.contact_email is None
+        assert row.organization is None
+        assert row.contact_phone is None
+        # And the anonymous-era public read still works normally.
+        resp = client.get(f"/api/buyer-requirements/{req_id}")
+        assert resp.status_code == 200, resp.text
+    finally:
+        with engine.begin() as conn:
+            conn.execute(text("SET search_path TO humanoid, public"))
+            conn.execute(text("DELETE FROM buyer_requirement WHERE id=:i"), {"i": req_id})
+
+
+def test_public_requirement_read_never_exposes_identity(client, database_url) -> None:
+    sentinel_email = "identity-leak-probe@example.com"
+    sentinel_org = "Sentinel Org Ltd"
+    sentinel_phone = "+1-555-0177"
+    req_id = _created_id(client, {
+        "contact_name": "Sentinel Person", "organization": sentinel_org,
+        "contact_email": sentinel_email, "contact_phone": sentinel_phone,
+        "raw_input": rawv(),
+    })
+    # The identity really was captured — otherwise this test proves nothing.
+    row = _fetch(req_id)
+    assert row.contact_email == sentinel_email
+
+    resp = client.get(f"/api/buyer-requirements/{req_id}")
+    assert resp.status_code == 200, resp.text
+    body = resp.text
+    for field in ("contact_name", "contact_email", "organization", "contact_phone"):
+        assert f'"{field}"' not in body, f"{field} leaked in RequirementRead"
+    assert sentinel_email not in body
+    assert sentinel_org not in body
+    assert sentinel_phone not in body
+    assert "Sentinel Person" not in body
+
+
+def test_identity_never_appears_in_urls_or_query_strings(client) -> None:
+    """POST-only body field, never a query param or path component."""
+    from app.main import app
+
+    for route in app.routes:
+        path = getattr(route, "path", "")
+        for field in ("contact_name", "contact_email", "organization", "contact_phone"):
+            assert field not in path, (path, field)
+
+
+def test_identity_does_not_affect_matching(client, database_url) -> None:
+    """Two otherwise-identical requirements differing ONLY in contact identity
+    must produce identical match results — the matcher reads structured
+    requirement fields only (app/services/matching), never identity columns."""
+    body = {
+        "use_case": "warehouse-logistics", "country": "US", "payload_min_kg": 10,
+        "preferred_transaction": "RAAS",
+        "raw_input": rawv({
+            "task": {"state": "ANSWERED", "use_case": "warehouse-logistics"},
+            "country": {"state": "ANSWERED", "value": "US"},
+            "payload": {"state": "ANSWERED", "value": 10},
+        }),
+    }
+    rid_a = _created_id(client, {
+        **body, "contact_name": "Buyer A", "organization": "Org A",
+        "contact_email": "a@example.com",
+    })
+    rid_b = _created_id(client, {
+        **body, "contact_name": "Someone Completely Different",
+        "organization": "A Different Org Entirely",
+        "contact_email": "z@example.com", "contact_phone": "+1-555-9999",
+    })
+    matches_a = client.get(f"/api/buyer-requirements/{rid_a}/matches").json()["matches"]
+    matches_b = client.get(f"/api/buyer-requirements/{rid_b}/matches").json()["matches"]
+    slugs_a = [(m["robot"]["slug"], m["score"], m["rank"]) for m in matches_a]
+    slugs_b = [(m["robot"]["slug"], m["score"], m["rank"]) for m in matches_b]
+    assert slugs_a == slugs_b
 
 
 # ---- versioned raw_input required ---------------------------------------

@@ -34,8 +34,17 @@ def _rows(sql: str, **params):
         return conn.execute(text(sql), params).all()
 
 
+#: Merged into every _create_requirement call — the wizard's contact step now
+#: requires this on every /api/buyer-requirements POST; these tests care about
+#: the L1-L14 lead-capture behaviors, not requirement identity specifically.
+_REQ_IDENTITY = {
+    "contact_name": "Test Buyer", "organization": "Test Org",
+    "contact_email": "buyer@example.com",
+}
+
+
 def _create_requirement(client, body) -> str:
-    resp = client.post("/api/buyer-requirements", json=body)
+    resp = client.post("/api/buyer-requirements", json={**_REQ_IDENTITY, **body})
     assert resp.status_code == 201, (resp.status_code, resp.text)
     return resp.json()["id"]
 
@@ -685,18 +694,44 @@ def test_extension_removes_now_ineligible_pending_route(client, database_url) ->
         _drop_linked_fixture(fx)
 
 
-# ---- L14 — WS5 anonymity regression ---------------------------------------
+# ---- L14 — contact identity is now REQUIRED, not rejected ------------------
+# WS5's original "anonymous intent" design (this slot used to prove contact
+# fields were REJECTED as extra="forbid") was reversed by explicit product
+# decision: the Find a Humanoid questionnaire now ends with a contact step
+# before submission, so contact_name/organization/contact_email are required
+# fields on this same schema. Kept as L14 (not deleted) so the regression slot
+# stays discoverable; see test_buyer_requirements.py for the full identity
+# test suite (missing/blank rejected, phone optional, persistence, privacy,
+# matching-unaffected).
 
-def test_l14_ws5_still_rejects_contact_fields(client, database_url) -> None:
+def test_l14_buyer_requirements_now_requires_contact_identity(
+    client, database_url
+) -> None:
     base_raw = {"wizard_version": 1, "answers": {"industry": {"state": "ANSWERED", "value": "logistics"}}}  # noqa: E501
-    for field, value in (
-        ("contact_email", "leak@example.com"),
-        ("contact_name", "Jane"),
-        ("organization", "Acme"),
-    ):
-        body = {"industry": "logistics", "raw_input": base_raw, field: value}
-        resp = client.post("/api/buyer-requirements", json=body)
+    # Present and valid -> no longer rejected as "extra".
+    ok = client.post("/api/buyer-requirements", json={
+        "industry": "logistics", "raw_input": base_raw,
+        "contact_name": "Jane", "organization": "Acme",
+        "contact_email": "leak@example.com",
+    })
+    assert ok.status_code == 201, ok.text
+    # But still required — omitting any one of the three is a 422.
+    for field in ("contact_email", "contact_name", "organization"):
+        full = {
+            "industry": "logistics", "raw_input": base_raw,
+            "contact_name": "Jane", "organization": "Acme",
+            "contact_email": "leak@example.com",
+        }
+        del full[field]
+        resp = client.post("/api/buyer-requirements", json=full)
         assert resp.status_code == 422, (field, resp.status_code, resp.text)
+    # extra="forbid" still blocks genuinely unknown/server-owned fields.
+    forbidden = client.post("/api/buyer-requirements", json={
+        "industry": "logistics", "raw_input": base_raw,
+        "contact_name": "Jane", "organization": "Acme",
+        "contact_email": "leak@example.com", "lead_status": "WON",
+    })
+    assert forbidden.status_code == 422, forbidden.text
 
 
 # ---- Find a Humanoid contact-information enhancement -----------------------

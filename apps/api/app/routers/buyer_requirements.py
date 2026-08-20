@@ -15,6 +15,10 @@ the data laws:
     (the DB DEFAULT 'USD' is overridden with an explicit NULL).
   - No matching and no lead: this endpoint creates zero `match_result` and zero
     `commercial_lead` rows. Matching runs later (WS6, on the first /matches fetch).
+  - Identity (contact_name/organization/contact_email/contact_phone) is
+    persisted alongside the requirement but never influences matching or
+    scoring — the deterministic matcher reads only the structured requirement
+    fields (app/services/matching), never these columns.
 """
 from __future__ import annotations
 
@@ -144,10 +148,12 @@ def create_buyer_requirement(
             status_code=422, detail="at least one requirement signal is required"
         )
 
-    # WS5 is anonymous: contact identity (name/email/organization) is NOT captured
-    # here — those columns stay NULL and are owned by WS7 (commercial lead).
     requirement = BuyerRequirement(
         buyer_type=payload.buyer_type,
+        contact_name=payload.contact_name,
+        contact_email=payload.contact_email,
+        organization=payload.organization,
+        contact_phone=payload.contact_phone,
         country_region_id=country_region_id,
         use_case_id=use_case_id,
         industry=_clean(payload.industry),

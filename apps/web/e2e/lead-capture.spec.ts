@@ -13,6 +13,11 @@ async function matchedRequirement(page: Page) {
   for (let i = 0; i < 10; i++) {
     await page.getByRole("button", { name: "Skip" }).click(); // INDUSTRY..TRANSACTION
   }
+  // CONTACT: buyer identity is now required before REVIEW is reachable.
+  await page.locator("#wz-contact-name").fill("Test Buyer");
+  await page.locator("#wz-contact-org").fill("Test Org");
+  await page.locator("#wz-contact-email").fill("buyer@example.com");
+  await page.getByRole("button", { name: /Next/ }).click();
   await page.getByRole("button", { name: /Submit requirements/i }).click();
   await page.getByRole("link", { name: /See matches/i }).click();
   await expect(page).toHaveURL(/\/matches\//);

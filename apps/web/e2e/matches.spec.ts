@@ -20,6 +20,11 @@ async function submitWarehouse(page: Page, { country }: { country?: string } = {
       await page.getByRole("button", { name: "Skip" }).click(); // INDUSTRY..TRANSACTION
     }
   }
+  // CONTACT: buyer identity is now required before REVIEW is reachable.
+  await page.locator("#wz-contact-name").fill("Test Buyer");
+  await page.locator("#wz-contact-org").fill("Test Org");
+  await page.locator("#wz-contact-email").fill("buyer@example.com");
+  await page.getByRole("button", { name: /Next/ }).click();
   await expect(page.getByRole("heading", { name: /Review/i })).toBeVisible();
   await page.getByRole("button", { name: /Submit requirements/i }).click();
   await page.getByRole("link", { name: /See matches/i }).click();
@@ -45,6 +50,35 @@ test("SEE MATCHES leads to ranked results with the exact six-part breakdown", as
     page.getByRole("button", { name: /Request commercial help/i }).first(),
   ).toBeVisible();
   await expect(page.locator("input[type=email]")).toHaveCount(0);
+});
+
+test("Request commercial help pre-fills identity captured on the wizard's contact step", async ({
+  page,
+}) => {
+  await page.goto("/find-a-humanoid?use_case=warehouse-logistics");
+  await page.getByRole("button", { name: /Next/ }).click(); // TASK
+  for (let i = 0; i < 10; i++) {
+    await page.getByRole("button", { name: "Skip" }).click(); // INDUSTRY..TRANSACTION
+  }
+  await page.locator("#wz-contact-name").fill("Jane Buyer");
+  await page.locator("#wz-contact-org").fill("Acme Robotics");
+  await page.locator("#wz-contact-email").fill("jane@example.com");
+  await page.locator("#wz-contact-phone").fill("+1 555 0123");
+  await page.getByRole("button", { name: /Next/ }).click();
+  await expect(page.getByRole("heading", { name: /Review/i })).toBeVisible();
+  await page.getByRole("button", { name: /Submit requirements/i }).click();
+  await page.getByRole("link", { name: /See matches/i }).click();
+  await expect(page).toHaveURL(/\/matches\//);
+
+  await page.getByRole("button", { name: /Request commercial help/i }).first().click();
+  // Pre-filled from the requirement's identity — no retyping.
+  await expect(page.locator("#lead-name")).toHaveValue("Jane Buyer");
+  await expect(page.locator("#lead-org")).toHaveValue("Acme Robotics");
+  await expect(page.locator("#lead-email")).toHaveValue("jane@example.com");
+  await expect(page.locator("#lead-phone")).toHaveValue("+1 555 0123");
+  // Still fully editable before sending the commercial lead.
+  await page.locator("#lead-name").fill("Jane B. Buyer");
+  await expect(page.locator("#lead-name")).toHaveValue("Jane B. Buyer");
 });
 
 test("Compare these links the ranked robots into /compare", async ({ page }) => {

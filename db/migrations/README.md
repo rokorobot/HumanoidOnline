@@ -112,6 +112,15 @@ Forward migrations:
   OPTIONAL (name/organization become required only at the API layer, not by a
   DB constraint, to keep historical rows with NULL identity fields valid), and
   international phone formats are never normalized. Additive and idempotent.
+- `0009_add_buyer_requirement_contact_phone.sql` — adds
+  `buyer_requirement.contact_phone TEXT`, nullable. The Find a Humanoid
+  questionnaire now collects identity on a final contact step before
+  submission (product decision reversing WS5's original anonymous intake);
+  contact_name/contact_email/organization already had columns (WS7 lead-
+  capture denormalization), telephone did not. All four stay nullable at the
+  DB layer — "required" is enforced only at the API layer for NEW submissions,
+  never by a DB constraint, so every historical anonymous requirement remains
+  a valid row. Additive and idempotent.
 
 ## Checksum integrity (WS8.2 / R9)
 

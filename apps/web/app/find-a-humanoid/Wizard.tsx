@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { SectionIndex } from "@/components/SectionIndex";
 import { SystemLabel } from "@/components/SystemLabel";
+import { emailError, MAX_PHONE, nameError, organizationError } from "@/lib/lead-form";
 import type { RegionListItem, UseCaseListItem } from "@/lib/types";
 import {
   ANSWER_KEYS,
@@ -17,15 +18,19 @@ import {
   type AnswerState,
   type Answers,
   buildSubmission,
+  CONTACT_INDEX,
+  type ContactDraft,
+  emptyContactDraft,
   hasSignal,
   initialAnswers,
+  REVIEW_INDEX,
   STEP_TITLES,
   type StepKey,
   stepIsComplete,
   TRANSACTION_OPTIONS,
 } from "@/lib/wizard";
 
-const REVIEW_INDEX = 11; // steps 0..10 are questions; 11 is REVIEW
+const CONTACT_ID = "ho.leadIdentity."; // sessionStorage key prefix, keyed by requirement id
 
 interface WizardProps {
   useCases: UseCaseListItem[];
@@ -60,6 +65,16 @@ export function Wizard({ useCases, countries, seedUseCase, seedAnswers }: Wizard
   const [answers, setAnswers] = useState<Answers>(
     () => seedAnswers ?? initialAnswers(seedUseCase),
   );
+  const [contact, setContact] = useState<ContactDraft>(emptyContactDraft);
+  // Mirrors LeadDialog: validation errors are not derived unconditionally from
+  // the (initially empty) draft — they only appear once the buyer has tried to
+  // leave the step with something invalid. Because the error text itself is
+  // still computed live from `contact` on every render (not snapshotted at the
+  // attempt), fixing a field clears its error immediately, no extra plumbing.
+  const [contactAttempted, setContactAttempted] = useState(false);
+  const contactNameRef = useRef<HTMLInputElement>(null);
+  const contactOrgRef = useRef<HTMLInputElement>(null);
+  const contactEmailRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -92,6 +107,23 @@ export function Wizard({ useCases, countries, seedUseCase, seedAnswers }: Wizard
   }
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
+  // Same shape as LeadDialog's onSubmit: validate in field order, reveal every
+  // invalid field's error but focus only the first one, and only advance when
+  // everything required is valid.
+  function attemptContactNext() {
+    const nameErr = nameError(contact.contact_name);
+    const orgErr = organizationError(contact.organization);
+    const emailErr = emailError(contact.contact_email);
+    if (nameErr || orgErr || emailErr) {
+      setContactAttempted(true);
+      if (nameErr) contactNameRef.current?.focus();
+      else if (orgErr) contactOrgRef.current?.focus();
+      else if (emailErr) contactEmailRef.current?.focus();
+      return;
+    }
+    setStep((s) => Math.min(s + 1, REVIEW_INDEX));
+  }
+
   async function submit() {
     if (submittingRef.current || !hasSignal(answers)) return;
     submittingRef.current = true;
@@ -101,11 +133,21 @@ export function Wizard({ useCases, countries, seedUseCase, seedAnswers }: Wizard
       const res = await fetch("/api/buyer-requirements", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(buildSubmission(answers)),
+        body: JSON.stringify(buildSubmission(answers, contact)),
       });
       if (res.status === 201) {
         const j = await res.json();
-        if (typeof j?.id === "string") setReqId(j.id);
+        if (typeof j?.id === "string") {
+          setReqId(j.id);
+          // Bridge identity to LeadDialog without a new PII-exposing read
+          // endpoint: client-only, keyed by requirement id, never sent over
+          // the network. See LeadDialog's `identity` prop / MatchesCommercial.
+          try {
+            sessionStorage.setItem(CONTACT_ID + j.id, JSON.stringify(contact));
+          } catch {
+            /* sessionStorage unavailable (private mode etc.) — prefill is best-effort */
+          }
+        }
         setCaptured(true);
         return;
       }
@@ -127,6 +169,8 @@ export function Wizard({ useCases, countries, seedUseCase, seedAnswers }: Wizard
 
   function reset() {
     setAnswers(initialAnswers(null));
+    setContact(emptyContactDraft());
+    setContactAttempted(false);
     setStep(0);
     setCaptured(false);
     setError(null);
@@ -161,7 +205,7 @@ export function Wizard({ useCases, countries, seedUseCase, seedAnswers }: Wizard
     );
   }
 
-  const key = step < REVIEW_INDEX ? ANSWER_KEYS[step] : null;
+  const key = step < CONTACT_INDEX ? ANSWER_KEYS[step] : null;
   const pct = Math.round(((step + 1) / STEP_TITLES.length) * 100);
 
   return (
@@ -246,6 +290,8 @@ export function Wizard({ useCases, countries, seedUseCase, seedAnswers }: Wizard
               </div>
             </div>
           </>
+        ) : step === CONTACT_INDEX ? (
+          renderContact()
         ) : (
           renderReview()
         )}
@@ -478,6 +524,98 @@ export function Wizard({ useCases, countries, seedUseCase, seedAnswers }: Wizard
       default:
         return null;
     }
+  }
+
+  function renderContact() {
+    // Only surfaced after an attempted (and failed) Next — never on initial,
+    // untouched entry. Still derived live from `contact`, so fixing a field
+    // clears its own error on the very next keystroke, no stale state.
+    const nameErr = contactAttempted ? nameError(contact.contact_name) : null;
+    const orgErr = contactAttempted ? organizationError(contact.organization) : null;
+    const emailErr = contactAttempted ? emailError(contact.contact_email) : null;
+    return (
+      <>
+        <h2 ref={headingRef} tabIndex={-1} className="wz-qlabel">
+          Who should we send matches to?
+        </h2>
+        <p className="wz-qhelp">
+          We use this to follow up on your requirement — never for anything else.
+        </p>
+
+        <div className="field">
+          <label htmlFor="wz-contact-name">Full name</label>
+          <input
+            id="wz-contact-name"
+            ref={contactNameRef}
+            type="text"
+            value={contact.contact_name}
+            onChange={(e) => setContact((prev) => ({ ...prev, contact_name: e.target.value }))}
+            aria-invalid={nameErr ? true : undefined}
+            aria-describedby={nameErr ? "wz-contact-name-error" : undefined}
+          />
+          {nameErr && (
+            <p id="wz-contact-name-error" className="wz-error" role="alert">
+              {nameErr}
+            </p>
+          )}
+        </div>
+        <div className="field">
+          <label htmlFor="wz-contact-org">Company / organization</label>
+          <input
+            id="wz-contact-org"
+            ref={contactOrgRef}
+            type="text"
+            value={contact.organization}
+            onChange={(e) => setContact((prev) => ({ ...prev, organization: e.target.value }))}
+            aria-invalid={orgErr ? true : undefined}
+            aria-describedby={orgErr ? "wz-contact-org-error" : undefined}
+          />
+          {orgErr && (
+            <p id="wz-contact-org-error" className="wz-error" role="alert">
+              {orgErr}
+            </p>
+          )}
+        </div>
+        <div className="field">
+          <label htmlFor="wz-contact-email">Business email</label>
+          <input
+            id="wz-contact-email"
+            ref={contactEmailRef}
+            type="email"
+            value={contact.contact_email}
+            onChange={(e) => setContact((prev) => ({ ...prev, contact_email: e.target.value }))}
+            aria-invalid={emailErr ? true : undefined}
+            aria-describedby={emailErr ? "wz-contact-email-error" : undefined}
+          />
+          {emailErr && (
+            <p id="wz-contact-email-error" className="wz-error" role="alert">
+              {emailErr}
+            </p>
+          )}
+        </div>
+        <div className="field">
+          <label htmlFor="wz-contact-phone">Telephone (optional)</label>
+          <input
+            id="wz-contact-phone"
+            type="tel"
+            maxLength={MAX_PHONE}
+            value={contact.contact_phone}
+            onChange={(e) => setContact((prev) => ({ ...prev, contact_phone: e.target.value }))}
+          />
+        </div>
+
+        <div className="wz-navrow">
+          <button className="btn btn--ghost" type="button" onClick={back}>
+            ← Back
+          </button>
+          <div className="wz-navrow-right">
+            <button className="btn btn--signal" type="button" onClick={attemptContactNext}>
+              Next →
+            </button>
+          </div>
+        </div>
+      </>
+    );
   }
 
   function summarize(k: StepKey): { state: AnswerState; text: string } {

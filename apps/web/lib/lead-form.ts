@@ -53,22 +53,68 @@ export function isValidEmail(email: string): boolean {
   return EMAIL_RE.test(email.trim());
 }
 
-/** Full name, company/organization and business email are all required (the
- * server enforces the same three — see app/schemas/commercial_lead.py). Phone
- * and message stay optional; this is no longer "identity is light-touch". */
-export function draftNameError(draft: LeadDraft): string | null {
-  return draft.contact_name.trim() ? null : "Full name is required.";
+// ---- identity validators ----------------------------------------------
+// Plain-string primitives so any surface collecting this identity (the
+// LeadDialog draft here, and the Find a Humanoid wizard's contact step in
+// lib/wizard.ts) shares ONE validation implementation instead of each
+// re-deriving it against a differently-shaped draft object. Full name,
+// company/organization and business email are all required (the server
+// enforces the same three — see app/schemas/commercial_lead.py and
+// app/schemas/buyer_requirement.py, which intentionally follow the identical
+// shape). Telephone stays optional everywhere.
+
+export function nameError(value: string): string | null {
+  return value.trim() ? null : "Full name is required.";
 }
 
-export function draftOrganizationError(draft: LeadDraft): string | null {
-  return draft.organization.trim() ? null : "Company / organization is required.";
+export function organizationError(value: string): string | null {
+  return value.trim() ? null : "Company / organization is required.";
 }
 
-export function draftEmailError(draft: LeadDraft): string | null {
-  const email = draft.contact_email.trim();
+export function emailError(value: string): string | null {
+  const email = value.trim();
   if (!email) return "Business email is required.";
   if (!isValidEmail(email)) return "Enter a valid email address.";
   return null;
+}
+
+export function draftNameError(draft: LeadDraft): string | null {
+  return nameError(draft.contact_name);
+}
+
+export function draftOrganizationError(draft: LeadDraft): string | null {
+  return organizationError(draft.organization);
+}
+
+export function draftEmailError(draft: LeadDraft): string | null {
+  return emailError(draft.contact_email);
+}
+
+// ---- prefill from a previously-captured identity -----------------------
+// Shape shared with the wizard's ContactDraft (lib/wizard.ts) and the
+// server's canonical identity fields — deliberately the same four names
+// (contact_name/organization/contact_email/contact_phone) everywhere.
+export interface Identity {
+  contact_name: string;
+  organization: string;
+  contact_email: string;
+  contact_phone: string;
+}
+
+/** Build a fresh, fully-editable draft pre-populated from a known identity
+ * (e.g. what the buyer already typed on the Find a Humanoid contact step).
+ * `identity` absent/null -> identical to `emptyDraft()`, so a dialog opened
+ * with no prior context behaves exactly as before this existed. */
+export function draftFromIdentity(identity: Identity | null | undefined): LeadDraft {
+  const base = emptyDraft();
+  if (!identity) return base;
+  return {
+    ...base,
+    contact_name: identity.contact_name,
+    organization: identity.organization,
+    contact_email: identity.contact_email,
+    phone: identity.contact_phone,
+  };
 }
 
 export interface LeadSubmission {

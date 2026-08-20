@@ -5,6 +5,8 @@ import {
   answersFromRawInput,
   buildRawInput,
   buildSubmission,
+  type ContactDraft,
+  emptyContactDraft,
   hasSignal,
   initialAnswers,
   stepIsComplete,
@@ -102,6 +104,38 @@ describe("buildSubmission — projection + data laws", () => {
     expect(sub.use_case).toBe("warehouse-logistics");
     expect(sub.country).toBe("DE");
     expect(sub.industry).toBe("logistics");
+  });
+});
+
+describe("buildSubmission — contact identity (Find a Humanoid contact step)", () => {
+  function contact(overrides: Partial<ContactDraft> = {}): ContactDraft {
+    return { ...emptyContactDraft(), contact_name: "Jane Buyer", organization: "Acme",
+      contact_email: "jane@example.com", ...overrides };
+  }
+
+  it("omitting the second argument sends empty identity (default = emptyContactDraft)", () => {
+    const sub = buildSubmission(base());
+    expect(sub.contact_name).toBe("");
+    expect(sub.organization).toBe("");
+    expect(sub.contact_email).toBe("");
+    expect(sub).not.toHaveProperty("contact_phone");
+  });
+
+  it("a supplied contact draft is trimmed onto the submission", () => {
+    const sub = buildSubmission(base(), contact({
+      contact_name: "  Jane Buyer  ", organization: " Acme ", contact_email: " jane@example.com ",
+    }));
+    expect(sub.contact_name).toBe("Jane Buyer");
+    expect(sub.organization).toBe("Acme");
+    expect(sub.contact_email).toBe("jane@example.com");
+  });
+
+  it("blank telephone is omitted; a provided one is trimmed and sent", () => {
+    expect(buildSubmission(base(), contact({ contact_phone: "  " }))).not.toHaveProperty(
+      "contact_phone",
+    );
+    expect(buildSubmission(base(), contact({ contact_phone: " +44 20 7946 0958 " }))
+      .contact_phone).toBe("+44 20 7946 0958");
   });
 });
 

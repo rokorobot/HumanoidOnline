@@ -5,11 +5,15 @@ surface may expose `commercial_lead` / `buyer_requirement` contact data.
 
 The sharp edge is `GET /api/buyer-requirements/{id}`. It is public and
 unauthenticated (it powers "Adjust Requirements"), and the underlying row
-*acquires contact identity* at WS7 lead capture — `contact_name`,
-`contact_email`, `organization` are all columns on `buyer_requirement`. Only the
-read schema keeps them out of the response. That is exactly the kind of
-invariant that survives by accident until someone adds a field, so it is pinned
-here with a real lead attached to a real requirement.
+*carries contact identity* — captured directly on the Find a Humanoid contact
+step (`contact_name`, `contact_email`, `organization`, `contact_phone` are all
+columns on `buyer_requirement`) and, historically, denormalized there at WS7
+lead capture too. Only the read schema keeps them out of the response. That is
+exactly the kind of invariant that survives by accident until someone adds a
+field, so it is pinned here with both a real submission-time identity and a
+real lead attached to a real requirement (see also
+`test_buyer_requirements.py::test_public_requirement_read_never_exposes_identity`
+for the submission-time case specifically).
 """
 from __future__ import annotations
 
@@ -85,6 +89,9 @@ def _warehouse_requirement(client) -> str:
     resp = client.post(
         "/api/buyer-requirements",
         json={
+            "contact_name": "Test Buyer",
+            "organization": "Test Org",
+            "contact_email": "buyer@example.com",
             "use_case": "warehouse-logistics",
             "country": "US",
             "preferred_transaction": "RAAS",
@@ -254,3 +261,37 @@ def test_r5_lead_capture_does_not_write_pii_to_logs(
         assert sentinel_phone not in logged
     finally:
         _cleanup(lead_id, rid)
+
+
+def test_r5_requirement_submission_does_not_write_identity_to_logs(
+    client, database_url, caplog
+) -> None:
+    """Same proof as above, for the Find a Humanoid contact step itself: capture
+    everything logged during a real requirement submission carrying identity;
+    assert it is clean."""
+    sentinel_email = f"wizard-log-probe-{uuid.uuid4().hex[:10]}@example.com"
+    sentinel_phone = "+1-555-0188"
+    req_id = None
+    try:
+        with caplog.at_level(logging.DEBUG):
+            resp = client.post(
+                "/api/buyer-requirements",
+                json={
+                    "contact_name": "Wizard Log Probe",
+                    "organization": "WizardLogProbe Ltd",
+                    "contact_email": sentinel_email,
+                    "contact_phone": sentinel_phone,
+                    "raw_input": {"wizard_version": 1, "answers": {}},
+                },
+            )
+        assert resp.status_code == 201, resp.text
+        req_id = resp.json()["id"]
+
+        logged = "\n".join(record.getMessage() for record in caplog.records)
+        assert sentinel_email not in logged
+        assert "Wizard Log Probe" not in logged
+        assert "WizardLogProbe Ltd" not in logged
+        assert sentinel_phone not in logged
+    finally:
+        if req_id:
+            _exec("DELETE FROM buyer_requirement WHERE id = :i", i=req_id)

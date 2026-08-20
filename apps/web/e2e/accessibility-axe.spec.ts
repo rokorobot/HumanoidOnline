@@ -34,6 +34,9 @@ async function expectNoViolations(page: import("@playwright/test").Page, context
 async function createRequirement(page: import("@playwright/test").Page): Promise<string> {
   const res = await page.request.post("/api/buyer-requirements", {
     data: {
+      contact_name: "Test Buyer",
+      organization: "Test Org",
+      contact_email: "buyer@example.com",
       country: "US",
       preferred_transaction: "UNKNOWN",
       raw_input: {
@@ -75,6 +78,20 @@ test.describe("@a11y automated WCAG 2.2 AA", () => {
     // Interactive state: advance a step so a different panel is rendered.
     await page.getByRole("button", { name: /Next/ }).click();
     await expectNoViolations(page, "wizard step 2");
+  });
+
+  test("buyer-intent wizard contact step", async ({ page }) => {
+    await page.goto("/find-a-humanoid?use_case=warehouse-logistics", {
+      waitUntil: "networkidle",
+    });
+    await page.getByRole("button", { name: /Next/ }).click(); // TASK
+    for (let i = 0; i < 10; i++) {
+      await page.getByRole("button", { name: "Skip" }).click(); // INDUSTRY..TRANSACTION
+    }
+    await expect(
+      page.getByRole("heading", { name: /Who should we send matches to/i }),
+    ).toBeVisible();
+    await expectNoViolations(page, "wizard contact step");
   });
 
   test("match results", async ({ page }) => {

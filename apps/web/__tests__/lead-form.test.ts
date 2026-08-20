@@ -3,11 +3,16 @@ import { describe, expect, it } from "vitest";
 import {
   buildSubmission,
   draftEmailError,
+  draftFromIdentity,
   draftNameError,
   draftOrganizationError,
+  emailError,
   emptyDraft,
+  type Identity,
   isValidEmail,
   type LeadDraft,
+  nameError,
+  organizationError,
 } from "../lib/lead-form";
 
 function draft(overrides: Partial<LeadDraft> = {}): LeadDraft {
@@ -63,6 +68,50 @@ describe("draftEmailError", () => {
   });
   it("passes a valid email", () => {
     expect(draftEmailError(draft({ contact_email: "jane@example.com" }))).toBeNull();
+  });
+});
+
+// Plain-string validators — shared with the Find a Humanoid wizard's contact
+// step (lib/wizard.ts / Wizard.tsx), which has no LeadDraft to build against.
+describe("nameError / organizationError / emailError (plain-string primitives)", () => {
+  it("nameError mirrors draftNameError", () => {
+    expect(nameError("   ")).toMatch(/required/i);
+    expect(nameError("Jane Buyer")).toBeNull();
+  });
+  it("organizationError mirrors draftOrganizationError", () => {
+    expect(organizationError("   ")).toMatch(/required/i);
+    expect(organizationError("Acme")).toBeNull();
+  });
+  it("emailError mirrors draftEmailError", () => {
+    expect(emailError("   ")).toMatch(/required/i);
+    expect(emailError("nope")).toMatch(/valid/i);
+    expect(emailError("jane@example.com")).toBeNull();
+  });
+});
+
+describe("draftFromIdentity", () => {
+  const identity: Identity = {
+    contact_name: "Jane Buyer",
+    organization: "Acme",
+    contact_email: "jane@example.com",
+    contact_phone: "+1 555 0123",
+  };
+
+  it("maps a known identity into a fully-editable draft (contact_phone -> phone)", () => {
+    const d = draftFromIdentity(identity);
+    expect(d.contact_name).toBe("Jane Buyer");
+    expect(d.organization).toBe("Acme");
+    expect(d.contact_email).toBe("jane@example.com");
+    expect(d.phone).toBe("+1 555 0123");
+    // everything else stays at the empty-draft default.
+    expect(d.country).toBe("");
+    expect(d.preferred_transaction).toBe("");
+    expect(d.message).toBe("");
+  });
+
+  it("null/undefined identity is identical to emptyDraft (unchanged behavior)", () => {
+    expect(draftFromIdentity(null)).toEqual(emptyDraft());
+    expect(draftFromIdentity(undefined)).toEqual(emptyDraft());
   });
 });
 

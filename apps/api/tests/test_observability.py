@@ -241,6 +241,9 @@ def test_event_log_stays_empty_after_real_flows(
     created = client.post(
         "/api/buyer-requirements",
         json={
+            "contact_name": "Test Buyer",
+            "organization": "Test Org",
+            "contact_email": "buyer@example.com",
             "country": "US",
             "preferred_transaction": "UNKNOWN",
             "raw_input": {

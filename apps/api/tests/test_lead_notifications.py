@@ -71,6 +71,8 @@ def _warehouse_requirement(client) -> str:
         },
     }
     resp = client.post("/api/buyer-requirements", json={
+        "contact_name": "Test Buyer", "organization": "Test Org",
+        "contact_email": "buyer@example.com",
         "use_case": "warehouse-logistics", "country": "US", "payload_min_kg": 10,
         "preferred_transaction": "RAAS", "raw_input": raw,
     })

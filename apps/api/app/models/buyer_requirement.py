@@ -35,13 +35,16 @@ class BuyerRequirement(Base):
         UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()")
     )
 
-    # who (light-touch; anonymous in WS5 — the wizard collects no contact fields)
+    # who (captured on the Find a Humanoid contact step; historical rows may
+    # still be anonymous — required-ness is an API-layer rule, not a DB one)
     buyer_type: Mapped[str] = mapped_column(
         buyer_type, nullable=False, server_default=text("'UNKNOWN'")
     )
     contact_name: Mapped[str | None] = mapped_column(Text)
     contact_email: Mapped[str | None] = mapped_column(Text)
     organization: Mapped[str | None] = mapped_column(Text)
+    # Optional; free-text, never format-validated (mirrors commercial_lead).
+    contact_phone: Mapped[str | None] = mapped_column(Text)
     country_region_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("region.id")
     )

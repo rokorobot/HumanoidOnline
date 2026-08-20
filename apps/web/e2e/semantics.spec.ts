@@ -15,6 +15,9 @@ import { expect, test, type Page } from "@playwright/test";
 async function createRequirement(page: Page): Promise<string> {
   const res = await page.request.post("/api/buyer-requirements", {
     data: {
+      contact_name: "Test Buyer",
+      organization: "Test Org",
+      contact_email: "buyer@example.com",
       country: "US",
       preferred_transaction: "UNKNOWN",
       raw_input: {

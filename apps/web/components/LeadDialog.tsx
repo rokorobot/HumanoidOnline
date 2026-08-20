@@ -15,9 +15,11 @@ import type { RegionListItem } from "@/lib/types";
 import {
   buildSubmission,
   draftEmailError,
+  draftFromIdentity,
   draftNameError,
   draftOrganizationError,
   emptyDraft,
+  type Identity,
   type LeadDraft,
   MAX_MESSAGE,
   MAX_NAME,
@@ -36,6 +38,12 @@ export interface LeadDialogProps {
   requirementId: string | null;
   robotSlugs: string[];
   countries: RegionListItem[];
+  // Known identity from the Find a Humanoid contact step, when this dialog is
+  // opened for a matched requirement — prefills the form so the buyer never
+  // retypes what they already gave us. Still fully editable. Absent/null for
+  // a direct Robot-Detail "Request availability" (no requirement context) or
+  // a historical anonymous requirement: the form opens empty, as before.
+  identity?: Identity | null;
 }
 
 export function LeadDialog({
@@ -46,6 +54,7 @@ export function LeadDialog({
   requirementId,
   robotSlugs,
   countries,
+  identity,
 }: LeadDialogProps) {
   const [draft, setDraft] = useState<LeadDraft>(emptyDraft);
   const [submitting, setSubmitting] = useState(false);
@@ -69,10 +78,11 @@ export function LeadDialog({
   const emailErrId = useId();
   const titleId = useId();
 
-  // Reset to a clean form whenever the dialog is (re)opened.
+  // Reset to a clean form whenever the dialog is (re)opened — prefilled from
+  // the requirement's identity when we have one (still fully editable).
   useEffect(() => {
     if (open) {
-      setDraft(emptyDraft());
+      setDraft(draftFromIdentity(identity));
       setError(null);
       setNameError(null);
       setOrgError(null);
@@ -81,7 +91,7 @@ export function LeadDialog({
       submittingRef.current = false;
       setSubmitting(false);
     }
-  }, [open]);
+  }, [open, identity]);
 
   // Move focus into the dialog on open (the first required field — full name —
   // or the heading in the success state).

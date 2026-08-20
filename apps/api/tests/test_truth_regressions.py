@@ -463,6 +463,9 @@ def test_r14_unpublished_robot_is_absent_from_matching_and_leads(
         created = client.post(
             "/api/buyer-requirements",
             json={
+                "contact_name": "Test Buyer",
+                "organization": "Test Org",
+                "contact_email": "buyer@example.com",
                 "country": "US",
                 "preferred_transaction": "UNKNOWN",
                 "raw_input": {

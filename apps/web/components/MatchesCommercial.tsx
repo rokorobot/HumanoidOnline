@@ -10,11 +10,12 @@
 // card, every surfaced slug for the shortlist, none for zero-match. The server
 // re-validates each against the requirement's persisted match_result.
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { LeadDialog } from "@/components/LeadDialog";
 import { MatchCard } from "@/components/MatchCard";
 import { SectionIndex } from "@/components/SectionIndex";
+import type { Identity } from "@/lib/lead-form";
 import type { MatchItem, RegionListItem } from "@/lib/types";
 
 interface Props {
@@ -38,8 +39,23 @@ export function MatchesCommercial({
   const [robotSlugs, setRobotSlugs] = useState<string[]>([]);
   const [title, setTitle] = useState("Request commercial help");
   const [context, setContext] = useState<string | undefined>(undefined);
+  const [identity, setIdentity] = useState<Identity | null>(null);
   // Return focus to the CTA that opened the dialog (accessibility).
   const triggerRef = useRef<HTMLElement | null>(null);
+
+  // Identity captured on the Find a Humanoid contact step, bridged here via
+  // sessionStorage (client-only, keyed by this requirement id) so LeadDialog
+  // can prefill without a new PII-exposing backend read endpoint. A
+  // historical anonymous requirement, or a fresh session/browser, simply has
+  // nothing stored — the dialog then opens empty exactly as before.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("ho.leadIdentity." + requirementId);
+      if (raw) setIdentity(JSON.parse(raw) as Identity);
+    } catch {
+      /* sessionStorage unavailable or malformed value — fall back to empty */
+    }
+  }, [requirementId]);
 
   function openDialog(
     e: React.MouseEvent<HTMLElement>,
@@ -71,6 +87,7 @@ export function MatchesCommercial({
       requirementId={requirementId}
       robotSlugs={robotSlugs}
       countries={countries}
+      identity={identity}
     />
   );
 

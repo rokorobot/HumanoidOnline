@@ -703,11 +703,13 @@ COMMENT ON TABLE evidence_source IS
 
 CREATE TABLE buyer_requirement (
     id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    -- who (light-touch; may be anonymous until lead capture)
+    -- who (captured on the Find a Humanoid contact step; historical rows may
+    -- still be anonymous — see db/migrations/0009 and BuyerRequirementCreate)
     buyer_type            buyer_type NOT NULL DEFAULT 'UNKNOWN',
     contact_name          TEXT,
     contact_email         TEXT,
     organization          TEXT,
+    contact_phone         TEXT,               -- optional; free-text, not format-validated
     country_region_id     UUID REFERENCES region(id),
 
     -- what they need the robot to do

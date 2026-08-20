@@ -1,8 +1,19 @@
 """Buyer-intent write schemas (API contract §4) — Pydantic v2.
 
-`POST /api/buyer-requirements` request/response. All fields optional except the
-"at least one requirement signal" rule, which is enforced in the router because
-an explicitly-UNKNOWN answer (preserved in `raw_input`) also counts as a signal.
+`POST /api/buyer-requirements` request/response. Requirement fields are all
+optional except the "at least one requirement signal" rule, enforced in the
+router because an explicitly-UNKNOWN answer (preserved in `raw_input`) also
+counts as a signal.
+
+`contact_name`, `organization` and `contact_email` are REQUIRED (a product
+decision reversing WS5's original anonymous intake — the Find a Humanoid
+questionnaire now ends with a contact step before submission). This is
+enforced only here (the API edge): the underlying DB columns stay nullable
+(`db/schema.sql`) so historical rows captured before this change remain valid.
+`contact_phone` is optional and free-text — never format-validated or
+normalized, mirroring `app/schemas/commercial_lead.py` exactly (see that
+module's docstring for the reasoning). Do not duplicate this validation
+elsewhere: both schemas intentionally follow the identical shape.
 
 Enum values are `Literal`s mirroring db/schema.sql, so a bad enum is a 422 at the
 edge. Budget integrity (min<=max; currency required when a numeric budget is
@@ -11,11 +22,29 @@ ids) happens in the router, which owns the DB.
 """
 from __future__ import annotations
 
+import re
 from datetime import date
 from decimal import Decimal
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+# Identical to app/schemas/commercial_lead.py — one @, no surrounding
+# whitespace, a dotted domain. Shape only, never proof of delivery.
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+# Same generous cap as commercial_lead.py, for the same reason: a formatted
+# international number with an extension, not a shape constraint.
+MAX_PHONE = 40
+
+
+def _clean(value: str | None) -> str | None:
+    """Trim; a blank/whitespace string becomes None (never persisted as "")."""
+    if value is None:
+        return None
+    trimmed = value.strip()
+    return trimmed or None
+
 
 AnswerStateIn = Literal["ANSWERED", "UNKNOWN", "SKIPPED"]
 
@@ -75,14 +104,20 @@ class RawInput(BaseModel):
 
 
 class BuyerRequirementCreate(BaseModel):
-    """WS5 POST body (API contract §4). WS5 is ANONYMOUS intent: contact identity
-    (name / email / organization) is NOT collected here — that is WS7 (commercial
-    lead). With extra=forbid, sending a contact field is a 422. Matching and leads
-    have no fields here."""
+    """WS5 POST body (API contract §4). Matching and leads have no fields here —
+    those stay owned by WS6/WS7. With extra=forbid, sending a server-owned field
+    (e.g. `lead_status`) is a 422."""
 
     model_config = ConfigDict(extra="forbid")
 
     buyer_type: BuyerTypeIn = "UNKNOWN"
+
+    # Required (API-layer only — see module docstring): full name, unsplit.
+    contact_name: str
+    organization: str
+    contact_email: str
+    # Optional. Free-text; see module docstring for why it is never normalized.
+    contact_phone: str | None = None
 
     # canonical references (resolved to ids in the router; invalid -> 422 there)
     use_case: str | None = None
@@ -104,6 +139,42 @@ class BuyerRequirementCreate(BaseModel):
 
     # Required, versioned. Preserves ANSWERED/UNKNOWN/SKIPPED per answer.
     raw_input: RawInput
+
+    @field_validator("contact_name")
+    @classmethod
+    def _name(cls, v: str) -> str:
+        cleaned = _clean(v)
+        if cleaned is None:
+            raise ValueError("contact_name is required")
+        if len(cleaned) > 200:
+            raise ValueError("contact_name must be at most 200 characters")
+        return cleaned
+
+    @field_validator("organization")
+    @classmethod
+    def _org(cls, v: str) -> str:
+        cleaned = _clean(v)
+        if cleaned is None:
+            raise ValueError("organization is required")
+        if len(cleaned) > 300:
+            raise ValueError("organization must be at most 300 characters")
+        return cleaned
+
+    @field_validator("contact_email")
+    @classmethod
+    def _valid_email(cls, v: str) -> str:
+        trimmed = (v or "").strip()
+        if not _EMAIL_RE.match(trimmed):
+            raise ValueError("contact_email must be a valid email address")
+        return trimmed
+
+    @field_validator("contact_phone")
+    @classmethod
+    def _phone(cls, v: str | None) -> str | None:
+        cleaned = _clean(v)
+        if cleaned is not None and len(cleaned) > MAX_PHONE:
+            raise ValueError(f"contact_phone must be at most {MAX_PHONE} characters")
+        return cleaned
 
 
 class BuyerRequirementCreated(BaseModel):

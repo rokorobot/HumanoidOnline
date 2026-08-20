@@ -22,8 +22,17 @@ def _scalar(sql: str, **params) -> int:
         return conn.execute(text(sql), params).scalar_one()
 
 
+#: Merged into every _create call — the wizard's contact step now requires
+#: this on every /api/buyer-requirements POST; these tests care about the
+#: WS6 matching/persistence contract, not requirement identity specifically.
+_REQ_IDENTITY = {
+    "contact_name": "Test Buyer", "organization": "Test Org",
+    "contact_email": "buyer@example.com",
+}
+
+
 def _create(client, body) -> str:
-    resp = client.post("/api/buyer-requirements", json=body)
+    resp = client.post("/api/buyer-requirements", json={**_REQ_IDENTITY, **body})
     assert resp.status_code == 201, (resp.status_code, resp.text)
     return resp.json()["id"]
 

@@ -41,8 +41,8 @@ export interface Answers {
   transaction: { state: AnswerState; value: string };
 }
 
-// The 12 steps in frozen order. REVIEW (12) is not an answer, it is the submit
-// gate; the first 11 keys map 1:1 to `Answers`.
+// The 13 steps in frozen order. CONTACT (11) collects buyer identity; REVIEW
+// (12) is the submit gate. The first 11 keys map 1:1 to `Answers`.
 export const STEP_TITLES: string[] = [
   "Task",
   "Industry",
@@ -55,6 +55,7 @@ export const STEP_TITLES: string[] = [
   "Budget",
   "Timeline",
   "Transaction",
+  "Contact",
   "Review",
 ];
 
@@ -71,6 +72,26 @@ export const ANSWER_KEYS: StepKey[] = [
   "timeline",
   "transaction",
 ];
+
+export const CONTACT_INDEX = ANSWER_KEYS.length; // 11
+export const REVIEW_INDEX = CONTACT_INDEX + 1; // 12
+
+// Buyer identity, captured on the final contact step (product reversal: WS5's
+// anonymous intake now collects identity before submission). Field names
+// mirror the server's canonical identity columns exactly — see
+// app/schemas/buyer_requirement.py and lib/lead-form.ts's Identity — so the
+// same shape flows straight through to LeadDialog prefill with no remapping
+// except contact_phone -> LeadDraft.phone.
+export interface ContactDraft {
+  contact_name: string;
+  organization: string;
+  contact_email: string;
+  contact_phone: string;
+}
+
+export function emptyContactDraft(): ContactDraft {
+  return { contact_name: "", organization: "", contact_email: "", contact_phone: "" };
+}
 
 export const AUTONOMY_OPTIONS: { value: string; label: string; hint: string }[] = [
   { value: "TELEOPERATED", label: "Teleoperated", hint: "Human in the loop, remote" },
@@ -222,6 +243,10 @@ export interface SubmissionBudget {
 }
 
 export interface Submission {
+  contact_name: string;
+  organization: string;
+  contact_email: string;
+  contact_phone?: string;
   use_case?: string;
   task_description?: string;
   industry?: string;
@@ -239,15 +264,23 @@ export interface Submission {
 
 // Structured projection sent to POST /api/buyer-requirements. ANSWERED -> value;
 // UNKNOWN/SKIPPED -> field omitted (server stores NULL). JSON.stringify drops the
-// undefined keys, so `extra: forbid` on the API model stays happy.
-export function buildSubmission(a: Answers): Submission {
+// undefined keys, so `extra: forbid` on the API model stays happy. `contact`
+// defaults to empty so existing single-argument callers (tests exercising the
+// structured projection only) keep compiling; a real submission always passes
+// the CONTACT step's validated draft.
+export function buildSubmission(a: Answers, contact: ContactDraft = emptyContactDraft()): Submission {
   const s: Submission = {
+    contact_name: contact.contact_name.trim(),
+    organization: contact.organization.trim(),
+    contact_email: contact.contact_email.trim(),
     preferred_transaction:
       a.transaction.state === "ANSWERED" && a.transaction.value
         ? a.transaction.value
         : "UNKNOWN",
     raw_input: buildRawInput(a),
   };
+  const phone = contact.contact_phone.trim();
+  if (phone) s.contact_phone = phone;
 
   if (a.task.state === "ANSWERED") {
     if (a.task.useCase) s.use_case = a.task.useCase;

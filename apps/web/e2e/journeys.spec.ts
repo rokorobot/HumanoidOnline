@@ -56,6 +56,11 @@ test("Journey B — buyer intent: wizard -> match results -> commercial lead", a
     await page.getByRole("button", { name: "Skip" }).click(); // ENV..TIMELINE
   }
   await page.getByRole("button", { name: "Skip" }).click(); // TRANSACTION
+  // CONTACT: buyer identity is now required before REVIEW is reachable.
+  await page.locator("#wz-contact-name").fill("Jane Buyer");
+  await page.locator("#wz-contact-org").fill("Acme Robotics");
+  await page.locator("#wz-contact-email").fill("journey-b@example.com");
+  await page.getByRole("button", { name: /Next/ }).click();
   await expect(page.getByRole("heading", { name: /Review/i })).toBeVisible();
   await page.getByRole("button", { name: /Submit requirements/i }).click();
 

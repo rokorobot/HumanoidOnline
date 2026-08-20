@@ -90,10 +90,13 @@ test.describe("@a11y automated WCAG 2.2 AA", () => {
     await expect(dialog).toBeVisible();
     await expectNoViolations(page, "lead dialog open");
 
-    // Interactive state where a11y defects hide: submit empty -> inline error
-    // with role="alert" + aria-invalid. Axe must still find no violations.
+    // Interactive state where a11y defects hide: submit empty -> inline errors
+    // with role="alert" + aria-invalid. Full name, organization and email are
+    // all required, so an empty submit surfaces all three alerts at once
+    // (intentional — not a single-error UI). Axe must still find no violations.
     await dialog.getByRole("button", { name: /Send request/i }).click();
-    await expect(dialog.getByRole("alert")).toBeVisible();
+    await expect(dialog.getByRole("alert")).toHaveCount(3);
+    await expect(dialog.getByRole("alert").first()).toBeVisible();
     await expectNoViolations(page, "lead dialog validation error");
   });
 

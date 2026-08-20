@@ -147,11 +147,18 @@ test.describe("focus behaviour", () => {
 
     // Submit empty: the first required field (full name) is invalid, gets
     // aria-invalid + an alert, and receives focus so a keyboard user is taken
-    // straight to the problem.
+    // straight to the problem. Organization and email are also required and
+    // surface their own alerts at the same time (intentional), so assert
+    // specifically on the alert tied to the focused field via
+    // aria-describedby rather than "an alert exists somewhere".
     await dialog.getByRole("button", { name: /Send request/i }).click();
     const name = page.locator("#lead-name");
     await expect(name).toBeFocused();
     await expect(name).toHaveAttribute("aria-invalid", "true");
-    await expect(dialog.getByRole("alert")).toBeVisible();
+    const describedby = await name.getAttribute("aria-describedby");
+    expect(describedby, "name has no aria-describedby when invalid").toBeTruthy();
+    const nameAlert = page.locator(`#${describedby}`);
+    await expect(nameAlert).toHaveAttribute("role", "alert");
+    await expect(nameAlert).toBeVisible();
   });
 });

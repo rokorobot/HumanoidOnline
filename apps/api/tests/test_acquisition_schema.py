@@ -808,9 +808,35 @@ def test_schema_sql_and_migration_0004_declare_the_same_tables() -> None:
 # --------------------------------------------------------------------------- #
 # Slice A carries no acquisition MACHINERY — only the schema
 # --------------------------------------------------------------------------- #
+# Explicit, narrow exceptions to the Slice-A "no fetching machinery" rule below
+# — each entry is a SPECIFIC file, never a directory or pattern, and exists for
+# a reason that has nothing to do with the acquisition/crawling layer this test
+# guards. Adding a path here is a governance decision: it must be reviewed like
+# any other change to this test, not treated as a place to quietly widen scope.
+#
+#   apps/api/app/services/lead_notifications.py — WS7 lead-capture email
+#   side-channel (commit da403d6, predates DATA-D1.LIVE Slice A). Its one
+#   network call (`_send_email`) is a single fixed-timeout POST of a JSON body
+#   to the operator-configured `email_api_endpoint` (Resend) — no crawling, no
+#   arbitrary-URL fetching, no `robotparser`. It is unrelated to, and cannot be
+#   reached from, the acquisition/discovery models this file asserts are
+#   schema-only. See that module's own docstring for the full delivery/privacy
+#   contract.
+_SLICE_A_HTTP_EXCEPTIONS = frozenset(
+    {"apps/api/app/services/lead_notifications.py"}
+)
+
+
 def test_slice_a_adds_no_http_client_or_crawler(database_url) -> None:
     """The authorized exclusions, asserted against the source tree rather than
-    trusted: Slice A is schema only."""
+    trusted: Slice A is schema only.
+
+    `_SLICE_A_HTTP_EXCEPTIONS` is the ONLY carve-out from that rule — every
+    other file under apps/api/app still fails this test the moment it imports
+    a fetching library or uses `urllib.request`/`robotparser`, so the
+    acquisition layer itself remains exactly as unable to perform a live fetch
+    as before this exception existed.
+    """
     forbidden = re.compile(
         r"\b(?:import\s+(?:requests|httpx|aiohttp|urllib3|selenium|playwright)"
         r"|from\s+(?:requests|httpx|aiohttp|selenium|playwright)\s+import"
@@ -818,8 +844,11 @@ def test_slice_a_adds_no_http_client_or_crawler(database_url) -> None:
     )
     offenders: list[str] = []
     for path in (ROOT / "apps" / "api" / "app").rglob("*.py"):
+        rel = str(path.relative_to(ROOT)).replace("\\", "/")
+        if rel in _SLICE_A_HTTP_EXCEPTIONS:
+            continue
         if forbidden.search(path.read_text(encoding="utf-8")):
-            offenders.append(str(path.relative_to(ROOT)))
+            offenders.append(rel)
     assert offenders == [], f"Slice A must add no fetching machinery: {offenders}"
 
 

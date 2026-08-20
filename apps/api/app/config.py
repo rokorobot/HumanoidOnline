@@ -183,6 +183,16 @@ class Settings(BaseSettings):
     # Override only when migrating to a different provider.
     email_api_endpoint: str = "https://api.resend.com/emails"
 
+    # ---------------------------------------------------- compare caching ---
+    # GET /api/robots/compare is public, read-only and unauthenticated, so its
+    # response is safe to cache both at the CDN (Cache-Control, set by the
+    # router) and in-process (services/compare_cache.py) for this many
+    # seconds. Conservative default: the catalogue changes by editorial review,
+    # not by the second, so briefly-stale comparison data is an acceptable
+    # trade for not re-running the per-robot detail + evidence load on every
+    # request. A single env var to override — no code change needed to retune.
+    compare_cache_ttl_s: int = 60
+
     # -- derived / validated -------------------------------------------------
 
     @model_validator(mode="after")

@@ -1,18 +1,20 @@
 """Public read API for robots (API contract §1)."""
 from __future__ import annotations
 
+import logging
 from decimal import Decimal
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
+from app.config import get_settings
 from app.db.session import get_session
 from app.models.robot import Robot
 from app.schemas.common import Page
 from app.schemas.robot import CompareResponse, CompareRow, RobotDetail, RobotListItem
-from app.services import reads
+from app.services import compare_cache, reads
 from app.services.pricing import (
     InvalidPriceQuery,
     apply_price_ceiling,
@@ -24,6 +26,10 @@ from app.services.robot_filters import (
     resolve_region_filter,
     resolve_sort,
 )
+
+# No PII here (WS8-L6): only a cache disposition and integer counts, never the
+# requested slugs/query string — same doctrine as app.request (observability.py).
+_cache_logger = logging.getLogger("app.compare_cache")
 
 router = APIRouter(prefix="/api/robots", tags=["robots"])
 
@@ -129,12 +135,36 @@ _load_detail = reads.load_detail
 @router.get("/compare", response_model=CompareResponse)
 def compare_robots(
     session: Annotated[Session, Depends(get_session)],
+    response: Response,
     ids: str = Query(..., description="2–4 comma-separated robot slugs"),
 ) -> CompareResponse:
     slugs = [s.strip() for s in ids.split(",") if s.strip()]
+    # Trimmed, de-duplicated, ORDER-PRESERVED — this is also the exact cache
+    # key basis (services/compare_cache.cache_key): the response's `robots`
+    # array and each row's `values` mapping are built by iterating this list
+    # in order, so ids=a,b and ids=b,a are genuinely different responses and
+    # must never share a cache entry (see that module's docstring).
     unique = list(dict.fromkeys(slugs))
+    settings = get_settings()
+    ttl = settings.compare_cache_ttl_s
+    cache_control = f"public, s-maxage={ttl}, stale-while-revalidate={ttl * 5}"
+
+    key = compare_cache.cache_key(unique)
+    cached = compare_cache.get(key)
+    if cached is not None:
+        response.headers["Cache-Control"] = cache_control
+        # Distinguishes an in-process cache hit from Vercel's own edge cache
+        # (surfaced separately as `x-vercel-cache`) — the two are different
+        # layers and either can be a HIT while the other is a MISS.
+        response.headers["X-App-Cache"] = "HIT"
+        _cache_logger.info("compare cache HIT robots=%d", len(unique))
+        return cached
+
     robots = [r for r in (_load_detail(session, s) for s in unique) if r is not None]
     if not 2 <= len(robots) <= 4:
+        # Never cached: an invalid request must not poison the cache for a
+        # later valid, identical request (requirement: don't cache errors).
+        _cache_logger.info("compare cache BYPASS reason=invalid_request robots=%d", len(robots))
         raise HTTPException(status_code=422, detail="compare requires 2–4 valid robot slugs")
 
     details = [reads.serialize_detail(session, r) for r in robots]
@@ -145,7 +175,13 @@ def compare_robots(
             raw = getattr(r, attr)
             values[r.slug] = float(raw) if isinstance(raw, Decimal) else raw
         rows.append(CompareRow(group=group, key=attr, label=label, values=values))
-    return CompareResponse(robots=details, rows=rows)
+    result = CompareResponse(robots=details, rows=rows)
+
+    compare_cache.put(key, result, ttl_seconds=ttl)
+    response.headers["Cache-Control"] = cache_control
+    response.headers["X-App-Cache"] = "MISS"
+    _cache_logger.info("compare cache MISS robots=%d ttl_s=%d", len(unique), ttl)
+    return result
 
 
 @router.get("/{slug}", response_model=RobotDetail)

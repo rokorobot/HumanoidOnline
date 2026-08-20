@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import time
 
 # WS8.2 / R7 — the suite IS the test environment, and it must say so before
 # anything imports the app. With APP_ENV unset the contract resolves to
@@ -15,6 +16,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 from app.main import app  # noqa: E402
 from app.security.rate_limit import RATE_LIMITER, RateLimitPolicy
+from app.services import compare_cache  # noqa: E402
 
 #: WS8.1 / R3. The limiter is a process-local singleton (DEP P2/P3), so state
 #: leaks between tests unless it is reset. The rest of the suite predates rate
@@ -41,6 +43,19 @@ def reset_rate_limiter():
     yield
     RATE_LIMITER.reset()
     RATE_LIMITER.load_from_settings()
+
+
+@pytest.fixture(autouse=True)
+def reset_compare_cache():
+    """The compare cache (app/services/compare_cache.py) is a process-local
+    singleton, same story as the rate limiter above: the `client` fixture is
+    session-scoped, so without a reset a cache entry warmed by one test would
+    silently serve stale (or just cross-test-polluting) data to the next."""
+    compare_cache.clear()
+    compare_cache.clock = time.monotonic
+    yield
+    compare_cache.clear()
+    compare_cache.clock = time.monotonic
 
 
 @pytest.fixture(scope="session")

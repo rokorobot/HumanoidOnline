@@ -57,16 +57,27 @@ test.describe("R20 empty / error states", () => {
     expect(body.toLowerCase()).not.toMatch(/\bnot available\b/);
   });
 
-  test("invalid form state: empty email is announced, submission blocked", async ({ page }) => {
+  test("invalid form state: empty required fields are announced, submission blocked", async ({
+    page,
+  }) => {
     await page.goto("/robots/unitree-g1", { waitUntil: "networkidle" });
     await page.getByRole("button", { name: /Request Availability/i }).first().click();
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
-    // Submit with no email -> inline error (role=alert) + aria-invalid, no close.
+    // Submit fully empty -> inline error (role=alert) + aria-invalid on the
+    // first required field (full name), no close.
     await dialog.getByRole("button", { name: /Send request/i }).click();
-    await expect(dialog.getByRole("alert")).toBeVisible();
-    await expect(dialog.locator("#lead-email")).toHaveAttribute("aria-invalid", "true");
+    await expect(dialog.getByRole("alert").first()).toBeVisible();
+    await expect(dialog.locator("#lead-name")).toHaveAttribute("aria-invalid", "true");
     await expect(dialog).toBeVisible(); // dialog stayed open; nothing was captured
+
+    // Name + organization filled, email still empty -> now email is the one
+    // flagged invalid.
+    await dialog.locator("#lead-name").fill("Jane Buyer");
+    await dialog.locator("#lead-org").fill("Acme Robotics");
+    await dialog.getByRole("button", { name: /Send request/i }).click();
+    await expect(dialog.locator("#lead-email")).toHaveAttribute("aria-invalid", "true");
+    await expect(dialog).toBeVisible();
   });
 
   test("API failure: the lead form shows an error and retains what was typed", async ({
@@ -75,6 +86,8 @@ test.describe("R20 empty / error states", () => {
     await page.goto("/robots/unitree-g1", { waitUntil: "networkidle" });
     await page.getByRole("button", { name: /Request Availability/i }).first().click();
     const dialog = page.getByRole("dialog");
+    await dialog.locator("#lead-name").fill("Jane Buyer");
+    await dialog.locator("#lead-org").fill("Acme Robotics");
     await dialog.locator("#lead-email").fill("buyer@example.com");
 
     // Force the write to fail at the network boundary.

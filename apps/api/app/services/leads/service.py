@@ -210,6 +210,7 @@ def _capture_requirement_linked(
         contact_name=payload.contact_name,
         contact_email=payload.contact_email,
         organization=payload.organization,
+        contact_phone=payload.contact_phone,
         country_region_id=lead_country_id,
         use_case_id=req.use_case_id,
         preferred_transaction=resolved_pref,
@@ -261,9 +262,13 @@ def _extend_requirement_linked(
 
       - country / preferred_transaction: updated when EXPLICITLY supplied in this
         submission; an omitted field preserves the existing lead value.
-      - contact_name / organization: filled only when the existing value is NULL
-        and the buyer now supplies one; a non-null identity field is never
-        silently overwritten (contact_email identity is guarded upstream by 409).
+      - contact_name / organization / contact_phone: filled only when the
+        existing value is NULL and the buyer now supplies one; a non-null
+        identity field is never silently overwritten (contact_email identity is
+        guarded upstream by 409). contact_name/organization are required on
+        every submission now, so in practice only a historical NULL row (from
+        before that requirement existed) can still be filled this way;
+        contact_phone stays genuinely optional, so this is its only path in.
       - message: filled only when none was captured yet.
 
     Additive on robots — a robot is never un-selected. Route reconciliation runs
@@ -283,6 +288,8 @@ def _extend_requirement_linked(
         lead.contact_name = payload.contact_name
     if lead.organization is None and payload.organization is not None:
         lead.organization = payload.organization
+    if lead.contact_phone is None and payload.contact_phone is not None:
+        lead.contact_phone = payload.contact_phone
     if payload.message is not None and lead.message is None:
         lead.message = payload.message
 
@@ -331,6 +338,7 @@ def _capture_direct(
         contact_name=payload.contact_name,
         contact_email=payload.contact_email,
         organization=payload.organization,
+        contact_phone=payload.contact_phone,
         country_region_id=country_id,
         use_case_id=None,
         preferred_transaction=resolved_pref,

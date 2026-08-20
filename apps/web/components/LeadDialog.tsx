@@ -15,11 +15,14 @@ import type { RegionListItem } from "@/lib/types";
 import {
   buildSubmission,
   draftEmailError,
+  draftNameError,
+  draftOrganizationError,
   emptyDraft,
   type LeadDraft,
   MAX_MESSAGE,
   MAX_NAME,
   MAX_ORG,
+  MAX_PHONE,
   TRANSACTION_OPTIONS,
 } from "@/lib/lead-form";
 
@@ -47,9 +50,13 @@ export function LeadDialog({
   const [draft, setDraft] = useState<LeadDraft>(emptyDraft);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [orgError, setOrgError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
+  const nameRef = useRef<HTMLInputElement>(null);
+  const orgRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -57,6 +64,8 @@ export function LeadDialog({
   // so two clicks in one tick would both read false; the ref blocks the second.
   const submittingRef = useRef(false);
 
+  const nameErrId = useId();
+  const orgErrId = useId();
   const emailErrId = useId();
   const titleId = useId();
 
@@ -65,6 +74,8 @@ export function LeadDialog({
     if (open) {
       setDraft(emptyDraft());
       setError(null);
+      setNameError(null);
+      setOrgError(null);
       setEmailError(null);
       setDone(false);
       submittingRef.current = false;
@@ -72,13 +83,13 @@ export function LeadDialog({
     }
   }, [open]);
 
-  // Move focus into the dialog on open (the email field, or the heading in the
-  // success state).
+  // Move focus into the dialog on open (the first required field — full name —
+  // or the heading in the success state).
   useEffect(() => {
     if (!open) return;
     const t = window.setTimeout(() => {
       if (done) headingRef.current?.focus();
-      else emailRef.current?.focus();
+      else nameRef.current?.focus();
     }, 0);
     return () => window.clearTimeout(t);
   }, [open, done]);
@@ -117,8 +128,23 @@ export function LeadDialog({
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // Required, in the order they appear in the form: full name, organization,
+    // email. Set every field's error state (so all three show at once) but
+    // focus only the FIRST invalid one.
+    const nameErr = draftNameError(draft);
+    const orgErr = draftOrganizationError(draft);
     const emailErr = draftEmailError(draft);
+    setNameError(nameErr);
+    setOrgError(orgErr);
     setEmailError(emailErr);
+    if (nameErr) {
+      nameRef.current?.focus();
+      return;
+    }
+    if (orgErr) {
+      orgRef.current?.focus();
+      return;
+    }
     if (emailErr) {
       emailRef.current?.focus();
       return;
@@ -210,7 +236,49 @@ export function LeadDialog({
             {context && <p className="note" style={{ marginTop: 0 }}>{context}</p>}
 
             <div className="field">
-              <label htmlFor="lead-email">Email *</label>
+              <label htmlFor="lead-name">Full name *</label>
+              <input
+                id="lead-name"
+                ref={nameRef}
+                type="text"
+                required
+                maxLength={MAX_NAME}
+                autoComplete="name"
+                value={draft.contact_name}
+                onChange={(e) => set("contact_name", e.target.value)}
+                aria-invalid={nameError ? true : undefined}
+                aria-describedby={nameError ? nameErrId : undefined}
+              />
+              {nameError && (
+                <span id={nameErrId} className="field-error" role="alert">
+                  {nameError}
+                </span>
+              )}
+            </div>
+
+            <div className="field">
+              <label htmlFor="lead-org">Company / organization *</label>
+              <input
+                id="lead-org"
+                ref={orgRef}
+                type="text"
+                required
+                maxLength={MAX_ORG}
+                autoComplete="organization"
+                value={draft.organization}
+                onChange={(e) => set("organization", e.target.value)}
+                aria-invalid={orgError ? true : undefined}
+                aria-describedby={orgError ? orgErrId : undefined}
+              />
+              {orgError && (
+                <span id={orgErrId} className="field-error" role="alert">
+                  {orgError}
+                </span>
+              )}
+            </div>
+
+            <div className="field">
+              <label htmlFor="lead-email">Business email *</label>
               <input
                 id="lead-email"
                 ref={emailRef}
@@ -227,30 +295,6 @@ export function LeadDialog({
                   {emailError}
                 </span>
               )}
-            </div>
-
-            <div className="field">
-              <label htmlFor="lead-name">Name</label>
-              <input
-                id="lead-name"
-                type="text"
-                maxLength={MAX_NAME}
-                autoComplete="name"
-                value={draft.contact_name}
-                onChange={(e) => set("contact_name", e.target.value)}
-              />
-            </div>
-
-            <div className="field">
-              <label htmlFor="lead-org">Organization</label>
-              <input
-                id="lead-org"
-                type="text"
-                maxLength={MAX_ORG}
-                autoComplete="organization"
-                value={draft.organization}
-                onChange={(e) => set("organization", e.target.value)}
-              />
             </div>
 
             <div className="field">
@@ -285,7 +329,19 @@ export function LeadDialog({
             </div>
 
             <div className="field">
-              <label htmlFor="lead-message">Message</label>
+              <label htmlFor="lead-phone">Telephone</label>
+              <input
+                id="lead-phone"
+                type="tel"
+                maxLength={MAX_PHONE}
+                autoComplete="tel"
+                value={draft.phone}
+                onChange={(e) => set("phone", e.target.value)}
+              />
+            </div>
+
+            <div className="field">
+              <label htmlFor="lead-message">Additional message</label>
               <textarea
                 id="lead-message"
                 rows={4}

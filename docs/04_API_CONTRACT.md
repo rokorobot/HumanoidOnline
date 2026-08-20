@@ -207,13 +207,14 @@ The first commercial conversion (WS7). This is where WS5 anonymity ends: `contac
 {
   "requirement_id": "uuid | null",
   "contact_name": "…", "contact_email": "…", "organization": "…",
+  "contact_phone": "…",
   "country": "DE",
   "robot_slugs": ["digit", "apollo"],
   "preferred_transaction": "RAAS",
   "message": "…"
 }
 ```
-- `contact_email` **required** (valid, trimmed). `contact_name`/`organization`/`message` optional (trimmed; blank→NULL; capped 200/300/4000). `country` resolves **only** to a canonical `COUNTRY` region (economic zone like `EU`/`GLOBAL` → `422`). `preferred_transaction` ∈ `UNKNOWN|RENT|BUY|LEASE|RAAS|FLEXIBLE`; **omitted** means "inherit the requirement" (requirement-linked) or `UNKNOWN` (direct).
+- `contact_name`, `contact_email`, `organization` **required** (trimmed; blank → `422`; capped 200/254-ish shape check/300). This is an API-layer requirement only — the underlying DB columns stay nullable so historical rows captured before this requirement remain valid, and a requirement-linked lead's existing non-null identity field is still never overwritten by a later submission (only a genuinely-NULL one gets filled). `contact_phone` optional (trimmed; capped 40 characters; free-text — never format-validated or normalized, since international phone formats vary too widely to police safely). `message` optional (trimmed; blank→NULL; capped 4000). `country` resolves **only** to a canonical `COUNTRY` region (economic zone like `EU`/`GLOBAL` → `422`). `preferred_transaction` ∈ `UNKNOWN|RENT|BUY|LEASE|RAAS|FLEXIBLE`; **omitted** means "inherit the requirement" (requirement-linked) or `UNKNOWN` (direct).
 
 **Response.** `201` on first capture, `200` when an existing requirement-linked lead is **extended** (see below); both return `{ "id": "uuid", "lead_status": "NEW" }`. `lead_status` is admin-only and always `NEW` from the public path. There is **no** public `GET`/`PATCH` for a lead (it carries PII).
 

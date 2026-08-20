@@ -123,7 +123,8 @@ def test_new_lead_triggers_exactly_one_notification(client, database_url, monkey
     slug = _matched_slug(client, rid)
 
     resp = client.post("/api/commercial-leads", json={
-        "requirement_id": rid, "contact_email": "notif-new@example.com", "robot_slugs": [slug],
+        "requirement_id": rid, "contact_email": "notif-new@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org", "robot_slugs": [slug],
     })
     assert resp.status_code == 201, resp.text
     assert len(calls) == 1
@@ -141,11 +142,13 @@ def test_extension_triggers_updated_notification(client, database_url, monkeypat
     slug = _matched_slug(client, rid)
 
     first = client.post("/api/commercial-leads", json={
-        "requirement_id": rid, "contact_email": "notif-ext@example.com", "robot_slugs": [slug],
+        "requirement_id": rid, "contact_email": "notif-ext@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org", "robot_slugs": [slug],
     })
     assert first.status_code == 201, first.text
     second = client.post("/api/commercial-leads", json={
         "requirement_id": rid, "contact_email": "notif-ext@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org",
         "robot_slugs": [slug], "message": "following up",
     })
     assert second.status_code == 200, second.text
@@ -166,7 +169,8 @@ def test_invalid_request_sends_no_notification(client, database_url, monkeypatch
 
     resp = client.post("/api/commercial-leads", json={
         # not in the persisted shortlist -> 422, zero writes
-        "requirement_id": rid, "contact_email": "bad@example.com", "robot_slugs": ["unitree-g1"],
+        "requirement_id": rid, "contact_email": "bad@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org", "robot_slugs": ["unitree-g1"],
     })
     assert resp.status_code == 422, resp.text
     assert calls == []
@@ -179,7 +183,9 @@ def test_provider_success_leaves_response_semantics_unchanged(client, database_u
     _enable(monkeypatch)
     _record_sends(monkeypatch)  # succeeds (no exception)
     resp = client.post("/api/commercial-leads", json={
-        "contact_email": "notif-success@example.com", "robot_slugs": [_any_published_slug()],
+        "contact_email": "notif-success@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org",
+        "robot_slugs": [_any_published_slug()],
     })
     assert resp.status_code == 201, resp.text
     body = resp.json()
@@ -197,7 +203,8 @@ def test_notification_failure_does_not_affect_commit_or_response(client, databas
     slug = _matched_slug(client, rid)
 
     resp = client.post("/api/commercial-leads", json={
-        "requirement_id": rid, "contact_email": "notif-fail@example.com", "robot_slugs": [slug],
+        "requirement_id": rid, "contact_email": "notif-fail@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org", "robot_slugs": [slug],
     })
     assert resp.status_code == 201, resp.text
     lead_id = resp.json()["id"]
@@ -213,7 +220,9 @@ def test_disabled_notifications_send_zero_calls(client, database_url, monkeypatc
     _enable(monkeypatch, _DisabledSettings())
     calls = _record_sends(monkeypatch)
     resp = client.post("/api/commercial-leads", json={
-        "contact_email": "notif-disabled@example.com", "robot_slugs": [_any_published_slug()],
+        "contact_email": "notif-disabled@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org",
+        "robot_slugs": [_any_published_slug()],
     })
     assert resp.status_code == 201, resp.text
     assert calls == []
@@ -224,7 +233,9 @@ def test_partially_configured_notifications_send_zero_calls(client, database_url
     _enable(monkeypatch, _MissingKeySettings())
     calls = _record_sends(monkeypatch)
     resp = client.post("/api/commercial-leads", json={
-        "contact_email": "notif-partial@example.com", "robot_slugs": [_any_published_slug()],
+        "contact_email": "notif-partial@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org",
+        "robot_slugs": [_any_published_slug()],
     })
     assert resp.status_code == 201, resp.text
     assert calls == []
@@ -234,26 +245,51 @@ def test_partially_configured_notifications_send_zero_calls(client, database_url
 
 
 def test_build_email_represents_unknown_honestly(client, database_url):
+    # contact_name/organization are required by the API now, so a NULL name/org/
+    # phone can no longer be produced by a live POST — this test exercises
+    # `_build_email` directly against a lead object with those fields cleared
+    # (a historical row, or any other route to a NULL value, renders the same).
     resp = client.post("/api/commercial-leads", json={
-        "contact_email": "notif-unknown@example.com", "robot_slugs": [_any_published_slug()],
+        "contact_email": "notif-unknown@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org",
+        "robot_slugs": [_any_published_slug()],
     })
     assert resp.status_code == 201, resp.text
     lead = _load_lead(resp.json()["id"])
+    lead.contact_name = None
+    lead.organization = None
 
     with SessionLocal() as session:
         subject, body = notif._build_email(session, lead, True)
 
-    # No country/budget/message/name/org was supplied on a direct capture —
-    # every one of those must read UNKNOWN, never a fabricated 0/false/"".
+    # No country/budget/message/name/org/phone was supplied on a direct capture
+    # (name/org cleared above; phone was never sent) — every one of those must
+    # read UNKNOWN, never a fabricated 0/false/"".
     assert "Country: UNKNOWN" in body
     assert "Name: UNKNOWN" in body
     assert "Organization: UNKNOWN" in body
+    assert "Phone: UNKNOWN" in body
     assert "Message: UNKNOWN" in body
     assert "Payload (min kg): UNKNOWN" in body
     assert "Manipulation required: UNKNOWN" in body
     assert "0" not in subject
     assert "This is an internal HumanoidOnline operational notification." in body
     assert "The authoritative lead record remains in the HumanoidOnline database." in body
+
+
+def test_build_email_includes_a_supplied_phone_number(client, database_url):
+    resp = client.post("/api/commercial-leads", json={
+        "contact_email": "notif-phone@example.com", "contact_name": "Test Buyer",
+        "organization": "Test Org", "contact_phone": "+1-555-0142",
+        "robot_slugs": [_any_published_slug()],
+    })
+    assert resp.status_code == 201, resp.text
+    lead = _load_lead(resp.json()["id"])
+
+    with SessionLocal() as session:
+        _, body = notif._build_email(session, lead, True)
+
+    assert "Phone: +1-555-0142" in body
 
 
 # ---- 8 — canonical server-owned data, never client-supplied ----------------
@@ -264,7 +300,8 @@ def test_email_uses_canonical_robot_name_from_persisted_state(client, database_u
     real_name = _scalar("SELECT name FROM robot WHERE slug=:s", s=slug)
 
     resp = client.post("/api/commercial-leads", json={
-        "contact_email": "notif-canonical@example.com", "robot_slugs": [slug],
+        "contact_email": "notif-canonical@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org", "robot_slugs": [slug],
     })
     assert resp.status_code == 201, resp.text
     lead = _load_lead(resp.json()["id"])
@@ -319,6 +356,7 @@ def test_log_distinguishes_disabled_from_incomplete_config(
     with caplog.at_level(logging.INFO):
         resp = client.post("/api/commercial-leads", json={
             "contact_email": "notif-obs-disabled@example.com",
+            "contact_name": "Test Buyer", "organization": "Test Org",
             "robot_slugs": [_any_published_slug()],
         })
     assert resp.status_code == 201, resp.text
@@ -331,6 +369,7 @@ def test_log_distinguishes_disabled_from_incomplete_config(
     with caplog.at_level(logging.INFO):
         resp = client.post("/api/commercial-leads", json={
             "contact_email": "notif-obs-incomplete@example.com",
+            "contact_name": "Test Buyer", "organization": "Test Org",
             "robot_slugs": [_any_published_slug()],
         })
     assert resp.status_code == 201, resp.text
@@ -345,6 +384,7 @@ def test_log_records_attempt_before_outcome(client, database_url, monkeypatch, c
     with caplog.at_level(logging.INFO):
         resp = client.post("/api/commercial-leads", json={
             "contact_email": "notif-obs-attempt@example.com",
+            "contact_name": "Test Buyer", "organization": "Test Org",
             "robot_slugs": [_any_published_slug()],
         })
     assert resp.status_code == 201, resp.text
@@ -368,6 +408,7 @@ def test_log_reports_provider_status_class_on_http_error(client, database_url, m
     with caplog.at_level(logging.INFO):
         resp = client.post("/api/commercial-leads", json={
             "contact_email": "notif-obs-4xx@example.com",
+            "contact_name": "Test Buyer", "organization": "Test Org",
             "robot_slugs": [_any_published_slug()],
         })
     assert resp.status_code == 201, resp.text
@@ -386,12 +427,15 @@ def test_both_capture_surfaces_use_same_notification_path(client, database_url, 
     rid = _warehouse_requirement(client)
     slug = _matched_slug(client, rid)
     linked = client.post("/api/commercial-leads", json={
-        "requirement_id": rid, "contact_email": "notif-path-a@example.com", "robot_slugs": [slug],
+        "requirement_id": rid, "contact_email": "notif-path-a@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org", "robot_slugs": [slug],
     })
     assert linked.status_code == 201, linked.text
 
     direct = client.post("/api/commercial-leads", json={
-        "contact_email": "notif-path-b@example.com", "robot_slugs": [_any_published_slug()],
+        "contact_email": "notif-path-b@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org",
+        "robot_slugs": [_any_published_slug()],
     })
     assert direct.status_code == 201, direct.text
 

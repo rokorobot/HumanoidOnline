@@ -85,10 +85,16 @@ test.describe("@keyboard keyboard-only journeys", () => {
 
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
-    // Focus entered the dialog on the email field.
-    await expect(page.locator("#lead-email")).toBeFocused();
+    // Focus entered the dialog on the first required field: full name.
+    await expect(page.locator("#lead-name")).toBeFocused();
 
-    // Fill and submit entirely from the keyboard (Enter submits the form).
+    // Fill all three required fields and submit, entirely from the keyboard
+    // (Tab moves through name -> organization -> email in DOM order; Enter
+    // submits the form).
+    await page.keyboard.type("Jane Buyer");
+    await page.keyboard.press("Tab");
+    await page.keyboard.type("Acme Robotics");
+    await page.keyboard.press("Tab");
     await page.keyboard.type("keyboard-journey@example.com");
     await page.keyboard.press("Enter");
     // Governed result: the capture confirmation (a commercial_lead now exists).
@@ -103,7 +109,7 @@ test.describe("focus behaviour", () => {
     await page.goto("/robots/unitree-g1", { waitUntil: "networkidle" });
     await page.getByRole("button", { name: /Request Availability/i }).first().click();
     await expect(page.getByRole("dialog")).toBeVisible();
-    await expect(page.locator("#lead-email")).toBeFocused();
+    await expect(page.locator("#lead-name")).toBeFocused();
 
     // Tab many times: focus must never escape the dialog (WCAG 2.4.3 / 2.1.2).
     for (let i = 0; i < 12; i++) {
@@ -139,12 +145,13 @@ test.describe("focus behaviour", () => {
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
 
-    // Submit empty: the email field is invalid, gets aria-invalid + an alert, and
-    // receives focus so a keyboard user is taken straight to the problem.
+    // Submit empty: the first required field (full name) is invalid, gets
+    // aria-invalid + an alert, and receives focus so a keyboard user is taken
+    // straight to the problem.
     await dialog.getByRole("button", { name: /Send request/i }).click();
-    const email = page.locator("#lead-email");
-    await expect(email).toBeFocused();
-    await expect(email).toHaveAttribute("aria-invalid", "true");
+    const name = page.locator("#lead-name");
+    await expect(name).toBeFocused();
+    await expect(name).toHaveAttribute("aria-invalid", "true");
     await expect(dialog.getByRole("alert")).toBeVisible();
   });
 });

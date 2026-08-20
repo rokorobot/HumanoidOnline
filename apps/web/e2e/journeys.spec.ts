@@ -68,6 +68,8 @@ test("Journey B — buyer intent: wizard -> match results -> commercial lead", a
   await page.getByRole("button", { name: /Request commercial help/i }).first().click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
+  await dialog.locator("#lead-name").fill("Jane Buyer");
+  await dialog.locator("#lead-org").fill("Acme Robotics");
   await dialog.locator("#lead-email").fill("journey-b@example.com");
   await dialog.getByRole("button", { name: /Send request/i }).click();
   // Governed result: the capture confirmation (a commercial_lead now exists).

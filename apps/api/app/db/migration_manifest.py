@@ -44,4 +44,7 @@ MIGRATIONS: dict[str, str] = {
     "0007_default_commercial_status_unknown": (
         "8ec46af3bc018bc22af747321e035d24074f0baa72418336172a4a43f355bb6d"
     ),
+    "0008_add_commercial_lead_contact_phone": (
+        "97115d7e94765e6f9b1c06d20dd28ed5afb01dcf0130fcda54b99db26247d791"
+    ),
 }

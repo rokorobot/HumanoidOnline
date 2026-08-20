@@ -28,6 +28,8 @@ test("@zeromatch zero-match: 'tell us anyway' captures a demand lead", async ({ 
   await page.getByRole("button", { name: /Tell us anyway/i }).click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
+  await dialog.locator("#lead-name").fill("Jane Buyer");
+  await dialog.locator("#lead-org").fill("Acme Robotics");
   await dialog.locator("#lead-email").fill("demand@example.com");
   await dialog.getByRole("button", { name: /Send request/i }).click();
   await expect(page.getByRole("heading", { name: /Request received/i })).toBeVisible();

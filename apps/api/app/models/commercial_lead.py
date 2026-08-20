@@ -53,6 +53,11 @@ class CommercialLead(Base):
     contact_name: Mapped[str | None] = mapped_column(Text)
     contact_email: Mapped[str] = mapped_column(Text, nullable=False)
     organization: Mapped[str | None] = mapped_column(Text)
+    # Optional; free-text, never format-validated (international numbers vary
+    # too widely to normalize safely). Nullable at the DB layer even though the
+    # API now requires contact_name/organization for new submissions, matching
+    # the product decision that phone stays optional.
+    contact_phone: Mapped[str | None] = mapped_column(Text)
 
     country_region_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("region.id")

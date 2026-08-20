@@ -83,7 +83,7 @@ def test_l1_matched_per_card(client, database_url) -> None:
 
     resp = client.post("/api/commercial-leads", json={
         "requirement_id": rid, "contact_email": "jane@example.com",
-        "organization": "Acme", "robot_slugs": [clicked],
+        "contact_name": "Test Buyer", "organization": "Acme", "robot_slugs": [clicked],
     })
     assert resp.status_code == 201, resp.text
     body = resp.json()
@@ -109,6 +109,7 @@ def test_l2_shortlist_all_selected(client, database_url) -> None:
 
     resp = client.post("/api/commercial-leads", json={
         "requirement_id": rid, "contact_email": "jane@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org",
         "robot_slugs": all_slugs,
     })
     assert resp.status_code == 201, resp.text
@@ -129,6 +130,7 @@ def test_l3_spoof_robot_not_in_shortlist_422(client, database_url) -> None:
     # persisted shortlist — the browser may not attach it.
     resp = client.post("/api/commercial-leads", json={
         "requirement_id": rid, "contact_email": "jane@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org",
         "robot_slugs": ["unitree-g1"],
     })
     assert resp.status_code == 422, resp.text
@@ -162,12 +164,14 @@ def test_l4_zero_match_capture(client, database_url) -> None:
 
         # A non-empty selection is rejected (no surfaced match backs it)...
         bad = client.post("/api/commercial-leads", json={
-            "requirement_id": rid, "contact_email": "jane@example.com", "robot_slugs": ["digit"],
+            "requirement_id": rid, "contact_email": "jane@example.com",
+            "contact_name": "Test Buyer", "organization": "Test Org", "robot_slugs": ["digit"],
         })
         assert bad.status_code == 422, bad.text
         # ...and the empty selection creates the demand lead.
         resp = client.post("/api/commercial-leads", json={
-            "requirement_id": rid, "contact_email": "jane@example.com", "robot_slugs": [],
+            "requirement_id": rid, "contact_email": "jane@example.com",
+            "contact_name": "Test Buyer", "organization": "Test Org", "robot_slugs": [],
         })
         assert resp.status_code == 201, resp.text
         lid = resp.json()["id"]
@@ -195,14 +199,16 @@ def test_l5_repeated_capture_extends(client, database_url) -> None:
     clicked = all_slugs[0]
 
     first = client.post("/api/commercial-leads", json={
-        "requirement_id": rid, "contact_email": "jane@example.com", "robot_slugs": [clicked],
+        "requirement_id": rid, "contact_email": "jane@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org", "robot_slugs": [clicked],
     })
     assert first.status_code == 201
     lid = first.json()["id"]
 
     # same identity, now the whole shortlist -> 200, SAME lead, no duplicates
     second = client.post("/api/commercial-leads", json={
-        "requirement_id": rid, "contact_email": "Jane@Example.com", "robot_slugs": all_slugs,
+        "requirement_id": rid, "contact_email": "Jane@Example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org", "robot_slugs": all_slugs,
     })
     assert second.status_code == 200, second.text
     assert second.json()["id"] == lid
@@ -224,7 +230,8 @@ def test_l6_concurrent_capture_one_lead(client, database_url) -> None:
     def worker() -> None:
         barrier.wait()
         results.append(client.post("/api/commercial-leads", json={
-            "requirement_id": rid, "contact_email": "jane@example.com", "robot_slugs": [slug],
+            "requirement_id": rid, "contact_email": "jane@example.com",
+            "contact_name": "Test Buyer", "organization": "Test Org", "robot_slugs": [slug],
         }))
 
     threads = [threading.Thread(target=worker) for _ in range(2)]
@@ -249,12 +256,14 @@ def test_l7_identity_conflict_409(client, database_url) -> None:
     slug = matches[0]["robot"]["slug"]
 
     first = client.post("/api/commercial-leads", json={
-        "requirement_id": rid, "contact_email": "alice@example.com", "robot_slugs": [slug],
+        "requirement_id": rid, "contact_email": "alice@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org", "robot_slugs": [slug],
     })
     assert first.status_code == 201
 
     conflict = client.post("/api/commercial-leads", json={
-        "requirement_id": rid, "contact_email": "bob@example.com", "robot_slugs": [slug],
+        "requirement_id": rid, "contact_email": "bob@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org", "robot_slugs": [slug],
     })
     assert conflict.status_code == 409, conflict.text
     # existing identity unchanged
@@ -267,7 +276,8 @@ def test_l7_identity_conflict_409(client, database_url) -> None:
 def test_l8_direct_capture(client, database_url) -> None:
     reqs_before = _scalar("SELECT count(*) FROM buyer_requirement")
     resp = client.post("/api/commercial-leads", json={
-        "contact_email": "dev@example.com", "robot_slugs": ["digit"],
+        "contact_email": "dev@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org", "robot_slugs": ["digit"],
     })
     assert resp.status_code == 201, resp.text
     lid = resp.json()["id"]
@@ -295,12 +305,14 @@ def test_l8_direct_capture_requires_exactly_one_robot(client, database_url) -> N
     reqs_before = _scalar("SELECT count(*) FROM buyer_requirement")
     # zero robots -> 422
     empty = client.post("/api/commercial-leads", json={
-        "contact_email": "dev@example.com", "robot_slugs": [],
+        "contact_email": "dev@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org", "robot_slugs": [],
     })
     assert empty.status_code == 422, empty.text
     # more than one robot -> 422 (no such direct UI; adversarial handcrafted POST)
     many = client.post("/api/commercial-leads", json={
         "contact_email": "dev@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org",
         "robot_slugs": ["digit", "unitree-g1", "apollo"],
     })
     assert many.status_code == 422, many.text
@@ -316,6 +328,7 @@ def test_l9_message_round_trips(client, database_url) -> None:
     msg = "We are evaluating 20 units for a 2027 deployment."
     resp = client.post("/api/commercial-leads", json={
         "requirement_id": rid, "contact_email": "jane@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org",
         "robot_slugs": [slug], "message": msg,
     })
     assert resp.status_code == 201
@@ -327,7 +340,9 @@ def test_l9_message_round_trips(client, database_url) -> None:
 def test_l10_canonical_region(client, database_url) -> None:
     # DE resolves to a COUNTRY region on the lead
     ok = client.post("/api/commercial-leads", json={
-        "contact_email": "dev@example.com", "robot_slugs": ["digit"], "country": "DE",
+        "contact_email": "dev@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org",
+        "robot_slugs": ["digit"], "country": "DE",
     })
     assert ok.status_code == 201, ok.text
     de_id = _scalar("SELECT id FROM region WHERE code='DE' AND type='COUNTRY'")
@@ -337,12 +352,16 @@ def test_l10_canonical_region(client, database_url) -> None:
 
     # EU is an economic zone, not a COUNTRY -> 422
     eu = client.post("/api/commercial-leads", json={
-        "contact_email": "dev@example.com", "robot_slugs": ["digit"], "country": "EU",
+        "contact_email": "dev@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org",
+        "robot_slugs": ["digit"], "country": "EU",
     })
     assert eu.status_code == 422, eu.text
     # a nonsense code -> 422
     bad = client.post("/api/commercial-leads", json={
-        "contact_email": "dev@example.com", "robot_slugs": ["digit"], "country": "ZZ",
+        "contact_email": "dev@example.com",
+        "contact_name": "Test Buyer", "organization": "Test Org",
+        "robot_slugs": ["digit"], "country": "ZZ",
     })
     assert bad.status_code == 422, bad.text
 
@@ -387,12 +406,18 @@ def _routing_case(
             "a": is_active, "al": accepts_leads}).scalar_one()
         conn.execute(text(
             "INSERT INTO availability_offer "
-            "(robot_id, provider_id, region_id, transaction_type, availability_status, is_current) "
+            "(robot_id, provider_id, region_id, transaction_type, "
+            "availability_status, is_current) "
             "VALUES (:r, :p, :reg, :t, :st, true)"
         ), {"r": robot_id, "p": provider_id, "reg": offer_region_id,
             "t": transaction_type, "st": availability_status})
 
-    payload = {"contact_email": "dev@example.com", "robot_slugs": [robot_slug]}
+    payload = {
+        "contact_email": "dev@example.com",
+        "contact_name": "Test Buyer",
+        "organization": "Test Org",
+        "robot_slugs": [robot_slug],
+    }
     if lead_country is not None:
         payload["country"] = lead_country
     if lead_pref is not None:
@@ -500,7 +525,8 @@ def _make_linked_fixture(
         ), {"s": f"p-{tag}", "n": f"Fixture Provider {tag}"}).scalar_one()
         conn.execute(text(
             "INSERT INTO availability_offer "
-            "(robot_id, provider_id, region_id, transaction_type, availability_status, is_current) "
+            "(robot_id, provider_id, region_id, transaction_type, "
+            "availability_status, is_current) "
             "VALUES (:r, :p, :reg, :t, 'AVAILABLE', true)"
         ), {"r": robot_id, "p": provider_id, "reg": offer_region_id, "t": transaction_type})
         req_country_id = _region_id(req_country)
@@ -537,15 +563,21 @@ def test_extension_refines_lead_never_requirement(client, database_url) -> None:
         rid = fx["req_id"]
         first = client.post("/api/commercial-leads", json={
             "requirement_id": rid, "contact_email": "jane@example.com",
+            "contact_name": "Jane Doe", "organization": "Acme First",
             "robot_slugs": [fx["robot_slug"]],
         })
         assert first.status_code == 201, first.text
 
-        # refine country + transaction on the SAME lead
+        # refine country + transaction on the SAME lead; a DIFFERENT organization
+        # is submitted too, to prove the existing non-null identity field is
+        # never silently overwritten by extension (contact_name/organization are
+        # required on every submission now, so "NULL -> filled" is no longer
+        # reachable via the public API; "non-null -> never replaced" still is).
         second = client.post("/api/commercial-leads", json={
             "requirement_id": rid, "contact_email": "jane@example.com",
+            "contact_name": "Jane Doe", "organization": "Acme Later",
             "robot_slugs": [fx["robot_slug"]], "country": "DE",
-            "preferred_transaction": "BUY", "organization": "Acme Later",
+            "preferred_transaction": "BUY",
         })
         assert second.status_code == 200, second.text
 
@@ -556,7 +588,7 @@ def test_extension_refines_lead_never_requirement(client, database_url) -> None:
         )[0]
         assert str(lead[0]) == str(de_id)          # lead country refined
         assert lead[1] == "BUY"                     # lead transaction refined
-        assert lead[2] == "Acme Later"              # org filled (was NULL)
+        assert lead[2] == "Acme First"               # org NEVER overwritten once set
 
         # the historical scoring requirement is UNCHANGED
         req = _rows(
@@ -585,6 +617,7 @@ def test_extension_reconciles_routes_add_remove_retain(client, database_url) -> 
         # First capture as BUY: RAAS offer is transaction-incompatible -> 0 routes.
         c1 = client.post("/api/commercial-leads", json={
             "requirement_id": rid, "contact_email": "jane@example.com",
+            "contact_name": "Test Buyer", "organization": "Test Org",
             "robot_slugs": [slug], "preferred_transaction": "BUY",
         })
         assert c1.status_code == 201, c1.text
@@ -593,6 +626,7 @@ def test_extension_reconciles_routes_add_remove_retain(client, database_url) -> 
         # Refine to RAAS -> reconcile ADDS one PENDING route.
         c2 = client.post("/api/commercial-leads", json={
             "requirement_id": rid, "contact_email": "jane@example.com",
+            "contact_name": "Test Buyer", "organization": "Test Org",
             "robot_slugs": [slug], "preferred_transaction": "RAAS",
         })
         assert c2.status_code == 200, c2.text
@@ -611,6 +645,7 @@ def test_extension_reconciles_routes_add_remove_retain(client, database_url) -> 
         # is RETAINED as operational history (never removed, contacted_at intact).
         c3 = client.post("/api/commercial-leads", json={
             "requirement_id": rid, "contact_email": "jane@example.com",
+            "contact_name": "Test Buyer", "organization": "Test Org",
             "robot_slugs": [slug], "preferred_transaction": "BUY",
         })
         assert c3.status_code == 200, c3.text
@@ -634,6 +669,7 @@ def test_extension_removes_now_ineligible_pending_route(client, database_url) ->
 
         c1 = client.post("/api/commercial-leads", json={
             "requirement_id": rid, "contact_email": "jane@example.com",
+            "contact_name": "Test Buyer", "organization": "Test Org",
             "robot_slugs": [slug], "preferred_transaction": "RAAS",
         })
         assert c1.status_code == 201 and n_routes() == 1
@@ -641,6 +677,7 @@ def test_extension_removes_now_ineligible_pending_route(client, database_url) ->
         # Refine to BUY -> the still-PENDING RAAS route is now ineligible -> removed.
         c2 = client.post("/api/commercial-leads", json={
             "requirement_id": rid, "contact_email": "jane@example.com",
+            "contact_name": "Test Buyer", "organization": "Test Org",
             "robot_slugs": [slug], "preferred_transaction": "BUY",
         })
         assert c2.status_code == 200 and n_routes() == 0
@@ -660,3 +697,169 @@ def test_l14_ws5_still_rejects_contact_fields(client, database_url) -> None:
         body = {"industry": "logistics", "raw_input": base_raw, field: value}
         resp = client.post("/api/buyer-requirements", json=body)
         assert resp.status_code == 422, (field, resp.status_code, resp.text)
+
+
+# ---- Find a Humanoid contact-information enhancement -----------------------
+# contact_name/organization are now required (API-layer only — the DB columns
+# stay nullable); contact_phone is a new, genuinely optional, unvalidated field.
+
+def test_contact_valid_submission_with_name_organization_email_succeeds(
+    client, database_url
+) -> None:
+    resp = client.post("/api/commercial-leads", json={
+        "contact_email": "valid-submit@example.com",
+        "contact_name": "Valid Buyer", "organization": "Valid Org",
+        "robot_slugs": ["digit"],
+    })
+    assert resp.status_code == 201, resp.text
+    lid = resp.json()["id"]
+    name, org = _rows(
+        "SELECT contact_name, organization FROM commercial_lead WHERE id=:i", i=lid,
+    )[0]
+    assert name == "Valid Buyer"
+    assert org == "Valid Org"
+
+
+def test_contact_missing_full_name_rejected(client, database_url) -> None:
+    resp = client.post("/api/commercial-leads", json={
+        "contact_email": "no-name@example.com", "organization": "Some Org",
+        "robot_slugs": ["digit"],
+    })
+    assert resp.status_code == 422, resp.text
+
+
+def test_contact_blank_full_name_rejected(client, database_url) -> None:
+    resp = client.post("/api/commercial-leads", json={
+        "contact_email": "blank-name@example.com", "contact_name": "   ",
+        "organization": "Some Org", "robot_slugs": ["digit"],
+    })
+    assert resp.status_code == 422, resp.text
+
+
+def test_contact_missing_organization_rejected(client, database_url) -> None:
+    resp = client.post("/api/commercial-leads", json={
+        "contact_email": "no-org@example.com", "contact_name": "Some Buyer",
+        "robot_slugs": ["digit"],
+    })
+    assert resp.status_code == 422, resp.text
+
+
+def test_contact_blank_organization_rejected(client, database_url) -> None:
+    resp = client.post("/api/commercial-leads", json={
+        "contact_email": "blank-org@example.com", "contact_name": "Some Buyer",
+        "organization": "   ", "robot_slugs": ["digit"],
+    })
+    assert resp.status_code == 422, resp.text
+
+
+def test_contact_missing_email_rejected(client, database_url) -> None:
+    resp = client.post("/api/commercial-leads", json={
+        "contact_name": "Some Buyer", "organization": "Some Org",
+        "robot_slugs": ["digit"],
+    })
+    assert resp.status_code == 422, resp.text
+
+
+def test_contact_phone_omitted_succeeds(client, database_url) -> None:
+    resp = client.post("/api/commercial-leads", json={
+        "contact_email": "phone-omitted@example.com",
+        "contact_name": "No Phone Buyer", "organization": "No Phone Org",
+        "robot_slugs": ["digit"],
+    })
+    assert resp.status_code == 201, resp.text
+    lid = resp.json()["id"]
+    phone = _scalar("SELECT contact_phone FROM commercial_lead WHERE id=:i", i=lid)
+    assert phone is None
+
+
+def test_contact_phone_supplied_and_persisted(client, database_url) -> None:
+    resp = client.post("/api/commercial-leads", json={
+        "contact_email": "phone-supplied@example.com",
+        "contact_name": "Phone Buyer", "organization": "Phone Org",
+        "contact_phone": " +1 (555) 123-4567 ", "robot_slugs": ["digit"],
+    })
+    assert resp.status_code == 201, resp.text
+    lid = resp.json()["id"]
+    phone = _scalar("SELECT contact_phone FROM commercial_lead WHERE id=:i", i=lid)
+    # trimmed, not otherwise reformatted/normalized
+    assert phone == "+1 (555) 123-4567"
+
+
+def test_contact_phone_over_max_length_rejected(client, database_url) -> None:
+    resp = client.post("/api/commercial-leads", json={
+        "contact_email": "phone-toolong@example.com",
+        "contact_name": "Phone Buyer", "organization": "Phone Org",
+        "contact_phone": "1" * 41, "robot_slugs": ["digit"],
+    })
+    assert resp.status_code == 422, resp.text
+
+
+def test_contact_phone_extension_fills_null_but_never_overwrites(
+    client, database_url
+) -> None:
+    fx = _make_linked_fixture()
+    try:
+        rid, slug = fx["req_id"], fx["robot_slug"]
+        first = client.post("/api/commercial-leads", json={
+            "requirement_id": rid, "contact_email": "phone-ext@example.com",
+            "contact_name": "Phone Ext Buyer", "organization": "Phone Ext Org",
+            "robot_slugs": [slug],
+        })
+        assert first.status_code == 201, first.text
+        assert _scalar(
+            "SELECT contact_phone FROM commercial_lead WHERE requirement_id=:i", i=rid
+        ) is None
+
+        # extend with a phone number -> fills the currently-NULL value
+        second = client.post("/api/commercial-leads", json={
+            "requirement_id": rid, "contact_email": "phone-ext@example.com",
+            "contact_name": "Phone Ext Buyer", "organization": "Phone Ext Org",
+            "contact_phone": "+1-555-0100", "robot_slugs": [slug],
+        })
+        assert second.status_code == 200, second.text
+        assert _scalar(
+            "SELECT contact_phone FROM commercial_lead WHERE requirement_id=:i", i=rid
+        ) == "+1-555-0100"
+
+        # extend again with a DIFFERENT phone -> the existing non-null value stays
+        third = client.post("/api/commercial-leads", json={
+            "requirement_id": rid, "contact_email": "phone-ext@example.com",
+            "contact_name": "Phone Ext Buyer", "organization": "Phone Ext Org",
+            "contact_phone": "+1-555-9999", "robot_slugs": [slug],
+        })
+        assert third.status_code == 200, third.text
+        assert _scalar(
+            "SELECT contact_phone FROM commercial_lead WHERE requirement_id=:i", i=rid
+        ) == "+1-555-0100"
+    finally:
+        _drop_linked_fixture(fx)
+
+
+def test_historical_lead_rows_without_name_organization_phone_remain_valid(
+    client, database_url
+) -> None:
+    """A row written before this change (all three NULL, as the API used to
+    allow) must still be a perfectly valid, selectable row — the required-field
+    rule is enforced only at the API edge, never by a DB constraint that would
+    invalidate history."""
+    lead_id = str(uuid.uuid4())
+    with engine.begin() as conn:
+        conn.execute(text("SET search_path TO humanoid, public"))
+        conn.execute(
+            text(
+                "INSERT INTO commercial_lead (id, contact_email, contact_name, "
+                "organization, contact_phone) "
+                "VALUES (:id, :email, NULL, NULL, NULL)"
+            ),
+            {"id": lead_id, "email": "historical-null@example.com"},
+        )
+    try:
+        row = _rows(
+            "SELECT contact_name, organization, contact_phone "
+            "FROM commercial_lead WHERE id=:i", i=lead_id,
+        )[0]
+        assert row[0] is None and row[1] is None and row[2] is None
+    finally:
+        with engine.begin() as conn:
+            conn.execute(text("SET search_path TO humanoid, public"))
+            conn.execute(text("DELETE FROM commercial_lead WHERE id=:i"), {"i": lead_id})

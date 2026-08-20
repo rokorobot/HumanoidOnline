@@ -483,6 +483,8 @@ def test_r14_unpublished_robot_is_absent_from_matching_and_leads(
             json={
                 "requirement_id": rid,
                 "contact_email": f"{_uniq('probe')}@example.com",
+                "contact_name": "Test Buyer",
+                "organization": "Test Org",
                 "robot_slugs": [slug],
             },
         )

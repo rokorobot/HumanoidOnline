@@ -175,7 +175,7 @@ test.describe("semantic forms", () => {
     await page.getByRole("button", { name: /Request Availability/i }).first().click();
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
-    for (const id of ["lead-email", "lead-name", "lead-org", "lead-country", "lead-transaction", "lead-message"]) {
+    for (const id of ["lead-email", "lead-name", "lead-org", "lead-country", "lead-transaction", "lead-phone", "lead-message"]) {
       await expect(
         page.locator(`label[for="${id}"]`),
         `no <label for="${id}">`,
@@ -203,11 +203,13 @@ test.describe("semantic dialog", () => {
     const dialog = page.getByRole("dialog");
     await dialog.getByRole("button", { name: /Send request/i }).click();
 
-    const email = page.locator("#lead-email");
-    await expect(email).toHaveAttribute("aria-invalid", "true");
+    // Full name is the first required field, so it's the one invalid + focused
+    // after an empty submit.
+    const name = page.locator("#lead-name");
+    await expect(name).toHaveAttribute("aria-invalid", "true");
     // aria-describedby points at the error, and that node is the role=alert.
-    const describedby = await email.getAttribute("aria-describedby");
-    expect(describedby, "email has no aria-describedby when invalid").toBeTruthy();
+    const describedby = await name.getAttribute("aria-describedby");
+    expect(describedby, "name has no aria-describedby when invalid").toBeTruthy();
     const errNode = page.locator(`#${describedby}`);
     await expect(errNode).toHaveAttribute("role", "alert");
     await expect(errNode).toBeVisible();

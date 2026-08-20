@@ -769,6 +769,7 @@ CREATE TABLE commercial_lead (
     contact_name          TEXT,
     contact_email         TEXT NOT NULL,
     organization          TEXT,
+    contact_phone         TEXT,               -- optional; free-text, not format-validated
     country_region_id     UUID REFERENCES region(id),
     use_case_id           UUID REFERENCES use_case(id) ON DELETE SET NULL,
     preferred_transaction transaction_preference NOT NULL DEFAULT 'UNKNOWN',

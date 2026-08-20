@@ -170,6 +170,7 @@ def _build_email(session: Session, lead: CommercialLead, created: bool) -> tuple
         f"  Email: {lead.contact_email}",
         f"  Name: {_s(lead.contact_name)}",
         f"  Organization: {_s(lead.organization)}",
+        f"  Phone: {_s(lead.contact_phone)}",
         f"  Country: {_s(country_code)}",
         "",
         "COMMERCIAL INTENT",

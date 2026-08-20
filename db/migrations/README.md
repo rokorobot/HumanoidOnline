@@ -105,6 +105,13 @@ Forward migrations:
   governs future inserts, and changing stored, evidence-backed maturities would
   be an editorial act this migration has no authority to perform. Additive and
   idempotent.
+- `0008_add_commercial_lead_contact_phone.sql` — adds
+  `commercial_lead.contact_phone TEXT`, nullable. The Find a Humanoid contact
+  step gained an optional telephone field; name/organization/email already had
+  columns, phone did not. Nullable and unvalidated by design: phone stays
+  OPTIONAL (name/organization become required only at the API layer, not by a
+  DB constraint, to keep historical rows with NULL identity fields valid), and
+  international phone formats are never normalized. Additive and idempotent.
 
 ## Checksum integrity (WS8.2 / R9)
 

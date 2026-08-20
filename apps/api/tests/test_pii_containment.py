@@ -21,7 +21,7 @@ from sqlalchemy import text
 from app.db.session import engine
 
 #: Field names that must never appear in a public response body.
-PII_FIELDS = ("contact_email", "contact_name", "organization")
+PII_FIELDS = ("contact_email", "contact_name", "organization", "contact_phone")
 
 #: Unauthenticated GET surfaces. Slug-bearing routes are filled in at runtime.
 STATIC_PUBLIC_GETS = (
@@ -136,6 +136,7 @@ def test_r2_requirement_read_hides_identity_attached_by_lead_capture(
     """
     sentinel_email = f"pii-probe-{uuid.uuid4().hex[:10]}@example.com"
     sentinel_org = f"Org-{uuid.uuid4().hex[:8]}"
+    sentinel_phone = "+1-555-0100"
     rid = _warehouse_requirement(client)
     matches = client.get(f"/api/buyer-requirements/{rid}/matches").json()["matches"]
     slugs = [m["robot"]["slug"] for m in matches]
@@ -147,6 +148,7 @@ def test_r2_requirement_read_hides_identity_attached_by_lead_capture(
             "contact_email": sentinel_email,
             "contact_name": "Probe Person",
             "organization": sentinel_org,
+            "contact_phone": sentinel_phone,
             "robot_slugs": slugs,
         },
     )
@@ -156,15 +158,18 @@ def test_r2_requirement_read_hides_identity_attached_by_lead_capture(
     try:
         # The identity really was captured — otherwise this test proves nothing.
         stored = _exec(
-            "SELECT contact_email FROM commercial_lead WHERE id = :i", i=lead_id
-        ).scalar_one()
-        assert stored == sentinel_email
+            "SELECT contact_email, contact_phone FROM commercial_lead WHERE id = :i",
+            i=lead_id,
+        ).one()
+        assert stored.contact_email == sentinel_email
+        assert stored.contact_phone == sentinel_phone
 
         resp = client.get(f"/api/buyer-requirements/{rid}")
         assert resp.status_code == 200, resp.text
         body = resp.text
         assert sentinel_email not in body
         assert sentinel_org not in body
+        assert sentinel_phone not in body
         assert "Probe Person" not in body
         for field in PII_FIELDS:
             assert f'"{field}"' not in body
@@ -219,6 +224,7 @@ def test_r5_lead_capture_does_not_write_pii_to_logs(
 ) -> None:
     """Capture everything logged during a real lead capture; assert it is clean."""
     sentinel_email = f"log-probe-{uuid.uuid4().hex[:10]}@example.com"
+    sentinel_phone = "+1-555-0199"
     rid = _warehouse_requirement(client)
     matches = client.get(f"/api/buyer-requirements/{rid}/matches").json()["matches"]
     slugs = [m["robot"]["slug"] for m in matches]
@@ -233,6 +239,7 @@ def test_r5_lead_capture_does_not_write_pii_to_logs(
                     "contact_email": sentinel_email,
                     "contact_name": "Log Probe",
                     "organization": "LogProbe Ltd",
+                    "contact_phone": sentinel_phone,
                     "robot_slugs": slugs,
                     "message": "please contact me",
                 },
@@ -244,5 +251,6 @@ def test_r5_lead_capture_does_not_write_pii_to_logs(
         assert sentinel_email not in logged
         assert "Log Probe" not in logged
         assert "LogProbe Ltd" not in logged
+        assert sentinel_phone not in logged
     finally:
         _cleanup(lead_id, rid)

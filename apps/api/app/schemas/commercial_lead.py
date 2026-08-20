@@ -3,6 +3,18 @@
 `POST /api/commercial-leads` request/response. This is the first commercial
 conversion and the point where WS5 anonymity ends: `contact_email` is required.
 
+`contact_name` and `organization` are ALSO required as of the Find a Humanoid
+contact-information enhancement — a deliberate reversal of the original
+"identity is light-touch" design, not an oversight. This is enforced only here
+(the API edge): the underlying `contact_name`/`organization` DB columns stay
+nullable (`db/schema.sql`) so historical rows captured before this change
+remain valid, and the create-or-extend service logic still fills a currently-
+NULL lead value rather than requiring a DB migration to backfill one.
+
+`contact_phone` is optional and free-text — never format-validated or
+normalized, since international phone formats vary too widely to police safely
+without rejecting valid numbers.
+
 The client owns ONLY its contact information and declared commercial intent. The
 server owns lead status, match scores, robot validation, provider routing, the
 requirements snapshot and all timestamps. `extra="forbid"` therefore makes any
@@ -23,6 +35,10 @@ from pydantic import BaseModel, ConfigDict, field_validator
 # validate shape only (a real address is proven by contacting it, later phases),
 # and avoid taking on the email-validator dependency.
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+# Generous cap for a formatted international number with an extension
+# ("+1 (555) 123-4567 ext. 89") — not a shape constraint, just an abuse bound.
+MAX_PHONE = 40
 
 # None means "not provided" -> inherit the requirement (or UNKNOWN for a direct
 # capture). This is distinct from the client explicitly sending "UNKNOWN".
@@ -47,9 +63,13 @@ class CommercialLeadCreate(BaseModel):
     # null for a direct Robot-Detail capture; a uuid for a /matches/[id] capture.
     requirement_id: str | None = None
 
-    contact_name: str | None = None
+    # Required (API-layer only — see module docstring): full name, unsplit.
+    contact_name: str
     contact_email: str
-    organization: str | None = None
+    organization: str
+
+    # Optional. Free-text; see module docstring for why it is never normalized.
+    contact_phone: str | None = None
 
     # canonical COUNTRY code (resolved to an id in the service; invalid -> 422).
     country: str | None = None
@@ -73,18 +93,34 @@ class CommercialLeadCreate(BaseModel):
 
     @field_validator("contact_name")
     @classmethod
-    def _name(cls, v: str | None) -> str | None:
+    def _name(cls, v: str) -> str:
         cleaned = _clean(v)
-        if cleaned is not None and len(cleaned) > 200:
+        if cleaned is None:
+            raise ValueError("contact_name is required")
+        if len(cleaned) > 200:
             raise ValueError("contact_name must be at most 200 characters")
         return cleaned
 
     @field_validator("organization")
     @classmethod
-    def _org(cls, v: str | None) -> str | None:
+    def _org(cls, v: str) -> str:
         cleaned = _clean(v)
-        if cleaned is not None and len(cleaned) > 300:
+        if cleaned is None:
+            raise ValueError("organization is required")
+        if len(cleaned) > 300:
             raise ValueError("organization must be at most 300 characters")
+        return cleaned
+
+    @field_validator("contact_phone")
+    @classmethod
+    def _phone(cls, v: str | None) -> str | None:
+        # Trim + cap only — deliberately no shape/format regex (module
+        # docstring): a generous cap accommodates real formatted numbers
+        # ("+1 (555) 123-4567 ext. 89") without rejecting valid international
+        # input this project has no authority to normalize.
+        cleaned = _clean(v)
+        if cleaned is not None and len(cleaned) > MAX_PHONE:
+            raise ValueError(f"contact_phone must be at most {MAX_PHONE} characters")
         return cleaned
 
     @field_validator("message")

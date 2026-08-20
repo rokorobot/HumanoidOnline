@@ -181,7 +181,7 @@ test("use-cases: robot count uses singular grammar ('1 ROBOT') and whole-card li
   await expect(tile).toBeFocused();
 });
 
-test("find-a-humanoid: the 12-step buyer-intent wizard renders (WS5 supersedes the WS3 placeholder)", async ({
+test("find-a-humanoid: the 13-step buyer-intent wizard renders (WS5 supersedes the WS3 placeholder)", async ({
   page,
 }) => {
   await page.goto("/find-a-humanoid");
@@ -194,8 +194,9 @@ test("find-a-humanoid: the 12-step buyer-intent wizard renders (WS5 supersedes t
   await expect(
     page.locator("#wz-usecase option", { hasText: "Warehouse & Logistics" }),
   ).toHaveCount(1);
-  // Exactly 12 steps; UNKNOWN and SKIP are distinct, explicit actions.
-  await expect(page.locator(".wz-step")).toHaveCount(12);
+  // Exactly 13 steps (11 questions + Contact + Review); UNKNOWN and SKIP are
+  // distinct, explicit actions.
+  await expect(page.locator(".wz-step")).toHaveCount(13);
   await expect(page.getByRole("button", { name: "Unknown" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Skip" })).toBeVisible();
   // The WS3 placeholder is gone.

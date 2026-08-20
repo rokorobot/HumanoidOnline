@@ -281,6 +281,9 @@ def test_r5_requirement_submission_does_not_write_identity_to_logs(
                     "organization": "WizardLogProbe Ltd",
                     "contact_email": sentinel_email,
                     "contact_phone": sentinel_phone,
+                    # A minimal real requirement signal — this test exercises
+                    # log containment, not the "at least one signal" rule.
+                    "use_case": "warehouse-logistics",
                     "raw_input": {"wizard_version": 1, "answers": {}},
                 },
             )

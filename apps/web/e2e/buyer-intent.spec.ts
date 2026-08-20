@@ -84,13 +84,22 @@ async function reachContactStep(page: Page) {
   await expect(page.getByRole("heading", { name: /Who should we send matches to/i })).toBeVisible();
 }
 
+// Scoped to the wizard's own `role="group" aria-label="Requirement wizard"`
+// container (Wizard.tsx), not the whole page: Next.js's built-in App Router
+// announcer (`#__next-route-announcer__`) injects a permanent, page-wide
+// `role="alert"` element outside this container on every route, which a
+// bare `page.locator('[role="alert"]')` would also (wrongly) count.
+function wizardAlerts(page: Page) {
+  return page.getByRole("group", { name: "Requirement wizard" }).locator('[role="alert"]');
+}
+
 test("wizard: CONTACT step shows no validation alerts on initial entry", async ({ page }) => {
   await reachContactStep(page);
   // A — untouched, empty fields: no validation feedback at all, not even for
   // the required ones. role="alert" is reserved for actual feedback, never
   // the default/untouched state; aria-invalid is omitted entirely (not just
   // "false") when there is no error to describe.
-  await expect(page.locator('[role="alert"]')).toHaveCount(0);
+  await expect(wizardAlerts(page)).toHaveCount(0);
   await expect(page.locator("#wz-contact-name")).not.toHaveAttribute("aria-invalid");
   await expect(page.locator("#wz-contact-org")).not.toHaveAttribute("aria-invalid");
   await expect(page.locator("#wz-contact-email")).not.toHaveAttribute("aria-invalid");
@@ -105,7 +114,7 @@ test("wizard: CONTACT step validates only after an attempted Next, then live-cle
   // B — attempt Next with everything blank: all three required errors appear,
   // and the wizard stays on CONTACT (never silently advances).
   await next.click();
-  await expect(page.locator('[role="alert"]')).toHaveCount(3);
+  await expect(wizardAlerts(page)).toHaveCount(3);
   await expect(page.getByRole("heading", { name: /Who should we send matches to/i })).toBeVisible();
   // Focus moved to the first invalid field (full name).
   await expect(page.locator("#wz-contact-name")).toBeFocused();
@@ -118,7 +127,7 @@ test("wizard: CONTACT step validates only after an attempted Next, then live-cle
   // C — fill full name only: its error clears immediately (no second attempt
   // needed); organization/email remain invalid.
   await page.locator("#wz-contact-name").fill("Jane Buyer");
-  await expect(page.locator('[role="alert"]')).toHaveCount(2);
+  await expect(wizardAlerts(page)).toHaveCount(2);
   await expect(page.locator("#wz-contact-name")).not.toHaveAttribute("aria-invalid", "true");
   await expect(page.locator("#wz-contact-org-error")).toBeVisible();
   await expect(page.locator("#wz-contact-email-error")).toBeVisible();
@@ -127,7 +136,7 @@ test("wizard: CONTACT step validates only after an attempted Next, then live-cle
   // succeeds and the wizard reaches REVIEW.
   await page.locator("#wz-contact-org").fill("Acme Robotics");
   await page.locator("#wz-contact-email").fill("jane@example.com");
-  await expect(page.locator('[role="alert"]')).toHaveCount(0);
+  await expect(wizardAlerts(page)).toHaveCount(0);
   await next.click();
   await expect(page.getByRole("heading", { name: /Review/i })).toBeVisible();
 });
@@ -140,7 +149,7 @@ test("wizard: CONTACT step telephone never produces a required-field error", asy
   // E — telephone deliberately left blank throughout, including after an
   // attempted Next: no alert of any kind, and Next still succeeds.
   await page.getByRole("button", { name: /Next/ }).click();
-  await expect(page.locator('[role="alert"]')).toHaveCount(0);
+  await expect(wizardAlerts(page)).toHaveCount(0);
   await expect(page.getByRole("heading", { name: /Review/i })).toBeVisible();
 });
 

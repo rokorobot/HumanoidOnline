@@ -290,13 +290,21 @@ def test_invalid_email_is_422(client, database_url) -> None:
 
 
 def test_telephone_omitted_succeeds(client, database_url) -> None:
-    req_id = _created_id(client, {"raw_input": rawv()})
+    # A minimal real requirement signal (use_case) — these tests exercise
+    # telephone handling, not the "at least one signal" rule, so a bare
+    # rawv() (zero signal) would 422 before ever reaching what's under test.
+    req_id = _created_id(
+        client, {"use_case": "warehouse-logistics", "raw_input": rawv()}
+    )
     assert _fetch(req_id).contact_phone is None
 
 
 def test_telephone_accepts_international_formatting(client, database_url) -> None:
     for phone in ("+44 20 7946 0958", "+1-555-0123", "(020) 7946 0958 ext. 12"):
-        req_id = _created_id(client, {"contact_phone": phone, "raw_input": rawv()})
+        req_id = _created_id(client, {
+            "contact_phone": phone, "use_case": "warehouse-logistics",
+            "raw_input": rawv(),
+        })
         assert _fetch(req_id).contact_phone == phone
 
 
@@ -350,7 +358,7 @@ def test_public_requirement_read_never_exposes_identity(client, database_url) ->
     req_id = _created_id(client, {
         "contact_name": "Sentinel Person", "organization": sentinel_org,
         "contact_email": sentinel_email, "contact_phone": sentinel_phone,
-        "raw_input": rawv(),
+        "use_case": "warehouse-logistics", "raw_input": rawv(),
     })
     # The identity really was captured — otherwise this test proves nothing.
     row = _fetch(req_id)

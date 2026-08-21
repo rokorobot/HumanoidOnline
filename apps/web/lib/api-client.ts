@@ -5,7 +5,7 @@
 import { notFound } from "next/navigation";
 
 import { correlationHeader } from "./request-id";
-import { API_BASE_URL } from "./server";
+import { apiBaseUrl } from "./server";
 import type {
   CompareResponse,
   DiscoveryCandidateReview,
@@ -44,7 +44,7 @@ async function getJSON<T>(
   path: string,
   { notFoundOn404 = false }: { notFoundOn404?: boolean } = {},
 ): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${path}`, {
+  const res = await fetch(`${apiBaseUrl()}${path}`, {
     cache: "no-store",
     headers: await correlationHeader(),
   });
@@ -63,7 +63,7 @@ async function getJSON<T>(
 // itself renders notFound() — both sharing ONE governed read (wrap in React
 // cache()), never an alternate data path (AGENT-01 projection-only).
 async function getJSONOrNull<T>(path: string): Promise<T | null> {
-  const res = await fetch(`${API_BASE_URL}${path}`, {
+  const res = await fetch(`${apiBaseUrl()}${path}`, {
     cache: "no-store",
     headers: await correlationHeader(),
   });
@@ -123,7 +123,7 @@ export async function compareRobots(
 ): Promise<CompareResponse | null> {
   const clean = ids.map((s) => s.trim()).filter(Boolean);
   const res = await fetch(
-    `${API_BASE_URL}/api/robots/compare${buildQuery({ ids: clean.join(",") })}`,
+    `${apiBaseUrl()}/api/robots/compare${buildQuery({ ids: clean.join(",") })}`,
     { cache: "no-store", headers: await correlationHeader() },
   );
   if (res.status === 422 || res.status === 404) return null;

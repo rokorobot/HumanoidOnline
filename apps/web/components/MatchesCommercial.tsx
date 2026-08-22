@@ -140,7 +140,11 @@ export function MatchesCommercial({
         </span>
         <div className="actions">
           {n >= 2 && (
-            <Link className="btn btn--ghost" href={compareHref}>
+            // Emergency Compare Traffic Containment — same rationale as
+            // CompareBar: this points at a compare computation that may never
+            // have been requested before, so it must not be triggered by
+            // viewport prefetch alone.
+            <Link className="btn btn--ghost" href={compareHref} prefetch={false}>
               Compare these →
             </Link>
           )}

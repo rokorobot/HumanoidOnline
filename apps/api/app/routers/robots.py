@@ -132,6 +132,31 @@ def list_robots(
 _load_detail = reads.load_detail
 
 
+def _reordered_for_request(cached: CompareResponse, order: list[str]) -> CompareResponse:
+    """Reshape a cache HIT to look exactly as if it had been computed fresh for
+    THIS request's slug order.
+
+    Emergency Compare Traffic Containment (2026-08-22): the cache key is now
+    order-independent (services/compare_cache.cache_key), so a HIT may have
+    been stored by a request that asked for the same robot SET in a different
+    order. The stored facts are identical either way — no new query, no
+    changed data — only the caller-requested display order (the `robots`
+    array, and each row's `values` KEY order) needs rebuilding, which is why
+    this is a pure in-memory reshape rather than a cache-bypass.
+    """
+    by_slug = {r.slug: r for r in cached.robots}
+    rows = [
+        CompareRow(
+            group=row.group,
+            key=row.key,
+            label=row.label,
+            values={slug: row.values[slug] for slug in order},
+        )
+        for row in cached.rows
+    ]
+    return CompareResponse(robots=[by_slug[s] for s in order], rows=rows)
+
+
 @router.get("/compare", response_model=CompareResponse)
 def compare_robots(
     session: Annotated[Session, Depends(get_session)],
@@ -139,11 +164,12 @@ def compare_robots(
     ids: str = Query(..., description="2–4 comma-separated robot slugs"),
 ) -> CompareResponse:
     slugs = [s.strip() for s in ids.split(",") if s.strip()]
-    # Trimmed, de-duplicated, ORDER-PRESERVED — this is also the exact cache
-    # key basis (services/compare_cache.cache_key): the response's `robots`
-    # array and each row's `values` mapping are built by iterating this list
-    # in order, so ids=a,b and ids=b,a are genuinely different responses and
-    # must never share a cache entry (see that module's docstring).
+    # Trimmed, de-duplicated, ORDER-PRESERVED — the response's `robots` array
+    # and each row's `values` mapping are built (or reshaped, on a cache HIT —
+    # see _reordered_for_request) by iterating this list in order, so ids=a,b
+    # and ids=b,a remain genuinely different RESPONSES. The CACHE KEY itself is
+    # order-independent (services/compare_cache.cache_key) — permutations of
+    # the same set now share one computation, they just never share output order.
     unique = list(dict.fromkeys(slugs))
     settings = get_settings()
     ttl = settings.compare_cache_ttl_s
@@ -158,7 +184,7 @@ def compare_robots(
         # layers and either can be a HIT while the other is a MISS.
         response.headers["X-App-Cache"] = "HIT"
         _cache_logger.info("compare cache HIT robots=%d", len(unique))
-        return cached
+        return _reordered_for_request(cached, unique)
 
     robots = [r for r in (_load_detail(session, s) for s in unique) if r is not None]
     if not 2 <= len(robots) <= 4:

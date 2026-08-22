@@ -26,7 +26,17 @@ export function CompareBar({ slugs }: { slugs: string[] }) {
         COMPARE SELECTION: {slugs.length} / 4 — {slugs.join(" · ")}
       </span>
       {ready ? (
-        <Link className="btn btn--signal" href={`/compare?ids=${slugs.join(",")}`}>
+        // Emergency Compare Traffic Containment — this link's target is the
+        // live compare selection, which changes on every toggle and is never
+        // guaranteed to have been requested before. Default viewport prefetch
+        // would trigger a full (currently unbatched) compare backend
+        // computation merely from this bar scrolling into view, before the
+        // user ever clicks it.
+        <Link
+          className="btn btn--signal"
+          href={`/compare?ids=${slugs.join(",")}`}
+          prefetch={false}
+        >
           Open comparison →
         </Link>
       ) : (

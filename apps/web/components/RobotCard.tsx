@@ -83,9 +83,19 @@ export function RobotCard({
         <div className="foot-actions">
           <AvailabilityBadge modes={robot.available_modes} />
           {compareHref ? (
+            // Emergency Compare Traffic Containment — every card on a catalogue
+            // page carries a DISTINCT compareHref (one toggled slug apart from
+            // every other card's), so on a full-page result set this is up to
+            // ~100 combinatorially-different /robots?compare= URLs at once.
+            // Next's default Link prefetch fires one of these per card as it
+            // enters the viewport with no user action — confirmed the primary
+            // amplification source in the 2026-08-22 19:53-19:55 CEST incident.
+            // Real navigation on click is unaffected; only the automatic
+            // viewport prefetch is disabled.
             <Link
               className="cmp"
               href={compareHref}
+              prefetch={false}
               aria-label={inCompare ? "Remove from compare" : "Add to compare"}
             >
               {inCompare ? "In compare ✓" : "Compare +"}

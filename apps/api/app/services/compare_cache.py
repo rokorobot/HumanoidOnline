@@ -45,20 +45,27 @@ _store: dict[str, _Entry] = {}
 
 
 def cache_key(slugs: list[str]) -> str:
-    """Build the cache key from the already-normalized (trimmed, de-duplicated,
-    order-PRESERVED) slug list the router computes.
+    """Build the cache key from the already-normalized (trimmed, de-duplicated)
+    slug list the router computes.
 
-    Order is part of the key deliberately: `compare_robots` builds its
-    `robots`/`details` arrays and each row's `values` mapping by iterating the
-    caller's slugs in the order given, so `ids=a,b` and `ids=b,a` are NOT
-    equivalent requests — they return the same facts in a different, caller-
-    requested order. Canonicalizing (e.g. sorting) the key would make one of
-    those two requests silently receive the other's response shape. A `\\x1f`
-    (unit separator) join is used instead of a printable delimiter so a slug
-    that happens to contain a comma or pipe can never collide two distinct
-    lists onto one key.
+    Emergency Compare Traffic Containment (2026-08-22): the key is now SORTED —
+    order-INDEPENDENT — so `ids=a,b` and `ids=b,a` share one cache entry instead
+    of each permutation separately re-running the expensive per-robot detail +
+    evidence load. Production evidence showed the same 4-robot sets requested
+    repeatedly in different permutations in a short window; an order-preserving
+    key made every permutation a fresh MISS.
+
+    This does NOT change what a caller receives: `ids=a,b` and `ids=b,a` remain
+    genuinely different RESPONSES (different `robots` array / `values` order) —
+    that ordering is caller-requested and preserved end-to-end (routers/robots.py
+    reorders a cache HIT to match the requesting call's own slug order before
+    returning it). Only the underlying computation is now shared across
+    permutations of the same set; the key is an internal cache identity, never
+    part of the API contract. A `\\x1f` (unit separator) join is used instead of
+    a printable delimiter so a slug that happens to contain a comma or pipe can
+    never collide two distinct sets onto one key.
     """
-    return "\x1f".join(slugs)
+    return "\x1f".join(sorted(slugs))
 
 
 def get(key: str) -> CompareResponse | None:

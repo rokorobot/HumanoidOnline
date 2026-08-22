@@ -12,6 +12,17 @@ import {
 // lists ONLY is_published canonical entities (AGENT-01.7) — discovery candidates
 // and promoted-but-unpublished robots never appear. Dynamic so it stays current;
 // `lastModified` is the real canonical `updated_at`.
+//
+// Neon Transfer Optimization Phase 1 — `dynamic = "force-dynamic"` is kept
+// deliberately (removing it made `next build` attempt to statically prerender
+// this route, which requires a reachable API/Neon at BUILD time — verified by
+// reproducing the build failure locally). The Neon-transfer win instead comes
+// from listAllRobots/listAllManufacturers/listAllUseCases now going through
+// governed reads that carry their own `revalidate` (see lib/api-client.ts):
+// Next's per-fetch Data Cache still applies within a force-dynamic route
+// whenever the fetch itself sets `next: { revalidate }`, so repeated crawl
+// hits within the TTL reuse the cached catalogue data instead of re-querying
+// Neon, without changing this route's build-time behaviour at all.
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

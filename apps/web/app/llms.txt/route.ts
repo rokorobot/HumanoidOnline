@@ -4,8 +4,20 @@ import { listAllManufacturers, listAllRobots, listAllUseCases } from "@/lib/seo"
 // AGENT-01 (A6): `/llms.txt` — a concise, LLM-friendly description of the site.
 // CANONICAL-ONLY: built from the governed reads, so it lists only is_published
 // entities (AGENT-01.7) — discovery candidates are never part of the public
-// knowledge surface. Dynamic so it stays current. llms.txt is a useful-but-
+// knowledge surface. Dynamic so it stays current; llms.txt is a useful-but-
 // non-canonical proposal; we provide it without architecting around it.
+//
+// Neon Transfer Optimization Phase 1 — `dynamic = "force-dynamic"` is kept
+// deliberately (removing it made `next build` attempt to statically prerender
+// this route, which requires a reachable API/Neon at BUILD time — verified by
+// reproducing the build failure locally). The Neon-transfer win instead comes
+// from listAllRobots/listAllManufacturers/listAllUseCases now going through
+// governed reads that carry their own `revalidate` (see lib/api-client.ts):
+// Next's per-fetch Data Cache still applies within a force-dynamic route
+// whenever the fetch itself sets `next: { revalidate }`, so repeated crawl
+// hits (this path is specifically the kind AI-agent crawlers seek out) within
+// the TTL reuse the cached catalogue data instead of re-querying Neon, without
+// changing this route's build-time behaviour at all.
 export const dynamic = "force-dynamic";
 
 export async function GET(): Promise<Response> {
@@ -55,7 +67,10 @@ export async function GET(): Promise<Response> {
   return new Response(lines.join("\n"), {
     headers: {
       "content-type": "text/plain; charset=utf-8",
-      "cache-control": "public, max-age=0, must-revalidate",
+      // Was "public, max-age=0, must-revalidate" (caching forbidden). Neon
+      // Transfer Optimization Phase 1: allow shared/edge caches to reuse this
+      // response for up to 15 minutes, matching the route's `revalidate` above.
+      "cache-control": "public, max-age=0, s-maxage=900, stale-while-revalidate=86400",
     },
   });
 }

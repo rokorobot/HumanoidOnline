@@ -1,5 +1,15 @@
 // Typed, server-side fetch layer over the FastAPI knowledge API.
-// All reads use { cache: "no-store" } so pages reflect the live catalogue.
+//
+// Two read policies, chosen per call site:
+//   - Catalogue-static reads (robots/manufacturers/use-cases/regions/market
+//     snapshot) pass `revalidate` and use Next's Data Cache (`next: { revalidate }`),
+//     so repeated page views, prefetches, sitemap/llms.txt generation and
+//     crawler requests within the TTL window are served from cache instead of
+//     re-querying the API/Neon on every hit (Neon Transfer Optimization Phase 1).
+//   - Everything user-specific, write-adjacent or already covered by its own
+//     cache (compare, matches, buyer-requirement reads, discovery review) omits
+//     `revalidate` and keeps the original `cache: "no-store"` behaviour exactly.
+//
 // A 404 from a detail endpoint triggers Next's notFound(); other non-2xx
 // responses throw so the error boundary / build surfaces the failure.
 import { notFound } from "next/navigation";
@@ -24,6 +34,11 @@ import type {
 
 export type QueryValue = string | number | boolean | string[] | undefined | null;
 
+// Governed catalogue reads change by editorial review, not by the second (same
+// doctrine as the existing compare cache), so a short TTL is a safe default that
+// still converges automatically — no manual invalidation exists or is needed.
+const CATALOGUE_REVALIDATE_S = 300;
+
 function buildQuery(params: Record<string, QueryValue>): string {
   const sp = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
@@ -40,14 +55,30 @@ function buildQuery(params: Record<string, QueryValue>): string {
   return qs ? `?${qs}` : "";
 }
 
+// Builds the fetch init for one governed read. `revalidate` omitted keeps the
+// original always-fresh behaviour byte-for-byte. `revalidate` set switches to
+// Next's Data Cache — and deliberately OMITS the `X-Request-ID` correlation
+// header for that call: Next's fetch cache key is derived from the full
+// request including headers (confirmed against the installed Next 15 source,
+// `generateCacheKey` in `incremental-cache/index.js`), and `correlationHeader()`
+// mints a fresh random UUID per request when no upstream proxy id is present —
+// sending it would make every cache key unique and silently defeat revalidation.
+// Non-cacheable calls are unaffected and keep full request correlation.
+async function readInit(revalidate?: number): Promise<RequestInit> {
+  if (revalidate !== undefined) {
+    return { next: { revalidate } };
+  }
+  return { cache: "no-store", headers: await correlationHeader() };
+}
+
 async function getJSON<T>(
   path: string,
-  { notFoundOn404 = false }: { notFoundOn404?: boolean } = {},
+  {
+    notFoundOn404 = false,
+    revalidate,
+  }: { notFoundOn404?: boolean; revalidate?: number } = {},
 ): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    cache: "no-store",
-    headers: await correlationHeader(),
-  });
+  const res = await fetch(`${API_BASE_URL}${path}`, await readInit(revalidate));
   if (res.status === 404 && notFoundOn404) {
     notFound();
   }
@@ -62,11 +93,11 @@ async function getJSON<T>(
 // page's generateMetadata return a specific "Not found" title while the page
 // itself renders notFound() — both sharing ONE governed read (wrap in React
 // cache()), never an alternate data path (AGENT-01 projection-only).
-async function getJSONOrNull<T>(path: string): Promise<T | null> {
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    cache: "no-store",
-    headers: await correlationHeader(),
-  });
+async function getJSONOrNull<T>(
+  path: string,
+  { revalidate }: { revalidate?: number } = {},
+): Promise<T | null> {
+  const res = await fetch(`${API_BASE_URL}${path}`, await readInit(revalidate));
   if (res.status === 404) return null;
   if (!res.ok) {
     throw new Error(`API ${res.status} for ${path}`);
@@ -107,13 +138,16 @@ export function listRobots(
 ): Promise<Page<RobotListItem>> {
   return getJSON<Page<RobotListItem>>(
     `/api/robots${buildQuery(params as Record<string, QueryValue>)}`,
+    { revalidate: CATALOGUE_REVALIDATE_S },
   );
 }
 
 // Non-throwing detail read (404 -> null). Detail pages wrap this in React
 // cache() so the page render and generateMetadata share a single governed fetch.
 export function findRobot(slug: string): Promise<RobotDetail | null> {
-  return getJSONOrNull<RobotDetail>(`/api/robots/${encodeURIComponent(slug)}`);
+  return getJSONOrNull<RobotDetail>(`/api/robots/${encodeURIComponent(slug)}`, {
+    revalidate: CATALOGUE_REVALIDATE_S,
+  });
 }
 
 // compare returns 422 for <2 or >4 valid slugs — surfaced to the caller as null
@@ -151,6 +185,7 @@ export function listManufacturers(
 ): Promise<Page<ManufacturerListItem>> {
   return getJSON<Page<ManufacturerListItem>>(
     `/api/manufacturers${buildQuery(params as Record<string, QueryValue>)}`,
+    { revalidate: CATALOGUE_REVALIDATE_S },
   );
 }
 
@@ -159,6 +194,7 @@ export function findManufacturer(
 ): Promise<ManufacturerDetail | null> {
   return getJSONOrNull<ManufacturerDetail>(
     `/api/manufacturers/${encodeURIComponent(slug)}`,
+    { revalidate: CATALOGUE_REVALIDATE_S },
   );
 }
 
@@ -169,12 +205,14 @@ export function listUseCases(
 ): Promise<Page<UseCaseListItem>> {
   return getJSON<Page<UseCaseListItem>>(
     `/api/use-cases${buildQuery(params as Record<string, QueryValue>)}`,
+    { revalidate: CATALOGUE_REVALIDATE_S },
   );
 }
 
 export function findUseCase(slug: string): Promise<UseCaseDetail | null> {
   return getJSONOrNull<UseCaseDetail>(
     `/api/use-cases/${encodeURIComponent(slug)}`,
+    { revalidate: CATALOGUE_REVALIDATE_S },
   );
 }
 
@@ -187,6 +225,7 @@ export function listRegions(
 ): Promise<RegionListItem[]> {
   return getJSON<RegionListItem[]>(
     `/api/regions${buildQuery(params as Record<string, QueryValue>)}`,
+    { revalidate: CATALOGUE_REVALIDATE_S },
   );
 }
 
@@ -212,5 +251,7 @@ export function getRequirement(id: string): Promise<RequirementRead> {
 // ---- Market snapshot -------------------------------------------------------
 
 export function getMarketSnapshot(): Promise<MarketSnapshot> {
-  return getJSON<MarketSnapshot>(`/api/market-snapshot`);
+  return getJSON<MarketSnapshot>(`/api/market-snapshot`, {
+    revalidate: CATALOGUE_REVALIDATE_S,
+  });
 }

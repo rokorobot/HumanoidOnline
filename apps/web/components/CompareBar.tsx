@@ -1,6 +1,6 @@
 // CompareBar — sticky tray showing the current compare selection built from the
-// catalogue `compare` URL param. Links to /compare?ids=... (2–4 required).
-import Link from "next/link";
+// catalogue `compare` URL param. Navigates to /compare?ids=... (2–4 required).
+import { CompareLink } from "./CompareLink";
 
 export function CompareBar({ slugs }: { slugs: string[] }) {
   if (slugs.length === 0) return null;
@@ -26,19 +26,14 @@ export function CompareBar({ slugs }: { slugs: string[] }) {
         COMPARE SELECTION: {slugs.length} / 4 — {slugs.join(" · ")}
       </span>
       {ready ? (
-        // Emergency Compare Traffic Containment — this link's target is the
-        // live compare selection, which changes on every toggle and is never
-        // guaranteed to have been requested before. Default viewport prefetch
-        // would trigger a full (currently unbatched) compare backend
-        // computation merely from this bar scrolling into view, before the
-        // user ever clicks it.
-        <Link
-          className="btn btn--signal"
-          href={`/compare?ids=${slugs.join(",")}`}
-          prefetch={false}
-        >
+        // Emergency Compare Crawl Containment (v0.2) — a real <a href> here
+        // survives a link-parsing crawler regardless of Next's prefetch
+        // setting (see components/CompareLink.tsx). This bar's target changes
+        // on every toggle and is never guaranteed to have been requested
+        // before, so it must only become a request on an explicit click.
+        <CompareLink className="btn btn--signal" href={`/compare?ids=${slugs.join(",")}`}>
           Open comparison →
-        </Link>
+        </CompareLink>
       ) : (
         <span className="ho-syslabel" style={{ color: "var(--ho-grey-400)" }}>
           SELECT AT LEAST 2 TO COMPARE

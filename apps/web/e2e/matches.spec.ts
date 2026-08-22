@@ -81,9 +81,11 @@ test("Request commercial help pre-fills identity captured on the wizard's contac
   await expect(page.locator("#lead-name")).toHaveValue("Jane B. Buyer");
 });
 
-test("Compare these links the ranked robots into /compare", async ({ page }) => {
+test("Compare these navigates the ranked robots into /compare", async ({ page }) => {
   await submitWarehouse(page);
-  const compare = page.getByRole("link", { name: /Compare these/i });
+  // A real <button> since Emergency Compare Crawl Containment v0.2 (not an
+  // <a>) — see components/CompareLink.tsx.
+  const compare = page.getByRole("button", { name: /Compare these/i });
   await expect(compare).toBeVisible();
   await compare.click();
   await expect(page).toHaveURL(/\/compare\?ids=/);

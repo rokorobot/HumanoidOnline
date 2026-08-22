@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import type { RobotListItem } from "@/lib/types";
 import { AvailabilityBadge } from "./AvailabilityState";
+import { CompareLink } from "./CompareLink";
 import { DotMatrix } from "./GraphicMarker";
 import { MachineCode } from "./MachineCode";
 import { Metric } from "./Metric";
@@ -83,23 +84,23 @@ export function RobotCard({
         <div className="foot-actions">
           <AvailabilityBadge modes={robot.available_modes} />
           {compareHref ? (
-            // Emergency Compare Traffic Containment — every card on a catalogue
-            // page carries a DISTINCT compareHref (one toggled slug apart from
-            // every other card's), so on a full-page result set this is up to
-            // ~100 combinatorially-different /robots?compare= URLs at once.
-            // Next's default Link prefetch fires one of these per card as it
-            // enters the viewport with no user action — confirmed the primary
-            // amplification source in the 2026-08-22 19:53-19:55 CEST incident.
-            // Real navigation on click is unaffected; only the automatic
-            // viewport prefetch is disabled.
-            <Link
+            // Emergency Compare Crawl Containment (v0.2) — every card on a
+            // catalogue page carries a DISTINCT compareHref (one toggled slug
+            // apart from every other card's), so a full-page result set is up
+            // to ~100 combinatorially-different /robots?compare= destinations.
+            // v0.1's prefetch={false} stopped Next's own automatic fetch, but
+            // a real <a href> still ships in the server-rendered HTML for any
+            // link-parsing mechanism to follow — production evidence after
+            // that deploy confirmed the storm persisted. A button (see
+            // CompareLink) never becomes an HTTP request until an explicit
+            // click.
+            <CompareLink
               className="cmp"
               href={compareHref}
-              prefetch={false}
-              aria-label={inCompare ? "Remove from compare" : "Add to compare"}
+              ariaLabel={inCompare ? "Remove from compare" : "Add to compare"}
             >
               {inCompare ? "In compare ✓" : "Compare +"}
-            </Link>
+            </CompareLink>
           ) : (
             <Link className="cmp" href={detailHref}>
               Detail →

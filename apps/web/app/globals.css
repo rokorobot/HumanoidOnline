@@ -183,6 +183,12 @@ section.block { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid
   border: var(--ho-rule-hair) solid var(--ho-ink); padding: 6px 9px;
   background: transparent; color: inherit; cursor: pointer; }
 .cmp:hover { background: var(--ho-ink); color: var(--ho-paper); }
+/* Emergency Compare Crawl Containment (v0.2) — the compare toggle is now a
+   <button class="cmp"> (CompareLink), not an <a>; browsers default a button to
+   inline-block rather than an anchor's inline, so this pins the exact same
+   visual box the anchor had. Scoped to the element, not the shared .cmp rule,
+   so the untouched a.cmp ("Detail →") is unaffected. */
+button.cmp { display: inline-flex; align-items: center; }
 
 /* ---- CATALOGUE LAYOUT + FILTER RAIL -------------------------------------- */
 /* WS8.4 / R19: minmax(0, 1fr) instead of 1fr so the results column can shrink

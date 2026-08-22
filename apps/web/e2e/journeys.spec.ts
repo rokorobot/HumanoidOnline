@@ -18,16 +18,18 @@ test("Journey A — explore & compare: catalogue -> compare matrix (2 robots)", 
   await expect(page).toHaveURL(/\/robots/);
 
   // Add two robots to the comparison via the real "Add to compare" control.
-  // Each add is a navigation that rewrites ?compare=…, so wait for the URL to
-  // settle between clicks (the selection is URL-driven state, not a race).
+  // Each add is a client-side router.push that rewrites ?compare=… (a real
+  // <button>, not an <a>, since Emergency Compare Crawl Containment v0.2 — see
+  // components/CompareLink.tsx), so wait for the URL to settle between clicks
+  // (the selection is URL-driven state, not a race).
   const cards = page.locator("article.rcard");
-  await cards.nth(0).getByRole("link", { name: /Add to compare/i }).click();
+  await cards.nth(0).getByRole("button", { name: /Add to compare/i }).click();
   await expect(page).toHaveURL(/[?&]compare=[^&]+/);
-  await cards.nth(1).getByRole("link", { name: /Add to compare/i }).click();
+  await cards.nth(1).getByRole("button", { name: /Add to compare/i }).click();
   await expect(page).toHaveURL(/[?&]compare=[^&]+%2C|[?&]compare=[^&]+,[^&]+/);
 
   // The compare tray reflects the selection and opens the matrix.
-  await page.getByRole("link", { name: /Open comparison/i }).click();
+  await page.getByRole("button", { name: /Open comparison/i }).click();
   await expect(page).toHaveURL(/\/compare\?ids=/);
 
   // The governed result: a real side-by-side matrix of exactly the two picks.

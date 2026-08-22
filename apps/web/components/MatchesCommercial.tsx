@@ -12,6 +12,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+import { CompareLink } from "@/components/CompareLink";
 import { LeadDialog } from "@/components/LeadDialog";
 import { MatchCard } from "@/components/MatchCard";
 import { SectionIndex } from "@/components/SectionIndex";
@@ -140,13 +141,14 @@ export function MatchesCommercial({
         </span>
         <div className="actions">
           {n >= 2 && (
-            // Emergency Compare Traffic Containment — same rationale as
-            // CompareBar: this points at a compare computation that may never
-            // have been requested before, so it must not be triggered by
-            // viewport prefetch alone.
-            <Link className="btn btn--ghost" href={compareHref} prefetch={false}>
+            // Emergency Compare Crawl Containment (v0.2) — same rationale as
+            // CompareBar: a real <a href> here is followed by any link-parsing
+            // mechanism regardless of Next's prefetch setting (see
+            // components/CompareLink.tsx), so this must only become a request
+            // on an explicit click.
+            <CompareLink className="btn btn--ghost" href={compareHref}>
               Compare these →
-            </Link>
+            </CompareLink>
           )}
           <button
             type="button"

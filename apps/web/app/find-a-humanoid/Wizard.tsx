@@ -10,7 +10,13 @@ import { useEffect, useRef, useState } from "react";
 
 import { SectionIndex } from "@/components/SectionIndex";
 import { SystemLabel } from "@/components/SystemLabel";
-import { emailError, MAX_PHONE, nameError, organizationError } from "@/lib/lead-form";
+import {
+  buildSubmission as buildLeadSubmission,
+  emailError,
+  MAX_PHONE,
+  nameError,
+  organizationError,
+} from "@/lib/lead-form";
 import type { RegionListItem, UseCaseListItem } from "@/lib/types";
 import {
   ANSWER_KEYS,
@@ -124,36 +130,94 @@ export function Wizard({ useCases, countries, seedUseCase, seedAnswers }: Wizard
     setStep((s) => Math.min(s + 1, REVIEW_INDEX));
   }
 
+  // Two calls, one submission: capture the requirement, then — in the SAME
+  // click — capture the commercial lead through the existing WS7 pipeline
+  // (route.ts -> FastAPI capture_lead() -> notify_lead_captured()). Contact
+  // info is already collected on the CONTACT step above, so completing the
+  // questionnaire itself is the qualified inquiry; the buyer is not required
+  // to separately visit /matches/[id] and fill LeadDialog again for
+  // HumanoidOnline to record the lead and notify.
+  //
+  // "REQUIREMENT CAPTURED" is gated on the SECOND call succeeding, not the
+  // first: if the lead POST fails, the buyer_requirement it's tied to
+  // already exists (harmless on its own), `reqId` is retained in state, and
+  // a retry — same button, same click — skips straight back to only the
+  // lead POST rather than re-submitting the questionnaire. That retry lands
+  // on the existing create-or-extend-by-requirement_id path in
+  // capture_lead(), so it can never produce a duplicate lead even after
+  // several failed attempts or a double-click (the pre-existing
+  // `submittingRef` guard still collapses same-tick double-clicks to one
+  // call as before).
   async function submit() {
     if (submittingRef.current || !hasSignal(answers)) return;
     submittingRef.current = true;
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch("/api/buyer-requirements", {
+      let currentReqId = reqId;
+      if (!currentReqId) {
+        const res = await fetch("/api/buyer-requirements", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(buildSubmission(answers, contact)),
+        });
+        if (res.status !== 201) {
+          let detail = "Submission failed. Please try again.";
+          try {
+            const j = await res.json();
+            if (typeof j?.detail === "string") detail = j.detail;
+          } catch {
+            /* non-JSON error body */
+          }
+          setError(detail);
+          return;
+        }
+        const j = await res.json();
+        if (typeof j?.id !== "string") {
+          setError("Submission failed. Please try again.");
+          return;
+        }
+        currentReqId = j.id;
+        setReqId(currentReqId);
+        // Bridge identity to LeadDialog without a new PII-exposing read
+        // endpoint: client-only, keyed by requirement id, never sent over
+        // the network. See LeadDialog's `identity` prop / MatchesCommercial.
+        try {
+          sessionStorage.setItem(CONTACT_ID + currentReqId, JSON.stringify(contact));
+        } catch {
+          /* sessionStorage unavailable (private mode etc.) — prefill is best-effort */
+        }
+      }
+
+      // No robot context exists yet — matching only runs once /matches/[id]
+      // is visited — so robot_slugs is empty here, never invented. The
+      // service requires exactly that for a requirement with no persisted
+      // matches yet (a non-empty selection would 422).
+      const leadRes = await fetch("/api/commercial-leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(buildSubmission(answers, contact)),
+        body: JSON.stringify(
+          buildLeadSubmission(
+            {
+              contact_name: contact.contact_name,
+              organization: contact.organization,
+              contact_email: contact.contact_email,
+              phone: contact.contact_phone,
+              country: "",
+              preferred_transaction: "",
+              message: "",
+            },
+            { requirementId: currentReqId, robotSlugs: [] },
+          ),
+        ),
       });
-      if (res.status === 201) {
-        const j = await res.json();
-        if (typeof j?.id === "string") {
-          setReqId(j.id);
-          // Bridge identity to LeadDialog without a new PII-exposing read
-          // endpoint: client-only, keyed by requirement id, never sent over
-          // the network. See LeadDialog's `identity` prop / MatchesCommercial.
-          try {
-            sessionStorage.setItem(CONTACT_ID + j.id, JSON.stringify(contact));
-          } catch {
-            /* sessionStorage unavailable (private mode etc.) — prefill is best-effort */
-          }
-        }
+      if (leadRes.status === 201 || leadRes.status === 200) {
         setCaptured(true);
         return;
       }
       let detail = "Submission failed. Please try again.";
       try {
-        const j = await res.json();
+        const j = await leadRes.json();
         if (typeof j?.detail === "string") detail = j.detail;
       } catch {
         /* non-JSON error body */

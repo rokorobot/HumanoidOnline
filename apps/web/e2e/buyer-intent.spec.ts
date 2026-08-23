@@ -8,6 +8,11 @@ import { expect, Page, test } from "@playwright/test";
 // Product reversal: the wizard now ends with a required CONTACT step (Full
 // name / Company / Business email / optional Telephone) between the last
 // question and REVIEW — see fillContact below.
+//
+// v0.2: completing the questionnaire now ALSO captures the commercial lead
+// (reusing the existing WS7 /api/commercial-leads pipeline) in the same
+// submission — see the tests below for the two-call sequence, the
+// commercial-leads-failure/retry contract, and duplicate protection.
 
 async function fillContact(page: Page, overrides: Partial<Record<"name" | "org" | "email" | "phone", string>> = {}) {
   await page.locator("#wz-contact-name").fill(overrides.name ?? "Test Buyer");
@@ -46,6 +51,21 @@ test("wizard: submitting captures a requirement and stops at confirmation (no ma
 }) => {
   await page.goto("/find-a-humanoid?use_case=warehouse-logistics");
 
+  // v0.2: completion must call BOTH endpoints exactly once, with the lead
+  // payload carrying the same contact identity + this exact requirement,
+  // and no invented robot interest (matching hasn't run yet).
+  let buyerReqPosts = 0;
+  let leadPosts = 0;
+  let leadBody: Record<string, unknown> | null = null;
+  page.on("request", (r) => {
+    if (r.method() !== "POST") return;
+    if (r.url().includes("/api/buyer-requirements")) buyerReqPosts++;
+    if (r.url().includes("/api/commercial-leads")) {
+      leadPosts++;
+      leadBody = r.postDataJSON() as Record<string, unknown>;
+    }
+  });
+
   // TASK -> Next
   await page.getByRole("button", { name: /Next/ }).click();
   // INDUSTRY -> Skip
@@ -73,6 +93,20 @@ test("wizard: submitting captures a requirement and stops at confirmation (no ma
   // The confirmation screen itself presents no form — identity was already
   // captured on the CONTACT step, not re-asked here.
   await expect(page.locator("input[type=email]")).toHaveCount(0);
+
+  expect(buyerReqPosts).toBe(1);
+  expect(leadPosts).toBe(1);
+  expect(leadBody).toMatchObject({
+    contact_name: "Jane Buyer",
+    organization: "Acme Robotics",
+    contact_email: "jane@example.com",
+    robot_slugs: [],
+  });
+  // No phone was filled — genuinely optional, never sent as "".
+  expect(leadBody).not.toHaveProperty("contact_phone");
+  const body = leadBody as unknown as { requirement_id: string };
+  expect(typeof body.requirement_id).toBe("string");
+  expect(body.requirement_id.length).toBeGreaterThan(0);
 });
 
 async function reachContactStep(page: Page) {
@@ -190,11 +224,16 @@ test("keyboard-only: select a transaction choice and advance to review", async (
   await expect(page.getByRole("heading", { name: /Review/i })).toBeVisible();
 });
 
-test("rapid double-submit fires exactly one request", async ({ page }) => {
+test("rapid double-submit fires exactly one request to each endpoint (no duplicate lead)", async ({
+  page,
+}) => {
   await page.goto("/find-a-humanoid?use_case=warehouse-logistics");
-  let posts = 0;
+  let buyerReqPosts = 0;
+  let leadPosts = 0;
   page.on("request", (r) => {
-    if (r.method() === "POST" && r.url().includes("/api/buyer-requirements")) posts++;
+    if (r.method() !== "POST") return;
+    if (r.url().includes("/api/buyer-requirements")) buyerReqPosts++;
+    if (r.url().includes("/api/commercial-leads")) leadPosts++;
   });
   await page.getByRole("button", { name: /Next/ }).click(); // TASK
   for (let i = 0; i < 10; i++) {
@@ -202,7 +241,8 @@ test("rapid double-submit fires exactly one request", async ({ page }) => {
   }
   await fillContact(page);
   await expect(page.getByRole("heading", { name: /Review/i })).toBeVisible();
-  // Two synchronous clicks in one tick — the ref guard must collapse to one POST.
+  // Two synchronous clicks in one tick — the ref guard must collapse to one
+  // full submission (both calls), never two leads for one completion.
   await page
     .getByRole("button", { name: /Submit requirements/i })
     .evaluate((b: HTMLButtonElement) => {
@@ -210,7 +250,52 @@ test("rapid double-submit fires exactly one request", async ({ page }) => {
       b.click();
     });
   await expect(page.getByRole("heading", { name: "Requirement captured" })).toBeVisible();
-  expect(posts).toBe(1);
+  expect(buyerReqPosts).toBe(1);
+  expect(leadPosts).toBe(1);
+});
+
+test("commercial-lead failure after a successful requirement capture shows a retryable error, not REQUIREMENT CAPTURED, and retry does not resubmit the questionnaire", async ({
+  page,
+}) => {
+  await page.goto("/find-a-humanoid?use_case=warehouse-logistics");
+  let buyerReqPosts = 0;
+  page.on("request", (r) => {
+    if (r.method() === "POST" && r.url().includes("/api/buyer-requirements")) buyerReqPosts++;
+  });
+  // The requirement capture itself is real (unmocked); only the lead call
+  // fails, so this proves the "persist wins, notify-adjacent capture can
+  // fail independently" contract holds at the wizard boundary too.
+  await page.route("**/api/commercial-leads", (route) =>
+    route.fulfill({
+      status: 500,
+      contentType: "application/json",
+      body: JSON.stringify({ detail: "lead capture boom" }),
+    }),
+  );
+
+  await page.getByRole("button", { name: /Next/ }).click(); // TASK
+  for (let i = 0; i < 10; i++) {
+    await page.getByRole("button", { name: "Skip" }).click();
+  }
+  await fillContact(page, { name: "Jane Buyer", org: "Acme Robotics", email: "jane@example.com" });
+  await page.getByRole("button", { name: /Submit requirements/i }).click();
+
+  // Must NOT show REQUIREMENT CAPTURED — the lead was never confirmed saved
+  // — and the review draft (including everything just typed) must still be
+  // there so the buyer never has to re-enter anything to retry.
+  await expect(page.locator(".wz-error")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Requirement captured" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: /Review/i })).toBeVisible();
+  expect(buyerReqPosts).toBe(1);
+
+  // Retry, now letting the lead call through for real. Must NOT re-submit
+  // the questionnaire (still exactly one buyer-requirements POST ever) —
+  // only the lead capture is retried, using the requirement_id already
+  // obtained on the first attempt.
+  await page.unroute("**/api/commercial-leads");
+  await page.getByRole("button", { name: /Submit requirements/i }).click();
+  await expect(page.getByRole("heading", { name: "Requirement captured" })).toBeVisible();
+  expect(buyerReqPosts).toBe(1);
 });
 
 test("submit error shows a message and keeps the draft on review", async ({ page }) => {

@@ -32,7 +32,7 @@ import logging
 import urllib.error
 import urllib.request
 from decimal import Decimal
-from typing import Any
+from typing import Any, NamedTuple
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -256,20 +256,56 @@ def _send_email(
         response.read()
 
 
-def _provider_error_name(exc: urllib.error.HTTPError) -> str:
-    """Best-effort extraction of Resend's machine-readable error `name`
-    field (e.g. "invalid_api_key", "validation_error") from a failed send's
-    JSON body — never its "message" text, which can echo request content.
-    Never raises: any read/parse failure, or a body with no string `name`,
-    yields "unknown" rather than propagating."""
+class _ProviderErrorInfo(NamedTuple):
+    """Every observable this module is allowed to log about a failed send,
+    all derived from ONE read of the response body — never the body,
+    message, or headers themselves. `content_type` is the declared media
+    type only (e.g. "application/json"), with any charset/parameter
+    stripped; `body_bytes` is the raw byte length; `is_json` and `name`
+    come from attempting to parse that same buffer, never a second read."""
+
+    name: str
+    content_type: str
+    body_bytes: int
+    is_json: bool
+
+
+def _classify_provider_error(exc: urllib.error.HTTPError) -> _ProviderErrorInfo:
+    """Reads the failed response body exactly ONCE and derives every
+    observable from that single captured buffer — a second read of an
+    HTTPError's stream returns nothing, so `name`, `body_bytes` and
+    `is_json` must all come from the one buffer captured here, never from
+    independent calls to `exc.read()`. Never raises: any header/read/parse
+    failure degrades the corresponding field to its safe default rather
+    than propagating."""
+    content_type = "unknown"
     try:
-        data = json.loads(exc.read().decode("utf-8"))
-        name = data.get("name")
-        if isinstance(name, str) and name:
-            return name
+        raw_ct = exc.headers.get("Content-Type") if exc.headers is not None else None
+        if raw_ct:
+            content_type = raw_ct.split(";", 1)[0].strip().lower()
     except Exception:
         pass
-    return "unknown"
+
+    try:
+        raw = exc.read()
+    except Exception:
+        raw = b""
+    body_bytes = len(raw)
+
+    name = "unknown"
+    is_json = False
+    try:
+        data = json.loads(raw.decode("utf-8"))
+        is_json = True
+        parsed_name = data.get("name") if isinstance(data, dict) else None
+        if isinstance(parsed_name, str) and parsed_name:
+            name = parsed_name
+    except Exception:
+        pass
+
+    return _ProviderErrorInfo(
+        name=name, content_type=content_type, body_bytes=body_bytes, is_json=is_json
+    )
 
 
 def notify_lead_captured(session: Session, lead: CommercialLead, created: bool) -> None:
@@ -283,9 +319,11 @@ def notify_lead_captured(session: Session, lead: CommercialLead, created: bool) 
     apart from "it's on but broken" apart from "it tried and the provider
     rejected it". No PII, subject, body, recipient or API key ever appears in
     any of these lines; only lead_id, the NEW/UPDATED event, the skip reason,
-    the provider's numeric HTTP status, its machine-readable error `name`
-    (see `_provider_error_name` — never its "message" text or raw body/
-    headers), and the exception TYPE (never str(exc))."""
+    the provider's numeric HTTP status, its response's derived shape (see
+    `_classify_provider_error`: a machine-readable error `name`, the
+    declared Content-Type media type, the raw body's byte length, and
+    whether it parsed as JSON — never the body, "message" text, or other
+    headers themselves), and the exception TYPE (never str(exc))."""
     settings = get_settings()
     event = "NEW" if created else "UPDATED"
     lead_id = str(lead.id)
@@ -317,11 +355,13 @@ def notify_lead_captured(session: Session, lead: CommercialLead, created: bool) 
         )
         logger.info("lead notification accepted lead_id=%s event=%s", lead_id, event)
     except urllib.error.HTTPError as exc:
-        provider_error = _provider_error_name(exc)
+        info = _classify_provider_error(exc)
         logger.error(
             "lead notification failed lead_id=%s event=%s status_class=%sxx "
-            "provider_status=%s provider_error=%s exc_type=%s",
-            lead_id, event, exc.code // 100, exc.code, provider_error, type(exc).__name__,
+            "provider_status=%s provider_error=%s provider_content_type=%s "
+            "provider_body_bytes=%s provider_body_is_json=%s exc_type=%s",
+            lead_id, event, exc.code // 100, exc.code, info.name, info.content_type,
+            info.body_bytes, "YES" if info.is_json else "NO", type(exc).__name__,
         )
     except Exception as exc:
         # Deliberately broad: ANY failure while building or sending the

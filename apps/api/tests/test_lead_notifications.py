@@ -8,6 +8,7 @@ email (`app.services.lead_notifications._send_email` is monkeypatched).
 """
 from __future__ import annotations
 
+import email
 import io
 import json
 import logging
@@ -422,8 +423,10 @@ def test_log_reports_provider_status_class_on_http_error(client, database_url, m
     assert "lead notification failed" in logged
     assert "status_class=4xx" in logged
     assert "provider_status=403" in logged
-    # no readable body (fp=None) -> the error name can't be extracted either
+    # no readable body (fp=None) -> nothing to parse: an empty-body 403
     assert "provider_error=unknown" in logged
+    assert "provider_body_bytes=0" in logged
+    assert "provider_body_is_json=NO" in logged
 
 
 def test_log_reports_provider_error_name_without_leaking_message(
@@ -431,13 +434,16 @@ def test_log_reports_provider_error_name_without_leaking_message(
 ):
     """Resend's JSON error body carries both a machine-readable `name` (safe
     to log) and a human `message` (which can echo request content, e.g. the
-    offending field's value) — only `name` may ever reach the logs."""
+    offending field's value) — only `name`, the Content-Type media type, the
+    byte length, and the JSON-parsed YES/NO flag may ever reach the logs."""
     _enable(monkeypatch)
     resend_body = json.dumps(
-        {"name": "invalid_api_key", "message": "API key is invalid, sensitive-detail-xyz"}
+        {"name": "invalid_api_key", "message": "API key is invalid, sensitive-detail-xyz",
+         "statusCode": 403}
     ).encode("utf-8")
+    headers = email.message_from_string("Content-Type: application/json; charset=utf-8\r\n\r\n")
     http_error = urllib.error.HTTPError(
-        "https://api.resend.example/emails", 403, "Forbidden", None, io.BytesIO(resend_body)
+        "https://api.resend.example/emails", 403, "Forbidden", headers, io.BytesIO(resend_body)
     )
     _record_sends(monkeypatch, raise_exc=http_error)
     with caplog.at_level(logging.INFO):
@@ -450,23 +456,29 @@ def test_log_reports_provider_error_name_without_leaking_message(
     assert resp.status_code == 201, resp.text
     logged = "\n".join(r.getMessage() for r in caplog.records)
     assert "provider_error=invalid_api_key" in logged
+    assert "provider_content_type=application/json" in logged
+    assert f"provider_body_bytes={len(resend_body)}" in logged
+    assert "provider_body_is_json=YES" in logged
     assert "sensitive-detail-xyz" not in logged
     assert "API key is invalid" not in logged
+    assert "statusCode" not in logged
 
 
-def test_log_reports_unknown_provider_error_for_a_malformed_body(
+def test_log_reports_unknown_provider_error_for_a_non_json_body(
     client, database_url, monkeypatch, caplog
 ):
     """A body that isn't the expected JSON shape (e.g. an HTML error page
     from a proxy in front of the provider) must degrade to "unknown" rather
     than raise — the notification failure path itself must never fail."""
     _enable(monkeypatch)
+    html_body = b"<html>not json</html>"
+    headers = email.message_from_string("Content-Type: text/html; charset=utf-8\r\n\r\n")
     http_error = urllib.error.HTTPError(
         "https://api.resend.example/emails",
         500,
         "Internal Server Error",
-        None,
-        io.BytesIO(b"<html>not json</html>"),
+        headers,
+        io.BytesIO(html_body),
     )
     _record_sends(monkeypatch, raise_exc=http_error)
     with caplog.at_level(logging.INFO):
@@ -478,6 +490,10 @@ def test_log_reports_unknown_provider_error_for_a_malformed_body(
     assert resp.status_code == 201, resp.text
     logged = "\n".join(r.getMessage() for r in caplog.records)
     assert "provider_error=unknown" in logged
+    assert "provider_content_type=text/html" in logged
+    assert f"provider_body_bytes={len(html_body)}" in logged
+    assert "provider_body_is_json=NO" in logged
+    assert "not json" not in logged
     assert "not json" not in logged
 
 

@@ -16,12 +16,14 @@ queue/background-worker dependency for v0.1.
 Privacy: the EMAIL this module sends deliberately DOES carry buyer PII — an
 internal lead notification is useless without contact details, and it goes
 only to HumanoidOnline's own configured operational address. Its LOGS never
-do: only `lead_id`, the NEW/UPDATED event, a coarse provider-status class and
-the exception type are ever logged — never the recipient, subject, body, or
-the buyer's email/name/organization/message. Every field written into the
-email body comes from server-owned persisted state (the committed lead row,
-its frozen `requirements_snapshot`, and fresh lookups of canonical robot/
-region facts) — this module never receives or reads the raw client payload.
+do: only `lead_id`, the NEW/UPDATED event, the provider's numeric HTTP
+status, its machine-readable error `name` field (e.g. "invalid_api_key" —
+never its "message" text), and the exception type are ever logged — never
+the recipient, subject, body, headers, API key, or the buyer's email/name/
+organization/message. Every field written into the email body comes from
+server-owned persisted state (the committed lead row, its frozen
+`requirements_snapshot`, and fresh lookups of canonical robot/region facts)
+— this module never receives or reads the raw client payload.
 """
 from __future__ import annotations
 
@@ -254,6 +256,22 @@ def _send_email(
         response.read()
 
 
+def _provider_error_name(exc: urllib.error.HTTPError) -> str:
+    """Best-effort extraction of Resend's machine-readable error `name`
+    field (e.g. "invalid_api_key", "validation_error") from a failed send's
+    JSON body — never its "message" text, which can echo request content.
+    Never raises: any read/parse failure, or a body with no string `name`,
+    yields "unknown" rather than propagating."""
+    try:
+        data = json.loads(exc.read().decode("utf-8"))
+        name = data.get("name")
+        if isinstance(name, str) and name:
+            return name
+    except Exception:
+        pass
+    return "unknown"
+
+
 def notify_lead_captured(session: Session, lead: CommercialLead, created: bool) -> None:
     """Best-effort operational notification. NEVER raises: a failure here must
     never affect the already-committed lead or the HTTP response. Call this
@@ -265,8 +283,9 @@ def notify_lead_captured(session: Session, lead: CommercialLead, created: bool) 
     apart from "it's on but broken" apart from "it tried and the provider
     rejected it". No PII, subject, body, recipient or API key ever appears in
     any of these lines; only lead_id, the NEW/UPDATED event, the skip reason,
-    the provider's numeric HTTP status (a status code alone, never its
-    response body or headers), and the exception TYPE (never str(exc))."""
+    the provider's numeric HTTP status, its machine-readable error `name`
+    (see `_provider_error_name` — never its "message" text or raw body/
+    headers), and the exception TYPE (never str(exc))."""
     settings = get_settings()
     event = "NEW" if created else "UPDATED"
     lead_id = str(lead.id)
@@ -298,10 +317,11 @@ def notify_lead_captured(session: Session, lead: CommercialLead, created: bool) 
         )
         logger.info("lead notification accepted lead_id=%s event=%s", lead_id, event)
     except urllib.error.HTTPError as exc:
+        provider_error = _provider_error_name(exc)
         logger.error(
             "lead notification failed lead_id=%s event=%s status_class=%sxx "
-            "provider_status=%s exc_type=%s",
-            lead_id, event, exc.code // 100, exc.code, type(exc).__name__,
+            "provider_status=%s provider_error=%s exc_type=%s",
+            lead_id, event, exc.code // 100, exc.code, provider_error, type(exc).__name__,
         )
     except Exception as exc:
         # Deliberately broad: ANY failure while building or sending the

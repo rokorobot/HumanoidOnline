@@ -8,6 +8,8 @@ email (`app.services.lead_notifications._send_email` is monkeypatched).
 """
 from __future__ import annotations
 
+import io
+import json
 import logging
 import urllib.error
 import uuid
@@ -420,6 +422,63 @@ def test_log_reports_provider_status_class_on_http_error(client, database_url, m
     assert "lead notification failed" in logged
     assert "status_class=4xx" in logged
     assert "provider_status=403" in logged
+    # no readable body (fp=None) -> the error name can't be extracted either
+    assert "provider_error=unknown" in logged
+
+
+def test_log_reports_provider_error_name_without_leaking_message(
+    client, database_url, monkeypatch, caplog
+):
+    """Resend's JSON error body carries both a machine-readable `name` (safe
+    to log) and a human `message` (which can echo request content, e.g. the
+    offending field's value) — only `name` may ever reach the logs."""
+    _enable(monkeypatch)
+    resend_body = json.dumps(
+        {"name": "invalid_api_key", "message": "API key is invalid, sensitive-detail-xyz"}
+    ).encode("utf-8")
+    http_error = urllib.error.HTTPError(
+        "https://api.resend.example/emails", 403, "Forbidden", None, io.BytesIO(resend_body)
+    )
+    _record_sends(monkeypatch, raise_exc=http_error)
+    with caplog.at_level(logging.INFO):
+        resp = client.post("/api/commercial-leads", json={
+            "contact_email": "notif-obs-error-name@example.com",
+            "contact_name": "Test Buyer", "organization": "Test Org",
+            "robot_slugs": [_any_published_slug()],
+        })
+    # non-fatal: the lead persists (201) regardless of the notification outcome
+    assert resp.status_code == 201, resp.text
+    logged = "\n".join(r.getMessage() for r in caplog.records)
+    assert "provider_error=invalid_api_key" in logged
+    assert "sensitive-detail-xyz" not in logged
+    assert "API key is invalid" not in logged
+
+
+def test_log_reports_unknown_provider_error_for_a_malformed_body(
+    client, database_url, monkeypatch, caplog
+):
+    """A body that isn't the expected JSON shape (e.g. an HTML error page
+    from a proxy in front of the provider) must degrade to "unknown" rather
+    than raise — the notification failure path itself must never fail."""
+    _enable(monkeypatch)
+    http_error = urllib.error.HTTPError(
+        "https://api.resend.example/emails",
+        500,
+        "Internal Server Error",
+        None,
+        io.BytesIO(b"<html>not json</html>"),
+    )
+    _record_sends(monkeypatch, raise_exc=http_error)
+    with caplog.at_level(logging.INFO):
+        resp = client.post("/api/commercial-leads", json={
+            "contact_email": "notif-obs-malformed@example.com",
+            "contact_name": "Test Buyer", "organization": "Test Org",
+            "robot_slugs": [_any_published_slug()],
+        })
+    assert resp.status_code == 201, resp.text
+    logged = "\n".join(r.getMessage() for r in caplog.records)
+    assert "provider_error=unknown" in logged
+    assert "not json" not in logged
 
 
 # ---- 10 — both capture surfaces share the one governed path ----------------

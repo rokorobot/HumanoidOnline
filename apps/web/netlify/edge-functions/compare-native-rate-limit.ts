@@ -1,16 +1,20 @@
-// Emergency Compare Rate Containment v0.3 — `/compare` native rate limiting.
+// Emergency Compare Rate Containment v0.3.2 — `/compare` native rate limit.
 //
 // `/compare` exists for nothing but comparison: `app/compare/page.tsx` makes
 // no backend call at all when `ids` is absent or has fewer than 2 entries
 // (it renders a static "select robots to compare" prompt), so a bare
 // `/compare` hit is cheap regardless. That makes the whole path — not just
 // `/compare?ids=...` — eligible for Netlify's *native*, platform-enforced
-// per-IP rate limit, declared below via `config.rateLimit`. Unlike
-// `/robots?compare=...` (see compare-rate-limit.ts), this needs no
-// query-string awareness and therefore no app-level counter: the block
-// decision is made by Netlify's own infrastructure, before this function
-// body ever runs for a rejected request, with none of the Netlify Blobs
-// concurrency exposure a hand-rolled counter would carry.
+// per-IP rate limit, declared below via `config.rateLimit`: no app-level
+// counter, no persistence, no concurrency exposure at all. The platform
+// itself owns the distributed per-IP counters.
+//
+// v0.3.2 note: `/robots` is protected the same way, by a sibling file
+// (robots-native-rate-limit.ts) — see that file for why the earlier
+// query-aware, Netlify-Blobs-backed `/robots?compare=...` limiter was
+// removed entirely (it could never bundle in Netlify's actual Edge Function
+// runtime — npm-module imports in Edge Functions are experimental and
+// `@netlify/blobs` failed to load there regardless of package version).
 //
 // `aggregateBy: ["ip", "domain"]` is the all-plans option — each visiting IP
 // gets its own 30/60s budget. (The alternative, `["domain"]` alone, is a
@@ -18,11 +22,10 @@
 // feature; not appropriate here regardless of plan.)
 //
 // This file's `config.rateLimit` is a declarative, platform-enforced rule —
-// it is NOT exercised by the mocked-Blobs unit tests in this repo (there is
-// nothing to mock: no app code runs the check). It is covered by a
-// config-shape audit test only; genuine enforcement can only be verified
-// against a live Netlify deployment (see docs/16_EMERGENCY_COMPARE_RATE_CONTAINMENT.md
-// residual-risk note).
+// it is NOT exercised by the unit tests in this repo (there is no
+// application code here to run or mock). Those tests are a config-shape
+// audit only: they prove the declared policy matches what's documented,
+// not that Netlify enforces it — only a live deployment can prove that.
 import type { Config } from "@netlify/edge-functions";
 
 export default async function compareNativeRateLimit() {

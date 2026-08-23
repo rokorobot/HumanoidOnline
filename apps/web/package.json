@@ -18,7 +18,6 @@
     "e2e:mobile": "playwright test --project=mobile-chromium --grep-invert \"@zeromatch|@discovery\""
   },
   "dependencies": {
-    "@netlify/blobs": "^11.0.1",
     "next": "^15.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

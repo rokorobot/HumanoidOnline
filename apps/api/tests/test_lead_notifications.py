@@ -13,6 +13,7 @@ import io
 import json
 import logging
 import urllib.error
+import urllib.request
 import uuid
 
 from sqlalchemy import text
@@ -116,6 +117,50 @@ def test_notification_ready_requires_all_four_fields():
 
     assert notif._notification_ready(_NoTo()) is False
     assert notif._notification_ready(_NoFrom()) is False
+
+
+# ---- outgoing request headers (pure, no DB) ---------------------------------
+
+
+def test_send_email_sets_explicit_user_agent_and_keeps_other_headers(monkeypatch):
+    """Resend's edge layer rejects urllib's generic default User-Agent
+    (Python-urllib/x.y) before the request ever reaches Resend's own API log
+    (see the production diagnostic: a 17-byte, non-JSON, text/plain 403).
+    `_send_email` must set an explicit application User-Agent while leaving
+    Authorization/Content-Type exactly as before."""
+    captured: dict[str, urllib.request.Request] = {}
+
+    class _FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc_info):
+            return False
+
+        def read(self):
+            return b""
+
+    def fake_urlopen(request, timeout=None):
+        captured["request"] = request
+        return _FakeResponse()
+
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+    notif._send_email(
+        endpoint="https://api.resend.example/emails",
+        api_key="fake-key",
+        from_addr="noreply@humanoidonline.example",
+        to_addrs=["ops@example.com"],
+        subject="s",
+        text="t",
+    )
+    request = captured["request"]
+    # urllib.request.Request.get_header() title-cases only the first letter
+    # of each hyphenated word ("User-agent", "Content-type"); this is the
+    # exact form the values are stored under, and matches what was verified
+    # on the wire against a real local HTTP server.
+    assert request.get_header("User-agent") == "HumanoidOnline/1.0"
+    assert request.get_header("Authorization") == "Bearer fake-key"
+    assert request.get_header("Content-type") == "application/json"
 
 
 # ---- 1 — new lead: persisted + exactly one attempt -------------------------

@@ -239,7 +239,14 @@ def _send_email(
     """The one network call in this module. Raises on any failure (timeout,
     connection error, non-2xx status) — the caller is solely responsible for
     containment. Deliberately stdlib-only (`urllib`): a single JSON POST needs
-    no provider SDK."""
+    no provider SDK.
+
+    Sets an explicit application `User-Agent` rather than leaving urllib's
+    generic default (`Python-urllib/x.y`) in place — evidence from the
+    production diagnostic (a 17-byte, non-JSON, text/plain 403 that never
+    reaches Resend's own request log) points at an edge/WAF layer rejecting
+    the generic library signature before the request reaches Resend's API,
+    not at Resend's application logic itself."""
     body = json.dumps(
         {"from": from_addr, "to": to_addrs, "subject": subject, "text": text}
     ).encode("utf-8")
@@ -250,6 +257,7 @@ def _send_email(
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
+            "User-Agent": "HumanoidOnline/1.0",
         },
     )
     with urllib.request.urlopen(request, timeout=_TIMEOUT_SECONDS) as response:

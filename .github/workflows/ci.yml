@@ -153,6 +153,14 @@ jobs:
       API_BASE_URL: http://127.0.0.1:8000
       # WS8.2 / R8 — explicit canonical origin; never the production hostname.
       NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
+      # CI-only: every Playwright worker in this job proxies through one
+      # Next.js -> FastAPI loopback hop, so the whole suite (~26 commercial-lead
+      # POSTs across parallel workers + retries) shares ONE rate-limit identity
+      # under app/security/rate_limit.py's per-client-IP counter — a collision
+      # that cannot occur in production, where real clients have distinct IPs.
+      # Raises only the burst ceiling for this job; window/sustained limits and
+      # every production default are untouched, and the limiter stays active.
+      COMMERCIAL_LEADS_BURST: "100"
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5

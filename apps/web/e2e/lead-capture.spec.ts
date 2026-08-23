@@ -149,7 +149,10 @@ test("matched per-card: missing sessionStorage identity blocks submission instea
   // the raw backend 409 detail never appears in the UI
   await expect(dialog).not.toContainText(/bound to a different contact email/i);
 
-  await dialog.getByRole("button", { name: /Close/i }).click();
+  // Not getByRole("button", { name: /Close/i }) — the header ✕ button carries
+  // aria-label="Close" too, so that locator resolves to two elements (strict
+  // mode violation). Target the visible ghost Close button specifically.
+  await dialog.locator("button.btn--ghost").filter({ hasText: /^Close$/ }).click();
   await expect(dialog).toHaveCount(0);
 
   // nothing was ever submitted

@@ -265,7 +265,8 @@ def notify_lead_captured(session: Session, lead: CommercialLead, created: bool) 
     apart from "it's on but broken" apart from "it tried and the provider
     rejected it". No PII, subject, body, recipient or API key ever appears in
     any of these lines; only lead_id, the NEW/UPDATED event, the skip reason,
-    a coarse provider status class, and the exception TYPE (never str(exc))."""
+    the provider's numeric HTTP status (a status code alone, never its
+    response body or headers), and the exception TYPE (never str(exc))."""
     settings = get_settings()
     event = "NEW" if created else "UPDATED"
     lead_id = str(lead.id)
@@ -298,8 +299,9 @@ def notify_lead_captured(session: Session, lead: CommercialLead, created: bool) 
         logger.info("lead notification accepted lead_id=%s event=%s", lead_id, event)
     except urllib.error.HTTPError as exc:
         logger.error(
-            "lead notification failed lead_id=%s event=%s status_class=%sxx exc_type=%s",
-            lead_id, event, exc.code // 100, type(exc).__name__,
+            "lead notification failed lead_id=%s event=%s status_class=%sxx "
+            "provider_status=%s exc_type=%s",
+            lead_id, event, exc.code // 100, exc.code, type(exc).__name__,
         )
     except Exception as exc:
         # Deliberately broad: ANY failure while building or sending the

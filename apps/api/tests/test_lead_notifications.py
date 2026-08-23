@@ -401,7 +401,9 @@ def test_log_records_attempt_before_outcome(client, database_url, monkeypatch, c
 
 def test_log_reports_provider_status_class_on_http_error(client, database_url, monkeypatch, caplog):
     """A rejected send (e.g. an unverified Resend sender domain, 403) must be
-    distinguishable from a network/timeout failure by its status class."""
+    distinguishable from a network/timeout failure by its status class, and
+    the exact numeric provider status must be recoverable from production
+    logs (e.g. 401 vs 403 vs 422) without exposing the response body."""
     _enable(monkeypatch)
     http_error = urllib.error.HTTPError(
         "https://api.resend.example/emails", 403, "Forbidden", None, None
@@ -417,6 +419,7 @@ def test_log_reports_provider_status_class_on_http_error(client, database_url, m
     logged = "\n".join(r.getMessage() for r in caplog.records)
     assert "lead notification failed" in logged
     assert "status_class=4xx" in logged
+    assert "provider_status=403" in logged
 
 
 # ---- 10 — both capture surfaces share the one governed path ----------------

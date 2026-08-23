@@ -25,7 +25,6 @@ from app.observability import (
     configure_logging,
 )
 from app.routers import (
-    _resend_diagnostic,
     buyer_requirements,
     commercial_leads,
     discovery_review,
@@ -93,12 +92,6 @@ app.include_router(stats.router)
 app.include_router(buyer_requirements.router)
 # WS7 — commercial lead (first commercial conversion / monetization seam).
 app.include_router(commercial_leads.router)
-
-# TEMPORARY — one-off Resend response-origin diagnostic (see
-# app/routers/_resend_diagnostic.py). Token-gated, no DB, no PII. Removed in
-# a follow-up commit immediately after its one authorized invocation; must
-# never remain a standing feature of this application.
-app.include_router(_resend_diagnostic.router)
 
 # DATA-D1 operator review surface — NOT PUBLIC, and mounted ONLY in relaxed
 # environments. In staging/production these routes do not exist: not disabled by

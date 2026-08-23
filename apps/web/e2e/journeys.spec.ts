@@ -65,19 +65,21 @@ test("Journey B — buyer intent: wizard -> match results -> commercial lead", a
   await page.getByRole("button", { name: /Next/ }).click();
   await expect(page.getByRole("heading", { name: /Review/i })).toBeVisible();
   await page.getByRole("button", { name: /Submit requirements/i }).click();
+  await expect(page.getByRole("heading", { name: "Requirement captured" })).toBeVisible();
 
   // A real buyer_requirement was persisted -> deterministic match results.
   await page.getByRole("link", { name: /See matches/i }).click();
   await expect(page).toHaveURL(/\/matches\//);
   await expect(page.getByRole("heading", { name: /matched/i })).toBeVisible();
 
-  // The commercial spine completes: request help -> lead captured (200/201).
+  // The commercial spine completes: request help -> lead extended (200) —
+  // the wizard's CONTACT step already created the lead, so LeadDialog shows
+  // that identity locked (read-only), not editable fields to refill.
   await page.getByRole("button", { name: /Request commercial help/i }).first().click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
-  await dialog.locator("#lead-name").fill("Jane Buyer");
-  await dialog.locator("#lead-org").fill("Acme Robotics");
-  await dialog.locator("#lead-email").fill("journey-b@example.com");
+  await expect(dialog.locator("#lead-name")).toHaveCount(0);
+  await expect(dialog).toContainText("journey-b@example.com");
   await dialog.getByRole("button", { name: /Send request/i }).click();
   // Governed result: the capture confirmation (a commercial_lead now exists).
   await expect(dialog.getByText(/Request received|received/i)).toBeVisible();

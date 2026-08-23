@@ -39,11 +39,52 @@ export interface LeadDialogProps {
   robotSlugs: string[];
   countries: RegionListItem[];
   // Known identity from the Find a Humanoid contact step, when this dialog is
-  // opened for a matched requirement — prefills the form so the buyer never
-  // retypes what they already gave us. Still fully editable. Absent/null for
-  // a direct Robot-Detail "Request availability" (no requirement context) or
-  // a historical anonymous requirement: the form opens empty, as before.
+  // opened for a matched requirement — locks the identity fields to a
+  // read-only summary (see isIdentityLocked) so the buyer never retypes, and
+  // can never diverge from, what they already gave us. Absent/null with a
+  // `requirementId` means this browser/session lost track of that identity
+  // (see isIdentityUnknown) — the dialog then blocks submission entirely
+  // rather than guess. Absent/null with `requirementId === null` (a direct
+  // Robot-Detail "Request availability", no requirement context) keeps the
+  // full editable form, as before.
   identity?: Identity | null;
+}
+
+// Requirement-linked contact identity is canonical once the Find a Humanoid
+// CONTACT step (or an earlier lead capture) established it: capture_lead()'s
+// identity-integrity guard (app/services/leads/service.py) 409s a
+// requirement-linked submission whose contact_email doesn't match the
+// lead's existing one — a later action on the SAME requirement must extend
+// that identity, never silently replace it. Re-asking editable name/org/
+// email fields here would let a buyer type a different email and hit that
+// raw backend 409. Whenever both a `requirementId` AND a known `identity`
+// are present, the three identity fields become a read-only summary instead
+// of inputs — no second source of truth, `draft` (seeded from `identity`)
+// still drives the submission. A direct Robot-Detail capture
+// (`requirementId === null`) never has an `identity` to lock to and keeps
+// the full editable form, unchanged.
+function isIdentityLocked(requirementId: string | null, identity: Identity | null | undefined): boolean {
+  return requirementId !== null && identity != null;
+}
+
+// The residual gap: `requirementId` is set but the sessionStorage bridge came
+// up empty (new tab, browser restart, a copied/shared matches URL, private
+// mode). Since the Find a Humanoid wizard now creates the commercial lead at
+// its CONTACT step (see Wizard.tsx) — BEFORE /matches/[id] is ever reachable —
+// every requirementId reaching this dialog already has a lead bound to it.
+// Falling back to the editable form here would let a buyer type a *guessed*
+// identity that capture_lead() must then judge against the real one, either
+// silently extending on a lucky match or surfacing the raw "already bound to
+// a different contact email" 409 on a miss — neither is an acceptable UX, and
+// there is no non-PII signal anywhere in the current API surface (MatchResponse,
+// RequirementRead) that would let the client tell in advance which outcome to
+// expect. So this state doesn't collect or submit anything: no editable
+// fields, no read-only summary (we don't know the identity to show), just an
+// explanation and a way out. Closing this properly — e.g. letting the buyer
+// re-verify and re-link — would need a new server data contract; this is the
+// smallest safe UX on the existing one.
+function isIdentityUnknown(requirementId: string | null, identity: Identity | null | undefined): boolean {
+  return requirementId !== null && identity == null;
 }
 
 export function LeadDialog({
@@ -78,6 +119,9 @@ export function LeadDialog({
   const emailErrId = useId();
   const titleId = useId();
 
+  const identityLocked = isIdentityLocked(requirementId, identity);
+  const identityUnknown = isIdentityUnknown(requirementId, identity);
+
   // Reset to a clean form whenever the dialog is (re)opened — prefilled from
   // the requirement's identity when we have one (still fully editable).
   useEffect(() => {
@@ -93,16 +137,17 @@ export function LeadDialog({
     }
   }, [open, identity]);
 
-  // Move focus into the dialog on open (the first required field — full name —
-  // or the heading in the success state).
+  // Move focus into the dialog on open: the heading in the success state, the
+  // first required field — full name — when it's editable, or the heading
+  // itself when there is no field to focus (identity locked, or unknown).
   useEffect(() => {
     if (!open) return;
     const t = window.setTimeout(() => {
-      if (done) headingRef.current?.focus();
+      if (done || identityLocked || identityUnknown) headingRef.current?.focus();
       else nameRef.current?.focus();
     }, 0);
     return () => window.clearTimeout(t);
-  }, [open, done]);
+  }, [open, done, identityLocked, identityUnknown]);
 
   // Escape to close + a simple focus trap that keeps Tab inside the dialog.
   useEffect(() => {
@@ -138,26 +183,34 @@ export function LeadDialog({
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // Defense in depth: this branch renders no <form> (see identityUnknown in
+    // the JSX below), so this is structurally unreachable — but never submit
+    // a guessed identity against a requirement whose real one we don't know.
+    if (identityUnknown) return;
     // Required, in the order they appear in the form: full name, organization,
     // email. Set every field's error state (so all three show at once) but
-    // focus only the FIRST invalid one.
-    const nameErr = draftNameError(draft);
-    const orgErr = draftOrganizationError(draft);
-    const emailErr = draftEmailError(draft);
-    setNameError(nameErr);
-    setOrgError(orgErr);
-    setEmailError(emailErr);
-    if (nameErr) {
-      nameRef.current?.focus();
-      return;
-    }
-    if (orgErr) {
-      orgRef.current?.focus();
-      return;
-    }
-    if (emailErr) {
-      emailRef.current?.focus();
-      return;
+    // focus only the FIRST invalid one. Skipped entirely when the identity is
+    // locked — `draft` was seeded from an already-validated `identity`, and
+    // there are no editable name/org/email inputs to focus an error on.
+    if (!identityLocked) {
+      const nameErr = draftNameError(draft);
+      const orgErr = draftOrganizationError(draft);
+      const emailErr = draftEmailError(draft);
+      setNameError(nameErr);
+      setOrgError(orgErr);
+      setEmailError(emailErr);
+      if (nameErr) {
+        nameRef.current?.focus();
+        return;
+      }
+      if (orgErr) {
+        orgRef.current?.focus();
+        return;
+      }
+      if (emailErr) {
+        emailRef.current?.focus();
+        return;
+      }
     }
     if (submittingRef.current) return;
     submittingRef.current = true;
@@ -241,71 +294,108 @@ export function LeadDialog({
               </button>
             </div>
           </div>
+        ) : identityUnknown ? (
+          // See isIdentityUnknown's comment: this requirement already has a
+          // lead bound to it, but this browser/session doesn't know who
+          // submitted it, so there is nothing safe to collect or submit here.
+          <div aria-live="polite">
+            {context && <p className="note" style={{ marginTop: 0 }}>{context}</p>}
+            <p className="prose">
+              This request already has a contact saved from when it was
+              submitted. To add to it, please continue from the browser tab or
+              session you originally used — this one can&apos;t confirm who
+              submitted it, so we can&apos;t safely add to it here.
+            </p>
+            <div className="actions" style={{ marginTop: "var(--ho-sp-5)" }}>
+              <button type="button" className="btn btn--ghost" onClick={onClose}>
+                Close
+              </button>
+            </div>
+          </div>
         ) : (
           <form onSubmit={onSubmit} noValidate>
             {context && <p className="note" style={{ marginTop: 0 }}>{context}</p>}
 
-            <div className="field">
-              <label htmlFor="lead-name">Full name *</label>
-              <input
-                id="lead-name"
-                ref={nameRef}
-                type="text"
-                required
-                maxLength={MAX_NAME}
-                autoComplete="name"
-                value={draft.contact_name}
-                onChange={(e) => set("contact_name", e.target.value)}
-                aria-invalid={nameError ? true : undefined}
-                aria-describedby={nameError ? nameErrId : undefined}
-              />
-              {nameError && (
-                <span id={nameErrId} className="field-error" role="alert">
-                  {nameError}
-                </span>
-              )}
-            </div>
+            {identityLocked ? (
+              // Read-only summary, not editable inputs — see isIdentityLocked's
+              // comment. `draft` (seeded from `identity`) is still the single
+              // source of truth for what gets submitted; this only displays it.
+              <div className="field lead-identity-locked">
+                <p className="wz-qhelp" style={{ marginTop: 0 }}>
+                  Submitting as <strong>{draft.contact_name}</strong>
+                  {draft.organization ? <> · {draft.organization}</> : null}
+                  {" · "}
+                  {draft.contact_email}
+                </p>
+                <p className="note">
+                  {"// This is the identity from your Find a Humanoid submission and can't be changed here."}
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="field">
+                  <label htmlFor="lead-name">Full name *</label>
+                  <input
+                    id="lead-name"
+                    ref={nameRef}
+                    type="text"
+                    required
+                    maxLength={MAX_NAME}
+                    autoComplete="name"
+                    value={draft.contact_name}
+                    onChange={(e) => set("contact_name", e.target.value)}
+                    aria-invalid={nameError ? true : undefined}
+                    aria-describedby={nameError ? nameErrId : undefined}
+                  />
+                  {nameError && (
+                    <span id={nameErrId} className="field-error" role="alert">
+                      {nameError}
+                    </span>
+                  )}
+                </div>
 
-            <div className="field">
-              <label htmlFor="lead-org">Company / organization *</label>
-              <input
-                id="lead-org"
-                ref={orgRef}
-                type="text"
-                required
-                maxLength={MAX_ORG}
-                autoComplete="organization"
-                value={draft.organization}
-                onChange={(e) => set("organization", e.target.value)}
-                aria-invalid={orgError ? true : undefined}
-                aria-describedby={orgError ? orgErrId : undefined}
-              />
-              {orgError && (
-                <span id={orgErrId} className="field-error" role="alert">
-                  {orgError}
-                </span>
-              )}
-            </div>
+                <div className="field">
+                  <label htmlFor="lead-org">Company / organization *</label>
+                  <input
+                    id="lead-org"
+                    ref={orgRef}
+                    type="text"
+                    required
+                    maxLength={MAX_ORG}
+                    autoComplete="organization"
+                    value={draft.organization}
+                    onChange={(e) => set("organization", e.target.value)}
+                    aria-invalid={orgError ? true : undefined}
+                    aria-describedby={orgError ? orgErrId : undefined}
+                  />
+                  {orgError && (
+                    <span id={orgErrId} className="field-error" role="alert">
+                      {orgError}
+                    </span>
+                  )}
+                </div>
 
-            <div className="field">
-              <label htmlFor="lead-email">Business email *</label>
-              <input
-                id="lead-email"
-                ref={emailRef}
-                type="email"
-                required
-                autoComplete="email"
-                value={draft.contact_email}
-                onChange={(e) => set("contact_email", e.target.value)}
-                aria-invalid={emailError ? true : undefined}
-                aria-describedby={emailError ? emailErrId : undefined}
-              />
-              {emailError && (
-                <span id={emailErrId} className="field-error" role="alert">
-                  {emailError}
-                </span>
-              )}
-            </div>
+                <div className="field">
+                  <label htmlFor="lead-email">Business email *</label>
+                  <input
+                    id="lead-email"
+                    ref={emailRef}
+                    type="email"
+                    required
+                    autoComplete="email"
+                    value={draft.contact_email}
+                    onChange={(e) => set("contact_email", e.target.value)}
+                    aria-invalid={emailError ? true : undefined}
+                    aria-describedby={emailError ? emailErrId : undefined}
+                  />
+                  {emailError && (
+                    <span id={emailErrId} className="field-error" role="alert">
+                      {emailError}
+                    </span>
+                  )}
+                </div>
+              </>
+            )}
 
             <div className="field">
               <label htmlFor="lead-country">Country</label>

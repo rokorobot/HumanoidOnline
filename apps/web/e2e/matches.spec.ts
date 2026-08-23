@@ -52,7 +52,7 @@ test("SEE MATCHES leads to ranked results with the exact six-part breakdown", as
   await expect(page.locator("input[type=email]")).toHaveCount(0);
 });
 
-test("Request commercial help pre-fills identity captured on the wizard's contact step", async ({
+test("Request commercial help shows the identity captured on the wizard's contact step, locked", async ({
   page,
 }) => {
   await page.goto("/find-a-humanoid?use_case=warehouse-logistics");
@@ -67,18 +67,23 @@ test("Request commercial help pre-fills identity captured on the wizard's contac
   await page.getByRole("button", { name: /Next/ }).click();
   await expect(page.getByRole("heading", { name: /Review/i })).toBeVisible();
   await page.getByRole("button", { name: /Submit requirements/i }).click();
+  await expect(page.getByRole("heading", { name: "Requirement captured" })).toBeVisible();
   await page.getByRole("link", { name: /See matches/i }).click();
   await expect(page).toHaveURL(/\/matches\//);
 
   await page.getByRole("button", { name: /Request commercial help/i }).first().click();
-  // Pre-filled from the requirement's identity — no retyping.
-  await expect(page.locator("#lead-name")).toHaveValue("Jane Buyer");
-  await expect(page.locator("#lead-org")).toHaveValue("Acme Robotics");
-  await expect(page.locator("#lead-email")).toHaveValue("jane@example.com");
-  await expect(page.locator("#lead-phone")).toHaveValue("+1 555 0123");
-  // Still fully editable before sending the commercial lead.
-  await page.locator("#lead-name").fill("Jane B. Buyer");
-  await expect(page.locator("#lead-name")).toHaveValue("Jane B. Buyer");
+  // The wizard's CONTACT step already established this requirement's
+  // identity (and created its commercial lead) — LeadDialog shows it as a
+  // read-only summary, not editable inputs. See LeadDialog's
+  // `isIdentityLocked`: re-asking editable fields here could let a buyer
+  // type a different email and hit the backend's identity-integrity 409.
+  await expect(page.locator("#lead-name")).toHaveCount(0);
+  await expect(page.locator("#lead-org")).toHaveCount(0);
+  await expect(page.locator("#lead-email")).toHaveCount(0);
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toContainText("Jane Buyer");
+  await expect(dialog).toContainText("Acme Robotics");
+  await expect(dialog).toContainText("jane@example.com");
 });
 
 test("Compare these navigates the ranked robots into /compare", async ({ page }) => {

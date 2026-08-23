@@ -7,18 +7,28 @@ import { type Locator, type Page, expect, test } from "@playwright/test";
 // API-failure retains the form, double-submit guard, and no contact data in the
 // URL.
 
+// v0.2: the wizard's CONTACT step now already creates the commercial lead
+// (see Wizard.tsx), using this exact identity — which is therefore canonical
+// for this requirement from this point on. Every capture surface below that
+// opens LeadDialog for this SAME requirement_id extends that lead; it cannot
+// re-collect a (possibly different) name/org/email — see LeadDialog's
+// `isIdentityLocked`. Waiting explicitly for "Requirement captured" before
+// clicking "See matches" (rather than relying only on click's implicit
+// auto-wait) makes that state transition an intentional checkpoint here.
 async function matchedRequirement(page: Page) {
   await page.goto("/find-a-humanoid?use_case=warehouse-logistics");
   await page.getByRole("button", { name: /Next/ }).click(); // TASK (seeded)
   for (let i = 0; i < 10; i++) {
     await page.getByRole("button", { name: "Skip" }).click(); // INDUSTRY..TRANSACTION
   }
-  // CONTACT: buyer identity is now required before REVIEW is reachable.
+  // CONTACT: buyer identity is now required before REVIEW is reachable, and
+  // becomes this requirement's canonical identity.
   await page.locator("#wz-contact-name").fill("Test Buyer");
   await page.locator("#wz-contact-org").fill("Test Org");
   await page.locator("#wz-contact-email").fill("buyer@example.com");
   await page.getByRole("button", { name: /Next/ }).click();
   await page.getByRole("button", { name: /Submit requirements/i }).click();
+  await expect(page.getByRole("heading", { name: "Requirement captured" })).toBeVisible();
   await page.getByRole("link", { name: /See matches/i }).click();
   await expect(page).toHaveURL(/\/matches\//);
   await expect(page.getByRole("heading", { name: /matched/i })).toBeVisible();
@@ -45,29 +55,105 @@ async function fillRequiredContact(dialog: Locator, email: string) {
 
 // ---- capture path 1: matched per-card -------------------------------------
 
-test("matched per-card: card CTA -> form -> success", async ({ page }) => {
+test("matched per-card: card CTA -> form -> success (identity locked, extends the wizard's lead)", async ({
+  page,
+}) => {
   await matchedRequirement(page);
+
+  let leadStatus: number | undefined;
+  page.on("response", (r) => {
+    if (r.request().method() === "POST" && r.url().includes("/api/commercial-leads")) {
+      leadStatus = r.status();
+    }
+  });
+
   await page.getByRole("button", { name: /Request commercial help/i }).first().click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
-  await fillRequiredContact(dialog, "jane@example.com");
+
+  // Identity is already known (the wizard's CONTACT step) — a read-only
+  // summary, not editable inputs. No way to type a different email here, so
+  // the backend's identity-integrity 409 can never be hit through this UI.
+  await expect(dialog.locator("#lead-name")).toHaveCount(0);
+  await expect(dialog.locator("#lead-org")).toHaveCount(0);
+  await expect(dialog.locator("#lead-email")).toHaveCount(0);
+  await expect(dialog).toContainText("Test Buyer");
+  await expect(dialog).toContainText("buyer@example.com");
+
   await dialog.getByRole("button", { name: /Send request/i }).click();
   await expect(page.getByRole("heading", { name: /Request received/i })).toBeVisible();
   // no contact data ever leaks into the URL
   expect(page.url()).not.toContain("@");
-  expect(page.url()).not.toContain("jane");
+
+  // Extends the lead the wizard already created for this requirement — 200
+  // (UPDATED), never a fresh 201, and never a duplicate lead.
+  expect(leadStatus).toBe(200);
 });
 
 // ---- capture path 2: whole shortlist --------------------------------------
 
-test("shortlist: 'request help with these matches' -> form -> success", async ({ page }) => {
+test("shortlist: 'request help with these matches' -> form -> success (identity locked, extends the wizard's lead)", async ({
+  page,
+}) => {
   await matchedRequirement(page);
+
+  let leadStatus: number | undefined;
+  page.on("response", (r) => {
+    if (r.request().method() === "POST" && r.url().includes("/api/commercial-leads")) {
+      leadStatus = r.status();
+    }
+  });
+
   await page.getByRole("button", { name: /Request help with these matches/i }).click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
-  await fillRequiredContact(dialog, "shortlist@example.com");
+  await expect(dialog.locator("#lead-email")).toHaveCount(0);
+  await expect(dialog).toContainText("buyer@example.com");
+
   await dialog.getByRole("button", { name: /Send request/i }).click();
   await expect(page.getByRole("heading", { name: /Request received/i })).toBeVisible();
+  expect(leadStatus).toBe(200);
+});
+
+// ---- capture path 3: requirement-linked, identity unknown to this browser -
+
+test("matched per-card: missing sessionStorage identity blocks submission instead of guessing", async ({
+  page,
+}) => {
+  await matchedRequirement(page);
+
+  // Simulate a new tab / browser restart / copied matches URL: the identity
+  // bridge (sessionStorage, keyed by requirement id) is gone, but the
+  // requirement — and the lead the wizard already created for it — still
+  // exists server-side.
+  await page.evaluate(() => sessionStorage.clear());
+  await page.reload();
+  await expect(page.getByRole("heading", { name: /matched/i })).toBeVisible();
+
+  let leadPosts = 0;
+  page.on("request", (r) => {
+    if (r.method() === "POST" && r.url().includes("/api/commercial-leads")) leadPosts += 1;
+  });
+
+  await page.getByRole("button", { name: /Request commercial help/i }).first().click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+
+  // No editable identity fields (nothing to guess) and no way to submit —
+  // only an explanation and Close.
+  await expect(dialog.locator("#lead-name")).toHaveCount(0);
+  await expect(dialog.locator("#lead-org")).toHaveCount(0);
+  await expect(dialog.locator("#lead-email")).toHaveCount(0);
+  await expect(dialog.getByRole("button", { name: /Send request/i })).toHaveCount(0);
+  await expect(dialog).toContainText(/already has a contact saved/i);
+  // the raw backend 409 detail never appears in the UI
+  await expect(dialog).not.toContainText(/bound to a different contact email/i);
+
+  await dialog.getByRole("button", { name: /Close/i }).click();
+  await expect(dialog).toHaveCount(0);
+
+  // nothing was ever submitted
+  expect(leadPosts).toBe(0);
 });
 
 // ---- capture path 4: Robot Detail "Request Availability" ------------------

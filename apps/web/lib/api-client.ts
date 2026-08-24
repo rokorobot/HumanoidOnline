@@ -152,17 +152,51 @@ export function findRobot(slug: string): Promise<RobotDetail | null> {
 
 // compare returns 422 for <2 or >4 valid slugs — surfaced to the caller as null
 // so the compare page can render an explanatory empty state instead of crashing.
+//
+// COMPARE BACKEND CDN KEY CANONICALIZATION (2026-08-24): the wire request uses
+// a SORTED, de-duplicated id list so every permutation of the same robot set
+// (ids=a,b,c,d / d,a,c,b / b,d,a,c) hits the identical `/api/robots/compare`
+// URL and therefore the same Vercel CDN cache entry (routers/robots.py sets a
+// public Cache-Control on this route) instead of each permutation being a
+// fresh, ~5s origin compute. The backend already reorders its own response to
+// match whatever `ids` order it receives, so sending the sorted order would
+// leak into the caller-visible result — `reorderToRequested` below undoes
+// that locally, in memory, so the public /compare URL and rendered order stay
+// exactly what the caller asked for. Dedup collapses to first occurrence,
+// matching the backend's own `dict.fromkeys` (routers/robots.py) exactly, so
+// duplicate-id behaviour is unchanged.
 export async function compareRobots(
   ids: string[],
 ): Promise<CompareResponse | null> {
-  const clean = ids.map((s) => s.trim()).filter(Boolean);
+  const requestedIds = [...new Set(ids.map((s) => s.trim()).filter(Boolean))];
+  const canonicalIds = [...requestedIds].sort();
   const res = await fetch(
-    `${API_BASE_URL}/api/robots/compare${buildQuery({ ids: clean.join(",") })}`,
+    `${API_BASE_URL}/api/robots/compare${buildQuery({ ids: canonicalIds.join(",") })}`,
     { cache: "no-store", headers: await correlationHeader() },
   );
   if (res.status === 422 || res.status === 404) return null;
   if (!res.ok) throw new Error(`API ${res.status} for /api/robots/compare`);
-  return (await res.json()) as CompareResponse;
+  const data = (await res.json()) as CompareResponse;
+  return reorderToRequested(data, requestedIds);
+}
+
+// Reshapes a canonical-order compare response back to the caller's originally
+// requested order. Never fabricates: a requested slug the response doesn't
+// contain (not found, or dropped by the backend) is simply absent from the
+// result too, same as if the backend had received the request in that order.
+function reorderToRequested(
+  data: CompareResponse,
+  requestedIds: string[],
+): CompareResponse {
+  const bySlug = new Map(data.robots.map((r) => [r.slug, r]));
+  const order = requestedIds.filter((slug) => bySlug.has(slug));
+  return {
+    robots: order.map((slug) => bySlug.get(slug)!),
+    rows: data.rows.map((row) => ({
+      ...row,
+      values: Object.fromEntries(order.map((slug) => [slug, row.values[slug]])),
+    })),
+  };
 }
 
 // ---- DATA-D1 operator review (NONCANONICAL, dev/test only) -----------------

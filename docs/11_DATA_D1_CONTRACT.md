@@ -340,6 +340,10 @@ initiates verification.
 **autonomously** without the P8 human gate. Changing the underlying *value* still
 requires promotion.
 
+**Amended 2026-08-25 (`docs/21`, DATA-D1.LIVE Amendment A2 —
+`SCHEDULED_FRESHNESS`):** what may now *trigger* a freshness re-check that
+raises `RECHECK_REQUIRED` is narrowly widened — see §15.
+
 ## 13. Change detection
 
 Future iterations may detect: new robot / variant; price change; commercial-status
@@ -365,6 +369,16 @@ No single universal cadence: fast-changing commercial sources checked more often
 manufacturer catalogues moderate; stable technical docs low; failed/unavailable
 sources on exponential backoff. Exact schedules are implementation policy, not
 frozen.
+
+**Amended 2026-08-25 (`docs/21`, DATA-D1.LIVE Amendment A2 —
+`SCHEDULED_FRESHNESS`):** this section's general "not frozen" cadence policy
+remains unimplemented for discovery/radar work — `docs/16` LIVE.4's manual-only
+rule still governs all of that. For one narrow purpose only — re-checking an
+already-registered, already-eligible, already-canonically-linked exact URL for
+freshness — a production scheduler may now run at most once every 7 days
+(`FRESHNESS_INTERVAL_DAYS = 7`), under `docs/21` §2's ten requirements. This is
+not a general cadence implementation; it is a single, narrowly bounded
+exception to LIVE.4, and it approves zero sources on its own.
 
 ## 16. Cross-source corroboration
 

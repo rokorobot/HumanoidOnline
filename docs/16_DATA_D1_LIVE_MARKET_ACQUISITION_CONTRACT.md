@@ -312,6 +312,19 @@ path by which the production stack initiates a fetch. The operator is recorded o
 the run. (`docs/11` §15 cadence policy stays unimplemented until a later,
 separately ratified slice.)
 
+**Amended 2026-08-25 (`docs/21`, Amendment A2 — `SCHEDULED_FRESHNESS`):** one
+narrow, additional trigger now exists, for freshness re-checks only. A
+production scheduler MAY re-check an already-registered, already-eligible,
+already-canonically-linked exact URL at most once every 7 days
+(`FRESHNESS_INTERVAL_DAYS = 7`), under the ten requirements of `docs/21` §2 —
+in particular: no recursion or link-following beyond the registered URL, no
+automated trigger without a current DATA-D1.9 decision, and no canonical
+mutation of any kind. This rule — manual-only, no scheduler, no code path from
+the production stack — **remains fully authoritative for every other
+purpose**, in particular all new-discovery and competitor-radar crawling.
+`docs/11` §15's general cadence policy remains otherwise unimplemented, and
+this exception approves zero sources on its own (`docs/21` §11.1).
+
 ### LIVE.5 — Discovery-layer writes only
 The crawler, the extractor and every adapter may write **only** to discovery
 tables. Canonical mutation happens exclusively through the existing human

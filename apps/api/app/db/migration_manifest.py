@@ -50,4 +50,7 @@ MIGRATIONS: dict[str, str] = {
     "0009_add_buyer_requirement_contact_phone": (
         "ff367e74eddf790eeb7baafa61d94e991d6ab1b38db584d3de0845af7403eeae"
     ),
+    "0010_add_freshness_layer": (
+        "00665b075e8e22ed72287894f163b02aab4ad5b915706e1c1a760d60da1ce1af"
+    ),
 }

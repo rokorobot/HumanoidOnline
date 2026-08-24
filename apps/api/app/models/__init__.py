@@ -11,6 +11,10 @@ availability / deployment). WS5 adds `buyer_requirement` and WS6 adds
 
 DATA-D1 adds the discovery layer; DATA-D1.LIVE Slice A adds the acquisition
 layer (`app.models.acquisition`) — schema only, no adapter or crawler.
+DATA-D1 Scheduled Freshness (docs/22, Amendment A2) adds the freshness
+bookkeeping layer (`app.models.freshness`) — foundation only, no adapter,
+HTTP client or scheduler; AUTO_CHECK target count is zero until a later,
+separately-gated slice.
 """
 from app.models.acquisition import (
     CandidateCommercialSignal,
@@ -37,6 +41,7 @@ from app.models.discovery import (
 )
 from app.models.event_log import EventLog
 from app.models.evidence import EvidenceSource
+from app.models.freshness import FreshnessObservation, FreshnessTarget
 from app.models.manufacturer import Manufacturer, Provider
 from app.models.match_result import MatchResult
 from app.models.region import Region
@@ -64,6 +69,8 @@ __all__ = [
     "EvidenceSource",
     "ExtractionResult",
     "FetchedPage",
+    "FreshnessObservation",
+    "FreshnessTarget",
     "Manufacturer",
     "MatchResult",
     "PricingOffer",

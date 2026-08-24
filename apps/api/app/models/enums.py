@@ -190,6 +190,26 @@ evidence_subject_type = _pg_enum(
     "evidence_subject_type", "CLAIM", "COMMERCIAL_SIGNAL", "IMAGE_REF"
 )
 
+# --- DATA-D1 Scheduled Freshness (docs/22, RATIFIED v0.1; amends docs/16
+# LIVE.4 per docs/21 Amendment A2, RATIFIED v0.1) ----------------------------
+# Foundation slice: bookkeeping only, no adapter/HTTP client/scheduler exists
+# because of this. Mirrors db/migrations/0010_add_freshness_layer.sql.
+freshness_execution_mode = _pg_enum(
+    "freshness_execution_mode",
+    "AUTO_CHECK", "MANUAL_CHECK", "ELIGIBILITY_REVIEW_REQUIRED", "INACTIVE",
+)
+freshness_result = _pg_enum(
+    "freshness_result", "UNCHANGED", "CHANGED", "FETCH_ERROR", "SOURCE_REMOVED"
+)
+freshness_fact_area = _pg_enum(
+    "freshness_fact_area",
+    "SPEC", "PRICE", "AVAILABILITY", "COMMERCIAL_STATUS", "DEPLOYMENT",
+    "OFFICIAL_EVIDENCE", "OTHER",
+)
+# A DEDICATED enum, deliberately NOT an addition to crawl_trigger (which stays
+# exactly {'MANUAL'}) — see docs/22 Phase 4 for why reuse was rejected.
+freshness_trigger = _pg_enum("freshness_trigger", "MANUAL", "SCHEDULED_FRESHNESS")
+
 # Autonomy ordered low->high, for the `autonomy_min` catalogue filter.
 AUTONOMY_ORDER = [
     "TELEOPERATED", "ASSISTED", "SUPERVISED_AUTONOMY", "TASK_AUTONOMOUS",

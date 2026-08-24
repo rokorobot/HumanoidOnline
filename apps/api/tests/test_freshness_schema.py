@@ -233,9 +233,14 @@ def test_observation_discovery_candidate_fk_set_null_on_candidate_delete(dsessio
     dsession.delete(candidate)
     dsession.flush()
 
-    refreshed = dsession.get(FreshnessObservation, obs_id)
-    assert refreshed is not None  # the observation survives (audit trail is the point)
-    assert refreshed.discovery_candidate_id is None  # SET NULL, not RESTRICT
+    # The FK's ON DELETE SET NULL fires server-side; `obs` is already in this
+    # session's identity map from the flush above, so session.get() would
+    # return the same cached Python object with its stale pre-delete value
+    # instead of re-querying. refresh() forces the re-SELECT that actually
+    # observes what the database did.
+    dsession.refresh(obs)
+    assert dsession.get(FreshnessObservation, obs_id) is not None  # observation survives
+    assert obs.discovery_candidate_id is None  # SET NULL, not RESTRICT
 
 
 # ---- V / W: freshness_trigger is dedicated; crawl_trigger is untouched -----

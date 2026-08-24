@@ -121,6 +121,33 @@ Forward migrations:
   DB layer — "required" is enforced only at the API layer for NEW submissions,
   never by a DB constraint, so every historical anonymous requirement remains
   a valid row. Additive and idempotent.
+- `0010_add_freshness_layer.sql` — adds the DATA-D1 Scheduled Freshness
+  bookkeeping layer (`docs/22_DATA_D1_SCHEDULED_FRESHNESS_IMPLEMENTATION_
+  CONTRACT.md`, RATIFIED v0.1; amends `docs/16` LIVE.4 per `docs/21`
+  Amendment A2, RATIFIED v0.1): `freshness_target` (durable config only — no
+  derived eligibility verdict stored, so it cannot go stale) and
+  `freshness_observation` (append-only per-check-attempt log, carrying the
+  only stored copy of `execution_mode_at_check` and the explicit
+  `discovery_candidate_id` lineage FK), plus four enums
+  (`freshness_execution_mode`, `freshness_result`, `freshness_fact_area`,
+  `freshness_trigger`). `freshness_trigger` is a **dedicated** enum, not an
+  addition to `crawl_trigger`, which stays exactly `('MANUAL')` — reusing it
+  would put a freshness-triggered value on the same enum/table the
+  radar/discovery ingest path uses. **Structurally isolated** exactly as
+  `0003`/`0004`: no canonical table is altered, and `discovery_candidate`
+  itself gains no column (the lineage FK lives entirely on the new
+  `freshness_observation` table, pointing *to* `discovery_candidate`, never
+  the reverse). Idempotent, so it is a no-op on databases already built from
+  a `schema.sql` that includes these objects.
+
+  **Scope note.** This is the *foundation* slice: schema + models + a
+  service layer that accepts pre-supplied check results, so the whole
+  change-detection/idempotency/lineage pipeline is testable without
+  contacting any third party. It adds no HTTP client, no adapter and no
+  scheduler, seeds zero `freshness_target` rows, and applying it does not
+  make the system capable of fetching anything — `AUTO_CHECK` target count
+  is, and must remain, zero until a later, separately-gated slice performs
+  DATA-D1.9 eligibility reviews and registers targets.
 
 ## Checksum integrity (WS8.2 / R9)
 

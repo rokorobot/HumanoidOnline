@@ -38,6 +38,12 @@ DISCOVERY_TABLES = {
     # the new tables unprotected by it.
     "source_eligibility_review", "crawl_run", "fetched_page", "extraction_result",
     "candidate_commercial_signal", "discovery_evidence_excerpt",
+    # DATA-D1 Scheduled Freshness (migration 0010, docs/22, RATIFIED v0.1)
+    # added this pair. Same precedent as the DATA-D1.LIVE tables above:
+    # freshness_target's FK to discovery_source is intentional and ratified
+    # (docs/22 Phase 2), so it belongs in this set for the same reason —
+    # listing it here does not weaken Gate K, the invariant is unchanged.
+    "freshness_target", "freshness_observation",
 }
 
 

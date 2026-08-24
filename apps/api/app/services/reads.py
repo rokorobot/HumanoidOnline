@@ -289,6 +289,23 @@ def _specs_block(robot: Robot) -> SpecsBlock:
     )
 
 
+# The one governed detail eager-load graph, factored out so load_detail and
+# load_details (single vs batched) can never drift into two independently
+# maintained option lists — the whole point of "one governed read" (`docs/20`
+# §6) is broken if a batching call site has to remember to copy this by hand.
+_DETAIL_LOAD_OPTIONS = (
+    selectinload(Robot.variants),
+    selectinload(Robot.status_history),
+    selectinload(Robot.specifications),
+    selectinload(Robot.robot_capabilities),
+    selectinload(Robot.use_case_fits),
+    selectinload(Robot.pricing_offers),
+    selectinload(Robot.availability_offers),
+    selectinload(Robot.deployments),
+    selectinload(Robot.images),
+)
+
+
 def load_detail(session: Session, slug: str) -> Robot | None:
     """The one governed detail load: a *published* robot by canonical slug.
 
@@ -305,19 +322,33 @@ def load_detail(session: Session, slug: str) -> Robot | None:
     stmt = (
         select(Robot)
         .where(Robot.slug == slug, Robot.is_published.is_(True))
-        .options(
-            selectinload(Robot.variants),
-            selectinload(Robot.status_history),
-            selectinload(Robot.specifications),
-            selectinload(Robot.robot_capabilities),
-            selectinload(Robot.use_case_fits),
-            selectinload(Robot.pricing_offers),
-            selectinload(Robot.availability_offers),
-            selectinload(Robot.deployments),
-            selectinload(Robot.images),
-        )
+        .options(*_DETAIL_LOAD_OPTIONS)
     )
     return session.execute(stmt).scalars().first()
+
+
+def load_details(session: Session, slugs: list[str]) -> list[Robot]:
+    """Batched sibling of `load_detail`: the identical governed eager-load
+    graph (`_DETAIL_LOAD_OPTIONS`), for however many slugs the caller passes,
+    as ONE query graph instead of one per slug — SQLAlchemy's `selectin`
+    strategy already batches a relationship's children across however many
+    parent rows a single `select` returns, so this is the same governed
+    projection `load_detail` gives one robot, just invoked for a set instead
+    of a loop (compare's multi-robot read is the motivating caller).
+
+    A slug that doesn't resolve to a published robot is simply absent from the
+    result, same as `load_detail` returning ``None`` for it. Row order is
+    whatever the database returns, NOT necessarily `slugs` order — a caller
+    that needs requested-order (compare does) reorders the result itself.
+    """
+    if not slugs:
+        return []
+    stmt = (
+        select(Robot)
+        .where(Robot.slug.in_(slugs), Robot.is_published.is_(True))
+        .options(*_DETAIL_LOAD_OPTIONS)
+    )
+    return list(session.execute(stmt).scalars().all())
 
 
 # ---------------------------------------------------------------------------

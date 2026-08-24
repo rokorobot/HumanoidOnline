@@ -186,14 +186,31 @@ def compare_robots(
         _cache_logger.info("compare cache HIT robots=%d", len(unique))
         return _reordered_for_request(cached, unique)
 
-    robots = [r for r in (_load_detail(session, s) for s in unique) if r is not None]
+    # Compare Origin Performance v0.2: one batched governed read for the whole
+    # requested set (reads.load_details) instead of one load_detail() call per
+    # robot — same eager-load graph, same published-only predicate, just not
+    # repeated N times. The batch query's row order isn't guaranteed to match
+    # `unique`, so it's reordered back here (`fetched[s] for s in unique`),
+    # exactly preserving the drop-if-missing semantics the old per-slug loop had.
+    fetched = {r.slug: r for r in reads.load_details(session, unique)}
+    robots = [fetched[s] for s in unique if s in fetched]
     if not 2 <= len(robots) <= 4:
         # Never cached: an invalid request must not poison the cache for a
         # later valid, identical request (requirement: don't cache errors).
         _cache_logger.info("compare cache BYPASS reason=invalid_request robots=%d", len(robots))
         raise HTTPException(status_code=422, detail="compare requires 2–4 valid robot slugs")
 
-    details = [reads.serialize_detail(session, r) for r in robots]
+    # Evidence, too, is loaded ONCE for the union of every robot's subjects
+    # (reads.serialize_detail already accepts a pre-computed evidence_rows dict
+    # for exactly this reason — see its docstring and app/services/agent_tools/
+    # get_robot.py for the existing single-robot precedent) rather than once
+    # per robot. Selection rule, precedence and confidence are unchanged: this
+    # is the same load_evidence_rows call, just made once instead of N times.
+    subject_ids = set().union(*(reads.detail_subject_ids(r) for r in robots))
+    evidence_rows = reads.load_evidence_rows(session, subject_ids)
+    details = [
+        reads.serialize_detail(session, r, evidence_rows=evidence_rows) for r in robots
+    ]
     rows: list[CompareRow] = []
     for group, attr, label in reads.COMPARE_FIELDS:
         values: dict[str, float | bool | str | None] = {}

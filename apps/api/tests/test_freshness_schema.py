@@ -160,6 +160,12 @@ def test_B_deleting_the_robot_cascades_to_its_freshness_targets(dsession: Sessio
     ):
         dsession.delete(robot)
         dsession.flush()
+    # The CASCADE fires server-side; `target` is already in this session's
+    # identity map (same class of staleness the SET NULL test above hit), so
+    # session.get() would otherwise return that cached object unchanged
+    # instead of observing the row's actual absence. expire_all() forces the
+    # next access to re-query.
+    dsession.expire_all()
     assert dsession.get(FreshnessTarget, target_id) is None
 
 

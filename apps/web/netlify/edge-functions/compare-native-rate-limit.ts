@@ -1,4 +1,4 @@
-// Emergency Compare Rate Containment v0.3.2 — `/compare` native rate limit.
+// Emergency Compare Rate Containment v0.3.3 — `/compare` native rate limit.
 //
 // `/compare` exists for nothing but comparison: `app/compare/page.tsx` makes
 // no backend call at all when `ids` is absent or has fewer than 2 entries
@@ -16,8 +16,19 @@
 // runtime — npm-module imports in Edge Functions are experimental and
 // `@netlify/blobs` failed to load there regardless of package version).
 //
+// v0.3.3 note: production evidence (2026-08-24) showed automated /compare
+// traffic pacing itself under the v0.3.2 limit (~14 req/min against a 30/min
+// budget) — the count itself, not any bucket-evasion trick, is why it stayed
+// mostly 200. This path matches on `path` only, never the query string
+// (confirmed against Netlify's own docs and this file's config below), so
+// tightening the limit is a direct, request-count-level lever, independent
+// of how `?ids=` permutations are cached or computed — see
+// services/compare_cache.py on the backend for that separate concern, which
+// this change does not touch. 10 req/60s/IP is judged still comfortably
+// above a human clicking through a handful of comparisons (one every 6s).
+//
 // `aggregateBy: ["ip", "domain"]` is the all-plans option — each visiting IP
-// gets its own 30/60s budget. (The alternative, `["domain"]` alone, is a
+// gets its own 10/60s budget. (The alternative, `["domain"]` alone, is a
 // single shared budget across every visitor and is an Enterprise-only
 // feature; not appropriate here regardless of plan.)
 //
@@ -38,7 +49,7 @@ export const config: Config = {
   path: "/compare",
   rateLimit: {
     windowSize: 60,
-    windowLimit: 30,
+    windowLimit: 10,
     aggregateBy: ["ip", "domain"],
   },
 };

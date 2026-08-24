@@ -1,14 +1,13 @@
-// Emergency Compare Rate Containment v0.3 — `/compare` native rate limit.
+// Emergency Compare Rate Containment v0.3.3 — `/compare` native rate limit.
 //
 // This is a CONFIG-SHAPE AUDIT, not a functional test of rate limiting.
 // `config.rateLimit` is a declarative rule enforced by Netlify's own
 // platform infrastructure before this file's function body ever runs for a
 // blocked request — there is no application code here to mock or exercise
 // locally. Do not read a pass here as proof the limit is enforced in
-// production; only a live Netlify deployment can prove that (see the
-// residual-risk note in docs/16_EMERGENCY_COMPARE_RATE_CONTAINMENT.md).
+// production; only a live Netlify deployment can prove that.
 // What this test *does* prove: the declared policy matches the documented
-// v0.3 policy (30 req / 60s / IP) and is bound to exactly `/compare`, not
+// v0.3.3 policy (10 req / 60s / IP) and is bound to exactly `/compare`, not
 // silently to some other or broader path — and that this file carries no
 // `@netlify/blobs` runtime dependency (see robots-native-rate-limit.ts for
 // why that matters: the earlier custom counter never bundled in Netlify's
@@ -25,9 +24,9 @@ describe("compare-native-rate-limit config audit", () => {
     expect(config.path).toBe("/compare");
   });
 
-  it("declares the documented policy: 30 requests / 60 seconds / IP", () => {
+  it("declares the documented policy: 10 requests / 60 seconds / IP", () => {
     expect(config.rateLimit).toBeDefined();
-    expect(config.rateLimit?.windowLimit).toBe(30);
+    expect(config.rateLimit?.windowLimit).toBe(10);
     expect(config.rateLimit?.windowSize).toBe(60);
     expect(config.rateLimit?.aggregateBy).toContain("ip");
   });

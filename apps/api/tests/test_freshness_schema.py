@@ -145,12 +145,21 @@ def test_B_nonexistent_robot_is_refused(dsession: Session) -> None:
 
 
 def test_B_deleting_the_robot_cascades_to_its_freshness_targets(dsession: Session) -> None:
+    from app.models.robot import authorized_robot_deletion
+
     robot = _robot(dsession)
     source = _source(dsession)
     target = _target(dsession, robot, source)
     target_id = target.id
-    dsession.delete(robot)
-    dsession.flush()
+    # DR-C1 (unrelated to freshness): the catalogue is cumulative and an
+    # ordinary session.delete(robot) is refused by an ORM guard. The FK
+    # CASCADE this test actually proves only fires through the one
+    # sanctioned deletion path.
+    with authorized_robot_deletion(
+        authorized_by="tester@humanoid.company", reason="freshness FK cascade test"
+    ):
+        dsession.delete(robot)
+        dsession.flush()
     assert dsession.get(FreshnessTarget, target_id) is None
 
 

@@ -9,6 +9,7 @@ import { cache } from "react";
 
 import { findRobot, listRegions } from "@/lib/api-client";
 import { buildRobotJsonLd } from "@/lib/jsonld";
+import { absoluteUrl } from "@/lib/site";
 import {
   formatDate,
   maturityIndex,
@@ -22,6 +23,7 @@ import type {
   RobotDetail,
 } from "@/lib/types";
 import { AvailabilityMatrix } from "@/components/AvailabilityState";
+import { CitationFacts } from "@/components/CitationFacts";
 import { CommercialTriad } from "@/components/CommercialTriad";
 import { ConfidenceIndicator } from "@/components/ConfidenceIndicator";
 import { deriveModelCode } from "@/components/RobotCard";
@@ -115,11 +117,23 @@ export async function generateMetadata({
   const { slug } = await params;
   const robot = await getRobotCached(slug);
   if (!robot) return { title: "Not found" };
+  // AI Citation Layer v0.1 / CID-04 + CIT-E — one unambiguous canonical URL per
+  // record, from the SAME authoritative origin resolver every other machine
+  // surface uses (lib/site.ts). Never a hard-coded production hostname: on a
+  // staging/preview deploy `siteUrl()` resolves that environment's own origin
+  // (or throws), so a preview can never publish production canonicals.
+  //
+  // The description deliberately makes NO price/availability claim: this page
+  // renders those as independent, evidence-gated dimensions that may be absent
+  // entirely, and metadata must not assert what the record may not contain
+  // (docs/23 §10, CIT-K).
+  const canonical = absoluteUrl(`/robots/${robot.slug}`);
   return {
-    title: robot.name,
+    title: `${robot.name} by ${robot.manufacturer.name} — Specs, Status & Evidence`,
     description:
       robot.summary ??
-      `${robot.name} by ${robot.manufacturer.name} — verified capabilities, commercial status and evidence on HumanoidOnline.`,
+      `${robot.name} by ${robot.manufacturer.name} — capabilities, commercial status and evidence on HumanoidOnline.`,
+    alternates: { canonical },
   };
 }
 
@@ -272,7 +286,7 @@ export default async function RobotDetailPage({
         <RobotGallery robotName={robot.name} images={robot.images} />
 
         {/* SUMMARY + ACTIONS */}
-        <div className="summary-row">
+        <div className="summary-row" id="robot-summary">
           <p>{robot.summary ?? robot.description ?? "No description on record."}</p>
           <div className="actions">
             <Link className="btn" href={`/compare?ids=${robot.slug}`}>
@@ -286,8 +300,26 @@ export default async function RobotDetailPage({
           </div>
         </div>
 
+        {/* CANONICAL FACTS — AI Citation Layer v0.1 / CID-02.
+            A concise restatement of facts already rendered further down this
+            same page (specs, identity, maturity), grouped for extraction.
+            Adds no fact, queries nothing, and asserts no evidence — see
+            components/CitationFacts.tsx. */}
+        <section className="blk" id="canonical-facts">
+          <div className="blk-head">
+            <div>
+              <SectionIndex>00 — CANONICAL FACTS</SectionIndex>
+              <h2>Record summary</h2>
+            </div>
+            <SystemLabel>
+              PROJECTION OF THIS RECORD — UNKNOWN VALUES OMITTED, NEVER INFERRED
+            </SystemLabel>
+          </div>
+          <CitationFacts robot={robot} />
+        </section>
+
         {/* THE THREE DIMENSIONS */}
-        <section className="blk">
+        <section className="blk" id="commercial-status">
           <div className="blk-head">
             <div>
               <SectionIndex>01 — THE THREE DIMENSIONS</SectionIndex>
@@ -349,7 +381,7 @@ export default async function RobotDetailPage({
             </article>
 
             {/* DIM 2 — obtainability */}
-            <article className="dim">
+            <article className="dim" id="availability">
               <div className="dtop">
                 <span className="num">2</span>
                 <span className="t">
@@ -369,7 +401,7 @@ export default async function RobotDetailPage({
             </article>
 
             {/* DIM 3 — evidence */}
-            <article className="dim">
+            <article className="dim" id="deployments">
               <div className="dtop">
                 <span className="num">3</span>
                 <span className="t">
@@ -397,7 +429,7 @@ export default async function RobotDetailPage({
         </section>
 
         {/* PRICING */}
-        <section className="blk">
+        <section className="blk" id="pricing">
           <div className="blk-head">
             <div>
               <SectionIndex>02 — PRICING</SectionIndex>
@@ -445,7 +477,7 @@ export default async function RobotDetailPage({
         </section>
 
         {/* SPECIFICATIONS */}
-        <section className="blk">
+        <section className="blk" id="specifications">
           <div className="blk-head">
             <div>
               <SectionIndex>03 — SPECIFICATIONS</SectionIndex>
@@ -515,7 +547,7 @@ export default async function RobotDetailPage({
         </section>
 
         {/* EVIDENCE / PROVENANCE */}
-        <section className="blk">
+        <section className="blk" id="evidence">
           <div className="blk-head">
             <div>
               <SectionIndex>04 — EVIDENCE &amp; PROVENANCE</SectionIndex>

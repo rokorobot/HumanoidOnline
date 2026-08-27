@@ -414,6 +414,23 @@ section.blk { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid v
   font-variant-numeric: tabular-nums; text-align: right; }
 .srow .v.unk { color: var(--ho-unknown); display: inline-flex; align-items: center; gap: 8px; }
 
+/* Canonical facts (AI Citation Layer v0.1 / CID-02). Deliberately reuses the
+   spec-row visual language (.srow) rather than introducing a new one — this
+   block restates facts already on the page, so it should read as the same kind
+   of thing. Two responsive columns on wide viewports, one on narrow. */
+.citation-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 var(--ho-sp-6); border-top: var(--ho-rule-hair) solid var(--ho-ink); }
+.citation-facts .cf-row { display: flex; justify-content: space-between; gap: 12px;
+  padding: 8px 0; border-bottom: var(--ho-rule-hair) solid var(--ho-line-soft);
+  min-width: 0; }
+.citation-facts dt { color: var(--ho-text-muted); font-size: var(--ho-fs-small); }
+.citation-facts dd { margin: 0; font-family: var(--ho-font-machine);
+  font-size: var(--ho-fs-mono); font-variant-numeric: tabular-nums;
+  text-align: right; overflow-wrap: anywhere; }
+@media (max-width: 720px) {
+  .citation-facts { grid-template-columns: minmax(0, 1fr); }
+}
+
 /* Evidence */
 .ev { border: var(--ho-rule-hair) solid var(--ho-ink); background: var(--ho-paper-2);
   display: flex; flex-direction: column; gap: 0; }

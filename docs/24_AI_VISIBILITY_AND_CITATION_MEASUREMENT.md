@@ -1,6 +1,6 @@
 # AI Visibility and Citation Measurement v0.1
 
-> ## STATUS: DRAFT v0.1 — 2026-08-28 — awaiting owner ratification
+> ## STATUS: RATIFIED v0.1 — 2026-08-28
 >
 > **Repository baseline:** `main @ 73397e6336fda040206e037940469611053944d6`
 > (AI Citation Layer v0.1, PR #45, merged and production-verified).
@@ -685,7 +685,7 @@ This document does **not**, and no work authorized by it may:
 ## 15. Ratification record
 
 ```
-STATUS:                     DRAFT v0.1 — awaiting owner ratification
+STATUS:                     RATIFIED v0.1
 Drafted:                    2026-08-28
 Baseline:                   main @ 73397e6336fda040206e037940469611053944d6
 Implements:                 docs/23 §20 + CITATION-01.10 (Measurability)
@@ -728,8 +728,8 @@ Aggregate firewall:         Measuring AI answers authorizes NO HumanoidOnline
                             the inline-denominator rule is PROPOSED for docs/25
                             and is NOT ratified here (§11).
 
-Ratified by:                — pending —
-Ratification date:          — pending —
+Ratified by:                Robert Konecny — Product Owner
+Ratification date:          2026-08-28
 ```
 
 ### 15.1 Authorized sequence following ratification

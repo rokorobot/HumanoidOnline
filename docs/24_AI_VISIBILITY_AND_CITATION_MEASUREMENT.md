@@ -219,15 +219,42 @@ inferred from pixel order or guessed.
 
 ## 5. Result states
 
+> **Result states are mutually exclusive.** Exactly one applies to any
+> observation. They are evaluated in the order listed: the first state whose
+> definition is satisfied is the recorded state, and no observation may carry
+> two.
+
 ```
-CITED                  visibly attributed and/or linked to HumanoidOnline
-LINKED_NOT_CITED       a link is present without attribution in the answer text
-MENTIONED_NOT_LINKED   named in prose with no link
-NOT_CITED              answer observed in full; HumanoidOnline absent
-UNOBSERVABLE           the answer surface could not be accessed or inspected
-ENGINE_ERROR           the engine failed, refused, or returned no answer
-AMBIGUOUS              observed, but the reviewer cannot classify confidently
+CITED                  HumanoidOnline is visibly presented BY THE PRODUCT as a
+                       source/citation for the answer — via an attribution
+                       marker, citation link, source card, source-panel entry,
+                       or equivalent source treatment.
+
+LINKED_NOT_CITED       A HumanoidOnline link is visible, but the product does
+                       NOT present it as a source/citation supporting the
+                       answer (e.g. an incidental or decorative link).
+
+MENTIONED_NOT_LINKED   HumanoidOnline is named in prose with NEITHER a
+                       source/citation treatment NOR a link.
+
+NOT_CITED              The answer was observable in full and HumanoidOnline had
+                       none of the above.
+
+UNOBSERVABLE           The answer surface could not be accessed or inspected.
+ENGINE_ERROR           The engine failed, refused, or returned no answer.
+AMBIGUOUS              Observed, but the reviewer cannot classify confidently.
 ```
+
+The distinction between `CITED` and `LINKED_NOT_CITED` is **source treatment by
+the product**, not the mere presence of a URL. A link the product renders as
+supporting evidence is `CITED`; a link it renders without that role is
+`LINKED_NOT_CITED`.
+
+> **Where classification is genuinely uncertain, record `AMBIGUOUS` — never the
+> more favourable state.** A reviewer who cannot tell whether a link carried
+> source treatment has an answer available (`AMBIGUOUS`), and reaching for
+> `CITED` in that position is how a visibility metric quietly becomes
+> self-flattering.
 
 ### 5.1 `UNOBSERVABLE` never collapses into `NOT_CITED` — mandatory
 
@@ -255,15 +282,32 @@ semantics**, by a named human reviewer.
 CORRECT           consistent with governed facts and their semantics
 MOSTLY_CORRECT    materially right; minor imprecision that misleads no decision
 MIXED             some governed facts right, others wrong
-INCORRECT         contradicts governed facts, or asserts a fact we hold as UNKNOWN
+INCORRECT         contradicts sufficiently current governed evidence, materially
+                  misstates governed semantics, or is disproven by reviewed
+                  authoritative evidence
 NOT_ASSESSABLE    too vague, or HumanoidOnline holds no governed position
 ```
+
+> **HumanoidOnline holding UNKNOWN is not, by itself, evidence that an external
+> assertion is incorrect.**
+>
+> An engine stating a value we do not hold is stating something we cannot
+> corroborate — which is not the same as something false. Absent contradicting
+> current governed evidence or reviewed authoritative evidence, the correct
+> classification is `NOT_ASSESSABLE` (or `MIXED` where other parts of the answer
+> are scorable), never `INCORRECT`.
+
+This constrains only how we score *external* answers. It does **not** weaken
+UNKNOWN semantics inside HumanoidOnline: our own records still never fabricate,
+infer or default a value (AGENTS.md rule 6), and an unverified external claim
+never becomes a governed fact by appearing in an AI answer.
 
 Semantic distinctions that must be applied when scoring (each is a frozen law
 elsewhere in this repository, not a preference):
 
-- **UNKNOWN remains UNKNOWN.** An engine asserting a confident value where
-  HumanoidOnline holds NULL is asserting something unevidenced — but see §6.1.
+- **UNKNOWN remains UNKNOWN — for us.** Our holding NULL constrains what
+  *HumanoidOnline* may assert; it does not make an engine's differing value
+  false. See the rule above and §6.1.
 - **Maturity ≠ availability.** `commercial_status` is not obtainability.
 - **Availability ≠ purchasability.** Orderable, quotable and shipping are
   different states.
@@ -337,21 +381,79 @@ citation_rate =
     observable benchmark answers
 ```
 
-where **observable** excludes `UNOBSERVABLE`, `ENGINE_ERROR` and `AMBIGUOUS`
-(§5.1).
+where **observable benchmark answers** is the standard denominator defined
+below.
 
-### 8.2 Additional metrics
+> **Standard denominator.** Unless a metric explicitly states otherwise, the
+> denominator is **observable benchmark answers**, where *observable* excludes
+> `UNOBSERVABLE`, `ENGINE_ERROR` and `AMBIGUOUS` (§5.1). Every rate-like metric
+> in this contract states its denominator; a metric whose denominator is not
+> defensible is not published (§8.3).
+
+### 8.2 Additional metrics — denominators frozen
 
 ```
-first_source_rate                  CITED with citation_position = first
-linked_source_rate                 CITED or LINKED_NOT_CITED
-correct_answer_with_citation_rate  CITED and correctness in {CORRECT, MOSTLY_CORRECT}
-citation_rate_by_query_family      grouped by §3 family
-citation_rate_by_engine_surface    grouped by (engine, product_surface)
-citation_rate_by_url               which HumanoidOnline pages get cited
-competitor_citation_frequency      per competing source, over the same denominator
-unattributed_use_rate              humanoidonline_fact_used_without_citation
+first_source_rate =
+    CITED and citation_position = first
+  ─────────────────────────────────────
+    observable benchmark answers
+
+linked_source_rate =
+    CITED or LINKED_NOT_CITED
+  ─────────────────────────────
+    observable benchmark answers
+
+correct_answer_with_citation_rate =
+    CITED and correctness in {CORRECT, MOSTLY_CORRECT}
+  ────────────────────────────────────────────────────
+    observable benchmark answers
+
+unattributed_use_rate =
+    humanoidonline_fact_used_without_citation = true
+  ──────────────────────────────────────────────────
+    observable benchmark answers where that field is assessable
+    (i.e. excluding "unknown")
+
+competitor_citation_frequency  (per competing source S) =
+    observable benchmark answers citing S
+  ───────────────────────────────────────
+    observable benchmark answers
 ```
+
+**Grouped rates** — `citation_rate_by_query_family`,
+`citation_rate_by_engine_surface`, `citation_rate_by_url` — apply the identical
+numerator and denominator semantics *within the group*: the denominator is the
+observable benchmark answers **belonging to that group**, never the global
+total. Each group publishes its own denominator and observability coverage.
+
+> `citation_rate_by_url` needs care: its natural denominator is observable
+> answers, not "answers citing us". A per-URL share **of citations** is a
+> different metric and must be labelled as such if ever published.
+
+### 8.2.1 `citation_correctness_rate` — a different question
+
+```
+citation_correctness_rate =
+    CITED and correctness in {CORRECT, MOSTLY_CORRECT}
+  ────────────────────────────────────────────────────
+    CITED answers with assessable correctness
+    (i.e. excluding NOT_ASSESSABLE)
+```
+
+This measures **answer quality when we are cited**. It shares a numerator with
+`correct_answer_with_citation_rate` but has a different denominator, and the two
+answer different questions:
+
+- `correct_answer_with_citation_rate` — *how often does a benchmark answer both
+  cite us and get it right?* (a visibility-and-quality metric)
+- `citation_correctness_rate` — *when we are cited, how often is the answer
+  right?* (a quality-only metric)
+
+> **They must never be substituted for one another.** `citation_correctness_rate`
+> has the smaller denominator and will usually be the larger, more flattering
+> number; publishing it in place of `correct_answer_with_citation_rate`, or
+> without naming which one it is, is exactly the misuse §8.3 prohibits. It is
+> **optional** — publish it only alongside its denominator and its `CITED` count.
 
 ### 8.3 No vanity percentage
 
@@ -594,9 +696,27 @@ Collection model:           Partly manual by design. No claim of automatic
 Prohibited absolutely:      scraping AI answer products, browser automation
                             against them, ToS circumvention, account/credential
                             automation, CAPTCHA bypass, hidden API discovery.
+Result states:              MUTUALLY EXCLUSIVE — exactly one per observation,
+                            evaluated in listed order. CITED vs
+                            LINKED_NOT_CITED turns on SOURCE TREATMENT BY THE
+                            PRODUCT, not the presence of a URL. Genuine
+                            uncertainty records AMBIGUOUS, never the more
+                            favourable state (§5).
 UNOBSERVABLE:               First-class state. NEVER collapsed into NOT_CITED.
                             Excluded from all metric denominators (§5.1).
-Denominator discipline:     No percentage without numerator, denominator,
+Correctness vs UNKNOWN:     HumanoidOnline holding UNKNOWN is NOT, by itself,
+                            evidence that an external assertion is incorrect —
+                            that is NOT_ASSESSABLE/MIXED, never INCORRECT. This
+                            constrains only how we SCORE external answers; our
+                            own UNKNOWN semantics are unchanged (§6, §6.1).
+Denominator discipline:     Standard denominator = OBSERVABLE BENCHMARK ANSWERS
+                            unless a metric states otherwise; every rate-like
+                            metric in §8.2 has a frozen numerator/denominator.
+                            Grouped rates use the group's own denominator, never
+                            the global total. citation_correctness_rate is a
+                            DIFFERENT metric from correct_answer_with_citation_
+                            rate and may never be substituted for it (§8.2.1).
+                            No percentage without numerator, denominator,
                             window, surfaces, registry version and
                             observability coverage (§8.3).
 Prompt steering:            PROHIBITED. Steered observations are void (§9.3).

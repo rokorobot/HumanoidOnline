@@ -166,8 +166,6 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          # TEMPORARY validation (forced uv cache miss) - removed before merge.
-          cache-suffix: validate-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
@@ -252,8 +250,6 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          # TEMPORARY validation (forced uv cache miss) - removed before merge.
-          cache-suffix: validate-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
@@ -341,8 +337,6 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          # TEMPORARY validation (forced uv cache miss) - removed before merge.
-          cache-suffix: validate-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
       - uses: actions/setup-node@v4
         with:
           node-version: "24"

@@ -1,0 +1,21 @@
+{
+  "_about": "Confirmed identity aliases (DATA-D1.7 'known aliases'; docs/16 section 11). Read by the discovery resolver (apps/api/app/services/discovery/identity.py) and by catalogue stub planning (db/catalogue_entries.py). An alias is matched by EXACT normalized equality under the robot's own manufacturer -- never by prefix, token overlap or similarity. An entry whose confirmed_by / confirmed_at are null is a PROPOSAL and both readers ignore it: aliases are proposals, not merges, until a human confirms them.",
+  "aliases": [
+    {
+      "robot_slug": "unitree-g1",
+      "alias": "G1",
+      "basis": "Radar entry unitree/g1 ('G1', official URL https://www.unitree.com/g1/) resolved to this record while it was named 'G1' (model_code 'G1'). The 2026-08-17 scope resolution renamed the record 'G1 Basic' / 'G1-Basic' and kept the slug unitree-g1; the record's specs_note still cites https://www.unitree.com/g1/ as its source. This restores the pre-rename match. It does not assert that EDU-tier configurations are this record: 'G1 EDU Plus (U2)' is its own record and does not carry this alias.",
+      "proposed_at": "2026-09-10",
+      "confirmed_by": "robert@humanoid.company",
+      "confirmed_at": "2026-09-10"
+    },
+    {
+      "robot_slug": "boston-dynamics-atlas-electric",
+      "alias": "Atlas",
+      "basis": "Radar entry bostondynamics/atlas ('Atlas', official URL https://bostondynamics.com/atlas/) carries the same official URL as this record. The record is named 'Atlas (Electric)' to distinguish it from the earlier hydraulic Atlas, which is not catalogued; the manufacturer's current Atlas product page, which this record's specs were verified against, is the electric robot.",
+      "proposed_at": "2026-09-10",
+      "confirmed_by": "robert@humanoid.company",
+      "confirmed_at": "2026-09-10"
+    }
+  ]
+}

@@ -61,6 +61,17 @@ def test_the_plan_skips_robots_already_in_the_catalogue():
     assert not (new & set(ce.existing_robots()))
 
 
+def test_the_plan_proposes_no_second_stub_for_a_robot_catalogued_under_another_name():
+    """Every v1 radar entry is already catalogued, some under a scoped name
+    ("Atlas" is the record "Atlas (Electric)", "G1" is "G1 Basic"). Matching on
+    the radar name alone proposed a duplicate `boston-dynamics-atlas` stub, and a
+    written record is never removed (DR-C1). The slug check above cannot see it:
+    the duplicate's slug is new, only its identity is not."""
+    plan = ce.plan_stubs("humanoid_radar_v1")
+    assert [r["slug"] for r in plan["robots"]] == []
+    assert {s["why"] for s in plan["skipped"]} == {"already in the catalogue"}
+
+
 def test_a_manufacturer_is_matched_by_slug_as_well_as_name():
     """The catalogue calls it "Figure" with slug `figure-ai`; the bootstrap says
     "Figure AI". Matching on name alone appends a second manufacturer whose slug

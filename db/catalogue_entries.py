@@ -51,6 +51,7 @@ CATALOGUE = REPO_ROOT / "db" / "catalogue"
 ROBOTS_DIR = CATALOGUE / "robots"
 MANUFACTURERS = CATALOGUE / "manufacturers.json"
 BOOTSTRAP_DIR = REPO_ROOT / "db" / "discovery" / "bootstrap"
+ALIASES = REPO_ROOT / "db" / "discovery" / "identity_aliases.json"
 
 WORKSHEET_VERSION = 1
 
@@ -137,6 +138,15 @@ def existing_robots() -> dict[str, dict]:
     }
 
 
+def confirmed_aliases() -> list[tuple[str, str]]:
+    """`(robot_slug, alias)` pairs a human has confirmed — the same register the
+    discovery resolver reads. Proposals (null confirmed_by/confirmed_at) are
+    ignored; the register's shape is validated by the resolver's loader."""
+    doc = json.loads(ALIASES.read_text(encoding="utf-8"))
+    return [(e["robot_slug"], e["alias"]) for e in doc["aliases"]
+            if e.get("confirmed_by") and e.get("confirmed_at")]
+
+
 def load_bootstrap(dataset: str) -> list[dict]:
     path = BOOTSTRAP_DIR / f"{dataset}.json"
     if not path.is_file():
@@ -214,6 +224,12 @@ def plan_stubs(dataset: str) -> dict:
         (_norm(r.get("manufacturer_slug")), _norm(r.get("name"))): slug
         for slug, r in robots.items()
     }
+    # A confirmed alias is the same robot under another name ("Atlas" is the
+    # record "Atlas (Electric)"). Without it, a renamed or qualified record is
+    # invisible here and gets a second stub — which DR-C1 then never removes.
+    for slug, alias in confirmed_aliases():
+        if slug in robots:
+            known_robots[(_norm(robots[slug].get("manufacturer_slug")), _norm(alias))] = slug
 
     new_mfrs: dict[str, dict] = {}
     new_robots: list[dict] = []

@@ -1,7 +1,11 @@
 # DATA-D1.LIVE — Amendment A3: `AGENT_ASSISTED_RESEARCH`
 
 > **STATUS: RATIFIED BY PRODUCT OWNER — 2026-09-11.**
-> **PENDING REPOSITORY ADOPTION / MERGE.**
+> **REPOSITORY-EFFECTIVE ON MAIN — merge `883cb1f`.**
+>
+> **REVISION 4 (§6A / §6B): RATIFIED BY PRODUCT OWNER — 2026-09-11.**
+> **PENDING REPOSITORY ADOPTION / MERGE.** Revision 4 is not
+> repository-effective until its pull request is merged to `main`.
 > Laws and definitions in this document are **FROZEN**. See §12.
 >
 > This document amends `16_DATA_D1_LIVE_MARKET_ACQUISITION_CONTRACT.md`
@@ -18,7 +22,14 @@
 > amendment is governance only: it requires no code, migration or new data
 > structure.
 >
-> **Revision history.** Revision 3 (2026-09-11) — consistency corrections at
+> **Revision history.** Revision 4 (2026-09-11; ratified by the product owner,
+> pending repository adoption) — adds §6A *No implied continuation — explicit
+> phase authorization* and §6B *Work-order execution pattern*, records the
+> base amendment's repository adoption (merge `883cb1f`) in this header, and
+> adds the Revision 4 ratification record to §12. No other section is
+> changed. Governing principle: *the owner authorizes actions, not
+> trajectories.* Revision 3
+> (2026-09-11) — consistency corrections at
 > ratification: §2.6 restated as the explicit, sole, narrow
 > *eligibility-review bootstrap exception* to LIVE.2, with its exclusions
 > listed; every "access policy unchanged" statement narrowed to *product/source
@@ -287,6 +298,117 @@ genuine human reading of the primary source may be recorded as such (§4).
 
 No schema change.
 
+## 6A. No implied continuation — explicit phase authorization
+
+*(Revision 4 — ratified by the product owner 2026-09-11; pending repository
+adoption.)*
+
+6A.1 **Every materially distinct execution phase requires explicit owner
+authorization before it begins.** Distinct phases include at least: a source
+eligibility review (§2.6); product or source retrieval; authoring or changing a
+canonical change proposal; canonical mutation; commit; push and pull request;
+merge; publication; and any cleanup or follow-up work.
+
+6A.2 **Completion or approval of one phase is not authorization for any
+logically subsequent phase.** Approval to merge a governance change does not
+authorize an eligibility review; an eligibility decision does not authorize
+retrieval; research does not authorize mutation; mutation does not authorize a
+commit; a commit does not authorize a merge; a merge does not authorize
+publication; publication does not authorize unrelated follow-up work.
+
+6A.3 **Within an authorized phase the agent may only:** inspect within that
+phase's scope; execute the explicitly authorized action; verify it; report the
+result; and recommend a next action.
+
+6A.4 **The agent stops before any recommended next action** unless the owner
+explicitly authorizes that action.
+
+6A.5 **Sequencing language is not authorization.** Words such as "after
+this", "next", "then", "once merged", "after CI" or "following approval"
+describe order only. A later phase described that way — including an
+instruction to proceed with a later phase once an earlier one succeeds — is
+treated as **PROPOSE ONLY**: the agent completes the earlier phase, reports,
+and stops. It becomes authorized only when the owner explicitly authorizes it
+after the earlier phase has been reported, or when the work order lists it
+under **AUTHORIZED NOW**.
+
+6A.6 **Work orders distinguish two lists:**
+- **AUTHORIZED NOW** — actions the agent may perform;
+- **PROPOSE ONLY** — possible next actions that must not be performed yet.
+
+Where a work order does not make the distinction, only the immediately
+requested action is authorized, and everything after it is PROPOSE ONLY.
+
+6A.7 **External access is its own authorization boundary.** Authorization to
+change governance, code or catalogue files, or to merge a pull request, does
+not authorize any new network access to third-party sources. Traffic with this
+project's own repository host or infrastructure that is strictly necessary to
+perform an explicitly authorized repository action is part of that action —
+for example: a fetch needed to verify the approved branch state; a push when
+push is explicitly authorized; opening the explicitly authorized pull request;
+reading CI or check status for that pull request. This applies only to the
+project's own repository and infrastructure operation. It **never** authorizes
+third-party research or source access.
+
+6A.8 **A source eligibility review is a distinct, externally active phase**
+and requires explicit owner authorization naming the hosts. The
+"owner-initiated session" of §2.6 means a session whose current work order
+explicitly authorizes that review for those hosts.
+
+6A.9 **Product or source retrieval after an eligibility decision is another
+distinct phase** and requires explicit owner authorization naming the hosts
+and pages. An eligibility decision permits retrieval in principle; it never
+starts it.
+
+6A.10 **Canonical mutation, commit, merge and publication remain separate
+boundaries**, unless the owner's work order expressly combines specific named
+boundaries — for example, "commit, push and open a Draft PR; do not merge".
+
+6A.11 **Authorization is never inferred** from project goals, governance
+logic, previous discussions, likely owner intent, the next action being
+obvious, or the prior action having succeeded.
+
+6A.12 **If authorization is ambiguous, the agent stops and reports.**
+
+6A.13 **No retroactive justification.** Work performed beyond an authorized
+boundary is disclosed as such. It is not reinterpreted as authorized because it
+proved useful, and its outputs trigger nothing — no decision is recorded from
+them and no further action follows from them — unless the owner explicitly
+authorizes their use.
+
+6A.14 **Scope.** This section binds every `AGENT_ASSISTED_RESEARCH` session and
+every agent acting on this repository's catalogue or governance under a work
+order. It narrows what an agent may do; it never widens any permission.
+
+**Standing processes.** This section does not repeal a standing authorization
+that an already-ratified contract explicitly establishes for a system process
+(for example the scheduled-freshness trigger of `docs/21` and `docs/22`).
+Such an authorization:
+- is valid only within the exact scope, trigger, cadence and permissions that
+  its own contract grants;
+- may not be extrapolated into a new workflow or into new source access;
+- can be changed only through the governance process applicable to that
+  contract.
+
+The existing scheduled-freshness contracts remain governed by their own
+ratified rules.
+
+## 6B. Work-order execution pattern
+
+*(Revision 4 — ratified by the product owner 2026-09-11; pending repository
+adoption.)*
+
+    1. INSPECT       within the authorized scope only
+    2. REPORT        findings, and the exact intended action
+    3. OWNER AUTHORIZATION
+    4. EXECUTE       exactly the authorized scope
+    5. VERIFY
+    6. REPORT RESULT
+    7. STOP
+
+Any further phase is presented as a recommendation (**PROPOSE ONLY**) and is
+not executed until the owner explicitly authorizes it.
+
 ## 7. Publication
 
 Publication stays a **separate, explicit owner decision**. Approving a mutation
@@ -376,6 +498,11 @@ This amendment does not:
                                verification; not publication
     RobotShop:                 never retrieved by agent tooling (unchanged)
     Evidence system:           existing evidence_source only; no parallel store
+    Repository adoption:       base amendment merged to main @ 883cb1f
+                               (PR #49) — repository-effective
+    Revision 4:                §6A, §6B — RATIFIED by product owner
+                               2026-09-11; PENDING REPOSITORY ADOPTION /
+                               MERGE (not repository-effective until merged)
 
 > **Ratification statement — approved by product owner 2026-09-11; effective in
 > repository governance when this amendment is merged to main:**
@@ -429,3 +556,40 @@ This amendment does not:
 > Publication remains a separate explicit decision of mine.
 >
 > This ratification approves no source and authorizes no schema change.
+
+> **Revision 4 ratification statement — approved by product owner 2026-09-11;
+> effective in repository governance when Revision 4 is merged to main:**
+>
+> I, Robert Konecny (product owner), ratify Revision 4 of DATA-D1.LIVE
+> Amendment A3.
+>
+> Every materially distinct agent execution phase requires explicit
+> authorization before it begins.
+>
+> Approval or completion of one phase does not authorize the next phase.
+>
+> Sequencing language describes order, not permission.
+>
+> A work order may explicitly authorize multiple named phases in advance under
+> AUTHORIZED NOW. Anything not so authorized is PROPOSE ONLY.
+>
+> External third-party access is a separate authorization boundary.
+>
+> Eligibility review, source retrieval, canonical mutation, commit, merge and
+> publication are separate authorization boundaries unless I expressly combine
+> specific named boundaries in the work order.
+>
+> The agent may recommend the next action, but must stop before executing it
+> unless it is explicitly authorized.
+>
+> Authorization is never inferred from project goals, governance logic,
+> previous discussions, likely intent, obvious next steps, or successful
+> completion of prior work.
+>
+> If authorization is ambiguous, the agent stops and reports.
+>
+> Standing autonomous processes remain valid only to the extent explicitly
+> authorized by their own ratified contracts.
+>
+> Work performed outside an authorized boundary is disclosed truthfully and
+> cannot be retroactively treated as authorized merely because it was useful.

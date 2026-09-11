@@ -4,8 +4,7 @@
 > **REPOSITORY-EFFECTIVE ON MAIN — merge `883cb1f`.**
 >
 > **REVISION 4 (§6A / §6B): RATIFIED BY PRODUCT OWNER — 2026-09-11.**
-> **PENDING REPOSITORY ADOPTION / MERGE.** Revision 4 is not
-> repository-effective until its pull request is merged to `main`.
+> **REPOSITORY-EFFECTIVE ON MAIN — merge `67a572d`.**
 > Laws and definitions in this document are **FROZEN**. See §12.
 >
 > This document amends `16_DATA_D1_LIVE_MARKET_ACQUISITION_CONTRACT.md`
@@ -22,8 +21,8 @@
 > amendment is governance only: it requires no code, migration or new data
 > structure.
 >
-> **Revision history.** Revision 4 (2026-09-11; ratified by the product owner,
-> pending repository adoption) — adds §6A *No implied continuation — explicit
+> **Revision history.** Revision 4 (2026-09-11; ratified by the product owner;
+> repository-effective on main at merge `67a572d`) — adds §6A *No implied continuation — explicit
 > phase authorization* and §6B *Work-order execution pattern*, records the
 > base amendment's repository adoption (merge `883cb1f`) in this header, and
 > adds the Revision 4 ratification record to §12. No other section is
@@ -300,8 +299,8 @@ No schema change.
 
 ## 6A. No implied continuation — explicit phase authorization
 
-*(Revision 4 — ratified by the product owner 2026-09-11; pending repository
-adoption.)*
+*(Revision 4 — ratified by the product owner 2026-09-11;
+repository-effective on main, merge `67a572d`.)*
 
 6A.1 **Every materially distinct execution phase requires explicit owner
 authorization before it begins.** Distinct phases include at least: a source
@@ -395,8 +394,8 @@ ratified rules.
 
 ## 6B. Work-order execution pattern
 
-*(Revision 4 — ratified by the product owner 2026-09-11; pending repository
-adoption.)*
+*(Revision 4 — ratified by the product owner 2026-09-11;
+repository-effective on main, merge `67a572d`.)*
 
     1. INSPECT       within the authorized scope only
     2. REPORT        findings, and the exact intended action
@@ -501,8 +500,8 @@ This amendment does not:
     Repository adoption:       base amendment merged to main @ 883cb1f
                                (PR #49) — repository-effective
     Revision 4:                §6A, §6B — RATIFIED by product owner
-                               2026-09-11; PENDING REPOSITORY ADOPTION /
-                               MERGE (not repository-effective until merged)
+                               2026-09-11; REPOSITORY-EFFECTIVE ON MAIN —
+                               merge 67a572d (PR #50)
 
 > **Ratification statement — approved by product owner 2026-09-11; effective in
 > repository governance when this amendment is merged to main:**

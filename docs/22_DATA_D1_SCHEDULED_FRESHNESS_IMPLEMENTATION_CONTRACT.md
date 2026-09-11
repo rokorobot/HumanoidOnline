@@ -88,7 +88,7 @@ intent/config only** — never a derived, potentially-stale eligibility verdict
 | `discovery_source_id` | `uuid`, FK → `discovery_source.id`, `NOT NULL`, `ON DELETE RESTRICT` | Same reasoning `CandidateClaim.discovery_source_id` already uses (Gate X): a target's eligibility is only meaningful through its source, and silently orphaning that link would strip auditability. |
 | `url` | `text`, `NOT NULL` | The exact page. Never a domain, a prefix, or a pattern (A2 §2 req. 1/5). |
 | `purpose` | `freshness_fact_area` enum, `NOT NULL` | What this target helps keep fresh — `SPEC`, `PRICE`, `AVAILABILITY`, `COMMERCIAL_STATUS`, `DEPLOYMENT`, `OFFICIAL_EVIDENCE`, `OTHER`. Informational routing for the human review queue; asserts nothing about canonical truth. |
-| `manual_override` | `boolean`, `NOT NULL`, default `false` | Durable config, human-set at registration. When `true`, forces `MANUAL_CHECK` unconditionally — eligibility is never even consulted (Phase 3). This is how the `robotshop.com`/`eu.robotshop.com` rule is enforced. |
+| `manual_override` | `boolean`, `NOT NULL`, default `false` | Durable config, human-set at registration. When `true`, forces `MANUAL_CHECK` unconditionally — eligibility is never even consulted (Phase 3). Available for any target a human decides must stay manual. *(Introduced to enforce the `robotshop.com`/`eu.robotshop.com` hard override, which `docs/26` Revision 5 withdraws.)* |
 | `interval_days` | `integer`, `NOT NULL`, default `7`, `CHECK (interval_days >= 7)` | A2's `FRESHNESS_INTERVAL_DAYS`. The `CHECK` makes "someone quietly sets 1 day" a schema-level impossibility, not a code-review hope (A2 adversarial example 6). |
 | `active` | `boolean`, `NOT NULL`, default `true` | Individually deactivatable per A2's requirement, without deleting history. |
 | `last_checked_at` | `timestamptz`, nullable | Denormalized from the latest `FreshnessObservation` — factual history-cache (when did we last actually check), not an eligibility verdict, so it carries none of correction 3's staleness risk. |
@@ -643,14 +643,11 @@ still requires its own recorded `DiscoverySource` row and DATA-D1.9 review,
 exactly as `docs/21` §11.1 sequences it (step 2, after this implementation
 contract, step 1).
 
-**`robotshop.com` / `eu.robotshop.com`**: any future `FreshnessTarget` row for
-either domain **must** be registered with `manual_override = true` (Phase 3)
-at creation time — this is an operational rule for whoever performs that
-future registration, not something this contract's schema can enforce by
-itself (a `CHECK` constraint keyed on URL substring would be brittle and easy
-to defeat by a redirect or a new path; the enforcement point is the human
-registration step and the standing operational instruction, restated here so
-it is not lost between now and then).
+**`robotshop.com` / `eu.robotshop.com`** *(revised by `docs/26` Revision 5 —
+ratified by owner 2026-09-11; repository-effective upon merge)*: the operational rule that required
+`manual_override = true` for these domains is withdrawn. A `FreshnessTarget`
+for either domain is registered like any other, subject to the same DATA-D1.9
+requirement; `manual_override` remains available to the human registering it.
 
 ---
 
@@ -822,3 +819,8 @@ robotshop.com /
 Test plan:                   22 tests (A-T plus I2/I3) specified, none
                              written
 ```
+
+> **Revision note (`docs/26` Revision 5 — ratified by owner 2026-09-11;
+> repository-effective upon merge):** the
+> `robotshop.com` / `eu.robotshop.com` `manual_override` rule recorded above is
+> withdrawn; see Phase 10. The `manual_override` column itself is unchanged.

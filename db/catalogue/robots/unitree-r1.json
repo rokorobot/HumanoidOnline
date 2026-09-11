@@ -3,40 +3,182 @@
   "name": "R1",
   "manufacturer_slug": "unitree",
   "model_code": null,
-  "summary": null,
+  "summary": "Mid-tier edition of Unitree's R1 humanoid line (between R1 AIR and R1 EDU): about 1.23 m and 29 kg, 26 joints (6 per leg, 5 per arm, 2 waist, 2 head), binocular camera, 4-mic array and speaker, 8-core processor, about 1 h battery life, 8-month warranty. Secondary development is not supported on this edition (R1 EDU only). Manufacturer list price $5,900 excluding tax and shipping. Sources: unitree.com/R1 and shop.unitree.com, agent-retrieved 2026-09-11.",
   "announced_year": null,
-  "commercial_status": "ANNOUNCED",
+  "commercial_status": "COMMERCIAL",
   "is_published": false,
   "specs": {
-    "height_cm": null,
-    "weight_kg": null,
+    "height_cm": 123.0,
+    "weight_kg": 29.0,
     "arm_span_cm": null,
     "reach_cm": null,
     "payload_kg": null,
     "walk_speed_ms": null,
-    "runtime_minutes": null,
+    "runtime_minutes": 60,
     "battery_wh": null,
-    "mobility": null,
-    "degrees_of_freedom": null,
+    "mobility": "BIPEDAL",
+    "degrees_of_freedom": 26,
     "hand_type": null,
     "hand_dof": null,
     "autonomy": null,
     "has_manipulation": null,
     "has_teleoperation": null,
-    "has_vision": null,
-    "has_language_ui": null,
-    "has_sdk": null,
+    "has_vision": true,
+    "has_language_ui": true,
+    "has_sdk": false,
     "has_api": null,
     "ros_support": null,
-    "developer_edition": null,
+    "developer_edition": false,
     "simulation_support": null
   },
-  "specs_note": "Specifications not yet verified.",
-  "official_url": "https://www.unitree.com/",
-  "commercial_status_evidence": [],
+  "specs_note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (curl + WebFetch) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Values from Unitree's R1 parameter table, 'R1' column (unitree.com/R1): height_cm 123.0 ('1230x357x190mm' standing), weight_kg 29.0 ('About 29kg'), degrees_of_freedom 26 (6 per leg, 5 per arm, 2 waist, 2 head), runtime_minutes 60 ('About 1h'). payload_kg UNKNOWN (owner decision, 2026-09-11): the row is labelled 'Maximum Torque of Arm Joint【1】' but reads 'About 2kg' (footnote 【1】 refers to 'the maximum load of the arm') — internally inconsistent source wording, and the owner capture that corroborates 2 kg has no source URL. has_sdk FALSE and developer_edition FALSE: 'Secondary Development【2】' is '/' for R1 and 'YES' only for R1 EDU; reichelt's listing agrees ('Basismodell, nicht frei programmierbar'). hand_type and hand_dof UNKNOWN (owner decision, 2026-09-11 — hand_dof held explicitly; hand_type held for the same reason, its only support being the same URL-less capture): Unitree lists 'Dexterous Hand' as '/' for R1; an owner-supplied capture of a RobotShop US listing (captured 2026-08-17; NO source URL — limitation recorded, no URL invented) states 'Hand Type Dummy hands' and 'Hand DOF (per hand) 0 (dummy hands)'. has_language_ui: 'Integrated with a Large Multimodal Model for voice and images' plus 4-mic array and speaker — series-level claim, MEDIUM (footnote [7]: some sample functions still in development). CONFLICTS preserved: (1) DoF — reichelt 'R1 Base' lists 'DOF: 24' and 'Total degrees of freedom: 24 DOF (up to 40 DOF depending on the model)'; the owner capture's prose says 'twenty-four actuated degrees of freedom' while its own table says 26; Unitree says 26 for R1 (and 20 for R1 AIR). Manufacturer value used. (2) Height — reichelt 'Length: 1210 mm'; capture prose '1,210 mm' vs its table '1230×357×190 mm'; Unitree 1230 mm used. (3) Weight — reichelt 'Weight: 25000 g' and 'Weight (manufacturer specs): 40 kg'; Unitree 29 kg used. The reichelt/QUADRUPED 'R1 Base' spec rows (24 DoF, 25 kg, 1210 mm) look like an older launch-era sheet; they do not match any current Unitree edition exactly, which is why the reichelt identity mapping is MEDIUM. has_api, ros_support, simulation_support, autonomy, walk_speed, battery_wh, reach and arm span are not stated for this edition and stay UNKNOWN. model_code stays NULL: sellers use different part numbers ('R1 BASE' at reichelt, 'R1-Basic' in the RobotShop capture) and Unitree publishes none.",
+  "official_url": "https://www.unitree.com/R1",
+  "commercial_status_evidence": [
+    {
+      "source_url": "https://shop.unitree.com/products/unitree-r1",
+      "source_type": "MANUFACTURER_STORE",
+      "source_title": "Unitree R1 — Unitree official online store (shop.unitree.com)",
+      "excerpt": "Unitree R1 — variants 'R1 (White)' $5,900.00 (SKU 00.01.05.00013) and 'R1 (Red)' $5,900.00 (SKU 00.01.05.00109), available; 'R1 Air' $4,900.00; 'R1 EDU' $10,500.00. 'In Stock'. 'Add to Cart'.",
+      "published_at": null,
+      "observed_at": "2026-09-11",
+      "verified_at": null,
+      "confidence": "HIGH",
+      "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (curl 8.11.0 (store product JSON) + WebFetch (product page)) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own store. Variant prices and availability flags read from the store's public product data (shop.unitree.com/products/unitree-r1.js, HTTP 200) and the product page."
+    },
+    {
+      "source_url": "https://www.unitree.com/R1",
+      "source_type": "MANUFACTURER_SITE",
+      "source_title": "Unitree R1 — unitree.com product page and parameter table",
+      "excerpt": "Price（Tax and Shipping cost excluded） R1 AIR $4,900 · R1 $5,900 · R1 EDU Contact Sales",
+      "published_at": null,
+      "observed_at": "2026-09-11",
+      "verified_at": null,
+      "confidence": "HIGH",
+      "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (curl 8.11.0, default user agent; raw page sha256 f91cb8ce1d5209d5…) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified."
+    },
+    {
+      "source_url": "https://www.reichelt.com/de/en/shop/product/unitree_r1_base_-_humanoid_robot_base_model_blue-417035",
+      "source_type": "OTHER",
+      "source_title": "Unitree R1 Base — reichelt.com (third-party distributor, DE)",
+      "excerpt": "Unitree R1 Base - Humanoid Robot, Base Model, Blue — €9,930.- incl. 19% VAT; Man. part no. R1 BASE; 'Limited stock, delivery within 1 - 2 business days'.",
+      "published_at": null,
+      "observed_at": "2026-09-11",
+      "verified_at": null,
+      "confidence": "MEDIUM",
+      "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Corroborates European obtainability. Identity mapping of reichelt's 'Base Model' to Unitree's 'R1' (non-EDU) is MEDIUM — its spec rows conflict with Unitree's table (see specs_note)."
+    }
+  ],
   "variants": [],
-  "pricing_offers": [],
-  "availability_offers": [],
+  "pricing_offers": [
+    {
+      "provider_slug": "unitree-store",
+      "region_code": "GLOBAL",
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "USD",
+      "price": 5900.0,
+      "billing_period": "ONE_TIME",
+      "note": "OEM store list price for 'R1' (White or Red; SKUs 00.01.05.00013 / 00.01.05.00109) — not R1 AIR ($4,900) and not R1 EDU. Unitree's table states the price excludes tax and shipping; the store states 'Shipping costs between $300 and $1200' and that the customer is responsible for customs duties and taxes.",
+      "evidence": [
+        {
+          "source_url": "https://shop.unitree.com/products/unitree-r1",
+          "source_type": "MANUFACTURER_STORE",
+          "source_title": "Unitree R1 — Unitree official online store (shop.unitree.com)",
+          "excerpt": "Unitree R1 — variants 'R1 (White)' $5,900.00 (SKU 00.01.05.00013) and 'R1 (Red)' $5,900.00 (SKU 00.01.05.00109), available; 'R1 Air' $4,900.00; 'R1 EDU' $10,500.00. 'In Stock'. 'Add to Cart'.",
+          "published_at": null,
+          "observed_at": "2026-09-11",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (curl 8.11.0 (store product JSON) + WebFetch (product page)) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own store. Variant prices and availability flags read from the store's public product data (shop.unitree.com/products/unitree-r1.js, HTTP 200) and the product page."
+        }
+      ]
+    },
+    {
+      "provider_slug": "reichelt",
+      "region_code": "DE",
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "EUR",
+      "price": 9930.0,
+      "billing_period": "ONE_TIME",
+      "note": "reichelt DE storefront price for 'Unitree R1 Base' (Product# UNITREE R1 BASE, Man. part no. R1 BASE): €9,930.00 incl. 19% VAT, plus special shipping €35.70 per position. Identity mapped to Unitree 'R1' (MEDIUM, see specs_note conflicts).",
+      "evidence": [
+        {
+          "source_url": "https://www.reichelt.com/de/en/shop/product/unitree_r1_base_-_humanoid_robot_base_model_blue-417035",
+          "source_type": "OTHER",
+          "excerpt": "€9,930.- incl. 19% VAT shipping costs will apply; plus special shipping: €35.70 per position",
+          "published_at": null,
+          "observed_at": "2026-09-11",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Third-party distributor price, not manufacturer MSRP."
+        }
+      ]
+    },
+    {
+      "provider_slug": "quadruped-de",
+      "region_code": "DE",
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "EUR",
+      "price": 8400.0,
+      "billing_period": "ONE_TIME",
+      "note": "QUADRUPED.DE price for variant 'R1 Base' of article 1196 'Unitree R1': €8,400.00 excl. 19% VAT (the catalogue records the price as displayed; it is not VAT-adjusted). The page states 'Available from: 28.12.2026' — recorded here, not mapped to an availability status.",
+      "evidence": [
+        {
+          "source_url": "https://www.quadruped.de/Unitree-R1_1",
+          "source_type": "OTHER",
+          "excerpt": "Unitree R1 — R1 Base 8,400.00 € excl. 19% VAT; Available from: 28.12.2026",
+          "published_at": null,
+          "observed_at": "2026-09-11",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (QUADRUPED Robotics, DE), not the manufacturer."
+        }
+      ]
+    }
+  ],
+  "availability_offers": [
+    {
+      "provider_slug": "unitree-store",
+      "region_code": "GLOBAL",
+      "transaction_type": "PURCHASE",
+      "availability_status": "AVAILABLE",
+      "note": "OEM store shows 'In Stock' with 'Add to Cart'; store product data marks both R1 variants available=true. (Only 'R1 Air (White)' is noted as backordered — a different edition.)",
+      "evidence": [
+        {
+          "source_url": "https://shop.unitree.com/products/unitree-r1",
+          "source_type": "MANUFACTURER_STORE",
+          "source_title": "Unitree R1 — Unitree official online store (shop.unitree.com)",
+          "excerpt": "Unitree R1 — variants 'R1 (White)' $5,900.00 (SKU 00.01.05.00013) and 'R1 (Red)' $5,900.00 (SKU 00.01.05.00109), available; 'R1 Air' $4,900.00; 'R1 EDU' $10,500.00. 'In Stock'. 'Add to Cart'.",
+          "published_at": null,
+          "observed_at": "2026-09-11",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (curl 8.11.0 (store product JSON) + WebFetch (product page)) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own store. Variant prices and availability flags read from the store's public product data (shop.unitree.com/products/unitree-r1.js, HTTP 200) and the product page."
+        }
+      ]
+    },
+    {
+      "provider_slug": "reichelt",
+      "region_code": "DE",
+      "transaction_type": "PURCHASE",
+      "availability_status": "AVAILABLE",
+      "note": "reichelt: 'Limited stock, delivery within 1 - 2 business days' → AVAILABLE (in stock, stated delivery; 'Limited stock' describes quantity, not a purchase constraint). lead_time_days NULL (business days).",
+      "evidence": [
+        {
+          "source_url": "https://www.reichelt.com/de/en/shop/product/unitree_r1_base_-_humanoid_robot_base_model_blue-417035",
+          "source_type": "OTHER",
+          "excerpt": "Limited stock, delivery within 1 - 2 business days",
+          "published_at": null,
+          "observed_at": "2026-09-11",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Seller's own stock statement for this SKU on the DE storefront."
+        }
+      ]
+    }
+  ],
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],

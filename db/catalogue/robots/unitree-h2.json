@@ -3,39 +3,141 @@
   "name": "H2",
   "manufacturer_slug": "unitree",
   "model_code": null,
-  "summary": null,
+  "summary": "Unitree's full-size humanoid, base edition: about 1.82 m and 70 kg, 31 joints (6 per leg, 7 per arm, 3 waist, 2 head), bionic head with facial features, rated arm payload ~7 kg (peak ~15 kg), 0.972 kWh quick-release battery for about 3 h, Intel Core i5 platform computer, wide-FoV binocular camera, array microphone and speaker for voice interaction, 8-month warranty. No dexterous hands and no secondary development on this edition (H2 EDU only). Manufacturer list price $29,900 excluding tax and shipping. Sources: unitree.com/H2 and shop.unitree.com, agent-retrieved 2026-09-11.",
   "announced_year": null,
-  "commercial_status": "ANNOUNCED",
+  "commercial_status": "LIMITED_COMMERCIAL",
   "is_published": false,
   "specs": {
-    "height_cm": null,
-    "weight_kg": null,
+    "height_cm": 182.0,
+    "weight_kg": 70.0,
     "arm_span_cm": null,
     "reach_cm": null,
-    "payload_kg": null,
+    "payload_kg": 7.0,
     "walk_speed_ms": null,
-    "runtime_minutes": null,
-    "battery_wh": null,
-    "mobility": null,
-    "degrees_of_freedom": null,
+    "runtime_minutes": 180,
+    "battery_wh": 972.0,
+    "mobility": "BIPEDAL",
+    "degrees_of_freedom": 31,
     "hand_type": null,
     "hand_dof": null,
     "autonomy": null,
     "has_manipulation": null,
     "has_teleoperation": null,
-    "has_vision": null,
-    "has_language_ui": null,
-    "has_sdk": null,
+    "has_vision": true,
+    "has_language_ui": true,
+    "has_sdk": false,
     "has_api": null,
     "ros_support": null,
-    "developer_edition": null,
+    "developer_edition": false,
     "simulation_support": null
   },
-  "specs_note": "Specifications not yet verified.",
-  "official_url": "https://www.unitree.com/",
-  "commercial_status_evidence": [],
+  "specs_note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (curl + WebFetch) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Values from Unitree's H2 parameter table (unitree.com/H2): height_cm 182.0 ('1820 x 456 x 218mm'), weight_kg 70.0 ('About 70kg'), degrees_of_freedom 31 (6 per leg, 7 per arm, 3 waist, 2 head), battery_wh 972.0 ('15Ah(0.972KWh)' — a unit conversion of the stated kWh, not a derivation), runtime_minutes 180 ('About 3h'). payload_kg 7.0 is the RATED per-arm payload: 'Arm Maximum Payload【1】 Peak: ~15 kg; Rated: ~7 kg' — the rated figure is recorded, the peak is preserved here. has_language_ui TRUE: 'Voice Interaction — Array Microphone and High-Power Speaker for Voice Interaction' is listed for both H2 and H2 EDU. VOICE ATTRIBUTION: Unitree attributes voice interaction (microphone array + speaker) to both editions but makes no large-language-model claim in the parameter table; the page's marketing line 'Powered by a 2070 TOPS chip, it supports diverse intelligent models' refers to the optional high-power computing module ('such as Thor'), listed for H2 EDU only — it is NOT recorded as base-H2 compute. Basic computing: 'PC1：Intel Core i5（Platform Capabilities）' (both); 'PC2：Intel Core i7（Custom Development）' (H2 EDU only). Distributor spec rows (reichelt, QUADRUPED.DE) agree on 31 DoF, 1820 mm, 70 kg, 0.972 kWh, ~3 h. walk_speed, autonomy, reach, arm span, ros_support and simulation_support are not stated and stay UNKNOWN. model_code stays NULL (reichelt part numbers 'H2-BASIC' / 'H2-EDU' are seller identifiers). has_sdk FALSE / developer_edition FALSE: 'Secondary Development [2]' is '/' for H2 and 'YES' only for H2 EDU; reichelt: 'does not include hands, an additional high-compute module, or support for secondary development'. hand_type / hand_dof left UNKNOWN: Unitree lists 'Dexterous Hand' as '/' (none) for H2 — there is no hand to count, which is not the same as a stated 0-DoF hand.",
+  "official_url": "https://www.unitree.com/H2",
+  "commercial_status_evidence": [
+    {
+      "source_url": "https://shop.unitree.com/products/unitree-h2",
+      "source_type": "MANUFACTURER_STORE",
+      "source_title": "Unitree H2 — Unitree official online store (shop.unitree.com)",
+      "excerpt": "Unitree H2 — single variant 'H2', price $29,900.00; store product data flag available=false. Collection page lists 'Unitree H2 $29,900.00 USD' with no sold-out badge.",
+      "published_at": null,
+      "observed_at": "2026-09-11",
+      "verified_at": null,
+      "confidence": "MEDIUM",
+      "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (curl 8.11.0 (store product JSON) + WebFetch (collection page)) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. LIMITED_COMMERCIAL rather than COMMERCIAL: a public OEM price exists and European distributors list it, but the OEM store's product data marks the only H2 variant available=false at observation, reichelt lists it as a 'Special item, note delivery time!' and QUADRUPED.DE states 'Available from: 28.12.2026' — for sale, but constrained. MEDIUM."
+    },
+    {
+      "source_url": "https://www.unitree.com/H2",
+      "source_type": "MANUFACTURER_SITE",
+      "source_title": "Unitree H2 — unitree.com product page and parameter table",
+      "excerpt": "Price（Tax and Shipping cost excluded） H2 $29,900 · H2 EDU Contact Sales",
+      "published_at": null,
+      "observed_at": "2026-09-11",
+      "verified_at": null,
+      "confidence": "HIGH",
+      "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (curl 8.11.0, default user agent; raw page sha256 3ca42e4b0557b54a…) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified."
+    },
+    {
+      "source_url": "https://www.reichelt.com/de/en/shop/product/h2_basic_-_humanoid_research_robot-418424",
+      "source_type": "OTHER",
+      "source_title": "UNITREE H2 Basic — reichelt.com (third-party distributor, DE)",
+      "excerpt": "H2 Basic - Humanoid Research Robot — €49,800.- incl. 19% VAT; Man. part no. H2-BASIC; 'Special item, note delivery time!'.",
+      "published_at": null,
+      "observed_at": "2026-09-11",
+      "verified_at": null,
+      "confidence": "MEDIUM",
+      "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Orderable European listing with an unspecified delivery time."
+    }
+  ],
   "variants": [],
-  "pricing_offers": [],
+  "pricing_offers": [
+    {
+      "provider_slug": "unitree-store",
+      "region_code": "GLOBAL",
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "USD",
+      "price": 29900.0,
+      "billing_period": "ONE_TIME",
+      "note": "OEM store list price for 'Unitree H2' (single variant). Unitree's table: tax and shipping excluded. The store's product data marked the variant available=false at observation — see availability note (no availability row recorded).",
+      "evidence": [
+        {
+          "source_url": "https://shop.unitree.com/products/unitree-h2",
+          "source_type": "MANUFACTURER_STORE",
+          "source_title": "Unitree H2 — Unitree official online store (shop.unitree.com)",
+          "excerpt": "Unitree H2 — single variant 'H2', price $29,900.00; store product data flag available=false. Collection page lists 'Unitree H2 $29,900.00 USD' with no sold-out badge.",
+          "published_at": null,
+          "observed_at": "2026-09-11",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (curl 8.11.0 (store product JSON) + WebFetch (collection page)) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified."
+        }
+      ]
+    },
+    {
+      "provider_slug": "reichelt",
+      "region_code": "DE",
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "EUR",
+      "price": 49800.0,
+      "billing_period": "ONE_TIME",
+      "note": "reichelt DE storefront price for 'H2 Basic - Humanoid Research Robot' (Product# UNITREE H2 BASE, Man. part no. H2-BASIC): €49,800.00 incl. 19% VAT, plus special shipping €35.70 per position. Availability wording: 'Special item, note delivery time!' — not mapped to a status (see offer policy).",
+      "evidence": [
+        {
+          "source_url": "https://www.reichelt.com/de/en/shop/product/h2_basic_-_humanoid_research_robot-418424",
+          "source_type": "OTHER",
+          "excerpt": "€49,800.- incl. 19% VAT shipping costs will apply; plus special shipping: €35.70 per position",
+          "published_at": null,
+          "observed_at": "2026-09-11",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Third-party distributor price, not manufacturer MSRP."
+        }
+      ]
+    },
+    {
+      "provider_slug": "quadruped-de",
+      "region_code": "DE",
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "EUR",
+      "price": 42000.0,
+      "billing_period": "ONE_TIME",
+      "note": "QUADRUPED.DE price for variant 'H2' of article 1243 'Unitree H2 (Humanoid Robot)': €42,000.00 excl. 19% VAT, plus shipping. Page states 'Available from: 28.12.2026' — recorded, not mapped to a status.",
+      "evidence": [
+        {
+          "source_url": "https://www.quadruped.de/Unitree-H2-Humanoid-Robot_1",
+          "source_type": "OTHER",
+          "excerpt": "Unitree H2 (Humanoid Robot) — H2 42.000,00 € excl. 19% VAT, plus shipping costs; Available from: 28.12.2026",
+          "published_at": null,
+          "observed_at": "2026-09-11",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (QUADRUPED Robotics, DE), not the manufacturer."
+        }
+      ]
+    }
+  ],
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],

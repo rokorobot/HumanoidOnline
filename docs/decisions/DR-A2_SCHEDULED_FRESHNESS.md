@@ -3,6 +3,7 @@
 | | |
 |---|---|
 | **Status** | **DECIDED — ADOPTED, 2026-08-25, Robert Konecny (product owner)** |
+| **Superseded in part** | The `robotshop.com` / `eu.robotshop.com` hard `MANUAL_CHECK` override (§5, §8) is withdrawn by `docs/26` Revision 5 (ratified by owner 2026-09-11; repository-effective upon merge). Everything else stands. |
 | **Raised** | 2026-08-25 |
 | **Decision owner** | Robert Konecny (product owner) — sole ratifying authority |
 | **Amends** | `docs/16_DATA_D1_LIVE_MARKET_ACQUISITION_CONTRACT.md` §"LIVE.4" (RATIFIED v0.1, 2026-07-29) |

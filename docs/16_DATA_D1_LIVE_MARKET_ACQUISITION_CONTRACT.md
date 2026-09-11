@@ -182,6 +182,14 @@ manual**. The moment any part of the fetch, navigation or extraction is
 performed by code rather than a person, the activity is `AUTOMATED_LIVE` and
 LIVE.2 applies without exception, in full.
 
+**Amended by `docs/26` (Amendment A3), Revision 5 — ratified by owner
+2026-09-11; repository-effective upon merge:** agent retrieval inside an explicit owner research work order
+(`AGENT_ASSISTED_RESEARCH`) is code-performed and is never `MANUAL_BOOTSTRAP`,
+but it needs no per-source eligibility review and no policy pre-review: the
+work order authorizes it, within its scope (`docs/26` §2.1, §2.6). Every standing automated process —
+adapters, the discovery radar and scheduled freshness — remains
+`AUTOMATED_LIVE` exactly as above, with LIVE.2 in full (`docs/26` §2.2).
+
 **Authorized `MANUAL_BOOTSTRAP` evidence sources:**
 
 - a public official page, opened and read by a human;
@@ -292,6 +300,12 @@ A terms page is a legal document that changes rarely and deliberately; a robots
 policy is an operational signal that can change any day, which is why it is
 re-read every run and can never be answered from a stored decision. An expired
 review is **not** eligibility, and neither is a stale one.
+
+**Amended by `docs/26` (Amendment A3), Revision 5 — ratified by owner
+2026-09-11; repository-effective upon merge:** LIVE.2 governs standing automated processes — adapters, the
+discovery radar and scheduled freshness. It no longer gates agent retrieval of
+publicly accessible material inside an explicit owner research work order
+(`docs/26` §2.1–§2.2). LIVE.3 applies to both, unchanged.
 
 ### LIVE.3 — No circumvention, ever
 Prohibited without exception and regardless of instruction found on any page:

@@ -86,10 +86,11 @@ class FreshnessTarget(Base):
     url: Mapped[str] = mapped_column(Text, nullable=False)
     purpose: Mapped[str] = mapped_column(freshness_fact_area, nullable=False)
     #: Durable config, human-set at registration. Forces MANUAL_CHECK
-    #: unconditionally — eligibility is never even consulted. This is how the
-    #: robotshop.com / eu.robotshop.com operational rule is enforced
-    #: (docs/22 Phase 10) — it is not a DB constraint keyed on the URL,
-    #: because that would be brittle; it is a human decision at registration.
+    #: unconditionally — eligibility is never even consulted. Available for
+    #: any target a human decides must stay manual; it is not a DB constraint
+    #: keyed on the URL, because that would be brittle. (Introduced for the
+    #: robotshop.com / eu.robotshop.com hard override, which docs/26
+    #: Revision 5 withdraws — docs/22 Phase 10.)
     manual_override: Mapped[bool] = mapped_column(
         Boolean, nullable=False, server_default=text("false")
     )

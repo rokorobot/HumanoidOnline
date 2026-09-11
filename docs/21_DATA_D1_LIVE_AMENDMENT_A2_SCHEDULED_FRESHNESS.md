@@ -17,6 +17,11 @@
 > **This amendment does not reopen new-discovery crawling.** LIVE.4 remains
 > fully authoritative — manual, local, human-triggered only — for every purpose
 > other than the one narrow exception defined in §2.
+>
+> **Amended by `docs/26` (Amendment A3), Revision 5 — ratified by owner
+> 2026-09-11; repository-effective upon merge:** the `robotshop.com` / `eu.robotshop.com` hard `MANUAL_CHECK`
+> override (§5, §7 example 7, §10, §11) is withdrawn. Nothing else in this
+> amendment changes; DATA-D1.9 remains fully binding for scheduled freshness.
 
 ---
 
@@ -208,8 +213,8 @@ static editorial/archival sources normally are not:
 | figure.ai | 1 | freshness-candidate → `ELIGIBILITY_REVIEW_REQUIRED` | Never assessed. |
 | robotera.com | 1 | freshness-candidate → `ELIGIBILITY_REVIEW_REQUIRED` | Never assessed. |
 | 1x.tech | 1 | freshness-candidate → `ELIGIBILITY_REVIEW_REQUIRED` | Never assessed. |
-| eu.robotshop.com | 4 | freshness-candidate (commercial, price/availability) → `MANUAL_CHECK` (hard override) | Independent of any DATA-D1.9 outcome: this domain crashes the Claude/Claude-Code browser tooling this project's operator uses. Never fetched by any of this project's automated *or agent-driven* tooling — a human checks it directly, outside this stack, regardless of eligibility. |
-| robotshop.com | 1 | freshness-candidate (commercial) → `MANUAL_CHECK` (hard override) | Same rule as above. |
+| eu.robotshop.com | 4 | freshness-candidate (commercial, price/availability) → `ELIGIBILITY_REVIEW_REQUIRED` | Never assessed under DATA-D1.9. *(Revised by `docs/26` Revision 5: the former hard `MANUAL_CHECK` override is withdrawn. The Claude Code Browser pane's instability on this domain is a tool-stability constraint, not a source rule; a freshness checker is an HTTP client, not that browser.)* |
+| robotshop.com | 1 | freshness-candidate (commercial) → `ELIGIBILITY_REVIEW_REQUIRED` | Same as above. |
 | commons.wikimedia.org | 5 | `INACTIVE` (archival/image evidence) | Static historical reference; not a specification/price/availability/status source. No freshness reason identified. |
 | humanoid.guide | 4 | `INACTIVE` (archival/editorial) | Editorial/news coverage, not an authoritative source for facts that change. |
 | robotsguide.com | 3 | `INACTIVE` (archival, and already disqualified) | Prior assessment: `robots.txt` names `ClaudeBot` with `Disallow: /`, Article 4 rights reservation, `403` on all other paths. Editorial content regardless. Never `AUTO_CHECK`. |
@@ -222,10 +227,10 @@ currently `AUTO_CHECK` (all 12 lack a current, recorded, affirmative
 DATA-D1.9 decision in `discovery_source`; 3 carry a **known prior negative**
 finding that predates this amendment and is not treated as automatically
 current). **12 are `ELIGIBILITY_REVIEW_REQUIRED`** in the strict sense
-("no current affirmative decision exists"), of which 2 domains (robotshop.com
-/ eu.robotshop.com, both distributor pages) additionally carry a **hard
-`MANUAL_CHECK` override** independent of eligibility, because this project's
-own tooling cannot safely open that domain at all. `robotsguide.com`
+("no current affirmative decision exists"). *(Revised by `docs/26` Revision
+5: robotshop.com / eu.robotshop.com no longer carry the hard `MANUAL_CHECK`
+override this sentence originally recorded; they are ordinary
+`ELIGIBILITY_REVIEW_REQUIRED` domains.)* `robotsguide.com`
 (archival/`INACTIVE`) already carries a recorded **negative** DATA-D1.9
 finding from prior work, separate from the "review required" domains that
 have simply never been assessed.
@@ -273,7 +278,7 @@ review exists.
 | 4 | A scheduled fetch detects the price changed from $13,500 to $14,200. | `RECHECK_REQUIRED` is raised (or an existing discovery-layer record for that robot/source is reused), change-type guessed as `PRICE`. **The canonical `pricing_offer` row is untouched** until a human traces, verifies, and promotes through P1–P8. |
 | 5 | An operator argues one AUTO_CHECK run "obviously" found nothing wrong on a `MANUAL_CHECK` source, so it should count as checked. | Refused. `MANUAL_CHECK` means no automated fetch occurs, full stop (§2, "If D1.9 is missing... no network fetch"). A human must record `CHECKED_UNCHANGED` themselves. |
 | 6 | Someone proposes adding a second scheduled run per week "just to be safer." | Refused without a new amendment. `FRESHNESS_INTERVAL_DAYS = 7` is the ceiling this amendment ratifies; loosening it is a cadence change, not an implementation detail, given `docs/16` LIVE.4's own "visible schema change, not a config flag" principle (§8). |
-| 7 | A target's source is `eu.robotshop.com`, which later somehow passes a DATA-D1.9 review. | **Still `MANUAL_CHECK`.** The hard override in §5 is independent of DATA-D1.9 — it exists because this project's own tooling cannot safely open that domain, not because of the source's terms. Eligibility alone does not clear it. |
+| 7 | A target's source is `eu.robotshop.com`. | *(Revised by `docs/26` Revision 5.)* Treated like any other domain: `AUTO_CHECK` only if requirement 3 holds, otherwise `ELIGIBILITY_REVIEW_REQUIRED`. The former hard override is withdrawn; a human may still set `manual_override` on any target at registration (`docs/22` Phase 3). |
 
 ## 8. Implementation consequences (not authorized by this document)
 
@@ -325,9 +330,8 @@ This amendment explicitly does **not**:
   without P1–P8;
 - weaken UNKNOWN semantics, G2 ("no commercial fact without evidence"), or
   MEDIA-01 in any way;
-- override the `robotshop.com` / `eu.robotshop.com` operational exclusion —
-  that exclusion is independent of, and not superseded by, any DATA-D1.9
-  outcome for those domains.
+- *(bullet withdrawn by `docs/26` Revision 5 — the `robotshop.com` /
+  `eu.robotshop.com` operational exclusion it protected no longer exists.)*
 
 ## 11. Ratification record
 
@@ -373,6 +377,11 @@ Canonical mutation:          NOT POSSIBLE from this path, under any outcome
 Ratified by:                 Robert Konecny (product owner)
 Ratification date:           2026-08-25
 ```
+
+> **Revision note (`docs/26` Revision 5 — ratified by owner 2026-09-11;
+> repository-effective upon merge):** the
+> `robotshop.com` / `eu.robotshop.com` hard `MANUAL_CHECK` override recorded
+> above is withdrawn; see §5. The record is otherwise unchanged.
 
 **This document freezes principles only.** Implementing `SCHEDULED_FRESHNESS`
 — the enum value, the `FreshnessTarget`-equivalent table, the scheduler

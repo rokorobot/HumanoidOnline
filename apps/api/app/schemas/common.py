@@ -63,6 +63,11 @@ class PriceDisplay(BaseModel):
     region: str | None = None
     price_basis: str | None = None
     order_status_note: str | None = None
+    #: The configuration this amount was quoted for, when the offer is scoped to
+    #: one. NULL means the offer is variant-agnostic and speaks for the record.
+    #: Present so a variant-scoped headline can never be read as the price of
+    #: every configuration.
+    variant: str | None = None
     #: NULL = the edition match was never assessed (and is never shown as
     #: confirmed). FALSE offers are excluded from headline selection upstream.
     edition_confirmed: bool | None = None

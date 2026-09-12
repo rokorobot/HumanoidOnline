@@ -603,34 +603,42 @@ it is a display projection of real offers, not a new pricing concept.
 currency, basis and order status — never a minimum assembled across rows. The
 selection order, highest priority first:
 
-1. **Eligibility.** Removed outright: retired offers (`is_current` false),
-   edition-excluded ones (`edition_confirmed` FALSE), and **variant-scoped**
-   offers. `variant_id` NULL is variant-*agnostic*, and `db/schema.sql` freezes
-   the rule that a variant-specific price never attaches to a robot-level
-   offer — so for a robot-level headline it is not a weaker candidate, it is
-   not a candidate. Ranking it last instead would let it win whenever nothing
-   else survived, which is precisely what that rule forbids.
+1. **Eligibility.** Removed outright: retired offers (`is_current` false) and
+   edition-excluded ones (`edition_confirmed` FALSE).
 2. **Transaction mode, then price concreteness.**
 3. **Market applicability**, when `offered_in` is active (§12.1): offers outside
    the market are dropped rather than ranked, and the rest order exact region →
    wider region → member region → worldwide → region-agnostic.
-4. **Edition relevance to this record.** `edition_confirmed` TRUE (checked
+4. **Configuration relevance.** A variant-agnostic offer (`variant_id` NULL,
+   which applies to any configuration and therefore speaks for the record)
+   before one scoped to a single variant. The scoped offer is a **representative
+   fallback**: it becomes the headline only when the record has no eligible
+   variant-agnostic price, and the selected offer's variant identity is reported
+   in `price_display.variant` so a scoped amount is never read as the price of
+   every configuration. Refusing such an offer entirely was wrong in practice —
+   the seeded catalogue prices `unitree-g1` only through its `g1`/`g1-edu`
+   variants, so exclusion reported a robot with a published list price as having
+   none. This ranking concerns only which offer represents a record on a card:
+   it does **not** alter the frozen price↔availability matching rule (a
+   variant-specific price still never attaches to a different variant's or a
+   robot-level availability offer), and it infers nothing from `is_developer`.
+5. **Edition relevance to this record.** `edition_confirmed` TRUE (checked
    against the manufacturer's specification for this record) before NULL (never
    assessed); FALSE was already excluded. Comparability is settled **before**
    seller preference, so no offer can win on who sells it while describing
    something other than the record on display.
-5. **Manufacturer-direct before reseller**, among candidates already established
+6. **Manufacturer-direct before reseller**, among candidates already established
    as comparable. Decided from two governed columns — `provider.type = 'OEM'`
    **and** `provider.manufacturer_id` equal to the robot's manufacturer — never
    from the seller's name. Both halves are required: an OEM provider with no
    manufacturer link is unproven for this robot, and unproven never outranks
    proven.
-6. **Amount, within one comparable group only.** `price` decides solely between
+7. **Amount, within one comparable group only.** `price` decides solely between
    offers sharing a currency **and** a price basis. Across groups the amounts
    are not consulted at all: with no FX and no tax normalisation, a
    differently-denominated price is *incomparable* — a different fact from
    *expensive* (`services/pricing.py`, §10.3 case F).
-7. **Documented arbitrary tie-break** — provider slug, region code, currency,
+8. **Documented arbitrary tie-break** — provider slug, region code, currency,
    basis, alphabetically — so repeated imports cannot reorder equals. It
    expresses **no** preference: it does not mean USD beats EUR, nor that any tax
    basis is preferred, and it must never be read as either.

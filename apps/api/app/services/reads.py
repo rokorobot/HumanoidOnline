@@ -206,19 +206,33 @@ def _seller_rank(offer: PricingOffer, robot: Robot) -> int:
     return SELLER_OTHER
 
 
-def _describes_this_record(offer: PricingOffer) -> bool:
-    """Can this offer speak for the ROBOT-level record at all?
+#: Configuration relevance. 0 = variant-agnostic (`variant_id` NULL), which
+#: speaks for the record itself. 1 = scoped to one configuration.
+CONFIG_RECORD_LEVEL = 0
+CONFIG_VARIANT_SCOPED = 1
 
-    `variant_id` is not "which configuration is nicer" — the frozen matching
-    semantics in `db/schema.sql` define NULL as variant-**agnostic** (applies to
-    any configuration) and state that "a variant-specific price never attaches
-    to a different variant's (or robot-level) offer". A robot-level headline is
-    exactly a robot-level offer, so a variant-scoped price is not a weaker
-    candidate for it — it is not a candidate. Ranking it last instead would let
-    it win whenever nothing else survived, which is the case the frozen rule
-    forbids outright.
+
+def _config_rank(offer: PricingOffer) -> int:
+    """How well does this offer represent the ROBOT-level record?
+
+    `variant_id` NULL is variant-**agnostic** in the frozen semantics of
+    `db/schema.sql` — it applies to any configuration — so it always represents
+    the record better than a price attached to one configuration.
+
+    A variant-scoped offer is nonetheless a **representative fallback**: when a
+    record has no eligible variant-agnostic price, the seeded catalogue's own
+    modelling shows why refusing one is wrong — `unitree-g1`'s only prices are
+    scoped to its `g1` and `g1-edu` variants, and excluding them outright
+    reported a robot with a published list price as having no price at all.
+
+    This ranking is strictly about which offer represents the record on a card.
+    It does NOT touch the frozen price↔availability matching rule (a
+    variant-specific price still never attaches to a different variant's or a
+    robot-level availability offer), and it infers nothing from `is_developer`.
+    Whichever offer wins carries its variant identity into `PriceDisplay`, so a
+    scoped amount is never presented as the price of every configuration.
     """
-    return offer.variant_id is None
+    return CONFIG_RECORD_LEVEL if offer.variant_id is None else CONFIG_VARIANT_SCOPED
 
 
 #: Edition relevance, the real comparability signal (`pricing_offer.edition_confirmed`,
@@ -245,29 +259,33 @@ def price_display_for(
 
     The order of preference, highest first:
 
-    1. **Eligibility.** Removed outright: retired offers (`is_current` false),
-       edition-excluded ones (`edition_confirmed` FALSE), and variant-scoped
-       ones, which may never represent a robot-level record
-       (`_describes_this_record`).
+    1. **Eligibility.** Removed outright: retired offers (`is_current` false)
+       and edition-excluded ones (`edition_confirmed` FALSE).
     2. **Transaction mode, then price concreteness** — a purchase before a
        developer price, a published figure before an estimate.
     3. **Market applicability**, when `offered_in` is active: offers outside the
        market are dropped rather than ranked (an offer in an unrelated market is
        not a worse answer, it is not an answer), and the rest are ordered exact
        region, wider region, member region, worldwide, region-agnostic.
-    4. **Edition relevance to THIS record** (`_edition_rank`) — a listing
+    4. **Configuration relevance** (`_config_rank`) — a variant-agnostic offer,
+       which speaks for the record, before one scoped to a single
+       configuration. The scoped offer is a *representative fallback*: it wins
+       only when no eligible variant-agnostic price exists, and it carries its
+       variant identity into the result so it is never read as the price of
+       every configuration.
+    5. **Edition relevance to THIS record** (`_edition_rank`) — a listing
        confirmed against the manufacturer's specification before one never
        assessed. Comparability is settled BEFORE seller preference, so an offer
        can never win on who sells it while describing something else.
-    5. **Manufacturer-direct before reseller** (`_seller_rank`) — the business
+    6. **Manufacturer-direct before reseller** (`_seller_rank`) — the business
        preference, decided from governed columns, not seller names, and only
        among candidates already established as comparable.
-    6. **Amount, inside one comparable group only.** `price` decides solely
+    7. **Amount, inside one comparable group only.** `price` decides solely
        between offers sharing a currency AND a price basis. Across groups there
        is no comparison at all: `services/pricing.py` states the rule this
        obeys — with no FX and no tax normalisation, a differently-denominated
        price is *incomparable*, which is a different fact from *expensive*.
-    7. **Documented arbitrary tie-break** — provider slug, region code,
+    8. **Documented arbitrary tie-break** — provider slug, region code,
        currency, basis, alphabetically. This exists only so repeated imports
        cannot reorder equals. It expresses NO preference: it does not mean USD
        beats EUR or that a pre-tax basis is better, and it must never be read as
@@ -279,9 +297,7 @@ def price_display_for(
     """
     offers = [
         p for p in robot.pricing_offers
-        if p.is_current
-        and p.edition_confirmed is not False
-        and _describes_this_record(p)
+        if p.is_current and p.edition_confirmed is not False
     ]
     if market_rank is not None:
         offers = [p for p in offers if _offer_market_rank(p, market_rank) is not None]
@@ -294,6 +310,7 @@ def price_display_for(
             _TXN_PREF.get(p.transaction_type, 9),
             _PRICE_TYPE_RANK.get(p.price_type, 9),
             _offer_market_rank(p, market_rank) if market_rank is not None else 0,
+            _config_rank(p),
             _edition_rank(p),
             _seller_rank(p, robot),
         )
@@ -337,6 +354,9 @@ def price_display_for(
         price_basis=p.price_basis,
         order_status_note=p.order_status_note,
         edition_confirmed=p.edition_confirmed,
+        # Provenance of the configuration, not a preference signal: present only
+        # when the winning offer is scoped to one variant.
+        variant=p.variant.name if p.variant is not None else None,
     )
 
 

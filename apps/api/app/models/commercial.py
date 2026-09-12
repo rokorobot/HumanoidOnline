@@ -81,6 +81,10 @@ class PricingOffer(Base):
     robot: Mapped[Robot] = relationship("Robot", back_populates="pricing_offers")  # noqa: F821
     provider: Mapped[Provider | None] = relationship("Provider", lazy="selectin")  # noqa: F821
     region: Mapped[Region | None] = relationship("Region", lazy="selectin")  # noqa: F821
+    # Loaded like provider/region because the configuration an offer is scoped to
+    # travels WITH the price: a variant-scoped amount must never be reported as
+    # though it applied to every configuration of the robot.
+    variant: Mapped[RobotVariant | None] = relationship("RobotVariant", lazy="selectin")  # noqa: F821
 
 
 class AvailabilityOffer(Base):

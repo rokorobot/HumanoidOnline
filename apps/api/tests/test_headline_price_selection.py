@@ -73,7 +73,11 @@ def offer(
         order_status_note=order_status_note,
         edition_confirmed=edition_confirmed,
         is_current=is_current,
+        # Both halves of the configuration scope, exactly as the ORM carries
+        # them: the id the ranking reads, and the relationship whose name is
+        # reported so a scoped amount is never read as the record's own price.
         variant_id=variant_id,
+        variant=SimpleNamespace(name=f"Variant {variant_id}") if variant_id else None,
     )
 
 
@@ -189,13 +193,39 @@ def test_market_rank_outranks_seller_preference() -> None:
 
 # --- configuration / edition comparability -----------------------------------
 
-def test_a_variant_scoped_offer_never_represents_the_robot_record() -> None:
-    """`variant_id` NULL is variant-AGNOSTIC, and `db/schema.sql` freezes the
-    rule that a variant-specific price never attaches to a robot-level offer.
-    So it is excluded, not merely ranked last — ranking would let it win
-    whenever nothing else survived."""
-    variant_only = oem(provider="maker-store", price=10.0, variant_id="variant-1")
-    assert price_display_for(robot_with(variant_only)) is None
+def test_a_variant_scoped_offer_is_the_representative_fallback() -> None:
+    """When a record has NO variant-agnostic price, a scoped one represents it.
+
+    Excluding it outright was a regression: the seeded catalogue prices
+    `unitree-g1` only through its `g1`/`g1-edu` variants, so exclusion reported
+    a robot with a published list price as having none.
+    """
+    variant_only = oem(provider="maker-store", price=16000.0, variant_id="variant-1")
+    display = price_display_for(robot_with(variant_only))
+    assert display is not None
+    assert display.amount == 16000.0
+    # The scope travels with the amount: the card can say WHICH configuration
+    # this price is for, so it is never read as the price of every one.
+    assert display.variant == "Variant variant-1"
+
+
+def test_a_variant_agnostic_headline_reports_no_configuration() -> None:
+    """Absence of a variant is itself the statement that the price speaks for
+    the record — it must not be filled in with a guess."""
+    display = price_display_for(robot_with(oem(price=5900.0)))
+    assert display is not None
+    assert display.variant is None
+
+
+def test_a_variant_agnostic_offer_always_outranks_a_scoped_one() -> None:
+    """The fallback is strictly a fallback: it never displaces an offer that
+    speaks for the record, however much cheaper or better-sold it is."""
+    scoped = oem(provider="a-maker-store", price=10.0, variant_id="variant-1")
+    agnostic = offer(provider="z-reseller", price=30000.0)
+    display = price_display_for(robot_with(scoped, agnostic))
+    assert display is not None
+    assert display.provider == "z-reseller"
+    assert display.amount == 30000.0
 
 
 def test_a_confirmed_edition_outranks_an_unassessed_one_even_for_an_oem() -> None:

@@ -35,6 +35,9 @@ export function PriceStateCard({
       <span className={`amt ${hatch} ho-state`.trim()}>{s.label}</span>
       {s.context && <span className="ctx">{s.context}</span>}
       {seller && <span className="ctx">{seller}</span>}
+      {/* Only present when the headline came from a variant-scoped offer. Shown
+          so the amount is never read as the price of every configuration. */}
+      {price?.variant && <span className="ctx">Configuration: {price.variant}</span>}
       {price?.price_basis && <span className="ctx">{price.price_basis}</span>}
       {price?.order_status_note && (
         <span className="ctx" style={{ color: "var(--ho-caution)" }}>

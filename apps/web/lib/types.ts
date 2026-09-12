@@ -36,6 +36,10 @@ export interface PriceDisplay {
   order_status_note?: string | null;
   // null = the edition match was never assessed. Never render it as "confirmed".
   edition_confirmed?: boolean | null;
+  // The configuration this amount was quoted for, when the offer is scoped to
+  // one. Rendered with the price so a variant's figure is never read as the
+  // price of every configuration.
+  variant?: string | null;
 }
 
 export interface Evidence {

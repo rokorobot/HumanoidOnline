@@ -76,7 +76,26 @@ identity_status:  VERIFIED | UNVERIFIED            -- does it depict THIS exact 
 rights_status:    PERMITTED | ATTRIBUTION_REQUIRED -- legal/licensing EVIDENCE of reuse
                 | UNKNOWN | RESTRICTED
 usage_basis:      NONE | OFFICIAL_MANUFACTURER_MEDIA -- platform display POLICY
+                | OWNER_APPROVED_DISPLAY
 ```
+
+`OWNER_APPROVED_DISPLAY` records an explicit decision by the platform owner to
+display an asset for which **no source granted anything** — including
+distributor-sourced product photography, which `OFFICIAL_MANUFACTURER_MEDIA`
+would misdescribe. Like the other policy basis it is **not** evidence of a
+licence: `rights_status` stays `UNKNOWN`, the original `source_name` /
+`source_url` / `attribution` stay on the row, `display_approved_by` and
+`display_approved_at` record who decided and when, and `RESTRICTED` still blocks.
+
+**Representative imagery.** `is_representative` marks an asset that depicts the
+product **line or chassis** rather than the exact edition on the record. Such a
+row keeps `identity_status = UNVERIFIED` — exact-edition verification is not
+claimed — and is displayable only under `OWNER_APPROVED_DISPLAY` **and** only
+with a `representative_note` caption shown to the reader (e.g. "H2 chassis shown;
+EDU package may vary."). An unlabelled stand-in is indistinguishable from a claim
+about the exact edition and is therefore ineligible. An image that materially
+misrepresents the robot's appearance, hands or included equipment is rejected
+outright, caption or not.
 
 We do **not** encode a business decision to display official manufacturer product
 media as `rights_status = ATTRIBUTION_REQUIRED` — that would falsely assert an

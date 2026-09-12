@@ -6,7 +6,7 @@
   "summary": "Unitree R1 EDU U1: entry EDU configuration (reichelt 'EDU-Standardausführung', 40 TOPS per reichelt) without dexterous hands. R1 EDU platform per Unitree: about 1.23 m; 6 DoF per leg, 5 per arm, 2 waist and 2 head, with a total of 26-40 DoF depending on configuration; binocular camera, 4-mic array and speaker, about 1 h battery life, secondary development supported, 12-month warranty. Total DoF for this configuration is unresolved (reichelt 24 vs Unitree's 26-40 EDU range; see specs_note). Sources: unitree.com/R1 and reichelt.com, agent-retrieved 2026-09-11.",
   "announced_year": null,
   "commercial_status": "COMMERCIAL",
-  "is_published": false,
+  "is_published": true,
   "specs": {
     "height_cm": 123.0,
     "weight_kg": 29.0,

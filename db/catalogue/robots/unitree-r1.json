@@ -6,7 +6,7 @@
   "summary": "Mid-tier edition of Unitree's R1 humanoid line (between R1 AIR and R1 EDU): about 1.23 m and 29 kg, 26 joints (6 per leg, 5 per arm, 2 waist, 2 head), binocular camera, 4-mic array and speaker, 8-core processor, about 1 h battery life, 8-month warranty. Secondary development is not supported on this edition (R1 EDU only). Manufacturer list price $5,900 excluding tax and shipping. Sources: unitree.com/R1 and shop.unitree.com, agent-retrieved 2026-09-11.",
   "announced_year": null,
   "commercial_status": "COMMERCIAL",
-  "is_published": false,
+  "is_published": true,
   "specs": {
     "height_cm": 123.0,
     "weight_kg": 29.0,

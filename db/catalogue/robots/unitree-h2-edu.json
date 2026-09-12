@@ -6,7 +6,7 @@
   "summary": "Unitree H2 EDU: the research/development edition of the H2 full-size humanoid — same 1.82 m, 70 kg, 31-joint body, 0.972 kWh battery (~3 h) and voice-interaction hardware as H2, plus a second computer ('PC2：Intel Core i7（Custom Development）'), secondary development support, optional dexterous hands ('Multiple Model Options') and an optional high-power computing module ('such as Thor'); 12-month warranty. Sold through Unitree sales ('Contact Sales'). Sources: unitree.com/H2 and reichelt.com, agent-retrieved 2026-09-11.",
   "announced_year": null,
   "commercial_status": "LIMITED_COMMERCIAL",
-  "is_published": false,
+  "is_published": true,
   "specs": {
     "height_cm": 182.0,
     "weight_kg": 70.0,

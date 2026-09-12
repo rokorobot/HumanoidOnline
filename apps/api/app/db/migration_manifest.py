@@ -56,4 +56,7 @@ MIGRATIONS: dict[str, str] = {
     "0011_public_profile_and_offer_details": (
         "efff3538bb40c527b0273e2829983e24ae2d7bd5270321019180eccc59cef8a3"
     ),
+    "0012_owner_approved_display_basis": (
+        "2fad27ad99cae091ef7c82dab01e02590b83193aec4c678d14a792a259ec7cdb"
+    ),
 }

@@ -98,7 +98,13 @@ image_rights_status = _pg_enum(
     "PERMITTED", "ATTRIBUTION_REQUIRED", "UNKNOWN", "RESTRICTED",
 )
 image_usage_basis = _pg_enum(
-    "image_usage_basis", "NONE", "OFFICIAL_MANUFACTURER_MEDIA"
+    "image_usage_basis",
+    "NONE",
+    "OFFICIAL_MANUFACTURER_MEDIA",
+    # Migration 0012. An explicit owner decision to display an asset no source
+    # licensed (including distributor photography). Policy, not evidence:
+    # rights_status stays UNKNOWN and RESTRICTED still blocks.
+    "OWNER_APPROVED_DISPLAY",
 )
 match_category = _pg_enum(
     "match_category",

@@ -458,8 +458,9 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
             INSERT INTO robot_image
                 (robot_id, image_url, source_url, source_name, source_type, image_type,
                  identity_status, rights_status, usage_basis, is_official, is_primary,
-                 attribution, captured_at, last_verified_at)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                 attribution, is_representative, representative_note,
+                 display_approved_by, display_approved_at, captured_at, last_verified_at)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """,
             (
                 robot_id, im["image_url"], im.get("source_url"), im.get("source_name"),
@@ -468,7 +469,10 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
                 im.get("rights_status", "UNKNOWN"),
                 im.get("usage_basis", "NONE"),
                 im.get("is_official", False), im.get("is_primary", False),
-                im.get("attribution"), im.get("captured_at"), im.get("last_verified_at"),
+                im.get("attribution"),
+                im.get("is_representative", False), im.get("representative_note"),
+                im.get("display_approved_by"), im.get("display_approved_at"),
+                im.get("captured_at"), im.get("last_verified_at"),
             ),
         )
 
@@ -597,15 +601,130 @@ def _refresh_lowest_price(cur, robot_id) -> None:
         )
 
 
+class UnknownSlugs(SystemExit):
+    """`--only` named robot slugs the catalogue does not contain."""
+
+
+def select_robot_files(only: set[str] | None) -> list[Path]:
+    """The robot files this run will import.
+
+    `None` (the default) is every file — unchanged behaviour. A non-empty
+    allowlist is validated against the catalogue HERE, before any connection is
+    opened, so an unknown slug can never be discovered halfway through a
+    partially written import.
+    """
+    available = {p.stem: p for p in sorted(ROBOTS_DIR.glob("*.json"))}
+    if only is None:
+        return list(available.values())
+    unknown = sorted(only - set(available))
+    if unknown:
+        raise UnknownSlugs(
+            "unknown robot slug(s) in --only: " + ", ".join(unknown)
+            + f" (catalogue has {len(available)} records)"
+        )
+    return [available[s] for s in sorted(only)]
+
+
+def _ancestors(regions: dict, codes: set[str]) -> set[str]:
+    """Referenced region codes plus every `parent_code` above them.
+
+    A scoped import must not create a region whose parent is absent: `DE`
+    without `EU` would break the applicability walk the catalogue depends on.
+    """
+    by_code = {r["code"]: r for r in regions["regions"]}
+    out: set[str] = set()
+    frontier = list(codes)
+    while frontier:
+        code = frontier.pop()
+        if code in out or code not in by_code:
+            continue
+        out.add(code)
+        parent = by_code[code].get("parent_code")
+        if parent:
+            frontier.append(parent)
+    return out
+
+
+def scoped_dependencies(robots: list[dict], regions: dict) -> dict[str, set[str]]:
+    """Shared entities the SELECTED records actually reference.
+
+    Restricting the shared upserts to these is what keeps a scoped import
+    scoped: without it, importing one robot would still rewrite every
+    manufacturer, provider, capability, use case and spec definition in the
+    catalogue — rows belonging to robots the caller did not select.
+    """
+    deps: dict[str, set[str]] = {
+        "manufacturers": set(), "providers": set(), "regions": set(),
+        "capabilities": set(), "use_cases": set(), "spec_definitions": set(),
+    }
+    for r in robots:
+        if r.get("manufacturer_slug"):
+            deps["manufacturers"].add(r["manufacturer_slug"])
+        for kind in ("pricing_offers", "availability_offers", "deployments"):
+            for row in r.get(kind) or []:
+                if row.get("provider_slug"):
+                    deps["providers"].add(row["provider_slug"])
+                if row.get("region_code"):
+                    deps["regions"].add(row["region_code"])
+        for c in r.get("capabilities") or []:
+            slug = c.get("capability_slug") or c.get("slug")
+            if slug:
+                deps["capabilities"].add(slug)
+        for f in r.get("use_case_fits") or []:
+            if f.get("use_case_slug"):
+                deps["use_cases"].add(f["use_case_slug"])
+        for x in r.get("extended_specs") or []:
+            deps["spec_definitions"].add(x["key"])
+    # A provider may be owned by a manufacturer the selection does not name.
+    deps["regions"] = _ancestors(regions, deps["regions"])
+    return deps
+
+
+def _narrow(data: dict, key: str, field: str, keep: set[str]) -> dict:
+    """The same payload shape, carrying only the entries `keep` names."""
+    return {key: [row for row in data[key] if row.get(field) in keep]}
+
+
 # --------------------------------------------------------------------------- #
-def run(url: str, *, apply_publication_state: bool = False) -> None:
+def run(url: str, *, apply_publication_state: bool = False,
+        only: set[str] | None = None) -> None:
     regions = _load(CATALOGUE_DIR / "regions.json")
     providers = _load(CATALOGUE_DIR / "providers.json")
     capabilities = _load(CATALOGUE_DIR / "capabilities.json")
     use_cases = _load(CATALOGUE_DIR / "use_cases.json")
     spec_definitions = _load(CATALOGUE_DIR / "spec_definitions.json")
     manufacturers = _load(CATALOGUE_DIR / "manufacturers.json")
-    robot_files = sorted(ROBOTS_DIR.glob("*.json"))
+
+    # Validated BEFORE the connection opens: an unknown slug aborts with nothing
+    # written, and the filter is applied before any robot or child-row mutation.
+    robot_files = select_robot_files(only)
+    loaded = [_load(p) for p in robot_files]
+
+    if only is not None:
+        deps = scoped_dependencies(loaded, regions)
+        # A provider's own manufacturer must exist before the provider upsert
+        # resolves `manufacturer_slug`.
+        provider_rows = [p for p in providers["providers"] if p["slug"] in deps["providers"]]
+        deps["manufacturers"] |= {
+            p["manufacturer_slug"] for p in provider_rows if p.get("manufacturer_slug")
+        }
+        manufacturer_rows = [
+            m for m in manufacturers["manufacturers"] if m["slug"] in deps["manufacturers"]
+        ]
+        deps["regions"] |= _ancestors(regions, {
+            m["country_region_code"] for m in manufacturer_rows
+            if m.get("country_region_code")
+        } | {
+            p["country_region_code"] for p in provider_rows if p.get("country_region_code")
+        })
+        regions = _narrow(regions, "regions", "code", deps["regions"])
+        manufacturers = {"manufacturers": manufacturer_rows}
+        providers = {"providers": provider_rows}
+        capabilities = _narrow(capabilities, "capabilities", "slug", deps["capabilities"])
+        use_cases = _narrow(use_cases, "use_cases", "slug", deps["use_cases"])
+        spec_definitions = _narrow(
+            spec_definitions, "spec_definitions", "key", deps["spec_definitions"]
+        )
 
     with psycopg.connect(url, autocommit=False) as conn:
         with conn.cursor() as cur:
@@ -663,8 +782,7 @@ def run(url: str, *, apply_publication_state: bool = False) -> None:
             import_spec_definitions(cur, spec_definitions, collisions)
 
             n_robots = 0
-            for path in robot_files:
-                robot = _load(path)
+            for robot in loaded:
                 import_robot(cur, robot, region_id, manufacturer_id,
                              capability_id, use_case_id, spec_definition, collisions,
                              apply_publication_state=apply_publication_state)
@@ -676,6 +794,9 @@ def run(url: str, *, apply_publication_state: bool = False) -> None:
 
         conn.commit()
 
+    if only is not None:
+        print(f"SCOPED IMPORT — {n_robots} selected record(s): "
+              + ", ".join(sorted(only)))
     print(f"Catalogue import OK: {len(manufacturers['manufacturers'])} manufacturers, "
           f"{len(providers['providers'])} providers, {n_robots} robots.")
     # Stored vs displayed, always reported: the master catalogue is cumulative,
@@ -703,10 +824,25 @@ def main(argv: list[str] | None = None) -> None:
              "Omitted (the default), an import updates catalogue facts and leaves "
              "the existing publication state of every known robot untouched.",
     )
+    ap.add_argument(
+        "--only",
+        action="append",
+        metavar="SLUG",
+        help="Import ONLY these robot slugs (repeatable, or comma-separated). "
+             "Shared entities (regions, manufacturers, providers, capabilities, "
+             "use cases, spec definitions) are narrowed to what the selected "
+             "records reference. Unknown slugs abort before anything is written. "
+             "Omitted, every catalogue record is imported, exactly as before.",
+    )
     args = ap.parse_args(argv)
     if not args.database_url:
         ap.error("no database URL: pass --database-url or set DATABASE_URL")
-    run(normalize_url(args.database_url),
+    only = None
+    if args.only:
+        only = {s.strip() for item in args.only for s in item.split(",") if s.strip()}
+        if not only:
+            ap.error("--only was given with no slugs")
+    run(normalize_url(args.database_url), only=only,
         apply_publication_state=args.apply_publication_state)
 
 

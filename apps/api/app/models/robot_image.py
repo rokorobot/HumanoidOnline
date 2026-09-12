@@ -12,6 +12,17 @@ collapsed:
   - identity_status: does it depict THIS exact robot;
   - rights_status: legal/licensing EVIDENCE for reuse;
   - usage_basis: platform display POLICY (why we display absent a formal license).
+
+`usage_basis` has two policy bases. OFFICIAL_MANUFACTURER_MEDIA covers official
+manufacturer product media. OWNER_APPROVED_DISPLAY covers an explicit owner
+decision to display an asset — including distributor-sourced photography —
+where no source granted anything. Neither is evidence of a licence, so
+`rights_status` stays UNKNOWN and RESTRICTED still blocks.
+
+A REPRESENTATIVE image (`is_representative`) depicts the product line/chassis
+rather than the exact edition. It keeps `identity_status = UNVERIFIED` and is
+displayable only under OWNER_APPROVED_DISPLAY with a `representative_note`
+caption, so the reader is told what is actually shown.
 `attribution` is NOT a fourth dimension — it is the credit OBLIGATION attached to
 the `ATTRIBUTION_REQUIRED` rights state (schema: "required credit line when
 ATTRIBUTION_REQUIRED"). An image is shown ONLY when identity VERIFIED AND
@@ -41,8 +52,10 @@ from app.models.enums import (
 
 # Rights values that on their own permit display (a real reuse basis on record).
 DISPLAYABLE_RIGHTS = ("PERMITTED", "ATTRIBUTION_REQUIRED")
-# Usage-policy bases that permit display absent a formal license.
-DISPLAYABLE_USAGE = ("OFFICIAL_MANUFACTURER_MEDIA",)
+# Usage-policy bases that permit display absent a formal license. Both are
+# DISPLAY POLICY, never evidence of a licence: `rights_status` stays whatever the
+# evidence actually supports (usually UNKNOWN), and RESTRICTED still blocks.
+DISPLAYABLE_USAGE = ("OFFICIAL_MANUFACTURER_MEDIA", "OWNER_APPROVED_DISPLAY")
 
 
 class RobotImage(Base):
@@ -77,6 +90,17 @@ class RobotImage(Base):
         Boolean, nullable=False, server_default=text("false")
     )
     attribution: Mapped[str | None] = mapped_column(Text)
+    # Representative imagery: depicts the product line/chassis, not this exact
+    # edition. Such a row keeps identity_status = UNVERIFIED — the caption, not a
+    # false identity value, is what makes it honest.
+    is_representative: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default=text("false")
+    )
+    representative_note: Mapped[str | None] = mapped_column(Text)
+    # Who approved display absent a reuse licence, and when. Attribution of the
+    # DECISION — never a grant of rights by the source.
+    display_approved_by: Mapped[str | None] = mapped_column(Text)
+    display_approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     captured_at: Mapped[date | None] = mapped_column(Date)
     last_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
@@ -110,14 +134,28 @@ class RobotImage(Base):
         precisely so that an attribution licence is never falsely asserted —
         so ATTRIBUTION_REQUIRED always means a credit is owed.
         """
+        # Identity: normally VERIFIED. A REPRESENTATIVE image is the one
+        # exception, and it is not a loophole: it is displayable only under an
+        # explicit owner display approval AND only with a caption saying what is
+        # actually shown, so identity uncertainty reaches the reader instead of
+        # being silently upgraded to "this exact robot".
         if self.identity_status != "VERIFIED":
-            return False
+            if not (self.is_representative and self.usage_basis == "OWNER_APPROVED_DISPLAY"):
+                return False
+            if not (self.representative_note or "").strip():
+                return False
         if self.rights_status == "RESTRICTED":
             return False
 
         has_rights_basis = self.rights_status in DISPLAYABLE_RIGHTS
         has_usage_basis = self.usage_basis in DISPLAYABLE_USAGE
         if not (has_rights_basis or has_usage_basis):
+            return False
+
+        # A representative image must always carry its caption, whatever its
+        # identity or rights state — an unlabelled stand-in reads as a claim
+        # about the exact edition.
+        if self.is_representative and not (self.representative_note or "").strip():
             return False
 
         if self.rights_status == "ATTRIBUTION_REQUIRED":

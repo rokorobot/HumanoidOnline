@@ -123,7 +123,26 @@
     }
   ],
   "use_case_fits": [],
-  "images": [],
+  "images": [
+    {
+      "image_url": "/robots/unitree-r1.png",
+      "source_url": "https://www.quadruped.de/Unitree-R1_1",
+      "source_name": "QUADRUPED Robotics",
+      "source_type": "DISTRIBUTOR",
+      "image_type": "FRONT",
+      "identity_status": "UNVERIFIED",
+      "rights_status": "UNKNOWN",
+      "usage_basis": "OWNER_APPROVED_DISPLAY",
+      "is_official": false,
+      "is_primary": true,
+      "attribution": "© QUADRUPED Robotics UG",
+      "is_representative": true,
+      "representative_note": "Representative R1 image; EDU appearance and equipment may vary.",
+      "display_approved_by": "robert@humanoid.company",
+      "display_approved_at": "2026-09-12T00:00:00Z",
+      "last_verified_at": "2026-09-12T00:00:00Z"
+    }
+  ],
   "spec_caveats": [
     {
       "field": "payload_kg",

@@ -50,7 +50,22 @@ export function AvailabilityMatrix({
         <div className="mrow" key={i}>
           <span>{modeLabel(o.transaction_type)}</span>
           <span className={o.region ? "" : "na"}>{o.region ?? "—"}</span>
-          <span>{o.availability_status}</span>
+          <span>
+            {o.availability_status}
+            {/* The enum is our normalization; the seller's own sentence and the
+                geography their estimate was given for are shown beneath it, so a
+                domestic estimate is never read as wider coverage. */}
+            {o.seller_wording && (
+              <span className="ho-syslabel" style={{ display: "block" }}>
+                “{o.seller_wording}”
+              </span>
+            )}
+            {o.delivery_estimate_label && (
+              <span className="ho-syslabel" style={{ display: "block" }}>
+                {o.delivery_estimate_label}
+              </span>
+            )}
+          </span>
         </div>
       ))}
     </div>

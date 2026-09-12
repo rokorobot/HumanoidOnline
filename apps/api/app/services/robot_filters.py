@@ -45,13 +45,13 @@ from sqlalchemy import false, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.models import enums as pg_enums
-from app.models.commercial import AvailabilityOffer
+from app.models.commercial import AvailabilityOffer, PricingOffer
 from app.models.enums import AUTONOMY_ORDER
 from app.models.manufacturer import Manufacturer
 from app.models.robot import Robot
 from app.models.use_case import UseCase, UseCaseFit
 from app.services.pricing import comparable_price_order_column
-from app.services.regions import applicable_region_ids
+from app.services.regions import applicable_region_ids, discovery_region_ids
 
 
 class InvalidFilterValue(ValueError):
@@ -102,6 +102,24 @@ def resolve_region_filter(session: Session, code: str) -> set[uuid.UUID]:
     ids = applicable_region_ids(session, code=code)
     if not ids:
         raise InvalidRegion("region", code)
+    return ids
+
+
+def resolve_discovery_filter(session: Session, code: str) -> set[uuid.UUID]:
+    """Region ids for the `offered_in` MARKET scope (`docs/20` §12.1).
+
+    A different question from `resolve_region_filter`, kept in a different
+    function so no call site can confuse them: this one answers "whose offers
+    should a buyer browsing this market see", which includes offers scoped to
+    member countries of an economic zone. It is never used for eligibility,
+    matching or lead routing.
+
+    An unrecognised code is invalid input here too — a typo must fail rather than
+    widen to the whole catalogue.
+    """
+    ids = discovery_region_ids(session, code=code)
+    if not ids:
+        raise InvalidRegion("offered_in", code)
     return ids
 
 
@@ -322,6 +340,7 @@ def apply_catalogue_filters(
     developer_edition,
     has_manipulation,
     region_ids: Collection[uuid.UUID] | None = None,
+    offered_in_region_ids: Collection[uuid.UUID] | None = None,
 ):
     """Apply the governed catalogue predicates to `stmt`.
 
@@ -421,4 +440,27 @@ def apply_catalogue_filters(
                 # more than a resolvable one.
                 avail = avail.where(false())
         stmt = stmt.where(Robot.id.in_(avail))
+
+    # MARKET DISCOVERY (`docs/20` §12.1) — deliberately NOT the eligibility filter
+    # above. A robot belongs to a market if it has a current PRICING offer or a
+    # current AVAILABILITY offer there: a priced listing with no availability row
+    # is exactly the case this exists for, and requiring an availability row would
+    # hide every special-order listing from the market that sells it. Region-
+    # agnostic (NULL) offers belong to every market. Nothing here asserts delivery.
+    if offered_in_region_ids is not None:
+        ids = list(offered_in_region_ids)
+        if not ids:
+            stmt = stmt.where(false())
+        else:
+            def _in_market(model):
+                return (
+                    select(model.robot_id)
+                    .where(model.is_current.is_(True))
+                    .where((model.region_id.in_(ids)) | (model.region_id.is_(None)))
+                )
+
+            stmt = stmt.where(
+                Robot.id.in_(_in_market(PricingOffer))
+                | Robot.id.in_(_in_market(AvailabilityOffer))
+            )
     return stmt

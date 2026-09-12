@@ -99,10 +99,20 @@ def comparable_amount():
     )
 
 
+#: A listing whose edition does not match the record it hangs on is a *qualified*
+#: listing: it is shown, with its warning, but it never sets or constrains this
+#: robot's price. `IS NOT FALSE` keeps NULL (never assessed) behaving exactly as
+#: before — absence of an assessment is not a finding either way.
+def _edition_not_excluded():
+    return PricingOffer.edition_confirmed.is_not(False)
+
+
 def _purchase_offers(price_currency: str) -> Select:
-    """Current PURCHASE offers denominated exactly in `price_currency`."""
+    """Current, edition-qualified PURCHASE offers denominated exactly in
+    `price_currency`."""
     return select(PricingOffer.robot_id).where(
         PricingOffer.is_current.is_(True),
+        _edition_not_excluded(),
         PricingOffer.transaction_type == "PURCHASE",
         PricingOffer.currency == price_currency.upper(),
     )
@@ -159,6 +169,9 @@ def comparable_price_order_column(price_currency: str):
         .where(
             PricingOffer.robot_id == Robot.id,
             PricingOffer.is_current.is_(True),
+            # Same exclusion as the ceiling, for the same reason: qualification
+            # and ordering must never disagree about what a robot's price is.
+            _edition_not_excluded(),
             PricingOffer.transaction_type == "PURCHASE",
             PricingOffer.currency == price_currency.upper(),
         )

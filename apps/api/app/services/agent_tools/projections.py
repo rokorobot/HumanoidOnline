@@ -38,6 +38,7 @@ from app.schemas.robot import (
     RobotImagePrimary,
     RobotImageRead,
     RobotListItem,
+    SpecCaveat,
     SpecsBlock,
     StatusHistoryEntry,
     UseCaseFitRead,
@@ -169,6 +170,17 @@ class AgentPricingOffer(BaseModel):
     billing_period: str
     region: str | None = None
     provider: str | None = None
+    #: Offer detail, carried verbatim from the governed read (AGENT-01.2 semantic
+    #: parity): a machine reader gets the same tax basis, box contents, seller
+    #: warranty, order status and edition qualification a person sees, or the
+    #: two surfaces would describe the same offer differently.
+    price_basis: str | None = None
+    shipping_terms: str | None = None
+    package_contents: str | None = None
+    warranty_terms: str | None = None
+    order_status_note: str | None = None
+    edition_confirmed: bool | None = None
+    edition_note: str | None = None
     evidence: AgentEvidence | None = None
 
 
@@ -181,6 +193,9 @@ class AgentAvailabilityOffer(BaseModel):
     provider: str | None = None
     available_from: date | None = None
     lead_time_days: int | None = None
+    #: The seller's own wording and its geographically-scoped delivery estimate.
+    seller_wording: str | None = None
+    delivery_estimate_label: str | None = None
     evidence: AgentEvidence | None = None
 
 
@@ -227,8 +242,13 @@ class AgentRobotDetail(BaseModel):
     description: str | None = None
     hero_image_url: str | None = None
     announced_year: int | None = None
+    official_url: str | None = None
     status_history: list[StatusHistoryEntry]
     specs: SpecsBlock
+    #: The same UNKNOWN/conflict explanations the website shows. Without them a
+    #: machine reader sees a null spec and cannot tell "nobody knows" from
+    #: "sources disagree" (§9.1).
+    spec_caveats: list[SpecCaveat] = []
     extended_specs: list[ExtendedSpec]
     capabilities: list[CapabilityRead]
     variants: list[VariantRead]
@@ -357,8 +377,10 @@ def project_detail(
         description=detail.description,
         hero_image_url=detail.hero_image_url,
         announced_year=detail.announced_year,
+        official_url=detail.official_url,
         status_history=detail.status_history,
         specs=detail.specs,
+        spec_caveats=detail.spec_caveats,
         extended_specs=detail.extended_specs,
         capabilities=detail.capabilities,
         variants=detail.variants,

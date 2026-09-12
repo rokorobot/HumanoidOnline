@@ -49,6 +49,95 @@ def _ancestors_of(session: Session, region_id: uuid.UUID) -> set[uuid.UUID]:
     return ids
 
 
+def _descendants_of(session: Session, region_id: uuid.UUID) -> set[uuid.UUID]:
+    """`region_id` plus every region beneath it, walking `parent_id` downward."""
+    ids: set[uuid.UUID] = {region_id}
+    frontier = [region_id]
+    while frontier:
+        children = session.execute(
+            select(Region.id).where(Region.parent_id.in_(frontier))
+        ).scalars().all()
+        new = [c for c in children if c not in ids]
+        ids.update(new)
+        frontier = new
+    return ids
+
+
+def discovery_region_ids(session: Session, *, code: str) -> set[uuid.UUID]:
+    """Regions whose offers make a robot DISCOVERABLE in a market (`docs/20` §12.1).
+
+    Deliberately a different question from `applicable_region_ids`, and kept in a
+    different function so the two can never be confused at a call site:
+
+        applicability / eligibility  = the region + its ANCESTORS + GLOBAL
+        discovery / market browsing  = the region + ancestors + DESCENDANTS + GLOBAL
+
+    The descendants are the whole point. A buyer browsing the EU market should
+    find a robot a German supplier lists, because that listing is real and
+    inspectable — but including it says only that such an offer exists. It is not
+    evidence of delivery to any particular country, and this function is never
+    used for eligibility, matching or lead routing, which keep the ancestor rule.
+
+    Each offer still reports its own region verbatim; nothing here relabels a DE
+    offer as EU. An unknown code returns the empty set, so a typo matches nothing
+    rather than widening to everything.
+    """
+    resolved = session.execute(
+        select(Region.id).where(Region.code == code)
+    ).scalar_one_or_none()
+    if resolved is None:
+        return set()
+    ids = _ancestors_of(session, resolved) | _descendants_of(session, resolved)
+    global_id = session.execute(
+        select(Region.id).where(Region.code == GLOBAL_CODE)
+    ).scalar_one_or_none()
+    if global_id is not None:
+        ids.add(global_id)
+    return ids
+
+
+#: Precedence of an offer's own scope inside an active market, used to choose a
+#: headline offer. Exact first, then a wider region containing it, then a narrower
+#: region inside the market, then worldwide, then region-agnostic.
+MARKET_RANK_EXACT = 0
+MARKET_RANK_ANCESTOR = 1
+MARKET_RANK_DESCENDANT = 2
+MARKET_RANK_GLOBAL = 3
+MARKET_RANK_AGNOSTIC = 4
+
+
+def discovery_market_rank(session: Session, *, code: str) -> dict[str | None, int]:
+    """Region code -> precedence within the market `code`, for headline selection.
+
+    The keys are exactly the regions this market can show (plus `None` for
+    region-agnostic offers), so a caller can both *filter* an offer out of the
+    market and *rank* the ones inside it without a second interpretation of
+    geography. An empty mapping means the code resolved to nothing.
+    """
+    resolved = session.execute(
+        select(Region.id).where(Region.code == code)
+    ).scalar_one_or_none()
+    if resolved is None:
+        return {}
+    ancestors = _ancestors_of(session, resolved)
+    descendants = _descendants_of(session, resolved)
+    ranks: dict[str | None, int] = {None: MARKET_RANK_AGNOSTIC}
+    rows = session.execute(
+        select(Region.id, Region.code).where(
+            Region.id.in_(ancestors | descendants)
+        )
+    ).all()
+    for region_id, region_code in rows:
+        if region_id == resolved:
+            ranks[region_code] = MARKET_RANK_EXACT
+        elif region_id in ancestors:
+            ranks[region_code] = MARKET_RANK_ANCESTOR
+        else:
+            ranks[region_code] = MARKET_RANK_DESCENDANT
+    ranks.setdefault(GLOBAL_CODE, MARKET_RANK_GLOBAL)
+    return ranks
+
+
 def applicable_region_ids(
     session: Session,
     *,

@@ -37,6 +37,7 @@ import os
 from pathlib import Path
 
 import psycopg
+from psycopg.types.json import Json
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CATALOGUE_DIR = REPO_ROOT / "db" / "catalogue"
@@ -52,6 +53,21 @@ SPEC_COLUMNS = [
     "has_language_ui", "has_sdk", "has_api", "ros_support", "developer_edition",
     "simulation_support",
 ]
+
+#: Marks the rows this importer OWNS in tables it shares with the seed and with
+#: hand authoring (`specification`, `spec_definition`). It refreshes only these;
+#: anything else occupying the same logical key is preserved and reported, never
+#: overwritten. The catalogue is add-only and does not own what it did not write.
+MANAGED_BY = "CATALOGUE_IMPORT"
+
+#: Extra public columns on `pricing_offer` / `availability_offer`: separate facts
+#: in separate columns (tax basis, box contents, seller warranty, order status,
+#: edition match), so none of them has to be parsed back out of prose.
+PRICING_DETAIL_COLUMNS = [
+    "price_basis", "shipping_terms", "package_contents", "warranty_terms",
+    "order_status_note", "edition_confirmed", "edition_note",
+]
+AVAILABILITY_DETAIL_COLUMNS = ["seller_wording", "delivery_estimate_label"]
 
 
 def normalize_url(url: str) -> str:
@@ -196,6 +212,47 @@ def import_use_cases(cur, data: dict) -> None:
         )
 
 
+def import_spec_definitions(cur, data: dict, collisions: list[str]) -> None:
+    """Upsert the long-tail spec keys this catalogue uses — its OWN ones only.
+
+    `spec_definition` is shared with `db/seed/seed.sql`, which authors keys like
+    `swappable_battery` with its own labels, units and `is_filterable` flags. A
+    blanket UPSERT would let the catalogue quietly redefine a key it does not
+    own, changing the meaning of every existing value pointing at it. So the
+    UPDATE is conditional on `managed_by = MANAGED_BY`: an unmanaged definition
+    keeps its own shape and is reported. The catalogue may still *reference* it —
+    only redefining it is refused.
+    """
+    for d in data["spec_definitions"]:
+        row = cur.execute(
+            """
+            INSERT INTO spec_definition
+                (key, label, category, value_type, unit, is_filterable, sort_order, managed_by)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+            ON CONFLICT (key) DO UPDATE SET
+                label = EXCLUDED.label, category = EXCLUDED.category,
+                value_type = EXCLUDED.value_type, unit = EXCLUDED.unit,
+                is_filterable = EXCLUDED.is_filterable, sort_order = EXCLUDED.sort_order
+            WHERE spec_definition.managed_by = %s
+            RETURNING id
+            """,
+            (d["key"], d["label"], d.get("category", "OTHER"), d["value_type"],
+             d.get("unit"), d.get("is_filterable", False), d.get("sort_order", 0),
+             MANAGED_BY, MANAGED_BY),
+        ).fetchone()
+        if row is None:
+            # The conflicting row exists but is not ours: DO UPDATE ... WHERE
+            # matched nothing, so nothing was written. Keep theirs, say so.
+            owner = cur.execute(
+                "SELECT coalesce(managed_by, 'seed/hand-authored') FROM spec_definition WHERE key = %s",
+                (d["key"],),
+            ).fetchone()[0]
+            collisions.append(
+                f"spec_definition {d['key']!r} already exists and is owned by "
+                f"{owner} — its definition was preserved, not overwritten"
+            )
+
+
 # --------------------------------------------------------------------------- #
 # Robots (+ children). Upsert robot by slug; replace children.
 # --------------------------------------------------------------------------- #
@@ -221,6 +278,12 @@ def _reset_robot_children(cur, robot_id) -> None:
     for table in ("pricing_offer", "availability_offer", "deployment",
                   "robot_capability", "use_case_fit", "robot_variant", "robot_image"):
         cur.execute(f"DELETE FROM {table} WHERE robot_id = %s", (robot_id,))
+    # `specification` is NOT wholly owned here: the seed and hand authoring write
+    # rows to the same table. Only this importer's own rows are replaced.
+    cur.execute(
+        "DELETE FROM specification WHERE robot_id = %s AND managed_by = %s",
+        (robot_id, MANAGED_BY),
+    )
 
 
 # Columns the importer owns outright: catalogue FACTS, refreshed from JSON on
@@ -229,7 +292,8 @@ EDITORIAL_COLUMNS = ("is_published",)
 
 
 def import_robot(cur, robot: dict, region_id, manufacturer_id,
-                 capability_id, use_case_id, *,
+                 capability_id, use_case_id, spec_definition=None,
+                 collisions=None, *,
                  apply_publication_state: bool = False) -> None:
     """Upsert one robot.
 
@@ -247,11 +311,17 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
     46 stored robots once collapsed to 7 on screen.
     """
     specs = robot.get("specs", {})
+    caveats = robot.get("spec_caveats")
     cols = ["slug", "manufacturer_id", "name", "model_code", "summary",
-            "announced_year", "commercial_status", "is_published"] + SPEC_COLUMNS
+            "announced_year", "official_url", "spec_caveats",
+            "commercial_status", "is_published"] + SPEC_COLUMNS
     vals = [
         robot["slug"], manufacturer_id(robot["manufacturer_slug"]), robot["name"],
         robot.get("model_code"), robot.get("summary"), robot.get("announced_year"),
+        # The maker's page for this model, and the per-field caveats explaining
+        # UNKNOWNs/conflicts. Both were carried by the JSON and dropped for want
+        # of a column until migration 0011.
+        robot.get("official_url"), Json(caveats) if caveats else None,
         # Absent maturity means UNVERIFIED, not ANNOUNCED: an omitted key must
         # not become a factual claim the file never made.
         robot.get("commercial_status", "UNKNOWN"), robot.get("is_published", False),
@@ -302,8 +372,10 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
             """
             INSERT INTO pricing_offer
                 (robot_id, variant_id, provider_id, region_id, transaction_type,
-                 price_type, currency, price, price_min, price_max, billing_period, note)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                 price_type, currency, price, price_min, price_max, billing_period,
+                 note, is_current, price_basis, shipping_terms, package_contents,
+                 warranty_terms, order_status_note, edition_confirmed, edition_note)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             RETURNING id
             """,
             (
@@ -312,7 +384,11 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
                 po["transaction_type"], po["price_type"], po.get("currency", "USD"),
                 po.get("price"), po.get("price_min"), po.get("price_max"),
                 po.get("billing_period", "ONE_TIME"), po.get("note"),
-            ),
+                # A retired offer keeps its row and its evidence; it simply stops
+                # being current. `edition_confirmed` stays tri-state: absent in the
+                # JSON means NOT ASSESSED (NULL), never "confirmed".
+                po.get("is_current", True),
+            ) + tuple(po.get(c) for c in PRICING_DETAIL_COLUMNS),
         ).fetchone()[0]
         for ev in po.get("evidence", []):
             insert_evidence(cur, "PRICING_OFFER", pid, ev)
@@ -323,8 +399,9 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
             """
             INSERT INTO availability_offer
                 (robot_id, variant_id, provider_id, region_id, transaction_type,
-                 availability_status, available_from, lead_time_days, min_order_qty, note)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                 availability_status, available_from, lead_time_days, min_order_qty,
+                 note, is_current, seller_wording, delivery_estimate_label)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             RETURNING id
             """,
             (
@@ -332,8 +409,8 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
                 _provider(cur, ao.get("provider_slug")), region_id(ao.get("region_code")),
                 ao["transaction_type"], ao.get("availability_status", "ON_REQUEST"),
                 ao.get("available_from"), ao.get("lead_time_days"),
-                ao.get("min_order_qty"), ao.get("note"),
-            ),
+                ao.get("min_order_qty"), ao.get("note"), ao.get("is_current", True),
+            ) + tuple(ao.get(c) for c in AVAILABILITY_DETAIL_COLUMNS),
         ).fetchone()[0]
         for ev in ao.get("evidence", []):
             insert_evidence(cur, "AVAILABILITY_OFFER", aid, ev)
@@ -425,6 +502,59 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
              f.get("notes"), f.get("limitations")),
         )
 
+    # Long-tail specs. Each carries its own attribution and edition scope: these
+    # values have no evidence_source row (they are descriptive, not commercial
+    # facts), so provenance travels with the value or it does not exist at all.
+    # `spec_definition`/`collisions` default to None so a caller inspecting the
+    # robot upsert alone (the publication-state tests do exactly this) need not
+    # build a definition registry. They become required the moment there is
+    # actually a long-tail spec to write: writing one without a registry is
+    # impossible, and silently DROPPING it would lose an attributed fact. So
+    # their absence fails loudly here rather than quietly skipping the loop.
+    extended = robot.get("extended_specs", [])
+    if extended and (spec_definition is None or collisions is None):
+        raise ValueError(
+            f"robot {robot['slug']!r} carries {len(extended)} extended_specs, which "
+            "require both `spec_definition` and `collisions`"
+        )
+    for x in extended:
+        definition_id, value_type = spec_definition(x["key"])
+        existing = cur.execute(
+            """
+            SELECT coalesce(managed_by, 'seed/hand-authored') FROM specification
+            WHERE robot_id = %s AND variant_id IS NULL AND definition_id = %s
+            """,
+            (robot_id, definition_id),
+        ).fetchone()
+        if existing is not None:
+            # Our own rows were deleted above, so anything still here belongs to
+            # someone else and occupies this logical key. Preserve it and report:
+            # deleting only our rows is not enough if the insert then overwrites.
+            collisions.append(
+                f"robot {robot['slug']!r}: specification {x['key']!r} already exists "
+                f"and is owned by {existing[0]} — the catalogue value was skipped, "
+                f"the existing row preserved"
+            )
+            continue
+        value = x.get("value")
+        cur.execute(
+            """
+            INSERT INTO specification
+                (robot_id, variant_id, definition_id, value_number, value_bool,
+                 value_text, unit, managed_by, source_label, source_url, source_kind,
+                 edition_scope, observed_at)
+            VALUES (%s,NULL,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            """,
+            (
+                robot_id, definition_id,
+                value if value_type == "NUMBER" else None,
+                value if value_type == "BOOLEAN" else None,
+                value if value_type == "TEXT" else None,
+                x.get("unit"), MANAGED_BY, x.get("source_label"), x.get("source_url"),
+                x.get("source_kind"), x.get("edition_scope"), x.get("observed_at"),
+            ),
+        )
+
     # Denormalised lowest purchase price cache (source of truth stays pricing_offer).
     _refresh_lowest_price(cur, robot_id)
 
@@ -445,6 +575,10 @@ def _refresh_lowest_price(cur, robot_id) -> None:
         """
         SELECT price, currency FROM pricing_offer
         WHERE robot_id = %s AND is_current
+          -- A listing whose edition does not match this record is a qualified
+          -- listing: it may be shown, but it never sets this robot's price.
+          -- NULL (not assessed) keeps its existing behaviour.
+          AND edition_confirmed IS DISTINCT FROM FALSE
           AND transaction_type = 'PURCHASE'
           AND price_type IN ('PUBLIC','FROM') AND price IS NOT NULL
         ORDER BY price ASC LIMIT 1
@@ -469,6 +603,7 @@ def run(url: str, *, apply_publication_state: bool = False) -> None:
     providers = _load(CATALOGUE_DIR / "providers.json")
     capabilities = _load(CATALOGUE_DIR / "capabilities.json")
     use_cases = _load(CATALOGUE_DIR / "use_cases.json")
+    spec_definitions = _load(CATALOGUE_DIR / "spec_definitions.json")
     manufacturers = _load(CATALOGUE_DIR / "manufacturers.json")
     robot_files = sorted(ROBOTS_DIR.glob("*.json"))
 
@@ -507,17 +642,31 @@ def run(url: str, *, apply_publication_state: bool = False) -> None:
                     raise SystemExit(f"unknown use_case slug referenced: {slug!r}")
                 return r[0]
 
+            def spec_definition(key):
+                """(id, value_type) for a long-tail spec key. The value_type decides
+                which of value_number/value_bool/value_text carries the value, so a
+                definition and its values can never disagree about their own type."""
+                r = cur.execute(
+                    "SELECT id, value_type FROM spec_definition WHERE key=%s", (key,)
+                ).fetchone()
+                if not r:
+                    raise SystemExit(f"unknown spec_definition key referenced: {key!r}")
+                return r[0], r[1]
+
+            collisions: list[str] = []
+
             import_regions(cur, regions)
             import_manufacturers(cur, manufacturers, region_id)
             import_providers(cur, providers, region_id, manufacturer_id)
             import_capabilities(cur, capabilities)
             import_use_cases(cur, use_cases)
+            import_spec_definitions(cur, spec_definitions, collisions)
 
             n_robots = 0
             for path in robot_files:
                 robot = _load(path)
                 import_robot(cur, robot, region_id, manufacturer_id,
-                             capability_id, use_case_id,
+                             capability_id, use_case_id, spec_definition, collisions,
                              apply_publication_state=apply_publication_state)
                 n_robots += 1
 
@@ -533,6 +682,12 @@ def run(url: str, *, apply_publication_state: bool = False) -> None:
     # the public view is a subset of it, and a surprising gap should be visible
     # the moment it appears rather than discovered later in a browser.
     print(f"Catalogue state: {stored} stored, {displayed} displayed.")
+    # Preserved, not silently skipped: a collision means someone else's row held a
+    # key this catalogue also describes, and their row won. Saying so is the point.
+    for line in collisions:
+        print(f"PRESERVED (not overwritten): {line}")
+    if collisions:
+        print(f"{len(collisions)} unmanaged record(s) preserved on logical-key collision.")
     if apply_publication_state:
         print("Publication state was REWRITTEN from JSON (--apply-publication-state).")
 

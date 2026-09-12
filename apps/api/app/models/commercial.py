@@ -56,6 +56,21 @@ class PricingOffer(Base):
     valid_from: Mapped[date | None] = mapped_column(Date)
     valid_until: Mapped[date | None] = mapped_column(Date)
     note: Mapped[str | None] = mapped_column(Text)
+    #: Public offer detail — separate facts, separate columns, so a reader never
+    #: has to parse prose to learn the tax basis or what ships in the box.
+    price_basis: Mapped[str | None] = mapped_column(Text)
+    shipping_terms: Mapped[str | None] = mapped_column(Text)
+    package_contents: Mapped[str | None] = mapped_column(Text)
+    #: Warranty as stated BY THIS SELLER; a manufacturer's edition-level warranty
+    #: is a property of the robot, not of one seller's offer.
+    warranty_terms: Mapped[str | None] = mapped_column(Text)
+    order_status_note: Mapped[str | None] = mapped_column(Text)
+    #: Tri-state, NULL by design: NULL = not assessed (and never displayed as
+    #: confirmed), TRUE = checked against the manufacturer spec, FALSE = the
+    #: listing's own specification conflicts -> qualified listing, excluded from
+    #: unqualified price selection.
+    edition_confirmed: Mapped[bool | None] = mapped_column(Boolean)
+    edition_note: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("now()"), nullable=False
     )
@@ -66,6 +81,10 @@ class PricingOffer(Base):
     robot: Mapped[Robot] = relationship("Robot", back_populates="pricing_offers")  # noqa: F821
     provider: Mapped[Provider | None] = relationship("Provider", lazy="selectin")  # noqa: F821
     region: Mapped[Region | None] = relationship("Region", lazy="selectin")  # noqa: F821
+    # Loaded like provider/region because the configuration an offer is scoped to
+    # travels WITH the price: a variant-scoped amount must never be reported as
+    # though it applied to every configuration of the robot.
+    variant: Mapped[RobotVariant | None] = relationship("RobotVariant", lazy="selectin")  # noqa: F821
 
 
 class AvailabilityOffer(Base):
@@ -94,6 +113,10 @@ class AvailabilityOffer(Base):
     lead_time_days: Mapped[int | None] = mapped_column(Integer)
     min_order_qty: Mapped[int | None] = mapped_column(Integer)
     note: Mapped[str | None] = mapped_column(Text)
+    #: The seller's availability sentence verbatim (the enum is our normalization),
+    #: and its delivery estimate WITH the geography it was stated for.
+    seller_wording: Mapped[str | None] = mapped_column(Text)
+    delivery_estimate_label: Mapped[str | None] = mapped_column(Text)
     is_current: Mapped[bool] = mapped_column(
         Boolean, nullable=False, server_default=text("true")
     )

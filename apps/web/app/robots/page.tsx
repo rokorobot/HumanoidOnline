@@ -80,8 +80,9 @@ export default async function RobotsPage({
   const activeFilterCount =
     asArray(sp.commercial_status).length +
     asArray(sp.transaction_type).length +
-    ["region", "mobility", "autonomy_min", "payload_min", "height_min", "price_max",
-      "has_sdk", "ros_support", "developer_edition", "has_manipulation", "q"].filter(
+    ["region", "offered_in", "mobility", "autonomy_min", "payload_min", "height_min",
+      "price_max", "has_sdk", "ros_support", "developer_edition", "has_manipulation",
+      "q"].filter(
       (k) => asString(sp[k]),
     ).length;
 

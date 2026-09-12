@@ -79,12 +79,221 @@
           "confidence": "MEDIUM",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Third-party distributor price, not manufacturer MSRP."
         }
-      ]
+      ],
+      "price_basis": "German supplier price · includes German VAT",
+      "shipping_terms": "Plus €35.70 special shipping per item (Germany)",
+      "package_contents": "Robot, smart battery (quick-change), charger, handheld remote control, lifting crane (hands optional)",
+      "warranty_terms": "12 months (supplier-stated, H2 EDU)",
+      "order_status_note": "Special item — check delivery time with the supplier. Delivery date not confirmed."
     }
   ],
   "availability_offers": [],
   "deployments": [],
-  "capabilities": [],
+  "capabilities": [
+    {
+      "slug": "voice-interaction",
+      "supported": true,
+      "detail": "Unitree's H2 parameter table lists voice interaction (array microphone and high-power speaker) for the H2 EDU column. No language-model claim is made."
+    }
+  ],
   "use_case_fits": [],
-  "images": []
+  "images": [],
+  "spec_caveats": [
+    {
+      "field": "payload_kg",
+      "text": "7 kg is the RATED arm payload; the ~15 kg peak is recorded separately."
+    },
+    {
+      "field": "hand_type",
+      "text": "Hands are optional on this edition and the reseller's Standard configuration ships without them, so no hand type is stated for the record itself."
+    },
+    {
+      "field": "hand_dof",
+      "text": "Not stated: hands are an option on this edition."
+    },
+    {
+      "field": "walk_speed_ms",
+      "text": "Not stated by Unitree for H2."
+    },
+    {
+      "field": "ros_support",
+      "text": "Not established by any fresh public source."
+    },
+    {
+      "field": "simulation_support",
+      "text": "Not established by any fresh public source."
+    },
+    {
+      "field": "has_api",
+      "text": "Secondary development is stated for this edition; no separate API claim is made."
+    }
+  ],
+  "extended_specs": [
+    {
+      "key": "standing_dimensions_mm",
+      "value": "1820 × 456 × 218 mm",
+      "source_label": "Unitree H2 — parameter table (H2 column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "limb_lengths_mm",
+      "value": "Calf + thigh 1045 mm; forearm + upper arm 690 mm",
+      "source_label": "Unitree H2 — parameter table (H2 column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "arm_joint_torque_nm",
+      "value": 120,
+      "unit": "N·m",
+      "source_label": "Unitree H2 — parameter table (H2 column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "leg_joint_torque_nm",
+      "value": 360,
+      "unit": "N·m",
+      "source_label": "Unitree H2 — parameter table (H2 column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "arm_payload_peak_kg",
+      "value": 15,
+      "unit": "kg",
+      "source_label": "Unitree H2 — parameter table (H2 column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "battery_pack",
+      "value": "15 Ah (0.972 kWh), maximum 75.6 V, quick-release",
+      "source_label": "Unitree H2 — parameter table (H2 column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "swappable_battery",
+      "value": true,
+      "source_label": "Unitree H2 — parameter table (H2 column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "cameras",
+      "value": "Humanoid binocular camera with wide field of view",
+      "source_label": "Unitree H2 — parameter table (H2 column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "audio",
+      "value": "Array microphone + high-power speaker",
+      "source_label": "Unitree H2 — parameter table (H2 column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "head",
+      "value": "Bionic head with facial features",
+      "source_label": "Unitree H2 — parameter table (H2 column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "connectivity",
+      "value": "Wi-Fi 6, Bluetooth 5.2",
+      "source_label": "Unitree H2 — parameter table (H2 column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "ota_updates",
+      "value": true,
+      "source_label": "Unitree H2 — parameter table (H2 column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "joint_breakdown",
+      "value": "6 per leg, 7 per arm, 3 waist, 2 head — 31 body joints",
+      "source_label": "Unitree H2 — parameter table (H2 EDU column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "compute_base",
+      "value": "PC1: Intel Core i5 (platform capabilities) + PC2: Intel Core i7 (custom development)",
+      "source_label": "Unitree H2 — parameter table (H2 EDU column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "compute_ai",
+      "value": "Optional high-power computing module (multiple brands and models, e.g. Thor)",
+      "source_label": "Unitree H2 — parameter table (H2 EDU column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "dexterous_hand_option",
+      "value": "Optional — multiple hand models offered by the manufacturer",
+      "source_label": "Unitree H2 — parameter table (H2 EDU column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "secondary_development",
+      "value": "Supported on H2 EDU",
+      "source_label": "Unitree H2 — parameter table (H2 EDU column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "manufacturer_warranty_months",
+      "value": 12,
+      "unit": "months",
+      "source_label": "Unitree H2 — parameter table (H2 EDU column)",
+      "source_url": "https://www.unitree.com/H2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    }
+  ]
 }

@@ -114,6 +114,10 @@ export interface RobotListParams {
   transaction_type?: string[];
   availability_status?: string[];
   region?: string;
+  // Market discovery scope (`docs/20` §12.1). A DIFFERENT question from `region`:
+  // it also admits offers from member countries of an economic zone, so an EU
+  // browser finds what a German supplier lists. It claims no delivery anywhere.
+  offered_in?: string;
   use_case?: string;
   payload_min?: number;
   height_min?: number;

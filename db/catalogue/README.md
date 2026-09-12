@@ -58,6 +58,72 @@ each carrying **its own evidence array**:
 }
 ```
 
+### Public profile keys
+
+```jsonc
+{
+  "official_url": "https://www.unitree.com/R1",   // the MAKER's page for this model
+  "spec_caveats": [                                // why a spec is UNKNOWN / what conflicts
+    { "field": "degrees_of_freedom",
+      "text": "reichelt lists 24 DOF; Unitree states a 26-40 range for R1 EDU. Unresolved." }
+  ],
+  "extended_specs": [                              // long-tail specs -> `specification`
+    { "key": "compute_ai", "value": "375 TOPS (INT8)",
+      "source_label": "Booster T2 product manual - specifications",
+      "source_url": "https://docs.booster.tech/…/specifications/",
+      "source_kind": "MANUFACTURER_DOC",           // MANUFACTURER | MANUFACTURER_DOC |
+                                                   // COMPONENT_MANUFACTURER | RESELLER_CLAIM
+      "edition_scope": "THIS_EDITION",             // THIS_EDITION | PRODUCT_LINE | PLATFORM
+      "observed_at": "2026-09-11" }
+  ]
+}
+```
+
+`extended_specs[].key` must exist in `spec_definitions.json` (or already exist in
+the database). **Every extended spec carries its own attribution and edition
+scope** — these values have no `evidence_source` row (they are descriptive, not
+commercial facts), so provenance travels with the value. A distributor's figure
+is `RESELLER_CLAIM` and renders as a reseller claim, never as the manufacturer's
+own statement; a figure stated for a product family is `PRODUCT_LINE` and is
+never presented as confirmation for one configuration.
+
+**Importer-managed rows.** Extended specs and any definitions the catalogue adds
+are written with `managed_by = 'CATALOGUE_IMPORT'`. A re-import replaces only
+those rows. A seed or hand-authored `specification` (or `spec_definition`) that
+occupies the same logical key is **preserved and reported**, never overwritten —
+the catalogue is add-only and does not own data it did not write.
+
+### Offer keys beyond the money
+
+```jsonc
+"pricing_offers": [{
+  "provider_slug": "reichelt", "region_code": "DE", "transaction_type": "PURCHASE",
+  "price_type": "PUBLIC", "currency": "EUR", "price": 15500.0,
+  "is_current": true,                      // false = retired; row and evidence are KEPT
+  "price_basis":       "German supplier price · includes German VAT",
+  "shipping_terms":    "Plus €35.70 special shipping per item (Germany)",
+  "package_contents":  "1× robot, controller, battery, charger, user manual",
+  "warranty_terms":    null,               // THIS SELLER's terms only
+  "order_status_note": "Special item — check delivery time with the supplier.",
+  "edition_confirmed": null,               // null = not assessed · false = qualified listing
+  "edition_note":      null,
+  "evidence": [ … ]
+}],
+"availability_offers": [{
+  "availability_status": "AVAILABLE",
+  "seller_wording": "Limited stock, delivery within 1 - 2 business days",
+  "delivery_estimate_label": "Delivery estimate for Germany: 1–2 business days",
+  "evidence": [ … ]
+}]
+```
+
+`is_current: false` retires an offer without deleting it: the row and its
+evidence are kept in the database as history, and the read API omits them
+entirely — a retired offer appears in **no** public surface, so neither its
+`order_status_note` nor its evidence is displayed to anyone. "Kept" means
+auditable in the record, not published. `edition_confirmed` is tri-state —
+**null means nobody checked**, and is never rendered as "confirmed".
+
 ### `images[]` — MEDIA-01 verified product imagery (`docs/09_MEDIA_CONTRACT.md`)
 
 Each image of a **specific named robot** must depict that exact robot. There is no

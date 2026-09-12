@@ -110,6 +110,7 @@ export function toRobotListParams(sp: RawSearchParams): RobotListParams {
     transaction_type: asArray(sp.transaction_type),
     availability_status: asArray(sp.availability_status),
     region: asString(sp.region),
+    offered_in: asString(sp.offered_in),
     use_case: asString(sp.use_case),
     payload_min: asNumber(sp.payload_min),
     height_min: asNumber(sp.height_min),

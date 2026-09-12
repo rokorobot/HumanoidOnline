@@ -79,7 +79,12 @@
           "confidence": "MEDIUM",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Third-party distributor price, not manufacturer MSRP."
         }
-      ]
+      ],
+      "price_basis": "German supplier price · includes German VAT",
+      "shipping_terms": "Plus €35.70 special shipping per item (Germany)",
+      "package_contents": "Robot, remote controller, battery pack, charger, carrying case",
+      "warranty_terms": "Warranty period not stated by this supplier.",
+      "order_status_note": "The supplier advertises 'Shipments begin September 1, 2026' — an advertised date, not confirmation of shipment."
     }
   ],
   "availability_offers": [
@@ -100,11 +105,164 @@
           "confidence": "MEDIUM",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Seller's own availability statement for this SKU."
         }
-      ]
+      ],
+      "seller_wording": "available in 3 - 5 business days",
+      "delivery_estimate_label": "Delivery estimate for Germany: 3–5 business days"
     }
   ],
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": []
+  "images": [],
+  "spec_caveats": [
+    {
+      "field": "payload_kg",
+      "text": "Not recorded. Booster states a maximum COMBINED dual-arm load of 10 kg, posture-dependent (kept as its own extended specification); reichelt claims 3 kg per arm for this edition and another reseller claims 5 kg. A combined figure is not converted into a per-arm value."
+    },
+    {
+      "field": "max_dual_arm_load_kg",
+      "text": "Manufacturer-stated maximum combined dual-arm load: 10 kg, posture-dependent — 'The maximum arm payload varies significantly depending on arm posture' (booster.tech/booster-t2 and the T2 product manual, observed 2026-09-11)."
+    },
+    {
+      "field": "compute_ai",
+      "text": "2,070 TFLOPS (FP4, sparse) on Jetson Thor T5000 for this edition; the Education edition states 375 TOPS (INT8). Different precisions and sparsity conditions — not directly comparable. reichelt's listing names 'Nvidia Thor Orin' at 2,000 TOPS, which mixes two NVIDIA product names."
+    },
+    {
+      "field": "walk_speed_ms",
+      "text": "3 m/s per Booster's own page and product manual. One reseller states up to 2 m/s."
+    },
+    {
+      "field": "battery_wh",
+      "text": "Booster states 48 V and 10 Ah but no watt-hour figure; no value is derived here."
+    },
+    {
+      "field": "has_language_ui",
+      "text": "The T2 manual has a voice-interaction section that could not be retrieved; the product page lists only a microphone array, a speaker and voice prompts."
+    },
+    {
+      "field": "developer_edition",
+      "text": "Both T2 editions are presented as development platforms, so this flag would not distinguish them; left unstated."
+    }
+  ],
+  "extended_specs": [
+    {
+      "key": "peak_joint_torque_nm",
+      "value": 140,
+      "unit": "N·m",
+      "source_label": "Booster T2 product manual — specifications",
+      "source_url": "https://docs.booster.tech/docs/product-manual/t2/getting-started/specifications/",
+      "source_kind": "MANUFACTURER_DOC",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "max_dual_arm_load_kg",
+      "value": 10,
+      "unit": "kg",
+      "source_label": "Booster T2 product manual — specifications",
+      "source_url": "https://docs.booster.tech/docs/product-manual/t2/getting-started/specifications/",
+      "source_kind": "MANUFACTURER_DOC",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "battery_pack",
+      "value": "48 V, 10 Ah",
+      "source_label": "Booster T2 product manual — specifications",
+      "source_url": "https://docs.booster.tech/docs/product-manual/t2/getting-started/specifications/",
+      "source_kind": "MANUFACTURER_DOC",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "cameras",
+      "value": "Head binocular camera; abdominal binocular camera; wrist camera optional",
+      "source_label": "Booster T2 product manual — specifications",
+      "source_url": "https://docs.booster.tech/docs/product-manual/t2/getting-started/specifications/",
+      "source_kind": "MANUFACTURER_DOC",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "audio",
+      "value": "Microphone array + speaker",
+      "source_label": "Booster T2 — specifications",
+      "source_url": "https://www.booster.tech/booster-t2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "lidar",
+      "value": "Optional",
+      "source_label": "Booster T2 — specifications",
+      "source_url": "https://www.booster.tech/booster-t2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "connectivity",
+      "value": "Wi-Fi 6, Bluetooth 5.2, Ethernet, USB Type-C locking connector",
+      "source_label": "Booster T2 — specifications",
+      "source_url": "https://www.booster.tech/booster-t2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "dexterous_hand_option",
+      "value": "End effector optional; compatible with dexterous hands and grippers",
+      "source_label": "Booster T2 — specifications",
+      "source_url": "https://www.booster.tech/booster-t2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "sdk_software",
+      "value": "Booster Robotics SDK (C++/Python); ROS 2 SDK; Booster Train (Isaac Lab RL training); Booster Deploy (Sim2Real / Sim2Sim)",
+      "source_label": "Booster Robotics — official open source",
+      "source_url": "https://www.booster.tech/open-source/",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "PLATFORM",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "joint_breakdown",
+      "value": "6 per leg, 7 per arm, 3 waist, 2 head — 31 body joints",
+      "source_label": "Booster T2 product manual — specifications",
+      "source_url": "https://docs.booster.tech/docs/product-manual/t2/getting-started/specifications/",
+      "source_kind": "MANUFACTURER_DOC",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "compute_base",
+      "value": "Jetson Thor T5000 (14-core Neoverse-V3AE @2.6 GHz, 128 GB)",
+      "source_label": "Booster T2 product manual — specifications",
+      "source_url": "https://docs.booster.tech/docs/product-manual/t2/getting-started/specifications/",
+      "source_kind": "MANUFACTURER_DOC",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "compute_ai",
+      "value": "2,070 TFLOPS (FP4, sparse)",
+      "source_label": "Booster T2 product manual — specifications",
+      "source_url": "https://docs.booster.tech/docs/product-manual/t2/getting-started/specifications/",
+      "source_kind": "MANUFACTURER_DOC",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "configurations",
+      "value": "P1 ~42 kg; P2 (gripper) ~43 kg; P3 (dexterous hand) ~43 kg",
+      "source_label": "Booster T2 product manual — specifications",
+      "source_url": "https://docs.booster.tech/docs/product-manual/t2/getting-started/specifications/",
+      "source_kind": "MANUFACTURER_DOC",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    }
+  ]
 }

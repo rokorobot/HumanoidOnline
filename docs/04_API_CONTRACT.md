@@ -17,7 +17,11 @@ manufacturer         manufacturer slug
 commercial_status    repeatable enum
 transaction_type     repeatable enum   → robots with a current availability_offer of this type
 availability_status  repeatable enum
-region               region code (e.g. EU, US, DE)
+region               region code (e.g. EU, US, DE) — eligibility: offers applying to a buyer there
+offered_in           region code — market DISCOVERY scope; also admits member-country
+                     offers (EU finds a DE supplier's listing) and matches a current
+                     PRICING or AVAILABILITY offer. Each offer still reports its own
+                     region verbatim; implies no delivery and no edition claim (docs/20 §12.1)
 use_case             use_case slug
 payload_min          number (kg)
 height_min|height_max  number (cm)

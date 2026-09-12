@@ -8,16 +8,27 @@ export function SpecRow({
   value,
   unit,
   notApplicable = false,
+  note,
 }: {
   label: string;
   value?: number | string | boolean | null;
   unit?: string | null;
   notApplicable?: boolean;
+  // Why this value is UNKNOWN, or which sources disagree. Rendered as visible
+  // text rather than a tooltip: an explanation nobody can see does not explain.
+  note?: string | null;
 }) {
   return (
     <div className="srow">
       <span className="k">{label}</span>
-      <SpecValue value={value} unit={unit} notApplicable={notApplicable} />
+      <span style={{ display: "block" }}>
+        <SpecValue value={value} unit={unit} notApplicable={notApplicable} />
+        {note && (
+          <span className="ho-syslabel" style={{ display: "block" }}>
+            {note}
+          </span>
+        )}
+      </span>
     </div>
   );
 }

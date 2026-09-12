@@ -42,6 +42,14 @@ const TRANSACTION_TYPES = [
   "DEVELOPER",
 ];
 const REGIONS = ["US", "EU", "CN", "DE", "UK", "NO", "CA"];
+// Offer market is NOT a second region filter. `region` asks where a robot is
+// offered as the record states it; this asks which market's storefronts to
+// search, and an economic zone admits its member countries' suppliers — an EU
+// buyer should find what a German distributor lists. Only zones with member
+// regions on record appear: for a plain country the two questions collapse into
+// one, and a second control would imply a distinction that isn't there.
+// Unset by default — no listing is hidden until the buyer narrows.
+const OFFER_MARKETS = ["EU"];
 const MOBILITY = ["BIPEDAL", "WHEELED", "HYBRID", "QUADRUPED", "STATIONARY", "OTHER"];
 const AUTONOMY = [
   "TELEOPERATED",
@@ -185,6 +193,26 @@ export function FilterPanel({
               </option>
             ))}
           </select>
+        </div>
+        <div className="field">
+          <label htmlFor="f-offered-in">Offer market</label>
+          <select
+            id="f-offered-in"
+            name="offered_in"
+            defaultValue={asString(params.offered_in) ?? ""}
+            aria-describedby="f-offered-in-help"
+          >
+            <option value="">Any market</option>
+            {OFFER_MARKETS.map((m) => (
+              <option key={m} value={m}>
+                {m}
+              </option>
+            ))}
+          </select>
+          <span className="ho-syslabel" id="f-offered-in-help">
+            Where the offer is sold from, including suppliers in member countries.
+            Not a delivery guarantee, and not a claim about the robot&apos;s edition.
+          </span>
         </div>
         <div className="field">
           <label htmlFor="f-price">Max purchase price (USD)</label>

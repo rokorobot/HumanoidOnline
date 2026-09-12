@@ -172,6 +172,28 @@ Forward migrations:
   line or the platform — a reseller's claim is never rendered as the maker's own.
   `specification` and `spec_definition` both gain `managed_by`, so a catalogue
   import refreshes only rows it wrote and leaves seed/hand-authored rows alone.
+
+- `0012_owner_approved_display_basis.sql` — adds the vocabulary MEDIA-01 needed
+  to record two display decisions **truthfully** instead of forcing them into a
+  false value. `image_usage_basis` gains `OWNER_APPROVED_DISPLAY`: an explicit
+  owner decision to display an asset for which **no source granted anything**,
+  including a distributor's own photography, which `OFFICIAL_MANUFACTURER_MEDIA`
+  would misdescribe. It is a display **policy**, never evidence of a licence —
+  `rights_status` stays `UNKNOWN`, `source_name` / `source_url` / `attribution`
+  stay on the row, and `RESTRICTED` still blocks (enforced in the application
+  gate, as the existing policy basis already is). `robot_image` gains
+  `is_representative` and `representative_note`, for an asset that depicts the
+  product **line or chassis** rather than the exact edition on the record: such a
+  row keeps `identity_status = UNVERIFIED` — exact-edition verification is not
+  claimed — and is display-eligible **only** with a caption, which the API
+  returns and the gallery renders as a "Representative" badge rather than
+  "Official ✓". An unlabelled stand-in is indistinguishable from a claim about
+  the exact edition and is therefore ineligible. `display_approved_by` and
+  `display_approved_at` record who approved the display and when, so the basis is
+  attributable to a decision rather than to an imagined grant. Additive and
+  idempotent (`ADD VALUE IF NOT EXISTS`, `ADD COLUMN IF NOT EXISTS`), so it is a
+  no-op on databases already built from a `schema.sql` containing these objects,
+  and rows written before it keep their meaning unchanged.
   Additive and idempotent.
 
 ## Checksum integrity (WS8.2 / R9)

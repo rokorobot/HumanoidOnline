@@ -6,7 +6,7 @@
   "summary": "Unitree's full-size humanoid, base edition: about 1.82 m and 70 kg, 31 joints (6 per leg, 7 per arm, 3 waist, 2 head), bionic head with facial features, rated arm payload ~7 kg (peak ~15 kg), 0.972 kWh quick-release battery for about 3 h, Intel Core i5 platform computer, wide-FoV binocular camera, array microphone and speaker for voice interaction, 8-month warranty. No dexterous hands and no secondary development on this edition (H2 EDU only). Manufacturer list price $29,900 excluding tax and shipping. Sources: unitree.com/H2 and shop.unitree.com, agent-retrieved 2026-09-11.",
   "announced_year": null,
   "commercial_status": "LIMITED_COMMERCIAL",
-  "is_published": false,
+  "is_published": true,
   "specs": {
     "height_cm": 182.0,
     "weight_kg": 70.0,

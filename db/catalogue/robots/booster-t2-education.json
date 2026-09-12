@@ -6,7 +6,7 @@
   "summary": "Booster T2 Education edition: Booster Robotics' flagship embodied-AI development humanoid — about 1.4 m and ~42 kg (base configuration), 31 DoF (6 per leg, 7 per arm, 3 waist, 2 head), 140 Nm peak joint torque, 10 kg maximum dual-arm load (posture-dependent), 3 m/s walking speed, 48 V / 10 Ah battery for about 2 h of continuous walking, binocular head and waist cameras, optional LiDAR, wrist cameras and end effectors (grippers or dexterous hands). Compute: 'High‑performance ARM processor, 375 TOPS' (manual; controller '16-core Arm Cortex A78AE @1.9GHz', '375 TOPS (INT8)', 16 GB). Sources: booster.tech and docs.booster.tech, agent-retrieved 2026-09-11.",
   "announced_year": null,
   "commercial_status": "COMMERCIAL",
-  "is_published": false,
+  "is_published": true,
   "specs": {
     "height_cm": 140.0,
     "weight_kg": 42.0,

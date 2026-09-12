@@ -700,6 +700,15 @@ def serialize_detail(
             is_official=img.is_official,
             is_primary=img.is_primary,
             attribution=img.attribution,
+            # A representative image is display-eligible ONLY because it carries
+            # this designation and its note (MEDIA-01 §4). Both are defaulted in
+            # the schema, so omitting them here did not fail — it silently served
+            # `false`/`null`, and the gallery rendered an owner-approved stand-in
+            # as "Verified ✓" with no caption: exactly the exact-edition claim the
+            # designation exists to prevent. The disclosure travels with the image
+            # or it is not a disclosure.
+            is_representative=img.is_representative,
+            representative_note=img.representative_note,
         )
         for img in _eligible_images(robot)
     ]

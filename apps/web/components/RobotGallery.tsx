@@ -34,10 +34,22 @@ export function RobotGallery({
 
   const primary = images[0];
   const rest = images.slice(1);
+  // The section heading is a claim about the whole SET, so it has three honest
+  // states. "VERIFIED" must not be asserted of a set containing a stand-in, and
+  // "REPRESENTATIVE" must not be asserted of exact-edition imagery. A mixed
+  // gallery therefore gets a neutral heading, and the per-image badges and notes
+  // carry the distinction where it actually applies.
+  const representativeCount = images.filter((i) => i.is_representative).length;
+  const sectionHeading =
+    representativeCount === 0
+      ? "IDENTITY IMAGERY — VERIFIED"
+      : representativeCount === images.length
+        ? "IDENTITY IMAGERY — REPRESENTATIVE"
+        : "IDENTITY IMAGERY";
 
   return (
     <div className="ro-gallery">
-      <SectionIndex>IDENTITY IMAGERY — VERIFIED</SectionIndex>
+      <SectionIndex>{sectionHeading}</SectionIndex>
       <figure className="ro-gallery__figure ho-cropframe">
         <span className="ho-crop" aria-hidden="true" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -48,18 +60,33 @@ export function RobotGallery({
           loading="lazy"
         />
         <figcaption className="ro-gallery__cap">
-          <span className="ro-imgbadge">
+          {/* What makes a line/chassis image honest: the caption says what is
+              actually shown, so it is never read as this exact edition. A
+              stand-in never claims "Official ✓" or a bare "Verified ✓" — but a
+              genuine official/verified provenance is not erased either, it is
+              stated ALONGSIDE the representative label, because both facts are
+              true and dropping either one misinforms. */}
+          <span
+            className={
+              primary.is_representative ? "ro-imgbadge ro-imgbadge--rep" : "ro-imgbadge"
+            }
+          >
             {primary.is_representative
-              ? "Representative"
+              ? primary.is_official
+                ? "Representative · Official ✓"
+                : "Representative"
               : primary.is_official
                 ? "Official ✓"
                 : "Verified ✓"}
           </span>
-          {/* What makes a line/chassis image honest: the caption says what is
-              actually shown, so it is never read as this exact edition. The
-              badge does not claim "Official ✓" for a stand-in. */}
-          {primary.is_representative && primary.representative_note && (
-            <span className="ro-imgnote">{primary.representative_note}</span>
+          {/* The note is what makes the label mean something. A representative
+              image with no note reaching the page would be an unlabelled
+              stand-in, so the designation alone is still surfaced. */}
+          {primary.is_representative && (
+            <span className="ro-imgnote">
+              {primary.representative_note ??
+                "Representative image — may not depict this exact edition."}
+            </span>
           )}
           {primary.source_name && (
             <span className="ro-imgsrc">
@@ -80,14 +107,27 @@ export function RobotGallery({
       </figure>
 
       {rest.length > 0 && (
-        <ul className="ro-gallery__strip" aria-label="More verified images">
+        <ul className="ro-gallery__strip" aria-label="More images">
           {rest.map((img, i) => (
             <li key={i}>
+              {/* A stand-in in the strip carries its disclosure too: the
+                  accessible name and tooltip say so, since these thumbnails
+                  have no caption of their own. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={img.image_url}
-                alt={`${robotName} — ${img.image_type.toLowerCase()}`}
-                title={img.source_name ?? undefined}
+                alt={
+                  img.is_representative
+                    ? `${robotName} — ${img.image_type.toLowerCase()} (representative image)`
+                    : `${robotName} — ${img.image_type.toLowerCase()}`
+                }
+                title={
+                  img.is_representative
+                    ? [img.representative_note, img.source_name]
+                        .filter(Boolean)
+                        .join(" — ") || undefined
+                    : (img.source_name ?? undefined)
+                }
                 loading="lazy"
               />
             </li>

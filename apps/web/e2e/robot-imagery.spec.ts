@@ -60,6 +60,27 @@ test("listing and detail page agree on image truth for a photographed robot", as
   await expect(page.getByText("IMAGE UNAVAILABLE")).toHaveCount(0);
 });
 
+// MEDIA-01 §4 — a representative stand-in must disclose itself in the BROWSER,
+// through the real API. The component test proves the markup given props; this
+// proves the props actually arrive: the disclosure was lost for weeks in the
+// read path while every component-level test still passed.
+test("a representative image is labelled and shows its note through the real API", async ({ page }) => {
+  await page.goto("/robots/unitree-r1-edu-u1");
+  await expect(page.locator(".ro-gallery__img")).toHaveCount(1);
+
+  const badge = page.locator(".ro-imgbadge");
+  await expect(badge).toBeVisible();
+  await expect(badge).toContainText("Representative");
+
+  // The note is visible, not merely present in the DOM.
+  const note = page.locator(".ro-imgnote");
+  await expect(note).toBeVisible();
+  await expect(note).toContainText("EDU appearance and equipment may vary");
+
+  // And the exact-edition claim is absent.
+  await expect(page.getByText("IDENTITY IMAGERY — VERIFIED")).toHaveCount(0);
+});
+
 test("listing and detail page agree on image truth for an unphotographed robot", async ({ page }) => {
   await page.goto("/robots");
   const unavailable = page.locator(".rcard").filter({ has: page.locator(".rcard-media__unavailable") }).first();

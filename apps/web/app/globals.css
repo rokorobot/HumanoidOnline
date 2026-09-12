@@ -786,6 +786,11 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-line); padding: var(
   color: var(--ho-text-muted); }
 .ro-imgbadge { color: var(--ho-verified); font-weight: 700; text-transform: uppercase;
   letter-spacing: var(--ho-tracking-label); }
+/* A representative stand-in must not wear the VERIFIED colour (--ho-verified is
+   "VERIFIED only"), and its note must sit on its own line — the caption is a
+   flex row, so without a full basis the disclosure reads as part of the badge. */
+.ro-imgbadge--rep { color: var(--ho-caution); }
+.ro-imgnote { flex-basis: 100%; color: var(--ho-caution); }
 .ro-imgsrc a { color: inherit; text-decoration: underline; }
 .ro-imgattr { color: var(--ho-text-faint); }
 .ro-gallery__strip { list-style: none; display: flex; gap: var(--ho-sp-3);

@@ -597,6 +597,49 @@ No tool returns a single invented "best price" for a robot. `price_display` is
 returned only because it is an **existing governed read** (`price_display_for`);
 it is a display projection of real offers, not a new pricing concept.
 
+#### 10.4.1 Which offer becomes the headline (ratified)
+
+`price_display` is **one offer row**, reported with its own seller, region,
+currency, basis and order status — never a minimum assembled across rows. The
+selection order, highest priority first:
+
+1. **Eligibility.** Removed outright: retired offers (`is_current` false),
+   edition-excluded ones (`edition_confirmed` FALSE), and **variant-scoped**
+   offers. `variant_id` NULL is variant-*agnostic*, and `db/schema.sql` freezes
+   the rule that a variant-specific price never attaches to a robot-level
+   offer — so for a robot-level headline it is not a weaker candidate, it is
+   not a candidate. Ranking it last instead would let it win whenever nothing
+   else survived, which is precisely what that rule forbids.
+2. **Transaction mode, then price concreteness.**
+3. **Market applicability**, when `offered_in` is active (§12.1): offers outside
+   the market are dropped rather than ranked, and the rest order exact region →
+   wider region → member region → worldwide → region-agnostic.
+4. **Edition relevance to this record.** `edition_confirmed` TRUE (checked
+   against the manufacturer's specification for this record) before NULL (never
+   assessed); FALSE was already excluded. Comparability is settled **before**
+   seller preference, so no offer can win on who sells it while describing
+   something other than the record on display.
+5. **Manufacturer-direct before reseller**, among candidates already established
+   as comparable. Decided from two governed columns — `provider.type = 'OEM'`
+   **and** `provider.manufacturer_id` equal to the robot's manufacturer — never
+   from the seller's name. Both halves are required: an OEM provider with no
+   manufacturer link is unproven for this robot, and unproven never outranks
+   proven.
+6. **Amount, within one comparable group only.** `price` decides solely between
+   offers sharing a currency **and** a price basis. Across groups the amounts
+   are not consulted at all: with no FX and no tax normalisation, a
+   differently-denominated price is *incomparable* — a different fact from
+   *expensive* (`services/pricing.py`, §10.3 case F).
+7. **Documented arbitrary tie-break** — provider slug, region code, currency,
+   basis, alphabetically — so repeated imports cannot reorder equals. It
+   expresses **no** preference: it does not mean USD beats EUR, nor that any tax
+   basis is preferred, and it must never be read as either.
+
+**Forbidden as selection inputs:** `updated_at`, offer UUIDs, and alphabetical
+seller order used as a preference. Every import rewrites the first and
+regenerates the second, so either would move the headline for no reason;
+repeated imports of unchanged data must select the same offer.
+
 ### 10.5 `sort=price` under a currency-constrained query (ratified)
 
 `sort` has always been one of four keys (§5, §16); this section specifies a case
@@ -722,6 +765,39 @@ moved. Two independent region walks still exist in other subsystems
 mirroring the former). Migrating them onto the canonical resolver is separately
 scoped work; their parity with it is pinned by tests so a third interpretation
 cannot drift in unnoticed.
+
+### 12.1 `offered_in` — market discovery scope (distinct from `region`)
+
+`region` above answers **"does this offer apply to a buyer here?"** — an
+eligibility question, resolved through the applicable-ancestor walk. There is a
+second, genuinely different question a buyer asks: **"which market's
+storefronts should I search?"** A German distributor's `DE` offer is invisible
+to `region=EU`, and correctly so: a `DE`-scoped offer is not evidence of
+EU-wide applicability, and widening the eligibility walk downward would make it
+claim exactly that. But a buyer browsing the EU market still wants to find it.
+
+`offered_in` therefore resolves a **discovery** scope — the requested region,
+its ancestors, `GLOBAL`, region-agnostic, **and its descendants** (`EU` admits
+`DE`). It is implemented by `services/regions.py::discovery_region_ids`, beside
+but never merged with `applicable_region_ids`; the two walks answer two
+questions and collapsing them would silently restate one as the other.
+
+Three constraints keep the distinction honest:
+
+- **It widens discovery only, never applicability.** A `DE` offer surfaced by
+  `offered_in=EU` is still reported with `region: "DE"` verbatim, and is never
+  relabelled, promoted or presented as an EU-wide offer. The rule of §12 stands
+  unchanged: an offer scoped to one region is not evidence of availability in a
+  sibling region, and a descendant offer is not evidence of zone-wide coverage.
+- **It states nothing about delivery or edition.** That a German supplier lists
+  a robot is a fact about the *supplier's market*, not a shipping promise and
+  not evidence that the unit sold is an EU-specific edition.
+- **It matches a current `PRICING` *or* `AVAILABILITY` offer**, because a
+  storefront that publishes a price is discoverable even where no separate
+  availability row has been established. Absence still claims nothing.
+
+An unresolvable code is invalid input on both surfaces, exactly as in §12 — it
+is never treated as `GLOBAL` and never silently dropped.
 
 ## 13. Evidence and provenance semantics
 

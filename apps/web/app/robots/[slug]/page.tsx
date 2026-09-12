@@ -19,6 +19,7 @@ import {
 import type {
   Deployment,
   Evidence,
+  ExtendedSpec,
   PricingOffer,
   RobotDetail,
 } from "@/lib/types";
@@ -33,7 +34,7 @@ import { RequestAvailabilityButton } from "@/components/RequestAvailabilityButto
 import { RobotGallery } from "@/components/RobotGallery";
 import { MachineCode } from "@/components/MachineCode";
 import { PriceStateLong } from "@/components/PricingState";
-import { SpecRow } from "@/components/DataCell";
+import { SpecRow, SpecValue } from "@/components/DataCell";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SystemHeader } from "@/components/SystemHeader";
 import { SystemLabel } from "@/components/SystemLabel";
@@ -156,6 +157,11 @@ export default async function RobotDetailPage({
   const ladderIdx = maturityIndex(robot.commercial_status);
   const discontinued = robot.commercial_status === "DISCONTINUED";
   const s = robot.specs;
+
+  // A caveat EXPLAINS a spec — most often why it is UNKNOWN, or that sources
+  // disagree. It never supplies a value: the row still renders whatever the
+  // record holds (usually the UNKNOWN state), with the explanation beneath it.
+  const caveats = new Map(robot.spec_caveats.map((c) => [c.field, c.text]));
 
   const evidenceStatusField = conf
     ? { label: "EVIDENCE STATUS:", value: conf, emphasis: conf === "VERIFIED" || conf === "HIGH" }
@@ -289,6 +295,18 @@ export default async function RobotDetailPage({
         <div className="summary-row" id="robot-summary">
           <p>{robot.summary ?? robot.description ?? "No description on record."}</p>
           <div className="actions">
+            {/* The maker's own page for this model. Rendered only when the
+                record holds one — never guessed from the manufacturer site. */}
+            {robot.official_url && (
+              <a
+                className="btn"
+                href={robot.official_url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <GraphicMarker /> Official product page ↗
+              </a>
+            )}
             <Link className="btn" href={`/compare?ids=${robot.slug}`}>
               <GraphicMarker /> Compare +
             </Link>
@@ -488,47 +506,58 @@ export default async function RobotDetailPage({
           <div className="specgrid">
             <div className="spectbl">
               <h3>Physical</h3>
-              <SpecRow label="Height" value={s.height_cm} unit="cm" />
-              <SpecRow label="Weight" value={s.weight_kg} unit="kg" />
-              <SpecRow label="Arm span" value={s.arm_span_cm} unit="cm" />
-              <SpecRow label="Reach" value={s.reach_cm} unit="cm" />
-              <SpecRow label="Payload" value={s.payload_kg} unit="kg" />
-              <SpecRow label="Walk speed" value={s.walk_speed_ms} unit="m/s" />
-              <SpecRow label="Runtime" value={s.runtime_minutes} unit="min" />
-              <SpecRow label="Battery" value={s.battery_wh} unit="Wh" />
-              <SpecRow label="Mobility" value={s.mobility} />
-              <SpecRow label="DOF" value={s.degrees_of_freedom} />
+              <SpecRow label="Height" value={s.height_cm} unit="cm" note={caveats.get("height_cm")} />
+              <SpecRow label="Weight" value={s.weight_kg} unit="kg" note={caveats.get("weight_kg")} />
+              <SpecRow label="Arm span" value={s.arm_span_cm} unit="cm" note={caveats.get("arm_span_cm")} />
+              <SpecRow label="Reach" value={s.reach_cm} unit="cm" note={caveats.get("reach_cm")} />
+              <SpecRow label="Payload" value={s.payload_kg} unit="kg" note={caveats.get("payload_kg")} />
+              <SpecRow label="Walk speed" value={s.walk_speed_ms} unit="m/s" note={caveats.get("walk_speed_ms")} />
+              <SpecRow label="Runtime" value={s.runtime_minutes} unit="min" note={caveats.get("runtime_minutes")} />
+              <SpecRow label="Battery" value={s.battery_wh} unit="Wh" note={caveats.get("battery_wh")} />
+              <SpecRow label="Mobility" value={s.mobility} note={caveats.get("mobility")} />
+              <SpecRow label="DOF" value={s.degrees_of_freedom} note={caveats.get("degrees_of_freedom")} />
             </div>
             <div className="spectbl">
               <h3>Intelligence</h3>
-              <SpecRow label="Autonomy" value={s.autonomy} />
-              <SpecRow label="Manipulation" value={s.has_manipulation} />
-              <SpecRow label="Teleoperation" value={s.has_teleoperation} />
-              <SpecRow label="Vision" value={s.has_vision} />
-              <SpecRow label="Language UI" value={s.has_language_ui} />
-              <SpecRow label="Hand type" value={s.hand_type} />
-              <SpecRow label="Hand DOF" value={s.hand_dof} />
+              <SpecRow label="Autonomy" value={s.autonomy} note={caveats.get("autonomy")} />
+              <SpecRow label="Manipulation" value={s.has_manipulation} note={caveats.get("has_manipulation")} />
+              <SpecRow label="Teleoperation" value={s.has_teleoperation} note={caveats.get("has_teleoperation")} />
+              <SpecRow label="Vision" value={s.has_vision} note={caveats.get("has_vision")} />
+              <SpecRow label="Language UI" value={s.has_language_ui} note={caveats.get("has_language_ui")} />
+              <SpecRow label="Hand type" value={s.hand_type} note={caveats.get("hand_type")} />
+              <SpecRow label="Hand DOF" value={s.hand_dof} note={caveats.get("hand_dof")} />
             </div>
             <div className="spectbl">
               <h3>Developer</h3>
-              <SpecRow label="SDK" value={s.has_sdk} />
-              <SpecRow label="API" value={s.has_api} />
-              <SpecRow label="ROS support" value={s.ros_support} />
-              <SpecRow label="Developer edition" value={s.developer_edition} />
-              <SpecRow label="Simulation support" value={s.simulation_support} />
+              <SpecRow label="SDK" value={s.has_sdk} note={caveats.get("has_sdk")} />
+              <SpecRow label="API" value={s.has_api} note={caveats.get("has_api")} />
+              <SpecRow label="ROS support" value={s.ros_support} note={caveats.get("ros_support")} />
+              <SpecRow label="Developer edition" value={s.developer_edition} note={caveats.get("developer_edition")} />
+              <SpecRow label="Simulation support" value={s.simulation_support} note={caveats.get("simulation_support")} />
               <SpecRow label="Announced" value={robot.announced_year} />
             </div>
           </div>
 
           {robot.extended_specs.length > 0 && (
-            <div className="specgrid" style={{ marginTop: "var(--ho-sp-6)" }}>
-              <div className="spectbl">
-                <h3>Extended specifications</h3>
-                {robot.extended_specs.map((x, i) => (
-                  <SpecRow key={i} label={x.label} value={x.value} unit={x.unit} />
+            <>
+              <div className="specgrid" style={{ marginTop: "var(--ho-sp-6)" }}>
+                {groupExtendedSpecs(robot.extended_specs).map(([category, rows]) => (
+                  <div className="spectbl" key={category}>
+                    <h3>{category}</h3>
+                    {rows.map((x) => (
+                      <ExtendedSpecRow key={x.key} spec={x} />
+                    ))}
+                  </div>
                 ))}
               </div>
-            </div>
+              <p className="stamp" style={{ marginTop: "var(--ho-sp-4)" }}>
+                Each extended specification carries its own source and the edition
+                it was stated for. <b>PRODUCT LINE</b> means the figure was published
+                for the model family, not measured on this edition;{" "}
+                <b>RESELLER CLAIM</b> means a distributor stated it, not the
+                manufacturer.
+              </p>
+            </>
           )}
 
           {robot.capabilities.length > 0 && (
@@ -641,6 +670,41 @@ function PricingRow({ offer }: { offer: PricingOffer }) {
       </div>
       <div>
         <PriceStateLong price={price} />
+        {/* The terms this price is quoted on. They belong to THIS offer row and
+            are rendered with it, so one seller's number is never read under
+            another seller's terms. */}
+        {offer.price_basis && (
+          <span className="ho-syslabel" style={{ display: "block" }}>
+            {offer.price_basis}
+          </span>
+        )}
+        {offer.shipping_terms && (
+          <span className="ho-syslabel" style={{ display: "block" }}>
+            {offer.shipping_terms}
+          </span>
+        )}
+        {offer.package_contents && (
+          <span className="ho-syslabel" style={{ display: "block" }}>
+            Includes: {offer.package_contents}
+          </span>
+        )}
+        {offer.warranty_terms && (
+          <span className="ho-syslabel" style={{ display: "block" }}>
+            Warranty (this seller): {offer.warranty_terms}
+          </span>
+        )}
+        {offer.order_status_note && (
+          <span className="ho-syslabel" style={{ display: "block" }}>
+            {offer.order_status_note}
+          </span>
+        )}
+        {/* Only an explicit FALSE is a warning. null means the edition match was
+            never assessed, and silence is the honest rendering of that. */}
+        {offer.edition_confirmed === false && (
+          <span className="ho-syslabel" style={{ display: "block" }}>
+            ⚠ {offer.edition_note ?? "This listing is not confirmed to be this edition."}
+          </span>
+        )}
       </div>
       <div className="stamp">
         {offer.evidence ? (
@@ -656,6 +720,58 @@ function PricingRow({ offer }: { offer: PricingOffer }) {
           <span style={{ color: "var(--ho-text-faint)" }}>— no evidence —</span>
         )}
       </div>
+    </div>
+  );
+}
+
+// Stable grouping for the extended table: categories in first-appearance order
+// (the API already sorts the rows), so the page cannot reorder itself between
+// renders. No fact is computed here — only which heading a row sits under.
+function groupExtendedSpecs(specs: ExtendedSpec[]): [string, ExtendedSpec[]][] {
+  const groups = new Map<string, ExtendedSpec[]>();
+  for (const spec of specs) {
+    const key = spec.category || "Other";
+    const bucket = groups.get(key);
+    if (bucket) bucket.push(spec);
+    else groups.set(key, [spec]);
+  }
+  return [...groups.entries()];
+}
+
+// An extended spec has no evidence row of its own, so its attribution travels
+// with the value and is rendered WITH it — a number whose source is a click away
+// is a number presented as ours.
+function ExtendedSpecRow({ spec }: { spec: ExtendedSpec }) {
+  const qualifiers: string[] = [];
+  if (spec.source_kind === "RESELLER_CLAIM") qualifiers.push("RESELLER CLAIM");
+  if (spec.edition_scope === "PRODUCT_LINE") qualifiers.push("PRODUCT LINE");
+  if (spec.edition_scope === "PLATFORM") qualifiers.push("PLATFORM");
+
+  const attribution = [
+    spec.source_label,
+    qualifiers.length ? qualifiers.join(" · ") : null,
+    spec.observed_at ? `observed ${formatDate(spec.observed_at)}` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  return (
+    <div className="srow">
+      <span className="k">{spec.label}</span>
+      <span style={{ display: "block" }}>
+        <SpecValue value={spec.value} unit={spec.unit} />
+        {attribution && (
+          <span className="ho-syslabel" style={{ display: "block" }}>
+            {spec.source_url ? (
+              <a href={spec.source_url} target="_blank" rel="noopener noreferrer">
+                {attribution} ↗
+              </a>
+            ) : (
+              attribution
+            )}
+          </span>
+        )}
+      </span>
     </div>
   );
 }

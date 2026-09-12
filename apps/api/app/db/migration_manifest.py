@@ -53,4 +53,7 @@ MIGRATIONS: dict[str, str] = {
     "0010_add_freshness_layer": (
         "00665b075e8e22ed72287894f163b02aab4ad5b915706e1c1a760d60da1ce1af"
     ),
+    "0011_public_profile_and_offer_details": (
+        "efff3538bb40c527b0273e2829983e24ae2d7bd5270321019180eccc59cef8a3"
+    ),
 }

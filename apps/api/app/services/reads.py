@@ -27,6 +27,7 @@ from app.schemas.robot import (
     RobotImagePrimary,
     RobotImageRead,
     RobotListItem,
+    SpecCaveat,
     SpecsBlock,
     StatusHistoryEntry,
     UseCaseFitRead,
@@ -170,18 +171,160 @@ def snapshot_for(
     return {r.id: (int(r.deployment_count or 0), list(r.available_modes or [])) for r in rows}
 
 
-def price_display_for(robot: Robot) -> PriceDisplay | None:
-    offers = [p for p in robot.pricing_offers if p.is_current]
+def _offer_market_rank(offer: PricingOffer, market_rank: dict[str | None, int]) -> int | None:
+    """This offer's place in the active market, or None if it is outside it."""
+    code = offer.region.code if offer.region else None
+    return market_rank.get(code)
+
+
+#: Seller preference. 0 = the manufacturer selling its own robot, 1 = anyone else.
+SELLER_MANUFACTURER_DIRECT = 0
+SELLER_OTHER = 1
+
+
+def _seller_rank(offer: PricingOffer, robot: Robot) -> int:
+    """Is this offer manufacturer-direct FOR THIS ROBOT?
+
+    Decided by two explicit governed columns — `provider.type` (the
+    `provider_type` enum) and `provider.manufacturer_id` — never by reading the
+    seller's name. Both halves are required: `type = 'OEM'` alone says the
+    provider is somebody's factory outlet, not that it is *this* robot's, and a
+    manufacturer link alone does not make a distributor direct. An OEM provider
+    with no manufacturer link is therefore NOT treated as direct; it is
+    unproven, and unproven must not outrank proven.
+
+    Preference is not a claim that the OEM is cheaper. It is a claim about which
+    price is the *right headline*: the manufacturer's own listing for its own
+    product is the canonical commercial fact, and a reseller's markup is a fact
+    about the reseller.
+    """
+    provider = offer.provider
+    if provider is None:
+        return SELLER_OTHER
+    if provider.type == "OEM" and provider.manufacturer_id == robot.manufacturer_id:
+        return SELLER_MANUFACTURER_DIRECT
+    return SELLER_OTHER
+
+
+def _describes_this_record(offer: PricingOffer) -> bool:
+    """Can this offer speak for the ROBOT-level record at all?
+
+    `variant_id` is not "which configuration is nicer" — the frozen matching
+    semantics in `db/schema.sql` define NULL as variant-**agnostic** (applies to
+    any configuration) and state that "a variant-specific price never attaches
+    to a different variant's (or robot-level) offer". A robot-level headline is
+    exactly a robot-level offer, so a variant-scoped price is not a weaker
+    candidate for it — it is not a candidate. Ranking it last instead would let
+    it win whenever nothing else survived, which is the case the frozen rule
+    forbids outright.
+    """
+    return offer.variant_id is None
+
+
+#: Edition relevance, the real comparability signal (`pricing_offer.edition_confirmed`,
+#: migration 0011). TRUE = this listing was checked against the manufacturer's
+#: specification for this record; NULL = never assessed. FALSE is excluded earlier
+#: and never reaches this ranking — absence of assessment must not read as
+#: verification, so a confirmed listing is preferred over an unassessed one.
+EDITION_CONFIRMED = 0
+EDITION_UNASSESSED = 1
+
+
+def _edition_rank(offer: PricingOffer) -> int:
+    return EDITION_CONFIRMED if offer.edition_confirmed is True else EDITION_UNASSESSED
+
+
+def price_display_for(
+    robot: Robot, *, market_rank: dict[str | None, int] | None = None
+) -> PriceDisplay | None:
+    """The headline price: ONE offer row, reported with its own terms.
+
+    Everything the card shows — amount, currency, seller, region, price basis and
+    order status — comes from the single offer selected here, so a number is
+    never displayed under another seller's terms.
+
+    The order of preference, highest first:
+
+    1. **Eligibility.** Removed outright: retired offers (`is_current` false),
+       edition-excluded ones (`edition_confirmed` FALSE), and variant-scoped
+       ones, which may never represent a robot-level record
+       (`_describes_this_record`).
+    2. **Transaction mode, then price concreteness** — a purchase before a
+       developer price, a published figure before an estimate.
+    3. **Market applicability**, when `offered_in` is active: offers outside the
+       market are dropped rather than ranked (an offer in an unrelated market is
+       not a worse answer, it is not an answer), and the rest are ordered exact
+       region, wider region, member region, worldwide, region-agnostic.
+    4. **Edition relevance to THIS record** (`_edition_rank`) — a listing
+       confirmed against the manufacturer's specification before one never
+       assessed. Comparability is settled BEFORE seller preference, so an offer
+       can never win on who sells it while describing something else.
+    5. **Manufacturer-direct before reseller** (`_seller_rank`) — the business
+       preference, decided from governed columns, not seller names, and only
+       among candidates already established as comparable.
+    6. **Amount, inside one comparable group only.** `price` decides solely
+       between offers sharing a currency AND a price basis. Across groups there
+       is no comparison at all: `services/pricing.py` states the rule this
+       obeys — with no FX and no tax normalisation, a differently-denominated
+       price is *incomparable*, which is a different fact from *expensive*.
+    7. **Documented arbitrary tie-break** — provider slug, region code,
+       currency, basis, alphabetically. This exists only so repeated imports
+       cannot reorder equals. It expresses NO preference: it does not mean USD
+       beats EUR or that a pre-tax basis is better, and it must never be read as
+       one.
+
+    **Stability.** Every key is a durable attribute. `updated_at` is rewritten
+    and offer UUIDs are regenerated by every import, so neither may participate:
+    either would change the headline for no reason at all.
+    """
+    offers = [
+        p for p in robot.pricing_offers
+        if p.is_current
+        and p.edition_confirmed is not False
+        and _describes_this_record(p)
+    ]
+    if market_rank is not None:
+        offers = [p for p in offers if _offer_market_rank(p, market_rank) is not None]
     if not offers:
-        return None  # unknown price — no rows
-    offers.sort(
-        key=lambda p: (
+        return None  # unknown price — no rows (or none inside this market)
+
+    def preference(p: PricingOffer) -> tuple:
+        """Everything decided on merit, before any amount is looked at."""
+        return (
             _TXN_PREF.get(p.transaction_type, 9),
             _PRICE_TYPE_RANK.get(p.price_type, 9),
-            -p.updated_at.timestamp(),
+            _offer_market_rank(p, market_rank) if market_rank is not None else 0,
+            _edition_rank(p),
+            _seller_rank(p, robot),
         )
-    )
-    p = offers[0]
+
+    def arbitrary(p: PricingOffer) -> tuple:
+        """Deterministic, meaningless, and last. Never a preference."""
+        return (
+            p.provider.slug if p.provider else "~",
+            p.region.code if p.region else "~",
+            p.currency,
+            p.price_basis or "",
+        )
+
+    best = min(preference(p) for p in offers)
+    finalists = [p for p in offers if preference(p) == best]
+
+    # The amount may break the remaining tie only when every finalist is quoted
+    # in the same money on the same basis. Otherwise the amounts are genuinely
+    # incomparable and are not consulted at all — ranking currencies to force an
+    # answer would invent a preference this system does not have.
+    groups = {(p.currency, p.price_basis or "") for p in finalists}
+    if len(groups) == 1:
+        p = min(
+            finalists,
+            key=lambda p: (
+                float(p.price) if p.price is not None else float("inf"),
+                arbitrary(p),
+            ),
+        )
+    else:
+        p = min(finalists, key=arbitrary)
     return PriceDisplay(
         type=p.price_type,
         amount=_f(p.price),
@@ -189,6 +332,11 @@ def price_display_for(robot: Robot) -> PriceDisplay | None:
         amount_max=_f(p.price_max),
         currency=p.currency,
         billing_period=p.billing_period,
+        provider=p.provider.slug if p.provider else None,
+        region=p.region.code if p.region else None,
+        price_basis=p.price_basis,
+        order_status_note=p.order_status_note,
+        edition_confirmed=p.edition_confirmed,
     )
 
 
@@ -238,7 +386,10 @@ def _primary_image(robot: Robot) -> RobotImagePrimary | None:
 
 
 def serialize_list_item(
-    robot: Robot, snapshot: dict[uuid.UUID, tuple[int, list[str]]]
+    robot: Robot,
+    snapshot: dict[uuid.UUID, tuple[int, list[str]]],
+    *,
+    market_rank: dict[str | None, int] | None = None,
 ) -> RobotListItem:
     dep_count, modes = snapshot.get(robot.id, (0, []))
     return RobotListItem(
@@ -255,7 +406,7 @@ def serialize_list_item(
         payload_kg=_f(robot.payload_kg),
         height_cm=_f(robot.height_cm),
         mobility=robot.mobility,
-        price_display=price_display_for(robot),
+        price_display=price_display_for(robot, market_rank=market_rank),
         available_modes=modes,
         deployment_count=dep_count,
         updated_at=robot.updated_at,
@@ -419,8 +570,23 @@ def serialize_detail(
             value=_spec_value(s),
             unit=s.unit or s.definition.unit,
             category=s.definition.category,
+            # Attribution travels with the value: a long-tail spec has no
+            # evidence_source row, so dropping these would leave a figure nobody
+            # can trace and no way to tell a reseller's claim from the maker's.
+            source_label=s.source_label,
+            source_url=s.source_url,
+            source_kind=s.source_kind,
+            edition_scope=s.edition_scope,
+            observed_at=s.observed_at,
         )
-        for s in robot.specifications
+        for s in sorted(
+            robot.specifications,
+            key=lambda s: (s.definition.sort_order, s.definition.key),
+        )
+    ]
+    caveats = [
+        SpecCaveat(field=c["field"], text=c["text"])
+        for c in (robot.spec_caveats or [])
     ]
     capabilities = [
         CapabilityRead(
@@ -459,6 +625,13 @@ def serialize_detail(
             billing_period=p.billing_period,
             region=p.region.code if p.region else None,
             provider=p.provider.slug if p.provider else None,
+            price_basis=p.price_basis,
+            shipping_terms=p.shipping_terms,
+            package_contents=p.package_contents,
+            warranty_terms=p.warranty_terms,
+            order_status_note=p.order_status_note,
+            edition_confirmed=p.edition_confirmed,
+            edition_note=p.edition_note,
             evidence=ev.get(("PRICING_OFFER", p.id)),
         )
         for p in current_pricing_offers(robot)
@@ -471,6 +644,8 @@ def serialize_detail(
             provider=a.provider.slug if a.provider else None,
             available_from=a.available_from,
             lead_time_days=a.lead_time_days,
+            seller_wording=a.seller_wording,
+            delivery_estimate_label=a.delivery_estimate_label,
             evidence=ev.get(("AVAILABILITY_OFFER", a.id)),
         )
         for a in current_availability_offers(robot)
@@ -524,8 +699,10 @@ def serialize_detail(
         description=robot.description,
         hero_image_url=_governed_hero_image_url(robot),
         announced_year=robot.announced_year,
+        official_url=robot.official_url,
         status_history=status_history,
         specs=_specs_block(robot),
+        spec_caveats=caveats,
         extended_specs=extended,
         capabilities=capabilities,
         variants=variants,

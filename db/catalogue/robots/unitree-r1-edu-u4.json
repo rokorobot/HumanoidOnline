@@ -79,7 +79,11 @@
           "confidence": "MEDIUM",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Third-party distributor price, not manufacturer MSRP."
         }
-      ]
+      ],
+      "price_basis": "German supplier price · includes German VAT",
+      "shipping_terms": "Plus €35.70 special shipping per item (Germany)",
+      "package_contents": "Supplier's generic R1 list: 1× robot (Base or EDU, depending on variant), controller, battery, charger, user manual",
+      "warranty_terms": "Not stated by this supplier. Unitree states 12 months for the R1 EDU line (edition-level, not a seller term)."
     }
   ],
   "availability_offers": [
@@ -100,11 +104,184 @@
           "confidence": "MEDIUM",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Seller's own stock statement for this SKU on the DE storefront."
         }
-      ]
+      ],
+      "seller_wording": "Limited stock, delivery within 1 - 2 business days",
+      "delivery_estimate_label": "Delivery estimate for Germany: 1–2 business days"
     }
   ],
   "deployments": [],
-  "capabilities": [],
+  "capabilities": [
+    {
+      "slug": "voice-interaction",
+      "supported": true,
+      "detail": "Unitree's R1 page states the platform is 'Integrated with a Large Multimodal Model for voice and images', with a 4-microphone array and speaker. Stated for the R1 line, with a footnote that some sample functions are still in development."
+    },
+    {
+      "slug": "dexterous-hands",
+      "supported": true,
+      "detail": "Two Dex3-1 three-finger hands with tactile sensors, 7 DoF per hand (Unitree Dex3-1 page; tactile configuration per the reseller)."
+    }
+  ],
   "use_case_fits": [],
-  "images": []
+  "images": [],
+  "spec_caveats": [
+    {
+      "field": "payload_kg",
+      "text": "Not recorded. Unitree's R1 row is labelled 'Maximum Torque of Arm Joint' but reads 'About 2kg', and its footnote refers to the maximum LOAD of the arm — the source wording is internally inconsistent, so no payload is stated here."
+    },
+    {
+      "field": "ros_support",
+      "text": "Not established by any fresh public source for this configuration."
+    },
+    {
+      "field": "walk_speed_ms",
+      "text": "Not stated by Unitree for the R1 line."
+    },
+    {
+      "field": "battery_wh",
+      "text": "Unitree states about 1 hour of battery life but no watt-hour capacity."
+    },
+    {
+      "field": "weight_kg",
+      "text": "Not recorded for this configuration: Unitree's ~29 kg figure is stated for the R1 EDU line and does not say whether dexterous hands are included; reichelt lists 25 kg and, separately, 40 kg."
+    }
+  ],
+  "extended_specs": [
+    {
+      "key": "standing_dimensions_mm",
+      "value": "1230 × 357 × 190 mm",
+      "source_label": "Unitree R1 — parameter table (R1 EDU column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "PRODUCT_LINE",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "limb_lengths_mm",
+      "value": "Calf + thigh 600 mm; forearm + upper arm 420 mm",
+      "source_label": "Unitree R1 — parameter table (R1 EDU column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "PRODUCT_LINE",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "compute_base",
+      "value": "8-core high-performance processor",
+      "source_label": "Unitree R1 — parameter table (R1 EDU column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "PRODUCT_LINE",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "cameras",
+      "value": "Binocular camera",
+      "source_label": "Unitree R1 — parameter table (R1 EDU column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "PRODUCT_LINE",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "audio",
+      "value": "4-microphone array + speaker",
+      "source_label": "Unitree R1 — parameter table (R1 EDU column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "PRODUCT_LINE",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "connectivity",
+      "value": "Wi-Fi 6, Bluetooth 5.2",
+      "source_label": "Unitree R1 — parameter table (R1 EDU column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "PRODUCT_LINE",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "swappable_battery",
+      "value": true,
+      "source_label": "Unitree R1 — parameter table (R1 EDU column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "PRODUCT_LINE",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "ota_updates",
+      "value": true,
+      "source_label": "Unitree R1 — parameter table (R1 EDU column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "PRODUCT_LINE",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "secondary_development",
+      "value": "Supported on R1 EDU",
+      "source_label": "Unitree R1 — parameter table (R1 EDU column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "PRODUCT_LINE",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "sdk_software",
+      "value": "Fully open control interfaces for joints and sensors; support for mainstream simulation platforms",
+      "source_label": "Unitree R1 — parameter table (R1 EDU column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "PRODUCT_LINE",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "manufacturer_warranty_months",
+      "value": 12,
+      "unit": "months",
+      "source_label": "Unitree R1 — parameter table (R1 EDU column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "PRODUCT_LINE",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "joint_breakdown",
+      "value": "R1 EDU line: 6 per leg, 5 per arm, 2 waist, 2 head — 26 body joints, plus 2 × 7 hand joints = 40 total.",
+      "source_label": "Unitree R1 — parameter table (R1 EDU column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "PRODUCT_LINE",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "compute_ai",
+      "value": "Up to 100 TOPS (reseller claim)",
+      "source_label": "reichelt.com listing (U4)",
+      "source_url": "https://www.reichelt.com/de/en/shop/product/unitree_r1_edu_u4_-_humanoid_robot-417249",
+      "source_kind": "RESELLER_CLAIM",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "hand_module",
+      "value": "Dex3-1 three-finger hand: thumb 3, index 2, middle 2 — 7 DoF per hand",
+      "source_label": "Unitree Dex3-1 — dexterous hand page",
+      "source_url": "https://www.unitree.com/Dex3-1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "PRODUCT_LINE",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "dexterous_hand_option",
+      "value": "Two Dex3-1 three-finger hands with tactile sensors (reseller claim)",
+      "source_label": "reichelt.com listing (U4)",
+      "source_url": "https://www.reichelt.com/de/en/shop/product/unitree_r1_edu_u4_-_humanoid_robot-417249",
+      "source_kind": "RESELLER_CLAIM",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    }
+  ]
 }

@@ -146,7 +146,11 @@ def load_candidates(session: Session, req: RequirementInput) -> list[RobotInput]
                 is_current=p.is_current,
                 geo_applicable=geo_ok(p.region_id),
             )
+            # A listing whose edition does not match this record never competes on
+            # cost: it is a qualified listing, not this robot's price. NULL (never
+            # assessed) keeps its existing behaviour.
             for p in r.pricing_offers
+            if p.edition_confirmed is not False
         )
 
         subject_ids = (

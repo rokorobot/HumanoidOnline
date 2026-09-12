@@ -42,6 +42,12 @@ class Robot(Base):
     description: Mapped[str | None] = mapped_column(Text)
     hero_image_url: Mapped[str | None] = mapped_column(Text)
     announced_year: Mapped[int | None] = mapped_column(Integer)
+    #: The manufacturer's own page for THIS model. Identity/provenance only —
+    #: distinct from `manufacturer.website_url`, which is the company site.
+    official_url: Mapped[str | None] = mapped_column(Text)
+    #: Per-field public caveats: [{"field": "...", "text": "..."}]. Explains why a
+    #: spec is UNKNOWN or which sources conflict; it never fills a NULL.
+    spec_caveats: Mapped[list | None] = mapped_column(JSONB)
 
     commercial_status: Mapped[str] = mapped_column(
         # UNKNOWN, not ANNOUNCED: an unstated maturity has not been verified and

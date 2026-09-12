@@ -20,9 +20,11 @@ from app.services.pricing import (
     apply_price_ceiling,
     validate_price_pair,
 )
+from app.services.regions import discovery_market_rank
 from app.services.robot_filters import (
     InvalidFilterValue,
     apply_catalogue_filters,
+    resolve_discovery_filter,
     resolve_region_filter,
     resolve_sort,
 )
@@ -49,6 +51,7 @@ def list_robots(
     transaction_type: Annotated[list[str] | None, Query()] = None,
     availability_status: Annotated[list[str] | None, Query()] = None,
     region: str | None = None,
+    offered_in: str | None = None,
     use_case: str | None = None,
     payload_min: float | None = None,
     height_min: float | None = None,
@@ -78,6 +81,19 @@ def list_robots(
         # happens in this router.
         region_ids = resolve_region_filter(session, region) if region else None
 
+        # `offered_in` is the MARKET scope (`docs/20` §12.1), a different question
+        # from `region` eligibility and resolved by a different function: it also
+        # admits offers scoped to member countries of an economic zone, so an EU
+        # buyer discovers what a German supplier lists. It asserts no delivery.
+        # The same resolved market ranks the headline offer, so the card cannot
+        # show one market's price under another market's heading.
+        offered_in_region_ids = (
+            resolve_discovery_filter(session, offered_in) if offered_in else None
+        )
+        market_rank = (
+            discovery_market_rank(session, code=offered_in) if offered_in else None
+        )
+
         # AGENT-02.1d — `price_max` and `price_currency` are a required pair, and
         # the constraint is the shared currency-safe predicate AGENT-02 uses
         # (`services/pricing.py`), never the cross-currency `lowest_purchase_price`
@@ -88,7 +104,8 @@ def list_robots(
         filters = dict(
             q=q, manufacturer=manufacturer, commercial_status=commercial_status,
             transaction_type=transaction_type, availability_status=availability_status,
-            region_ids=region_ids, use_case=use_case, payload_min=payload_min,
+            region_ids=region_ids, offered_in_region_ids=offered_in_region_ids,
+            use_case=use_case, payload_min=payload_min,
             height_min=height_min, height_max=height_max,
             mobility=mobility, autonomy_min=autonomy_min, has_sdk=has_sdk,
             ros_support=ros_support, developer_edition=developer_edition,
@@ -121,7 +138,9 @@ def list_robots(
     robots = list(session.execute(stmt).scalars())
 
     snapshot = reads.snapshot_for(session, [r.id for r in robots])
-    items = [reads.serialize_list_item(r, snapshot) for r in robots]
+    items = [
+        reads.serialize_list_item(r, snapshot, market_rank=market_rank) for r in robots
+    ]
     return Page(items=items, total=total, limit=limit, offset=offset)
 
 

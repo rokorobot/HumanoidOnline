@@ -26,6 +26,16 @@ export interface PriceDisplay {
   amount_max?: number | null;
   currency?: string | null;
   billing_period?: string | null;
+  // All of this comes from the SAME offer row as the amount above: the seller,
+  // the region that offer is scoped to, the basis it is quoted on and whether it
+  // can be ordered. Rendering the number without them would show one supplier's
+  // price under another supplier's terms.
+  provider?: string | null;
+  region?: string | null;
+  price_basis?: string | null;
+  order_status_note?: string | null;
+  // null = the edition match was never assessed. Never render it as "confirmed".
+  edition_confirmed?: boolean | null;
 }
 
 export interface Evidence {
@@ -103,6 +113,20 @@ export interface ExtendedSpec {
   value?: number | boolean | string | null;
   unit?: string | null;
   category: string;
+  // Attribution travels with the value (these specs carry no evidence row).
+  source_label?: string | null;
+  source_url?: string | null;
+  // MANUFACTURER | MANUFACTURER_DOC | COMPONENT_MANUFACTURER | RESELLER_CLAIM
+  source_kind?: string | null;
+  // THIS_EDITION | PRODUCT_LINE | PLATFORM
+  edition_scope?: string | null;
+  observed_at?: string | null;
+}
+
+export interface SpecCaveat {
+  // The spec field this explains. A caveat explains a NULL; it never fills one.
+  field: string;
+  text: string;
 }
 
 export interface Capability {
@@ -135,6 +159,17 @@ export interface PricingOffer {
   billing_period: string;
   region?: string | null;
   provider?: string | null;
+  // One fact per field, so none of them has to be parsed out of prose.
+  price_basis?: string | null;
+  shipping_terms?: string | null;
+  package_contents?: string | null;
+  // What THIS seller warrants. A manufacturer's edition-level warranty is a
+  // property of the robot and appears among the extended specifications.
+  warranty_terms?: string | null;
+  order_status_note?: string | null;
+  // null = not assessed (never shown as confirmed); false = qualified listing.
+  edition_confirmed?: boolean | null;
+  edition_note?: string | null;
   evidence?: Evidence | null;
 }
 
@@ -145,6 +180,10 @@ export interface AvailabilityOffer {
   provider?: string | null;
   available_from?: string | null;
   lead_time_days?: number | null;
+  // The seller's own sentence, and a delivery estimate that states the country
+  // it was given for. Never widen a domestic estimate to a region.
+  seller_wording?: string | null;
+  delivery_estimate_label?: string | null;
   evidence?: Evidence | null;
 }
 
@@ -169,8 +208,12 @@ export interface RobotDetail {
   description?: string | null;
   hero_image_url?: string | null;
   announced_year?: number | null;
+  // The manufacturer's own page for this model (identity/provenance).
+  official_url?: string | null;
   status_history: StatusHistoryEntry[];
   specs: SpecsBlock;
+  // Why a spec is UNKNOWN, or which sources conflict, keyed by field name.
+  spec_caveats: SpecCaveat[];
   extended_specs: ExtendedSpec[];
   capabilities: Capability[];
   variants: Variant[];

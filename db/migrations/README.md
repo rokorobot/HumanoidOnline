@@ -149,6 +149,31 @@ Forward migrations:
   is, and must remain, zero until a later, separately-gated slice performs
   DATA-D1.9 eligibility reviews and registers targets.
 
+- `0011_public_profile_and_offer_details.sql` — adds the columns a complete
+  public robot profile needs, in two groups. **Offer detail**: `pricing_offer`
+  gains `price_basis`, `shipping_terms`, `package_contents`, `warranty_terms`,
+  `order_status_note`, `edition_confirmed` and `edition_note`;
+  `availability_offer` gains `seller_wording` and `delivery_estimate_label`.
+  These are separate columns rather than one caveat field because they are
+  separate facts — a tax basis, a box content and an order status answer
+  different questions, and flattening them into prose makes every one of them
+  unfilterable and unciteable. `edition_confirmed` is **nullable with no
+  default**: NULL means *not assessed* and keeps today's behaviour exactly,
+  TRUE means the listing was checked against the manufacturer's specification,
+  FALSE means it conflicts and the offer is shown as a qualified listing and
+  excluded from unqualified price selection. Absence of an assessment must never
+  read as verification, which is why there is no `DEFAULT TRUE`.
+  **Public profile**: `robot` gains `official_url` (the maker's page for this
+  model — the catalogue JSON already carried it and the importer discarded it
+  for want of a column) and `spec_caveats` (per-field explanations of UNKNOWNs
+  and conflicts); `specification` gains per-value attribution (`source_label`,
+  `source_url`, `source_kind`, `edition_scope`, `observed_at`) so a long-tail
+  spec can say who stated it and whether it describes this edition, the product
+  line or the platform — a reseller's claim is never rendered as the maker's own.
+  `specification` and `spec_definition` both gain `managed_by`, so a catalogue
+  import refreshes only rows it wrote and leaves seed/hand-authored rows alone.
+  Additive and idempotent.
+
 ## Checksum integrity (WS8.2 / R9)
 
 `schema_migrations` stores a `sha256` for every applied file, and

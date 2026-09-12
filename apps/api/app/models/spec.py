@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, Numeric, Text, text
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, Numeric, Text, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -32,6 +32,9 @@ class SpecDefinition(Base):
     sort_order: Mapped[int] = mapped_column(
         Integer, nullable=False, server_default=text("0")
     )
+    #: 'CATALOGUE_IMPORT' for definitions the catalogue importer owns; NULL for
+    #: seed/hand-authored ones, which it must never rewrite.
+    managed_by: Mapped[str | None] = mapped_column(Text)
 
 
 class Specification(Base):
@@ -53,6 +56,17 @@ class Specification(Base):
     value_bool: Mapped[bool | None] = mapped_column(Boolean)
     value_text: Mapped[str | None] = mapped_column(Text)
     unit: Mapped[str | None] = mapped_column(Text)
+    #: Provenance of this value. A long-tail spec carries no evidence_source row
+    #: (it is descriptive, not a commercial fact), so attribution travels with it:
+    #: who stated it, where, what it describes, and when it was observed.
+    managed_by: Mapped[str | None] = mapped_column(Text)
+    source_label: Mapped[str | None] = mapped_column(Text)
+    source_url: Mapped[str | None] = mapped_column(Text)
+    #: MANUFACTURER | MANUFACTURER_DOC | COMPONENT_MANUFACTURER | RESELLER_CLAIM
+    source_kind: Mapped[str | None] = mapped_column(Text)
+    #: THIS_EDITION | PRODUCT_LINE | PLATFORM
+    edition_scope: Mapped[str | None] = mapped_column(Text)
+    observed_at: Mapped[date | None] = mapped_column(Date)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("now()"), nullable=False
     )

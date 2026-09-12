@@ -1,0 +1,29 @@
+{
+  "_comment": "Long-tail specification keys referenced by robots[].extended_specs. Upserted by key and written with managed_by='CATALOGUE_IMPORT'. A definition already present with a different owner (seed or hand-authored, managed_by NULL) is PRESERVED and reported by the importer — 'swappable_battery' below is exactly that case and is listed here only so the key resolves. value_type and category use the spec_value_type / capability_category enums verbatim.",
+  "spec_definitions": [
+    { "key": "standing_dimensions_mm", "label": "Dimensions (standing)",        "category": "OTHER",        "value_type": "TEXT",    "unit": null,     "sort_order": 10 },
+    { "key": "joint_breakdown",        "label": "Joint breakdown",              "category": "MOBILITY",     "value_type": "TEXT",    "unit": null,     "sort_order": 11 },
+    { "key": "limb_lengths_mm",        "label": "Limb lengths",                 "category": "MOBILITY",     "value_type": "TEXT",    "unit": null,     "sort_order": 12 },
+    { "key": "arm_joint_torque_nm",    "label": "Max arm joint torque",         "category": "MANIPULATION", "value_type": "NUMBER",  "unit": "N·m",    "sort_order": 13 },
+    { "key": "leg_joint_torque_nm",    "label": "Max leg joint torque",         "category": "MOBILITY",     "value_type": "NUMBER",  "unit": "N·m",    "sort_order": 14 },
+    { "key": "peak_joint_torque_nm",   "label": "Max joint peak torque",        "category": "MOBILITY",     "value_type": "NUMBER",  "unit": "N·m",    "sort_order": 15 },
+    { "key": "arm_payload_peak_kg",    "label": "Arm payload (peak)",           "category": "MANIPULATION", "value_type": "NUMBER",  "unit": "kg",     "sort_order": 16 },
+    { "key": "max_dual_arm_load_kg",   "label": "Max combined dual-arm load",   "category": "MANIPULATION", "value_type": "NUMBER",  "unit": "kg",     "sort_order": 17 },
+    { "key": "battery_pack",           "label": "Battery pack",                 "category": "OTHER",        "value_type": "TEXT",    "unit": null,     "sort_order": 20 },
+    { "key": "swappable_battery",      "label": "Swappable battery",            "category": "OTHER",        "value_type": "BOOLEAN", "unit": null,     "sort_order": 21 },
+    { "key": "compute_base",           "label": "Onboard computer",             "category": "AI_AUTONOMY",  "value_type": "TEXT",    "unit": null,     "sort_order": 30 },
+    { "key": "compute_ai",             "label": "AI compute",                   "category": "AI_AUTONOMY",  "value_type": "TEXT",    "unit": null,     "sort_order": 31 },
+    { "key": "cameras",                "label": "Cameras",                      "category": "PERCEPTION",   "value_type": "TEXT",    "unit": null,     "sort_order": 40 },
+    { "key": "audio",                  "label": "Audio",                        "category": "INTERACTION",  "value_type": "TEXT",    "unit": null,     "sort_order": 41 },
+    { "key": "lidar",                  "label": "LiDAR",                        "category": "PERCEPTION",   "value_type": "TEXT",    "unit": null,     "sort_order": 42 },
+    { "key": "connectivity",           "label": "Connectivity",                 "category": "SOFTWARE",     "value_type": "TEXT",    "unit": null,     "sort_order": 43 },
+    { "key": "head",                   "label": "Head",                         "category": "INTERACTION",  "value_type": "TEXT",    "unit": null,     "sort_order": 44 },
+    { "key": "hand_module",            "label": "Hand module",                  "category": "MANIPULATION", "value_type": "TEXT",    "unit": null,     "sort_order": 50 },
+    { "key": "dexterous_hand_option",  "label": "Dexterous hand option",        "category": "MANIPULATION", "value_type": "TEXT",    "unit": null,     "sort_order": 51 },
+    { "key": "secondary_development",  "label": "Secondary development",        "category": "SOFTWARE",     "value_type": "TEXT",    "unit": null,     "sort_order": 60 },
+    { "key": "sdk_software",           "label": "SDK / software",               "category": "SOFTWARE",     "value_type": "TEXT",    "unit": null,     "sort_order": 61 },
+    { "key": "ota_updates",            "label": "OTA updates",                  "category": "SOFTWARE",     "value_type": "BOOLEAN", "unit": null,     "sort_order": 62 },
+    { "key": "configurations",         "label": "Configurations offered",       "category": "OTHER",        "value_type": "TEXT",    "unit": null,     "sort_order": 70 },
+    { "key": "manufacturer_warranty_months", "label": "Manufacturer warranty (edition-level)", "category": "OTHER", "value_type": "NUMBER", "unit": "months", "sort_order": 71 }
+  ]
+}

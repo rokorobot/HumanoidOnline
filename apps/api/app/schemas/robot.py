@@ -81,6 +81,26 @@ class ExtendedSpec(BaseModel):
     value: float | bool | str | None = None
     unit: str | None = None
     category: str
+    #: Attribution travels WITH the value. A long-tail spec carries no
+    #: evidence_source row (it is descriptive, not a commercial fact), so if the
+    #: source did not come along, the value would arrive unattributable.
+    source_label: str | None = None
+    source_url: str | None = None
+    #: MANUFACTURER | MANUFACTURER_DOC | COMPONENT_MANUFACTURER | RESELLER_CLAIM —
+    #: a distributor's claim is never presented as the maker's own statement.
+    source_kind: str | None = None
+    #: THIS_EDITION | PRODUCT_LINE | PLATFORM. A figure stated for a family must
+    #: not read as confirmation for one configuration.
+    edition_scope: str | None = None
+    observed_at: date | None = None
+
+
+class SpecCaveat(BaseModel):
+    """Why a spec is UNKNOWN, or which sources conflict. Attached to a field name
+    so the UI can mark that row; it explains a NULL and never fills one."""
+
+    field: str
+    text: str
 
 
 class CapabilityRead(BaseModel):
@@ -113,6 +133,19 @@ class PricingOfferRead(BaseModel):
     billing_period: str
     region: str | None = None
     provider: str | None = None
+    #: Public offer detail, one fact per field: what the amount includes, what
+    #: shipping costs, what is in the box, what THIS seller warrants, and whether
+    #: it can be ordered right now.
+    price_basis: str | None = None
+    shipping_terms: str | None = None
+    package_contents: str | None = None
+    warranty_terms: str | None = None
+    order_status_note: str | None = None
+    #: Tri-state. NULL = not assessed — never rendered as "confirmed". FALSE = the
+    #: listing's own specification conflicts with this record, so it is shown as a
+    #: qualified listing and excluded from unqualified price selection.
+    edition_confirmed: bool | None = None
+    edition_note: str | None = None
     evidence: EvidenceRead | None = None
 
 
@@ -123,6 +156,10 @@ class AvailabilityOfferRead(BaseModel):
     provider: str | None = None
     available_from: date | None = None
     lead_time_days: int | None = None
+    #: The seller's own sentence, and its delivery estimate with the geography it
+    #: was stated for. A domestic estimate is never widened to a region.
+    seller_wording: str | None = None
+    delivery_estimate_label: str | None = None
     evidence: EvidenceRead | None = None
 
 
@@ -168,8 +205,13 @@ class RobotDetail(BaseModel):
     description: str | None = None
     hero_image_url: str | None = None
     announced_year: int | None = None
+    #: The manufacturer's own page for this model (identity/provenance). Carried
+    #: by the catalogue all along; it had no column to land in until 0011.
+    official_url: str | None = None
     status_history: list[StatusHistoryEntry]
     specs: SpecsBlock
+    #: Per-field explanations of UNKNOWNs and conflicts, keyed by spec field.
+    spec_caveats: list[SpecCaveat] = []
     extended_specs: list[ExtendedSpec]
     capabilities: list[CapabilityRead]
     variants: list[VariantRead]

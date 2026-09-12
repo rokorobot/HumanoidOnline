@@ -359,6 +359,13 @@ CREATE TABLE robot (
     description           TEXT,
     hero_image_url        TEXT,
     announced_year        INT CHECK (announced_year BETWEEN 1900 AND 2100),
+    -- The manufacturer's own page for THIS model (identity/provenance, not a
+    -- commercial claim). Distinct from manufacturer.website_url.
+    official_url          TEXT,
+    -- Per-field public caveats: [{"field":"degrees_of_freedom","text":"…"}].
+    -- Explains why a spec is UNKNOWN or which sources conflict. A caveat never
+    -- fills a NULL; it explains one.
+    spec_caveats          JSONB,
 
     -- DIMENSION 1: commercial MATURITY (current). History in robot_status_history.
     -- Defaults to UNKNOWN, not ANNOUNCED: a row inserted without an explicit
@@ -498,7 +505,10 @@ CREATE TABLE spec_definition (
     value_type  spec_value_type NOT NULL,
     unit        TEXT,                        -- 'cm','kg','Nm','V'...
     is_filterable BOOLEAN NOT NULL DEFAULT FALSE,
-    sort_order  INT NOT NULL DEFAULT 0
+    sort_order  INT NOT NULL DEFAULT 0,
+    -- 'CATALOGUE_IMPORT' for definitions the catalogue importer owns. NULL for
+    -- seed/hand-authored ones, which it must never rewrite.
+    managed_by  TEXT
 );
 
 CREATE TABLE specification (
@@ -510,10 +520,28 @@ CREATE TABLE specification (
     value_bool   BOOLEAN,
     value_text   TEXT,
     unit         TEXT,                       -- overrides definition.unit if needed
+    -- Provenance of THIS value. A long-tail spec has no evidence_source row (it is
+    -- descriptive, not a commercial fact), so attribution travels with the value:
+    -- who said it, where, what it describes, and when we saw it.
+    managed_by    TEXT,                      -- 'CATALOGUE_IMPORT' = importer-owned
+    source_label  TEXT,
+    source_url    TEXT,
+    source_kind   TEXT,                      -- MANUFACTURER | MANUFACTURER_DOC |
+                                             -- COMPONENT_MANUFACTURER | RESELLER_CLAIM
+    edition_scope TEXT,                      -- THIS_EDITION | PRODUCT_LINE | PLATFORM
+    observed_at   DATE,
     created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+    updated_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
     -- Logical uniqueness enforced by uq_specification_logical below
     -- (variant_id is nullable; see NULL-uniqueness note on availability_offer).
+    CONSTRAINT chk_specification_source_kind CHECK (
+        source_kind IS NULL OR source_kind IN (
+            'MANUFACTURER', 'MANUFACTURER_DOC', 'COMPONENT_MANUFACTURER', 'RESELLER_CLAIM'
+        )
+    ),
+    CONSTRAINT chk_specification_edition_scope CHECK (
+        edition_scope IS NULL OR edition_scope IN ('THIS_EDITION', 'PRODUCT_LINE', 'PLATFORM')
+    )
 );
 COMMENT ON TABLE specification IS
     'Long-tail structured specs (key/value with numeric+bool+text). First-class '
@@ -591,6 +619,19 @@ CREATE TABLE pricing_offer (
     valid_from       DATE,
     valid_until      DATE,
     note             TEXT,
+    -- Public offer detail. Separate columns because these are separate facts: a
+    -- reader must not have to parse prose to learn the tax basis or what ships.
+    price_basis       TEXT,   -- e.g. 'German supplier price · includes German VAT'
+    shipping_terms    TEXT,
+    package_contents  TEXT,
+    warranty_terms    TEXT,   -- as stated BY THIS SELLER (never the maker's own)
+    order_status_note TEXT,   -- e.g. 'Not available to order at last check'
+    -- Tri-state; NULL by design. NULL = not assessed (pre-existing offers),
+    -- TRUE = listing checked against the manufacturer spec, FALSE = the listing's
+    -- own specification conflicts -> qualified listing, excluded from unqualified
+    -- price selection (`edition_confirmed IS DISTINCT FROM FALSE`).
+    edition_confirmed BOOLEAN,
+    edition_note      TEXT,
     created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
     -- Frozen price_type semantics (03_DATA_DICTIONARY §3), enforced by the DB
@@ -627,6 +668,10 @@ CREATE TABLE availability_offer (
     lead_time_days      INT CHECK (lead_time_days >= 0),
     min_order_qty       INT CHECK (min_order_qty >= 0),
     note                TEXT,
+    -- The seller's own sentence, and its delivery estimate WITH the geography it
+    -- was stated for. A domestic estimate is never presented as wider coverage.
+    seller_wording          TEXT,
+    delivery_estimate_label TEXT,
     is_current          BOOLEAN NOT NULL DEFAULT TRUE,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()

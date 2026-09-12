@@ -91,7 +91,10 @@
           "confidence": "HIGH",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (curl 8.11.0 (store product JSON) + WebFetch (product page)) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own store. Variant prices and availability flags read from the store's public product data (shop.unitree.com/products/unitree-r1.js, HTTP 200) and the product page."
         }
-      ]
+      ],
+      "price_basis": "Manufacturer store price (USD) · excludes tax, customs duties and shipping",
+      "shipping_terms": "Shipping $300–1,200; buyer pays customs duties and import taxes; returns not accepted (store policy)",
+      "warranty_terms": "Not stated by the store. Unitree states 8 months for this edition."
     },
     {
       "provider_slug": "reichelt",
@@ -113,7 +116,12 @@
           "confidence": "MEDIUM",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Third-party distributor price, not manufacturer MSRP."
         }
-      ]
+      ],
+      "price_basis": "German supplier price · includes German VAT",
+      "shipping_terms": "Plus €35.70 special shipping per item (Germany)",
+      "package_contents": "Supplier's generic R1 list: 1× robot (Base or EDU, depending on variant), controller, battery, charger, user manual",
+      "edition_confirmed": false,
+      "edition_note": "Edition match unconfirmed: this supplier's specifications differ from the manufacturer's R1 specification. Confirm the exact model and configuration before ordering."
     },
     {
       "provider_slug": "quadruped-de",
@@ -134,8 +142,24 @@
           "verified_at": null,
           "confidence": "MEDIUM",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (QUADRUPED Robotics, DE), not the manufacturer."
+        },
+        {
+          "source_url": "https://www.quadruped.de/Unitree-R1_1",
+          "source_type": "OTHER",
+          "source_title": "Unitree R1 — QUADRUPED.DE (third-party distributor, DE): R1 Base variant withdrawn",
+          "excerpt": "from 12.200,00 € excl. 19% VAT — variant selector lists only R1 Edu U1 (+3.800,00 €), U2 (+6.600,00 €), U3 (+16.200,00 €), U4 (+19.000,00 €), U5 (+14.150,00 €) and U6 (+18.600,00 €); no 'R1 Base' option.",
+          "published_at": null,
+          "observed_at": "2026-09-11",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (curl 8.11.0, raw page) in a session initiated by Robert Konecny, under the Batch 01B commercial completeness audit. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Retires the €8,400 'R1 Base' offer: the variant is no longer offered, so the price is no longer current. The original offer and its evidence are kept as history."
         }
-      ]
+      ],
+      "price_basis": "German supplier price · excludes VAT",
+      "shipping_terms": "Shipping quoted in the cart",
+      "package_contents": "Robot (selected version), battery, controller, charger",
+      "is_current": false,
+      "order_status_note": "Withdrawn: this supplier no longer offers the R1 Base variant."
     }
   ],
   "availability_offers": [
@@ -157,7 +181,9 @@
           "confidence": "HIGH",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (curl 8.11.0 (store product JSON) + WebFetch (product page)) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own store. Variant prices and availability flags read from the store's public product data (shop.unitree.com/products/unitree-r1.js, HTTP 200) and the product page."
         }
-      ]
+      ],
+      "seller_wording": "In Stock",
+      "delivery_estimate_label": "Manufacturer store: normally shipped within 30 business days (store policy)"
     },
     {
       "provider_slug": "reichelt",
@@ -176,11 +202,176 @@
           "confidence": "MEDIUM",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Seller's own stock statement for this SKU on the DE storefront."
         }
-      ]
+      ],
+      "seller_wording": "Limited stock, delivery within 1 - 2 business days",
+      "delivery_estimate_label": "Delivery estimate for Germany: 1–2 business days"
     }
   ],
   "deployments": [],
-  "capabilities": [],
+  "capabilities": [
+    {
+      "slug": "voice-interaction",
+      "supported": true,
+      "detail": "Unitree's R1 page states the platform is 'Integrated with a Large Multimodal Model for voice and images', with a 4-microphone array and speaker. The same page footnotes that some sample functions are still in development."
+    }
+  ],
   "use_case_fits": [],
-  "images": []
+  "images": [],
+  "spec_caveats": [
+    {
+      "field": "degrees_of_freedom",
+      "text": "26 per Unitree's R1 column. reichelt's listing states 24 DOF and QUADRUPED.DE repeats it; an owner-supplied capture says 26 in its table and 'twenty-four' in its prose. The manufacturer figure is used and the others are preserved here."
+    },
+    {
+      "field": "height_cm",
+      "text": "123 cm from Unitree's standing dimensions (1230 mm). reichelt lists 1210 mm."
+    },
+    {
+      "field": "weight_kg",
+      "text": "About 29 kg per Unitree. reichelt lists 25 kg and, separately, 40 kg."
+    },
+    {
+      "field": "payload_kg",
+      "text": "Not recorded. Unitree's R1 row is labelled 'Maximum Torque of Arm Joint' but reads 'About 2kg', and its footnote refers to the maximum LOAD of the arm — the source wording is internally inconsistent, so no payload is stated here."
+    },
+    {
+      "field": "hand_type",
+      "text": "Unitree's R1 column lists the dexterous hand as not specified for this edition, which states nothing about the standard end effector. The only description of 'dummy hands' comes from an owner-supplied capture that carries no source URL."
+    },
+    {
+      "field": "hand_dof",
+      "text": "Not stated for this edition; see the hand type note."
+    },
+    {
+      "field": "walk_speed_ms",
+      "text": "Not stated by Unitree for the R1 line."
+    },
+    {
+      "field": "battery_wh",
+      "text": "Unitree states about 1 hour of battery life but no watt-hour capacity."
+    },
+    {
+      "field": "has_api",
+      "text": "Open control interfaces are stated for R1 EDU, not for this edition."
+    },
+    {
+      "field": "ros_support",
+      "text": "Not established by any fresh public source."
+    },
+    {
+      "field": "simulation_support",
+      "text": "Simulation support is stated for R1 EDU, not for this edition."
+    }
+  ],
+  "extended_specs": [
+    {
+      "key": "standing_dimensions_mm",
+      "value": "1230 × 357 × 190 mm",
+      "source_label": "Unitree R1 — parameter table (R1 column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "joint_breakdown",
+      "value": "6 per leg, 5 per arm, 2 waist, 2 head — 26 body joints",
+      "source_label": "Unitree R1 — parameter table (R1 column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "limb_lengths_mm",
+      "value": "Calf + thigh 600 mm; forearm + upper arm 420 mm",
+      "source_label": "Unitree R1 — parameter table (R1 column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "compute_base",
+      "value": "8-core high-performance processor",
+      "source_label": "Unitree R1 — parameter table (R1 column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "cameras",
+      "value": "Binocular camera",
+      "source_label": "Unitree R1 — parameter table (R1 column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "audio",
+      "value": "4-microphone array + speaker",
+      "source_label": "Unitree R1 — parameter table (R1 column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "connectivity",
+      "value": "Wi-Fi 6, Bluetooth 5.2",
+      "source_label": "Unitree R1 — parameter table (R1 column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "swappable_battery",
+      "value": true,
+      "source_label": "Unitree R1 — parameter table (R1 column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "ota_updates",
+      "value": true,
+      "source_label": "Unitree R1 — parameter table (R1 column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "dexterous_hand_option",
+      "value": "Not specified for this edition",
+      "source_label": "Unitree R1 — parameter table (R1 column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "secondary_development",
+      "value": "Not supported on this edition (R1 EDU only)",
+      "source_label": "Unitree R1 — parameter table (R1 column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    },
+    {
+      "key": "manufacturer_warranty_months",
+      "value": 8,
+      "unit": "months",
+      "source_label": "Unitree R1 — parameter table (R1 column)",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-09-11"
+    }
+  ]
 }

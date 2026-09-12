@@ -68,7 +68,10 @@ def _public_surfaces(client) -> list[tuple[str, str]]:
 
 IDENTITY = ("VERIFIED", "UNVERIFIED")
 RIGHTS = ("PERMITTED", "ATTRIBUTION_REQUIRED", "UNKNOWN", "RESTRICTED")
-USAGE = ("NONE", "OFFICIAL_MANUFACTURER_MEDIA")
+# Migration 0012 widened this vocabulary. OWNER_APPROVED_DISPLAY is a second
+# DISPLAY POLICY basis — an explicit owner decision covering assets no source
+# licensed, including distributor photography. It is not evidence of a licence.
+USAGE = ("NONE", "OFFICIAL_MANUFACTURER_MEDIA", "OWNER_APPROVED_DISPLAY")
 
 
 def _image(identity: str, rights: str, usage: str, attribution: str | None = "© Someone"):
@@ -90,7 +93,7 @@ def _expected_eligible(identity: str, rights: str, usage: str, attribution: str 
         return False
     if rights == "RESTRICTED":
         return False
-    has_usage = usage == "OFFICIAL_MANUFACTURER_MEDIA"
+    has_usage = usage in ("OFFICIAL_MANUFACTURER_MEDIA", "OWNER_APPROVED_DISPLAY")
     if not (rights in ("PERMITTED", "ATTRIBUTION_REQUIRED") or has_usage):
         return False
     # The credit obligation attaches to the rights state and is NOT overridable
@@ -118,6 +121,17 @@ def test_r11_full_eligibility_matrix(identity: str, rights: str, usage: str) -> 
 def test_r11_restricted_always_blocks_even_with_official_media() -> None:
     """RESTRICTED is absolute: no display policy can override a rights refusal."""
     assert not _image("VERIFIED", "RESTRICTED", "OFFICIAL_MANUFACTURER_MEDIA").is_display_eligible()
+    # The same holds for the owner-approval basis: an owner may decide to display
+    # an asset nobody licensed, but never one a source explicitly restricted.
+    assert not _image("VERIFIED", "RESTRICTED", "OWNER_APPROVED_DISPLAY").is_display_eligible()
+
+
+def test_r11_owner_approval_is_policy_not_a_licence() -> None:
+    """The new basis authorises display while rights remain honestly UNKNOWN — it
+    must never be recorded as, or behave like, a granted licence."""
+    img = _image("VERIFIED", "UNKNOWN", "OWNER_APPROVED_DISPLAY")
+    assert img.is_display_eligible()
+    assert img.rights_status == "UNKNOWN"
 
 
 def test_r11_unknown_rights_never_behaves_like_permitted() -> None:

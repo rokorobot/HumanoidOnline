@@ -175,10 +175,9 @@ class DeploymentRead(BaseModel):
 
 
 class RobotImageRead(BaseModel):
-    """A DISPLAY-ELIGIBLE verified image (MEDIA-01). The read path returns ONLY
-    eligible images (identity VERIFIED + rights PERMITTED/ATTRIBUTION_REQUIRED),
-    so the client cannot render an unverified or rights-uncleared image. When the
-    list is empty the UI shows the explicit IMAGE_UNAVAILABLE state."""
+    """A DISPLAY-ELIGIBLE image (MEDIA-01). The read path returns ONLY eligible
+    images, so the client cannot render an unverified or rights-uncleared one.
+    When the list is empty the UI shows the explicit IMAGE_UNAVAILABLE state."""
 
     image_url: str
     image_type: str
@@ -188,6 +187,12 @@ class RobotImageRead(BaseModel):
     is_official: bool
     is_primary: bool
     attribution: str | None = None
+    #: TRUE when the asset depicts the product line/chassis rather than this exact
+    #: edition. Such an image is eligible only WITH `representative_note`, and the
+    #: caption must cross this boundary: an unlabelled stand-in reads as a claim
+    #: about the exact edition, which is precisely what the designation prevents.
+    is_representative: bool = False
+    representative_note: str | None = None
 
 
 class RobotDetail(BaseModel):

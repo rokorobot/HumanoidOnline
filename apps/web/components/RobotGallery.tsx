@@ -49,8 +49,18 @@ export function RobotGallery({
         />
         <figcaption className="ro-gallery__cap">
           <span className="ro-imgbadge">
-            {primary.is_official ? "Official ✓" : "Verified ✓"}
+            {primary.is_representative
+              ? "Representative"
+              : primary.is_official
+                ? "Official ✓"
+                : "Verified ✓"}
           </span>
+          {/* What makes a line/chassis image honest: the caption says what is
+              actually shown, so it is never read as this exact edition. The
+              badge does not claim "Official ✓" for a stand-in. */}
+          {primary.is_representative && primary.representative_note && (
+            <span className="ro-imgnote">{primary.representative_note}</span>
+          )}
           {primary.source_name && (
             <span className="ro-imgsrc">
               Source:{" "}

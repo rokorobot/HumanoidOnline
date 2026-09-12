@@ -272,7 +272,12 @@ CREATE TYPE image_rights_status AS ENUM (
 -- WITHOUT falsely asserting an attribution license was granted (MEDIA-01 §H2).
 CREATE TYPE image_usage_basis AS ENUM (
     'NONE',
-    'OFFICIAL_MANUFACTURER_MEDIA'
+    'OFFICIAL_MANUFACTURER_MEDIA',
+    -- An explicit owner decision to display an asset for which NO source granted
+    -- anything — including distributor photography, which the value above would
+    -- misdescribe. Policy, never evidence: rights_status stays UNKNOWN, source and
+    -- attribution stay on the row, and RESTRICTED still blocks (docs/09 §4).
+    'OWNER_APPROVED_DISPLAY'
 );
 
 -- =============================================================================
@@ -477,6 +482,14 @@ CREATE TABLE robot_image (
     is_official     BOOLEAN NOT NULL DEFAULT FALSE,
     is_primary      BOOLEAN NOT NULL DEFAULT FALSE,
     attribution     TEXT,                      -- required credit line when ATTRIBUTION_REQUIRED
+    -- Representative imagery: depicts the product LINE/chassis, not this exact
+    -- edition. Keeps identity_status = UNVERIFIED and is displayable only under
+    -- usage_basis = OWNER_APPROVED_DISPLAY with a caption, so identity uncertainty
+    -- reaches the reader instead of being upgraded to a false VERIFIED.
+    is_representative   BOOLEAN NOT NULL DEFAULT FALSE,
+    representative_note TEXT,                  -- reader-facing caption, required when representative
+    display_approved_by TEXT,                  -- who approved display absent a licence (the DECISION)
+    display_approved_at TIMESTAMPTZ,           -- when that approval was recorded
     captured_at     DATE,                      -- when the photo/asset was captured, if known
     last_verified_at TIMESTAMPTZ,              -- when identity/rights were last checked
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),

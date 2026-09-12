@@ -113,7 +113,26 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": [],
+  "images": [
+    {
+      "image_url": "/robots/booster-t2-professional.webp",
+      "source_url": "https://www.booster.tech/booster-t2",
+      "source_name": "Booster Robotics",
+      "source_type": "MANUFACTURER",
+      "image_type": "FRONT",
+      "identity_status": "UNVERIFIED",
+      "rights_status": "UNKNOWN",
+      "usage_basis": "OWNER_APPROVED_DISPLAY",
+      "is_official": true,
+      "is_primary": true,
+      "attribution": "© Booster Robotics",
+      "is_representative": true,
+      "representative_note": "T2 chassis shown; equipment varies by edition.",
+      "display_approved_by": "robert@humanoid.company",
+      "display_approved_at": "2026-09-12T00:00:00Z",
+      "last_verified_at": "2026-09-12T00:00:00Z"
+    }
+  ],
   "spec_caveats": [
     {
       "field": "payload_kg",

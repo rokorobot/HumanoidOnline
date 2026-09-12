@@ -129,9 +129,27 @@ auditable in the record, not published. `edition_confirmed` is tri-state —
 Each image of a **specific named robot** must depict that exact robot. There is no
 `GENERATED` source — a synthesized/look-alike identity image is rejected by the
 importer. An image is only *displayed* when `identity_status = VERIFIED` **and**
-`rights_status ∈ {PERMITTED, ATTRIBUTION_REQUIRED}`; a non-null `image_url` is never
-sufficient. A robot with no honestly-clearable image simply has an empty `images`
-array → the UI shows `IMAGE_UNAVAILABLE` (never a placeholder fill).
+either `rights_status ∈ {PERMITTED, ATTRIBUTION_REQUIRED}` or a display-policy basis
+applies (`usage_basis ∈ {OFFICIAL_MANUFACTURER_MEDIA, OWNER_APPROVED_DISPLAY}`); a
+non-null `image_url` is never sufficient. A robot with no honestly-clearable image
+simply has an empty `images` array → the UI shows `IMAGE_UNAVAILABLE` (never a
+placeholder fill).
+
+**Display policy is not a licence.** `OWNER_APPROVED_DISPLAY` records that the
+platform owner decided to display an asset when **no source granted anything** —
+including a distributor's own photography, which `OFFICIAL_MANUFACTURER_MEDIA`
+would misdescribe. `rights_status` stays `UNKNOWN`, the original `source_name` /
+`source_url` / `attribution` stay on the row, and `display_approved_by` /
+`display_approved_at` record who decided and when. `RESTRICTED` still blocks.
+
+**Representative imagery.** `is_representative: true` marks an asset showing the
+product **line/chassis** rather than this exact edition. Such a row keeps
+`identity_status: "UNVERIFIED"` — exact-edition verification is not claimed — and is
+displayable only under `OWNER_APPROVED_DISPLAY` **with** a `representative_note`
+caption (e.g. `"H2 chassis shown; EDU package may vary."`), which the UI renders with
+the image. An unlabelled stand-in is ineligible, and an image that materially
+misrepresents the robot's appearance, hands or included equipment is rejected
+outright, caption or not.
 
 ```jsonc
 {

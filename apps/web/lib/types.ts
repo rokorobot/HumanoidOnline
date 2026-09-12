@@ -239,6 +239,11 @@ export interface RobotImage {
   is_official: boolean;
   is_primary: boolean;
   attribution?: string | null;
+  // The asset shows the product line/chassis, not this exact edition. When true
+  // the caption MUST be rendered with the image — an unlabelled stand-in reads
+  // as a claim about the exact edition (docs/09 §4).
+  is_representative?: boolean;
+  representative_note?: string | null;
 }
 
 export interface CompareRow {

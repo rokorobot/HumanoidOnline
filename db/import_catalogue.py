@@ -458,8 +458,9 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
             INSERT INTO robot_image
                 (robot_id, image_url, source_url, source_name, source_type, image_type,
                  identity_status, rights_status, usage_basis, is_official, is_primary,
-                 attribution, captured_at, last_verified_at)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                 attribution, is_representative, representative_note,
+                 display_approved_by, display_approved_at, captured_at, last_verified_at)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """,
             (
                 robot_id, im["image_url"], im.get("source_url"), im.get("source_name"),
@@ -468,7 +469,10 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
                 im.get("rights_status", "UNKNOWN"),
                 im.get("usage_basis", "NONE"),
                 im.get("is_official", False), im.get("is_primary", False),
-                im.get("attribution"), im.get("captured_at"), im.get("last_verified_at"),
+                im.get("attribution"),
+                im.get("is_representative", False), im.get("representative_note"),
+                im.get("display_approved_by"), im.get("display_approved_at"),
+                im.get("captured_at"), im.get("last_verified_at"),
             ),
         )
 

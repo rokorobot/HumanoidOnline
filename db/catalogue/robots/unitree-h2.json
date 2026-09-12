@@ -162,7 +162,23 @@
     }
   ],
   "use_case_fits": [],
-  "images": [],
+  "images": [
+    {
+      "image_url": "/robots/unitree-h2.png",
+      "source_url": "https://www.unitree.com/H2",
+      "source_name": "Unitree Robotics",
+      "source_type": "MANUFACTURER",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "UNKNOWN",
+      "usage_basis": "OFFICIAL_MANUFACTURER_MEDIA",
+      "is_official": true,
+      "is_primary": true,
+      "attribution": "© Unitree Robotics",
+      "is_representative": false,
+      "last_verified_at": "2026-09-12T00:00:00Z"
+    }
+  ],
   "spec_caveats": [
     {
       "field": "payload_kg",

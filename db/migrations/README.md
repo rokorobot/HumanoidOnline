@@ -212,13 +212,22 @@ Forward migrations:
   listing status and parent. `evidence_source.managed_by = 'CATALOGUE_IMPORT'`
   marks the MANUFACTURER evidence the importer wrote (the 0011
   `specification.managed_by` convention): a manufacturer import replaces only
-  those rows, so manually maintained company evidence survives. No backfill — a
-  pre-existing unmarked row is adopted on the next import only when every column
-  the importer writes matches a catalogue source and it has no `claim_fields`
-  (an untouched pre-marker import). An unmarked row that shares only the source's
-  URL, type and observed date is preserved and reported as an ambiguous collision. Additive (`ADD COLUMN IF NOT EXISTS`; dropping a
+  those rows. No backfill: rows written before the marker stay unmarked, and the
+  importer preserves every unmarked row exactly, whatever its content. One that
+  shares a catalogue source's URL, type and observed date is reported as a
+  collision that asserts no ownership. Additive (`ADD COLUMN IF NOT EXISTS`; dropping a
   NOT NULL/default is repeatable), so it is a no-op on databases already built
   from a `schema.sql` containing these objects.
+
+  **Historical note.** 0013 is applied history (production checksum
+  `fd20dc97…`), so its file is unchanged. Its header comment ("a pre-existing
+  importer row is adopted on the next import only when it matches a catalogue
+  source exactly") describes the importer as merged in PR #60, which deleted an
+  unmarked row and wrote a marked copy when every importer-written column matched
+  and the row had no `claim_fields`. That was a content match, not established
+  provenance. The importer no longer does this; the 2026-09-13 production effect
+  and its retrospective reconciliation are recorded in
+  `db/catalogue/MANUFACTURER_PROFILE_ROLLOUT.md`.
 
 ## Checksum integrity (WS8.2 / R9)
 

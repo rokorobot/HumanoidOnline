@@ -1,13 +1,13 @@
 """Company-evidence ownership against real Postgres.
 
-An unmarked MANUFACTURER evidence row (``managed_by IS NULL``) is either a row an
-import wrote before migration 0013 introduced the marker, or a row someone
-maintains by hand. Sharing a catalogue source's URL, type and observed date does
-not tell them apart: an editor may have corrected that very row. So the importer
-adopts an unmarked row ONLY when stronger provenance says it is an untouched
-pre-marker import — every column the importer writes equals the catalogue source
-and it carries no ``claim_fields`` (which only post-0013 writers set). Anything
-else is preserved and reported as an ambiguous collision.
+An unmarked MANUFACTURER evidence row (``managed_by IS NULL``) may have been
+written by an import that predates migration 0013's marker, or by someone by
+hand — and nothing in a row's content tells those apart. A row identical to a
+catalogue source is not proof the importer wrote it. So the importer takes
+ownership of NO unmarked row: every one is preserved exactly (content,
+ownership, subject), the catalogue keeps its own marked copy separately beside
+it, and an unmarked row sharing a source's URL, type and observed date is
+reported as a collision that asserts no ownership.
 
 Each test runs the importer's real SQL inside one transaction that is rolled
 back, so the shared database is left exactly as found and no seed fact changes.
@@ -28,8 +28,8 @@ _spec = importlib.util.spec_from_file_location(
 ic = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(ic)
 
-#: What an import that predates migration 0013 wrote for a catalogue source.
-LEGACY_SOURCE = {
+#: A company source as an import before migration 0013 would have written it.
+UNMARKED_SOURCE = {
     "source_url": "https://example.test/collision/company-profile",
     "source_type": "MANUFACTURER_SITE",
     "source_title": "Example Robotics official site",
@@ -41,7 +41,7 @@ LEGACY_SOURCE = {
     "note": "Company identity sourced from the official manufacturer site.",
 }
 #: The same source as the catalogue carries it today (now field-attributed).
-CATALOGUE_SOURCE = {**LEGACY_SOURCE, "claim_fields": ["legal_name"]}
+CATALOGUE_SOURCE = {**UNMARKED_SOURCE, "claim_fields": ["legal_name"]}
 
 ROW_COLUMNS = (
     "id, subject_type, subject_id, source_url, source_type, source_title, excerpt, "
@@ -72,7 +72,7 @@ def _manufacturer(cur) -> tuple[str, object]:
 
 
 def _unmarked_row(cur, mid, **overrides) -> object:
-    row = {**LEGACY_SOURCE, **overrides}
+    row = {**UNMARKED_SOURCE, **overrides}
     ic.insert_evidence(cur, "MANUFACTURER", mid, row)
     return cur.execute(
         "SELECT id FROM evidence_source WHERE subject_id=%s ORDER BY created_at DESC, id LIMIT 1",
@@ -91,24 +91,39 @@ def _import(cur, slug, sources):
     return ic.import_manufacturers(cur, data, lambda code: None)
 
 
-def _rows_for(cur, mid):
+def _managed_rows(cur, mid):
     return cur.execute(
-        "SELECT source_url, managed_by, claim_fields FROM evidence_source "
-        "WHERE subject_type='MANUFACTURER' AND subject_id=%s ORDER BY managed_by NULLS FIRST",
-        (mid,),
+        "SELECT id, source_url, claim_fields FROM evidence_source "
+        "WHERE subject_type='MANUFACTURER' AND subject_id=%s AND managed_by = %s",
+        (mid, ic.MANAGED_BY),
     ).fetchall()
 
 
-def test_untouched_pre_marker_import_row_is_adopted_not_duplicated(cur) -> None:
+def _assert_preserved_and_reported(cur, slug, mid, manual_id, runs) -> None:
+    before = _row(cur, manual_id)
+    results = [_import(cur, slug, [CATALOGUE_SOURCE]) for _ in range(runs)]
+
+    # Content, ownership (still unmarked) and subject are exactly as before.
+    assert _row(cur, manual_id) == before
+    for result in results:
+        assert "adopted" not in result
+        assert len(result["collisions"]) == 1
+        line = result["collisions"][0]
+        assert slug in line and UNMARKED_SOURCE["source_url"] in line
+        assert "ownership not assumed" in line
+        assert "importer" not in line  # the report claims no authorship
+    # The catalogue's own copy is kept separately, exactly once, however many runs.
+    managed = _managed_rows(cur, mid)
+    assert len(managed) == 1
+    assert managed[0][2] == ["legal_name"]
+
+
+def test_exact_content_unmarked_row_is_preserved_not_adopted(cur) -> None:
+    """Identical to the catalogue source in every importer-written column: still
+    not evidence of importer authorship, so it is kept and reported."""
     slug, mid = _manufacturer(cur)
-    _unmarked_row(cur, mid)
-
-    first = _import(cur, slug, [CATALOGUE_SOURCE])
-    second = _import(cur, slug, [CATALOGUE_SOURCE])
-
-    assert first["adopted"] == 1 and first["collisions"] == []
-    assert second["adopted"] == 0 and second["removed"] == 1 and second["collisions"] == []
-    assert _rows_for(cur, mid) == [(LEGACY_SOURCE["source_url"], ic.MANAGED_BY, ["legal_name"])]
+    manual_id = _unmarked_row(cur, mid)
+    _assert_preserved_and_reported(cur, slug, mid, manual_id, runs=3)
 
 
 @pytest.mark.parametrize(
@@ -118,42 +133,31 @@ def test_untouched_pre_marker_import_row_is_adopted_not_duplicated(cur) -> None:
         {"source_title": "Example Robotics — corrected page title"},
         {"confidence": "LOW"},
         {"verified_at": None},
+        {"claim_fields": ["legal_name"]},
     ],
-    ids=["note", "title", "confidence", "verified_at"],
+    ids=["note", "title", "confidence", "verified_at", "claim_fields"],
 )
-def test_manually_edited_row_sharing_url_type_and_date_survives_repeated_imports(
+def test_edited_unmarked_row_sharing_url_type_and_date_survives_repeated_imports(
     cur, edit
 ) -> None:
     slug, mid = _manufacturer(cur)
     manual_id = _unmarked_row(cur, mid, **edit)
-    before = _row(cur, manual_id)
-
-    runs = [_import(cur, slug, [CATALOGUE_SOURCE]) for _ in range(3)]
-
-    # Content, ownership (still unmarked) and relationship (same subject) intact.
-    assert _row(cur, manual_id) == before
-    for run in runs:
-        assert run["adopted"] == 0
-        assert len(run["collisions"]) == 1
-        assert LEGACY_SOURCE["source_url"] in run["collisions"][0]
-        assert slug in run["collisions"][0]
-    # The catalogue's own copy exists exactly once beside it — never duplicated.
-    marked = [r for r in _rows_for(cur, mid) if r[1] == ic.MANAGED_BY]
-    assert len(marked) == 1
+    _assert_preserved_and_reported(cur, slug, mid, manual_id, runs=3)
 
 
-def test_unmarked_row_carrying_claim_fields_is_never_treated_as_legacy(cur) -> None:
-    """Identical content, but `claim_fields` only exist since 0013: someone
-    attributed this row by hand, so it is not a pre-marker import."""
+def test_repeated_imports_replace_only_catalogue_managed_rows(cur) -> None:
+    """No unmarked row present: the managed copy is replaced on each run, never
+    duplicated, and nothing is reported."""
     slug, mid = _manufacturer(cur)
-    manual_id = _unmarked_row(cur, mid, claim_fields=["legal_name"])
-    before = _row(cur, manual_id)
-
-    result = _import(cur, slug, [CATALOGUE_SOURCE])
-
-    assert _row(cur, manual_id) == before
-    assert result["adopted"] == 0
-    assert len(result["collisions"]) == 1
+    ids = []
+    for run in range(3):
+        result = _import(cur, slug, [CATALOGUE_SOURCE])
+        assert result["collisions"] == []
+        assert result["removed"] == (0 if run == 0 else 1)
+        managed = _managed_rows(cur, mid)
+        assert len(managed) == 1
+        ids.append(managed[0][0])
+    assert len(set(ids)) == 3  # re-inserted each run, one row at a time
 
 
 def test_unrelated_manual_row_is_preserved_without_a_collision(cur) -> None:
@@ -169,3 +173,4 @@ def test_unrelated_manual_row_is_preserved_without_a_collision(cur) -> None:
         assert result["collisions"] == []
 
     assert _row(cur, manual_id) == before
+    assert len(_managed_rows(cur, mid)) == 1

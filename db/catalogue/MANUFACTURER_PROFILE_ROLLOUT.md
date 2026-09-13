@@ -111,11 +111,14 @@ DATABASE_URL="<production URL>" uv run db/import_catalogue.py --manufacturers-on
 DATABASE_URL="<production URL>" uv run db/validate_catalogue.py
 ```
 Record `import_finished_at`. Review the output:
-- `pre-marker importer row(s) adopted` — unmarked rows provably written by an
-  earlier import (every importer-written column matches, no `claim_fields`).
-- `AMBIGUOUS EVIDENCE COLLISION (preserved, not adopted)` lines — an unmarked row
-  shares a catalogue source's URL/type/date but not its content. It was kept as
-  it is. **Stop and report each one** before treating the rollout as complete.
+- `unmarked row(s) preserved` — company evidence without the
+  `CATALOGUE_IMPORT` marker. The importer never deletes, rewrites or takes
+  ownership of these rows, whatever their content.
+- `EVIDENCE COLLISION (unmarked row preserved, ownership not assumed)` lines — an
+  unmarked row shares a catalogue source's URL, type and observed date (exact
+  content or edited). It was kept as it is and the catalogue's own copy was
+  written beside it. The line asserts nothing about who wrote the row.
+  **Stop and report each one** before treating the rollout as complete.
 - `validate_catalogue.py` must print the three OK lines.
 
 ### 8. Verify the API content
@@ -204,7 +207,7 @@ DELETE FROM evidence_source e
  WHERE e.subject_type = 'MANUFACTURER' AND e.managed_by = 'CATALOGUE_IMPORT'
    AND NOT EXISTS (SELECT 1 FROM bk_manufacturer_evidence b WHERE b.id = e.id);
 
--- Pre-import company evidence the import replaced or adopted, restored byte-for-byte.
+-- Pre-import company evidence the import replaced, restored byte-for-byte.
 INSERT INTO evidence_source
 SELECT * FROM bk_manufacturer_evidence b
  WHERE NOT EXISTS (SELECT 1 FROM evidence_source e WHERE e.id = b.id);
@@ -237,3 +240,46 @@ Restoring the step 1 checkpoint discards **every** write made after it — leads
 buyer requirements, discovery and freshness data included. Use it only when damage
 extends beyond manufacturer data and scoped recovery cannot repair it, and only by
 explicit owner decision with a plan for reconciling the intervening writes.
+
+## Record: 2026-09-13 production rollout and evidence-ownership reconciliation
+
+The rollout completed on 2026-09-13: migration 0013 applied at 17:52:27 UTC, PR #60
+merged as `496eef2`, and `--manufacturers-only` ran from that commit at
+18:04:52–18:05:03 UTC. It wrote 29 manufacturer profiles and 62 catalogue-managed
+company-evidence rows. No robot, publication, image or unrelated record changed.
+
+**What the deployed importer did with pre-existing company evidence.** The
+importer at `496eef2` treated an unmarked row as its own when every importer-written
+column (URL, type, title, excerpt, published/observed/verified dates, confidence,
+note) matched a catalogue source and the row had no `claim_fields`. It deleted such
+rows and wrote marked copies. Production had six unmarked rows, all matching, so all
+six were replaced (1X, Agility Robotics, Apptronik, Engineered Arts, Figure, Unitree).
+The import output called them "pre-marker importer row(s) adopted".
+
+**That rule did not establish provenance.** It was a content match. A hand-entered
+row with identical content would have been treated the same way, so the output's
+claim that these were importer rows was not something the importer verified.
+
+**Retrospective evidence does support the six rows' importer origin.** Checked
+read-only against Neon checkpoint branches after the rollout:
+- Each of the six carried the exact `created_at` of robot-level evidence written in
+  the same catalogue-import transaction. PostgreSQL gives every row inserted in one
+  transaction the same `now()`, and five rows date from the 2026-08-19 00:01:28.988428
+  initial import.
+- The Unitree row received a new id and exactly that import's timestamp each time
+  Unitree was re-imported on 2026-09-12 (10:10:26, 13:20:10, 13:43:24). That is the
+  earlier importer's delete-and-reinsert pattern.
+
+A field-by-field comparison with the pre-import backup found no substantive change.
+Each row received a new id, `managed_by = 'CATALOGUE_IMPORT'` and `claim_fields`.
+Four of them carry `verified_at = 2026-07-24` (1X, Agility Robotics, Engineered Arts,
+Unitree) and are now catalogue-managed, so a future import re-creates them from
+`manufacturers.json`. They were equally replaceable before 0013, when every full
+import deleted all company evidence. The six rows and all profile data are left as
+they are.
+
+**Correction.** The importer no longer takes ownership of any unmarked row. Every
+unmarked row is preserved exactly, including exact-content matches, and a row that
+shares a catalogue source's URL, type and observed date is reported as a collision
+that asserts no ownership. The catalogue keeps its own marked copy beside it.
+Migration 0013 is unchanged; see `db/migrations/README.md` for its historical note.

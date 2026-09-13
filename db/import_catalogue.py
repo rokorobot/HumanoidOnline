@@ -146,6 +146,9 @@ SOURCE_TYPES = frozenset({
 CONFIDENCE_LEVELS = frozenset({"LOW", "MEDIUM", "HIGH", "VERIFIED"})
 #: docs/26 §3.1 fixed provenance statement prefix.
 AGENT_RETRIEVAL_PREFIX = "RETRIEVAL: AGENT_ASSISTED_RESEARCH"
+#: Printed for an unmarked company-evidence row sharing a catalogue source's
+#: URL, type and observed date. Deliberately says nothing about who wrote it.
+EVIDENCE_COLLISION_LABEL = "EVIDENCE COLLISION (unmarked row preserved, ownership not assumed)"
 
 
 def _asserted(m: dict, field: str) -> bool:
@@ -240,47 +243,23 @@ def replace_manufacturer_evidence(cur, manufacturer_id, evidence: list[dict]) ->
     * `managed_by = CATALOGUE_IMPORT` rows are the importer's: deleted, then the
       catalogue's rows are re-inserted with that marker, so repeated runs never
       duplicate them.
-    * An UNMARKED row is adopted (replaced by its marked copy) only when stronger
-      provenance shows it is an untouched row written by an import that predates
-      the marker (migration 0013): EVERY column the importer writes (URL, type,
-      title, excerpt, published/observed/verified dates, confidence, note) equals
-      this catalogue source, and it carries no `claim_fields`, which only
-      post-0013 writers set. URL, type and date alone never establish ownership.
+    * Every UNMARKED row is preserved exactly as it is: content, ownership and
+      subject. The importer never deletes, rewrites or takes ownership of one.
+      Row content says nothing reliable about who wrote a row, so even an
+      unmarked row identical to a catalogue source is left alone; the
+      catalogue's own marked copy is maintained separately beside it.
     * An unmarked row that shares a catalogue source's URL, type and observed
-      date but differs in any of that content was edited, or written by someone
-      else. It is PRESERVED and returned as an ambiguous collision: never adopted,
-      never overwritten.
-    * Every other unmarked row is manually maintained and is left in place.
+      date (whether its other content matches or not) is reported as a
+      collision. The report asserts no ownership; resolving it is an owner
+      decision, never an import side effect.
     """
     removed = _rowcount(cur.execute(
         "DELETE FROM evidence_source "
         "WHERE subject_type='MANUFACTURER' AND subject_id=%s AND managed_by = %s",
         (manufacturer_id, MANAGED_BY),
     ))
-    adopted = 0
     collisions: list[str] = []
     for ev in evidence:
-        adopted += _rowcount(cur.execute(
-            """
-            DELETE FROM evidence_source
-            WHERE subject_type='MANUFACTURER' AND subject_id=%s
-              AND managed_by IS NULL AND claim_fields IS NULL
-              AND source_url IS NOT DISTINCT FROM %s AND source_type = %s
-              AND source_title IS NOT DISTINCT FROM %s
-              AND excerpt IS NOT DISTINCT FROM %s
-              AND published_at IS NOT DISTINCT FROM %s::date
-              AND observed_at::date IS NOT DISTINCT FROM %s::date
-              AND verified_at::date IS NOT DISTINCT FROM %s::date
-              AND confidence = %s
-              AND note IS NOT DISTINCT FROM %s
-            """,
-            (
-                manufacturer_id, ev.get("source_url"), ev["source_type"],
-                ev.get("source_title"), ev.get("excerpt"), ev.get("published_at"),
-                ev.get("observed_at"), ev.get("verified_at"),
-                ev.get("confidence", "MEDIUM"), ev.get("note"),
-            ),
-        ))
         shared = cur.execute(
             """
             SELECT count(*) FROM evidence_source
@@ -293,11 +272,10 @@ def replace_manufacturer_evidence(cur, manufacturer_id, evidence: list[dict]) ->
         if shared:
             collisions.append(
                 f"{ev.get('source_url')} ({shared} unmarked row(s) share its URL, type "
-                "and observed date but not its importer-written content)"
+                "and observed date; preserved, ownership not assumed)"
             )
         insert_evidence(cur, "MANUFACTURER", manufacturer_id, ev, managed_by=MANAGED_BY)
-    return {"removed": removed, "adopted": adopted, "inserted": len(evidence),
-            "collisions": collisions}
+    return {"removed": removed, "inserted": len(evidence), "collisions": collisions}
 
 
 # --------------------------------------------------------------------------- #
@@ -331,10 +309,9 @@ def import_manufacturers(cur, data: dict, region_id) -> dict:
 
     Shared by the full catalogue import and `--manufacturers-only`, so both write
     manufacturer data identically. Returns summed evidence counts and every
-    ambiguous evidence collision (`slug: source_url (...)`).
+    evidence collision with an unmarked row (`slug: source_url (...)`).
     """
-    totals: dict = {"manufacturers": 0, "removed": 0, "adopted": 0, "inserted": 0,
-                    "collisions": []}
+    totals: dict = {"manufacturers": 0, "removed": 0, "inserted": 0, "collisions": []}
     for m in data["manufacturers"]:
         mid = cur.execute(
             """
@@ -380,7 +357,7 @@ def import_manufacturers(cur, data: dict, region_id) -> dict:
         # manually maintained rows survive (see replace_manufacturer_evidence).
         counts = replace_manufacturer_evidence(cur, mid, m.get("evidence") or [])
         totals["manufacturers"] += 1
-        for key in ("removed", "adopted", "inserted"):
+        for key in ("removed", "inserted"):
             totals[key] += counts[key]
         totals["collisions"].extend(f"{m['slug']}: {line}" for line in counts["collisions"])
     return totals
@@ -1036,7 +1013,7 @@ def run(url: str, *, apply_publication_state: bool = False,
     if collisions:
         print(f"{len(collisions)} unmanaged record(s) preserved on logical-key collision.")
     for line in manufacturer_totals["collisions"]:
-        print(f"AMBIGUOUS EVIDENCE COLLISION (preserved, not adopted): {line}")
+        print(f"{EVIDENCE_COLLISION_LABEL}: {line}")
     if apply_publication_state:
         print("Publication state was REWRITTEN from JSON (--apply-publication-state).")
 
@@ -1094,15 +1071,13 @@ def run_manufacturers_only(url: str, *, manufacturers_path: Path | None = None) 
     totals["preserved"] = preserved
     print(f"MANUFACTURER-ONLY IMPORT OK: {totals['manufacturers']} "
           "manufacturer profile(s) upserted.")
-    print(f"Company evidence: {totals['inserted']} catalogue row(s) written, "
-          f"{totals['removed']} previous importer row(s) replaced, "
-          f"{totals['adopted']} pre-marker importer row(s) adopted, "
+    print(f"Company evidence: {totals['inserted']} catalogue-managed row(s) written, "
+          f"{totals['removed']} previous catalogue-managed row(s) replaced, "
           f"{preserved} unmarked row(s) preserved, "
-          f"{len(totals['collisions'])} ambiguous collision(s).")
-    # Preserved, never adopted: an unmarked row sharing a source's URL/type/date
-    # but not its content may be an editor's correction. Saying so is the point.
+          f"{len(totals['collisions'])} collision(s) with unmarked rows.")
+    # Reported, never resolved here: content cannot show who wrote an unmarked row.
     for line in totals["collisions"]:
-        print(f"AMBIGUOUS EVIDENCE COLLISION (preserved, not adopted): {line}")
+        print(f"{EVIDENCE_COLLISION_LABEL}: {line}")
     print("Robot records, publication state and robot-level evidence were not read or written.")
     return totals
 

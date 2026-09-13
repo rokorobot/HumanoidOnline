@@ -10,10 +10,9 @@ does not:
   anything connects;
 * robot files are never read, and no statement touches a robot-side table,
   providers or regions;
-* only the importer's own MANUFACTURER evidence is replaced — manually maintained
-  rows survive; an unmarked row is adopted only when its full importer-written
-  content matches (provably an untouched pre-marker import), and a row that
-  merely shares a source's URL/type/date is preserved and reported;
+* only the importer's own (catalogue-managed) MANUFACTURER evidence is replaced —
+  every unmarked row survives untouched, and one sharing a source's URL/type/date
+  is reported as a collision without any claim about who wrote it;
 * invalid data or an unknown region aborts before the first write, and a failure
   mid-import is never committed.
 
@@ -196,9 +195,7 @@ def test_manufacturers_only_reads_no_robot_file_and_writes_only_company_rows(
     assert connection.committed
 
 
-def test_company_evidence_refresh_spares_manual_rows_and_adopts_pre_marker_rows(
-    connection,
-) -> None:
+def test_company_evidence_refresh_deletes_only_catalogue_managed_rows(connection) -> None:
     ic.run_manufacturers_only("postgresql://unused")
     deletes = [
         (sql, p) for _, sql, p in connection.writes()
@@ -206,20 +203,14 @@ def test_company_evidence_refresh_spares_manual_rows_and_adopts_pre_marker_rows(
     ]
     assert deletes, "no evidence refresh happened"
     for sql, params in deletes:
+        # Only the importer's own marked rows — never an unmarked row, whatever
+        # its content.
         assert "subject_type='MANUFACTURER'" in sql
-        # Either the importer's own rows, or an unmarked row whose EVERY
-        # importer-written column matches and that carries no claim_fields —
-        # never a delete keyed on URL/type/date alone.
-        assert ("managed_by = %s" in sql and params[-1] == ic.MANAGED_BY) or (
-            "managed_by IS NULL" in sql
-            and "claim_fields IS NULL" in sql
-            and "source_type = %s" in sql
-            and "confidence = %s" in sql
-            and all(
-                f"{column} IS NOT DISTINCT FROM %s" in sql
-                for column in ("source_url", "source_title", "excerpt", "note")
-            )
-        ), sql
+        assert "managed_by = %s" in sql and params[-1] == ic.MANAGED_BY, sql
+        assert "managed_by IS NULL" not in sql, sql
+    assert not any(
+        sql.startswith("UPDATE evidence_source") for _, sql, _ in connection.writes()
+    )
     inserts = [
         p for _, sql, p in connection.writes()
         if sql.startswith("INSERT INTO evidence_source")
@@ -312,7 +303,7 @@ def test_a_failure_mid_import_is_never_committed(monkeypatch) -> None:
     assert conn.exited_with is RuntimeError
 
 
-def test_ambiguous_collisions_are_reported_and_never_adopted(monkeypatch, capsys) -> None:
+def test_collisions_are_reported_without_asserting_ownership(monkeypatch, capsys) -> None:
     class CollidingCursor(_Cursor):
         def fetchone(self):
             # An unmarked row shares every catalogue source's URL/type/date.
@@ -332,4 +323,6 @@ def test_ambiguous_collisions_are_reported_and_never_adopted(monkeypatch, capsys
     expected = sum(len(m.get("evidence") or []) for m in MANUFACTURERS["manufacturers"])
     assert len(totals["collisions"]) == expected
     out = capsys.readouterr().out
-    assert out.count("AMBIGUOUS EVIDENCE COLLISION (preserved, not adopted)") == expected
+    assert out.count(ic.EVIDENCE_COLLISION_LABEL) == expected
+    assert "adopted" not in out
+    assert "pre-marker importer" not in out

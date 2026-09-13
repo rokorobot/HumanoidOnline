@@ -35,6 +35,12 @@
 --     replaces only its own rows; manually maintained evidence (NULL) survives.
 --     No backfill: a pre-existing importer row is adopted on the next import
 --     only when it matches a catalogue source exactly.
+--
+-- The schema is named explicitly, as in 0001-0004 and 0008-0010. A role's default
+-- search_path ("$user", public) only reaches the `humanoid` schema when the role
+-- is itself called `humanoid`; the production role is not.
+
+SET search_path TO humanoid, public;
 
 ALTER TABLE manufacturer ALTER COLUMN is_public_company DROP NOT NULL;
 ALTER TABLE manufacturer ALTER COLUMN is_public_company DROP DEFAULT;

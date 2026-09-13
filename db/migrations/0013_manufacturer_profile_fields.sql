@@ -28,6 +28,13 @@
 --  5. FIELD ATTRIBUTION. `evidence_source.claim_fields` names the profile
 --     fields a MANUFACTURER evidence row supports, so each company fact can be
 --     attributed to its source. NULL on every pre-existing row (no claim made).
+--
+--  6. EVIDENCE OWNERSHIP. `evidence_source.managed_by` = 'CATALOGUE_IMPORT' marks
+--     the MANUFACTURER evidence rows db/import_catalogue.py wrote, following the
+--     `specification.managed_by` convention of 0011. A manufacturer import
+--     replaces only its own rows; manually maintained evidence (NULL) survives.
+--     No backfill: a pre-existing importer row is adopted on the next import
+--     only when it matches a catalogue source exactly.
 
 ALTER TABLE manufacturer ALTER COLUMN is_public_company DROP NOT NULL;
 ALTER TABLE manufacturer ALTER COLUMN is_public_company DROP DEFAULT;
@@ -41,6 +48,7 @@ ALTER TABLE manufacturer ADD COLUMN IF NOT EXISTS parent_relationship TEXT;
 ALTER TABLE manufacturer ADD COLUMN IF NOT EXISTS deployment_note     TEXT;
 
 ALTER TABLE evidence_source ADD COLUMN IF NOT EXISTS claim_fields TEXT[];
+ALTER TABLE evidence_source ADD COLUMN IF NOT EXISTS managed_by   TEXT;
 
 COMMENT ON COLUMN manufacturer.country_region_id IS
     'Headquarters country. Not the incorporation jurisdiction and not an operating '

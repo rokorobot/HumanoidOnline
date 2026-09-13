@@ -60,6 +60,6 @@ MIGRATIONS: dict[str, str] = {
         "2fad27ad99cae091ef7c82dab01e02590b83193aec4c678d14a792a259ec7cdb"
     ),
     "0013_manufacturer_profile_fields": (
-        "0621762d420f613ef1210df226d35ac0b609128e8a56992666f2a1490fc56a23"
+        "25c0d646d47f78e4e1dda2f25550e3c468870df3e791e39ac898c4f7b322ff35"
     ),
 }

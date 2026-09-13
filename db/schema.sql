@@ -763,6 +763,7 @@ CREATE TABLE evidence_source (
     confidence    confidence_level NOT NULL DEFAULT 'MEDIUM',
     note          TEXT,
     claim_fields  TEXT[],                -- MANUFACTURER rows: profile fields supported
+    managed_by    TEXT,                  -- 'CATALOGUE_IMPORT' = written by the importer
     created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 COMMENT ON TABLE evidence_source IS

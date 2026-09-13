@@ -307,6 +307,9 @@ export interface ManufacturerSource {
   retrieval?: string | null;
 }
 
+// Fields added with migration 0013 are OPTIONAL here on purpose: the previous
+// API (still serving while a web deploy goes live first) does not return them.
+// Read them through `manufacturerProfileView` (lib/manufacturer-profile.ts).
 export interface ManufacturerDetail {
   id: string;
   slug: string;
@@ -316,11 +319,11 @@ export interface ManufacturerDetail {
   country?: string | null;
   headquarters_city?: string | null;
   incorporation?: string | null;
-  operating_locations: string[];
+  operating_locations?: string[] | null;
   website_url?: string | null;
   founded_year?: number | null;
   description?: string | null;
-  target_markets: string[];
+  target_markets?: string[] | null;
   commercial_model?: string | null;
   // Humanoid deployment status and the basis it rests on.
   deployment_status?: string | null;
@@ -331,12 +334,12 @@ export interface ManufacturerDetail {
   parent_company?: string | null;
   parent_listing?: string | null;
   parent_relationship?: string | null;
-  tracked_robot_count: number;
-  published_robot_count: number;
+  tracked_robot_count?: number | null;
+  published_robot_count?: number | null;
   robots: ManufacturerRobot[];
   providers: Provider[];
   deployments: ManufacturerDeployment[];
-  sources: ManufacturerSource[];
+  sources?: ManufacturerSource[] | null;
 }
 
 export interface UseCaseListItem {

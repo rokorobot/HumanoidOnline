@@ -209,7 +209,14 @@ Forward migrations:
   `deployment_note` stating what it rests on. `evidence_source.claim_fields`
   names the profile fields a MANUFACTURER evidence row supports, and
   `db/validate_catalogue.py` requires one for every asserted deployment status,
-  listing status and parent. Additive (`ADD COLUMN IF NOT EXISTS`; dropping a
+  listing status and parent. `evidence_source.managed_by = 'CATALOGUE_IMPORT'`
+  marks the MANUFACTURER evidence the importer wrote (the 0011
+  `specification.managed_by` convention): a manufacturer import replaces only
+  those rows, so manually maintained company evidence survives. No backfill — a
+  pre-existing unmarked row is adopted on the next import only when every column
+  the importer writes matches a catalogue source and it has no `claim_fields`
+  (an untouched pre-marker import). An unmarked row that shares only the source's
+  URL, type and observed date is preserved and reported as an ambiguous collision. Additive (`ADD COLUMN IF NOT EXISTS`; dropping a
   NOT NULL/default is repeatable), so it is a no-op on databases already built
   from a `schema.sql` containing these objects.
 

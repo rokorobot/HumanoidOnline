@@ -28,7 +28,9 @@ db/catalogue/
                             claim_fields naming the profile fields it supports;
                             field meanings in docs/03 §8)
   robots/<slug>.json     <- one file per robot, with every commercial fact + its evidence
-db/import_catalogue.py   <- self-contained UPSERT importer (PEP 723 uv script)
+db/import_catalogue.py   <- self-contained UPSERT importer (PEP 723 uv script);
+                            --manufacturers-only imports manufacturer profiles and
+                            their company evidence ONLY (no robot file read)
 db/validate_catalogue.py <- catalogue-level G2 gate (PEP 723 uv script)
 ```
 

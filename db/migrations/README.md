@@ -196,6 +196,30 @@ Forward migrations:
   and rows written before it keep their meaning unchanged.
   Additive and idempotent.
 
+- `0013_manufacturer_profile_fields.sql` — lets a manufacturer profile state
+  company facts without collapsing them. `is_public_company` loses its
+  `NOT NULL DEFAULT FALSE`: NULL now means *listing status unknown*, and the
+  importer no longer fills FALSE for a missing key, so "not researched" can no
+  longer render as "PUBLIC CO.: NO". `parent_company`, `parent_listing` and
+  `parent_relationship` record a listed parent separately from the entity's own
+  status (`funding_status` is deliberately not reused). `country_region_id` is
+  documented as the **headquarters** country; `headquarters_city`,
+  `incorporation` and `operating_locations` keep the other location facts
+  distinct. `deployment_status` is scoped to humanoid deployment, with
+  `deployment_note` stating what it rests on. `evidence_source.claim_fields`
+  names the profile fields a MANUFACTURER evidence row supports, and
+  `db/validate_catalogue.py` requires one for every asserted deployment status,
+  listing status and parent. `evidence_source.managed_by = 'CATALOGUE_IMPORT'`
+  marks the MANUFACTURER evidence the importer wrote (the 0011
+  `specification.managed_by` convention): a manufacturer import replaces only
+  those rows, so manually maintained company evidence survives. No backfill — a
+  pre-existing unmarked row is adopted on the next import only when every column
+  the importer writes matches a catalogue source and it has no `claim_fields`
+  (an untouched pre-marker import). An unmarked row that shares only the source's
+  URL, type and observed date is preserved and reported as an ambiguous collision. Additive (`ADD COLUMN IF NOT EXISTS`; dropping a
+  NOT NULL/default is repeatable), so it is a no-op on databases already built
+  from a `schema.sql` containing these objects.
+
 ## Checksum integrity (WS8.2 / R9)
 
 `schema_migrations` stores a `sha256` for every applied file, and

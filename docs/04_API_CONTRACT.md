@@ -131,8 +131,12 @@ Full detail. Response `200` (abbreviated):
 
 ## 2. Manufacturers
 
-### `GET /api/manufacturers` — index: `{items: [{slug, name, country, robot_count, deployment_status}], total, ...}`
-### `GET /api/manufacturers/{slug}` — profile + `robots: []` portfolio + `providers: []` + `deployments: []`. `404` unknown.
+### `GET /api/manufacturers` — index: `{items: [{slug, name, country, tracked_robot_count, published_robot_count, deployment_status, portfolio_status, updated_at}], total, ...}`
+`country` is the **headquarters** country (null = unresolved). `tracked_robot_count` counts every catalogue record; `published_robot_count` the published subset. `portfolio_status` is derived from **published** records only (null when none are published; `DISCONTINUED` only when every published record is discontinued) — it never describes unpublished records or the company.
+
+### `GET /api/manufacturers/{slug}` — profile + `robots: []` (published only) + `providers: []` + `deployments: []` + `sources: []`. `404` unknown.
+Profile fields: `legal_name`, `country` (headquarters), `headquarters_city`, `incorporation`, `operating_locations[]`, `founded_year`, `website_url`, `description`, `target_markets[]`, `commercial_model`, `deployment_status` (humanoid deployment, `commercial_status` vocabulary) + `deployment_note`, `is_public_company` (**nullable** — null = unknown, never "no"; describes this entity only), `ticker`, `parent_company` / `parent_listing` / `parent_relationship` (listed-parent ownership, kept separate), `tracked_robot_count`, `published_robot_count`.
+`sources[]`: `{claim_fields[], source_type, source_title, source_url, published_at, observed_at, verified_at, confidence, retrieval}` — company-level evidence and the profile fields each supports. `retrieval = "AGENT_ASSISTED_RESEARCH"` marks agent-retrieved sources (docs/26); `verified_at` stays null until a human verifies.
 
 ## 3. Use cases
 

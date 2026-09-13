@@ -10,7 +10,7 @@ import uuid
 from datetime import date, datetime
 
 from sqlalchemy import Date, DateTime, Text, text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -38,6 +38,12 @@ class EvidenceSource(Base):
         confidence_level, nullable=False, server_default=text("'MEDIUM'")
     )
     note: Mapped[str | None] = mapped_column(Text)
+    #: MANUFACTURER rows: the profile fields this source supports (migration
+    #: 0013). NULL on every other row — no field claim is made.
+    claim_fields: Mapped[list[str] | None] = mapped_column(ARRAY(Text))
+    #: 'CATALOGUE_IMPORT' on MANUFACTURER rows db/import_catalogue.py wrote
+    #: (migration 0013). NULL = manually maintained; the importer never deletes it.
+    managed_by: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("now()"), nullable=False
     )

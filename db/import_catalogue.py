@@ -18,6 +18,17 @@ IDEMPOTENCY MODEL
     have no natural key, so on each import they are DELETED for that robot and
     re-inserted from the JSON. This "replace children" pass keeps the import
     fully idempotent while honouring UPSERT-by-slug for the parents.
+  - Manufacturer company evidence is replaced only where this importer owns it
+    (`evidence_source.managed_by = 'CATALOGUE_IMPORT'`, migration 0013);
+    manually maintained MANUFACTURER evidence is never deleted.
+
+MANUFACTURER-ONLY MODE (`--manufacturers-only`)
+  Imports manufacturer profiles and their company-level evidence and nothing
+  else: robot files are not read, and robots, publication state,
+  specifications, offers, capabilities, variants, deployments, images,
+  providers, regions and robot-level evidence are not written. The data and its
+  source attribution are validated before the transaction opens; the write is a
+  single transaction. It is the production rollout path for manufacturer data.
 
 NULL / UNKNOWN (AGENTS.md rule 6): every field absent or null in the JSON is
 written as SQL NULL — never coerced to 0, false or a made-up value.
@@ -81,21 +92,212 @@ def _load(path: Path) -> dict:
 # --------------------------------------------------------------------------- #
 # Evidence helper
 # --------------------------------------------------------------------------- #
-def insert_evidence(cur, subject_type: str, subject_id, ev: dict) -> None:
+def insert_evidence(cur, subject_type: str, subject_id, ev: dict,
+                    *, managed_by: str | None = None) -> None:
     cur.execute(
         """
         INSERT INTO evidence_source
             (subject_type, subject_id, source_url, source_type, source_title,
-             excerpt, published_at, observed_at, verified_at, confidence, note)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+             excerpt, published_at, observed_at, verified_at, confidence, note,
+             claim_fields, managed_by)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         """,
         (
             subject_type, subject_id,
             ev.get("source_url"), ev["source_type"], ev.get("source_title"),
             ev.get("excerpt"), ev.get("published_at"), ev.get("observed_at"),
             ev.get("verified_at"), ev.get("confidence", "MEDIUM"), ev.get("note"),
+            # MANUFACTURER rows name the profile fields they support (migration
+            # 0013); every other row makes no field claim.
+            ev.get("claim_fields"),
+            managed_by,
         ),
     )
+
+
+def _rowcount(result) -> int:
+    """Rows affected by the statement just executed (0 when not reported)."""
+    count = getattr(result, "rowcount", 0) or 0
+    return count if count > 0 else 0
+
+
+# --------------------------------------------------------------------------- #
+# Manufacturer profiles: validation and company-level evidence ownership
+# --------------------------------------------------------------------------- #
+#: Company facts that must be attributed to an evidence row whenever they are
+#: asserted (docs/03 §8). `website_url` may be claimed but predates attribution.
+MANUFACTURER_ATTRIBUTED_FIELDS = (
+    "legal_name", "country_region_code", "headquarters_city", "incorporation",
+    "operating_locations", "founded_year", "description", "target_markets",
+    "commercial_model", "deployment_status", "deployment_note",
+    "is_public_company", "ticker", "parent_company", "parent_listing",
+    "parent_relationship",
+)
+MANUFACTURER_CLAIMABLE_FIELDS = frozenset(MANUFACTURER_ATTRIBUTED_FIELDS) | {"website_url"}
+COMMERCIAL_STATUSES = frozenset({
+    "UNKNOWN", "ANNOUNCED", "DEVELOPMENT", "PROTOTYPE", "PILOT", "EARLY_ACCESS",
+    "LIMITED_COMMERCIAL", "COMMERCIAL", "RAAS_DEPLOYMENT", "DISCONTINUED",
+})
+SOURCE_TYPES = frozenset({
+    "MANUFACTURER_STORE", "MANUFACTURER_SITE", "PRESS_RELEASE", "NEWS_ARTICLE",
+    "ANALYST_REPORT", "FINANCIAL_FILING", "DIRECT_QUOTE", "CONFERENCE",
+    "INTERVIEW", "OTHER",
+})
+CONFIDENCE_LEVELS = frozenset({"LOW", "MEDIUM", "HIGH", "VERIFIED"})
+#: docs/26 §3.1 fixed provenance statement prefix.
+AGENT_RETRIEVAL_PREFIX = "RETRIEVAL: AGENT_ASSISTED_RESEARCH"
+
+
+def _asserted(m: dict, field: str) -> bool:
+    value = m.get(field)
+    if value is None or value == [] or value == "":
+        return False
+    # UNKNOWN is the explicit absence of a status claim (docs/03 §7).
+    return not (field == "deployment_status" and value == "UNKNOWN")
+
+
+def validate_manufacturer_profiles(data: dict) -> list[str]:
+    """Every reason `manufacturers.json` must not be written, or [] when clean.
+
+    Pure (no database): the vocabularies, the three-state listing rule and the
+    source-attribution rule `db/validate_catalogue.py` enforces after an import,
+    checked BEFORE one, so an invalid profile never reaches a transaction.
+    """
+    rows = data.get("manufacturers")
+    if not isinstance(rows, list) or not rows:
+        return ["manufacturers.json has no non-empty 'manufacturers' list"]
+
+    errors: list[str] = []
+    seen: set[str] = set()
+    for i, m in enumerate(rows):
+        slug = m.get("slug")
+        where = slug if isinstance(slug, str) and slug.strip() else f"manufacturers[{i}]"
+        if where != slug:
+            errors.append(f"{where}: missing slug")
+        elif slug in seen:
+            errors.append(f"{slug}: duplicate slug")
+        else:
+            seen.add(slug)
+        if not isinstance(m.get("name"), str) or not m["name"].strip():
+            errors.append(f"{where}: missing name")
+
+        status = m.get("deployment_status")
+        if status is not None and status not in COMMERCIAL_STATUSES:
+            errors.append(f"{where}: deployment_status {status!r} is not a commercial_status")
+        listed = m.get("is_public_company")
+        if listed not in (True, False, None):
+            errors.append(f"{where}: is_public_company must be true, false or null")
+        if m.get("ticker") and listed is not True:
+            errors.append(f"{where}: ticker given for an entity not recorded as listed")
+        has_parent_detail = m.get("parent_listing") or m.get("parent_relationship")
+        if has_parent_detail and not m.get("parent_company"):
+            errors.append(f"{where}: parent listing/relationship without parent_company")
+        year = m.get("founded_year")
+        if year is not None and (isinstance(year, bool) or not isinstance(year, int)
+                                 or not 1900 <= year <= 2100):
+            errors.append(f"{where}: founded_year {year!r} outside 1900-2100")
+        for field in ("operating_locations", "target_markets"):
+            value = m.get(field)
+            if value is not None and not (
+                isinstance(value, list) and all(isinstance(v, str) for v in value)
+            ):
+                errors.append(f"{where}: {field} must be a list of strings")
+
+        claimed: set[str] = set()
+        for j, ev in enumerate(m.get("evidence") or []):
+            at = f"{where} evidence[{j}]"
+            if ev.get("source_type") not in SOURCE_TYPES:
+                errors.append(f"{at}: source_type {ev.get('source_type')!r} is not a source_type")
+            if ev.get("confidence", "MEDIUM") not in CONFIDENCE_LEVELS:
+                errors.append(
+                    f"{at}: confidence {ev.get('confidence')!r} is not a confidence_level"
+                )
+            if not ev.get("observed_at"):
+                errors.append(f"{at}: missing observed_at")
+            fields = ev.get("claim_fields")
+            if fields is not None:
+                if not isinstance(fields, list) or any(
+                    f not in MANUFACTURER_CLAIMABLE_FIELDS for f in fields
+                ):
+                    errors.append(f"{at}: claim_fields names an unknown profile field")
+                else:
+                    claimed |= set(fields)
+            if (ev.get("note") or "").startswith(AGENT_RETRIEVAL_PREFIX) and ev.get("verified_at"):
+                errors.append(f"{at}: agent-assisted research row marked verified")
+
+        unattributed = [f for f in MANUFACTURER_ATTRIBUTED_FIELDS
+                        if _asserted(m, f) and f not in claimed]
+        if unattributed:
+            errors.append(f"{where}: asserted but no evidence row claims: "
+                          + ", ".join(unattributed))
+    return errors
+
+
+def replace_manufacturer_evidence(cur, manufacturer_id, evidence: list[dict]) -> dict:
+    """Refresh ONE manufacturer's company-level evidence without touching rows
+    this importer does not own.
+
+    * `managed_by = CATALOGUE_IMPORT` rows are the importer's: deleted, then the
+      catalogue's rows are re-inserted with that marker, so repeated runs never
+      duplicate them.
+    * An UNMARKED row is adopted (replaced by its marked copy) only when stronger
+      provenance shows it is an untouched row written by an import that predates
+      the marker (migration 0013): EVERY column the importer writes (URL, type,
+      title, excerpt, published/observed/verified dates, confidence, note) equals
+      this catalogue source, and it carries no `claim_fields`, which only
+      post-0013 writers set. URL, type and date alone never establish ownership.
+    * An unmarked row that shares a catalogue source's URL, type and observed
+      date but differs in any of that content was edited, or written by someone
+      else. It is PRESERVED and returned as an ambiguous collision: never adopted,
+      never overwritten.
+    * Every other unmarked row is manually maintained and is left in place.
+    """
+    removed = _rowcount(cur.execute(
+        "DELETE FROM evidence_source "
+        "WHERE subject_type='MANUFACTURER' AND subject_id=%s AND managed_by = %s",
+        (manufacturer_id, MANAGED_BY),
+    ))
+    adopted = 0
+    collisions: list[str] = []
+    for ev in evidence:
+        adopted += _rowcount(cur.execute(
+            """
+            DELETE FROM evidence_source
+            WHERE subject_type='MANUFACTURER' AND subject_id=%s
+              AND managed_by IS NULL AND claim_fields IS NULL
+              AND source_url IS NOT DISTINCT FROM %s AND source_type = %s
+              AND source_title IS NOT DISTINCT FROM %s
+              AND excerpt IS NOT DISTINCT FROM %s
+              AND published_at IS NOT DISTINCT FROM %s::date
+              AND observed_at::date IS NOT DISTINCT FROM %s::date
+              AND verified_at::date IS NOT DISTINCT FROM %s::date
+              AND confidence = %s
+              AND note IS NOT DISTINCT FROM %s
+            """,
+            (
+                manufacturer_id, ev.get("source_url"), ev["source_type"],
+                ev.get("source_title"), ev.get("excerpt"), ev.get("published_at"),
+                ev.get("observed_at"), ev.get("verified_at"),
+                ev.get("confidence", "MEDIUM"), ev.get("note"),
+            ),
+        ))
+        shared = cur.execute(
+            """
+            SELECT count(*) FROM evidence_source
+            WHERE subject_type='MANUFACTURER' AND subject_id=%s AND managed_by IS NULL
+              AND source_url IS NOT DISTINCT FROM %s AND source_type = %s
+              AND observed_at::date IS NOT DISTINCT FROM %s::date
+            """,
+            (manufacturer_id, ev.get("source_url"), ev["source_type"], ev.get("observed_at")),
+        ).fetchone()[0]
+        if shared:
+            collisions.append(
+                f"{ev.get('source_url')} ({shared} unmarked row(s) share its URL, type "
+                "and observed date but not its importer-written content)"
+            )
+        insert_evidence(cur, "MANUFACTURER", manufacturer_id, ev, managed_by=MANAGED_BY)
+    return {"removed": removed, "adopted": adopted, "inserted": len(evidence),
+            "collisions": collisions}
 
 
 # --------------------------------------------------------------------------- #
@@ -124,40 +326,64 @@ def import_regions(cur, data: dict) -> None:
         )
 
 
-def import_manufacturers(cur, data: dict, region_id) -> None:
+def import_manufacturers(cur, data: dict, region_id) -> dict:
+    """Upsert manufacturer profiles by slug and refresh their company evidence.
+
+    Shared by the full catalogue import and `--manufacturers-only`, so both write
+    manufacturer data identically. Returns summed evidence counts and every
+    ambiguous evidence collision (`slug: source_url (...)`).
+    """
+    totals: dict = {"manufacturers": 0, "removed": 0, "adopted": 0, "inserted": 0,
+                    "collisions": []}
     for m in data["manufacturers"]:
         mid = cur.execute(
             """
             INSERT INTO manufacturer
-                (slug, name, legal_name, country_region_id, website_url,
+                (slug, name, legal_name, country_region_id, headquarters_city,
+                 incorporation, operating_locations, website_url,
                  founded_year, description, target_markets, commercial_model,
-                 deployment_status, is_public_company, ticker)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                 deployment_status, deployment_note, is_public_company, ticker,
+                 parent_company, parent_listing, parent_relationship)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             ON CONFLICT (slug) DO UPDATE SET
                 name = EXCLUDED.name, legal_name = EXCLUDED.legal_name,
                 country_region_id = EXCLUDED.country_region_id,
+                headquarters_city = EXCLUDED.headquarters_city,
+                incorporation = EXCLUDED.incorporation,
+                operating_locations = EXCLUDED.operating_locations,
                 website_url = EXCLUDED.website_url, founded_year = EXCLUDED.founded_year,
                 description = EXCLUDED.description, target_markets = EXCLUDED.target_markets,
                 commercial_model = EXCLUDED.commercial_model,
                 deployment_status = EXCLUDED.deployment_status,
-                is_public_company = EXCLUDED.is_public_company, ticker = EXCLUDED.ticker
+                deployment_note = EXCLUDED.deployment_note,
+                is_public_company = EXCLUDED.is_public_company, ticker = EXCLUDED.ticker,
+                parent_company = EXCLUDED.parent_company,
+                parent_listing = EXCLUDED.parent_listing,
+                parent_relationship = EXCLUDED.parent_relationship
             RETURNING id
             """,
             (
                 m["slug"], m["name"], m.get("legal_name"),
-                region_id(m.get("country_region_code")), m.get("website_url"),
+                region_id(m.get("country_region_code")), m.get("headquarters_city"),
+                m.get("incorporation"), m.get("operating_locations"), m.get("website_url"),
                 m.get("founded_year"), m.get("description"), m.get("target_markets"),
                 m.get("commercial_model"), m.get("deployment_status"),
-                m.get("is_public_company", False), m.get("ticker"),
+                m.get("deployment_note"),
+                # No default: a missing key is NULL (listing status unknown), never
+                # FALSE. FALSE is a claim and needs a source (validate_catalogue).
+                m.get("is_public_company"), m.get("ticker"),
+                m.get("parent_company"), m.get("parent_listing"),
+                m.get("parent_relationship"),
             ),
         ).fetchone()[0]
-        # Reset + re-insert manufacturer-level evidence to stay idempotent.
-        cur.execute(
-            "DELETE FROM evidence_source WHERE subject_type='MANUFACTURER' AND subject_id=%s",
-            (mid,),
-        )
-        for ev in m.get("evidence", []):
-            insert_evidence(cur, "MANUFACTURER", mid, ev)
+        # Refresh only this importer's own company evidence: idempotent, and
+        # manually maintained rows survive (see replace_manufacturer_evidence).
+        counts = replace_manufacturer_evidence(cur, mid, m.get("evidence") or [])
+        totals["manufacturers"] += 1
+        for key in ("removed", "adopted", "inserted"):
+            totals[key] += counts[key]
+        totals["collisions"].extend(f"{m['slug']}: {line}" for line in counts["collisions"])
+    return totals
 
 
 def import_providers(cur, data: dict, region_id, manufacturer_id) -> None:
@@ -775,7 +1001,7 @@ def run(url: str, *, apply_publication_state: bool = False,
             collisions: list[str] = []
 
             import_regions(cur, regions)
-            import_manufacturers(cur, manufacturers, region_id)
+            manufacturer_totals = import_manufacturers(cur, manufacturers, region_id)
             import_providers(cur, providers, region_id, manufacturer_id)
             import_capabilities(cur, capabilities)
             import_use_cases(cur, use_cases)
@@ -809,8 +1035,76 @@ def run(url: str, *, apply_publication_state: bool = False,
         print(f"PRESERVED (not overwritten): {line}")
     if collisions:
         print(f"{len(collisions)} unmanaged record(s) preserved on logical-key collision.")
+    for line in manufacturer_totals["collisions"]:
+        print(f"AMBIGUOUS EVIDENCE COLLISION (preserved, not adopted): {line}")
     if apply_publication_state:
         print("Publication state was REWRITTEN from JSON (--apply-publication-state).")
+
+
+class ManufacturerImportAborted(SystemExit):
+    """`--manufacturers-only` refused before writing anything."""
+
+
+def run_manufacturers_only(url: str, *, manufacturers_path: Path | None = None) -> dict:
+    """Import ONLY manufacturer profiles and their company-level evidence.
+
+    Reads `manufacturers.json` and nothing else. No robot file is opened, and no
+    robot, publication flag, specification, offer, capability, variant,
+    deployment, image, provider, region or robot-level evidence row is written.
+
+    Order: validate the file (vocabularies, listing rule, source attribution)
+    -> open ONE transaction -> confirm every headquarters region already exists
+    (this mode never writes regions) -> upsert the profiles and refresh only the
+    importer's own company evidence -> commit. Any failure before the commit
+    rolls the whole transaction back, so nothing is half-written.
+    """
+    path = manufacturers_path or CATALOGUE_DIR / "manufacturers.json"
+    manufacturers = _load(path)
+    errors = validate_manufacturer_profiles(manufacturers)
+    if errors:
+        raise ManufacturerImportAborted(
+            "manufacturer-only import refused before writing — "
+            f"{len(errors)} problem(s) in {path.name}:\n  " + "\n  ".join(errors)
+        )
+
+    with psycopg.connect(url, autocommit=False) as conn:
+        with conn.cursor() as cur:
+            cur.execute("SET search_path TO humanoid, public")
+            regions = dict(cur.execute("SELECT code, id FROM region").fetchall())
+            missing = sorted({
+                m["country_region_code"] for m in manufacturers["manufacturers"]
+                if m.get("country_region_code") and m["country_region_code"] not in regions
+            })
+            if missing:
+                raise ManufacturerImportAborted(
+                    "manufacturer-only import refused before writing — region code(s) "
+                    f"not in the database: {', '.join(missing)}. This mode does not "
+                    "write regions; load them through the catalogue import first."
+                )
+            totals = import_manufacturers(
+                cur, manufacturers, lambda code: regions[code] if code else None
+            )
+            preserved = cur.execute(
+                "SELECT count(*) FROM evidence_source "
+                "WHERE subject_type='MANUFACTURER' AND managed_by IS DISTINCT FROM %s",
+                (MANAGED_BY,),
+            ).fetchone()[0]
+        conn.commit()
+
+    totals["preserved"] = preserved
+    print(f"MANUFACTURER-ONLY IMPORT OK: {totals['manufacturers']} "
+          "manufacturer profile(s) upserted.")
+    print(f"Company evidence: {totals['inserted']} catalogue row(s) written, "
+          f"{totals['removed']} previous importer row(s) replaced, "
+          f"{totals['adopted']} pre-marker importer row(s) adopted, "
+          f"{preserved} unmarked row(s) preserved, "
+          f"{len(totals['collisions'])} ambiguous collision(s).")
+    # Preserved, never adopted: an unmarked row sharing a source's URL/type/date
+    # but not its content may be an editor's correction. Saying so is the point.
+    for line in totals["collisions"]:
+        print(f"AMBIGUOUS EVIDENCE COLLISION (preserved, not adopted): {line}")
+    print("Robot records, publication state and robot-level evidence were not read or written.")
+    return totals
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -834,9 +1128,30 @@ def main(argv: list[str] | None = None) -> None:
              "records reference. Unknown slugs abort before anything is written. "
              "Omitted, every catalogue record is imported, exactly as before.",
     )
+    ap.add_argument(
+        "--manufacturers-only",
+        action="store_true",
+        help="Import ONLY manufacturer profiles and their company-level evidence "
+             "from manufacturers.json. No robot file is read, and no robot, "
+             "publication flag, specification, offer, capability, variant, "
+             "deployment, image, provider, region or robot-level evidence row is "
+             "written. Data and source attribution are validated before writing, "
+             "in one transaction. Cannot be combined with --only or "
+             "--apply-publication-state.",
+    )
     args = ap.parse_args(argv)
+    if args.manufacturers_only:
+        conflicts = [flag for flag, given in (
+            ("--only", bool(args.only)),
+            ("--apply-publication-state", args.apply_publication_state),
+        ) if given]
+        if conflicts:
+            ap.error("--manufacturers-only cannot be combined with " + ", ".join(conflicts))
     if not args.database_url:
         ap.error("no database URL: pass --database-url or set DATABASE_URL")
+    if args.manufacturers_only:
+        run_manufacturers_only(normalize_url(args.database_url))
+        return
     only = None
     if args.only:
         only = {s.strip() for item in args.only for s in item.split(",") if s.strip()}

@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.db.session import get_session
 from app.models.commercial import Deployment
+from app.models.evidence import EvidenceSource
 from app.models.manufacturer import Manufacturer, Provider
 from app.models.robot import Robot
 from app.schemas.common import Page
@@ -17,11 +18,21 @@ from app.schemas.manufacturer import (
     ManufacturerDetail,
     ManufacturerListItem,
     ManufacturerRobot,
+    ManufacturerSource,
     ProviderRead,
 )
 from app.services.reads import _primary_image, derive_portfolio_status
 
 router = APIRouter(prefix="/api/manufacturers", tags=["manufacturers"])
+
+#: docs/26 §3.1 fixed provenance statement prefix.
+_AGENT_RETRIEVAL_PREFIX = "RETRIEVAL: AGENT_ASSISTED_RESEARCH"
+
+
+def _retrieval(note: str | None) -> str | None:
+    if note and note.startswith(_AGENT_RETRIEVAL_PREFIX):
+        return "AGENT_ASSISTED_RESEARCH"
+    return None
 
 
 @router.get("", response_model=Page[ManufacturerListItem])
@@ -118,19 +129,47 @@ def get_manufacturer(
             for d in dep_rows
         ]
 
+    # Company-level provenance. Deterministic order: newest observation first,
+    # then URL, then the internal id (never exposed) as the final tie-break.
+    evidence_rows = session.execute(
+        select(EvidenceSource)
+        .where(
+            EvidenceSource.subject_type == "MANUFACTURER",
+            EvidenceSource.subject_id == m.id,
+        )
+        .order_by(
+            EvidenceSource.observed_at.desc(),
+            EvidenceSource.source_url,
+            EvidenceSource.id,
+        )
+    ).scalars().all()
+
+    published = [r for r in m.robots if r.is_published]
+
     return ManufacturerDetail(
         id=str(m.id),
         slug=m.slug,
         name=m.name,
         legal_name=m.legal_name,
         country=m.country.code if m.country else None,
+        headquarters_city=m.headquarters_city,
+        incorporation=m.incorporation,
+        operating_locations=list(m.operating_locations or []),
         website_url=m.website_url,
         founded_year=m.founded_year,
         description=m.description,
+        target_markets=list(m.target_markets or []),
         commercial_model=m.commercial_model,
         deployment_status=m.deployment_status,
+        deployment_note=m.deployment_note,
         is_public_company=m.is_public_company,
         ticker=m.ticker,
+        parent_company=m.parent_company,
+        parent_listing=m.parent_listing,
+        parent_relationship=m.parent_relationship,
+        # Same two facts as the list endpoint: every record vs published ones.
+        tracked_robot_count=len(m.robots),
+        published_robot_count=len(published),
         robots=[
             ManufacturerRobot(
                 slug=r.slug,
@@ -140,9 +179,22 @@ def get_manufacturer(
                 # eligible gate); no unverified image can reach this surface.
                 primary_image=_primary_image(r),
             )
-            for r in sorted(m.robots, key=lambda r: r.name)
-            if r.is_published
+            for r in sorted(published, key=lambda r: r.name)
         ],
         providers=[ProviderRead(slug=p.slug, name=p.name, type=p.type) for p in providers],
         deployments=deployments,
+        sources=[
+            ManufacturerSource(
+                claim_fields=list(e.claim_fields or []),
+                source_type=e.source_type,
+                source_title=e.source_title,
+                source_url=e.source_url,
+                published_at=e.published_at,
+                observed_at=e.observed_at,
+                verified_at=e.verified_at,
+                confidence=e.confidence,
+                retrieval=_retrieval(e.note),
+            )
+            for e in evidence_rows
+        ],
     )

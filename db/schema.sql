@@ -308,22 +308,38 @@ CREATE TABLE manufacturer (
     slug               TEXT NOT NULL UNIQUE,          -- /manufacturers/agility-robotics
     name               TEXT NOT NULL,
     legal_name         TEXT,
-    country_region_id  UUID REFERENCES region(id),
+    country_region_id  UUID REFERENCES region(id),     -- HEADQUARTERS country; NULL = unresolved
+    headquarters_city  TEXT,
+    incorporation      TEXT,                          -- jurisdiction, e.g. 'United States (Delaware)'
+    operating_locations TEXT[],                       -- other sites; never the headquarters
     website_url        TEXT,
     logo_url           TEXT,
     founded_year       INT CHECK (founded_year BETWEEN 1900 AND 2100),
     description        TEXT,
     target_markets     TEXT[],                        -- e.g. {manufacturing,logistics}
     commercial_model   TEXT,                          -- narrative: sell / RaaS / hybrid
-    deployment_status  commercial_status,             -- coarse company-level maturity
+    deployment_status  commercial_status,             -- HUMANOID deployment status (evidence-gated)
+    deployment_note    TEXT,                          -- what that status rests on
     support_structure  TEXT,
     funding_status     TEXT,                          -- public / private / funding note
-    is_public_company  BOOLEAN NOT NULL DEFAULT FALSE,
+    is_public_company  BOOLEAN,                       -- THIS entity listed? NULL = unknown
     ticker             TEXT,
+    parent_company     TEXT,                          -- owning group, when not the entity itself
+    parent_listing     TEXT,                          -- the parent's listing, e.g. 'NYSE: XPEV'
+    parent_relationship TEXT,                         -- e.g. 'Controlling shareholder since 2021'
     created_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at         TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 COMMENT ON TABLE manufacturer IS 'OEM company profile. Powers /manufacturers.';
+COMMENT ON COLUMN manufacturer.country_region_id IS
+    'Headquarters country. Not the incorporation jurisdiction and not an operating '
+    'location. NULL when the headquarters is unresolved.';
+COMMENT ON COLUMN manufacturer.is_public_company IS
+    'Whether THIS entity''s own shares are publicly listed. NULL = unknown (never '
+    'rendered as NO). A listed parent is recorded in parent_* instead.';
+COMMENT ON COLUMN manufacturer.deployment_status IS
+    'Humanoid deployment status of the company (commercial_status vocabulary), '
+    'not the maturity of non-humanoid products. Evidence-gated like robot status.';
 
 -- Provider = any commercial counterparty that can fulfil an offer. Created now,
 -- mostly invisible in v0.1; it is the bridge to RentHumanoid / HumanoidMart /
@@ -746,12 +762,16 @@ CREATE TABLE evidence_source (
     verified_at   TIMESTAMPTZ,
     confidence    confidence_level NOT NULL DEFAULT 'MEDIUM',
     note          TEXT,
+    claim_fields  TEXT[],                -- MANUFACTURER rows: profile fields supported
+    managed_by    TEXT,                  -- 'CATALOGUE_IMPORT' = written by the importer
     created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 COMMENT ON TABLE evidence_source IS
     'Provenance for any changing commercial claim (price, availability, status, '
     'deployment...). Polymorphic via (subject_type, subject_id). Powers the '
     '"Verified: 2026-07-24 / Source: manufacturer store" indicators. The moat.';
+COMMENT ON COLUMN evidence_source.claim_fields IS
+    'MANUFACTURER rows: the profile fields this source supports. NULL = no field claim.';
 
 -- =============================================================================
 -- SECTION 4 — DECISION LAYER: BUYER INTENT & MATCHING (Phase 2)

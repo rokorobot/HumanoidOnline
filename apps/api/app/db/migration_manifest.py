@@ -59,4 +59,7 @@ MIGRATIONS: dict[str, str] = {
     "0012_owner_approved_display_basis": (
         "2fad27ad99cae091ef7c82dab01e02590b83193aec4c678d14a792a259ec7cdb"
     ),
+    "0013_manufacturer_profile_fields": (
+        "fd20dc973f79848d883353d39eb4b1832f624da8437a01e77e7c194cd5de48b4"
+    ),
 }

@@ -21,22 +21,32 @@ class Manufacturer(Base):
     slug: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
     name: Mapped[str] = mapped_column(Text, nullable=False)
     legal_name: Mapped[str | None] = mapped_column(Text)
+    #: Headquarters country (migration 0013). Never the incorporation
+    #: jurisdiction or an operating location; NULL when unresolved.
     country_region_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("region.id")
     )
+    headquarters_city: Mapped[str | None] = mapped_column(Text)
+    incorporation: Mapped[str | None] = mapped_column(Text)
+    operating_locations: Mapped[list[str] | None] = mapped_column(ARRAY(Text))
     website_url: Mapped[str | None] = mapped_column(Text)
     logo_url: Mapped[str | None] = mapped_column(Text)
     founded_year: Mapped[int | None] = mapped_column(Integer)
     description: Mapped[str | None] = mapped_column(Text)
     target_markets: Mapped[list[str] | None] = mapped_column(ARRAY(Text))
     commercial_model: Mapped[str | None] = mapped_column(Text)
+    #: Humanoid deployment status, with `deployment_note` saying what it rests on.
     deployment_status: Mapped[str | None] = mapped_column(commercial_status)
+    deployment_note: Mapped[str | None] = mapped_column(Text)
     support_structure: Mapped[str | None] = mapped_column(Text)
     funding_status: Mapped[str | None] = mapped_column(Text)
-    is_public_company: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, server_default=text("false")
-    )
+    #: Whether THIS entity is listed. NULL = unknown, which must never render as
+    #: "NO"; a listed parent lives in the parent_* columns instead.
+    is_public_company: Mapped[bool | None] = mapped_column(Boolean)
     ticker: Mapped[str | None] = mapped_column(Text)
+    parent_company: Mapped[str | None] = mapped_column(Text)
+    parent_listing: Mapped[str | None] = mapped_column(Text)
+    parent_relationship: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("now()"), nullable=False
     )

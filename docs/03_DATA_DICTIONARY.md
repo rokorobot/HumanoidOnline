@@ -127,3 +127,23 @@ Commercially sensitive fields — **price, availability, commercial status, depl
 The rule binds *asserted* facts. `commercial_status = UNKNOWN` is the explicit absence of a maturity claim (§1), so there is nothing for evidence to support and none is required — the alternative would be fabricating a source to justify saying "not verified", which is the failure this rule exists to prevent. Every other `commercial_status` value, `ANNOUNCED` included, requires its `evidence_source` row unchanged, as do price, availability, deployment and regional claims.
 
 Operationally: a value with no evidence may exist in the database (e.g. freshly scraped) but must not be *published* (`robot.is_published` gate) until evidence is attached. Stale evidence (`verified_at` older than a policy window) downgrades display confidence; it does not delete the fact.
+
+## 8. Manufacturer profile fields (migration 0013)
+
+Every manufacturer profile is public, so its company claims are attributed per field: each MANUFACTURER `evidence_source` row lists the fields it supports in `claim_fields`.
+
+| Field (UI label) | Meaning | Never |
+|---|---|---|
+| `country_region_id` (Headquarters) | Country of the operational headquarters; NULL = unresolved | the incorporation jurisdiction, an operating site, or the founders' nationality |
+| `headquarters_city` | City of that headquarters | inferred from a registration prefix or company name |
+| `incorporation` | Jurisdiction of incorporation, e.g. `United States (Delaware)` | the headquarters |
+| `operating_locations` | Other stated sites (factory, subsidiary office) | the headquarters |
+| `founded_year` (Founded) | Founding / establishment year stated by a source | a website copyright year |
+| `commercial_model` (Business model) | How the company sells or supplies | inferred from a reservation button |
+| `deployment_status` (Humanoid deployment) | `commercial_status` vocabulary scoped to **humanoid** deployment; `deployment_note` states what it rests on. `PILOT` (customer pilots/trials, as the evidence describes them) ≠ `COMMERCIAL` (generally available) ≠ `RAAS_DEPLOYMENT`; undisclosed commercial terms alone never reclassify a status | set from non-humanoid products; DISCONTINUED for a retired research programme |
+| `is_public_company` (Public company) | Whether **this** entity's shares are listed. TRUE/FALSE require a sourced claim; NULL = unknown | rendered as NO when NULL; TRUE because a parent is listed |
+| `parent_company` / `parent_listing` / `parent_relationship` | Listed-parent or group ownership, kept separate from the entity's own status | stored in `funding_status` |
+
+Card-level derived labels: **Published model status** is derived from *published* catalogue records only (`NONE PUBLISHED` when none; `ALL DISCONTINUED` only when every published record is discontinued) and never describes unpublished records or the company. **Catalogue models** shows `N TRACKED · M PUBLISHED`, both counted from records.
+
+`db/validate_catalogue.py` fails when an asserted `deployment_status` (other than UNKNOWN), a non-NULL `is_public_company`, or a `parent_company` lacks a MANUFACTURER evidence row naming that field.

@@ -151,20 +151,80 @@ test("compare renders a matrix with QUOTE_ONLY, PUBLIC and UNKNOWN kept distinct
   expect(body).not.toContain("$90,000");
 });
 
-test("manufacturers: Figure PORTFOLIO is DISCONTINUED (derived), not COMMERCIAL", async ({
+test("manufacturers: Figure card scopes its status to PUBLISHED models, never the maker", async ({
   page,
 }) => {
   await page.goto("/manufacturers");
   // The Figure card is a whole-card link.
   const card = page.locator("a.mcard", { hasText: "Figure" });
   await expect(card).toBeVisible();
-  // PORTFOLIO shows the derived robot-portfolio status, not the company column.
-  await expect(card).toContainText("PORTFOLIO");
-  await expect(card).toContainText("DISCONTINUED");
+  // Figure's only published catalogue model is discontinued while its other
+  // records are unpublished. The card must say that about PUBLISHED models —
+  // the old "PORTFOLIO: DISCONTINUED" read as a verdict on the whole company.
+  await expect(card).toContainText("PUBLISHED MODEL STATUS");
+  await expect(card).toContainText("ALL DISCONTINUED");
+  await expect(card).not.toContainText("PORTFOLIO");
+  // Tracked and published remain two labelled, derived counts.
+  await expect(card).toContainText("CATALOGUE MODELS");
+  await expect(card).toContainText(/\d+ TRACKED · 1 PUBLISHED/);
+  // The company's humanoid deployment column is not what the card shows.
   await expect(card).not.toContainText("DEPLOY");
   // Whole-card link is keyboard-focusable.
   await card.focus();
   await expect(card).toBeFocused();
+});
+
+test("manufacturers: a maker with no published models says NONE PUBLISHED, not UNKNOWN", async ({
+  page,
+}) => {
+  await page.goto("/manufacturers");
+  // XPeng Robotics holds catalogue records but none is published.
+  const card = page.locator('a.mcard[href="/manufacturers/xpeng-robotics"]');
+  await expect(card).toBeVisible();
+  await expect(card).toContainText("NONE PUBLISHED");
+  await expect(card).toContainText(/[1-9]\d* TRACKED · 0 PUBLISHED/);
+});
+
+function factValue(page: import("@playwright/test").Page, label: string) {
+  return page.locator("dl.mfr-facts .cf-row", { has: page.locator("dt", { hasText: label }) }).locator("dd");
+}
+
+test("manufacturer detail: unknown listing status renders UNKNOWN, never NO", async ({ page }) => {
+  await page.goto("/manufacturers/figure-ai");
+  // No listing claim on record for Figure: the old boolean default said "NO".
+  await expect(factValue(page, "Public company")).toHaveText("UNKNOWN");
+  await expect(factValue(page, "Headquarters")).toContainText("San Jose");
+  // Humanoid deployment, with its meaning and basis spelled out.
+  await expect(factValue(page, "Humanoid deployment")).toHaveText("COMMERCIAL");
+  await expect(page.locator(".mfr-deployment")).toContainText("Commercially available");
+  await expect(page.locator(".mfr-deployment")).toContainText("BMW");
+  // Header counts are labelled as published vs tracked models.
+  await expect(page.locator(".ho-sysheader")).toContainText("PUBLISHED MODELS");
+  await expect(page.locator(".ho-sysheader")).toContainText("TRACKED MODELS");
+});
+
+test("manufacturer detail: own listing, listed parent, locations and company sources stay distinct", async ({
+  page,
+}) => {
+  await page.goto("/manufacturers/unitree");
+  await expect(factValue(page, "Public company")).toHaveText("YES · SSE STAR Market: 688836");
+  await expect(page.locator(".mfr-markets")).toContainText("RESEARCH");
+  const sources = page.locator("#company-sources");
+  expect(await sources.locator(".evrow").count()).toBeGreaterThanOrEqual(2);
+  await expect(sources).toContainText("Supports:");
+  await expect(sources).toContainText("Agent-assisted research · not human-verified");
+
+  // Boston Dynamics is not listed; its controlling group is shown separately.
+  await page.goto("/manufacturers/boston-dynamics");
+  await expect(factValue(page, "Public company")).toHaveText("NO");
+  await expect(factValue(page, "Parent")).toHaveText("Hyundai Motor Group");
+  await expect(page.locator(".mfr-ownership")).toContainText("80%");
+
+  // Clone: incorporation is known, headquarters is not — and stays UNKNOWN.
+  await page.goto("/manufacturers/clone-robotics");
+  await expect(factValue(page, "Headquarters")).toHaveText("UNKNOWN");
+  await expect(factValue(page, "Incorporation")).toHaveText("United States (Delaware)");
+  await expect(factValue(page, "Other locations")).toContainText("Wrocław");
 });
 
 test("use-cases: robot count uses singular grammar ('1 ROBOT') and whole-card links", async ({

@@ -5,7 +5,8 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 
 import { findManufacturer } from "@/lib/api-client";
-import { regionLabel } from "@/lib/format";
+import { boolLabel, deploymentMeaning, formatDate, regionLabel } from "@/lib/format";
+import type { ManufacturerSource } from "@/lib/types";
 import { RobotThumb } from "@/components/RobotThumb";
 import { StatusBracket } from "@/components/StatusBadge";
 import { SectionIndex } from "@/components/SectionIndex";
@@ -18,6 +19,27 @@ export const dynamic = "force-dynamic";
 // WS8.5 / R22 — one governed read shared by the page and generateMetadata via
 // React cache() (per-request memoization), never an alternate data path.
 const getManufacturerCached = cache(findManufacturer);
+
+// Human labels for the profile fields a company source can support.
+const FIELD_LABELS: Record<string, string> = {
+  legal_name: "legal entity",
+  country_region_code: "headquarters country",
+  headquarters_city: "headquarters city",
+  incorporation: "incorporation",
+  operating_locations: "other locations",
+  founded_year: "founded",
+  website_url: "website",
+  description: "description",
+  target_markets: "target markets",
+  commercial_model: "business model",
+  deployment_status: "humanoid deployment",
+  deployment_note: "deployment basis",
+  is_public_company: "public company",
+  ticker: "listing",
+  parent_company: "parent",
+  parent_listing: "parent listing",
+  parent_relationship: "ownership",
+};
 
 export async function generateMetadata({
   params,
@@ -35,6 +57,52 @@ export async function generateMetadata({
   };
 }
 
+// One profile fact. UNKNOWN keeps the unknown tone; it is never a value.
+function Fact({ k, v, unknown }: { k: string; v: string; unknown?: boolean }) {
+  return (
+    <div className="cf-row">
+      <dt>{k}</dt>
+      <dd style={unknown ? { color: "var(--ho-unknown)" } : undefined}>{v}</dd>
+    </div>
+  );
+}
+
+function SourceRow({ source: s }: { source: ManufacturerSource }) {
+  const published = formatDate(s.published_at);
+  const observed = formatDate(s.observed_at);
+  const verified = formatDate(s.verified_at);
+  const supports = s.claim_fields.map((f) => FIELD_LABELS[f] ?? f).join(", ");
+  return (
+    <div className="evrow">
+      <div className="subj">
+        {s.source_url ? (
+          <a href={s.source_url} target="_blank" rel="noopener noreferrer">
+            {s.source_title ?? s.source_url} ↗
+          </a>
+        ) : (
+          (s.source_title ?? "Untitled source")
+        )}
+        <br />
+        <span className="stamp">{supports ? `Supports: ${supports}` : "No field claim recorded"}</span>
+      </div>
+      <div className="src">
+        SOURCE: {s.source_type}
+        <br />
+        {published && <>PUBLISHED {published} · </>}OBSERVED {observed}
+        <br />
+        {verified ? (
+          <>VERIFIED {verified} &reg;</>
+        ) : s.retrieval === "AGENT_ASSISTED_RESEARCH" ? (
+          <>Agent-assisted research · not human-verified</>
+        ) : (
+          <>Unverified claim</>
+        )}
+      </div>
+      <div className="conf-cell stamp">{s.confidence}</div>
+    </div>
+  );
+}
+
 export default async function ManufacturerDetailPage({
   params,
 }: {
@@ -44,13 +112,19 @@ export default async function ManufacturerDetailPage({
   const m = await getManufacturerCached(slug);
   if (!m) notFound();
 
+  const headquarters = [m.headquarters_city, regionLabel(m.country)].filter(Boolean).join(" · ");
+  const publicCo = boolLabel(m.is_public_company);
+  const deployment = m.deployment_status && m.deployment_status !== "UNKNOWN" ? m.deployment_status : null;
+  const meaning = deploymentMeaning(deployment);
+
   return (
     <>
       <SystemHeader
         title={`MANUFACTURER / ${m.slug.toUpperCase()}`}
         fields={[
-          { label: "ROBOTS", value: m.robots.length },
-          ...(m.country ? [{ label: "REGION", value: m.country }] : []),
+          { label: "PUBLISHED MODELS", value: m.published_robot_count },
+          { label: "TRACKED MODELS", value: m.tracked_robot_count },
+          ...(m.country ? [{ label: "HQ", value: m.country }] : []),
         ]}
       />
       <div className="wrap">
@@ -79,16 +153,62 @@ export default async function ManufacturerDetailPage({
               {m.legal_name && (
                 <p className="stamp" style={{ marginTop: 16 }}>
                   Legal entity: {m.legal_name}
-                  {m.is_public_company && m.ticker ? ` · ${m.ticker}` : ""}
                 </p>
+              )}
+              {m.target_markets.length > 0 && (
+                <>
+                  <p className="stamp" style={{ marginTop: 16 }}>
+                    Target markets
+                  </p>
+                  <div className="taglist mfr-markets">
+                    {m.target_markets.map((t) => (
+                      <span className="ho-chip" key={t}>
+                        {t.toUpperCase()}
+                      </span>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
             <div>
-              <div className="ho-leader"><span>REGION</span><span className="fill" /><span style={m.country ? undefined : { color: "var(--ho-unknown)" }}>{regionLabel(m.country) ?? "UNKNOWN"}</span></div>
-              <div className="ho-leader"><span>FOUNDED</span><span className="fill" /><span style={m.founded_year ? undefined : { color: "var(--ho-unknown)" }}>{m.founded_year ?? "UNKNOWN"}</span></div>
-              <div className="ho-leader"><span>MODEL</span><span className="fill" /><span style={m.commercial_model ? undefined : { color: "var(--ho-unknown)" }}>{m.commercial_model ?? "UNKNOWN"}</span></div>
-              <div className="ho-leader"><span>DEPLOY</span><span className="fill" /><span style={m.deployment_status ? undefined : { color: "var(--ho-unknown)" }}>{m.deployment_status ?? "UNKNOWN"}</span></div>
-              <div className="ho-leader"><span>PUBLIC CO.</span><span className="fill" /><span>{m.is_public_company ? "YES" : "NO"}</span></div>
+              <dl className="mfr-facts">
+                <Fact k="Headquarters" v={headquarters || "UNKNOWN"} unknown={!headquarters} />
+                <Fact k="Incorporation" v={m.incorporation ?? "UNKNOWN"} unknown={!m.incorporation} />
+                <Fact
+                  k="Other locations"
+                  v={m.operating_locations.length > 0 ? m.operating_locations.join("; ") : "NOT RECORDED"}
+                  unknown={m.operating_locations.length === 0}
+                />
+                <Fact
+                  k="Founded"
+                  v={m.founded_year != null ? String(m.founded_year) : "UNKNOWN"}
+                  unknown={m.founded_year == null}
+                />
+                <Fact k="Business model" v={m.commercial_model ?? "UNKNOWN"} unknown={!m.commercial_model} />
+                <Fact k="Humanoid deployment" v={deployment ?? "UNKNOWN"} unknown={!deployment} />
+                <Fact
+                  k="Public company"
+                  v={m.is_public_company && m.ticker ? `${publicCo.label} · ${m.ticker}` : publicCo.label}
+                  unknown={publicCo.unknown}
+                />
+                {m.parent_company && (
+                  <Fact
+                    k="Parent"
+                    v={m.parent_listing ? `${m.parent_company} · ${m.parent_listing}` : m.parent_company}
+                  />
+                )}
+              </dl>
+              {(meaning || m.deployment_note) && (
+                <p className="stamp mfr-deployment" style={{ marginTop: 12 }}>
+                  {meaning && <>Humanoid deployment {deployment}: {meaning}. </>}
+                  {m.deployment_note && <>Basis: {m.deployment_note}</>}
+                </p>
+              )}
+              {m.parent_relationship && (
+                <p className="stamp mfr-ownership" style={{ marginTop: 8 }}>
+                  Ownership: {m.parent_relationship}
+                </p>
+              )}
             </div>
           </div>
         </section>
@@ -96,10 +216,12 @@ export default async function ManufacturerDetailPage({
         <section className="blk">
           <div className="blk-head">
             <div>
-              <SectionIndex>01 — PORTFOLIO</SectionIndex>
+              <SectionIndex>01 — PUBLISHED MODELS</SectionIndex>
               <h2>Robots</h2>
             </div>
-            <SystemLabel>{m.robots.length} PUBLISHED</SystemLabel>
+            <SystemLabel>
+              {m.published_robot_count} PUBLISHED · {m.tracked_robot_count} TRACKED
+            </SystemLabel>
           </div>
           {m.robots.length > 0 ? (
             <div className="fit-list">
@@ -118,7 +240,7 @@ export default async function ManufacturerDetailPage({
               ))}
             </div>
           ) : (
-            <p className="empty-state">No published robots for this manufacturer.</p>
+            <p className="empty-state">No published models for this manufacturer.</p>
           )}
         </section>
 
@@ -141,7 +263,7 @@ export default async function ManufacturerDetailPage({
         )}
 
         {m.deployments.length > 0 && (
-          <section className="blk" style={{ marginBottom: "var(--ho-sp-7)" }}>
+          <section className="blk">
             <div className="blk-head">
               <div>
                 <SectionIndex>03 — DEPLOYMENTS</SectionIndex>
@@ -164,6 +286,25 @@ export default async function ManufacturerDetailPage({
             </div>
           </section>
         )}
+
+        <section className="blk" id="company-sources" style={{ marginBottom: "var(--ho-sp-7)" }}>
+          <div className="blk-head">
+            <div>
+              <SectionIndex>04 — COMPANY SOURCES</SectionIndex>
+              <h2>Where the profile comes from</h2>
+            </div>
+            <SystemLabel>{m.sources.length} SOURCES</SystemLabel>
+          </div>
+          {m.sources.length > 0 ? (
+            <div className="ev">
+              {m.sources.map((s, i) => (
+                <SourceRow source={s} key={i} />
+              ))}
+            </div>
+          ) : (
+            <p className="empty-state">No company-level sources on record.</p>
+          )}
+        </section>
       </div>
     </>
   );

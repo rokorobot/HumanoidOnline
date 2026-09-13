@@ -293,22 +293,50 @@ export interface ManufacturerDeployment {
   summary?: string | null;
 }
 
+export interface ManufacturerSource {
+  // Profile fields this company-level source supports.
+  claim_fields: string[];
+  source_type: string;
+  source_title?: string | null;
+  source_url?: string | null;
+  published_at?: string | null;
+  observed_at: string;
+  verified_at?: string | null;
+  confidence: string;
+  // "AGENT_ASSISTED_RESEARCH" when an agent retrieved the source (docs/26).
+  retrieval?: string | null;
+}
+
 export interface ManufacturerDetail {
   id: string;
   slug: string;
   name: string;
   legal_name?: string | null;
+  // Headquarters country code — not incorporation, not an operating location.
   country?: string | null;
+  headquarters_city?: string | null;
+  incorporation?: string | null;
+  operating_locations: string[];
   website_url?: string | null;
   founded_year?: number | null;
   description?: string | null;
+  target_markets: string[];
   commercial_model?: string | null;
+  // Humanoid deployment status and the basis it rests on.
   deployment_status?: string | null;
-  is_public_company: boolean;
+  deployment_note?: string | null;
+  // null = unknown; never rendered as NO.
+  is_public_company?: boolean | null;
   ticker?: string | null;
+  parent_company?: string | null;
+  parent_listing?: string | null;
+  parent_relationship?: string | null;
+  tracked_robot_count: number;
+  published_robot_count: number;
   robots: ManufacturerRobot[];
   providers: Provider[];
   deployments: ManufacturerDeployment[];
+  sources: ManufacturerSource[];
 }
 
 export interface UseCaseListItem {

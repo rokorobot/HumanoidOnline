@@ -431,6 +431,18 @@ section.blk { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid v
   .citation-facts { grid-template-columns: minmax(0, 1fr); }
 }
 
+/* Manufacturer profile facts: the same row language in a single column, so long
+   values (headquarters, other locations, parent listing) wrap inside the row
+   instead of stretching a leader line past the viewport. */
+.mfr-facts { display: grid; grid-template-columns: minmax(0, 1fr); margin: 0;
+  border-top: var(--ho-rule-hair) solid var(--ho-ink); }
+.mfr-facts .cf-row { display: flex; justify-content: space-between; gap: 12px;
+  padding: 8px 0; border-bottom: var(--ho-rule-hair) solid var(--ho-line-soft);
+  min-width: 0; }
+.mfr-facts dt { color: var(--ho-text-muted); font-size: var(--ho-fs-small); flex: none; }
+.mfr-facts dd { margin: 0; font-family: var(--ho-font-machine);
+  font-size: var(--ho-fs-mono-s); text-align: right; overflow-wrap: anywhere; min-width: 0; }
+
 /* Evidence */
 .ev { border: var(--ho-rule-hair) solid var(--ho-ink); background: var(--ho-paper-2);
   display: flex; flex-direction: column; gap: 0; }

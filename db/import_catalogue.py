@@ -86,14 +86,18 @@ def insert_evidence(cur, subject_type: str, subject_id, ev: dict) -> None:
         """
         INSERT INTO evidence_source
             (subject_type, subject_id, source_url, source_type, source_title,
-             excerpt, published_at, observed_at, verified_at, confidence, note)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+             excerpt, published_at, observed_at, verified_at, confidence, note,
+             claim_fields)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         """,
         (
             subject_type, subject_id,
             ev.get("source_url"), ev["source_type"], ev.get("source_title"),
             ev.get("excerpt"), ev.get("published_at"), ev.get("observed_at"),
             ev.get("verified_at"), ev.get("confidence", "MEDIUM"), ev.get("note"),
+            # MANUFACTURER rows name the profile fields they support (migration
+            # 0013); every other row makes no field claim.
+            ev.get("claim_fields"),
         ),
     )
 
@@ -129,26 +133,41 @@ def import_manufacturers(cur, data: dict, region_id) -> None:
         mid = cur.execute(
             """
             INSERT INTO manufacturer
-                (slug, name, legal_name, country_region_id, website_url,
+                (slug, name, legal_name, country_region_id, headquarters_city,
+                 incorporation, operating_locations, website_url,
                  founded_year, description, target_markets, commercial_model,
-                 deployment_status, is_public_company, ticker)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                 deployment_status, deployment_note, is_public_company, ticker,
+                 parent_company, parent_listing, parent_relationship)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             ON CONFLICT (slug) DO UPDATE SET
                 name = EXCLUDED.name, legal_name = EXCLUDED.legal_name,
                 country_region_id = EXCLUDED.country_region_id,
+                headquarters_city = EXCLUDED.headquarters_city,
+                incorporation = EXCLUDED.incorporation,
+                operating_locations = EXCLUDED.operating_locations,
                 website_url = EXCLUDED.website_url, founded_year = EXCLUDED.founded_year,
                 description = EXCLUDED.description, target_markets = EXCLUDED.target_markets,
                 commercial_model = EXCLUDED.commercial_model,
                 deployment_status = EXCLUDED.deployment_status,
-                is_public_company = EXCLUDED.is_public_company, ticker = EXCLUDED.ticker
+                deployment_note = EXCLUDED.deployment_note,
+                is_public_company = EXCLUDED.is_public_company, ticker = EXCLUDED.ticker,
+                parent_company = EXCLUDED.parent_company,
+                parent_listing = EXCLUDED.parent_listing,
+                parent_relationship = EXCLUDED.parent_relationship
             RETURNING id
             """,
             (
                 m["slug"], m["name"], m.get("legal_name"),
-                region_id(m.get("country_region_code")), m.get("website_url"),
+                region_id(m.get("country_region_code")), m.get("headquarters_city"),
+                m.get("incorporation"), m.get("operating_locations"), m.get("website_url"),
                 m.get("founded_year"), m.get("description"), m.get("target_markets"),
                 m.get("commercial_model"), m.get("deployment_status"),
-                m.get("is_public_company", False), m.get("ticker"),
+                m.get("deployment_note"),
+                # No default: a missing key is NULL (listing status unknown), never
+                # FALSE. FALSE is a claim and needs a source (validate_catalogue).
+                m.get("is_public_company"), m.get("ticker"),
+                m.get("parent_company"), m.get("parent_listing"),
+                m.get("parent_relationship"),
             ),
         ).fetchone()[0]
         # Reset + re-insert manufacturer-level evidence to stay idempotent.

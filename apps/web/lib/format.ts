@@ -255,13 +255,53 @@ export function formatRobotCoverage(tracked: number, published: number): string 
   return `${tracked} TRACKED · ${published} PUBLISHED`;
 }
 
+/**
+ * Manufacturer card: the derived status of PUBLISHED catalogue models.
+ *
+ * `status` comes from `reads.derive_portfolio_status`, which only sees published
+ * records. It therefore never speaks for unpublished records or for the company:
+ * a maker whose only published model is retired is "ALL DISCONTINUED" among
+ * published models, not a discontinued company. No published models is its own
+ * explicit state rather than an UNKNOWN maturity.
+ */
+export function formatPublishedModelStatus(
+  status: string | null | undefined,
+  publishedCount: number,
+): { label: string; unknown: boolean } {
+  if (publishedCount === 0) return { label: "NONE PUBLISHED", unknown: true };
+  if (status === "DISCONTINUED") return { label: "ALL DISCONTINUED", unknown: false };
+  if (!status || status === "UNKNOWN") return { label: "UNKNOWN", unknown: true };
+  return { label: status, unknown: false };
+}
+
+/** Plain meaning of a humanoid deployment status (commercial_status vocabulary). */
+const DEPLOYMENT_MEANING: Record<string, string> = {
+  ANNOUNCED: "Announced — no hardware shipping",
+  DEVELOPMENT: "In development — internal only",
+  PROTOTYPE: "Working prototypes — not sold",
+  PILOT: "Customer pilots or trials",
+  EARLY_ACCESS: "Limited external units",
+  LIMITED_COMMERCIAL: "For sale with constraints",
+  COMMERCIAL: "Commercially available",
+  RAAS_DEPLOYMENT: "Deployed commercially as a service",
+  DISCONTINUED: "No longer offered",
+};
+
+export function deploymentMeaning(status: string | null | undefined): string | null {
+  if (!status) return null;
+  return DEPLOYMENT_MEANING[status] ?? null;
+}
+
 const COUNTRY_NAMES: Record<string, string> = {
   US: "United States",
   CN: "China",
+  HK: "Hong Kong",
   GB: "United Kingdom",
   UK: "United Kingdom",
   NO: "Norway",
   DE: "Germany",
+  ES: "Spain",
+  PL: "Poland",
   CA: "Canada",
   JP: "Japan",
   KR: "South Korea",

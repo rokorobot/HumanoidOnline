@@ -13,6 +13,14 @@ commercial facts carry a backing evidence_source row:
   3. each availability_offer on a published robot   -> evidence(subject=AVAILABILITY_OFFER, offer.id)
   4. each deployment on a published robot           -> evidence(subject=DEPLOYMENT, deployment.id)
 
+and, because every manufacturer profile is public, that each asserted company
+claim is attributed to a MANUFACTURER evidence row naming that field in
+`claim_fields` (migration 0013):
+
+  5. manufacturer.deployment_status (other than UNKNOWN)
+  6. manufacturer.is_public_company (TRUE or FALSE; NULL asserts nothing)
+  7. manufacturer.parent_company
+
 Exits non-zero if any published commercial fact lacks evidence (this is the
 same "no commercial fact without evidence" contract the seed enforces, applied
 to the independently sourced catalogue). Prints a summary either way.
@@ -65,6 +73,35 @@ GAP_QUERIES = {
 }
 
 
+def _manufacturer_claim_gap(condition: str, field: str) -> str:
+    """Manufacturers asserting `condition` with no MANUFACTURER evidence row for `field`."""
+    return f"""
+        SELECT m.slug
+        FROM manufacturer m
+        WHERE {condition}
+          AND NOT EXISTS (SELECT 1 FROM evidence_source e
+                          WHERE e.subject_type='MANUFACTURER' AND e.subject_id=m.id
+                            AND '{field}' = ANY(e.claim_fields))
+    """
+
+
+GAP_QUERIES.update({
+    # Same UNKNOWN exclusion as robot commercial_status above.
+    "manufacturer.deployment_status": _manufacturer_claim_gap(
+        "m.deployment_status IS NOT NULL AND m.deployment_status <> 'UNKNOWN'",
+        "deployment_status",
+    ),
+    # FALSE is a claim ("this entity is not listed"), so it needs a source as
+    # much as TRUE does; only NULL (unknown) is free.
+    "manufacturer.is_public_company": _manufacturer_claim_gap(
+        "m.is_public_company IS NOT NULL", "is_public_company"
+    ),
+    "manufacturer.parent_company": _manufacturer_claim_gap(
+        "m.parent_company IS NOT NULL", "parent_company"
+    ),
+})
+
+
 def normalize_url(url: str) -> str:
     return url.replace("postgresql+psycopg://", "postgresql://", 1)
 
@@ -87,11 +124,16 @@ def main() -> None:
         deployments = scalar("SELECT count(*) FROM deployment")
         evidence = scalar("SELECT count(*) FROM evidence_source")
         verified = scalar("SELECT count(*) FROM evidence_source WHERE confidence='VERIFIED'")
+        manufacturers = scalar("SELECT count(*) FROM manufacturer")
+        manufacturer_sources = scalar(
+            "SELECT count(*) FROM evidence_source WHERE subject_type='MANUFACTURER'"
+        )
 
         print(
             f"catalogue summary: robots={robots_total} (published={robots_pub}) "
             f"pricing_offers={pricing} availability_offers={availability} "
-            f"deployments={deployments} evidence_rows={evidence} verified={verified}"
+            f"deployments={deployments} evidence_rows={evidence} verified={verified} "
+            f"manufacturers={manufacturers} manufacturer_sources={manufacturer_sources}"
         )
 
         gaps: dict[str, list[str]] = {}
@@ -143,6 +185,7 @@ def main() -> None:
         sys.exit(1)
 
     print("G2 OK: every published commercial fact carries an evidence_source row.")
+    print("G2 OK: every asserted manufacturer status, listing and parent claim is attributed.")
     print("MEDIA-01 OK: every display-eligible image carries provenance (+ attribution).")
 
 

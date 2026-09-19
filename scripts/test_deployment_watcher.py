@@ -1,4 +1,5 @@
 """Contract/regression tests: exact identity, false greens, retries and read-only I/O."""
+
 import copy
 import io
 import json
@@ -24,9 +25,17 @@ ENV = {
     "WATCHER_API_ORIGIN": "https://api.example.com",
     "WATCHER_WEB_ORIGIN": "https://humanoidonline.com",
 }
-RUN = {"id": 12, "head_sha": SHA, "path": ".github/workflows/ci.yml",
-       "repository": {"full_name": w.REPO}, "status": "completed",
-       "conclusion": "success", "run_attempt": 2, "event": "push", "head_branch": "main"}
+RUN = {
+    "id": 12,
+    "head_sha": SHA,
+    "path": ".github/workflows/ci.yml",
+    "repository": {"full_name": w.REPO},
+    "status": "completed",
+    "conclusion": "success",
+    "run_attempt": 2,
+    "event": "push",
+    "head_branch": "main",
+}
 JOBS_URL = f"{w.GH}/actions/runs/12/attempts/2/jobs?per_page=100&page=1"
 SITE_URL = "https://api.netlify.com/api/v1/sites/site-1"
 
@@ -38,18 +47,37 @@ class FakeReader:
             f"{w.GH}/actions/runs/12": copy.deepcopy(RUN),
             JOBS_URL: {"jobs": [{"name": "Backend", "conclusion": "success", "steps": []}]},
             f"{w.GH}/git/ref/heads/main": {"object": {"sha": SHA}},
-            SITE_URL: {"id": "site-1", "name": "humanoidonline", "ssl_url": "https://humanoidonline.com",
-                       "published_deploy": {"id": "deploy-1", "commit_ref": SHA, "context": "production", "state": "ready"}},
+            SITE_URL: {
+                "id": "site-1",
+                "name": "humanoidonline",
+                "ssl_url": "https://humanoidonline.com",
+                "published_deploy": {
+                    "id": "deploy-1",
+                    "commit_ref": SHA,
+                    "context": "production",
+                    "state": "ready",
+                },
+            },
             "https://api.example.com/health": {"status": "ok"},
             "https://api.example.com/ready": {"status": "ok", "database": "up"},
         }
         for role in ("api", "web"):
             self.data[f"https://api.vercel.com/v4/aliases/{role}.example.com?"] = {
-                "alias": f"{role}.example.com", "projectId": "prj_" + role, "deploymentId": "dpl_" + role}
+                "alias": f"{role}.example.com",
+                "projectId": "prj_" + role,
+                "deploymentId": "dpl_" + role,
+            }
             self.data[f"https://api.vercel.com/v13/deployments/dpl_{role}?withGitRepoInfo=true"] = {
-                "id": "dpl_" + role, "target": "production", "readyState": "READY", "gitSource": {"sha": SHA}}
+                "id": "dpl_" + role,
+                "target": "production",
+                "readyState": "READY",
+                "gitSource": {"sha": SHA},
+            }
         for path in ("/", "/robots", "/manufacturers", "/find-a-humanoid"):
-            self.data["https://humanoidonline.com" + path] = ("<html>HumanoidOnline</html>", "text/html; charset=utf-8")
+            self.data["https://humanoidonline.com" + path] = (
+                "<html>HumanoidOnline</html>",
+                "text/html; charset=utf-8",
+            )
 
     def get(self, url, *, as_json=True):
         self.calls.append(url)
@@ -86,16 +114,26 @@ class WatcherTests(unittest.TestCase):
     def test_post_cleanup_failure_is_failure_even_when_tests_passed(self):
         run = self.reader.data[f"{w.GH}/actions/runs/12"]
         run["conclusion"] = "failure"
-        self.reader.data[JOBS_URL]["jobs"] = [{"name": "Frontend", "conclusion": "failure", "steps": [
-            {"name": "Tests", "conclusion": "success"},
-            {"name": "Post Run astral-sh/setup-uv@v5", "conclusion": "failure"}]}]
+        self.reader.data[JOBS_URL]["jobs"] = [
+            {
+                "name": "Frontend",
+                "conclusion": "failure",
+                "steps": [
+                    {"name": "Tests", "conclusion": "success"},
+                    {"name": "Post Run astral-sh/setup-uv@v5", "conclusion": "failure"},
+                ],
+            }
+        ]
         _, checks = self.snapshot()
         self.assertEqual(w.outcome(checks), "FAIL")
         self.assertIn("Post Run astral-sh/setup-uv", checks[0]["detail"])
 
     def test_wrong_sha_workflow_or_repository_cannot_pass(self):
-        for field, value in (("head_sha", OLD), ("path", ".github/workflows/other.yml"),
-                             ("repository", {"full_name": "someone/else"})):
+        for field, value in (
+            ("head_sha", OLD),
+            ("path", ".github/workflows/other.yml"),
+            ("repository", {"full_name": "someone/else"}),
+        ):
             with self.subTest(field=field):
                 run = copy.deepcopy(RUN)
                 run[field] = value
@@ -117,14 +155,18 @@ class WatcherTests(unittest.TestCase):
         _, checks = self.snapshot()
         self.assertEqual(w.outcome(checks), "PENDING")
         self.assertEqual(w.outcome(checks, expired=True), "TIMEOUT")
-        self.assertFalse(any(url.startswith("https://humanoidonline.com") for url in self.reader.calls))
+        self.assertFalse(
+            any(url.startswith("https://humanoidonline.com") for url in self.reader.calls)
+        )
 
     def test_netlify_wrong_site_or_origin_is_unverified(self):
         for field, value in (("id", "wrong"), ("ssl_url", "https://other.example.com")):
             with self.subTest(field=field):
                 self.reader = FakeReader()
                 self.reader.data[SITE_URL][field] = value
-                self.assertEqual(w.netlify_observation(self.reader, ENV, SHA)["state"], "UNVERIFIED")
+                self.assertEqual(
+                    w.netlify_observation(self.reader, ENV, SHA)["state"], "UNVERIFIED"
+                )
 
     def test_netlify_unknown_sha_and_preview_are_unverified(self):
         deploy = self.reader.data[SITE_URL]["published_deploy"]
@@ -136,9 +178,11 @@ class WatcherTests(unittest.TestCase):
 
     def test_vercel_project_mismatch_redirect_and_missing_pointer(self):
         url = "https://api.vercel.com/v4/aliases/api.example.com?"
-        for field, value, state in (("projectId", "wrong", "UNVERIFIED"),
-                                    ("redirect", "https://other.com", "UNVERIFIED"),
-                                    ("deploymentId", None, "PENDING")):
+        for field, value, state in (
+            ("projectId", "wrong", "UNVERIFIED"),
+            ("redirect", "https://other.com", "UNVERIFIED"),
+            ("deploymentId", None, "PENDING"),
+        ):
             with self.subTest(field=field):
                 self.reader = FakeReader()
                 self.reader.data[url][field] = value
@@ -146,11 +190,13 @@ class WatcherTests(unittest.TestCase):
 
     def test_vercel_exact_sha_and_production_target_required(self):
         url = "https://api.vercel.com/v13/deployments/dpl_api?withGitRepoInfo=true"
-        for field, value, state in (("gitSource", {"sha": OLD}, "PENDING"),
-                                    ("gitSource", {}, "UNVERIFIED"),
-                                    ("target", "preview", "UNVERIFIED"),
-                                    ("readyState", "ERROR", "FAIL"),
-                                    ("readyState", "BUILDING", "PENDING")):
+        for field, value, state in (
+            ("gitSource", {"sha": OLD}, "PENDING"),
+            ("gitSource", {}, "UNVERIFIED"),
+            ("target", "preview", "UNVERIFIED"),
+            ("readyState", "ERROR", "FAIL"),
+            ("readyState", "BUILDING", "PENDING"),
+        ):
             with self.subTest(field=field):
                 self.reader = FakeReader()
                 self.reader.data[url][field] = value
@@ -194,7 +240,9 @@ class WatcherTests(unittest.TestCase):
 
     def test_job_pagination_uses_latest_attempt_and_includes_late_failure(self):
         self.reader.data[JOBS_URL]["jobs"] = [{"name": "ok", "conclusion": "success"}] * 100
-        self.reader.data[JOBS_URL.replace("&page=1", "&page=2")] = {"jobs": [{"name": "late", "conclusion": "failure"}]}
+        self.reader.data[JOBS_URL.replace("&page=1", "&page=2")] = {
+            "jobs": [{"name": "late", "conclusion": "failure"}]
+        }
         result = w.ci_observation(self.reader, RUN, SHA)
         self.assertEqual(result["state"], "FAIL")
         self.assertIn("late", result["detail"])
@@ -204,16 +252,32 @@ class WatcherTests(unittest.TestCase):
         sleep = Mock()
         pending = [w.row("deploy", "PENDING", "waiting")]
         passed = [w.row("deploy", "PASS", "ready")]
-        with tempfile.TemporaryDirectory() as tmp, patch.object(w, "snapshot", side_effect=[("production", pending), ("production", passed)]):
-            result = w.watch(self.reader, ENV, "12", SHA, 60, 30, Path(tmp), clock=clock, sleep=sleep)
+        with (
+            tempfile.TemporaryDirectory() as tmp,
+            patch.object(
+                w, "snapshot", side_effect=[("production", pending), ("production", passed)]
+            ),
+        ):
+            result = w.watch(
+                self.reader, ENV, "12", SHA, 60, 30, Path(tmp), clock=clock, sleep=sleep
+            )
             self.assertEqual(result["result"], "PASS")
             self.assertEqual(json.loads((Path(tmp) / "report.json").read_text())["sha"], SHA)
             self.assertIn("production", (Path(tmp) / "report.md").read_text())
             sleep.assert_called_once_with(30)
 
     def test_deadline_writes_timeout_with_pending_evidence(self):
-        with tempfile.TemporaryDirectory() as tmp, patch.object(w, "snapshot", return_value=("production", [w.row("deploy", "PENDING", "old commit")])):
-            result = w.watch(self.reader, ENV, "12", SHA, 60, 30, Path(tmp), clock=lambda: 60, sleep=Mock())
+        with (
+            tempfile.TemporaryDirectory() as tmp,
+            patch.object(
+                w,
+                "snapshot",
+                return_value=("production", [w.row("deploy", "PENDING", "old commit")]),
+            ),
+        ):
+            result = w.watch(
+                self.reader, ENV, "12", SHA, 60, 30, Path(tmp), clock=lambda: 60, sleep=Mock()
+            )
             self.assertEqual(result["result"], "TIMEOUT")
             self.assertEqual(result["checks"][0]["state"], "PENDING")
 
@@ -223,8 +287,14 @@ class WatcherTests(unittest.TestCase):
         self.assertEqual(w.outcome(checks), "UNVERIFIED")
 
     def test_markdown_escapes_untrusted_step_names(self):
-        report = {"result": "FAIL", "scope": "CI", "sha": SHA, "run_id": "12", "observed_at": "now",
-                  "checks": [w.row("<script>|x", "FAIL", "bad\nrow") ]}
+        report = {
+            "result": "FAIL",
+            "scope": "CI",
+            "sha": SHA,
+            "run_id": "12",
+            "observed_at": "now",
+            "checks": [w.row("<script>|x", "FAIL", "bad\nrow")],
+        }
         md = w.markdown(report)
         self.assertNotIn("<script>", md)
         self.assertIn("&#124;", md)
@@ -241,8 +311,11 @@ class TransportTests(unittest.TestCase):
 
     def test_get_only_and_tokens_never_sent_to_live_site(self):
         reader = self.reader()
-        for url, expected in ((w.GH, "Bearer github-secret"), ("https://api.vercel.com/v4/aliases/x", "Bearer vercel-secret"),
-                              ("https://humanoidonline.com/", None)):
+        for url, expected in (
+            (w.GH, "Bearer github-secret"),
+            ("https://api.vercel.com/v4/aliases/x", "Bearer vercel-secret"),
+            ("https://humanoidonline.com/", None),
+        ):
             reader.get(url)
             req = reader.opener.open.call_args.args[0]
             self.assertEqual(req.get_method(), "GET")
@@ -250,9 +323,17 @@ class TransportTests(unittest.TestCase):
             self.assertIsNone(req.data)
 
     def test_provider_errors_do_not_expose_bodies_or_tokens(self):
-        for code, state in ((401, "UNVERIFIED"), (403, "UNVERIFIED"), (429, "PENDING"), (503, "PENDING"), (302, "PENDING")):
+        for code, state in (
+            (401, "UNVERIFIED"),
+            (403, "UNVERIFIED"),
+            (429, "PENDING"),
+            (503, "PENDING"),
+            (302, "PENDING"),
+        ):
             reader = self.reader()
-            reader.opener.open.side_effect = HTTPError(w.GH, code, "secret", {}, io.BytesIO(b"github-secret"))
+            reader.opener.open.side_effect = HTTPError(
+                w.GH, code, "secret", {}, io.BytesIO(b"github-secret")
+            )
             with self.assertRaises(w.ObservationError) as exc:
                 reader.get(w.GH)
             self.assertEqual(exc.exception.state, state)
@@ -264,10 +345,16 @@ class TransportTests(unittest.TestCase):
         with self.assertRaises(w.ObservationError) as exc:
             reader.get(w.GH)
         self.assertEqual(exc.exception.state, "PENDING")
-        self.assertIsNone(w.NoRedirect().redirect_request(None, None, 302, "", {}, "https://evil.example"))
+        self.assertIsNone(
+            w.NoRedirect().redirect_request(None, None, 302, "", {}, "https://evil.example")
+        )
 
     def test_response_size_and_json_and_status_are_checked(self):
-        for body, status, state in ((b"x" * (w.MAX_BODY + 1), 200, "UNVERIFIED"), (b"not json", 200, "UNVERIFIED"), (b"{}", 204, "PENDING")):
+        for body, status, state in (
+            (b"x" * (w.MAX_BODY + 1), 200, "UNVERIFIED"),
+            (b"not json", 200, "UNVERIFIED"),
+            (b"{}", 204, "PENDING"),
+        ):
             reader = self.reader()
             response = reader.opener.open.return_value.__enter__.return_value
             response.read.return_value, response.status = body, status
@@ -276,7 +363,12 @@ class TransportTests(unittest.TestCase):
             self.assertEqual(exc.exception.state, state)
 
     def test_origin_rejects_credentials_paths_and_insecure_scheme(self):
-        for value in ("http://example.com", "https://user:pass@example.com", "https://example.com/path", "https://example.com?token=x"):
+        for value in (
+            "http://example.com",
+            "https://user:pass@example.com",
+            "https://example.com/path",
+            "https://example.com?token=x",
+        ):
             with self.subTest(value=value), self.assertRaises(w.ObservationError):
                 w.origin(value)
 

@@ -1,0 +1,83 @@
+name: Deployment watcher
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      ci_run_id:
+        description: Existing CI run ID to observe (no rerun or deploy)
+        required: true
+        type: string
+  pull_request:
+    paths:
+      - scripts/deployment_watcher.py
+      - scripts/test_deployment_watcher.py
+      - .github/workflows/deployment-watcher.yml
+
+permissions:
+  contents: read
+  actions: read
+
+# Retries replace only the observer for the same CI run, never another release.
+concurrency:
+  group: deployment-watcher-${{ github.event.workflow_run.id || inputs.ci_run_id || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s scripts -p 'test_deployment_watcher.py' -v
+
+  observe:
+    if: >-
+      github.event_name == 'workflow_run' ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # workflow_run can receive secrets even for fork PRs. Run ONLY trusted main
+      # code, never the observed PR head, and never consume upstream artifacts.
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test trusted observer
+        run: python -m unittest discover -s scripts -p 'test_deployment_watcher.py' -v
+      - name: Observe CI and production
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          WATCHER_CI_RUN_ID: ${{ github.event.workflow_run.id || inputs.ci_run_id }}
+          WATCHER_EXPECTED_SHA: ${{ github.event.workflow_run.head_sha }}
+          WATCHER_NETLIFY_TOKEN: ${{ secrets.WATCHER_NETLIFY_TOKEN }}
+          WATCHER_VERCEL_TOKEN: ${{ secrets.WATCHER_VERCEL_TOKEN }}
+          WATCHER_NETLIFY_SITE_ID: ${{ vars.WATCHER_NETLIFY_SITE_ID }}
+          WATCHER_WEB_ORIGIN: ${{ vars.WATCHER_WEB_ORIGIN || 'https://humanoidonline.com' }}
+          WATCHER_API_ORIGIN: ${{ vars.WATCHER_API_ORIGIN }}
+          WATCHER_VERCEL_TEAM_ID: ${{ vars.WATCHER_VERCEL_TEAM_ID }}
+          WATCHER_VERCEL_API_PROJECT_ID: ${{ vars.WATCHER_VERCEL_API_PROJECT_ID }}
+          WATCHER_VERCEL_API_ALIAS: ${{ vars.WATCHER_VERCEL_API_ALIAS }}
+          WATCHER_VERCEL_WEB_PROJECT_ID: ${{ vars.WATCHER_VERCEL_WEB_PROJECT_ID }}
+          WATCHER_VERCEL_WEB_ALIAS: ${{ vars.WATCHER_VERCEL_WEB_ALIAS }}
+        run: python scripts/deployment_watcher.py
+      - name: Retain observation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-observation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: var/deployment-watcher/
+          if-no-files-found: warn
+          retention-days: 14

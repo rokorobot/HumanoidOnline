@@ -136,6 +136,12 @@ test.describe("@a11y automated WCAG 2.2 AA", () => {
     await expectNoViolations(page, "use-case detail");
   });
 
+  test("about", async ({ page }) => {
+    await page.goto("/about", { waitUntil: "networkidle" });
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expectNoViolations(page, "about");
+  });
+
   test("404 not-found", async ({ page }) => {
     // Unknown slug -> notFound() -> the 404 record, served with HTTP 404.
     const res = await page.goto("/robots/no-such-robot-zzz", { waitUntil: "networkidle" });

@@ -49,6 +49,7 @@ export async function GET(): Promise<Response> {
     `- Catalogue: ${origin}/robots`,
     `- Manufacturers: ${origin}/manufacturers`,
     `- Use cases: ${origin}/use-cases`,
+    `- About HumanoidOnline (entity, methodology, FAQ): ${origin}/about`,
     `- Sitemap: ${origin}/sitemap.xml`,
     "",
     "## Robots (published, canonical)",

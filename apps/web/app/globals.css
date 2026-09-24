@@ -846,3 +846,24 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-line); padding: var(
    contrast-safe signal-as-text token (~4.66:1 AA); same orange semantic. */
 .field-error { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
   color: var(--ho-signal-ink); letter-spacing: var(--ho-tracking-code); }
+
+/* ---- ABOUT (/about) ------------------------------------------------------ */
+/* Readable long-form prose on the data-page grid. Reuses the citation-facts
+   rows for the key-facts table so entity facts read like record facts. */
+.about-intro { max-width: 72ch; padding-bottom: var(--ho-sp-6); }
+.about-intro p, .about-prose p, .about-prose li { line-height: 1.6; }
+.about-intro p + p { margin-top: var(--ho-sp-3); }
+.about-lede { font-size: var(--ho-fs-h2); font-weight: 500; line-height: 1.4; }
+.about-principle { margin: var(--ho-sp-4) 0 0; padding: var(--ho-sp-4) var(--ho-sp-5);
+  border-left: 4px solid var(--ho-signal); font-weight: 700; }
+.about-prose { max-width: 72ch; }
+.about-prose h2 { margin: 10px 0 var(--ho-sp-4); }
+.about-prose h3 { margin: var(--ho-sp-5) 0 var(--ho-sp-2); font-weight: 700; }
+.about-prose p { margin: 0 0 var(--ho-sp-3); }
+.about-prose ul, .about-prose ol { margin: 0 0 var(--ho-sp-3); padding-left: 1.4em; }
+.about-prose li { margin-bottom: var(--ho-sp-2); }
+.about-prose a, .about-facts a { color: inherit; text-decoration: underline; }
+.about-prose a:hover, .about-facts a:hover { color: var(--ho-signal); }
+.about-facts { margin-top: var(--ho-sp-4); }
+.foot-nav { margin: 0; }
+.foot-nav a { color: var(--ho-paper-ink); text-decoration: underline; }

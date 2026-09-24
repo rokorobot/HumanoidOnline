@@ -102,6 +102,9 @@ export function SiteFooter() {
         <span className="ho-chip">WS3 / INTELLIGENCE UI</span>
       </div>
       <div className="wrap foot-legal">
+        <p className="foot-nav">
+          <Link href="/about">About HumanoidOnline</Link>
+        </p>
         <p>&copy; 2026 Humanoid Company. All rights reserved.</p>
         <p>
           <b>HumanoidOnline</b> is a{" "}

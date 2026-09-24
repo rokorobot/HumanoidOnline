@@ -52,6 +52,7 @@ const ROUTES: { path: string; name: string; nav: boolean }[] = [
   { path: "/use-cases", name: "use-cases index", nav: true },
   { path: "/use-cases/warehouse-logistics", name: "use-case detail", nav: true },
   { path: "/find-a-humanoid", name: "wizard", nav: true },
+  { path: "/about", name: "about", nav: true },
 ];
 
 /** Structural invariants every rendered route must satisfy. */

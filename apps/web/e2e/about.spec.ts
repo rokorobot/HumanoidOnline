@@ -11,6 +11,21 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("About page", () => {
+  test("follows the site's visual register: dark hero, numbered sections, live band", async ({
+    page,
+  }) => {
+    await page.goto("/about", { waitUntil: "domcontentloaded" });
+    // Same control-room hero as home, carrying the H1 and the key-facts readout.
+    const hero = page.locator(".hero-shell.ho-dark");
+    await expect(hero.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(hero.locator("dl.about-facts")).toBeVisible();
+    // Numbered section indices 00–07, in order.
+    const indices = await page.locator(".ho-section-index").allTextContents();
+    expect(indices.map((t) => t.slice(0, 2))).toEqual(["00", "01", "02", "03", "04", "05", "06", "07"]);
+    // Live coverage band reuses the home snapshot grammar.
+    await expect(page.locator("section.snapshot.ho-dark .snap")).toHaveCount(4);
+  });
+
   test("server-renders title, H1, key facts and principle", async ({ page }) => {
     await page.goto("/about", { waitUntil: "domcontentloaded" });
     await expect(page).toHaveTitle("About — HumanoidOnline");
@@ -19,9 +34,9 @@ test.describe("About page", () => {
     const facts = page.locator("dl.about-facts");
     await expect(facts).toContainText("Humanoid.Company");
     await expect(facts).toContainText(/\d+ TRACKED · \d+ PUBLISHED/);
-    await expect(facts).toContainText(
+    await expect(page.getByText(
       "Maturity, obtainability and evidence are different facts. Unknown stays unknown.",
-    );
+    )).toBeVisible();
 
     const canonical = page.locator('link[rel="canonical"]');
     await expect(canonical).toHaveAttribute("href", /\/about$/);

@@ -848,22 +848,128 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-line); padding: var(
   color: var(--ho-signal-ink); letter-spacing: var(--ho-tracking-code); }
 
 /* ---- ABOUT (/about) ------------------------------------------------------ */
-/* Readable long-form prose on the data-page grid. Reuses the citation-facts
-   rows for the key-facts table so entity facts read like record facts. */
-.about-intro { max-width: 72ch; padding-bottom: var(--ho-sp-6); }
-.about-intro p, .about-prose p, .about-prose li { line-height: 1.6; }
-.about-intro p + p { margin-top: var(--ho-sp-3); }
-.about-lede { font-size: var(--ho-fs-h2); font-weight: 500; line-height: 1.4; }
-.about-principle { margin: var(--ho-sp-4) 0 0; padding: var(--ho-sp-4) var(--ho-sp-5);
-  border-left: 4px solid var(--ho-signal); font-weight: 700; }
-.about-prose { max-width: 72ch; }
-.about-prose h2 { margin: 10px 0 var(--ho-sp-4); }
-.about-prose h3 { margin: var(--ho-sp-5) 0 var(--ho-sp-2); font-weight: 700; }
-.about-prose p { margin: 0 0 var(--ho-sp-3); }
-.about-prose ul, .about-prose ol { margin: 0 0 var(--ho-sp-3); padding-left: 1.4em; }
-.about-prose li { margin-bottom: var(--ho-sp-2); }
-.about-prose a, .about-facts a { color: inherit; text-decoration: underline; }
-.about-prose a:hover, .about-facts a:hover { color: var(--ho-signal); }
-.about-facts { margin-top: var(--ho-sp-4); }
+/* Built from the home grammar: the hero reuses .hero-shell/.topbar/.subrow/
+   .readout; sections reuse .block/.block-head, the .apps tile grid and the
+   .snapshot band. Only the pieces below are About-specific. */
+.about-hero h1 { font-size: clamp(2.75rem, 8.5vw, 7rem); }
+.about-hero .subrow .cell.about-lede { color: var(--ho-paper-ink); }
+.about-tools { align-items: stretch; }
+.about-principle-label { color: var(--ho-grey-400); }
+.about-principle { margin: var(--ho-sp-3) 0 0; display: flex; flex-direction: column;
+  font-family: var(--ho-font-display-grotesk); font-weight: 800; font-stretch: 75%;
+  font-size: clamp(1.6rem, 4vw, 2.75rem); line-height: 0.95; letter-spacing: -0.02em;
+  text-transform: uppercase; color: var(--ho-paper-ink); }
+.about-principle .sig { color: var(--ho-signal); }
+.about-principle-text { margin-top: var(--ho-sp-3); font-family: var(--ho-font-machine);
+  font-size: var(--ho-fs-mono-s); letter-spacing: var(--ho-tracking-code);
+  color: var(--ho-text-muted); line-height: 1.7; max-width: 52ch; }
+.about-readout-title { color: var(--ho-grey-400); margin-bottom: var(--ho-sp-2); }
+/* Key facts: a real <dl>, drawn as the home readout's dotted leaders. */
+.about-facts { margin: 0; }
+.about-facts .cf-row { display: flex; align-items: baseline; gap: var(--ho-sp-3);
+  padding: 4px 0; font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-code); }
+.about-facts dt { display: flex; align-items: baseline; gap: var(--ho-sp-3); flex: 1;
+  text-transform: uppercase; color: var(--ho-text-muted); white-space: nowrap; }
+.about-facts dt::after { content: ""; flex: 1; align-self: center; height: 0;
+  border-bottom: var(--ho-rule-hair) dotted var(--ho-grey-600); }
+.about-facts dd { margin: 0; text-align: right; color: var(--ho-paper-ink);
+  overflow-wrap: anywhere; max-width: 60%; }
+.about-facts a, .about-inline { color: inherit; text-decoration: underline; }
+.about-facts a:hover, .about-inline:hover { color: var(--ho-signal); }
+
+/* 01 — capability cards */
+.about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  border-top: var(--ho-rule-hair) solid var(--ho-ink); border-left: var(--ho-rule-hair) solid var(--ho-ink); }
+.about-card { display: flex; flex-direction: column; gap: 10px; padding: 16px 16px 18px;
+  background: var(--ho-paper-2); border-right: var(--ho-rule-hair) solid var(--ho-ink);
+  border-bottom: var(--ho-rule-hair) solid var(--ho-ink); }
+.about-card h3, .about-row h3, .about-flow h3, .about-faq h3, .about-prose h3 {
+  font-family: var(--ho-font-display-grotesk); font-weight: 800; font-stretch: 75%;
+  text-transform: uppercase; letter-spacing: -0.01em; line-height: 1; }
+.about-card h3 { font-size: 1.3rem; }
+.about-card p { font-size: var(--ho-fs-small); line-height: 1.6; color: var(--ho-text-muted); }
+.about-card .ho-code, .about-flow .ho-code { margin-top: auto; align-self: flex-start;
+  display: inline-flex; align-items: center; min-height: 28px; color: inherit; }
+.about-card .ho-code:hover, .about-flow .ho-code:hover { background: var(--ho-ink); color: var(--ho-paper-ink); }
+
+/* 02 — stepped list with big index numerals */
+.about-rows { list-style: none; margin: 0; padding: 0; border-top: var(--ho-rule-med) solid var(--ho-ink); }
+.about-row { display: grid; grid-template-columns: 90px minmax(0, 1fr) minmax(0, 1.6fr);
+  gap: var(--ho-sp-5); padding: var(--ho-sp-5) 0; border-bottom: var(--ho-rule-hair) solid var(--ho-line-soft); }
+.about-row .n, .about-flow .n { font-family: var(--ho-font-display-grotesk); font-weight: 800;
+  font-stretch: 75%; font-size: 3rem; line-height: 0.8; letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums; color: var(--ho-ink); }
+.about-row h3 { font-size: 1.45rem; }
+.about-row .txt p { line-height: 1.65; max-width: 68ch; }
+.about-row .txt p + p { margin-top: var(--ho-sp-3); }
+
+/* 03 — coverage band */
+.about-snap-title { color: var(--ho-paper-ink); margin-top: 10px; }
+.about-snap-note { margin-top: var(--ho-sp-5); max-width: 72ch; line-height: 1.8; color: var(--ho-grey-400); }
+
+/* 04 — audiences on the .apps tile grid (not links; the last tile is) */
+.about-audiences { list-style: none; margin: 0; padding: 0; }
+.about-audiences .app { min-height: 150px; justify-content: flex-start; }
+.about-audiences .app:hover { background: transparent; color: inherit; }
+.about-audiences .app:hover .ho-syslabel { color: inherit; }
+.about-aud-body { font-size: var(--ho-fs-small); line-height: 1.55; color: var(--ho-text-muted); }
+.about-audiences .about-aud-cta { justify-content: space-between; background: var(--ho-ink); color: var(--ho-paper-ink); }
+.about-audiences .about-aud-cta:hover { background: var(--ho-signal); color: var(--ho-ink); }
+.about-audiences .about-aud-cta .ho-syslabel { color: var(--ho-signal); }
+.about-audiences .about-aud-cta:hover .ho-syslabel { color: var(--ho-ink); }
+.about-aud-cta .name { color: inherit; }
+.about-aud-cta .name::after { content: ""; position: absolute; inset: 0; }
+.about-aud-cta { position: relative; }
+
+/* 05 — team */
+.about-team-card { border: var(--ho-rule-hair) solid var(--ho-ink); background: var(--ho-paper-2);
+  padding: var(--ho-sp-5); display: flex; flex-direction: column; gap: var(--ho-sp-3); }
+.about-founder { font-family: var(--ho-font-display-grotesk); font-weight: 800; font-stretch: 75%;
+  font-size: clamp(2rem, 5vw, 3.25rem); line-height: 0.92; letter-spacing: -0.02em; text-transform: uppercase; }
+.about-team-meta { margin-top: var(--ho-sp-3); border-top: var(--ho-rule-med) solid var(--ho-ink); padding-top: var(--ho-sp-3); }
+.about-team-meta .ho-leader { padding: 4px 0; color: var(--ho-text-muted); }
+.about-team-meta .ho-leader > span:last-child { color: var(--ho-text); }
+.about-links { list-style: none; margin: 0; padding: 0; display: flex; gap: var(--ho-sp-3); flex-wrap: wrap; }
+.about-links a { color: inherit; text-decoration: underline; }
+.about-prose { max-width: 68ch; }
+.about-prose h3 { font-size: 1.3rem; margin: 0 0 var(--ho-sp-2); }
+.about-prose h3 + p { margin-top: 0; }
+.about-prose p { line-height: 1.7; margin: 0 0 var(--ho-sp-3); }
+.about-prose p + h3 { margin-top: var(--ho-sp-5); }
+
+/* 06 — five-step flow */
+.about-flow { list-style: none; margin: 0; padding: 0; display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr)); border: var(--ho-rule-med) solid var(--ho-ink); }
+.about-flow li { display: flex; flex-direction: column; gap: 10px; padding: 16px;
+  border-right: var(--ho-rule-hair) solid var(--ho-line-soft); min-width: 0; }
+.about-flow li:last-child { border-right: 0; }
+.about-flow li:first-child .n { color: var(--ho-signal-ink); }
+.about-flow h3 { font-size: 1.15rem; }
+.about-flow p { font-size: var(--ho-fs-small); line-height: 1.6; color: var(--ho-text-muted); }
+
+/* 07 — FAQ: disciplined rows */
+.about-faq { border-top: var(--ho-rule-med) solid var(--ho-ink); }
+.about-faq-item { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: var(--ho-sp-5);
+  padding: var(--ho-sp-4) 0; border-bottom: var(--ho-rule-hair) solid var(--ho-line-soft); }
+.about-faq-item .q { color: var(--ho-signal-ink); padding-top: 4px; }
+.about-faq h3 { font-size: 1.15rem; margin-bottom: var(--ho-sp-2); }
+.about-faq p { line-height: 1.65; max-width: 72ch; }
+.about-faq p + p { margin-top: var(--ho-sp-2); }
+
+@media (max-width: 900px) {
+  .about-row { grid-template-columns: 60px minmax(0, 1fr); }
+  .about-row .txt { grid-column: 2; }
+  .about-row .n, .about-flow .n { font-size: 2.2rem; }
+  .about-flow { grid-template-columns: 1fr 1fr; }
+  .about-flow li { border-bottom: var(--ho-rule-hair) solid var(--ho-line-soft); }
+}
+@media (max-width: 560px) {
+  .about-flow { grid-template-columns: 1fr; }
+  .about-flow li { border-right: 0; }
+  .about-faq-item { grid-template-columns: 1fr; gap: var(--ho-sp-2); }
+  .about-facts dd { max-width: 65%; }
+}
+
 .foot-nav { margin: 0; }
 .foot-nav a { color: var(--ho-paper-ink); text-decoration: underline; }

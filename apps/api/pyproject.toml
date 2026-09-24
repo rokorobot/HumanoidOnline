@@ -23,6 +23,10 @@ dependencies = [
 ]
 
 [dependency-groups]
+# Runner-only tooling; default API installs must not include this group.
+discovery = [
+    "playwright>=1.48",
+]
 dev = [
     "pytest>=8",
     "httpx>=0.27",

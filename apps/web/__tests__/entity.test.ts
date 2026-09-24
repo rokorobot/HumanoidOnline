@@ -1,6 +1,12 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { ENTITY, buildAboutJsonLd, entityFacts, type EntityProfile } from "@/lib/entity";
+import {
+  ENTITY,
+  buildAboutJsonLd,
+  entityFacts,
+  formatFoundingDate,
+  type EntityProfile,
+} from "@/lib/entity";
 
 const ORIGIN = "https://entity.test.invalid";
 
@@ -20,7 +26,20 @@ function node(graph: Node[], type: string): Node | undefined {
   return graph.find((n) => n["@type"] === type);
 }
 
-const CONFIRMED: EntityProfile = {
+// Every optional corporate fact unset — proves the omission rule independently
+// of whatever the canonical ENTITY currently confirms.
+const UNCONFIRMED: EntityProfile = {
+  ...ENTITY,
+  founder: null,
+  foundingDate: null,
+  headquarters: null,
+  contactEmail: null,
+  sameAs: [],
+};
+
+// Every optional field set, including ones the canonical ENTITY does not yet
+// confirm (title, profiles, email) — proves they flow through when confirmed.
+const FULLY_CONFIRMED: EntityProfile = {
   ...ENTITY,
   founder: {
     name: "Jane Founder",
@@ -28,12 +47,12 @@ const CONFIRMED: EntityProfile = {
     sameAs: ["https://www.linkedin.com/in/jane-founder", ""],
   },
   foundingDate: "2025",
-  headquarters: "Somewhere, Earth",
+  headquarters: { locality: "Somewhere", country: "Earth", countryCode: "EA" },
   contactEmail: "hello@example.invalid",
   sameAs: ["https://x.com/humanoidonline", "  "],
 };
 
-describe("About JSON-LD — default (unconfirmed corporate facts)", () => {
+describe("About JSON-LD — graph structure", () => {
   it("emits AboutPage, WebSite and Organization linked by @id on the configured origin", () => {
     const g = graphOf();
     const about = node(g, "AboutPage")!;
@@ -57,9 +76,80 @@ describe("About JSON-LD — default (unconfirmed corporate facts)", () => {
       url: "https://humanoid.company/",
     });
   });
+});
 
-  it("omits every unconfirmed field — never a placeholder, empty string or empty list", () => {
+describe("About JSON-LD — canonical confirmed facts", () => {
+  it("publishes founder, founding date and headquarters", () => {
     const g = graphOf();
+    const org = node(g, "Organization")!;
+    const person = node(g, "Person")!;
+
+    expect(org.foundingDate).toBe("2026-08");
+    expect(org.location).toEqual({
+      "@type": "Place",
+      name: "Prague, Czech Republic",
+      address: { "@type": "PostalAddress", addressLocality: "Prague", addressCountry: "CZ" },
+    });
+
+    // Founder Person, connected through Organization.founder.
+    expect(person).toBeDefined();
+    expect(person.name).toBe("Robert Konecny");
+    expect(org.founder).toEqual({ "@id": person["@id"] });
+    expect(person["@id"]).toBe(`${ORIGIN}/about#founder`);
+  });
+
+  it("invents nothing that is not confirmed", () => {
+    const g = graphOf();
+    const org = node(g, "Organization")!;
+    const person = node(g, "Person")!;
+
+    // No contact details until the mailbox exists.
+    expect(org).not.toHaveProperty("email");
+    expect(org).not.toHaveProperty("contactPoint");
+    expect(org).not.toHaveProperty("sameAs");
+    // No street address, postal code or legal name.
+    const address = (org.location as Node).address as Node;
+    expect(Object.keys(address).sort()).toEqual(["@type", "addressCountry", "addressLocality"]);
+    expect(org).not.toHaveProperty("legalName");
+    // Founder: name only — no title, bio, profiles or employment claim.
+    expect(Object.keys(person).sort()).toEqual(["@id", "@type", "name"]);
+
+    const json = JSON.stringify(g);
+    expect(json).not.toMatch(/@humanoidonline\.com|mailto:/i);
+    expect(json).not.toMatch(/TODO|placeholder|\[URL\]|confirm/i);
+  });
+
+  it("visible key facts show the same confirmed facts", () => {
+    const facts = entityFacts();
+    expect(facts.map((f) => f.label)).toEqual([
+      "Name",
+      "Type",
+      "A project of",
+      "Founder",
+      "Founded",
+      "Headquarters",
+    ]);
+    const byLabel = Object.fromEntries(facts.map((f) => [f.label, f.value]));
+    expect(byLabel.Founder).toBe("Robert Konecny");
+    expect(byLabel.Founded).toBe("August 2026");
+    expect(byLabel.Headquarters).toBe("Prague, Czech Republic");
+    expect(facts.some((f) => f.href?.startsWith("mailto:"))).toBe(false);
+  });
+
+  it("visible facts and JSON-LD agree (parity from one source)", () => {
+    const byLabel = Object.fromEntries(entityFacts().map((f) => [f.label, f.value]));
+    const g = graphOf();
+    const org = node(g, "Organization")!;
+    const person = node(g, "Person")!;
+    expect(byLabel.Founder).toBe(person.name);
+    expect(byLabel.Founded).toBe(formatFoundingDate(org.foundingDate as string));
+    expect(byLabel.Headquarters).toBe((org.location as Node).name);
+  });
+});
+
+describe("About JSON-LD — unconfirmed corporate facts", () => {
+  it("omits every unconfirmed field — never a placeholder, empty string or empty list", () => {
+    const g = graphOf(UNCONFIRMED);
     const org = node(g, "Organization")!;
     for (const key of ["founder", "foundingDate", "location", "email", "contactPoint", "sameAs"]) {
       expect(org, key).not.toHaveProperty(key);
@@ -69,36 +159,47 @@ describe("About JSON-LD — default (unconfirmed corporate facts)", () => {
   });
 
   it("visible facts carry only confirmed rows", () => {
-    const labels = entityFacts().map((f) => f.label);
+    const labels = entityFacts(UNCONFIRMED).map((f) => f.label);
     expect(labels).toEqual(["Name", "Type", "A project of"]);
   });
 });
 
-describe("About JSON-LD — confirmed corporate facts", () => {
-  it("adds founder Person, foundingDate, location, contact and sameAs, dropping blank URLs", () => {
-    const g = graphOf(CONFIRMED);
+describe("About JSON-LD — every optional field confirmed", () => {
+  it("adds founder title/profiles, contact and sameAs, dropping blank URLs", () => {
+    const g = graphOf(FULLY_CONFIRMED);
     const org = node(g, "Organization")!;
     const person = node(g, "Person")!;
 
     expect(org.founder).toEqual({ "@id": `${ORIGIN}/about#founder` });
     expect(org.foundingDate).toBe("2025");
-    expect(org.location).toEqual({ "@type": "Place", name: "Somewhere, Earth" });
+    expect((org.location as Node).name).toBe("Somewhere, Earth");
     expect(org.email).toBe("hello@example.invalid");
     expect(org.sameAs).toEqual(["https://x.com/humanoidonline"]);
 
-    expect(person["@id"]).toBe(`${ORIGIN}/about#founder`);
     expect(person.name).toBe("Jane Founder");
     expect(person.jobTitle).toBe("Founder");
-    expect(person.worksFor).toEqual({ "@id": `${ORIGIN}/#organization` });
     expect(person.sameAs).toEqual(["https://www.linkedin.com/in/jane-founder"]);
   });
 
   it("visible facts and JSON-LD agree on the confirmed fields (parity)", () => {
-    const facts = Object.fromEntries(entityFacts(CONFIRMED).map((f) => [f.label, f.value]));
-    const org = node(graphOf(CONFIRMED), "Organization")!;
+    const facts = Object.fromEntries(entityFacts(FULLY_CONFIRMED).map((f) => [f.label, f.value]));
+    const org = node(graphOf(FULLY_CONFIRMED), "Organization")!;
     expect(facts.Founder).toBe("Jane Founder");
     expect(facts.Founded).toBe(org.foundingDate);
     expect(facts.Headquarters).toBe((org.location as Node).name);
     expect(facts.Contact).toBe(org.email);
+  });
+});
+
+describe("formatFoundingDate", () => {
+  it("renders at the source precision and never adds precision", () => {
+    expect(formatFoundingDate("2026")).toBe("2026");
+    expect(formatFoundingDate("2026-08")).toBe("August 2026");
+    expect(formatFoundingDate("2026-08-05")).toBe("5 August 2026");
+  });
+
+  it("passes an unparseable value through unchanged", () => {
+    expect(formatFoundingDate("2026-13")).toBe("2026-13");
+    expect(formatFoundingDate("summer 2026")).toBe("summer 2026");
   });
 });

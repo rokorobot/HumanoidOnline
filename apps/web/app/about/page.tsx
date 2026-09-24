@@ -3,8 +3,8 @@
 //
 // Corporate facts come from lib/entity.ts, which also builds this page's
 // JSON-LD, so the visible key-facts table and the structured data share one
-// source. Unconfirmed corporate facts (founder, founding date, HQ, contact,
-// social profiles) are null there and simply do not render — no placeholders.
+// source. Unconfirmed corporate facts (e.g. contact email, social profiles,
+// founder title) are null there and simply do not render — no placeholders.
 // Coverage counts are live from /api/market-snapshot, never hard-coded.
 import type { Metadata } from "next";
 import Link from "next/link";

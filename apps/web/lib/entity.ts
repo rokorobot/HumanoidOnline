@@ -18,15 +18,22 @@ export interface EntityFounder {
   sameAs: string[];
 }
 
+/** Confirmed headquarters locality — a city and country, never a street address. */
+export interface EntityHeadquarters {
+  locality: string;
+  country: string;
+  /** ISO 3166-1 alpha-2 code of `country`. */
+  countryCode: string;
+}
+
 export interface EntityProfile {
   name: string;
   description: string;
   parentOrganization: { name: string; url: string };
   founder: EntityFounder | null;
-  /** ISO date or year, e.g. "2025". */
+  /** ISO 8601 date at the confirmed precision: "YYYY", "YYYY-MM" or "YYYY-MM-DD". */
   foundingDate: string | null;
-  /** Free-text headquarters location, e.g. "Prague, Czech Republic". */
-  headquarters: string | null;
+  headquarters: EntityHeadquarters | null;
   contactEmail: string | null;
   /** Official HumanoidOnline profiles (LinkedIn, X, ...). */
   sameAs: string[];
@@ -39,10 +46,13 @@ export const ENTITY: EntityProfile = {
     "companies, operators, researchers and buyers compare humanoid robots by " +
     "capabilities, commercial availability, pricing and real-world deployment evidence.",
   parentOrganization: { name: "Humanoid.Company", url: "https://humanoid.company/" },
-  // Not yet confirmed for publication — omitted until set.
-  founder: null,
-  foundingDate: null,
-  headquarters: null,
+  // Confirmed. The founder's title, biography and profiles are NOT confirmed,
+  // so they stay empty rather than guessed.
+  founder: { name: "Robert Konecny", jobTitle: null, sameAs: [] },
+  foundingDate: "2026-08",
+  headquarters: { locality: "Prague", country: "Czech Republic", countryCode: "CZ" },
+  // Not yet confirmed for publication — omitted until set. Do not publish an
+  // address before its mailbox exists.
   contactEmail: null,
   sameAs: [],
 };
@@ -68,6 +78,32 @@ function nonEmpty(urls: string[]): string[] {
   return urls.filter(present);
 }
 
+const MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+/**
+ * Human-readable form of an ISO founding date at its own precision:
+ * "2026" -> "2026", "2026-08" -> "August 2026", "2026-08-05" -> "5 August 2026".
+ * Never adds precision the source does not have; an unparseable value is shown
+ * as-is rather than reinterpreted.
+ */
+export function formatFoundingDate(iso: string): string {
+  const m = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/.exec(iso.trim());
+  if (!m) return iso;
+  const [, year, month, day] = m;
+  if (!month) return year;
+  const name = MONTHS[Number(month) - 1];
+  if (!name) return iso;
+  return day ? `${Number(day)} ${name} ${year}` : `${name} ${year}`;
+}
+
+/** "Prague, Czech Republic". */
+export function formatHeadquarters(hq: EntityHeadquarters): string {
+  return `${hq.locality}, ${hq.country}`;
+}
+
 /** Organization / Person / WebSite / AboutPage graph for /about. */
 export function buildAboutJsonLd(entity: EntityProfile = ENTITY): Record<string, unknown> {
   const origin = siteUrl();
@@ -91,8 +127,16 @@ export function buildAboutJsonLd(entity: EntityProfile = ENTITY): Record<string,
     knowsAbout: ENTITY_KNOWS_ABOUT,
   };
   if (present(entity.foundingDate)) organization.foundingDate = entity.foundingDate;
-  if (present(entity.headquarters)) {
-    organization.location = { "@type": "Place", name: entity.headquarters };
+  if (entity.headquarters) {
+    organization.location = {
+      "@type": "Place",
+      name: formatHeadquarters(entity.headquarters),
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: entity.headquarters.locality,
+        addressCountry: entity.headquarters.countryCode,
+      },
+    };
   }
   if (present(entity.contactEmail)) {
     organization.email = entity.contactEmail;
@@ -113,7 +157,6 @@ export function buildAboutJsonLd(entity: EntityProfile = ENTITY): Record<string,
       "@type": "Person",
       "@id": founderId,
       name: entity.founder.name,
-      worksFor: { "@id": orgId },
     };
     if (present(entity.founder.jobTitle)) person.jobTitle = entity.founder.jobTitle;
     const personSameAs = nonEmpty(entity.founder.sameAs);
@@ -159,8 +202,12 @@ export function entityFacts(entity: EntityProfile = ENTITY): Array<{ label: stri
   if (entity.founder && present(entity.founder.name)) {
     facts.push({ label: "Founder", value: entity.founder.name });
   }
-  if (present(entity.foundingDate)) facts.push({ label: "Founded", value: entity.foundingDate });
-  if (present(entity.headquarters)) facts.push({ label: "Headquarters", value: entity.headquarters });
+  if (present(entity.foundingDate)) {
+    facts.push({ label: "Founded", value: formatFoundingDate(entity.foundingDate) });
+  }
+  if (entity.headquarters) {
+    facts.push({ label: "Headquarters", value: formatHeadquarters(entity.headquarters) });
+  }
   if (present(entity.contactEmail)) {
     facts.push({ label: "Contact", value: entity.contactEmail, href: `mailto:${entity.contactEmail}` });
   }

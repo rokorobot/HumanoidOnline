@@ -48,6 +48,33 @@ test.describe("About page", () => {
     expect(html).not.toMatch(/\[URL\]|\[Add |confirm preferred/i);
   });
 
+  test("confirmed founder, founding date and HQ agree between visible facts and JSON-LD", async ({
+    page,
+  }) => {
+    await page.goto("/about", { waitUntil: "domcontentloaded" });
+
+    const row = (label: string) =>
+      page.locator("dl.about-facts .cf-row").filter({ has: page.locator("dt", { hasText: label }) }).locator("dd");
+    await expect(row("Founder")).toHaveText("Robert Konecny");
+    await expect(row("Founded")).toHaveText("August 2026");
+    await expect(row("Headquarters")).toHaveText("Prague, Czech Republic");
+    // Contact email is not confirmed: no row, no mailto link anywhere.
+    await expect(page.locator("dl.about-facts dt", { hasText: "Contact" })).toHaveCount(0);
+    await expect(page.locator('a[href^="mailto:"]')).toHaveCount(0);
+
+    const raw = await page.locator('script[type="application/ld+json"]').textContent();
+    const graph = JSON.parse(raw!)["@graph"] as Array<Record<string, unknown>>;
+    const org = graph.find((n) => n["@type"] === "Organization")!;
+    const person = graph.find((n) => n["@type"] === "Person")!;
+
+    expect(person.name).toBe("Robert Konecny");
+    expect(org.founder).toEqual({ "@id": person["@id"] });
+    expect(org.foundingDate).toBe("2026-08");
+    expect((org.location as Record<string, unknown>).name).toBe("Prague, Czech Republic");
+    expect(org).not.toHaveProperty("email");
+    expect(raw).not.toContain("contact@humanoidonline.com");
+  });
+
   test("is linked from the footer, the sitemap and llms.txt", async ({ page }) => {
     await page.goto("/robots", { waitUntil: "domcontentloaded" });
     await expect(page.locator('footer.foot a[href="/about"]')).toHaveCount(1);

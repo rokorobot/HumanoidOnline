@@ -90,9 +90,47 @@ test.describe("About page", () => {
     expect(raw).not.toContain("contact@humanoidonline.com");
   });
 
+  test("About sits in the shared primary nav, between Use Cases and the CTA", async ({
+    page,
+  }) => {
+    // Light data register (SiteNav) on a catalogue page.
+    await page.goto("/robots", { waitUntil: "domcontentloaded" });
+    const nav = page.getByRole("navigation", { name: "Primary" });
+    const labels = (await nav.getByRole("link").allTextContents()).map((t) => t.trim());
+    expect(labels).toEqual([
+      "Robots",
+      "Compare",
+      "Manufacturers",
+      "Use Cases",
+      "About",
+      "Find a Humanoid",
+    ]);
+    const about = nav.getByRole("link", { name: "About", exact: true });
+    await expect(about).toHaveAttribute("href", "/about");
+    // About is a normal link; Find a Humanoid stays the one CTA.
+    await expect(about).not.toHaveClass(/cta/);
+    await expect(nav.locator("a.cta")).toHaveCount(1);
+    await expect(nav.locator("a.cta")).toContainText("Find a Humanoid");
+    await about.click();
+    await expect(page).toHaveURL(/\/about$/);
+
+    // Dark register (DarkNav) on the About hero marks About as current.
+    const darkAbout = page
+      .getByRole("navigation", { name: "Primary" })
+      .getByRole("link", { name: "About", exact: true });
+    await expect(darkAbout).toHaveAttribute("aria-current", "page");
+  });
+
   test("is linked from the footer, the sitemap and llms.txt", async ({ page }) => {
     await page.goto("/robots", { waitUntil: "domcontentloaded" });
+    // Footer: a normal link inside the footer navigation, not a stray line.
     await expect(page.locator('footer.foot a[href="/about"]')).toHaveCount(1);
+    await expect(
+      page
+        .getByRole("contentinfo")
+        .getByRole("navigation", { name: "Footer" })
+        .getByRole("link", { name: "About", exact: true }),
+    ).toHaveAttribute("href", "/about");
 
     const sitemap = await (await page.request.get("/sitemap.xml")).text();
     expect(sitemap).toContain("/about</loc>");

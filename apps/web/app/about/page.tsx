@@ -325,7 +325,7 @@ export default async function AboutPage() {
             </div>
             <div className="seg mid">ABOUT / ENTITY DEFINITION</div>
             <div className="seg">
-              <DarkNav active={null} />
+              <DarkNav active="about" />
             </div>
             <div className="corner">
               <span className="ho-star">&#9733;</span>

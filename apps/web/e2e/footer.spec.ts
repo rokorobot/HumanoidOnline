@@ -50,3 +50,26 @@ test("footer brand link appears consistently on other pages", async ({ page }) =
   await expect(page.locator(UPPER)).toHaveAttribute("href", CORPORATE_URL);
   await expect(page.locator(LOWER)).toHaveAttribute("href", CORPORATE_URL);
 });
+
+test("footer lower band: identity/copyright left, secondary nav right", async ({ page }) => {
+  await page.goto("/");
+  const band = page.locator("footer.foot .foot-legal");
+  const id = band.locator(".foot-id");
+  const nav = page.getByRole("contentinfo").getByRole("navigation", { name: "Footer" });
+
+  await expect(id).toContainText("© 2026 Humanoid Company. All rights reserved.");
+  // The footer nav lives in the same band as the copyright, not above it.
+  await expect(band.locator("nav.foot-nav")).toHaveCount(1);
+  const labels = (await nav.getByRole("link").allTextContents()).map((t) => t.trim());
+  expect(labels).toEqual(["Robots", "Compare", "Manufacturers", "Use Cases", "About"]);
+  // Plain links — the orange CTA stays in the top navigation only.
+  await expect(nav.locator("a.cta")).toHaveCount(0);
+
+  // Desktop: identity block on the left, navigation on the right.
+  const vw = page.viewportSize()?.width ?? 0;
+  if (vw >= 900) {
+    const idBox = (await id.boundingBox())!;
+    const navBox = (await nav.boundingBox())!;
+    expect(navBox.x).toBeGreaterThan(idBox.x + idBox.width);
+  }
+});

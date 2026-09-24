@@ -54,6 +54,23 @@ test("@responsive about: hero, key facts and grids fit, no overflow", async ({ p
   await expectWithinViewport(page, "dl.about-facts", "about");
   await expectWithinViewport(page, ".about-grid", "about");
   await expectWithinViewport(page, ".about-flow", "about");
+  await expectWithinViewport(page, "footer nav.foot-nav", "about footer nav");
+  await expectWithinViewport(page, "footer .foot-id", "about footer identity");
+});
+
+test("@responsive primary nav with About: fits and stays operable", async ({ page }) => {
+  // SiteNav (light register) wraps rather than overflowing at phone width.
+  await page.goto("/robots", { waitUntil: "networkidle" });
+  const about = page
+    .getByRole("navigation", { name: "Primary" })
+    .getByRole("link", { name: "About", exact: true });
+  await expect(about).toBeVisible();
+  await expectWithinViewport(page, "nav.nav a[href='/about']", "catalogue nav About");
+  await expectWithinViewport(page, "nav.nav a.cta", "catalogue nav CTA");
+  await expectNoHorizontalOverflow(page, "catalogue nav");
+  await about.click();
+  await expect(page).toHaveURL(/\/about$/);
+  await expectNoHorizontalOverflow(page, "about");
 });
 
 test("@responsive catalogue: cards not clipped, filters reachable", async ({ page }) => {

@@ -606,7 +606,17 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-line); padding: var(
   border-top: var(--ho-rule-hair) solid var(--ho-line-soft);
   font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
   letter-spacing: var(--ho-tracking-code); color: var(--ho-text-muted); }
+.foot-legal { display: flex; justify-content: space-between; align-items: flex-end;
+  gap: var(--ho-sp-4) var(--ho-sp-6); flex-wrap: wrap; }
 .foot-legal p { margin: 0; }
+/* Secondary footer navigation — same machine-label voice as the top nav, in
+   the footer's off-white ink. Links carry padding so each target is >= 24px. */
+.foot-nav ul { list-style: none; margin: 0; padding: 0; display: flex;
+  flex-wrap: wrap; gap: 0 var(--ho-sp-4); }
+.foot-nav a { display: inline-flex; align-items: center; min-height: 28px;
+  color: var(--ho-paper-ink); text-transform: uppercase;
+  letter-spacing: var(--ho-tracking-label); text-decoration: none; }
+.foot-nav a:hover { color: var(--ho-signal); text-decoration: underline; }
 
 /* ---- TRIAD (CommercialTriad) --------------------------------------------- */
 .triad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
@@ -971,5 +981,3 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-line); padding: var(
   .about-facts dd { max-width: 65%; }
 }
 
-.foot-nav { margin: 0; }
-.foot-nav a { color: var(--ho-paper-ink); text-decoration: underline; }

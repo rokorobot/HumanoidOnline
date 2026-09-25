@@ -185,7 +185,10 @@ jobs:
       - name: Start FastAPI (uvicorn)
         working-directory: apps/api
         run: |
-          nohup uv run python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 \
+          # The synced venv's interpreter, not `uv run`: a live `uv run` holds the
+          # uv cache lock, so setup-uv's post-job `uv cache prune` (cache-miss runs
+          # only) waits out UV_LOCK_TIMEOUT (300 s) and fails the job.
+          nohup .venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 \
             > "$RUNNER_TEMP/api.log" 2>&1 &
           for i in $(seq 1 30); do
             if curl -sf http://127.0.0.1:8000/api/market-snapshot > /dev/null; then
@@ -268,7 +271,10 @@ jobs:
       - name: Start FastAPI (uvicorn)
         working-directory: apps/api
         run: |
-          nohup uv run python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 \
+          # The synced venv's interpreter, not `uv run`: a live `uv run` holds the
+          # uv cache lock, so setup-uv's post-job `uv cache prune` (cache-miss runs
+          # only) waits out UV_LOCK_TIMEOUT (300 s) and fails the job.
+          nohup .venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 \
             > "$RUNNER_TEMP/api.log" 2>&1 &
           for i in $(seq 1 30); do
             if curl -sf http://127.0.0.1:8000/ > /dev/null; then echo "API up"; break; fi
@@ -355,7 +361,10 @@ jobs:
       - name: Start FastAPI (uvicorn)
         working-directory: apps/api
         run: |
-          nohup uv run python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 \
+          # The synced venv's interpreter, not `uv run`: a live `uv run` holds the
+          # uv cache lock, so setup-uv's post-job `uv cache prune` (cache-miss runs
+          # only) waits out UV_LOCK_TIMEOUT (300 s) and fails the job.
+          nohup .venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 \
             > "$RUNNER_TEMP/api.log" 2>&1 &
           for i in $(seq 1 30); do
             if curl -sf http://127.0.0.1:8000/api/discovery-review > /dev/null; then

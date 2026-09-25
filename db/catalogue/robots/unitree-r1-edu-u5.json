@@ -78,12 +78,24 @@
           "verified_at": null,
           "confidence": "MEDIUM",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Third-party distributor price, not manufacturer MSRP."
+        },
+        {
+          "source_url": "https://www.reichelt.com/de/en/shop/product/unitree_r1_edu_u5_-_humanoid_robot-417251",
+          "source_type": "OTHER",
+          "source_title": "Unitree R1 EDU U5 — reichelt.com (third-party distributor, DE)",
+          "excerpt": "'Unitree R1 EDU U5 - Humanoid robot' — €27,900.- incl. 19% VAT; plus special shipping: €35.70 per position; 'Special item, note delivery time!'",
+          "published_at": null,
+          "observed_at": "2026-09-26",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-26 by Claude Opus 5.5 (WebFetch; processed page text, no page hash available; stock line re-read in the in-app browser) in a session initiated by Robert Konecny, under research work order 'CATALOGUE FRESHNESS PASS 2026-09-26' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answers plain curl with HTTP 503 'Blocked Request'; read through WebFetch — no block was circumvented. Price unchanged since 2026-09-11. Order wording CHANGED: the 2026-09-11 reading was 'Limited stock, delivery within 1 - 2 business days'; the supplier now shows 'Special item, note delivery time!'."
         }
       ],
       "price_basis": "German supplier price · includes German VAT",
       "shipping_terms": "Plus €35.70 special shipping per item (Germany)",
       "package_contents": "Supplier's generic R1 list: 1× robot (Base or EDU, depending on variant), controller, battery, charger, user manual",
-      "warranty_terms": "Not stated by this supplier. Unitree states 12 months for the R1 EDU line (edition-level, not a seller term)."
+      "warranty_terms": "Not stated by this supplier. Unitree states 12 months for the R1 EDU line (edition-level, not a seller term).",
+      "order_status_note": "Special item — check delivery time with the supplier. Delivery date not confirmed."
     }
   ],
   "availability_offers": [
@@ -92,7 +104,7 @@
       "region_code": "DE",
       "transaction_type": "PURCHASE",
       "availability_status": "AVAILABLE",
-      "note": "reichelt: 'Limited stock, delivery within 1 - 2 business days'. In stock with a stated 1–2 business-day delivery and an add-to-cart flow (no quote wording) → AVAILABLE. 'Limited stock' describes quantity on hand, not a purchase constraint, so LIMITED was not used. lead_time_days left NULL (business days, not calendar days).",
+      "note": "Withdrawn: supplier now shows \"Special item, note delivery time!\" (26 Sep 2026). Previously: reichelt: 'Limited stock, delivery within 1 - 2 business days'. In stock with a stated 1–2 business-day delivery and an add-to-cart flow (no quote wording) → AVAILABLE. 'Limited stock' describes quantity on hand, not a purchase constraint, so LIMITED was not used. lead_time_days left NULL (business days, not calendar days).",
       "evidence": [
         {
           "source_url": "https://www.reichelt.com/de/en/shop/product/unitree_r1_edu_u5_-_humanoid_robot-417251",
@@ -103,10 +115,22 @@
           "verified_at": null,
           "confidence": "MEDIUM",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Seller's own stock statement for this SKU on the DE storefront."
+        },
+        {
+          "source_url": "https://www.reichelt.com/de/en/shop/product/unitree_r1_edu_u5_-_humanoid_robot-417251",
+          "source_type": "OTHER",
+          "source_title": "Unitree R1 EDU U5 — reichelt.com (third-party distributor, DE): in-stock statement withdrawn",
+          "excerpt": "'Special item, note delivery time!' (Model: EDU-U5) — no 'Limited stock' / 'delivery within 1 - 2 business days' wording.",
+          "published_at": null,
+          "observed_at": "2026-09-26",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-26 by Claude Opus 5.5 (WebFetch; processed page text, no page hash available; stock line re-read in the in-app browser) in a session initiated by Robert Konecny, under research work order 'CATALOGUE FRESHNESS PASS 2026-09-26' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answers plain curl with HTTP 503 'Blocked Request'; read through WebFetch — no block was circumvented. Retires this AVAILABLE offer: the supplier no longer states stock or a delivery time, and 'Special item' wording does not establish availability (owner ruling, 2026-09-10/11). The original offer and its evidence are kept as history."
         }
       ],
       "seller_wording": "Limited stock, delivery within 1 - 2 business days",
-      "delivery_estimate_label": "Delivery estimate for Germany: 1–2 business days"
+      "delivery_estimate_label": "Delivery estimate for Germany: 1–2 business days",
+      "is_current": false
     }
   ],
   "deployments": [],

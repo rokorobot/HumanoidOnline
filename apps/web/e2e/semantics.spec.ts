@@ -52,6 +52,7 @@ const ROUTES: { path: string; name: string; nav: boolean }[] = [
   { path: "/use-cases", name: "use-cases index", nav: true },
   { path: "/use-cases/warehouse-logistics", name: "use-case detail", nav: true },
   { path: "/find-a-humanoid", name: "wizard", nav: true },
+  { path: "/about", name: "about", nav: true },
 ];
 
 /** Structural invariants every rendered route must satisfy. */
@@ -78,10 +79,17 @@ async function expectPageStructure(page: Page, where: string, hasNav: boolean) {
     page.getByRole("navigation", { name: "Primary" }),
     `${where}: expected ${hasNav ? "one" : "no"} nav named "Primary"`,
   ).toHaveCount(hasNav ? 1 : 0);
+  // The footer carries its own secondary navigation, named "Footer" and scoped
+  // to the contentinfo landmark, on every route (RootLayout renders it once).
+  await expect(
+    page.getByRole("contentinfo").getByRole("navigation", { name: "Footer" }),
+    `${where}: expected exactly one "Footer" nav inside the footer`,
+  ).toHaveCount(1);
+  // Nothing else: Primary (where composed) + Footer, and no third landmark.
   await expect(
     page.getByRole("navigation"),
     `${where}: unexpected extra navigation landmark`,
-  ).toHaveCount(hasNav ? 1 : 0);
+  ).toHaveCount((hasNav ? 1 : 0) + 1);
 }
 
 test.describe("semantic structure — every public route", () => {
@@ -105,8 +113,13 @@ test.describe("semantic structure — every public route", () => {
     await expect(home).toHaveAttribute("href", "/");
     const catalogue = crumb.getByRole("link", { name: "Robot Catalogue" });
     await expect(catalogue).toHaveAttribute("href", "/robots");
-    // The escape path must NOT reintroduce a nav landmark — the variance holds.
-    await expect(page.getByRole("navigation")).toHaveCount(0);
+    // The escape path must NOT reintroduce a primary nav landmark — the variance
+    // holds. The only navigation landmark is the site-wide footer nav.
+    await expect(page.getByRole("navigation", { name: "Primary" })).toHaveCount(0);
+    await expect(page.getByRole("navigation")).toHaveCount(1);
+    await expect(
+      page.getByRole("contentinfo").getByRole("navigation", { name: "Footer" }),
+    ).toHaveCount(1);
   });
 
   test("match results: one H1, a main landmark, a named primary nav", async ({ page }) => {
@@ -137,6 +150,7 @@ test.describe("semantic structure — every public route", () => {
       "/use-cases",
       "/use-cases/warehouse-logistics",
       "/find-a-humanoid",
+      "/about",
     ]) {
       await page.goto(path, { waitUntil: "networkidle" });
       await expect(

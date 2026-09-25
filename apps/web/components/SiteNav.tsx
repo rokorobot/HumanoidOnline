@@ -1,5 +1,5 @@
 // SiteNav — the restrained PERMANENT nav (system header). One row:
-// HUMANOIDONLINE · ROBOTS · COMPARE · MANUFACTURERS · USE CASES · FIND A HUMANOID.
+// HUMANOIDONLINE · ROBOTS · COMPARE · MANUFACTURERS · USE CASES · ABOUT · FIND A HUMANOID.
 // Orange marks the active section. No bulky SaaS navbar. Two registers:
 // `light` (data pages) and `dark` (used inside the hero/identity top strips).
 import Link from "next/link";
@@ -11,6 +11,7 @@ export type NavSection =
   | "compare"
   | "manufacturers"
   | "use-cases"
+  | "about"
   | "find"
   | null;
 
@@ -19,6 +20,7 @@ const LINKS: { key: Exclude<NavSection, null>; href: string; label: string }[] =
   { key: "compare", href: "/compare", label: "Compare" },
   { key: "manufacturers", href: "/manufacturers", label: "Manufacturers" },
   { key: "use-cases", href: "/use-cases", label: "Use Cases" },
+  { key: "about", href: "/about", label: "About" },
 ];
 
 export function SiteNav({ active = null }: { active?: NavSection }) {
@@ -73,12 +75,25 @@ export function DarkNav({ active = null }: { active?: NavSection }) {
       >
         Use Cases
       </Link>
+      <Link href="/about" aria-current={active === "about" ? "page" : undefined}>
+        About
+      </Link>
       <Link href="/find-a-humanoid" aria-current={active === "find" ? "page" : undefined}>
         Find a Humanoid
       </Link>
     </nav>
   );
 }
+
+// Secondary navigation in the footer's lower band. Plain links — the orange
+// Find a Humanoid CTA stays a top-navigation affordance only.
+const FOOTER_LINKS: { href: string; label: string }[] = [
+  { href: "/robots", label: "Robots" },
+  { href: "/compare", label: "Compare" },
+  { href: "/manufacturers", label: "Manufacturers" },
+  { href: "/use-cases", label: "Use Cases" },
+  { href: "/about", label: "About" },
+];
 
 export function SiteFooter() {
   return (
@@ -101,15 +116,28 @@ export function SiteFooter() {
         </span>
         <span className="ho-chip">WS3 / INTELLIGENCE UI</span>
       </div>
+      {/* Lower band: identity/copyright on the left, secondary footer
+          navigation on the right (stacks below on narrow viewports). */}
       <div className="wrap foot-legal">
-        <p>&copy; 2026 Humanoid Company. All rights reserved.</p>
-        <p>
-          <b>HumanoidOnline</b> is a{" "}
-          <a className="foot-brand-link" href="https://humanoid.company/">
-            <b>Humanoid.Company</b>
-          </a>{" "}
-          brand.
-        </p>
+        <div className="foot-id">
+          <p>&copy; 2026 Humanoid Company. All rights reserved.</p>
+          <p>
+            <b>HumanoidOnline</b> is a{" "}
+            <a className="foot-brand-link" href="https://humanoid.company/">
+              <b>Humanoid.Company</b>
+            </a>{" "}
+            brand.
+          </p>
+        </div>
+        <nav className="foot-nav" aria-label="Footer">
+          <ul>
+            {FOOTER_LINKS.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href}>{l.label}</Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
     </footer>
   );

@@ -90,6 +90,17 @@
           "verified_at": null,
           "confidence": "HIGH",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (curl 8.11.0 (store product JSON) + WebFetch (product page)) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own store. Variant prices and availability flags read from the store's public product data (shop.unitree.com/products/unitree-r1.js, HTTP 200) and the product page."
+        },
+        {
+          "source_url": "https://shop.unitree.com/products/unitree-r1",
+          "source_type": "MANUFACTURER_STORE",
+          "source_title": "Unitree R1 — Unitree official online store (shop.unitree.com)",
+          "excerpt": "Variants 'R1 (White)' $5,900.00 (SKU 00.01.05.00013) and 'R1 (Red)' $5,900.00 (SKU 00.01.05.00109), available=true; 'Shipping costs between $300 and $1200'; 'Customer is responsible for all applicable customs duties, taxes, and import clearance'; refund policy: 'We do not accept returns for ALL items'.",
+          "published_at": null,
+          "observed_at": "2026-09-26",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-26 by Claude Opus 5.5 (curl 8.11.0: store product JSON unitree-r1.js sha256 baa27f4515e623d0…, product page sha256 517027c804ff2b75…, policies/shipping-policy sha256 fe511db062126e5c…, policies/refund-policy sha256 7885151b24a8d075…; product page also rendered in the in-app browser) in a session initiated by Robert Konecny, under research work order 'CATALOGUE FRESHNESS PASS 2026-09-26' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own store. Price, shipping wording and return policy unchanged since 2026-09-11."
         }
       ],
       "price_basis": "Manufacturer store price (USD) · excludes tax, customs duties and shipping",
@@ -115,6 +126,17 @@
           "verified_at": null,
           "confidence": "MEDIUM",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Third-party distributor price, not manufacturer MSRP."
+        },
+        {
+          "source_url": "https://www.reichelt.com/de/en/shop/product/unitree_r1_base_-_humanoid_robot_base_model_blue-417035",
+          "source_type": "OTHER",
+          "source_title": "Unitree R1 Base — reichelt.com (third-party distributor, DE)",
+          "excerpt": "'Unitree R1 Base - Humanoid Robot, Base Model, Blue' — €9,930.- incl. 19% VAT; plus special shipping: €35.70 per position; Man. part no. R1 BASE.",
+          "published_at": null,
+          "observed_at": "2026-09-26",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-26 by Claude Opus 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny, under research work order 'CATALOGUE FRESHNESS PASS 2026-09-26' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answers plain curl with HTTP 503 'Blocked Request'; read through WebFetch — no block was circumvented. Price unchanged since 2026-09-11."
         }
       ],
       "price_basis": "German supplier price · includes German VAT",
@@ -153,6 +175,17 @@
           "verified_at": null,
           "confidence": "MEDIUM",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (curl 8.11.0, raw page) in a session initiated by Robert Konecny, under the Batch 01B commercial completeness audit. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Retires the €8,400 'R1 Base' offer: the variant is no longer offered, so the price is no longer current. The original offer and its evidence are kept as history."
+        },
+        {
+          "source_url": "https://www.quadruped.de/Unitree-R1_1",
+          "source_type": "OTHER",
+          "source_title": "Unitree R1 — QUADRUPED.DE (third-party distributor, DE): R1 Base variant still withdrawn",
+          "excerpt": "Variant selector lists only R1 Edu U1 (+3.800,00 €), U2 (+6.600,00 €), U3 (+16.200,00 €), U4 (+19.000,00 €), U5 (+14.150,00 €) and U6 (+18.600,00 €); 'from 12.200,00 € excl. 19% VAT'; no 'R1 Base' option.",
+          "published_at": null,
+          "observed_at": "2026-09-26",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-26 by Claude Opus 5.5 (curl 8.11.0, raw page sha256 952dcf457dfa4d44…) in a session initiated by Robert Konecny, under research work order 'CATALOGUE FRESHNESS PASS 2026-09-26' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (QUADRUPED Robotics, DE), not the manufacturer. Confirms the offer remains withdrawn; it stays retired (is_current false)."
         }
       ],
       "price_basis": "German supplier price · excludes VAT",
@@ -180,6 +213,17 @@
           "verified_at": null,
           "confidence": "HIGH",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (curl 8.11.0 (store product JSON) + WebFetch (product page)) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own store. Variant prices and availability flags read from the store's public product data (shop.unitree.com/products/unitree-r1.js, HTTP 200) and the product page."
+        },
+        {
+          "source_url": "https://shop.unitree.com/products/unitree-r1",
+          "source_type": "MANUFACTURER_STORE",
+          "source_title": "Unitree R1 — Unitree official online store (shop.unitree.com)",
+          "excerpt": "'In Stock'; 'Add to Cart'; R1 (White) and R1 (Red) available=true. Shipping policy: 'Your order will normally be shipped within 30 business days.'",
+          "published_at": null,
+          "observed_at": "2026-09-26",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-26 by Claude Opus 5.5 (curl 8.11.0: store product JSON unitree-r1.js sha256 baa27f4515e623d0…, product page sha256 517027c804ff2b75…, policies/shipping-policy sha256 fe511db062126e5c…, policies/refund-policy sha256 7885151b24a8d075…; product page also rendered in the in-app browser) in a session initiated by Robert Konecny, under research work order 'CATALOGUE FRESHNESS PASS 2026-09-26' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own store. Stock wording and shipping-policy lead time unchanged since 2026-09-11."
         }
       ],
       "seller_wording": "In Stock",
@@ -201,6 +245,17 @@
           "verified_at": null,
           "confidence": "MEDIUM",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Seller's own stock statement for this SKU on the DE storefront."
+        },
+        {
+          "source_url": "https://www.reichelt.com/de/en/shop/product/unitree_r1_base_-_humanoid_robot_base_model_blue-417035",
+          "source_type": "OTHER",
+          "source_title": "Unitree R1 Base — reichelt.com (third-party distributor, DE)",
+          "excerpt": "Limited stock, delivery within 1 - 2 business days",
+          "published_at": null,
+          "observed_at": "2026-09-26",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-26 by Claude Opus 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny, under research work order 'CATALOGUE FRESHNESS PASS 2026-09-26' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answers plain curl with HTTP 503 'Blocked Request'; read through WebFetch — no block was circumvented. Stock wording unchanged since 2026-09-11."
         }
       ],
       "seller_wording": "Limited stock, delivery within 1 - 2 business days",

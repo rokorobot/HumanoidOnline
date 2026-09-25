@@ -43,6 +43,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${origin}/robots`, changeFrequency: "daily", priority: 0.9 },
     { url: `${origin}/manufacturers`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${origin}/use-cases`, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${origin}/about`, changeFrequency: "monthly", priority: 0.6 },
   ];
 
   const robotPages: MetadataRoute.Sitemap = robots.map((r) => ({

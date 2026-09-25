@@ -70,6 +70,17 @@
           "verified_at": "2026-07-24",
           "confidence": "HIGH",
           "note": "Quote-only commercial model observed directly on the OEM store. The $90,000 figure shown on the same page is explicitly disavowed as the real price (conflict retained in the offer note, not resolved into a published number)."
+        },
+        {
+          "source_url": "https://shop.unitree.com/products/unitree-h1",
+          "source_type": "MANUFACTURER_STORE",
+          "source_title": "Unitree H1 — Unitree official online store (shop.unitree.com)",
+          "excerpt": "'Unitree H1（Contact us for the real price）' — $90,000.00 USD; variant 'H1' available=false; 'Not include customs duties'.",
+          "published_at": null,
+          "observed_at": "2026-09-26",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-26 by Claude Opus 5.5 (curl 8.11.0: store product JSON unitree-h1.js sha256 012e6a8f32e44b5c…, product page sha256 b60e6d856200bcda…) in a session initiated by Robert Konecny, under research work order 'CATALOGUE FRESHNESS PASS 2026-09-26' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own store. The displayed figure is still disavowed by the listing title; QUOTE_ONLY treatment unchanged since 2026-07-24."
         }
       ]
     }
@@ -94,6 +105,17 @@
           "verified_at": "2026-07-24",
           "confidence": "HIGH",
           "note": "Purchase is bespoke/contact-required per the OEM store listing."
+        },
+        {
+          "source_url": "https://shop.unitree.com/products/unitree-h1",
+          "source_type": "MANUFACTURER_STORE",
+          "source_title": "Unitree H1 — Unitree official online store (shop.unitree.com)",
+          "excerpt": "'Contact us for the real price' ... 'Email: sales_global@unitree.cc'",
+          "published_at": null,
+          "observed_at": "2026-09-26",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-26 by Claude Opus 5.5 (curl 8.11.0: store product JSON unitree-h1.js sha256 012e6a8f32e44b5c…, product page sha256 b60e6d856200bcda…) in a session initiated by Robert Konecny, under research work order 'CATALOGUE FRESHNESS PASS 2026-09-26' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own store. Still obtainable only via sales contact; unchanged since 2026-07-24."
         }
       ]
     }

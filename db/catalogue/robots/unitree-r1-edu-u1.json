@@ -78,6 +78,17 @@
           "verified_at": null,
           "confidence": "MEDIUM",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Third-party distributor price, not manufacturer MSRP."
+        },
+        {
+          "source_url": "https://www.reichelt.com/de/en/shop/product/unitree_r1_edu_u1_humanoid_robot_standard-417234",
+          "source_type": "OTHER",
+          "source_title": "Unitree R1 EDU U1 — reichelt.com (third-party distributor, DE)",
+          "excerpt": "'Unitree R1 EDU U1 humanoid robot, standard' — €15,500.- incl. 19% VAT; plus special shipping: €35.70 per position; 'Special item, note delivery time!'",
+          "published_at": null,
+          "observed_at": "2026-09-26",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-26 by Claude Opus 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny, under research work order 'CATALOGUE FRESHNESS PASS 2026-09-26' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answers plain curl with HTTP 503 'Blocked Request'; read through WebFetch — no block was circumvented. Price and order wording unchanged since 2026-09-11."
         }
       ],
       "price_basis": "German supplier price · includes German VAT",

@@ -90,11 +90,22 @@
           "verified_at": null,
           "confidence": "HIGH",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (curl 8.11.0 (store product JSON) + WebFetch (collection page)) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified."
+        },
+        {
+          "source_url": "https://shop.unitree.com/products/unitree-h2",
+          "source_type": "MANUFACTURER_STORE",
+          "source_title": "Unitree H2 — Unitree official online store (shop.unitree.com)",
+          "excerpt": "Single variant 'H2', $29,900.00; store product data available=false; rendered page shows no Add to Cart control, only 'Contact Sales: sales_global@unitree.cc'; 'Not include customs duties'.",
+          "published_at": null,
+          "observed_at": "2026-09-26",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-26 by Claude Opus 5.5 (curl 8.11.0: store product JSON unitree-h2.js sha256 fc1ceb4a64537515…, product page sha256 a07a7ee882a4aef1…; product page also rendered in the in-app browser) in a session initiated by Robert Konecny, under research work order 'CATALOGUE FRESHNESS PASS 2026-09-26' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own store. Price unchanged; still not orderable on the store (2026-09-26)."
         }
       ],
       "price_basis": "Manufacturer store price (USD) · excludes tax, customs duties and shipping",
       "shipping_terms": "Buyer pays customs duties and import taxes; returns not accepted (store policy)",
-      "order_status_note": "Not available to order on the manufacturer store at last check (11 Sep 2026).",
+      "order_status_note": "Not available to order on the manufacturer store at last check (26 Sep 2026).",
       "warranty_terms": "Not stated by the store. Unitree states 8 months for this edition."
     },
     {
@@ -116,6 +127,17 @@
           "verified_at": null,
           "confidence": "MEDIUM",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answered HTTP 503 'Blocked Request' to plain curl; the page was read through WebFetch instead — no block was circumvented. Third-party distributor price, not manufacturer MSRP."
+        },
+        {
+          "source_url": "https://www.reichelt.com/de/en/shop/product/h2_basic_-_humanoid_research_robot-418424",
+          "source_type": "OTHER",
+          "source_title": "Unitree H2 Basic — reichelt.com (third-party distributor, DE)",
+          "excerpt": "'H2 Basic - Humanoid Research Robot' — €49,800.- incl. 19% VAT; plus special shipping: €35.70 per position; 'Special item, note delivery time!'; warranty 'H2 Basis 8 months; H2 EDU and H2 EDU Smart 12 months'; Man. part no. H2-BASIC.",
+          "published_at": null,
+          "observed_at": "2026-09-26",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-26 by Claude Opus 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny, under research work order 'CATALOGUE FRESHNESS PASS 2026-09-26' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (reichelt, DE storefront), not the manufacturer. reichelt answers plain curl with HTTP 503 'Blocked Request'; read through WebFetch — no block was circumvented. Price, order wording and warranty wording unchanged since 2026-09-11."
         }
       ],
       "price_basis": "German supplier price · includes German VAT",
@@ -143,6 +165,17 @@
           "verified_at": null,
           "confidence": "MEDIUM",
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (QUADRUPED Robotics, DE), not the manufacturer."
+        },
+        {
+          "source_url": "https://www.quadruped.de/Unitree-H2-Humanoid-Robot_1",
+          "source_type": "OTHER",
+          "source_title": "Unitree H2 — QUADRUPED.DE (third-party distributor, DE)",
+          "excerpt": "Variant 'H2' — 'from 42.000,00 € excl. 19% VAT , plus shipping costs Available from: 28.12.2026'.",
+          "published_at": null,
+          "observed_at": "2026-09-26",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-26 by Claude Opus 5.5 (curl 8.11.0, raw page sha256 dea5c81e24d5979e…) in a session initiated by Robert Konecny, under research work order 'CATALOGUE FRESHNESS PASS 2026-09-26' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (QUADRUPED Robotics, DE), not the manufacturer. Price and stated availability date unchanged since 2026-09-11."
         }
       ],
       "price_basis": "German supplier price · excludes VAT",

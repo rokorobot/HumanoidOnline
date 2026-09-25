@@ -70,6 +70,17 @@
           "verified_at": "2026-07-24",
           "confidence": "VERIFIED",
           "note": "Store list price observed directly on the OEM store (2026-07-24)."
+        },
+        {
+          "source_url": "https://shop.unitree.com/products/unitree-g1",
+          "source_type": "MANUFACTURER_STORE",
+          "source_title": "Unitree G1 — Unitree official online store (shop.unitree.com)",
+          "excerpt": "Variant 'G1' $13,500.00 (SKU 00.02.05.00069).",
+          "published_at": null,
+          "observed_at": "2026-09-26",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-26 by Claude Opus 5.5 (curl 8.11.0: store product JSON unitree-g1.js sha256 b0dfdef16e95d3fa…, product page sha256 6dfae62f61d3f1fe…) in a session initiated by Robert Konecny, under research work order 'CATALOGUE FRESHNESS PASS 2026-09-26' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own store. Base G1 price unchanged since 2026-07-24. (The listing now also has a 'G1 Pro' variant at $21,500.00 — a different configuration, not this offer.)"
         }
       ]
     },

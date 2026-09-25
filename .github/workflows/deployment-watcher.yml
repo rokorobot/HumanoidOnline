@@ -40,9 +40,13 @@ jobs:
       - run: python -m unittest discover -s scripts -p 'test_deployment_watcher.py' -v
 
   observe:
+    # Default-off: merging this workflow activates nothing. The owner turns it on
+    # by setting the repository variable WATCHER_ENABLED to 'true'.
     if: >-
-      github.event_name == 'workflow_run' ||
-      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+      vars.WATCHER_ENABLED == 'true' && (
+        github.event_name == 'workflow_run' ||
+        (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+      )
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -62,6 +66,9 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           WATCHER_CI_RUN_ID: ${{ github.event.workflow_run.id || inputs.ci_run_id }}
           WATCHER_EXPECTED_SHA: ${{ github.event.workflow_run.head_sha }}
+          # Optional provider deployment-identity checks (comma-separated: netlify,
+          # vercel-api, vercel-web). Empty = none; their tokens/IDs are then unused.
+          WATCHER_PROVIDER_CHECKS: ${{ vars.WATCHER_PROVIDER_CHECKS }}
           WATCHER_NETLIFY_TOKEN: ${{ secrets.WATCHER_NETLIFY_TOKEN }}
           WATCHER_VERCEL_TOKEN: ${{ secrets.WATCHER_VERCEL_TOKEN }}
           WATCHER_NETLIFY_SITE_ID: ${{ vars.WATCHER_NETLIFY_SITE_ID }}

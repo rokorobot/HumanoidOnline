@@ -41,7 +41,7 @@ class Reader:
         }
         self.opener = build_opener(NoRedirect())
 
-    def get(self, url, *, as_json=True):
+    def _request(self, url):
         remaining = self.deadline - time.monotonic()
         if remaining <= 0:
             raise ObservationError("PENDING", "Observation deadline reached")
@@ -56,10 +56,26 @@ class Reader:
             headers.update(
                 {"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
             )
+        return Request(url, headers=headers, method="GET"), min(10, remaining)
+
+    def status(self, url):
+        """HTTP status of a GET, for surfaces that must NOT be served (expect 404).
+
+        No body is read or reported; redirects are not followed (their 3xx is returned).
+        """
+        request, timeout = self._request(url)
         try:
-            with self.opener.open(
-                Request(url, headers=headers, method="GET"), timeout=min(10, remaining)
-            ) as response:
+            with self.opener.open(request, timeout=timeout) as response:
+                return response.status
+        except HTTPError as exc:
+            return exc.code
+        except (URLError, TimeoutError, OSError):
+            raise ObservationError("PENDING", "Network request failed or timed out") from None
+
+    def get(self, url, *, as_json=True):
+        request, timeout = self._request(url)
+        try:
+            with self.opener.open(request, timeout=timeout) as response:
                 if response.status != 200:
                     raise ObservationError(
                         "PENDING", f"Expected HTTP 200, received {response.status}"
@@ -267,8 +283,20 @@ def vercel_observation(reader, env, sha, role):
     )
 
 
+def closed_surface(reader, url):
+    """A non-public surface must not exist in production: 404 passes, any 2xx is a FAIL."""
+    code = reader.status(url)
+    if code == 404:
+        return row(url, "PASS", "HTTP 404 — not served in production", url)
+    if 200 <= code < 300:
+        return row(url, "FAIL", f"Non-public surface is served (HTTP {code})", url)
+    return row(url, "PENDING", f"Expected HTTP 404, received {code}", url)
+
+
 def health_observations(reader, env):
-    api = origin(env.get("WATCHER_API_ORIGIN", ""))
+    if not env.get("WATCHER_API_ORIGIN"):
+        raise ObservationError("UNVERIFIED", "Configure WATCHER_API_ORIGIN for production probes")
+    api = origin(env["WATCHER_API_ORIGIN"])
     web = origin(env.get("WATCHER_WEB_ORIGIN", "https://humanoidonline.com"))
     checks = []
     for path, expected in (
@@ -302,16 +330,51 @@ def health_observations(reader, env):
             )
 
         checks.append(observe(url, web_check))
+    # DATA-D1 operator surfaces are mounted only in relaxed environments.
+    for url in (api + "/api/discovery-review", web + "/discovery-review"):
+        checks.append(observe(url, lambda url=url: closed_surface(reader, url)))
     return checks
+
+
+# Optional provider deployment-identity checks, enabled by name in
+# WATCHER_PROVIDER_CHECKS (comma-separated). Not listed => NOT_APPLICABLE (neutral);
+# listed but misconfigured => UNVERIFIED.
+PROVIDERS = {
+    "netlify": ("Netlify production", lambda r, e, s: netlify_observation(r, e, s)),
+    "vercel-api": ("Vercel api production", lambda r, e, s: vercel_observation(r, e, s, "API")),
+    "vercel-web": ("Vercel web production", lambda r, e, s: vercel_observation(r, e, s, "WEB")),
+}
+PR_SCOPE = "CI only (PR/non-production run) — informational"
+
+
+def enabled_providers(env):
+    names = {n.strip() for n in env.get("WATCHER_PROVIDER_CHECKS", "").split(",") if n.strip()}
+    unknown = sorted(names - PROVIDERS.keys())
+    if unknown:
+        raise ObservationError(
+            "UNVERIFIED", f"Unknown WATCHER_PROVIDER_CHECKS entries: {', '.join(unknown)}"
+        )
+    return [key for key in PROVIDERS if key in names]
+
+
+def provider_rows(reader, env, sha, enabled, *, recheck=False):
+    rows = []
+    for key, (name, check) in PROVIDERS.items():
+        label = name + (" recheck" if recheck else "")
+        if key in enabled:
+            result = observe(label, lambda check=check: check(reader, env, sha))
+            rows.append(dict(result, name=label))
+        elif not recheck:
+            rows.append(
+                row(label, "NOT_APPLICABLE", "Provider check not enabled (WATCHER_PROVIDER_CHECKS)")
+            )
+    return rows
 
 
 def snapshot(reader, env, run_id, sha):
     run = reader.get(f"{GH}/actions/runs/{run_id}")
-    checks = [observe("CI", lambda: ci_observation(reader, run, sha))]
-    if checks[0]["state"] == "UNVERIFIED":
-        return "unverified", checks
     production = run.get("event") == "push" and run.get("head_branch") == "main"
-    scope = "production" if production else "CI only (PR/non-production run)"
+    checks = [observe("CI", lambda: ci_observation(reader, run, sha))]
     if not production:
         # A successful PR CI run must never certify the existing production site.
         checks.append(
@@ -321,46 +384,43 @@ def snapshot(reader, env, run_id, sha):
                 "Production observation only follows a main push CI run",
             )
         )
-        return scope, checks
+        return PR_SCOPE, checks
+    if checks[0]["state"] == "UNVERIFIED":
+        return "production", checks
+    # Supersession: once main has moved on, the newer main run is the enforcement point.
     checks.append(observe("main", lambda: current_main(reader, sha)))
     if checks[-1]["state"] == "SUPERSEDED":
-        return scope, checks
-    checks.append(observe("Netlify production", lambda: netlify_observation(reader, env, sha)))
-    for role in ("API", "WEB"):
-        checks.append(
-            observe(
-                f"Vercel {role.lower()} production",
-                lambda role=role: vercel_observation(reader, env, sha, role),
-            )
-        )
-    if all(c["state"] == "PASS" for c in checks):
+        return "production", checks
+    try:
+        enabled = enabled_providers(env)
+    except ObservationError as exc:
+        return "production", checks + [row("Provider checks", exc.state, str(exc))]
+    scope = (
+        "production health + provider deployment identity (" + ", ".join(enabled) + ")"
+        if enabled
+        else "production health — deployment identity not verified"
+    )
+    checks.extend(provider_rows(reader, env, sha, enabled))
+    if all(c["state"] in ("PASS", "NOT_APPLICABLE") for c in checks):
         try:
             checks.extend(health_observations(reader, env))
         except ObservationError as exc:
             checks.append(row("Live health", exc.state, str(exc)))
-        # Recheck mutable aliases/site pointer after health to catch a deployment
-        # changing between identity verification and the live probes.
+        # Recheck mutable provider pointers (if enabled) and main after the probes to
+        # catch a deployment or main changing during the observation.
+        checks.extend(provider_rows(reader, env, sha, enabled, recheck=True))
         checks.append(
-            observe("Netlify production recheck", lambda: netlify_observation(reader, env, sha))
+            dict(observe("main recheck", lambda: current_main(reader, sha)), name="main recheck")
         )
-        for role in ("API", "WEB"):
-            checks.append(
-                observe(
-                    f"Vercel {role} recheck",
-                    lambda role=role: vercel_observation(reader, env, sha, role),
-                )
-            )
-        checks.append(observe("main recheck", lambda: current_main(reader, sha)))
     else:
         checks.append(
-            row(
-                "Live health", "NOT_CHECKED", "Waiting for CI and all production identities to pass"
-            )
+            row("Live health", "NOT_CHECKED", "Waiting for CI and enabled provider checks to pass")
         )
     return scope, checks
 
 
 def outcome(checks, expired=False):
+    """Overall result. NOT_APPLICABLE and NOT_CHECKED rows are neutral."""
     states = {c["state"] for c in checks}
     for state in ("SUPERSEDED", "FAIL", "UNVERIFIED"):
         if state in states:
@@ -368,6 +428,13 @@ def outcome(checks, expired=False):
     if "PENDING" in states:
         return "TIMEOUT" if expired else "PENDING"
     return "PASS" if "PASS" in states else "UNVERIFIED"
+
+
+def exit_code(report):
+    """PR-scope reports are informational. Production: PASS/SUPERSEDED 0, else 1."""
+    if not report["enforced"]:
+        return 0
+    return 0 if report["result"] in ("PASS", "SUPERSEDED") else 1
 
 
 def markdown(report):
@@ -385,6 +452,10 @@ def markdown(report):
         "",
         f"Scope: **{safe(report['scope'])}**",
         "",
+        "Enforcement: "
+        + ("production (non-PASS fails, except SUPERSEDED)" if report["enforced"]
+           else "informational only (always exits 0)"),
+        "",
         f"Commit: `{safe(report['sha'])}` · CI run: {safe(report['run_id'])}",
         "",
         f"Observed at: {safe(report['observed_at'])}",
@@ -401,7 +472,8 @@ def markdown(report):
     lines += [
         "",
         "Read-only observation; no repairs, reruns, merges, deployments or data writes.",
-        "PASS is limited to the stated scope and observation time. "
+        "PASS is limited to the stated scope and observation time. Without provider "
+        "checks it shows production was healthy, not that this commit is the one live. "
         "HTTP probes do not replace browser journey tests.",
         "",
     ]
@@ -428,6 +500,9 @@ def watch(
             "sha": sha,
             "run_id": run_id,
             "scope": scope,
+            # Only a PR/non-production run is known to be informational; anything else
+            # (including a run that could not be read) is treated as enforceable.
+            "enforced": scope != PR_SCOPE,
             "observed_at": datetime.now(UTC).isoformat(),
             "result": result,
             "checks": checks,
@@ -472,7 +547,7 @@ def main():
         with open(summary, "a", encoding="utf-8") as stream:
             stream.write(text)
     print(f"Watcher: {report['result']} ({report['scope']}); report: {args.output / 'report.md'}")
-    return 0 if report["result"] == "PASS" else 1
+    return exit_code(report)
 
 
 if __name__ == "__main__":

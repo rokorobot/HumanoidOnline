@@ -25,6 +25,8 @@ ENV = {
     "WATCHER_API_ORIGIN": "https://api.example.com",
     "WATCHER_WEB_ORIGIN": "https://humanoidonline.com",
 }
+ENV_PROVIDERS = dict(ENV, WATCHER_PROVIDER_CHECKS="netlify,vercel-api,vercel-web")
+CLOSED = ("https://api.example.com/api/discovery-review", "https://humanoidonline.com/discovery-review")
 RUN = {
     "id": 12,
     "head_sha": SHA,
@@ -78,6 +80,11 @@ class FakeReader:
                 "<html>HumanoidOnline</html>",
                 "text/html; charset=utf-8",
             )
+        self.statuses = {url: 404 for url in CLOSED}
+
+    def status(self, url):
+        self.calls.append(url)
+        return self.statuses[url]
 
     def get(self, url, *, as_json=True):
         self.calls.append(url)
@@ -96,20 +103,94 @@ class WatcherTests(unittest.TestCase):
     def snapshot(self, env=None):
         return w.snapshot(self.reader, ENV if env is None else env, "12", SHA)
 
-    def test_production_pass_requires_all_providers_and_six_live_probes(self):
+    def test_default_production_pass_needs_no_provider_and_says_identity_unverified(self):
         scope, checks = self.snapshot()
-        self.assertEqual(scope, "production")
+        self.assertEqual(scope, "production health — deployment identity not verified")
         self.assertEqual(w.outcome(checks), "PASS")
-        self.assertEqual(len([c for c in checks if c["name"].startswith("https://")]), 6)
+        self.assertEqual(len([c for c in checks if c["state"] == "NOT_APPLICABLE"]), 3)
+        # 6 health/route probes + 2 closed-surface probes.
+        self.assertEqual(len([c for c in checks if c["name"].startswith("https://")]), 8)
+        self.assertFalse(any("api.netlify.com" in u or "api.vercel.com" in u
+                             for u in self.reader.calls))
+
+    def test_production_pass_with_all_provider_checks_enabled(self):
+        scope, checks = self.snapshot(ENV_PROVIDERS)
+        self.assertIn("provider deployment identity (netlify, vercel-api, vercel-web)", scope)
+        self.assertEqual(w.outcome(checks), "PASS")
+        self.assertNotIn("NOT_APPLICABLE", {c["state"] for c in checks})
         self.assertEqual(self.reader.calls.count(SITE_URL), 2)
 
-    def test_pr_success_does_not_claim_production_or_use_provider_credentials(self):
+    def test_enabled_provider_missing_config_is_unverified_disabled_is_neutral(self):
+        env = {
+            "WATCHER_API_ORIGIN": "https://api.example.com",
+            "WATCHER_PROVIDER_CHECKS": "netlify",
+        }
+        _, checks = self.snapshot(env)
+        states = {c["name"]: c["state"] for c in checks}
+        self.assertEqual(states["Netlify production"], "UNVERIFIED")
+        self.assertEqual(states["Vercel api production"], "NOT_APPLICABLE")
+        self.assertEqual(w.outcome(checks), "UNVERIFIED")
+
+    def test_unknown_provider_name_is_unverified(self):
+        _, checks = self.snapshot(dict(ENV, WATCHER_PROVIDER_CHECKS="netlify,heroku"))
+        self.assertEqual(w.outcome(checks), "UNVERIFIED")
+        self.assertIn("heroku", checks[-1]["detail"])
+
+    def test_pr_scope_is_informational_and_never_uses_provider_credentials(self):
         self.reader.data[f"{w.GH}/actions/runs/12"]["event"] = "pull_request"
-        scope, checks = self.snapshot()
-        self.assertIn("CI only", scope)
+        scope, checks = self.snapshot(ENV_PROVIDERS)
+        self.assertEqual(scope, w.PR_SCOPE)
         self.assertEqual(w.outcome(checks), "PASS")
         self.assertEqual(checks[-1]["state"], "NOT_CHECKED")
         self.assertTrue(all(url.startswith(w.GH) for url in self.reader.calls))
+
+    def test_exit_codes_pr_informational_production_enforced(self):
+        for enforced, result, code in (
+            (False, "FAIL", 0),
+            (False, "UNVERIFIED", 0),
+            (False, "TIMEOUT", 0),
+            (True, "PASS", 0),
+            (True, "SUPERSEDED", 0),
+            (True, "FAIL", 1),
+            (True, "UNVERIFIED", 1),
+            (True, "TIMEOUT", 1),
+        ):
+            with self.subTest(enforced=enforced, result=result):
+                self.assertEqual(w.exit_code({"enforced": enforced, "result": result}), code)
+
+    def test_failed_pr_ci_is_reported_but_not_enforced(self):
+        self.reader.data[f"{w.GH}/actions/runs/12"].update(
+            event="pull_request", conclusion="failure"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            report = w.watch(
+                self.reader, ENV, "12", SHA, 60, 30, Path(tmp), clock=lambda: 0, sleep=Mock()
+            )
+        self.assertEqual(report["result"], "FAIL")
+        self.assertFalse(report["enforced"])
+        self.assertEqual(w.exit_code(report), 0)
+
+    def test_closed_surfaces_must_be_404_and_200_is_a_hard_fail(self):
+        for code, state in ((404, "PASS"), (200, "FAIL"), (204, "FAIL"), (503, "PENDING")):
+            with self.subTest(code=code):
+                self.reader = FakeReader()
+                self.reader.statuses[CLOSED[1]] = code
+                _, checks = self.snapshot()
+                self.assertEqual({c["name"]: c["state"] for c in checks}[CLOSED[1]], state)
+                if state == "FAIL":
+                    self.assertEqual(w.outcome(checks), "FAIL")
+
+    def test_missing_api_origin_is_unverified(self):
+        env = dict(ENV)
+        del env["WATCHER_API_ORIGIN"]
+        _, checks = self.snapshot(env)
+        self.assertEqual(w.outcome(checks), "UNVERIFIED")
+        self.assertIn("WATCHER_API_ORIGIN", checks[-2]["detail"])
+
+    def test_alias_coupling_applies_only_when_vercel_api_enabled(self):
+        env = dict(ENV, WATCHER_VERCEL_API_ALIAS="unrelated.example.com")
+        _, checks = self.snapshot(env)
+        self.assertEqual(w.outcome(checks), "PASS")
 
     def test_post_cleanup_failure_is_failure_even_when_tests_passed(self):
         run = self.reader.data[f"{w.GH}/actions/runs/12"]
@@ -146,13 +227,13 @@ class WatcherTests(unittest.TestCase):
         self.assertEqual(w.ci_observation(self.reader, RUN, SHA)["state"], "UNVERIFIED")
 
     def test_missing_configuration_never_passes(self):
-        _, checks = self.snapshot({})
+        _, checks = self.snapshot({"WATCHER_PROVIDER_CHECKS": "netlify,vercel-api,vercel-web"})
         self.assertEqual(w.outcome(checks), "UNVERIFIED")
         self.assertEqual(len([c for c in checks if c["state"] == "UNVERIFIED"]), 3)
 
     def test_old_netlify_commit_does_not_pass_because_site_is_healthy(self):
         self.reader.data[SITE_URL]["published_deploy"]["commit_ref"] = OLD
-        _, checks = self.snapshot()
+        _, checks = self.snapshot(ENV_PROVIDERS)
         self.assertEqual(w.outcome(checks), "PENDING")
         self.assertEqual(w.outcome(checks, expired=True), "TIMEOUT")
         self.assertFalse(
@@ -213,9 +294,10 @@ class WatcherTests(unittest.TestCase):
 
     def test_advanced_main_is_superseded_before_probes(self):
         self.reader.data[f"{w.GH}/git/ref/heads/main"]["object"]["sha"] = OLD
-        _, checks = self.snapshot()
+        _, checks = self.snapshot(ENV_PROVIDERS)
         self.assertEqual(w.outcome(checks), "SUPERSEDED")
         self.assertNotIn(SITE_URL, self.reader.calls)
+        self.assertFalse(any(u.startswith("https://humanoidonline.com") for u in self.reader.calls))
 
     def test_main_advances_during_health_cannot_pass(self):
         values = iter(({"object": {"sha": SHA}}, {"object": {"sha": OLD}}))
@@ -229,7 +311,7 @@ class WatcherTests(unittest.TestCase):
         changed["published_deploy"]["commit_ref"] = OLD
         values = iter((site, changed))
         self.reader.data[SITE_URL] = lambda: next(values)
-        _, checks = self.snapshot()
+        _, checks = self.snapshot(ENV_PROVIDERS)
         self.assertEqual(w.outcome(checks), "PENDING")
 
     def test_readiness_payload_and_html_are_checked(self):
@@ -283,13 +365,14 @@ class WatcherTests(unittest.TestCase):
 
     def test_malformed_provider_response_writes_unverified_report(self):
         self.reader.data[SITE_URL] = []
-        _, checks = self.snapshot()
+        _, checks = self.snapshot(ENV_PROVIDERS)
         self.assertEqual(w.outcome(checks), "UNVERIFIED")
 
     def test_markdown_escapes_untrusted_step_names(self):
         report = {
             "result": "FAIL",
             "scope": "CI",
+            "enforced": True,
             "sha": SHA,
             "run_id": "12",
             "observed_at": "now",
@@ -361,6 +444,22 @@ class TransportTests(unittest.TestCase):
             with self.assertRaises(w.ObservationError) as exc:
                 reader.get(w.GH)
             self.assertEqual(exc.exception.state, state)
+
+    def test_status_probe_returns_code_without_token_or_body(self):
+        reader = self.reader()
+        reader.opener.open.side_effect = HTTPError(
+            "https://humanoidonline.com/discovery-review", 404, "nf", {}, io.BytesIO(b"x")
+        )
+        self.assertEqual(reader.status("https://humanoidonline.com/discovery-review"), 404)
+        req = reader.opener.open.call_args.args[0]
+        self.assertEqual(req.get_method(), "GET")
+        self.assertIsNone(req.get_header("Authorization"))
+        reader.opener.open.side_effect = None
+        self.assertEqual(reader.status("https://humanoidonline.com/discovery-review"), 200)
+        reader.opener.open.side_effect = URLError("down")
+        with self.assertRaises(w.ObservationError) as exc:
+            reader.status("https://humanoidonline.com/discovery-review")
+        self.assertEqual(exc.exception.state, "PENDING")
 
     def test_origin_rejects_credentials_paths_and_insecure_scheme(self):
         for value in (

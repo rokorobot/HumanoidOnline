@@ -23,6 +23,11 @@ Per source, in a deterministic order (by key):
 - NOT_DUE: skipped until the last run's end plus the cadence.
 - otherwise: one SCHEDULED adapter run.
 
+`run_now` (manual dispatch of ONE named source only) skips exactly one check:
+the NOT_DUE cadence wait. Enablement, approval, adapter review, kill switch,
+in-progress/halt/resume rules, robots.txt, policy and crawl limits all apply,
+and the run's operator records that it was a run-now dispatch.
+
 One source failing never stops the others. The cycle result is machine-readable
 (`CycleResult.as_dict`) with an exit code for the scheduler.
 """
@@ -119,9 +124,13 @@ class CycleResult:
                 "sources": [s.as_dict() for s in self.sources]}
 
 
-def scheduled_operator(source: DiscoverySource) -> str:
-    """crawl_run.operator for a scheduled run: who authorized the cadence."""
-    return f"stage-f scheduler (cadence set by {source.observation_cadence_set_by})"
+def scheduled_operator(source: DiscoverySource, run_now: bool = False) -> str:
+    """crawl_run.operator for a scheduled run: who authorized the cadence (and,
+    for a run-now dispatch, that the cadence wait was skipped by a human)."""
+    who = source.observation_cadence_set_by
+    if run_now:
+        return f"stage-f manual dispatch, run-now: cadence wait skipped (cadence set by {who})"
+    return f"stage-f scheduler (cadence set by {who})"
 
 
 def _latest_run(session: Session, source: DiscoverySource) -> CrawlRun | None:
@@ -137,7 +146,8 @@ def _last_activity(session: Session, run: CrawlRun) -> datetime:
 
 
 def assess(session: Session, source: DiscoverySource, config: SourceAdapterConfig | None,
-           now: datetime, kill_engaged: bool) -> tuple[str, str, CrawlRun | None]:
+           now: datetime, kill_engaged: bool,
+           run_now: bool = False) -> tuple[str, str, CrawlRun | None]:
     """(status, detail, run to resume) for one source. Reads only; pure policy.
 
     Status is a skip outcome, WOULD_RUN or WOULD_RESUME."""
@@ -169,7 +179,9 @@ def assess(session: Session, source: DiscoverySource, config: SourceAdapterConfi
         return WOULD_RESUME, f"resume {latest.status} run {latest.id}", latest
     due = next_observation_at(source)
     if due is not None and due > now:
-        return NOT_DUE, f"next due {due.isoformat()}", None
+        if not run_now:
+            return NOT_DUE, f"next due {due.isoformat()}", None
+        return WOULD_RUN, f"run-now: cadence wait skipped (was due {due.isoformat()})", None
     return WOULD_RUN, "", None
 
 
@@ -233,11 +245,14 @@ def observe(
     fetcher_for: Callable[..., HttpFetcher] = _default_fetcher,
     checkpoint: Callable[[], None] | None = None,
     only: str | None = None,
+    run_now: bool = False,
 ) -> CycleResult:
     """One observation cycle. With `plan_only`, nothing is requested or written.
 
     `checkpoint` (e.g. session.commit) makes every run durable as it goes, and is
     what lets one failing source leave the others' work intact."""
+    if run_now and not only:
+        raise ValueError("run_now requires one named source (only=...)")
     commit = checkpoint or session.flush
     result = CycleResult(started_at=now().astimezone(UTC), plan_only=plan_only)
     query = select(DiscoverySource).order_by(DiscoverySource.key)
@@ -247,19 +262,19 @@ def observe(
         key = source.key
         config = adapters.get(key)
         kill = kill_switch_for(key)
-        status, detail, parent = assess(session, source, config, now(), kill())
+        status, detail, parent = assess(session, source, config, now(), kill(), run_now)
         if plan_only or status not in (WOULD_RUN, WOULD_RESUME):
             result.sources.append(SourceObservation(key, status, detail))
             continue
         result.sources.append(_run_one(session, source, config, parent, cache_dir, now,
-                                       kill, fetcher_for, commit))
+                                       kill, fetcher_for, commit, run_now))
     return result
 
 
 def _run_one(session, source, config, parent, cache_dir, now, kill, fetcher_for,
-             commit) -> SourceObservation:
+             commit, run_now=False) -> SourceObservation:
     key, source_id = source.key, source.id
-    operator = scheduled_operator(source)
+    operator = scheduled_operator(source, run_now)
     try:
         with fetcher_for(source, config, parent, kill) as fetcher:
             if parent is not None:

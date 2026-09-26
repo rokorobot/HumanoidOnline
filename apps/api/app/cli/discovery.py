@@ -8,7 +8,7 @@
     python -m app.cli.discovery source disable  <key> --by WHO --reason WHY
     python -m app.cli.discovery source show     <key>
     python -m app.cli.discovery source cadence  <key> (--every 24h|7d | --off) --by WHO
-    python -m app.cli.discovery observe [--plan] [--only KEY] [--report-json PATH]
+    python -m app.cli.discovery observe [--plan] [--only KEY [--run-now]] [--report-json PATH]
     python -m app.cli.discovery cache prune [--apply] [--cache-dir DIR]
     python -m app.cli.discovery plan   <source-key> --url URL [--url URL ...] [--urls-file F]
     python -m app.cli.discovery crawl  <source-key> --operator "Name" --url URL ...
@@ -70,7 +70,9 @@
   enabled source that has a cadence and is due, through each source's reviewed
   adapter (the same gates as `adapter run`). A failing source never stops the
   others; a policy halt is not retried; a FAILED run is resumed at most once.
-  `--plan` shows what a cycle would do: no request, no write. Nothing here
+  `--plan` shows what a cycle would do: no request, no write. `--run-now`
+  (only with `--only KEY`) skips the cadence wait for that one source and
+  nothing else; every approval, robots and policy check still applies. Nothing here
   decides a Stage E question, confirms an alias, traces or promotes.
   Exit: 0 nothing needs a human, 4 a source or new review item needs a human,
   1 a source run failed.
@@ -365,7 +367,7 @@ def _cmd_observe(args: argparse.Namespace) -> int:
     with SessionLocal() as session:
         result = observe(
             session, ADAPTERS, plan_only=args.plan, cache_dir=Path(args.cache_dir),
-            kill_switch_for=kill_switch_for, only=args.only,
+            kill_switch_for=kill_switch_for, only=args.only, run_now=args.run_now,
             checkpoint=None if args.plan else session.commit)
         if args.plan:
             session.rollback()
@@ -465,6 +467,8 @@ def main(argv: list[str] | None = None) -> int:
     observe_cmd.add_argument("--plan", action="store_true",
                              help="what a cycle would do now; no request, no write")
     observe_cmd.add_argument("--only", metavar="SOURCE_KEY", help="consider one source only")
+    observe_cmd.add_argument("--run-now", action="store_true",
+                             help="with --only: skip the cadence wait for that source only")
     observe_cmd.add_argument("--report-json", metavar="PATH",
                              help="also write the machine-readable cycle result")
     observe_cmd.add_argument("--cache-dir", default=str(DEFAULT_CACHE_DIR))
@@ -537,6 +541,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("crawl requires --operator (LIVE.4: a named human starts every run)")
     if args.command == "adapter" and args.action == "run" and not args.operator.strip():
         parser.error("adapter run requires --operator (LIVE.4: a named human starts every run)")
+    if args.command == "observe" and args.run_now and not args.only:
+        parser.error("--run-now requires --only SOURCE_KEY (one named source)")
     if args.command == "adapter" and args.action == "run" and args.index_only and args.resume:
         parser.error("--index-only and --resume cannot be combined")
     if args.command == "crawl" and args.resume and (_urls(args) or args.dry_run):

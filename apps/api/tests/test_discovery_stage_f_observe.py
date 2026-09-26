@@ -172,15 +172,20 @@ class Harness:
                            transport=httpx.MockTransport(self._route),
                            monotonic=self.monotonic, sleep=self.sleep, kill_switch=kill)
 
-    def cycle(self, *, plan_only: bool = False):
+    def cycle(self, *, plan_only: bool = False, only: str | None = None, run_now: bool = False):
         self.session.commit()
         result = observe(
             self.session, self.adapters, plan_only=plan_only, cache_dir=self.cache_dir,
+            only=only, run_now=run_now,
             now=self.now, fetcher_for=self._fetcher,
             kill_switch_for=lambda key: (lambda: key in self.killed),
             checkpoint=None if plan_only else self.session.commit)
         ours = [s for s in result.sources if s.key in self.keys]
         return result, {s.key: s for s in ours}, [s.key for s in ours]
+
+    def _src(self, site: Site) -> DiscoverySource:
+        return self.session.scalars(select(DiscoverySource).where(
+            DiscoverySource.key == site.key)).one()
 
     def candidates(self, site: Site) -> list[DiscoveryCandidate]:
         return list(self.session.scalars(
@@ -585,8 +590,8 @@ def test_a_run_started_between_check_and_start_is_refused_not_duplicated(h, monk
     site = h.source("a")
     real_assess = observe_module.assess
 
-    def racing(session, source, config, now, kill):
-        verdict = real_assess(session, source, config, now, kill)
+    def racing(session, source, config, now, kill, run_now=False):
+        verdict = real_assess(session, source, config, now, kill, run_now)
         if source.key == site.key:
             _running_run(h, site)                         # a manual run wins the race
         return verdict
@@ -594,3 +599,56 @@ def test_a_run_started_between_check_and_start_is_refused_not_duplicated(h, monk
     monkeypatch.setattr(observe_module, "assess", racing)
     _, by_key, _ = h.cycle()
     assert by_key[site.key].status == "RUN_IN_PROGRESS" and site.requests == []
+
+
+# ------------------------------------------------------------------ run-now --
+
+
+def test_run_now_skips_only_the_cadence_wait_for_the_named_source(h):
+    site = h.source("a", last_crawled=h.now() - timedelta(hours=1))
+    other = h.source("b", last_crawled=h.now() - timedelta(hours=1))
+    _, plain, _ = h.cycle(only=site.key)
+    assert plain[site.key].status == "NOT_DUE" and site.requests == []
+    _, plan, _ = h.cycle(only=site.key, run_now=True, plan_only=True)
+    assert plan[site.key].status == "WOULD_RUN" and site.requests == []
+    source = h.session.scalars(select(DiscoverySource).where(
+        DiscoverySource.key == site.key)).one()
+    cadence = source.observation_interval_hours
+    _, by_key, _ = h.cycle(only=site.key, run_now=True)
+    obs = by_key[site.key]
+    assert obs.status == "COMPLETED" and site.requests[0][0] == "/robots.txt"
+    run = h.session.get(CrawlRun, obs.run_id)
+    assert run.trigger == "SCHEDULED" and "run-now: cadence wait skipped" in run.operator
+    assert source.observation_interval_hours == cadence == 24     # cadence unchanged
+    assert source.last_crawled_at == run.finished_at               # next due counts from here
+    assert other.requests == []                                    # only the named source
+
+
+@pytest.mark.parametrize(("setup", "expected"), [
+    (lambda h, s: setattr(h._src(s), "is_enabled", False), "DISABLED"),
+    (lambda h, s: setattr(h._src(s), "observation_interval_hours", None), "NOT_SCHEDULED"),
+    (lambda h, s: h.killed.add(s.key), "KILL_SWITCH"),
+    (lambda h, s: setattr(h._src(s), "allowed_path_prefixes", ["/news"]), "INELIGIBLE"),
+])
+def test_run_now_keeps_every_other_gate(h, setup, expected):
+    site = h.source("a", last_crawled=h.now() - timedelta(hours=1))
+    setup(h, site)
+    _, by_key, _ = h.cycle(only=site.key, run_now=True)
+    assert by_key[site.key].status == expected and site.requests == []
+
+
+def test_run_now_does_not_retry_a_policy_halt(h):
+    site = h.source("a")
+    site.status["/products/b"] = 429
+    h.cycle()
+    seen = len(site.requests)
+    _, by_key, _ = h.cycle(only=site.key, run_now=True)
+    assert by_key[site.key].status == "NEEDS_HUMAN" and len(site.requests) == seen
+
+
+def test_run_now_requires_one_named_source(h, capsys):
+    with pytest.raises(ValueError, match="one named source"):
+        observe(h.session, h.adapters, run_now=True)
+    with pytest.raises(SystemExit):
+        cli.main(["observe", "--run-now"])
+    assert "--run-now requires --only" in capsys.readouterr().err

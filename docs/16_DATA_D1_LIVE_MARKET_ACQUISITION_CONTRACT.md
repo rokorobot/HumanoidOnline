@@ -1238,6 +1238,7 @@ Manual-only operation (LIVE.4) was the **commissioning phase**: it proved the ad
   - It can insert and update the discovery tables, and on `discovery_source` only the run bookkeeping columns.
   - It cannot write the catalogue, record decisions, promote, change approval or cadence, delete, run DDL, or read leads.
   - Migrations stay with the owner role.
+- **Run now.** A manual dispatch may pass `run_now` for **one named source** (`observe --only KEY --run-now`). It skips only the cadence wait. Every other check applies as normal: enablement, approval, adapter review, kill switch, halt and resume rules, the one-running-run guard, robots.txt, policy and crawl limits. The run's operator records it as a run-now dispatch. The cadence is unchanged, and the next due time is counted from this run's end.
 - **The dispatch gate is not a schedule.** The workflow runs only when a human dispatches it and the repository variable `DISCOVERY_OBSERVE_ENABLED` is `true`. Recurring observation needs a `schedule:` trigger, which does not exist.
 - **Retention (Gate Q)** is `discovery cache prune`. It is a dry run unless `--apply`. It applies LIVE.10's 90 days to raw bodies, but always keeps the latest body of every URL and bodies of open runs. Sidecars and provenance are never removed.
 - **Recurring crawling is disabled until operational scheduling is separately enabled by the owner.** The repository provides the cycle and a manual-dispatch workflow that is off by default. No live schedule exists until that separate authorization.

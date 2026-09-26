@@ -373,10 +373,10 @@ def test_refused_adapter_issues_no_request(dsession, world, clock, tmp_path):
         CrawlRun.source_id == source.id)) == 0
 
 
-def test_neura_adapter_is_refused_until_reviewed(dsession):
-    assert set(plan_adapter(NEURA, None)) >= {
-        "ADAPTER_NOT_STRUCTURALLY_REVIEWED", "ADAPTER_HAS_NO_SEEDS",
-        "ADAPTER_HAS_NO_PATH_PREFIXES", "SOURCE_NOT_REGISTERED"}
+def test_neura_adapter_is_refused_while_blocked(dsession):
+    problems = plan_adapter(NEURA, None)
+    assert f"ADAPTER_BLOCKED ({NEURA.blocked_reason})" in problems
+    assert "SOURCE_NOT_REGISTERED" in problems
 
 
 def test_replay_of_the_fixture_run_is_identical(dsession, world, clock, tmp_path):

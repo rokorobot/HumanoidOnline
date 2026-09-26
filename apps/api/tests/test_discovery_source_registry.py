@@ -144,10 +144,10 @@ def test_cli_full_path(shared_session, capsys):
     assert registry.get_source(shared_session, key).is_enabled is False
 
 
-def test_cli_adapter_plan_refuses_the_unreviewed_neura_module(shared_session, capsys):
+def test_cli_adapter_plan_refuses_the_blocked_neura_module(shared_session, capsys):
     assert cli.main(["adapter", "plan", "neura-robotics-official"]) == cli.REFUSED
     out = capsys.readouterr().out
-    assert "ADAPTER_NOT_STRUCTURALLY_REVIEWED" in out and "NOT RUNNABLE" in out
+    assert "ADAPTER_BLOCKED" in out and "NOT RUNNABLE" in out
     assert cli.main(["adapter", "plan", "no-such-source"]) == cli.REFUSED
 
 

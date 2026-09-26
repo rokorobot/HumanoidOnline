@@ -65,6 +65,7 @@ SCHEMA_AVAILABILITY = {
 
 _WS = re.compile(r"\s+")
 _LOC = re.compile(r"<loc>\s*(.*?)\s*</loc>", re.IGNORECASE | re.DOTALL)
+_XML_COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
 
 
 # ------------------------------------------------------------------- config --
@@ -101,6 +102,10 @@ class SourceAdapterConfig:
     structural_review: str | None = None
     #: docs/16 §12.1: at most this many target pages per source and run.
     target_cap: int = 50
+    #: Set when the structural review found the source NOT safe to run with the
+    #: current extraction rules. The runner refuses while it is set, whatever
+    #: the source's approval state.
+    blocked_reason: str | None = None
 
     def kind_of(self, url: str) -> str | None:
         path = urlsplit(url).path or "/"
@@ -210,7 +215,8 @@ def _is_sitemap(body: bytes) -> bool:
 def seed_links(body: bytes) -> list[str]:
     """Raw link targets on a seed page: `<loc>` entries of a sitemap, or anchors."""
     if _is_sitemap(body):
-        return [html.unescape(m) for m in _LOC.findall(body.decode("utf-8", errors="replace"))]
+        text = _XML_COMMENT.sub("", body.decode("utf-8", errors="replace"))
+        return [html.unescape(m) for m in _LOC.findall(text)]
     return list(parse_page(body).links)
 
 

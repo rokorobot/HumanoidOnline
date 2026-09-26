@@ -108,6 +108,8 @@ def adapter_problems(config: SourceAdapterConfig, source: DiscoverySource | None
     problems: list[str] = []
     if config.structural_review is None:
         problems.append("ADAPTER_NOT_STRUCTURALLY_REVIEWED")
+    if config.blocked_reason:
+        problems.append(f"ADAPTER_BLOCKED ({config.blocked_reason})")
     if not config.seed_urls:
         problems.append("ADAPTER_HAS_NO_SEEDS")
     if not config.allowed_path_prefixes:

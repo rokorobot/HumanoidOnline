@@ -135,6 +135,12 @@ def test_sitemap_is_just_another_bounded_seed() -> None:
     ]
 
 
+def test_sitemap_comments_never_yield_locations() -> None:
+    body = (b'<?xml version="1.0"?>\n<!-- lists <loc> entries; <loc>https://x.example/a</loc> -->'
+            b"<urlset><url><loc>https://maker.example/products/ex-1/</loc></url></urlset>")
+    assert seed_links(body) == ["https://maker.example/products/ex-1/"]
+
+
 def test_kind_of_uses_the_adapter_patterns() -> None:
     assert CONFIG.kind_of("https://maker.example/products/ex-1") == PRODUCT
     assert CONFIG.kind_of("https://maker.example/news/2026/launch") == ANNOUNCEMENT
@@ -222,11 +228,11 @@ def test_excerpt_over_limit_is_rejected_not_truncated() -> None:
 # --------------------------------------------------------- source modules --
 
 
-def test_neura_module_is_registered_but_not_runnable() -> None:
+def test_neura_module_is_registered_but_blocked() -> None:
     assert adapter_for("neura-robotics-official") is NEURA
     assert set(ADAPTERS) == {"neura-robotics-official"}
     assert NEURA.manufacturer == "Neura Robotics"          # canonical catalogue name
     assert NEURA.host == "neura-robotics.com"
-    assert NEURA.structural_review is None and NEURA.seed_urls == ()
+    assert NEURA.structural_review is not None and NEURA.blocked_reason
     assert NEURA.target_cap == 50
     assert NEURA.kind_of("https://neura-robotics.com/anything") is None

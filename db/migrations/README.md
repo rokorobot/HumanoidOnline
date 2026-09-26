@@ -248,7 +248,8 @@ Forward migrations:
   `crawl_trigger` gains `SCHEDULED` (the visible schema change LIVE.4 asked for),
   and `discovery_source` gains an attributed observation cadence
   (`observation_interval_hours` 6..2160, `observation_cadence_set_by`/`_at`,
-  CHECK `ck_discovery_source_cadence`). Every existing source stays unscheduled
+  CHECK `ck_discovery_source_cadence`), plus a partial unique index allowing at most
+  one RUNNING `crawl_run` per source. Every existing source stays unscheduled
   (NULL), so applying it starts no crawling. Additive and idempotent.
 
 ## Checksum integrity (WS8.2 / R9)

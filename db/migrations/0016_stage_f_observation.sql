@@ -10,6 +10,10 @@
 --  2. discovery_source gains an attributed observation cadence. NULL interval =
 --     not scheduled, which is what every existing source gets: applying this
 --     migration starts no crawling. The interval is whole hours, 6 h to 90 days.
+--  3. A partial unique index: at most one RUNNING crawl_run per source, so a
+--     manual run and a scheduled cycle can never crawl one source at once. The
+--     second run is refused before any request. (A dead process's RUNNING run
+--     is released by the existing governed `discovery run fail`.)
 --
 -- Additive and idempotent. No existing row changes meaning.
 --
@@ -38,3 +42,6 @@ BEGIN
         );
     END IF;
 END $$;
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_crawl_run_one_running_per_source
+    ON crawl_run (source_id) WHERE status = 'RUNNING';

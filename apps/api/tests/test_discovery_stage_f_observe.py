@@ -538,3 +538,59 @@ def test_cli_cadence_and_observe_plan(dsession, h, monkeypatch, capsys, tmp_path
     assert code == 4 and "PLAN (no request, no write)" in out  # enabled, no adapter module
     assert '"plan_only": true' in report.read_text(encoding="utf-8")
     assert site.requests == []
+
+
+# -------------------------------------------------------------- concurrency --
+
+
+def _running_run(h: Harness, site: Site) -> CrawlRun:
+    source = h.session.scalars(select(DiscoverySource).where(
+        DiscoverySource.key == site.key)).one()
+    run = CrawlRun(source_id=source.id, adapter_key="manual", adapter_version="1",
+                   operator="Robert Konecny (manual)", status="RUNNING", started_at=h.now())
+    h.session.add(run)
+    h.session.commit()
+    return run
+
+
+def test_database_refuses_a_second_running_run_of_one_source_before_any_request(h):
+    from app.services.discovery.acquisition import SOURCE_RUN_IN_PROGRESS, AcquisitionRefused
+    from app.services.discovery.adapter_run import run_adapter
+
+    site = h.source("a")
+    _running_run(h, site)                                 # e.g. a manual run in progress
+    source = h.session.scalars(select(DiscoverySource).where(
+        DiscoverySource.key == site.key)).one()
+    with h._fetcher(source, h.adapters[site.key], None, lambda: False) as fetcher, \
+            pytest.raises(AcquisitionRefused) as exc:
+        run_adapter(h.session, source=source, config=h.adapters[site.key],
+                    operator="scheduler", fetcher=fetcher, cache_dir=h.cache_dir,
+                    now=h.now, checkpoint=h.session.commit, trigger="SCHEDULED")
+    assert [r for _, r in exc.value.problems] == [SOURCE_RUN_IN_PROGRESS]
+    assert site.requests == []
+    assert count(h.session, CrawlRun, source_id=source.id) == 1
+
+
+def test_cycle_skips_a_source_whose_manual_run_is_in_progress(h):
+    site = h.source("a")
+    _running_run(h, site)
+    _, by_key, _ = h.cycle()
+    assert by_key[site.key].status == "RUN_IN_PROGRESS" and site.requests == []
+    assert not by_key[site.key].attention
+
+
+def test_a_run_started_between_check_and_start_is_refused_not_duplicated(h, monkeypatch):
+    from app.services.discovery import observe as observe_module
+
+    site = h.source("a")
+    real_assess = observe_module.assess
+
+    def racing(session, source, config, now, kill):
+        verdict = real_assess(session, source, config, now, kill)
+        if source.key == site.key:
+            _running_run(h, site)                         # a manual run wins the race
+        return verdict
+
+    monkeypatch.setattr(observe_module, "assess", racing)
+    _, by_key, _ = h.cycle()
+    assert by_key[site.key].status == "RUN_IN_PROGRESS" and site.requests == []

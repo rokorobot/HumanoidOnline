@@ -41,6 +41,7 @@ from app.models.acquisition import CrawlRun, ExtractionResult, FetchedPage
 from app.models.discovery import DiscoveryCandidate, DiscoverySource
 from app.services.discovery import cache as body_cache
 from app.services.discovery.acquisition import (
+    SOURCE_RUN_IN_PROGRESS,
     STALE_RUN_AFTER,
     AcquisitionRefused,
     _utcnow,
@@ -273,6 +274,10 @@ def _run_one(session, source, config, parent, cache_dir, now, kill, fetcher_for,
                     trigger="SCHEDULED")
     except AcquisitionRefused as exc:  # includes adapter and resume refusals
         session.rollback()
+        if any(reason == SOURCE_RUN_IN_PROGRESS for _, reason in exc.problems):
+            # A manual (or another scheduled) run started meanwhile; the database
+            # refused this one before any request. Not a fault: next cycle.
+            return SourceObservation(key, RUN_IN_PROGRESS, "another run started first")
         status = NEEDS_HUMAN if parent is not None else REFUSED
         return SourceObservation(key, status, f"refused before any request: {exc}")
     except Exception as exc:  # noqa: BLE001 — one source must not stop the cycle

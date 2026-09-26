@@ -31,6 +31,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from sqlalchemy import event, func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 
@@ -92,6 +93,9 @@ class ResumeRefused(AcquisitionRefused):
 class RobotsUnavailable(Exception):
     pass
 
+
+#: Refusal reason when the source already has a RUNNING run (manual or scheduled).
+SOURCE_RUN_IN_PROGRESS = "SOURCE_RUN_IN_PROGRESS (another run of this source is RUNNING)"
 
 #: Outcomes that count as "fetched successfully": resume never re-requests them.
 COMPLETED_OUTCOMES = ("FETCHED", "NOT_MODIFIED")
@@ -401,8 +405,17 @@ def _run(session, source, urls, operator, fetcher, cache_dir, now, checkpoint,
         },
         counters=counters,
     )
-    session.add(run)
-    session.flush()
+    # One RUNNING run per source, enforced by the database
+    # (uq_crawl_run_one_running_per_source): a concurrent manual or scheduled
+    # run of the same source is refused here, before any request.
+    try:
+        with session.begin_nested():
+            session.add(run)
+            session.flush()
+    except IntegrityError as exc:
+        if "uq_crawl_run_one_running_per_source" not in str(exc.orig):
+            raise
+        raise AcquisitionRefused([("-", SOURCE_RUN_IN_PROGRESS)]) from None
     checkpoint()
 
     status = "COMPLETED"

@@ -115,10 +115,13 @@ def _candidate(session: Session, source: DiscoverySource, ref: str) -> Discovery
     return candidate
 
 
-def _run(session: Session, source: DiscoverySource) -> CrawlRun:
+def _run(session: Session, source: DiscoverySource, *, finished: bool = False) -> CrawlRun:
+    # A source may have only one RUNNING run (uq_crawl_run_one_running_per_source),
+    # so a second run in a test is an ended one, as it would be in reality.
     run = CrawlRun(
         source_id=source.id, adapter_key="test", adapter_version="0.1",
         operator="tester",
+        **({"status": "FAILED", "finished_at": datetime.now(UTC)} if finished else {}),
     )
     session.add(run)
     session.flush()
@@ -574,7 +577,7 @@ def test_a_run_cannot_resume_itself(dsession: Session) -> None:
 
 def test_a_resumed_run_links_to_its_parent(dsession: Session) -> None:
     source = _source(dsession, key="run-5")
-    parent = _run(dsession, source)
+    parent = _run(dsession, source, finished=True)   # a resume follows a FAILED run
     child = CrawlRun(
         source_id=source.id, adapter_key="a", adapter_version="1", operator="op",
         resume_of_run_id=parent.id,
@@ -997,7 +1000,7 @@ def test_a_page_from_another_run_is_refused(dsession: Session) -> None:
     so without the lineage trigger a claim could cite a page fetched during a
     different run and the chain would still look sound."""
     source = _source(dsession, key="lineage-run")
-    run_a = _run(dsession, source)
+    run_a = _run(dsession, source, finished=True)
     run_b = _run(dsession, source)
     page_of_a = _page(dsession, run_a, source)
     candidate = _candidate(dsession, source, "lineage-run")

@@ -1,15 +1,17 @@
 name: Discovery observation (Stage F)
 
-# docs/16 §17.2. MANUAL DISPATCH ONLY: there is deliberately no `schedule:`
-# trigger. Adding one is the owner's separate operational authorization, made
-# in its own reviewed change after this workflow has been reviewed.
+# docs/16 §17.2. Two separate switches, deliberately:
 #
-# Default-off twice over:
-#   - the job runs only when the repository variable DISCOVERY_OBSERVE_ENABLED
-#     is 'true';
-#   - production database access comes only from the `discovery-production`
-#     environment's secret DISCOVERY_DATABASE_URL, which does not exist until
-#     the owner creates it (environments can require approval).
+#   DISPATCH GATE  repository variable DISCOVERY_OBSERVE_ENABLED == 'true'.
+#                  Without it even a manual dispatch runs nothing. It enables
+#                  manual runs only: this file has no `schedule:` trigger.
+#   RECURRING      a `schedule:` trigger. There is NONE. Adding one is the
+#                  owner's separate operational decision, in its own reviewed
+#                  change. Until then every cycle is started by a human.
+#
+# Production database access comes only from the `discovery-production`
+# environment's secret DISCOVERY_DATABASE_URL: the least-privilege
+# `discovery_observer` role (db/roles/discovery_observer.sql), never the owner.
 # Mode `plan` makes no manufacturer request and writes nothing.
 on:
   workflow_dispatch:
@@ -20,11 +22,18 @@ on:
         default: plan
         type: choice
         options: [plan, observe]
+      source:
+        description: "optional: one discovery source key (empty = every source)"
+        required: false
+        default: ""
+        type: string
 
 permissions:
   contents: read
 
-# Never two cycles at once: a second dispatch waits for the first.
+# Never two cycles at once: a second dispatch waits for the first. (Across
+# manual CLI runs and this workflow, the database allows one RUNNING run per
+# source: uq_crawl_run_one_running_per_source.)
 concurrency:
   group: discovery-observe
   cancel-in-progress: false
@@ -38,16 +47,17 @@ jobs:
     env:
       DATABASE_URL: ${{ secrets.DISCOVERY_DATABASE_URL }}
       APP_ENV: production
-      CACHE_DIR: var/discovery/cache
+      MODE: ${{ inputs.mode }}
+      ONLY: ${{ inputs.source }}
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
       - uses: astral-sh/setup-uv@v5
-      # The raw-body cache (docs/16 LIVE.10) lives outside the database. It is
+      # The raw-body cache (docs/16 LIVE.10) lives outside the database and is
       # carried between cycles with a rolling cache key. Losing it is safe:
       # conditional headers are sent only while the prior body is present, so a
-      # cold cache costs full fetches, never wrong results.
+      # cold cache costs full fetches, never wrong results. Pruning is not run.
       - name: Restore raw-body cache
         uses: actions/cache/restore@v4
         with:
@@ -58,14 +68,49 @@ jobs:
         working-directory: apps/api
         run: uv sync --frozen --no-dev --group discovery
       - name: Observation cycle
+        id: cycle
         working-directory: apps/api
-        run: >-
-          uv run --no-sync python -m app.cli.discovery observe
-          ${{ inputs.mode == 'plan' && '--plan' || '' }}
-          --cache-dir "$GITHUB_WORKSPACE/$CACHE_DIR"
-          --report-json "$GITHUB_WORKSPACE/var/discovery/observe/cycle.json"
-          | tee -a "$GITHUB_STEP_SUMMARY"
-        shell: bash -o pipefail {0}
+        shell: bash
+        run: |
+          args=(observe --cache-dir "$GITHUB_WORKSPACE/var/discovery/cache"
+                --report-json "$GITHUB_WORKSPACE/var/discovery/observe/cycle.json")
+          [ "$MODE" = plan ] && args+=(--plan)
+          [ -n "$ONLY" ] && args+=(--only "$ONLY")
+          set +e
+          uv run --no-sync python -m app.cli.discovery "${args[@]}" > "$RUNNER_TEMP/cycle.txt" 2>&1
+          code=$?
+          set -e
+          cat "$RUNNER_TEMP/cycle.txt"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+      # Exit codes (app.services.discovery.observe): 0 no action needed,
+      # 4 human review required, anything else an execution failure. 4 and
+      # failures both fail the job, so GitHub notifies the owner, but the
+      # summary headline says which it is.
+      - name: Summary
+        if: always()
+        shell: bash
+        env:
+          CODE: ${{ steps.cycle.outputs.code }}
+        run: |
+          case "$CODE" in
+            0) head="NO ACTION NEEDED: cycle completed; nothing requires a human." ;;
+            4) head="REVIEW REQUIRED: a source or new Stage E item needs a human. Not an execution failure."
+               echo "::warning::Discovery observation: review required (exit 4)" ;;
+            *) head="EXECUTION FAILURE (exit ${CODE:-none}): a source run failed or the cycle could not run."
+               echo "::error::Discovery observation: execution failure (exit ${CODE:-none})" ;;
+          esac
+          {
+            echo "## Discovery observation ($MODE${ONLY:+, source $ONLY})"
+            echo
+            echo "**$head**"
+            echo
+            echo "Recurring schedule: none (manual dispatch only)."
+            echo
+            echo '```'
+            cat "$RUNNER_TEMP/cycle.txt" 2>/dev/null || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          [ "$CODE" = 0 ]
       - name: Save raw-body cache
         if: always() && inputs.mode == 'observe'
         uses: actions/cache/save@v4

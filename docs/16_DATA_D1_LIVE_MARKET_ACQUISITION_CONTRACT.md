@@ -435,6 +435,12 @@ Retention is asymmetric on purpose:
 | failed / blocked responses | **30 days** |
 | crawl manifests, page hashes, evidence excerpts, provenance records | **indefinitely**, unless a later retention policy supersedes this |
 
+**Retention exception** *(Stage F, §17.2)*: `discovery cache prune` never removes two kinds of body, whatever their age:
+- the **latest successful body of each URL**, because a later `304 Not Modified` is answered from it (seed expansion, re-extraction), and a conditional request is only sent while it exists;
+- bodies belonging to an **unfinished run** (RUNNING, FAILED or CANCELLED), which a resume may still extract.
+
+So the 90 days applies to superseded bodies. Pruning is manual (dry run unless `--apply`) and is not part of the scheduled cycle.
+
 The distinction is the whole point: the *evidence* of what a page said, and the
 audit trail of what we did, are durable; the *page* is not. The cache is never
 committed, never deployed, and is not a corpus — content addressing means an
@@ -1226,6 +1232,13 @@ Manual-only operation (LIVE.4) was the **commissioning phase**: it proved the ad
   - A redirect to a different resource, or off policy, is never learned.
 - **Failures are bounded.** A policy halt (401/403/429, or robots unavailable) is a finding and is **not retried**; a robots disallow still disables the source. A FAILED or CANCELLED run is resumed **once** through the governed resume; if that fails too, the source is reported for a human and not retried again.
 - **Scheduled observation never implies promotion.** Stage F reports queue counts per source; it makes no Stage E decision, confirms no alias, records no trace and promotes nothing. **Human Stage E decisions remain authoritative**: a decided pair or a rejected candidate is not raised again on later cycles.
+- **One run per source at a time.** The database allows at most one RUNNING `crawl_run` per source (`uq_crawl_run_one_running_per_source`). A manual run and a scheduled cycle can never crawl the same source concurrently; the second is refused before any request. A dead process's run is released by the existing governed `discovery run fail`.
+- **Least privilege.** Scheduled observation connects as `discovery_observer` (`db/roles/discovery_observer.sql`).
+  - It can read the discovery layer, the Stage E decisions and audit, and the catalogue rows the identity resolver loads.
+  - It can insert and update the discovery tables, and on `discovery_source` only the run bookkeeping columns.
+  - It cannot write the catalogue, record decisions, promote, change approval or cadence, delete, run DDL, or read leads.
+  - Migrations stay with the owner role.
+- **The dispatch gate is not a schedule.** The workflow runs only when a human dispatches it and the repository variable `DISCOVERY_OBSERVE_ENABLED` is `true`. Recurring observation needs a `schedule:` trigger, which does not exist.
 - **Retention (Gate Q)** is `discovery cache prune`. It is a dry run unless `--apply`. It applies LIVE.10's 90 days to raw bodies, but always keeps the latest body of every URL and bodies of open runs. Sidecars and provenance are never removed.
 - **Recurring crawling is disabled until operational scheduling is separately enabled by the owner.** The repository provides the cycle and a manual-dispatch workflow that is off by default. No live schedule exists until that separate authorization.
 

@@ -1623,6 +1623,10 @@ CREATE INDEX idx_promotion_audit_candidate ON promotion_audit (candidate_id);
 CREATE INDEX idx_eligibility_review_source   ON source_eligibility_review (source_id, reviewed_at DESC);
 CREATE INDEX idx_crawl_run_source            ON crawl_run (source_id, started_at DESC);
 CREATE INDEX idx_crawl_run_status            ON crawl_run (status);
+-- Stage F1 (migration 0016): at most one RUNNING run per source, so a manual run and
+-- a scheduled cycle can never crawl the same source at the same time.
+CREATE UNIQUE INDEX uq_crawl_run_one_running_per_source
+    ON crawl_run (source_id) WHERE status = 'RUNNING';
 CREATE INDEX idx_fetched_page_run            ON fetched_page (crawl_run_id);
 CREATE INDEX idx_fetched_page_url            ON fetched_page (source_id, url);
 CREATE INDEX idx_fetched_page_hash           ON fetched_page (content_hash);

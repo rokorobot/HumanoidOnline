@@ -69,6 +69,6 @@ MIGRATIONS: dict[str, str] = {
         "b84a701ab92a6873a1a0e9ba4dd4626d968d1871b3a87f838705cf1f8115d65e"
     ),
     "0016_stage_f_observation": (
-        "97485b9c0ccb314edd5ee16b7b68289ec753637a0c811a284fc6f67c12909f90"
+        "2656961023871e872b83991e05acbe10640f4f4f88386dec4b1f1899b3830a99"
     ),
 }

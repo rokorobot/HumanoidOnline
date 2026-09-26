@@ -31,6 +31,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from sqlalchemy import event, func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 
@@ -47,6 +48,7 @@ from app.services.discovery.fetcher import (
 )
 from app.services.discovery.fingerprint import FINGERPRINT_VERSION, fingerprint, sha256_hex
 from app.services.discovery.robots import RobotsRules, parse
+from app.services.discovery.urlref import UnsupportedUrl, normalize_url
 
 #: One bounded enumeration step (docs/16 §12.1): given the seed pages this run
 #: fetched and the robots rules in force, return the target URLs to fetch next.
@@ -55,6 +57,8 @@ Expander = Callable[[list[tuple[FetchedPage, bytes]], RobotsRules], list[str]]
 
 ADAPTER_KEY = "http-url-list"
 ADAPTER_VERSION = "1"
+#: crawl_trigger values: a named human's run, or Stage F scheduled observation.
+TRIGGERS = ("MANUAL", "SCHEDULED")
 #: docs/16 LIVE.2 — a robots evaluation older than this is re-read before use.
 ROBOTS_MAX_AGE = timedelta(hours=24)
 
@@ -89,6 +93,9 @@ class ResumeRefused(AcquisitionRefused):
 class RobotsUnavailable(Exception):
     pass
 
+
+#: Refusal reason when the source already has a RUNNING run (manual or scheduled).
+SOURCE_RUN_IN_PROGRESS = "SOURCE_RUN_IN_PROGRESS (another run of this source is RUNNING)"
 
 #: Outcomes that count as "fetched successfully": resume never re-requests them.
 COMPLETED_OUTCOMES = ("FETCHED", "NOT_MODIFIED")
@@ -230,20 +237,51 @@ def classify(session: Session, page: FetchedPage, version: str = FINGERPRINT_VER
     return page.outcome  # BLOCKED_BY_ROBOTS / BLOCKED_BY_SOURCE
 
 
-def _validators(session: Session, source: DiscoverySource, url: str) -> dict[str, str]:
-    prior = session.scalars(
+def _latest_fetch(session: Session, source: DiscoverySource, url: str) -> FetchedPage | None:
+    return session.scalars(
         select(FetchedPage)
         .where(FetchedPage.source_id == source.id, FetchedPage.url == url,
                FetchedPage.outcome == "FETCHED")
         .order_by(FetchedPage.retrieved_at.desc())
         .limit(1)
     ).first()
+
+
+def _validators(session: Session, source: DiscoverySource, url: str,
+                cache_dir: Path | None = None) -> dict[str, str]:
+    """Conditional-request headers from the latest successful observation.
+
+    With `cache_dir`, they are sent only while that observation's body is still
+    cached: a 304 means "what you have is current", which is useless when we no
+    longer have it (a seed could not be expanded, a page not re-extracted)."""
+    prior = _latest_fetch(session, source, url)
     headers: dict[str, str] = {}
-    if prior is not None and prior.etag:
+    if prior is None or (cache_dir is not None
+                         and not body_cache.observed_body_available(cache_dir, str(prior.id))):
+        return headers
+    if prior.etag:
         headers["If-None-Match"] = prior.etag
-    if prior is not None and prior.last_modified:
+    if prior.last_modified:
         headers["If-Modified-Since"] = prior.last_modified
     return headers
+
+
+def learned_canonical(session: Session, source: DiscoverySource, url: str) -> str | None:
+    """The URL that actually served `url` last time, when it differs only in
+    representation (normalizes to the same URL, e.g. a trailing-slash redirect).
+
+    Requesting it directly saves the redirect hop and lets the conditional
+    headers reach the resource that set them. A redirect to a different resource
+    is never learned. The caller must still pass it through the source policy
+    and robots.txt; if either refuses, the planned URL is requested as usual."""
+    prior = _latest_fetch(session, source, url)
+    if prior is None or not prior.final_url or prior.final_url == url:
+        return None
+    try:
+        same = normalize_url(prior.final_url) == normalize_url(url)
+    except UnsupportedUrl:
+        return None
+    return prior.final_url if same else None
 
 
 # -------------------------------------------------------------------- run --
@@ -290,10 +328,12 @@ def run_acquisition(
     adapter: tuple[str, str] = (ADAPTER_KEY, ADAPTER_VERSION),
     manifest_extra: dict | None = None,
     resume_of: CrawlRun | None = None,
+    trigger: str = "MANUAL",
 ) -> CrawlRun:
-    """One MANUAL run over an explicit URL list. Refuses before any request if
-    the source or any URL fails policy. `checkpoint` (e.g. session.commit) is
-    called after every durable step; the caller owns the transaction.
+    """One run over an explicit URL list (MANUAL, or SCHEDULED by Stage F).
+    Refuses before any request if the source or any URL fails policy.
+    `checkpoint` (e.g. session.commit) is called after every durable step; the
+    caller owns the transaction.
 
     With `expand`, `urls` are the run's seeds: after the last seed, `expand` is
     called once with the fetched seed bodies and returns target URLs, which are
@@ -307,6 +347,8 @@ def run_acquisition(
     A resume (`resume_of`) may legitimately have nothing left to fetch."""
     if not operator or not operator.strip():
         raise AcquisitionRefused([("-", "OPERATOR_REQUIRED")])
+    if trigger not in TRIGGERS:
+        raise AcquisitionRefused([("-", f"UNKNOWN_TRIGGER ({trigger})")])
     if urls or resume_of is None:
         _refuse_unless_planned(source, urls, fetcher.limits.page_cap)
     else:
@@ -317,7 +359,7 @@ def run_acquisition(
     release = _guard_writes(session)
     try:
         return _run(session, source, urls, operator.strip(), fetcher, cache_dir, now,
-                    checkpoint, expand, adapter, manifest_extra or {}, resume_of)
+                    checkpoint, expand, adapter, manifest_extra or {}, resume_of, trigger)
     finally:
         release()
 
@@ -336,17 +378,18 @@ def _prior_body(session: Session, source: DiscoverySource, url: str,
 
 
 def _run(session, source, urls, operator, fetcher, cache_dir, now, checkpoint,
-         expand, adapter, manifest_extra, resume_of) -> CrawlRun:
+         expand, adapter, manifest_extra, resume_of, trigger="MANUAL") -> CrawlRun:
     counters = {
         "requested": len(urls), "attempted": 0, "fetched": 0, "not_modified": 0,
         FIRST_OBSERVATION.lower(): 0, UNCHANGED.lower(): 0, CHANGED.lower(): 0,
         SOURCE_REMOVED.lower(): 0, FETCH_ERROR.lower(): 0,
         "blocked_by_robots": 0, "blocked_by_source": 0, "redirects_refused": [],
         "not_attempted": 0, "halt_reason": None, "canonical_rows_written": 0,
+        "learned_canonical_requests": [],
     }
     run = CrawlRun(
         source_id=source.id, adapter_key=adapter[0], adapter_version=adapter[1],
-        trigger="MANUAL", operator=operator, status="RUNNING", started_at=now(),
+        trigger=trigger, operator=operator, status="RUNNING", started_at=now(),
         resume_of_run_id=resume_of.id if resume_of is not None else None,
         run_manifest={
             "source_key": source.key,
@@ -362,8 +405,17 @@ def _run(session, source, urls, operator, fetcher, cache_dir, now, checkpoint,
         },
         counters=counters,
     )
-    session.add(run)
-    session.flush()
+    # One RUNNING run per source, enforced by the database
+    # (uq_crawl_run_one_running_per_source): a concurrent manual or scheduled
+    # run of the same source is refused here, before any request.
+    try:
+        with session.begin_nested():
+            session.add(run)
+            session.flush()
+    except IntegrityError as exc:
+        if "uq_crawl_run_one_running_per_source" not in str(exc.orig):
+            raise
+        raise AcquisitionRefused([("-", SOURCE_RUN_IN_PROGRESS)]) from None
     checkpoint()
 
     status = "COMPLETED"
@@ -654,7 +706,16 @@ def _acquire_one(session, run, source, url, robots, fetcher, cache_dir, now, cou
             return reason
         return None if robots.rules.allows(target) else "ROBOTS_DISALLOW"
 
-    result = fetcher.get_following(url, _validators(session, source, url), hop_refusal)
+    # Stage F: request the URL that served this page last time when it differs
+    # only in representation (no redirect hop; validators reach the right resource).
+    # It must pass the source policy and robots like any hop; otherwise `url`.
+    request_url = url
+    learned = learned_canonical(session, source, url)
+    if learned is not None and hop_refusal(learned) is None:
+        request_url = learned
+        counters["learned_canonical_requests"].append({"url": url, "requested": learned})
+    result = fetcher.get_following(request_url, _validators(session, source, url, cache_dir),
+                                   hop_refusal)
     response = result.response
     page.retrieved_at = now()
     page.retrieval_method = RETRIEVAL_METHOD
@@ -725,7 +786,8 @@ def build_report(session: Session, run_id) -> str:
     ).all()
     lines = [
         f"RUN {run.id}   source={manifest.get('source_key')}   "
-        f"adapter={run.adapter_key}@{run.adapter_version}   operator={run.operator}",
+        f"adapter={run.adapter_key}@{run.adapter_version}   trigger={run.trigger}   "
+        f"operator={run.operator}",
         f"started={run.started_at.isoformat()}  finished="
         f"{run.finished_at.isoformat() if run.finished_at else '-'}  status={run.status}"
         f"  resumed_from={run.resume_of_run_id or '-'}",
@@ -753,6 +815,8 @@ def build_report(session: Session, run_id) -> str:
         f"Blocked by robots / by source        {counters.get('blocked_by_robots', 0)}"
         f" / {counters.get('blocked_by_source', 0)}",
         f"Redirects refused                    {len(counters.get('redirects_refused', []))}",
+        f"Learned canonical URLs requested     "
+        f"{len(counters.get('learned_canonical_requests', []))}",
         f"Not attempted                        {counters.get('not_attempted', 0)}",
         f"Halt reason                          {counters.get('halt_reason') or '-'}",
         f"Canonical rows written               {counters.get('canonical_rows_written', 0)}",

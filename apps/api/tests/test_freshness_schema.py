@@ -7,7 +7,7 @@ WorkOrder "Scheduled Freshness Foundation v0.1" tests:
   C. DiscoverySource FK integrity
   V. freshness_trigger cannot authorize generic DATA-D1 radar ingest
      (structurally: no shared table/FK with crawl_run)
-  W. crawl_trigger remains MANUAL-only
+  W. crawl_trigger is untouched by freshness (MANUAL, plus Stage F SCHEDULED)
   Z. schema introspection confirms NO new freshness column was added to
      discovery_candidate
 
@@ -45,7 +45,9 @@ FRESHNESS_TABLES = {"freshness_target", "freshness_observation"}
 
 #: The single, unmodified ratified value (LIVE.4). This set must never change
 #: because of the freshness layer.
-CRAWL_TRIGGER_VALUES = {"MANUAL"}
+# Stage F1 (migration 0016) added SCHEDULED for discovery observation; freshness
+# keeps its own dedicated enum either way.
+CRAWL_TRIGGER_VALUES = {"MANUAL", "SCHEDULED"}
 FRESHNESS_TRIGGER_VALUES = {"MANUAL", "SCHEDULED_FRESHNESS"}
 
 

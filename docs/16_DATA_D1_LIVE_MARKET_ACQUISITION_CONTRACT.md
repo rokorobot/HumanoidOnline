@@ -346,6 +346,8 @@ purpose**, in particular all new-discovery and competitor-radar crawling.
 `docs/11` §15's general cadence policy remains otherwise unimplemented, and
 this exception approves zero sources on its own (`docs/21` §11.1).
 
+**Amended 2026-09-27 (Stage F, §17.2):** manual-only was the commissioning phase. An already-approved, enabled source with an attributed cadence may now be observed by the scheduler (`crawl_trigger = 'SCHEDULED'`). Onboarding, approval and every gate stay as above, and no schedule runs until the owner separately enables it.
+
 ### LIVE.5 — Discovery-layer writes only
 The crawler, the extractor and every adapter may write **only** to discovery
 tables. Canonical mutation happens exclusively through the existing human
@@ -432,6 +434,12 @@ Retention is asymmetric on purpose:
 | successful raw page bodies | **90 days** |
 | failed / blocked responses | **30 days** |
 | crawl manifests, page hashes, evidence excerpts, provenance records | **indefinitely**, unless a later retention policy supersedes this |
+
+**Retention exception** *(Stage F, §17.2)*: `discovery cache prune` never removes two kinds of body, whatever their age:
+- the **latest successful body of each URL**, because a later `304 Not Modified` is answered from it (seed expansion, re-extraction), and a conditional request is only sent while it exists;
+- bodies belonging to an **unfinished run** (RUNNING, FAILED or CANCELLED), which a resume may still extract.
+
+So the 90 days applies to superseded bodies. Pruning is manual (dry run unless `--apply`) and is not part of the scheduled cycle.
 
 The distinction is the whole point: the *evidence* of what a page said, and the
 audit trail of what we did, are durable; the *page* is not. The cache is never
@@ -1205,6 +1213,34 @@ The first capped NEURA crawl (production run `2c64d1f3`) is the real acquired da
   - if members were promoted to exactly one robot, the candidate converges onto it as `MATCHED_EXISTING`. It keeps its own row, approval, trace and evidence, and nothing is merged;
   - if members point to more than one robot, or a name match would override a `NOT_SAME_ENTITY` decision, promotion is refused as a governance conflict, with the IDs, for human repair;
   - no alias is inferred.
+
+### 17.2 Stage F: scheduled observation of approved sources *(added 2026-09-27)*
+
+Manual-only operation (LIVE.4) was the **commissioning phase**: it proved the adapter, the gates, the extraction and the Stage E review on a real source. From Stage F, an approved, enabled source **may be observed by the scheduler**. Everything else in LIVE.4 still holds for everything else.
+
+- **Onboarding stays governed and manual.** A source must still be registered, reviewed and enabled by an attributed human (§5, §14), and must have a reviewed adapter module in code (§12.1).
+  - The scheduler observes a source only when an attributed human has also set its cadence: `source cadence <key> --every 24h|7d --by WHO`, with bounds 6 hours to 90 days and never minutes.
+  - Existing sources start **unscheduled**.
+- **Robots and the owner's ToS approval remain prerequisites on every run.** Robots.txt is re-read on every run, and each scheduled run goes through the same policy gates, bounds and etiquette as a manual adapter run. The scheduler can only choose *whether* a reviewed adapter runs, never *what* it fetches.
+- **One cycle** is `discovery observe`, which goes over the sources in key order:
+  - disabled, unscheduled, not-due and kill-switched sources are skipped, and every skip is reported with its reason;
+  - each due source gets one run, recorded as `crawl_run.trigger = 'SCHEDULED'`, with an operator string naming who set the cadence;
+  - one source failing never stops the others.
+- **New and changed only.** Seeds and targets are fetched with conditional requests.
+  - An unchanged page is not re-extracted, and candidates stay keyed by source and URL, so a cycle that finds nothing new writes no new candidate or claim.
+  - When a URL was last served from a URL that differs only in representation (the NEURA trailing-slash `301`), the next run requests that URL directly, after the source policy and robots checks. Its identity stays the planned URL.
+  - A redirect to a different resource, or off policy, is never learned.
+- **Failures are bounded.** A policy halt (401/403/429, or robots unavailable) is a finding and is **not retried**; a robots disallow still disables the source. A FAILED or CANCELLED run is resumed **once** through the governed resume; if that fails too, the source is reported for a human and not retried again.
+- **Scheduled observation never implies promotion.** Stage F reports queue counts per source; it makes no Stage E decision, confirms no alias, records no trace and promotes nothing. **Human Stage E decisions remain authoritative**: a decided pair or a rejected candidate is not raised again on later cycles.
+- **One run per source at a time.** The database allows at most one RUNNING `crawl_run` per source (`uq_crawl_run_one_running_per_source`). A manual run and a scheduled cycle can never crawl the same source concurrently; the second is refused before any request. A dead process's run is released by the existing governed `discovery run fail`.
+- **Least privilege.** Scheduled observation connects as `discovery_observer` (`db/roles/discovery_observer.sql`).
+  - It can read the discovery layer, the Stage E decisions and audit, and the catalogue rows the identity resolver loads.
+  - It can insert and update the discovery tables, and on `discovery_source` only the run bookkeeping columns.
+  - It cannot write the catalogue, record decisions, promote, change approval or cadence, delete, run DDL, or read leads.
+  - Migrations stay with the owner role.
+- **The dispatch gate is not a schedule.** The workflow runs only when a human dispatches it and the repository variable `DISCOVERY_OBSERVE_ENABLED` is `true`. Recurring observation needs a `schedule:` trigger, which does not exist.
+- **Retention (Gate Q)** is `discovery cache prune`. It is a dry run unless `--apply`. It applies LIVE.10's 90 days to raw bodies, but always keeps the latest body of every URL and bodies of open runs. Sidecars and provenance are never removed.
+- **Recurring crawling is disabled until operational scheduling is separately enabled by the owner.** The repository provides the cycle and a manual-dispatch workflow that is off by default. No live schedule exists until that separate authorization.
 
 ## 18. The run report
 

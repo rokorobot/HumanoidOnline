@@ -173,9 +173,10 @@ crawl_run_status = _pg_enum(
     "crawl_run_status",
     "RUNNING", "COMPLETED", "FAILED", "HALTED_BY_POLICY", "CANCELLED",
 )
-# LIVE.4: exactly one legal trigger. A single value means adding an automated
-# trigger is a visible schema change rather than a configuration flag.
-crawl_trigger = _pg_enum("crawl_trigger", "MANUAL")
+# LIVE.4 kept one legal trigger so that an automated trigger would be a visible
+# schema change; Stage F1 (migration 0016) is that change: SCHEDULED observation
+# of already-approved sources (docs/16 §17.2).
+crawl_trigger = _pg_enum("crawl_trigger", "MANUAL", "SCHEDULED")
 fetch_outcome = _pg_enum(
     "fetch_outcome",
     "FETCHED", "NOT_MODIFIED", "FROM_CACHE", "BLOCKED_BY_ROBOTS",

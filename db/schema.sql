@@ -1195,7 +1195,9 @@ CREATE TYPE crawl_run_status AS ENUM (
 -- LIVE.4: v0.1 has exactly one trigger. No scheduler, cron, queue or worker may
 -- start a run; a named human does, locally. The enum has one value so that
 -- adding an automated trigger is a visible schema change, not a config flag.
-CREATE TYPE crawl_trigger AS ENUM ('MANUAL');
+-- 'SCHEDULED' added by Stage F1 (migration 0016, docs/16 §17.2): a visible schema change,
+-- as LIVE.4 intended. Scheduled runs only observe already-approved sources.
+CREATE TYPE crawl_trigger AS ENUM ('MANUAL', 'SCHEDULED');
 
 CREATE TYPE fetch_outcome AS ENUM (
     'FETCHED', 'NOT_MODIFIED', 'FROM_CACHE', 'BLOCKED_BY_ROBOTS',
@@ -1258,6 +1260,19 @@ CREATE TABLE discovery_source (
     last_crawled_at         TIMESTAMPTZ,
     created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    -- Stage F1 (migration 0016, docs/16 §17.2): attributed observation cadence.
+    -- NULL = not scheduled (the default: no source starts crawling by itself).
+    observation_interval_hours INTEGER,
+    observation_cadence_set_by TEXT,
+    observation_cadence_set_at TIMESTAMPTZ,
+    CONSTRAINT ck_discovery_source_cadence CHECK (
+        observation_interval_hours IS NULL OR (
+            observation_interval_hours BETWEEN 6 AND 2160
+            AND observation_cadence_set_by IS NOT NULL
+            AND btrim(observation_cadence_set_by) <> ''
+            AND observation_cadence_set_at IS NOT NULL
+        )
+    ),
     CONSTRAINT ck_discovery_source_eligible CHECK (
         NOT is_enabled OR (
             tos_status = 'ALLOWED'
@@ -1608,6 +1623,10 @@ CREATE INDEX idx_promotion_audit_candidate ON promotion_audit (candidate_id);
 CREATE INDEX idx_eligibility_review_source   ON source_eligibility_review (source_id, reviewed_at DESC);
 CREATE INDEX idx_crawl_run_source            ON crawl_run (source_id, started_at DESC);
 CREATE INDEX idx_crawl_run_status            ON crawl_run (status);
+-- Stage F1 (migration 0016): at most one RUNNING run per source, so a manual run and
+-- a scheduled cycle can never crawl the same source at the same time.
+CREATE UNIQUE INDEX uq_crawl_run_one_running_per_source
+    ON crawl_run (source_id) WHERE status = 'RUNNING';
 CREATE INDEX idx_fetched_page_run            ON fetched_page (crawl_run_id);
 CREATE INDEX idx_fetched_page_url            ON fetched_page (source_id, url);
 CREATE INDEX idx_fetched_page_hash           ON fetched_page (content_hash);

@@ -7,6 +7,9 @@
     python -m app.cli.discovery source enable   <key> --by WHO
     python -m app.cli.discovery source disable  <key> --by WHO --reason WHY
     python -m app.cli.discovery source show     <key>
+    python -m app.cli.discovery source cadence  <key> (--every 24h|7d | --off) --by WHO
+    python -m app.cli.discovery observe [--plan] [--only KEY] [--report-json PATH]
+    python -m app.cli.discovery cache prune [--apply] [--cache-dir DIR]
     python -m app.cli.discovery plan   <source-key> --url URL [--url URL ...] [--urls-file F]
     python -m app.cli.discovery crawl  <source-key> --operator "Name" --url URL ...
                                        [--limit N] [--dry-run] [--cache-dir DIR]
@@ -62,6 +65,20 @@
 - `crawl` is a MANUAL run by a named operator over an explicit URL list: no
   link-following, no sitemap expansion, no scheduling. Writes discovery tables
   only (crawl_run, fetched_page, discovery_source bookkeeping).
+
+- `observe` (Stage F, docs/16 §17.2) runs ONE observation cycle over every
+  enabled source that has a cadence and is due, through each source's reviewed
+  adapter (the same gates as `adapter run`). A failing source never stops the
+  others; a policy halt is not retried; a FAILED run is resumed at most once.
+  `--plan` shows what a cycle would do: no request, no write. Nothing here
+  decides a Stage E question, confirms an alias, traces or promotes.
+  Exit: 0 nothing needs a human, 4 a source or new review item needs a human,
+  1 a source run failed.
+- `source cadence` sets the attributed observation interval (6h..90d) or turns
+  it off. It never enables a source and never fetches.
+- `cache prune` applies the LIVE.10 retention to raw bodies (90 days; latest
+  observation of each URL and open runs always kept; provenance never removed).
+  Dry run unless `--apply`.
 
 Kill switch: create `var/discovery/KILL` (all sources) or
 `var/discovery/KILL.<source-key>`; it is checked before every request.
@@ -200,6 +217,9 @@ def _cmd_source(args: argparse.Namespace) -> int:
             source = registry.enable_source(session, args.key, by=args.by)
         elif args.action == "disable":
             source = registry.disable_source(session, args.key, by=args.by, reason=args.reason)
+        elif args.action == "cadence":
+            source = registry.set_cadence(session, args.key,
+                                          every=None if args.off else args.every, by=args.by)
         else:
             source = registry.get_source(session, args.key)
         if args.action != "show":
@@ -335,6 +355,38 @@ def _cmd_review(args: argparse.Namespace) -> int:
         return 0
 
 
+def _cmd_observe(args: argparse.Namespace) -> int:
+    import json
+
+    from app.db.session import SessionLocal
+    from app.services.discovery.observe import observe
+    from app.services.discovery.sources import ADAPTERS
+
+    with SessionLocal() as session:
+        result = observe(
+            session, ADAPTERS, plan_only=args.plan, cache_dir=Path(args.cache_dir),
+            kill_switch_for=kill_switch_for, only=args.only,
+            checkpoint=None if args.plan else session.commit)
+        if args.plan:
+            session.rollback()
+    print("\n".join(result.lines()))
+    if args.report_json:
+        path = Path(args.report_json)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(result.as_dict(), indent=2, sort_keys=True), encoding="utf-8")
+    return result.exit_code
+
+
+def _cmd_cache(args: argparse.Namespace) -> int:
+    from app.db.session import SessionLocal
+    from app.services.discovery.cache_retention import prune_cache
+
+    with SessionLocal() as session:
+        report = prune_cache(session, Path(args.cache_dir), apply=args.apply)
+    print("\n".join(report.lines()))
+    return 0
+
+
 def _cmd_report(args: argparse.Namespace) -> int:
     from app.db.session import SessionLocal
     from app.services.discovery.acquisition import build_report
@@ -401,7 +453,29 @@ def main(argv: list[str] | None = None) -> int:
     disable.add_argument("--reason", required=True)
     show = actions.add_parser("show", help="print a source's recorded state")
     show.add_argument("key")
+    cadence = actions.add_parser("cadence", help="set the Stage F observation cadence")
+    cadence.add_argument("key")
+    every = cadence.add_mutually_exclusive_group(required=True)
+    every.add_argument("--every", help="interval: whole hours or days, e.g. 24h, 7d (6h..90d)")
+    every.add_argument("--off", action="store_true", help="stop scheduled observation")
+    cadence.add_argument("--by", required=True)
     source.set_defaults(func=_cmd_source)
+
+    observe_cmd = commands.add_parser("observe", help="one Stage F observation cycle")
+    observe_cmd.add_argument("--plan", action="store_true",
+                             help="what a cycle would do now; no request, no write")
+    observe_cmd.add_argument("--only", metavar="SOURCE_KEY", help="consider one source only")
+    observe_cmd.add_argument("--report-json", metavar="PATH",
+                             help="also write the machine-readable cycle result")
+    observe_cmd.add_argument("--cache-dir", default=str(DEFAULT_CACHE_DIR))
+    observe_cmd.set_defaults(func=_cmd_observe)
+
+    cache_cmd = commands.add_parser("cache", help="raw-body cache retention (LIVE.10)")
+    cache_actions = cache_cmd.add_subparsers(dest="action", required=True)
+    prune = cache_actions.add_parser("prune", help="report (or --apply) expired bodies")
+    prune.add_argument("--apply", action="store_true", help="remove; default is a dry run")
+    prune.add_argument("--cache-dir", default=str(DEFAULT_CACHE_DIR))
+    cache_cmd.set_defaults(func=_cmd_cache)
 
     adapter = commands.add_parser("adapter", help="the source's reviewed adapter module")
     adapter_actions = adapter.add_subparsers(dest="action", required=True)

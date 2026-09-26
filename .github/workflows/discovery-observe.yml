@@ -27,6 +27,11 @@ on:
         required: false
         default: ""
         type: string
+      run_now:
+        description: "run the named source now, skipping ONLY its cadence wait (needs source)"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -49,6 +54,7 @@ jobs:
       APP_ENV: production
       MODE: ${{ inputs.mode }}
       ONLY: ${{ inputs.source }}
+      RUN_NOW: ${{ inputs.run_now }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -76,6 +82,7 @@ jobs:
                 --report-json "$GITHUB_WORKSPACE/var/discovery/observe/cycle.json")
           [ "$MODE" = plan ] && args+=(--plan)
           [ -n "$ONLY" ] && args+=(--only "$ONLY")
+          [ "$RUN_NOW" = true ] && args+=(--run-now)   # the CLI refuses it without --only
           set +e
           uv run --no-sync python -m app.cli.discovery "${args[@]}" > "$RUNNER_TEMP/cycle.txt" 2>&1
           code=$?
@@ -100,7 +107,7 @@ jobs:
                echo "::error::Discovery observation: execution failure (exit ${CODE:-none})" ;;
           esac
           {
-            echo "## Discovery observation ($MODE${ONLY:+, source $ONLY})"
+            echo "## Discovery observation ($MODE${ONLY:+, source $ONLY}$([ "$RUN_NOW" = true ] && echo ', run-now'))"
             echo
             echo "**$head**"
             echo

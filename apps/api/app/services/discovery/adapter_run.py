@@ -318,7 +318,7 @@ def extract_run(
         enumeration = (run.run_manifest or {}).get("enumeration") or {}
         counters["deferred_urls"] = len(enumeration.get("deferred", []))
         manifest = run.run_manifest or {}
-        targets = set(manifest.get("expanded_urls", []))
+        targets = _extraction_targets(manifest, config)
         pages = list(session.scalars(
             select(FetchedPage)
             .where(FetchedPage.crawl_run_id == run.id, FetchedPage.url.in_(targets))
@@ -339,13 +339,21 @@ def extract_run(
         release()
 
 
+def _extraction_targets(manifest: dict, config: SourceAdapterConfig) -> set[str]:
+    """Pages to extract: the expanded targets, plus any seed that is itself a
+    product/announcement page. Such a seed was fetched once as a seed and is
+    extracted from that observation, never requested a second time."""
+    seeds = {u for u in manifest.get("seed_urls", []) if config.kind_of(u) is not None}
+    return set(manifest.get("expanded_urls", [])) | seeds
+
+
 def _unextracted_ancestor_pages(session, run, config) -> list[FetchedPage]:
     """Target pages the resumed chain fetched successfully but never extracted
     with this extractor version (the parent stopped before extraction)."""
     ancestors = [r.id for r in run_chain(session, run)[1:]]
     parent_targets = set()
     for ancestor in run_chain(session, run)[1:]:
-        parent_targets.update((ancestor.run_manifest or {}).get("expanded_urls", []))
+        parent_targets.update(_extraction_targets(ancestor.run_manifest or {}, config))
     if not ancestors or not parent_targets:
         return []
     extracted = select(ExtractionResult.fetched_page_id).where(
@@ -434,7 +442,11 @@ def _extract_page(session, run, source, config, cache_dir, page, counters) -> di
                                        counters)
     else:
         line["result"] = _product(session, run, source, config, page, body_page, url,
-                                  change, extract_product(config, body), existing, counters)
+                                  change,
+                                  extract_product(
+                                      config, body,
+                                      normalize_url(body_page.final_url or body_page.url)),
+                                  existing, counters)
     return line
 
 

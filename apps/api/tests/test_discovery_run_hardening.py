@@ -314,10 +314,10 @@ def test_extraction_failure_is_durable_and_resume_extracts_once(
     cache_dir = tmp_path / "cache"
     real = adapter_module.extract_product
 
-    def broken(cfg, body):
+    def broken(cfg, body, url=None):
         if b"EX-Beta 2" in body and b"<h1>EX-Beta 2" in body:
             raise ValueError("extractor bug")
-        return real(cfg, body)
+        return real(cfg, body, url)
 
     monkeypatch.setattr(adapter_module, "extract_product", broken)
     site = FixtureSite(world["maker"])

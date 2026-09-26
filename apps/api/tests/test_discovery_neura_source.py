@@ -58,7 +58,8 @@ def test_config_is_the_reviewed_structure():
         "neura-robotics.com", "Neura Robotics", "MANUFACTURER")
     assert NEURA.allowed_path_prefixes == ("/products/", "/product/", "/product-sitemap.xml",
                                            "/news/")
-    assert NEURA.seed_urls == (f"{HOST}/product-sitemap.xml", f"{HOST}/news")
+    assert NEURA.seed_urls == (f"{HOST}/product-sitemap.xml", f"{HOST}/news",
+                               f"{HOST}/product/4ne1-reservation")
     assert all(normalize_url(s) == s for s in NEURA.seed_urls)
     assert NEURA.target_cap == 50
     assert NEURA.announcement_path_pattern is None
@@ -68,8 +69,8 @@ def test_config_is_the_reviewed_structure():
     assert NEURA.blocked_reason.startswith(f"{BLOCK_CODE}: ")
     assert NEURA.heading_identity is False
     for phrase in ("server-rendered", "robots-compatible", "no usable Product JSON-LD",
-                   "<h1> is not a safe identity", "refundable reservation fee",
-                   "estimated robot price"):
+                   "<h1> is not a", "refundable reservation fee", "estimated",
+                   "not been approved for live use"):
         assert phrase in NEURA.blocked_reason
 
 
@@ -119,8 +120,8 @@ def test_product_pattern_rejects_everything_else(url):
 
 def test_enumeration_is_bounded_to_host_prefixes_and_pattern():
     result = enumerate_targets(NEURA, _seeds(), _robots(), {})
+    # 4ne1-reservation is itself a seed: extracted from its seed fetch, not a target.
     assert result.selected == [
-        f"{HOST}/product/4ne1-reservation",
         f"{HOST}/product/mipa-reservation",
         f"{HOST}/product/quadruped-reservation",
         f"{HOST}/products/4ne1",
@@ -129,7 +130,7 @@ def test_enumeration_is_bounded_to_host_prefixes_and_pattern():
         f"{HOST}/products/mav",
         f"{HOST}/products/mipa",
     ]
-    assert result.deferred == []                      # 8 targets, far under the cap of 50
+    assert result.deferred == []                      # 7 targets, far under the cap of 50
     reasons = dict(result.excluded)
     assert reasons[f"{HOST}/shop"] == "OUTSIDE_PATHS"
     assert reasons[f"{HOST}/de/produkt/4ne1-reservierung"] == "OUTSIDE_PATHS"
@@ -155,12 +156,12 @@ def test_a_robots_disallow_excludes_targets():
     rules = parse("User-agent: HumanoidOnlineMarketBot\nDisallow: /product/\n")
     result = enumerate_targets(NEURA, _seeds(), rules, {})
     assert not any("/product/" in u for u in result.selected)
-    assert dict(result.excluded)[f"{HOST}/product/4ne1-reservation"] == "ROBOTS_DISALLOW"
+    assert dict(result.excluded)[f"{HOST}/product/mipa-reservation"] == "ROBOTS_DISALLOW"
 
 
 def test_capped_enumeration_defers_the_rest():
     result = enumerate_targets(replace(NEURA, target_cap=3), _seeds(), _robots(), {})
-    assert len(result.selected) == 3 and len(result.deferred) == 5
+    assert len(result.selected) == 3 and len(result.deferred) == 4
 
 
 # ---------------------------------------------------------------- extraction --
@@ -187,7 +188,8 @@ def test_a_marketing_h1_cannot_become_a_robot_identity():
     assert result.status == "NOTHING_FOUND" and result.name is None
     assert extract_product(NEURA, TAGLINE_PAGE) == result             # deterministic
     # The hazard it guards against: the generic heading fallback WOULD use it.
-    generic = extract_product(replace(NEURA, heading_identity=True), TAGLINE_PAGE)
+    generic = extract_product(replace(NEURA, heading_identity=True, product_extractor=None),
+                              TAGLINE_PAGE)
     assert generic.name == "A Marketing Tagline"
 
 
@@ -202,7 +204,8 @@ def test_reservation_fee_and_estimate_never_become_a_price():
     result = extract_product(NEURA, RESERVATION_PAGE)
     assert not any(s.axis == "PRICE" for s in result.signals)
     # Even with heading identity and generic quote phrases, free text is never a price.
-    loose = replace(NEURA, heading_identity=True, quote_phrases=("price on request",))
+    loose = replace(NEURA, heading_identity=True, quote_phrases=("price on request",),
+                    product_extractor=None)
     assert not any(s.axis == "PRICE" for s in extract_product(loose, RESERVATION_PAGE).signals)
 
 
@@ -217,7 +220,8 @@ def test_sitemap_omission_does_not_hide_a_linked_reservation_page():
         NEURA, [(f"{HOST}/product/4ne1-reservation/",
                  (FIXTURES / "reservation-page-links.html").read_bytes())], _robots(), {})
     assert mini in linked.selected                                    # reached by one-level links
-    # Known gap, recorded rather than assumed away: the current seeds do not reach it.
+    # The sitemap + newsroom seeds alone do not reach it; the reservation-page
+    # seed (added with the NEURA extractor) does.
     assert mini not in enumerate_targets(NEURA, _seeds(), _robots(), {}).selected
 
 

@@ -57,6 +57,7 @@ from app.models.enums import (
     extraction_status,
     fetch_outcome,
     price_type,
+    retrieval_method,
     robots_status,
     signal_axis,
     transaction_type,
@@ -247,6 +248,11 @@ class FetchedPage(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("now()"), nullable=False
     )
+    #: Migration 0014. `url` is the REQUESTED url; this is where the bounded,
+    #: policy-checked redirect chain ended. NULL on pre-0014 rows.
+    final_url: Mapped[str | None] = mapped_column(Text)
+    #: Migration 0014. HTTP_GET only (docs/16 §20: no browser execution).
+    retrieval_method: Mapped[str | None] = mapped_column(retrieval_method)
 
     def __repr__(self) -> str:  # pragma: no cover - debug helper
         return f"<FetchedPage {self.url!r} outcome={self.outcome}>"
@@ -462,4 +468,31 @@ def _eligibility_review_block_delete(
     raise EligibilityReviewImmutableError(
         "source_eligibility_review is append-only: refusing DELETE of row "
         f"{target.id!r}"
+    )
+
+
+# ---------------------------------------------------- append-only observations --
+# Discovery Stage B: a fetched_page row is an observation of what a source
+# returned at one moment. Change detection compares a new observation with
+# earlier ones, so an earlier one must never be rewritten. Same honest scope as
+# the eligibility-review listeners above: ORM paths only (raw SQL and the
+# crawl_run ON DELETE CASCADE are not covered).
+
+
+class FetchedPageImmutableError(RuntimeError):
+    """Raised when a recorded fetched_page observation is modified or removed."""
+
+
+@event.listens_for(FetchedPage, "before_update", propagate=True)
+def _fetched_page_block_update(_mapper, _connection, target: FetchedPage) -> None:
+    raise FetchedPageImmutableError(
+        f"fetched_page is append-only: refusing UPDATE of row {target.id!r}. "
+        "Record a new observation instead."
+    )
+
+
+@event.listens_for(FetchedPage, "before_delete", propagate=True)
+def _fetched_page_block_delete(_mapper, _connection, target: FetchedPage) -> None:
+    raise FetchedPageImmutableError(
+        f"fetched_page is append-only: refusing DELETE of row {target.id!r}"
     )

@@ -75,3 +75,33 @@ def database_url() -> str:
     if not url:
         pytest.skip("DATABASE_URL not set; skipping DB-backed test")
     return url
+
+
+@pytest.fixture
+def no_external_network(monkeypatch):
+    """Discovery Stage B (docs/16 Gate P): the suite never contacts a real site.
+
+    Loopback stays reachable because the DB-backed tests talk to a local
+    Postgres; any other address — or any name resolution for a non-loopback
+    host — fails the test. Acquisition tests use httpx.MockTransport, which
+    never opens a socket, so this guard only fires if something bypasses it.
+    """
+    import socket
+
+    loopback = ("127.0.0.1", "::1", "localhost")
+    real_connect = socket.socket.connect
+    real_getaddrinfo = socket.getaddrinfo
+
+    def guarded_connect(sock, address):
+        host = address[0] if isinstance(address, tuple) else address
+        if host not in loopback:
+            pytest.fail(f"external network access attempted: {address!r}")
+        return real_connect(sock, address)
+
+    def guarded_getaddrinfo(host, *args, **kwargs):
+        if host not in loopback and host is not None:
+            pytest.fail(f"external name resolution attempted: {host!r}")
+        return real_getaddrinfo(host, *args, **kwargs)
+
+    monkeypatch.setattr(socket.socket, "connect", guarded_connect)
+    monkeypatch.setattr(socket, "getaddrinfo", guarded_getaddrinfo)

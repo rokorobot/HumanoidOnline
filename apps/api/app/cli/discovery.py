@@ -194,6 +194,7 @@ def _cmd_adapter(args: argparse.Namespace) -> int:
     from app.services.discovery.acquisition import AcquisitionRefused
     from app.services.discovery.adapter_run import (
         AdapterRefused,
+        index_adapter,
         plan_adapter,
         resume_adapter,
         run_adapter,
@@ -222,7 +223,12 @@ def _cmd_adapter(args: argparse.Namespace) -> int:
             limits = _parent_limits(session, args.resume) or limits
         with HttpFetcher(limits=limits, kill_switch=kill_switch_for(args.source_key)) as fetcher:
             try:
-                if args.resume:
+                if args.index_only:
+                    run = index_adapter(
+                        session, source=source, config=config, operator=args.operator or "",
+                        fetcher=fetcher, cache_dir=Path(args.cache_dir),
+                        checkpoint=session.commit)
+                elif args.resume:
                     run = resume_adapter(
                         session, parent_run_id=uuid.UUID(args.resume), source=source,
                         config=config, operator=args.operator or "", fetcher=fetcher,
@@ -236,6 +242,10 @@ def _cmd_adapter(args: argparse.Namespace) -> int:
                 session.rollback()
                 return _print_refusal(exc)
         print(f"RUN {run.id} status={run.status}")
+        if args.index_only:
+            from app.services.discovery.acquisition import build_report
+
+            print(build_report(session, run.id))
         print(f"report: python -m app.cli.discovery report {run.id}")
         return _RUN_EXIT.get(run.status, 1)
 
@@ -332,6 +342,9 @@ def main(argv: list[str] | None = None) -> int:
     adapter_run.add_argument("--cache-dir", default=str(DEFAULT_CACHE_DIR))
     adapter_run.add_argument("--resume", metavar="RUN_ID",
                              help="continue a FAILED/CANCELLED adapter run")
+    adapter_run.add_argument("--index-only", action="store_true",
+                             help="fetch only the reviewed seeds and report what would be "
+                                  "targeted; no target page, no extraction")
     adapter.set_defaults(func=_cmd_adapter)
 
     run_cmd = commands.add_parser("run", help="governed run lifecycle (no network)")
@@ -351,6 +364,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("crawl requires --operator (LIVE.4: a named human starts every run)")
     if args.command == "adapter" and args.action == "run" and not args.operator.strip():
         parser.error("adapter run requires --operator (LIVE.4: a named human starts every run)")
+    if args.command == "adapter" and args.action == "run" and args.index_only and args.resume:
+        parser.error("--index-only and --resume cannot be combined")
     if args.command == "crawl" and args.resume and (_urls(args) or args.dry_run):
         parser.error("--resume takes its URLs from the resumed run: no --url/--urls-file, "
                      "no --dry-run")

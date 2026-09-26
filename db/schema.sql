@@ -1195,7 +1195,9 @@ CREATE TYPE crawl_run_status AS ENUM (
 -- LIVE.4: v0.1 has exactly one trigger. No scheduler, cron, queue or worker may
 -- start a run; a named human does, locally. The enum has one value so that
 -- adding an automated trigger is a visible schema change, not a config flag.
-CREATE TYPE crawl_trigger AS ENUM ('MANUAL');
+-- 'SCHEDULED' added by Stage F1 (migration 0016, docs/16 §17.2): a visible schema change,
+-- as LIVE.4 intended. Scheduled runs only observe already-approved sources.
+CREATE TYPE crawl_trigger AS ENUM ('MANUAL', 'SCHEDULED');
 
 CREATE TYPE fetch_outcome AS ENUM (
     'FETCHED', 'NOT_MODIFIED', 'FROM_CACHE', 'BLOCKED_BY_ROBOTS',
@@ -1258,6 +1260,19 @@ CREATE TABLE discovery_source (
     last_crawled_at         TIMESTAMPTZ,
     created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    -- Stage F1 (migration 0016, docs/16 §17.2): attributed observation cadence.
+    -- NULL = not scheduled (the default: no source starts crawling by itself).
+    observation_interval_hours INTEGER,
+    observation_cadence_set_by TEXT,
+    observation_cadence_set_at TIMESTAMPTZ,
+    CONSTRAINT ck_discovery_source_cadence CHECK (
+        observation_interval_hours IS NULL OR (
+            observation_interval_hours BETWEEN 6 AND 2160
+            AND observation_cadence_set_by IS NOT NULL
+            AND btrim(observation_cadence_set_by) <> ''
+            AND observation_cadence_set_at IS NOT NULL
+        )
+    ),
     CONSTRAINT ck_discovery_source_eligible CHECK (
         NOT is_enabled OR (
             tos_status = 'ALLOWED'

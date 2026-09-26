@@ -180,8 +180,9 @@ def test_fetched_page_has_no_body_column(database_url) -> None:
 
 
 def test_crawl_run_records_the_named_human_and_manual_trigger(database_url) -> None:
-    """LIVE.4: a run is started by a person, locally. `crawl_trigger` has exactly
-    one value so adding an automated trigger is a visible schema change."""
+    """LIVE.4: a run records who started it. `crawl_trigger` had exactly one value
+    so that an automated trigger would be a visible schema change; Stage F1
+    (migration 0016, docs/16 §17.2) is that change and adds exactly SCHEDULED."""
     columns = {
         c["name"]: c for c in inspect(engine).get_columns("crawl_run", schema="humanoid")
     }
@@ -191,7 +192,7 @@ def test_crawl_run_records_the_named_human_and_manual_trigger(database_url) -> N
             "SELECT enumlabel FROM pg_enum e JOIN pg_type t ON t.oid = e.enumtypid"
             " WHERE t.typname = 'crawl_trigger'"
         )).scalars().all()
-    assert values == ["MANUAL"]
+    assert values == ["MANUAL", "SCHEDULED"]
 
 
 def test_extraction_confidence_has_no_verified_value(database_url) -> None:

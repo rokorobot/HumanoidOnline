@@ -68,4 +68,7 @@ MIGRATIONS: dict[str, str] = {
     "0015_candidate_identity_decision": (
         "b84a701ab92a6873a1a0e9ba4dd4626d968d1871b3a87f838705cf1f8115d65e"
     ),
+    "0016_stage_f_observation": (
+        "97485b9c0ccb314edd5ee16b7b68289ec753637a0c811a284fc6f67c12909f90"
+    ),
 }

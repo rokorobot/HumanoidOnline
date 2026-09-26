@@ -1,0 +1,82 @@
+name: Discovery observation (Stage F)
+
+# docs/16 §17.2. MANUAL DISPATCH ONLY: there is deliberately no `schedule:`
+# trigger. Adding one is the owner's separate operational authorization, made
+# in its own reviewed change after this workflow has been reviewed.
+#
+# Default-off twice over:
+#   - the job runs only when the repository variable DISCOVERY_OBSERVE_ENABLED
+#     is 'true';
+#   - production database access comes only from the `discovery-production`
+#     environment's secret DISCOVERY_DATABASE_URL, which does not exist until
+#     the owner creates it (environments can require approval).
+# Mode `plan` makes no manufacturer request and writes nothing.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "plan = what a cycle would do (no request, no write); observe = run one cycle"
+        required: true
+        default: plan
+        type: choice
+        options: [plan, observe]
+
+permissions:
+  contents: read
+
+# Never two cycles at once: a second dispatch waits for the first.
+concurrency:
+  group: discovery-observe
+  cancel-in-progress: false
+
+jobs:
+  observe:
+    if: vars.DISCOVERY_OBSERVE_ENABLED == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment: discovery-production
+    env:
+      DATABASE_URL: ${{ secrets.DISCOVERY_DATABASE_URL }}
+      APP_ENV: production
+      CACHE_DIR: var/discovery/cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v5
+      # The raw-body cache (docs/16 LIVE.10) lives outside the database. It is
+      # carried between cycles with a rolling cache key. Losing it is safe:
+      # conditional headers are sent only while the prior body is present, so a
+      # cold cache costs full fetches, never wrong results.
+      - name: Restore raw-body cache
+        uses: actions/cache/restore@v4
+        with:
+          path: var/discovery/cache
+          key: discovery-cache-${{ github.run_id }}
+          restore-keys: discovery-cache-
+      - name: Install runner dependencies
+        working-directory: apps/api
+        run: uv sync --frozen --no-dev --group discovery
+      - name: Observation cycle
+        working-directory: apps/api
+        run: >-
+          uv run --no-sync python -m app.cli.discovery observe
+          ${{ inputs.mode == 'plan' && '--plan' || '' }}
+          --cache-dir "$GITHUB_WORKSPACE/$CACHE_DIR"
+          --report-json "$GITHUB_WORKSPACE/var/discovery/observe/cycle.json"
+          | tee -a "$GITHUB_STEP_SUMMARY"
+        shell: bash -o pipefail {0}
+      - name: Save raw-body cache
+        if: always() && inputs.mode == 'observe'
+        uses: actions/cache/save@v4
+        with:
+          path: var/discovery/cache
+          key: discovery-cache-${{ github.run_id }}
+      - name: Retain cycle result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: discovery-cycle-${{ github.run_id }}-${{ github.run_attempt }}
+          path: var/discovery/observe/
+          if-no-files-found: warn
+          retention-days: 30

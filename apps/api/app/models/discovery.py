@@ -21,6 +21,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Identity,
+    Integer,
     Text,
     UniqueConstraint,
     event,
@@ -84,6 +85,10 @@ class DiscoverySource(Base):
     last_robots_hash: Mapped[str | None] = mapped_column(Text)
     last_robots_checked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     last_crawled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Stage F1 (migration 0016): attributed observation cadence; NULL = not scheduled.
+    observation_interval_hours: Mapped[int | None] = mapped_column(Integer)
+    observation_cadence_set_by: Mapped[str | None] = mapped_column(Text)
+    observation_cadence_set_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("now()"), nullable=False
     )

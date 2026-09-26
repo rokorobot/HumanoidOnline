@@ -169,10 +169,12 @@ def run_adapter(
     cache_dir: Path = body_cache.DEFAULT_CACHE_DIR,
     now: Callable[[], datetime] = _utcnow,
     checkpoint: Callable[[], None] = lambda: None,
+    trigger: str = "MANUAL",
 ) -> CrawlRun:
-    """One MANUAL adapter run. Refuses before any request unless the adapter is
-    structurally reviewed and the source is registered, ToS-approved, enabled and
-    approved for exactly this adapter's host and path prefixes."""
+    """One adapter run (MANUAL, or SCHEDULED by Stage F). Refuses before any
+    request unless the adapter is structurally reviewed and the source is
+    registered, ToS-approved, enabled and approved for exactly this adapter's
+    host and path prefixes."""
     problems = adapter_problems(config, source)
     if problems:
         raise AdapterRefused([("-", p) for p in problems])
@@ -191,7 +193,7 @@ def run_adapter(
     run = run_acquisition(
         session, source=source, urls=list(config.seed_urls), operator=operator,
         fetcher=fetcher, cache_dir=cache_dir, now=now, checkpoint=checkpoint,
-        expand=expand, adapter=(config.key, config.version),
+        expand=expand, adapter=(config.key, config.version), trigger=trigger,
         manifest_extra={
             "adapter_structural_review": config.structural_review,
             "adapter_manufacturer": config.manufacturer,
@@ -355,6 +357,7 @@ def resume_adapter(
     cache_dir: Path = body_cache.DEFAULT_CACHE_DIR,
     now: Callable[[], datetime] = _utcnow,
     checkpoint: Callable[[], None] = lambda: None,
+    trigger: str = "MANUAL",
 ) -> CrawlRun:
     """Resume a FAILED or CANCELLED adapter run (docs/16 §7).
 
@@ -374,7 +377,7 @@ def resume_adapter(
     run = run_acquisition(
         session, source=source, urls=remaining, operator=operator, fetcher=fetcher,
         cache_dir=cache_dir, now=now, checkpoint=checkpoint,
-        adapter=(config.key, config.version), resume_of=parent,
+        adapter=(config.key, config.version), resume_of=parent, trigger=trigger,
         manifest_extra={
             "adapter_structural_review": config.structural_review,
             "adapter_manufacturer": config.manufacturer,

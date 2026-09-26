@@ -1191,6 +1191,12 @@ The first capped NEURA crawl (production run `2c64d1f3`) is the real acquired da
 - **A SAME_ENTITY decision destroys nothing.** Both candidates keep their rows, claims and evidence. The relationship is exposed to the promoting human (`build_proposal` → `same_entity_candidates`); nothing is merged.
 - **Out of scope** uses the existing rejection path, with reason code `OUT_OF_SCOPE` recorded in `promotion_audit`. A rejected candidate is terminal, remains as research history, and **no longer causes another candidate to become `POSSIBLE_DUPLICATE`**. Before Stage E it did; that behaviour was changed deliberately.
 - **Candidate ↔ catalogue identity** stays with the confirmed alias register only. `review propose-alias` prints a register entry and writes nothing. A human confirms it in a reviewed change. No alias is inferred, and no variant is folded.
+- **Trace recording** (`review trace <id> --source KEY --url URL --by WHO`) is the governed CLI path onto the existing `record_trace` (P2).
+  - The source must be an official class (`MANUFACTURER` → `MANUFACTURER_SITE`, `OFFICIAL_STORE` → `MANUFACTURER_STORE`), and its approved host and paths must cover the URL.
+  - The trace confirms the entity only, never field values.
+  - It is audited as `TRACE_CONFIRMED` in `promotion_audit`.
+  - Re-recording the identical trace is a no-op, and a different trace is refused rather than replacing it.
+  - Recording a trace never promotes.
 - **Promotion remains a separate human act** (`app.cli.promote_candidate`). Nothing in Stage E promotes, and nothing writes a canonical table.
 
 ## 18. The run report

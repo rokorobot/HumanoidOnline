@@ -23,6 +23,7 @@ import uuid
 from dataclasses import dataclass
 from itertools import combinations
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
@@ -42,6 +43,7 @@ from app.models.discovery import (
 from app.models.manufacturer import Manufacturer
 from app.models.robot import Robot
 from app.services.discovery import DiscoveryError
+from app.services.discovery.eligibility import _path_within, approved_host, approved_prefixes
 from app.services.discovery.identity import (
     ALIASES_PATH,
     _model_key,
@@ -54,8 +56,9 @@ from app.services.discovery.identity_decisions import (
     effective_decisions,
     record_identity_decision,
 )
-from app.services.discovery.pipeline import _TERMINAL, advance
+from app.services.discovery.pipeline import _TERMINAL, advance, record_trace
 from app.services.discovery.promotion import reject
+from app.services.discovery.urlref import UnsupportedUrl, normalize_url
 
 #: Queue item kinds, in display order (most blocking first).
 KINDS = (
@@ -119,10 +122,11 @@ def review_queue(session: Session, aliases_path: Path = ALIASES_PATH) -> list[Qu
             items.append(QueueItem("AMBIGUOUS", (c.id,), _label(c)))
         if c.status in ("CONFLICT", "RECHECK_REQUIRED", "INSUFFICIENT_EVIDENCE",
                         "READY_FOR_PROMOTION"):
-            items.append(QueueItem(c.status, (c.id,), _label(c)))
+            traced = f"  [traced: {c.trace_url}]" if c.trace_state == "TRACE_CONFIRMED" else ""
+            items.append(QueueItem(c.status, (c.id,), _label(c) + traced))
         if c.status == "SOURCE_TRACE" and c.identity_status in ("NEW_ENTITY", "MATCHED_EXISTING"):
             items.append(QueueItem("AWAITING_TRACE", (c.id,),
-                                   f"{_label(c)}  [{c.identity_status}]"))
+                                   f"{_label(c)}  [{c.identity_status}; {c.trace_state}]"))
         for entry in proposals:
             robot_mfr = robots.get(entry.get("robot_slug"))
             if (robot_mfr and normalize(robot_mfr[1].name) == mfr and model
@@ -171,6 +175,77 @@ def reject_candidate(session: Session, candidate_id: uuid.UUID, *, by: str, reas
     return candidate
 
 
+#: Source classes that can be an authoritative trace (docs/16 §11.1 / Gate W),
+#: mapped onto the existing `trace_source_type` vocabulary. Aggregators,
+#: marketplaces and editorial sources are never an authoritative trace here.
+TRACE_SOURCE_TYPES = {"MANUFACTURER": "MANUFACTURER_SITE", "OFFICIAL_STORE": "MANUFACTURER_STORE"}
+
+
+def _source(session: Session, key_or_id: str) -> DiscoverySource:
+    try:
+        source = session.get(DiscoverySource, uuid.UUID(key_or_id))
+    except ValueError:
+        source = session.scalars(select(DiscoverySource).where(
+            DiscoverySource.key == key_or_id)).first()
+    if source is None:
+        raise DiscoveryError(f"no discovery source {key_or_id!r}")
+    return source
+
+
+def record_source_trace(session: Session, candidate_id: uuid.UUID, *, source: str, url: str,
+                        by: str) -> tuple[DiscoveryCandidate, bool]:
+    """Governed CLI path onto the EXISTING `pipeline.record_trace` (H2).
+
+    Validates what the service leaves to its caller: the source exists, is an
+    official class, and approves the URL's host and path. It records the trace
+    exactly as the batch review does (the entity only, no field confirmation),
+    audits it in promotion_audit (TRACE_CONFIRMED) and re-runs the pipeline.
+    Tracing never promotes and never writes a canonical table.
+
+    Returns (candidate, recorded?). Re-recording the identical trace is a no-op.
+    A different trace on an already-traced candidate is refused: the candidate's
+    trace columns hold one value, so replacing it would silently rewrite history.
+    """
+    candidate = _candidate(session, candidate_id)
+    if not (by or "").strip():
+        raise DiscoveryError("--by is required (an unattributed trace is not a trace)")
+    src = _source(session, source)
+    source_type = TRACE_SOURCE_TYPES.get(src.source_class)
+    if source_type is None:
+        raise DiscoveryError(
+            f"source {src.key!r} is {src.source_class}; an authoritative trace needs one of "
+            f"{sorted(TRACE_SOURCE_TYPES)} (docs/16 §11.1)")
+    try:
+        trace_url = normalize_url(url)
+    except UnsupportedUrl as exc:
+        raise DiscoveryError(str(exc)) from exc
+    parts = urlsplit(trace_url)
+    if approved_host(src) is None or parts.hostname != approved_host(src):
+        raise DiscoveryError(f"{trace_url} is not on {src.key}'s approved host "
+                             f"({approved_host(src)})")
+    prefixes = approved_prefixes(src)
+    if not any(_path_within(parts.path or "/", p) for p in prefixes):
+        raise DiscoveryError(f"{trace_url} is outside {src.key}'s approved paths {list(prefixes)}")
+
+    if candidate.trace_state == "TRACE_CONFIRMED":
+        if candidate.trace_url == trace_url and candidate.trace_source_type == source_type:
+            return candidate, False
+        raise DiscoveryError(
+            f"candidate already has a confirmed trace ({candidate.trace_url}, "
+            f"{candidate.trace_source_type}, by {candidate.trace_verified_by}); a different "
+            "trace is refused rather than replacing it")
+    record_trace(session, candidate, trace_url=trace_url, trace_source_type=source_type,
+                 verified_by=by.strip(), confirmed_fields=frozenset())
+    session.add(PromotionAudit(
+        candidate_id=candidate.id, action="TRACE_CONFIRMED", approved_by=by.strip(),
+        detail={"trace_url": trace_url, "trace_source_type": source_type,
+                "source_key": src.key, "source_class": src.source_class},
+    ))
+    advance(session, candidate)
+    session.flush()
+    return candidate, True
+
+
 def history(session: Session, candidate_id: uuid.UUID) -> list[str]:
     _candidate(session, candidate_id)
     lines: list[str] = []
@@ -201,6 +276,9 @@ def show(session: Session, candidate_id: uuid.UUID) -> list[str]:
         f"  external_ref={c.external_ref}",
         f"  discovery_url={c.discovery_url}",
         f"  identity_status={c.identity_status}  status={c.status}  trace={c.trace_state}",
+        *([f"  trace: {c.trace_url} ({c.trace_source_type}) by {c.trace_verified_by} at "
+           f"{c.trace_verified_at.isoformat() if c.trace_verified_at else '-'}"]
+          if c.trace_state != "NOT_TRACED" else []),
         f"  discovered_at={c.discovered_at.isoformat()}  last_seen_at={c.last_seen_at.isoformat()}",
     ]
     if c.possible_robot_id:
@@ -284,5 +362,6 @@ def propose_alias(session: Session, candidate_id: uuid.UUID, robot_slug: str) ->
     }
 
 
-__all__ = ["KINDS", "NOT_SAME_ENTITY", "SAME_ENTITY", "QueueItem", "decide_pair", "history",
-           "propose_alias", "reject_candidate", "review_queue", "show"]
+__all__ = ["KINDS", "NOT_SAME_ENTITY", "SAME_ENTITY", "TRACE_SOURCE_TYPES", "QueueItem",
+           "decide_pair", "history", "propose_alias", "record_source_trace", "reject_candidate",
+           "review_queue", "show"]

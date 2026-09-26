@@ -23,12 +23,16 @@
     python -m app.cli.discovery review reject <candidate-id> --reason-code OUT_OF_SCOPE
                                        --by WHO --reason WHY
     python -m app.cli.discovery review propose-alias <candidate-id> <robot-slug>
+    python -m app.cli.discovery review trace <candidate-id> --source KEY --url URL --by WHO
 
 - `review` is the Stage E exception-only workflow (docs/16 §17.1). `list`,
   `show`, `history` and `propose-alias` never write; `propose-alias` only PRINTS
   a register entry for a human to confirm in a reviewed change. `same-as`,
   `not-same-as` and `reject` append attributed history (nothing is merged or
   deleted) and re-run the deterministic pipeline on the affected candidates.
+  `trace` records a confirmed authoritative trace through the existing
+  record_trace path: the source must be an official class and approve the URL's
+  host/path; an identical re-record is a no-op, a different one is refused.
   Nothing here promotes.
 
 - `--resume` continues a FAILED or CANCELLED run as a NEW run linked to it, with
@@ -306,6 +310,15 @@ def _cmd_review(args: argparse.Namespace) -> int:
             print("human's confirmed_by / confirmed_at set:")
             print(json.dumps(entry, indent=2, ensure_ascii=False))
             return 0
+        if args.action == "trace":
+            candidate, recorded = review.record_source_trace(
+                session, uuid.UUID(args.candidate_id), source=args.source, url=args.url,
+                by=args.by)
+            session.commit()
+            print(f"{'TRACE RECORDED' if recorded else 'TRACE ALREADY RECORDED'} "
+                  f"{candidate.id} {candidate.trace_url} ({candidate.trace_source_type}) "
+                  f"status={candidate.status}; not promoted")
+            return 0
         if args.action in ("same-as", "not-same-as"):
             decision = review.SAME_ENTITY if args.action == "same-as" else review.NOT_SAME_ENTITY
             row, created = review.decide_pair(
@@ -431,6 +444,11 @@ def main(argv: list[str] | None = None) -> int:
     rej.add_argument("--reason-code", choices=["OUT_OF_SCOPE"])
     rej.add_argument("--by", required=True)
     rej.add_argument("--reason", required=True)
+    trace = review_actions.add_parser("trace", help="record a confirmed authoritative trace")
+    trace.add_argument("candidate_id")
+    trace.add_argument("--source", required=True, help="official discovery source key or id")
+    trace.add_argument("--url", required=True, help="the official page that traces the entity")
+    trace.add_argument("--by", required=True)
     alias = review_actions.add_parser("propose-alias", help="print a register proposal; no write")
     alias.add_argument("candidate_id")
     alias.add_argument("robot_slug")

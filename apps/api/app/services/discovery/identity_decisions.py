@@ -44,6 +44,25 @@ def effective_decisions(session: Session, candidate_id: uuid.UUID | None) -> dic
     return effective
 
 
+def same_entity_group(session: Session, candidate_id: uuid.UUID) -> set[uuid.UUID]:
+    """The candidate plus every candidate linked to it by effective SAME_ENTITY
+    decisions, transitively (A~B and B~C put A, B and C in one group).
+
+    A NOT_SAME_ENTITY decision, or a SAME_ENTITY that was later reversed, links
+    nothing. Used by promotion so one human-confirmed identity can produce at
+    most one canonical robot.
+    """
+    group = {candidate_id}
+    frontier = [candidate_id]
+    while frontier:
+        current = frontier.pop()
+        for other, decision in effective_decisions(session, current).items():
+            if decision == SAME_ENTITY and other not in group:
+                group.add(other)
+                frontier.append(other)
+    return group
+
+
 def pair_history(session: Session, a: uuid.UUID, b: uuid.UUID) -> list[CandidateIdentityDecision]:
     first, second = canonical_pair(a, b)
     return list(session.scalars(

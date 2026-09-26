@@ -50,14 +50,18 @@ from app.models.discovery import (
 from app.services.discovery import cache as body_cache
 from app.services.discovery.acquisition import (
     CHANGED,
+    COMPLETED_OUTCOMES,
     FIRST_OBSERVATION,
     SOURCE_REMOVED,
     UNCHANGED,
     AcquisitionRefused,
     CanonicalWriteRefused,
+    _planned_urls,
     _utcnow,
     classify,
+    resume_plan,
     run_acquisition,
+    run_chain,
 )
 from app.services.discovery.eligibility import (
     approved_host,
@@ -198,9 +202,75 @@ def run_adapter(
             "deferred": enumeration.deferred,
             "excluded": [{"url": u, "reason": r} for u, r in enumeration.excluded],
         }}
-    extract_run(session, run, source, config, cache_dir)
-    checkpoint()
-    return run
+    return _extract_durably(session, run, source, config, cache_dir, now, checkpoint)
+
+
+def resume_adapter(
+    session: Session,
+    *,
+    parent_run_id,
+    source: DiscoverySource | None,
+    config: SourceAdapterConfig,
+    operator: str,
+    fetcher: HttpFetcher,
+    cache_dir: Path = body_cache.DEFAULT_CACHE_DIR,
+    now: Callable[[], datetime] = _utcnow,
+    checkpoint: Callable[[], None] = lambda: None,
+) -> CrawlRun:
+    """Resume a FAILED or CANCELLED adapter run (docs/16 §7).
+
+    Honours the parent's manifest: no re-enumeration, only the parent's planned
+    seeds and targets that no run in the chain fetched successfully. Committed
+    observations are neither re-requested nor duplicated. Extraction then covers
+    this run's pages AND any page the chain fetched but never extracted (a run
+    interrupted before or during extraction)."""
+    problems = adapter_problems(config, source)
+    if problems:
+        raise AdapterRefused([("-", p) for p in problems])
+    parent = session.get(CrawlRun, parent_run_id)
+    remaining, skipped = resume_plan(session, parent, source, (config.key, config.version),
+                                     fetcher.limits.as_manifest())
+    parent_manifest = parent.run_manifest or {}
+    parent_targets = parent_manifest.get("expanded_urls", [])
+    run = run_acquisition(
+        session, source=source, urls=remaining, operator=operator, fetcher=fetcher,
+        cache_dir=cache_dir, now=now, checkpoint=checkpoint,
+        adapter=(config.key, config.version), resume_of=parent,
+        manifest_extra={
+            "adapter_structural_review": config.structural_review,
+            "adapter_manufacturer": config.manufacturer,
+            "seed_urls": parent_manifest.get("seed_urls", list(config.seed_urls)),
+            "target_cap": parent_manifest.get("target_cap", config.target_cap),
+            "planned_urls": _planned_urls(parent),
+            "expanded_urls": [u for u in remaining if u in parent_targets],
+            "resume_skipped_completed": skipped,
+            **({"enumeration": parent_manifest["enumeration"]}
+               if "enumeration" in parent_manifest else {}),
+        },
+    )
+    return _extract_durably(session, run, source, config, cache_dir, now, checkpoint)
+
+
+def _extract_durably(session, run, source, config, cache_dir, now, checkpoint) -> CrawlRun:
+    """Extraction is part of an adapter run: if it raises, its partial rows are
+    rolled back and the (already committed) run is durably marked FAILED, so a
+    resume re-extracts it. Acquisition observations are untouched."""
+    run_id = run.id
+    try:
+        extract_run(session, run, source, config, cache_dir)
+        checkpoint()
+        return run
+    except Exception as exc:
+        session.rollback()
+        failed = session.get(CrawlRun, run_id)
+        if failed is not None and failed.status in ("COMPLETED", "RUNNING"):
+            failed.status = "FAILED"
+            failed.finished_at = failed.finished_at or now()
+            failed.counters = {**(failed.counters or {}),
+                               "halt_reason": f"extraction_failed: {type(exc).__name__}"}
+            session.flush()
+            checkpoint()
+        raise
 
 
 # -------------------------------------------------------------- extraction --
@@ -245,12 +315,15 @@ def extract_run(
         pages_out: list[dict] = []
         enumeration = (run.run_manifest or {}).get("enumeration") or {}
         counters["deferred_urls"] = len(enumeration.get("deferred", []))
-        targets = set((run.run_manifest or {}).get("expanded_urls", []))
-        pages = session.scalars(
+        manifest = run.run_manifest or {}
+        targets = set(manifest.get("expanded_urls", []))
+        pages = list(session.scalars(
             select(FetchedPage)
             .where(FetchedPage.crawl_run_id == run.id, FetchedPage.url.in_(targets))
             .order_by(FetchedPage.retrieved_at, FetchedPage.url)
-        ).all() if targets else []
+        ).all()) if targets else []
+        if run.resume_of_run_id is not None:
+            pages = _unextracted_ancestor_pages(session, run, config) + pages
         for page in pages:
             counters["target_pages"] += 1
             pages_out.append(_extract_page(session, run, source, config, cache_dir,
@@ -262,6 +335,27 @@ def extract_run(
         return counters
     finally:
         release()
+
+
+def _unextracted_ancestor_pages(session, run, config) -> list[FetchedPage]:
+    """Target pages the resumed chain fetched successfully but never extracted
+    with this extractor version (the parent stopped before extraction)."""
+    ancestors = [r.id for r in run_chain(session, run)[1:]]
+    parent_targets = set()
+    for ancestor in run_chain(session, run)[1:]:
+        parent_targets.update((ancestor.run_manifest or {}).get("expanded_urls", []))
+    if not ancestors or not parent_targets:
+        return []
+    extracted = select(ExtractionResult.fetched_page_id).where(
+        ExtractionResult.extractor_key == config.key,
+        ExtractionResult.extractor_version == config.version,
+    )
+    return list(session.scalars(
+        select(FetchedPage)
+        .where(FetchedPage.crawl_run_id.in_(ancestors), FetchedPage.url.in_(parent_targets),
+               FetchedPage.outcome.in_(COMPLETED_OUTCOMES), FetchedPage.id.not_in(extracted))
+        .order_by(FetchedPage.retrieved_at, FetchedPage.url)
+    ).all())
 
 
 def _candidate_for(session, source, url) -> DiscoveryCandidate | None:
@@ -344,7 +438,7 @@ def _extract_page(session, run, source, config, cache_dir, page, counters) -> di
 
 def _result(session, run, page, config, status, candidate, notes: dict) -> None:
     session.add(ExtractionResult(
-        crawl_run_id=run.id, fetched_page_id=page.id,
+        crawl_run_id=page.crawl_run_id, fetched_page_id=page.id,
         candidate_id=candidate.id if candidate is not None else None,
         extractor_key=config.key, extractor_version=config.version,
         entity_type="ROBOT", status=status,

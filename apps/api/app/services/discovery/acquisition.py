@@ -30,7 +30,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from sqlalchemy import event, select
+from sqlalchemy import event, func, select
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 
@@ -38,7 +38,7 @@ from app.models.acquisition import CrawlRun, FetchedPage
 from app.models.discovery import DiscoverySource
 from app.services.discovery import DiscoveryError
 from app.services.discovery import cache as body_cache
-from app.services.discovery.eligibility import url_ineligibility
+from app.services.discovery.eligibility import source_ineligibility, url_ineligibility
 from app.services.discovery.fetcher import (
     RETRIEVAL_METHOD,
     USER_AGENT,
@@ -82,8 +82,18 @@ class CanonicalWriteRefused(DiscoveryError):
     """Acquisition attempted to write outside crawl_run/fetched_page/discovery_source."""
 
 
+class ResumeRefused(AcquisitionRefused):
+    """A run cannot be resumed; nothing was requested and nothing was written."""
+
+
 class RobotsUnavailable(Exception):
     pass
+
+
+#: Outcomes that count as "fetched successfully": resume never re-requests them.
+COMPLETED_OUTCOMES = ("FETCHED", "NOT_MODIFIED")
+#: A RUNNING run with no activity for this long may be marked FAILED by an operator.
+STALE_RUN_AFTER = timedelta(minutes=30)
 
 
 @dataclass
@@ -279,6 +289,7 @@ def run_acquisition(
     expand: Expander | None = None,
     adapter: tuple[str, str] = (ADAPTER_KEY, ADAPTER_VERSION),
     manifest_extra: dict | None = None,
+    resume_of: CrawlRun | None = None,
 ) -> CrawlRun:
     """One MANUAL run over an explicit URL list. Refuses before any request if
     the source or any URL fails policy. `checkpoint` (e.g. session.commit) is
@@ -287,15 +298,26 @@ def run_acquisition(
     With `expand`, `urls` are the run's seeds: after the last seed, `expand` is
     called once with the fetched seed bodies and returns target URLs, which are
     re-checked against the source policy and the page cap and then fetched. The
-    targets are never expanded (one level, no recursion)."""
+    targets are never expanded (one level, no recursion).
+
+    Durability: with a committing `checkpoint`, every observation is committed as
+    it is recorded. An unexpected exception rolls back only the uncommitted
+    remainder, then durably marks the run FAILED (KeyboardInterrupt: CANCELLED)
+    before re-raising, so no run is left RUNNING by an error this process saw.
+    A resume (`resume_of`) may legitimately have nothing left to fetch."""
     if not operator or not operator.strip():
         raise AcquisitionRefused([("-", "OPERATOR_REQUIRED")])
-    _refuse_unless_planned(source, urls, fetcher.limits.page_cap)
+    if urls or resume_of is None:
+        _refuse_unless_planned(source, urls, fetcher.limits.page_cap)
+    else:
+        reason = source_ineligibility(source)
+        if reason:
+            raise AcquisitionRefused([("-", reason)])
 
     release = _guard_writes(session)
     try:
         return _run(session, source, urls, operator.strip(), fetcher, cache_dir, now,
-                    checkpoint, expand, adapter, manifest_extra or {})
+                    checkpoint, expand, adapter, manifest_extra or {}, resume_of)
     finally:
         release()
 
@@ -314,7 +336,7 @@ def _prior_body(session: Session, source: DiscoverySource, url: str,
 
 
 def _run(session, source, urls, operator, fetcher, cache_dir, now, checkpoint,
-         expand, adapter, manifest_extra) -> CrawlRun:
+         expand, adapter, manifest_extra, resume_of) -> CrawlRun:
     counters = {
         "requested": len(urls), "attempted": 0, "fetched": 0, "not_modified": 0,
         FIRST_OBSERVATION.lower(): 0, UNCHANGED.lower(): 0, CHANGED.lower(): 0,
@@ -325,6 +347,7 @@ def _run(session, source, urls, operator, fetcher, cache_dir, now, checkpoint,
     run = CrawlRun(
         source_id=source.id, adapter_key=adapter[0], adapter_version=adapter[1],
         trigger="MANUAL", operator=operator, status="RUNNING", started_at=now(),
+        resume_of_run_id=resume_of.id if resume_of is not None else None,
         run_manifest={
             "source_key": source.key,
             "requested_urls": list(urls),
@@ -357,6 +380,7 @@ def _run(session, source, urls, operator, fetcher, cache_dir, now, checkpoint,
                                      urls, fetcher.limits.page_cap, run)
                 counters["requested"] += len(targets)
                 remaining = list(targets)
+                checkpoint()  # the expanded target list is durable before any target
                 continue
             url = remaining[0]
             if robots is None or now() - robots.checked_at > ROBOTS_MAX_AGE:
@@ -405,6 +429,13 @@ def _run(session, source, urls, operator, fetcher, cache_dir, now, checkpoint,
     except KillSwitchEngaged:
         status = "CANCELLED"
         counters["halt_reason"] = "kill_switch"
+    except KeyboardInterrupt:
+        _end_durably(session, run.id, "CANCELLED", "interrupted", now, checkpoint)
+        raise
+    except Exception as exc:
+        _end_durably(session, run.id, "FAILED", f"unexpected_error: {type(exc).__name__}",
+                     now, checkpoint)
+        raise
     counters["not_attempted"] = counters["requested"] - counters["attempted"]
     run.status = status
     run.finished_at = now()
@@ -414,6 +445,163 @@ def _run(session, source, urls, operator, fetcher, cache_dir, now, checkpoint,
     session.flush()
     checkpoint()
     return run
+
+
+def observed_counters(session: Session, run: CrawlRun) -> dict:
+    """The §18 counters rebuilt from the run's COMMITTED observations — used when
+    the in-memory counters of an interrupted run cannot be trusted."""
+    manifest = run.run_manifest or {}
+    version = manifest.get("fingerprint_version", FINGERPRINT_VERSION)
+    requested = len(manifest.get("requested_urls", [])) + len(manifest.get("expanded_urls", []))
+    counters = {
+        "requested": requested, "attempted": 0, "fetched": 0, "not_modified": 0,
+        FIRST_OBSERVATION.lower(): 0, UNCHANGED.lower(): 0, CHANGED.lower(): 0,
+        SOURCE_REMOVED.lower(): 0, FETCH_ERROR.lower(): 0,
+        "blocked_by_robots": 0, "blocked_by_source": 0, "redirects_refused": [],
+        "not_attempted": 0, "halt_reason": None, "canonical_rows_written": 0,
+    }
+    for page in session.scalars(select(FetchedPage).where(FetchedPage.crawl_run_id == run.id)):
+        counters["attempted"] += 1
+        key = {"FETCHED": "fetched", "NOT_MODIFIED": "not_modified",
+               "BLOCKED_BY_ROBOTS": "blocked_by_robots",
+               "BLOCKED_BY_SOURCE": "blocked_by_source"}.get(page.outcome)
+        if key:
+            counters[key] += 1
+        state = classify(session, page, version)
+        if state.lower() in counters and state not in ("BLOCKED_BY_ROBOTS", "BLOCKED_BY_SOURCE"):
+            counters[state.lower()] += 1
+    counters["not_attempted"] = max(requested - counters["attempted"], 0)
+    return counters
+
+
+def _end_durably(session, run_id, status, reason, now, checkpoint) -> None:
+    """Discard the uncommitted remainder, then record how the run ended.
+
+    Only a run that was durably written can be marked; if nothing was ever
+    committed (a non-committing caller) the rollback leaves nothing behind."""
+    session.rollback()
+    run = session.get(CrawlRun, run_id)
+    if run is None or run.status != "RUNNING":
+        return
+    counters = observed_counters(session, run)
+    counters["halt_reason"] = reason
+    run.status = status
+    run.finished_at = now()
+    run.counters = counters
+    session.flush()
+    checkpoint()
+
+
+def mark_stale_run_failed(
+    session: Session, run_id, *, by: str, reason: str,
+    now: Callable[[], datetime] = _utcnow, stale_after: timedelta = STALE_RUN_AFTER,
+) -> CrawlRun:
+    """Governed recovery for a run whose process died without recording an end
+    (killed, power loss): an attributed operator act, refused while the run shows
+    recent activity, so a live run in another process is not cut off."""
+    if not (by or "").strip() or not (reason or "").strip():
+        raise DiscoveryError("--by and --reason are required")
+    run = session.get(CrawlRun, run_id)
+    if run is None:
+        raise DiscoveryError(f"no crawl_run {run_id}")
+    if run.status != "RUNNING":
+        raise DiscoveryError(f"run {run_id} is {run.status}, not RUNNING")
+    last = session.scalar(select(func.max(FetchedPage.retrieved_at))
+                          .where(FetchedPage.crawl_run_id == run.id)) or run.started_at
+    if now() - last < stale_after:
+        raise DiscoveryError(
+            f"run {run_id} was active at {last.isoformat()}; it is not stale yet "
+            f"(needs {int(stale_after.total_seconds() // 60)} idle minutes)")
+    counters = observed_counters(session, run)
+    counters["halt_reason"] = f"marked_failed_by_operator: {reason.strip()}"
+    run.status = "FAILED"
+    run.finished_at = now()
+    run.counters = counters
+    run.run_manifest = {**(run.run_manifest or {}), "marked_failed_by": by.strip()}
+    session.flush()
+    return run
+
+
+# ------------------------------------------------------------------ resume --
+
+
+def _planned_urls(run: CrawlRun) -> list[str]:
+    """Every URL the run intended to fetch, in order: seeds/explicit URLs, then
+    expanded targets. A resumed run inherits its parent's plan."""
+    manifest = run.run_manifest or {}
+    if "planned_urls" in manifest:
+        return list(manifest["planned_urls"])
+    planned = list(manifest.get("requested_urls", []))
+    planned += [u for u in manifest.get("expanded_urls", []) if u not in planned]
+    return planned
+
+
+def run_chain(session: Session, run: CrawlRun) -> list[CrawlRun]:
+    """`run` and every run it resumes, newest first."""
+    chain = [run]
+    while chain[-1].resume_of_run_id is not None:
+        parent = session.get(CrawlRun, chain[-1].resume_of_run_id)
+        if parent is None or parent in chain:
+            break
+        chain.append(parent)
+    return chain
+
+
+def resume_plan(session: Session, parent: CrawlRun | None, source: DiscoverySource | None,
+                adapter: tuple[str, str], limits: dict) -> tuple[list[str], list[str]]:
+    """(remaining URLs, already-completed URLs) for resuming `parent`, or
+    ResumeRefused. Pure reads; nothing is requested or written."""
+    problems: list[str] = []
+    if parent is None:
+        raise ResumeRefused([("-", "NO_SUCH_RUN")])
+    if parent.status == "RUNNING":
+        problems.append("RUN_STILL_RUNNING (mark it FAILED first: discovery run fail)")
+    elif parent.status == "COMPLETED":
+        problems.append("RUN_COMPLETED (nothing to resume)")
+    elif parent.status == "HALTED_BY_POLICY":
+        problems.append("RUN_HALTED_BY_POLICY (a policy outcome is not retried)")
+    child = session.scalars(select(CrawlRun.id).where(CrawlRun.resume_of_run_id == parent.id)
+                            ).first()
+    if child is not None:
+        problems.append(f"ALREADY_RESUMED (by run {child}; resume that run instead)")
+    if source is None or source.id != parent.source_id:
+        problems.append("SOURCE_MISMATCH")
+    if (parent.adapter_key, parent.adapter_version) != tuple(adapter):
+        problems.append(f"ADAPTER_MISMATCH ({parent.adapter_key}@{parent.adapter_version})")
+    manifest = parent.run_manifest or {}
+    if manifest.get("fingerprint_version") != FINGERPRINT_VERSION:
+        problems.append("FINGERPRINT_VERSION_CHANGED")
+    if manifest.get("limits") != limits:
+        problems.append("LIMITS_CHANGED (a resume honours the parent's manifest)")
+    if problems:
+        raise ResumeRefused([("-", p) for p in problems])
+    chain_ids = [r.id for r in run_chain(session, parent)]
+    done = set(session.scalars(
+        select(FetchedPage.url).where(FetchedPage.crawl_run_id.in_(chain_ids),
+                                      FetchedPage.outcome.in_(COMPLETED_OUTCOMES))
+    ))
+    planned = _planned_urls(parent)
+    return [u for u in planned if u not in done], [u for u in planned if u in done]
+
+
+def resume_acquisition(
+    session: Session, *, parent_run_id, source: DiscoverySource | None, operator: str,
+    fetcher: HttpFetcher, cache_dir: Path = body_cache.DEFAULT_CACHE_DIR,
+    now: Callable[[], datetime] = _utcnow, checkpoint: Callable[[], None] = lambda: None,
+) -> CrawlRun:
+    """Resume a FAILED or CANCELLED plain run (docs/16 §7): a NEW run linked by
+    `resume_of_run_id`, same manifest, fetching only the planned URLs the chain
+    has not already fetched successfully. Committed observations are never
+    re-requested, rewritten or duplicated."""
+    parent = session.get(CrawlRun, parent_run_id)
+    remaining, skipped = resume_plan(session, parent, source, (ADAPTER_KEY, ADAPTER_VERSION),
+                                     fetcher.limits.as_manifest())
+    return run_acquisition(
+        session, source=source, urls=remaining, operator=operator, fetcher=fetcher,
+        cache_dir=cache_dir, now=now, checkpoint=checkpoint, resume_of=parent,
+        manifest_extra={"planned_urls": _planned_urls(parent),
+                        "resume_skipped_completed": skipped},
+    )
 
 
 def _expansion(source, targets, seeds, page_cap, run) -> list[str]:
@@ -539,7 +727,8 @@ def build_report(session: Session, run_id) -> str:
         f"RUN {run.id}   source={manifest.get('source_key')}   "
         f"adapter={run.adapter_key}@{run.adapter_version}   operator={run.operator}",
         f"started={run.started_at.isoformat()}  finished="
-        f"{run.finished_at.isoformat() if run.finished_at else '-'}  status={run.status}",
+        f"{run.finished_at.isoformat() if run.finished_at else '-'}  status={run.status}"
+        f"  resumed_from={run.resume_of_run_id or '-'}",
         f"user-agent={manifest.get('user_agent')}   method={manifest.get('retrieval_method')}",
         f"limits={manifest.get('limits')}   fingerprint={version}",
         f"robots={manifest.get('robots')}",

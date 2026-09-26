@@ -61,7 +61,7 @@ test("footer lower band: identity/copyright left, secondary nav right", async ({
   // The footer nav lives in the same band as the copyright, not above it.
   await expect(band.locator("nav.foot-nav")).toHaveCount(1);
   const labels = (await nav.getByRole("link").allTextContents()).map((t) => t.trim());
-  expect(labels).toEqual(["Robots", "Compare", "Manufacturers", "Use Cases", "About"]);
+  expect(labels).toEqual(["Robots", "Compare", "Manufacturers", "Use Cases", "About", "Contact"]);
   // Plain links — the orange CTA stays in the top navigation only.
   await expect(nav.locator("a.cta")).toHaveCount(0);
 

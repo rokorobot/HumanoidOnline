@@ -9,20 +9,20 @@
 // The figures come from lib/crawler-policy.ts, which mirrors the crawler's code
 // constants; the API test tests/test_crawler_policy_page.py guards the parity.
 //
-// Unknown stays unknown: the contact address comes from lib/entity.ts and is
-// shown only once it has been confirmed for publication. No address is invented.
+// Contact goes through the public /contact form (Netlify Forms); no email
+// address is published here.
 import type { Metadata } from "next";
 
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 import {
+  CRAWLER_CONTACT_URL,
   CRAWLER_MIN_INTERVAL_SECONDS as MIN_INTERVAL_SECONDS,
   CRAWLER_PAGES_PER_RUN as PAGES_PER_RUN,
   CRAWLER_PRODUCT_TOKEN as PRODUCT_TOKEN,
   CRAWLER_USER_AGENT as USER_AGENT,
 } from "@/lib/crawler-policy";
-import { ENTITY } from "@/lib/entity";
 import { absoluteUrl } from "@/lib/site";
 
 export function generateMetadata(): Metadata {
@@ -41,7 +41,6 @@ const SLOW_DOWN = `User-agent: ${PRODUCT_TOKEN}
 Crawl-delay: 30`;
 
 export default function CrawlerPolicyPage() {
-  const contact = ENTITY.contactEmail;
   return (
     <>
       <SystemHeader title="CRAWLER POLICY / HUMANOIDONLINEMARKETBOT" />
@@ -130,20 +129,22 @@ export default function CrawlerPolicyPage() {
           </p>
 
           <h2>Contact</h2>
-          {contact ? (
-            <p>
-              To ask for reduced frequency or exclusion, report a problem, or ask what we recorded
-              from your site, write to <a href={`mailto:${contact}`}>{contact}</a>. We will
-              disable your site in our crawler on request.
-            </p>
-          ) : (
-            <p>
-              A direct contact address for crawler questions and exclusion requests will be published
-              on this page before HumanoidOnlineMarketBot requests any product page. Until then, the
-              robots.txt rules above are the way to exclude or slow the crawler, and they are always
-              honoured.
-            </p>
-          )}
+          <p>
+            Site owners can reach us through the contact form at{" "}
+            <a href={CRAWLER_CONTACT_URL}>{CRAWLER_CONTACT_URL}</a>. Choose &ldquo;Crawler /
+            robots&rdquo; or &ldquo;Crawler opt-out / rate-limit request&rdquo; and include your
+            site&apos;s domain. Use it to:
+          </p>
+          <ul>
+            <li>ask questions about the crawler;</li>
+            <li>request a reduced crawl frequency;</li>
+            <li>report a problem caused by the crawler;</li>
+            <li>request that your site be excluded.</li>
+          </ul>
+          <p>
+            An exclusion or rate request is applied to our crawler configuration for your site.
+            Your robots.txt rules are honoured whether or not you contact us.
+          </p>
         </article>
       </div>
     </>

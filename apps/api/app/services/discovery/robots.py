@@ -14,6 +14,10 @@ Rules (RFC 9309 §2.2):
 - `*` matches any sequence and a trailing `$` anchors the end;
 - `/robots.txt` itself is always allowed.
 
+`Crawl-delay` is not part of RFC 9309 but is honoured when the applicable group
+states one: it can only make the fetcher slower (see `HttpFetcher.honour_crawl_delay`),
+never faster than the 2 s floor. A malformed or negative value is ignored.
+
 Fetch-status semantics (RFC 9309 §2.3.1), applied by the runner:
 - 2xx: parse the body;
 - 401/403: treated as a complete disallow (conservative);
@@ -49,6 +53,8 @@ class RobotsRules:
 
     rules: tuple[_Rule, ...] = field(default_factory=tuple)
     disallow_all: bool = False
+    #: Seconds, from the applicable group's `Crawl-delay`; None when not stated.
+    crawl_delay: float | None = None
 
     def allows(self, url: str) -> bool:
         parts = urlsplit(url)
@@ -71,11 +77,20 @@ class RobotsRules:
         return best is None or best.allow
 
 
+def _delay(value: str) -> float | None:
+    try:
+        seconds = float(value)
+    except ValueError:
+        return None
+    return seconds if seconds >= 0 and seconds == seconds and seconds != float("inf") else None
+
+
 def parse(text: str, product_token: str = PRODUCT_TOKEN) -> RobotsRules:
     token = product_token.lower()
-    groups: list[tuple[list[str], list[_Rule]]] = []
+    groups: list[tuple[list[str], list[_Rule], list[float]]] = []
     agents: list[str] = []
     rules: list[_Rule] = []
+    delays: list[float] = []
     last_was_agent = False
     for raw_line in text.splitlines():
         line = raw_line.split("#", 1)[0].strip()
@@ -84,22 +99,31 @@ def parse(text: str, product_token: str = PRODUCT_TOKEN) -> RobotsRules:
         key, value = (part.strip() for part in line.split(":", 1))
         key = key.lower()
         if key == "user-agent":
-            if not last_was_agent and (agents or rules):
-                groups.append((agents, rules))
-                agents, rules = [], []
+            if not last_was_agent and (agents or rules or delays):
+                groups.append((agents, rules, delays))
+                agents, rules, delays = [], [], []
             agents.append(value.split("/", 1)[0].strip().lower())
             last_was_agent = True
         elif key in ("allow", "disallow"):
             last_was_agent = False
             if value and agents:  # an empty disallow restricts nothing
                 rules.append(_Rule.build(key == "allow", value))
+        elif key == "crawl-delay":
+            last_was_agent = False
+            seconds = _delay(value)
+            if seconds is not None and agents:
+                delays.append(seconds)
         else:
             last_was_agent = False
-    if agents or rules:
-        groups.append((agents, rules))
+    if agents or rules or delays:
+        groups.append((agents, rules, delays))
 
-    specific = [r for names, group in groups if token in names for r in group]
-    if any(token in names for names, _ in groups):
-        return RobotsRules(tuple(specific))
-    wildcard = [r for names, group in groups if "*" in names for r in group]
-    return RobotsRules(tuple(wildcard))
+    for name in (token, "*"):
+        matching = [g for g in groups if name in g[0]]
+        if matching:
+            found = [d for _, _, ds in matching for d in ds]
+            return RobotsRules(
+                tuple(r for _, rs, _ in matching for r in rs),
+                crawl_delay=max(found) if found else None,
+            )
+    return RobotsRules()

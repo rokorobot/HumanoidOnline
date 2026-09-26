@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SYNTHETIC fixture sitemap -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://maker.example/products/ex-alpha-7/</loc></url>
+  <url><loc>https://maker.example/news/2026/ex-omega-unveiled</loc></url>
+  <url><loc>https://maker.example/news/2026/company-update?utm_campaign=rss</loc></url>
+  <url><loc>https://maker.example/sitemap-products.xml</loc></url>
+</urlset>

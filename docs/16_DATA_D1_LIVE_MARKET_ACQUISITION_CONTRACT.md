@@ -905,6 +905,70 @@ The fetcher — rate limiting, robots evaluation, conditional requests, retries,
 caching, recording — is **shared infrastructure**, not per-adapter code. Adapters
 cannot opt out of etiquette because they never touch the network.
 
+### 12.1 Bounded URL enumeration and adapter configuration *(clarification — owner decisions D2–D5, 2026-09-26)*
+
+This section narrows §12 for Slice B. It adds no new permission. Every rule in
+§5, §13 and LIVE.2 still applies to every request.
+
+**Where configuration lives (D3).** Each source has one versioned code module
+(`app/services/discovery/sources/<source>.py`). That module holds the seed URLs,
+the product and announcement URL patterns, the source-specific extraction rules,
+the adapter version, the expected source class and the canonical manufacturer
+identity. All of it is reviewed in a PR. The database holds only runtime approval
+and state: the owner's recorded ToS decision, robots status, enablement, approved
+host and path prefixes, and run history. Nothing read from the database can widen
+what an adapter fetches. A run is refused unless the module and the registered
+source agree on key, class, host and path prefixes. It is also refused until the
+module records a structural review: confirmation that the pages are
+server-rendered enough for HTTP-only acquisition, and whether they carry usable
+JSON-LD.
+
+**How new pages are found (D2).** Exactly one level:
+
+1. Fixed, reviewed **seed** pages. A `sitemap.xml` may be a seed only when it is
+   named explicitly. It is not crawled recursively, and a nested sitemap it lists
+   is never followed.
+2. From the seeds' bodies, links (or `<loc>` entries) are resolved, normalized
+   (§11), and kept only when the URL:
+   - is on the same approved host;
+   - is inside an approved path prefix;
+   - matches the adapter's product or announcement pattern;
+   - is allowed by robots.txt for our product token.
+   Each excluded link is recorded with its reason: `OFF_HOST`, `OUTSIDE_PATHS`,
+   `NO_PATTERN` or `ROBOTS_DISALLOW`.
+3. The kept targets are fetched. Their own links are never followed.
+
+A target that robots.txt disallows is excluded at enumeration and never
+requested. It therefore does not trigger Gate B's halt-and-disable, which stays
+reserved for a disallow on a requested URL.
+
+**Caps (D5).** At most 50 target pages per source per run, unseen URLs first,
+then the least recently observed. URLs over the cap are recorded in the run
+manifest and the report as `DEFERRED (not fetched this run)`, never silently
+dropped. The per-host interval is the larger of the 2 s floor and the site's
+robots.txt `Crawl-delay`. A `Crawl-delay` can only slow the crawler, never speed
+it up.
+
+**Announcements (D4).** A newly discovered newsroom URL produces **evidence
+only**. That evidence is an `extraction_result` with `status = AMBIGUOUS`
+(routed to a human) and classification `NEW_ANNOUNCEMENT_URL`. Its notes hold
+the headline, one excerpt of at most 1000 characters with a locator, the page
+URL, the retrieval time and the page hash. A robot candidate is created from an
+announcement only when the page's structured data explicitly names exactly one
+product carrying this source's manufacturer brand. No LLM is involved, and
+nothing is inferred from prose.
+
+**Identity.** Candidates are keyed by `(source_id, normalized product URL)`. The
+existing deterministic resolver (DATA-D1.6/1.7) is used unchanged, and the
+adapter supplies the canonical manufacturer name from its module rather than
+inferring or aliasing it.
+
+**`/crawler-policy` (Gate R, D9).** The page is part of the web app. It is
+informational only and neither weakens robots enforcement nor substitutes for
+the owner's source approval. Its contact line shows an address only once one is
+confirmed for publication (`lib/entity.ts`). It must resolve in production
+before the first product-page fetch.
+
 ## 13. Etiquette (implements DATA-D1 §14)
 
 - **Identifiable user agent** *(owner decision D-4, settled)* — this exact

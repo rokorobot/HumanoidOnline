@@ -44,6 +44,16 @@ def read_body(root: Path, digest: str) -> bytes:
     return (root / digest).read_bytes()
 
 
+def read_observed_body(root: Path, fetched_page_id: str) -> bytes | None:
+    """The body an observation retrieved, or None when it has left the cache."""
+    sidecar = root / "observations" / f"{fetched_page_id}.json"
+    try:
+        digest = json.loads(sidecar.read_text(encoding="utf-8"))["raw_sha256"]
+        return read_body(root, digest)
+    except (OSError, KeyError, ValueError, TypeError):
+        return None
+
+
 def record_observation(root: Path, fetched_page_id: str, meta: dict) -> Path:
     """Write the observation sidecar. Refuses to overwrite: observations are immutable."""
     target = root / "observations" / f"{fetched_page_id}.json"

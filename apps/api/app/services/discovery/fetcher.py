@@ -6,7 +6,8 @@ the runner never touch the network directly, so etiquette cannot be opted out
 of (docs/16 §12/§13):
 
 - the exact docs/16 user agent, never a browser impersonation string;
-- per-host minimum interval (>= 2 s) with an injectable clock and sleep;
+- per-host minimum interval (>= 2 s) with an injectable clock and sleep, raised
+  (never lowered) to a robots.txt `Crawl-delay` when the site states a longer one;
 - redirects are never followed automatically: every hop is re-checked by a
   caller-supplied policy (host/path + robots) and the chain is bounded;
 - bounded timeout and response-body size (streamed; oversize bodies discarded);
@@ -109,6 +110,7 @@ class HttpFetcher:
         self._sleep = sleep
         self._kill_switch = kill_switch
         self._last_request_at: dict[str, float] = {}
+        self._host_interval: dict[str, float] = {}
         self._client = httpx.Client(
             transport=transport,
             follow_redirects=False,
@@ -126,13 +128,26 @@ class HttpFetcher:
         self.close()
 
     # -- etiquette ---------------------------------------------------------
+    def honour_crawl_delay(self, host: str, seconds: float | None) -> float:
+        """Raise `host`'s minimum interval to a robots `Crawl-delay`. It can only
+        slow the fetcher down: a delay below the floor, or below a delay already
+        honoured this run, changes nothing. Returns the effective interval."""
+        key = host.lower()
+        current = self.interval_for(key)
+        if seconds is not None and seconds > current:
+            self._host_interval[key] = float(seconds)
+        return self.interval_for(key)
+
+    def interval_for(self, host: str) -> float:
+        return max(self.limits.min_interval_seconds, self._host_interval.get(host.lower(), 0.0))
+
     def _wait_for_host(self, url: str) -> None:
         if self._kill_switch():
             raise KillSwitchEngaged("kill switch engaged")
         host = (urlsplit(url).hostname or "").lower()
         last = self._last_request_at.get(host)
         if last is not None:
-            remaining = self.limits.min_interval_seconds - (self._monotonic() - last)
+            remaining = self.interval_for(host) - (self._monotonic() - last)
             if remaining > 0:
                 self._sleep(remaining)
         self._last_request_at[host] = self._monotonic()

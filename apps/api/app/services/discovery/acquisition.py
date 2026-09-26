@@ -760,6 +760,34 @@ def build_report(session: Session, run_id) -> str:
     return "\n".join(lines + _adapter_report(manifest, counters))
 
 
+def _index_lines(report: dict) -> list[str]:
+    """INDEX-ONLY report: seeds, what would be targeted, and why the rest is not."""
+    lines = ["", "INDEX-ONLY (no target page requested; nothing extracted or written)", "SEEDS"]
+    lines += [f"  {s['outcome']:<18} {s['http_status'] or '-':<4} {s['url']}"
+              + (f"  -> {s['final_url']}" if s.get("final_url") not in (None, s["url"]) else "")
+              for s in report.get("seeds", [])]
+    lines.append("QUALIFYING URLS (cap / unseen / found in)")
+    lines += [f"  {q['cap']:<9} {'unseen' if q['unseen'] else 'seen':<7} {q['url']}"
+              f"  [{', '.join(q['found_in'])}]" for q in report.get("qualifying", [])]
+    for key, title in (("sitemap_only", "SITEMAP-ONLY"), ("link_only", "LINK-ONLY"),
+                       ("sitemap_and_links", "SITEMAP AND LINKS"),
+                       ("absent_from_sitemap_but_linked", "ABSENT FROM SITEMAP BUT LINKED"),
+                       ("seeds_linked", "SEEDS ALSO LINKED (extracted from the seed fetch)")):
+        lines.append(f"{title} ({len(report.get(key, []))})")
+        lines += [f"  {u}" for u in report.get(key, [])]
+    lines.append(f"NORMALIZATION DUPLICATES ({len(report.get('normalization_duplicates', []))})")
+    lines += [f"  {d['url']}  <= {d['raw']}" for d in report.get("normalization_duplicates", [])]
+    lines.append(f"EXCLUDED ({len(report.get('excluded', []))})")
+    lines += [f"  {e['reason']:<16} {e['url']}" for e in report.get("excluded", [])]
+    lines.append("SEED PRODUCT PAGES (identity computed in memory; resolver prediction read-only)")
+    for row in report.get("seed_products", []):
+        predicted = row.get("predicted") or {}
+        lines.append(f"  {row['status']:<14} name={row['name']!r}  "
+                     f"resolver={predicted.get('identity_status', '-')}  {row['url']}")
+    lines.append(f"TARGETS NOT FETCHED ({len(report.get('targets_not_fetched', []))})")
+    return lines
+
+
 def _adapter_report(manifest: dict, counters: dict) -> list[str]:
     """The Slice B additions to the §18 report: enumeration and extraction."""
     extraction = counters.get("extraction")
@@ -774,6 +802,8 @@ def _adapter_report(manifest: dict, counters: dict) -> list[str]:
                  f"excluded {len(enumeration.get('excluded', []))}")
     lines += [f"  DEFERRED (not fetched this run)  {u}" for u in enumeration.get("deferred", [])]
     lines += [f"  EXCLUDED {e['reason']:<16} {e['url']}" for e in enumeration.get("excluded", [])]
+    if manifest.get("index_report") is not None:
+        return lines + _index_lines(manifest["index_report"])
     if extraction is None:
         return lines
     lines += ["", "EXTRACTION"]

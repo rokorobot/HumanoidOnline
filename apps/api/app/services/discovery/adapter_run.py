@@ -70,6 +70,7 @@ from app.services.discovery.eligibility import (
     url_ineligibility,
 )
 from app.services.discovery.fetcher import HttpFetcher
+from app.services.discovery.identity import resolve_identity
 from app.services.discovery.live_adapter import (
     ANNOUNCEMENT,
     OFFICIAL_CLASSES,
@@ -81,6 +82,7 @@ from app.services.discovery.live_adapter import (
     enumerate_targets,
     extract_announcement,
     extract_product,
+    link_provenance,
 )
 from app.services.discovery.pipeline import _TERMINAL, advance, flag_recheck
 from app.services.discovery.urlref import UnsupportedUrl, normalize_url
@@ -205,6 +207,141 @@ def run_adapter(
             "excluded": [{"url": u, "reason": r} for u, r in enumeration.excluded],
         }}
     return _extract_durably(session, run, source, config, cache_dir, now, checkpoint)
+
+
+def index_adapter(
+    session: Session,
+    *,
+    source: DiscoverySource | None,
+    config: SourceAdapterConfig,
+    operator: str,
+    fetcher: HttpFetcher,
+    cache_dir: Path = body_cache.DEFAULT_CACHE_DIR,
+    now: Callable[[], datetime] = _utcnow,
+    checkpoint: Callable[[], None] = lambda: None,
+) -> CrawlRun:
+    """INDEX-ONLY adapter run: what the adapter WOULD target, without the target
+    crawl.
+
+    Fetches only the reviewed seeds, with the same policy gates, robots.txt check
+    and per-host interval as a full run, and enumerates one level exactly as a
+    full run would (host/prefix/pattern/robots, cap, unseen first). No target is
+    requested, nothing is extracted into candidates, and nothing canonical is
+    written. A seed that is itself a product page is recorded as a fetched page;
+    its identity is computed in memory for the report, and the existing resolver
+    predicts its outcome read-only.
+    """
+    problems = adapter_problems(config, source)
+    if problems:
+        raise AdapterRefused([("-", p) for p in problems])
+
+    last_seen = _last_seen(session, source)
+    holder: dict = {}
+
+    def expand(seed_pages, robots_rules):
+        seeds = [(page.final_url or page.url, body) for page, body in seed_pages]
+        holder.update(seeds=seeds, robots=robots_rules,
+                      enumeration=enumerate_targets(config, seeds, robots_rules, last_seen))
+        return []  # index-only: no target page is requested
+
+    run = run_acquisition(
+        session, source=source, urls=list(config.seed_urls), operator=operator,
+        fetcher=fetcher, cache_dir=cache_dir, now=now, checkpoint=checkpoint,
+        expand=expand, adapter=(config.key, config.version),
+        manifest_extra={
+            "mode": "INDEX_ONLY",
+            "adapter_structural_review": config.structural_review,
+            "adapter_manufacturer": config.manufacturer,
+            "seed_urls": list(config.seed_urls),
+            "target_cap": config.target_cap,
+        },
+    )
+    release = _guard(session)
+    try:
+        report = _index_report(session, run, source, config, holder, last_seen)
+        enumeration = holder.get("enumeration")
+        run.run_manifest = {**run.run_manifest, "index_report": report, **({"enumeration": {
+            "selected": enumeration.selected,
+            "deferred": enumeration.deferred,
+            "excluded": [{"url": u, "reason": r} for u, r in enumeration.excluded],
+        }} if enumeration is not None else {})}
+        session.flush()
+    finally:
+        release()
+    checkpoint()
+    return run
+
+
+def _predict_identity(session, source, config, url, name) -> dict:
+    """The existing resolver's verdict for a would-be candidate, READ-ONLY: the
+    candidate is transient and never added to the session."""
+    probe = DiscoveryCandidate(
+        id=uuid.uuid4(), source_id=source.id, entity_type="ROBOT", candidate_name=name,
+        candidate_manufacturer=config.manufacturer, external_ref=url,
+    )
+    verdict = resolve_identity(session, probe)
+    assert probe not in session  # read-only by construction
+    return {"identity_status": verdict,
+            "possible_robot_id": str(probe.possible_robot_id) if probe.possible_robot_id else None,
+            "possible_manufacturer_id": (str(probe.possible_manufacturer_id)
+                                         if probe.possible_manufacturer_id else None)}
+
+
+def _index_report(session, run, source, config, holder, last_seen) -> dict:
+    seeds = holder.get("seeds", [])
+    robots = holder.get("robots")
+    enumeration = holder.get("enumeration")
+    pages = {p.url: p for p in session.scalars(
+        select(FetchedPage).where(FetchedPage.crawl_run_id == run.id))}
+    seed_rows = [{
+        "url": url,
+        "outcome": pages[url].outcome if url in pages else "NOT_ATTEMPTED",
+        "http_status": pages[url].http_status if url in pages else None,
+        "final_url": pages[url].final_url if url in pages else None,
+    } for url in config.seed_urls]
+    provenance = link_provenance(config, seeds, robots) if robots is not None else {}
+    selected = set(enumeration.selected) if enumeration else set()
+    deferred = set(enumeration.deferred) if enumeration else set()
+    has_sitemap = any(p["found_in"] == ["sitemap"] or "sitemap" in p["found_in"]
+                      for p in provenance.values())
+    qualifying = []
+    for url, entry in provenance.items():
+        if entry["reason"] is not None:
+            continue
+        qualifying.append({
+            "url": url, "kind": config.kind_of(url), "found_in": entry["found_in"],
+            "cap": "SELECTED" if url in selected else "DEFERRED" if url in deferred else "-",
+            "unseen": url not in last_seen,
+        })
+    seed_products = []
+    for page_url, body in seeds:
+        url = normalize_url(page_url)
+        if config.kind_of(url) is None:
+            continue
+        extraction = extract_product(config, body, url)
+        row = {"url": url, "status": extraction.status, "name": extraction.name,
+               "notes": list(extraction.notes)}
+        if extraction.status == "EXTRACTED" and extraction.name:
+            row["predicted"] = _predict_identity(session, source, config, url, extraction.name)
+        seed_products.append(row)
+    return {
+        "seeds": seed_rows,
+        "qualifying": qualifying,
+        "excluded": [{"url": u, "reason": e["reason"], "found_in": e["found_in"]}
+                     for u, e in provenance.items() if e["reason"] not in (None, "SEED")],
+        "seeds_linked": [u for u, e in provenance.items() if e["reason"] == "SEED"],
+        "sitemap_only": [q["url"] for q in qualifying if q["found_in"] == ["sitemap"]],
+        "link_only": [q["url"] for q in qualifying if "sitemap" not in q["found_in"]],
+        "sitemap_and_links": [q["url"] for q in qualifying
+                              if "sitemap" in q["found_in"] and len(q["found_in"]) > 1],
+        "absent_from_sitemap_but_linked": (
+            [q["url"] for q in qualifying if "sitemap" not in q["found_in"]]
+            if has_sitemap else []),
+        "normalization_duplicates": [{"url": u, "raw": e["raw"]}
+                                     for u, e in provenance.items() if len(e["raw"]) > 1],
+        "seed_products": seed_products,
+        "targets_not_fetched": sorted(selected | deferred),
+    }
 
 
 def resume_adapter(

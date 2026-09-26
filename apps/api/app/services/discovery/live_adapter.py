@@ -246,6 +246,21 @@ def _within(path: str, prefix: str) -> bool:
     return path == prefix or path.startswith(prefix + "/")
 
 
+def _link_reason(config: SourceAdapterConfig, robots: RobotsRules, url: str) -> str | None:
+    """Why a normalized link is NOT a target (None = it qualifies)."""
+    parts = urlsplit(url)
+    path = parts.path or "/"
+    if parts.hostname != config.host:
+        return "OFF_HOST"
+    if not any(_within(path, p) for p in config.allowed_path_prefixes):
+        return "OUTSIDE_PATHS"
+    if config.kind_of(url) is None:
+        return "NO_PATTERN"
+    if not robots.allows(url):
+        return "ROBOTS_DISALLOW"
+    return None
+
+
 def enumerate_targets(
     config: SourceAdapterConfig,
     seeds: Iterable[tuple[str, bytes]],
@@ -273,25 +288,47 @@ def enumerate_targets(
                 continue  # mailto:, tel:, javascript: are not links to pages
             if url in seed_set or url in found:
                 continue
-            parts = urlsplit(url)
-            path = parts.path or "/"
-            if parts.hostname != config.host:
-                reason = "OFF_HOST"
-            elif not any(_within(path, p) for p in config.allowed_path_prefixes):
-                reason = "OUTSIDE_PATHS"
-            elif config.kind_of(url) is None:
-                reason = "NO_PATTERN"
-            elif not robots.allows(url):
-                reason = "ROBOTS_DISALLOW"
-            else:
+            reason = _link_reason(config, robots, url)
+            if reason is None:
                 found.add(url)
-                continue
-            excluded.setdefault(url, reason)
+            else:
+                excluded.setdefault(url, reason)
     ordered = sorted(found, key=lambda u: (u in last_seen, last_seen.get(u) or datetime.min, u))
     result.selected = ordered[: config.target_cap]
     result.deferred = ordered[config.target_cap:]
     result.excluded = sorted(excluded.items())
     return result
+
+
+def link_provenance(
+    config: SourceAdapterConfig,
+    seeds: Iterable[tuple[str, bytes]],
+    robots: RobotsRules,
+) -> dict[str, dict]:
+    """Where every link came from, for an index-only report. Pure.
+
+    normalized URL -> {"reason": None | exclusion reason | "SEED",
+                       "found_in": ["sitemap" | seed page URL, ...],
+                       "raw": [every spelling that normalized to it]}
+    """
+    seed_set = {normalize_url(u) for u in config.seed_urls}
+    out: dict[str, dict] = {}
+    for page_url, body in seeds:
+        label = "sitemap" if _is_sitemap(body) else normalize_url(page_url)
+        for href in seed_links(body):
+            absolute = urljoin(page_url, href.strip())
+            try:
+                url = normalize_url(absolute)
+            except UnsupportedUrl:
+                continue
+            entry = out.setdefault(url, {
+                "reason": "SEED" if url in seed_set else _link_reason(config, robots, url),
+                "found_in": set(), "raw": set(),
+            })
+            entry["found_in"].add(label)
+            entry["raw"].add(absolute)
+    return {url: {"reason": e["reason"], "found_in": sorted(e["found_in"]),
+                  "raw": sorted(e["raw"])} for url, e in sorted(out.items())}
 
 
 # --------------------------------------------------------------- extraction --

@@ -1,44 +1,73 @@
-"""NEURA Robotics — official manufacturer site. First source, NOT YET RUNNABLE.
+"""NEURA Robotics — official manufacturer site. Structurally reviewed; BLOCKED.
 
 Owner ToS decision: Robert read the terms himself and decided ALLOWED
 (2026-09-26, DR-A4). That decision is recorded in the database through
-`discovery source review` when the source is registered, never here, and it does
-not expire on its own.
+`discovery source review` at registration, never here, and it does not expire.
 
-Structural review — 2026-09-26, read-only, 7 requests with the crawler's own
-user agent, 3 s apart. Full record:
-docs/discovery/NEURA_STRUCTURAL_REVIEW_2026-09-26.md. Summary:
+Structural review: 2026-09-26, read-only, 7 requests with the crawler's own user
+agent, 3 s apart. Full record and the future-extractor design note:
+docs/discovery/NEURA_STRUCTURAL_REVIEW_2026-09-26.md. Everything below is limited
+to what those 7 responses established; no URL family is guessed.
 
-- robots.txt (200): `User-agent: *` / `Allow: /` / `Crawl-delay:3`. Nothing
-  names our token. The fetcher uses max(3 s, 2 s floor) = 3 s.
-- HTTP-only acquisition is viable. Pages are server-rendered WordPress/Elementor
-  (~6-7k characters of visible text, no client-side framework).
-- Two English product-page families:
-    /products/<slug>/              official robot pages (4ne1, mipa, maira, lara, mav)
-    /product/<slug>-reservation/   reservation pages (4ne1, 4ne1-mini, mipa, quadruped)
-  German copies (/de/produkt/...) are outside the approved prefixes.
-- /shop/ answers 301 -> homepage, so there is no usable catalogue index. The
-  product sitemap lists the reservation pages but omits 4ne1-mini. The newsroom
-  page carries the site-wide nav, which links every /products/ page.
-- JSON-LD is Yoast's graph only (WebPage, BreadcrumbList, WebSite,
-  Organization, ImageObject). There is NO Product or Offer and no structured
-  price, currency, availability or specification. Specs, estimated price tiers
-  and the reservation fee appear only as visible text.
-- There is no deterministic newsroom article pattern: articles live at
-  root-level slugs (/<slug>/), the same shape as ordinary pages.
-
-Why it is BLOCKED: the generic extractor is unsafe here. With no Product
-JSON-LD it falls back to <h1>. The /products/ pages' <h1> is a marketing
-tagline, which would become a candidate's name, and the reservation pages have
-no <h1>, so they produce nothing. Running this module needs an owner-approved,
-NEURA-specific deterministic HTML extractor and the owner decisions listed in
-the review.
+The runner refuses this module (`ADAPTER_BLOCKED`) until a NEURA-specific
+deterministic extractor is approved. Commercial facts (the reservation fee,
+estimated prices) stay UNKNOWN and unextracted until then.
 """
 from __future__ import annotations
 
 import re
 
 from app.services.discovery.live_adapter import SourceAdapterConfig
+
+BLOCK_CODE = "BLOCKED_NEEDS_SOURCE_SPECIFIC_EXTRACTOR"
+
+#: What the inspection established, as data (asserted by the tests).
+STRUCTURAL_FINDINGS = {
+    "inspected_at": "2026-09-26T09:30Z/09:33Z",
+    "requests": (
+        ("https://neura-robotics.com/robots.txt", 200),
+        ("https://neura-robotics.com/sitemap_index.xml", 200),
+        ("https://neura-robotics.com/product-sitemap.xml", 200),
+        ("https://neura-robotics.com/shop/", 301),
+        ("https://neura-robotics.com/product/4ne1-reservation/", 200),
+        ("https://neura-robotics.com/products/4ne1/", 200),
+        ("https://neura-robotics.com/news/", 200),
+    ),
+    # `User-agent: *` / `Allow: /` applies; no group names our token.
+    "robots_status": "ALLOWED",
+    "crawl_delay_seconds": 3,
+    "sitemaps_observed": (
+        "https://neura-robotics.com/sitemap_index.xml",
+        "https://neura-robotics.com/post-sitemap.xml",
+        "https://neura-robotics.com/page-sitemap.xml",
+        "https://neura-robotics.com/product-sitemap.xml",
+        "https://neura-robotics.com/product_cat-sitemap.xml",
+    ),
+    "url_families": {
+        "/products/<slug>/": "official robot pages (4ne1, mipa, maira, lara, mav)",
+        "/product/<slug>-reservation/": "reservation pages (4ne1, 4ne1-mini, mipa, quadruped)",
+    },
+    "rejected_seeds": {
+        "https://neura-robotics.com/shop/": "301 to the homepage; not a catalogue index",
+    },
+    # The product sitemap is useful but NOT complete.
+    "sitemap_omissions": ("https://neura-robotics.com/product/4ne1-mini-reservation/",),
+    "newsroom": "https://neura-robotics.com/news/ exists; articles use root-level slugs, "
+    "so no deterministic announcement URL pattern was established",
+    "identity_issues": (
+        "catalogue robot is named '4NE-1' (slug neura-4ne-1); the site writes '4NE1'. "
+        "They do not normalize to each other and NO alias was added; human review "
+        "needed before any NEURA candidate is resolved",
+    ),
+    # Three different things, never interchangeable. None of them is mapped yet.
+    "commercial_language": {
+        "reservation_fee": "refundable per-unit reservation fee (a deposit), credited "
+        "toward a later purchase; NOT a price",
+        "estimated_price": "estimated price per unit in quantity bands, excluding taxes "
+        "and shipping; NOT an actual purchase price",
+        "purchase_price": "no actual purchase price was observed",
+    },
+}
 
 CONFIG = SourceAdapterConfig(
     key="neura-robotics-official",
@@ -49,9 +78,10 @@ CONFIG = SourceAdapterConfig(
     # Canonical catalogue manufacturer name, verbatim. No aliases.
     manufacturer="Neura Robotics",
     allowed_path_prefixes=("/products/", "/product/", "/product-sitemap.xml", "/news/"),
-    # Normalized (docs/16 §11) seeds, both observed 200 on 2026-09-26:
+    # Normalized (docs/16 §11) seeds, both observed 200:
     # - the product sitemap: the reservation pages (it omits 4ne1-mini);
     # - the newsroom index: its site-wide nav links every /products/ page.
+    # NOT /shop/ (301 to the homepage).
     seed_urls=(
         "https://neura-robotics.com/product-sitemap.xml",
         "https://neura-robotics.com/news",
@@ -62,11 +92,19 @@ CONFIG = SourceAdapterConfig(
     announcement_path_pattern=None,
     # No JSON-LD properties exist to map.
     property_map={},
-    # Neither page uses a price-on-request phrase.
+    # No price-on-request phrase observed, and reservation/estimate wording must
+    # never be read as a quote or a price.
     quote_phrases=(),
+    # The /products/ <h1> is a marketing tagline, never a product name.
+    heading_identity=False,
     structural_review="2026-09-26 read-only inspection (7 requests); "
     "docs/discovery/NEURA_STRUCTURAL_REVIEW_2026-09-26.md",
-    blocked_reason="generic extraction unsafe: no Product JSON-LD; /products/ <h1> is a "
-    "tagline and reservation pages have no <h1>; needs an owner-approved NEURA HTML "
-    "extractor",
+    blocked_reason=(
+        f"{BLOCK_CODE}: pages are HTTP/server-rendered and robots-compatible, but the "
+        "generic extractor cannot identify NEURA products reliably: product and "
+        "reservation pages expose no usable Product JSON-LD, <h1> is not a safe identity "
+        "source, and reservation pages distinguish a refundable reservation fee (deposit) "
+        "from an estimated robot price, neither of which is a purchase price; running the "
+        "generic adapter could create incorrect candidates or commercial facts"
+    ),
 )

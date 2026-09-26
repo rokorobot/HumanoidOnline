@@ -102,6 +102,9 @@ class SourceAdapterConfig:
     structural_review: str | None = None
     #: docs/16 §12.1: at most this many target pages per source and run.
     target_cap: int = 50
+    #: May the page's first <h1> name a product when there is no JSON-LD Product?
+    #: False for sources whose <h1> is known not to be a product name.
+    heading_identity: bool = True
     #: Set when the structural review found the source NOT safe to run with the
     #: current extraction rules. The runner refuses while it is set, whatever
     #: the source's approval state.
@@ -554,7 +557,7 @@ def extract_product(config: SourceAdapterConfig, body: bytes) -> ProductExtracti
             signals=tuple(signals), images=tuple(_images(pointer, product)),
             rejected=tuple(rejected),
         )
-    if page.h1:
+    if page.h1 and config.heading_identity:
         # No structured data: identity from the page heading only. No specs and no
         # commercial facts are read from free text beyond the declared phrases.
         return ProductExtraction(
@@ -562,6 +565,9 @@ def extract_product(config: SourceAdapterConfig, body: bytes) -> ProductExtracti
             signals=tuple(_quote_signals(config, page)),
             notes=("no JSON-LD Product; name from <h1>",),
         )
+    if page.h1:
+        return ProductExtraction("NOTHING_FOUND", notes=(
+            "no JSON-LD Product; <h1> is not an identity source for this adapter",))
     return ProductExtraction("NOTHING_FOUND", notes=("no JSON-LD Product and no <h1>",))
 
 

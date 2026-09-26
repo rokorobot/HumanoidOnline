@@ -49,7 +49,35 @@ What the pages expose **only as visible text**:
 
 `/news/` is a usable index page, and its site-wide nav is how the `/products/` pages are found. However, its article links are **root-level slugs** (`/<slug>/`), the same shape as ordinary pages, and its dated links (`/2026/06/10/` and similar) are day archives. With the current config design (one set of URL patterns shared by all seeds), there is **no deterministic announcement pattern**, so announcement monitoring is disabled for NEURA. A future option is a per-seed pattern that treats `post-sitemap.xml` entries as announcements.
 
+## Seeds
+
+| Seed | Decision |
+|---|---|
+| `https://neura-robotics.com/product-sitemap.xml` | **Proposed.** It lists the reservation pages, but it is **not complete**: `/product/4ne1-mini-reservation/` is linked from the 4NE1 reservation page and absent from the sitemap. |
+| `https://neura-robotics.com/news` | **Proposed.** Its site-wide nav links every `/products/` robot page. |
+| `https://neura-robotics.com/shop/` | **Rejected.** It returns 301 to the homepage; it is not a catalogue index. |
+
+**Known gap:** the proposed seeds do not reach `4ne1-mini-reservation`. Of the observed pages, only the reservation pages themselves link to it. The design note below addresses this.
+
+**Observed catalogue size:** 5 `/products/` pages and 4 reservation pages, so 9 known. The proposed seeds reach 8. The cap is 50.
+
+## Commercial language: three different things
+
+| Observed on the reservation page | What it is | Mapping now |
+|---|---|---|
+| A refundable per-unit reservation fee, credited toward a later purchase | a **deposit** | **none.** It is never a `PRICE` signal. |
+| An estimated price per unit in quantity bands, excluding taxes and shipping | an **estimated future price** | **none.** It stays UNKNOWN until a source-specific mapping is approved. |
+| An actual purchase price | **not observed** | none |
+
+`quote_phrases` is empty and the generic extractor never parses a price from free text, so none of these can reach a `PRICE` signal today. The tests assert this.
+
+## Identity issue (for human review)
+
+The catalogue robot is named **`4NE-1`** (slug `neura-4ne-1`); the site writes **`4NE1`**. Under the resolver's exact normalization they do not match. **No alias was added.** Whether to confirm one in `db/discovery/identity_aliases.json` is a human decision, to be taken before any NEURA candidate is resolved. The reservation page also names a generation ("Gen 3.5"), which is a variant question.
+
 ## Adapter configuration (what changed)
+
+The adapter state is **structurally reviewed and blocked**: `blocked_reason` starts with the machine-readable code `BLOCKED_NEEDS_SOURCE_SPECIFIC_EXTRACTOR`, and the runner refuses with `ADAPTER_BLOCKED (…)`. Only a code change can lift it, not the database. `heading_identity=False` additionally prevents any `<h1>` from ever naming a NEURA product. The findings are also recorded as data in `STRUCTURAL_FINDINGS` in the module.
 
 `sources/neura_robotics.py` moves from 0.1.0 to 0.2.0:
 - `allowed_path_prefixes`: `/products/`, `/product/`, `/product-sitemap.xml`, `/news/`
@@ -82,3 +110,19 @@ Running NEURA needs a NEURA-specific deterministic HTML extractor, a separate ch
 - Whether the homepage would be a better seed than `/news/` (not requested).
 - Whether `/products/mipa/` and the other robot pages share the 4NE1 template (only one robot page was inspected).
 - Whether the WordPress REST API (`/wp-json/wp/v2/product/…`) exposes structured fields (not requested; using it would be a separate decision).
+
+## Design note: a future NEURA-specific deterministic extractor (NOT implemented)
+
+This note uses only the responses already downloaded. There is no LLM, no fuzzy matching and no alias generation. It is a separate change for approval.
+
+1. **Product/model-name locator.** Candidate locators, in order of stability:
+   - **Reservation pages:** the `og:title` / `<title>` with a source-specific full-match pattern, for example `^Reserve (?P<name>[^:|]+):`. The Yoast `BreadcrumbList` last item is the cross-check (`"<name> Reservation"`). Accept a name only when the two agree; otherwise record the page as AMBIGUOUS.
+   - **Robot pages:** the title ("Humanoid Robot 4NE1 for Work and Life | …") has no stable name slot. The `<h1>` is a tagline, and the canonical URL slug (`/products/4ne1/`) is stable but lower-case, so it is not a display name. Option: identity-only from the slug, confirmed by the same slug appearing in a reservation page's name. Otherwise **no candidate** from robot pages, only a link for a human.
+2. **Safer than `<h1>`:** the canonical URL, `og:title`/`<title>` and the Yoast breadcrumb are deterministic and present on every observed page. Reservation pages also carry the WooCommerce body class `single-product postid-<N>`, a stable product id. **Elementor element ids** (`elementor-element-461a122`) change when a page is edited and must not be used as locators.
+3. **Commercial classification, if ever mapped:** the text shows labelled lines ("Estimated price/unit (<band>) <amount> € (excluding taxes and shipping)", "Reservation fee <amount>€ per unit"). Rules would be:
+   - an estimated price maps only to `price_type=ESTIMATED`, one signal per band, with the band and "excluding taxes and shipping" in the evidence excerpt;
+   - a reservation fee is **never** a `PRICE`: either no signal, or a separately approved field;
+   - a line not matching an approved label is dropped and counted.
+4. **Identity-only first.** The safe first step is to extract names only (points 1–2) with no claims and no signals. Commercial fields stay UNKNOWN until point 3 is approved.
+5. **Discovery.** Combine the product sitemap with one-level link discovery from pages that list reservations, because the sitemap omitted `4ne1-mini-reservation`. With the current one-level rule, a seed is never itself a target. So either add a dedicated listing page as a seed once one is observed, or allow one reservation page to be both a seed and a target. That second option would be a small, reviewed framework change.
+6. **Unchanged guards:** the 50-target cap, unseen URLs first, same host, approved prefixes, robots checked on every target, a 3 s interval (`max(Crawl-delay, 2 s)`), and determinism, with fixture replay proving byte-identical output.

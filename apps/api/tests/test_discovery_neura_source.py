@@ -28,8 +28,10 @@ from app.services.discovery.live_adapter import (
     PRODUCT,
     enumerate_targets,
     extract_product,
+    seed_links,
 )
 from app.services.discovery.robots import parse
+from app.services.discovery.sources.neura_robotics import BLOCK_CODE, STRUCTURAL_FINDINGS
 from app.services.discovery.sources.neura_robotics import CONFIG as NEURA
 from app.services.discovery.urlref import normalize_url
 
@@ -63,7 +65,34 @@ def test_config_is_the_reviewed_structure():
     assert NEURA.property_map == {} and NEURA.quote_phrases == ()
     assert NEURA.structural_review and REVIEW.name in NEURA.structural_review
     assert REVIEW.is_file()
-    assert NEURA.blocked_reason
+    assert NEURA.blocked_reason.startswith(f"{BLOCK_CODE}: ")
+    assert NEURA.heading_identity is False
+    for phrase in ("server-rendered", "robots-compatible", "no usable Product JSON-LD",
+                   "<h1> is not a safe identity", "refundable reservation fee",
+                   "estimated robot price"):
+        assert phrase in NEURA.blocked_reason
+
+
+def test_findings_record_only_what_the_seven_responses_established():
+    assert [status for _, status in STRUCTURAL_FINDINGS["requests"]] == [
+        200, 200, 200, 301, 200, 200, 200]
+    assert STRUCTURAL_FINDINGS["robots_status"] == "ALLOWED"
+    assert STRUCTURAL_FINDINGS["crawl_delay_seconds"] == 3
+    assert set(STRUCTURAL_FINDINGS["url_families"]) == {
+        "/products/<slug>/", "/product/<slug>-reservation/"}
+    assert "4NE-1" in STRUCTURAL_FINDINGS["identity_issues"][0]
+    language = STRUCTURAL_FINDINGS["commercial_language"]
+    assert "NOT a price" in language["reservation_fee"]
+    assert "NOT an actual purchase price" in language["estimated_price"]
+
+
+def test_shop_is_not_a_viable_seed():
+    shop = f"{HOST}/shop/"
+    assert STRUCTURAL_FINDINGS["rejected_seeds"][shop].startswith("301")
+    assert normalize_url(shop) not in NEURA.seed_urls
+    assert not any(normalize_url(shop).endswith(p.rstrip("/")) for p in NEURA.allowed_path_prefixes)
+    assert dict(enumerate_targets(NEURA, _seeds(), _robots(), {}).excluded)[
+        f"{HOST}/shop"] == "OUTSIDE_PATHS"
 
 
 @pytest.mark.parametrize("url", [
@@ -137,17 +166,59 @@ def test_capped_enumeration_defers_the_rest():
 # ---------------------------------------------------------------- extraction --
 
 
-def test_why_it_is_blocked_generic_extraction_would_name_a_slogan():
-    """A synthetic page with the observed SHAPE (tagline <h1>, Yoast-only JSON-LD)."""
-    body = (b'<html><head><script type="application/ld+json">{"@context":"https://schema.org",'
-            b'"@graph":[{"@type":"WebPage","name":"Robot page"},{"@type":"BreadcrumbList"}]}'
-            b"</script></head><body><h1>A Marketing Tagline</h1><p>text</p></body></html>")
-    first = extract_product(NEURA, body)
-    assert (first.status, first.name, first.name_method) == (
-        "EXTRACTED", "A Marketing Tagline", "SELECTOR")   # wrong identity -> must not run
-    assert extract_product(NEURA, body) == first          # still deterministic
-    no_h1 = extract_product(NEURA, b"<html><body><h2>Reservation</h2></body></html>")
-    assert no_h1.status == "NOTHING_FOUND"
+TAGLINE_PAGE = (
+    b'<html><head><title>Humanoid Robot X for Work | Maker</title>'
+    b'<script type="application/ld+json">{"@context":"https://schema.org","@graph":['
+    b'{"@type":"WebPage","name":"Robot page"},{"@type":"BreadcrumbList"},'
+    b'{"@type":"Organization","name":"Maker"}]}</script></head>'
+    b"<body><h1>A Marketing Tagline</h1><p>synthetic text</p></body></html>"
+)
+# Synthetic figures with the observed SHAPE of the reservation wording only.
+RESERVATION_PAGE = (
+    b"<html><head><title>Reserve X: A Robot | Maker</title></head><body>"
+    b"<h2>Reservation</h2><p>Estimated price/unit (1-19 units) 1,111 EUR "
+    b"(excluding taxes and shipping)</p><p>Reservation fee 11EUR per unit</p>"
+    b"<p>The reservation fee is fully refundable.</p></body></html>"
+)
+
+
+def test_a_marketing_h1_cannot_become_a_robot_identity():
+    result = extract_product(NEURA, TAGLINE_PAGE)
+    assert result.status == "NOTHING_FOUND" and result.name is None
+    assert extract_product(NEURA, TAGLINE_PAGE) == result             # deterministic
+    # The hazard it guards against: the generic heading fallback WOULD use it.
+    generic = extract_product(replace(NEURA, heading_identity=True), TAGLINE_PAGE)
+    assert generic.name == "A Marketing Tagline"
+
+
+def test_no_product_jsonld_creates_no_candidate_identity():
+    for body in (TAGLINE_PAGE, RESERVATION_PAGE, b"<html><body></body></html>"):
+        result = extract_product(NEURA, body)
+        assert result.status == "NOTHING_FOUND"
+        assert result.name is None and result.claims == () and result.signals == ()
+
+
+def test_reservation_fee_and_estimate_never_become_a_price():
+    result = extract_product(NEURA, RESERVATION_PAGE)
+    assert not any(s.axis == "PRICE" for s in result.signals)
+    # Even with heading identity and generic quote phrases, free text is never a price.
+    loose = replace(NEURA, heading_identity=True, quote_phrases=("price on request",))
+    assert not any(s.axis == "PRICE" for s in extract_product(loose, RESERVATION_PAGE).signals)
+
+
+def test_sitemap_omission_does_not_hide_a_linked_reservation_page():
+    mini = f"{HOST}/product/4ne1-mini-reservation"
+    sitemap_urls = {normalize_url(u)
+                    for u in seed_links((FIXTURES / "product-sitemap.xml").read_bytes())}
+    assert mini not in sitemap_urls                                   # omitted from the sitemap
+    assert normalize_url(STRUCTURAL_FINDINGS["sitemap_omissions"][0]) == mini
+    assert NEURA.kind_of(mini) == PRODUCT                             # but it qualifies
+    linked = enumerate_targets(
+        NEURA, [(f"{HOST}/product/4ne1-reservation/",
+                 (FIXTURES / "reservation-page-links.html").read_bytes())], _robots(), {})
+    assert mini in linked.selected                                    # reached by one-level links
+    # Known gap, recorded rather than assumed away: the current seeds do not reach it.
+    assert mini not in enumerate_targets(NEURA, _seeds(), _robots(), {}).selected
 
 
 # ---------------------------------------------------------- refusal (offline) --

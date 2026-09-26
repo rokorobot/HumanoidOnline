@@ -23,6 +23,7 @@ from app.models.commercial import AvailabilityOffer, Deployment, PricingOffer
 from app.models.commercial_lead import CommercialLead, CommercialLeadProvider
 from app.models.discovery import (
     CandidateClaim,
+    CandidateIdentityDecision,
     CandidateImageRef,
     DiscoveryCandidate,
     DiscoverySource,
@@ -273,6 +274,17 @@ class PromotionAuditAdmin(ModelView, model=PromotionAudit):
     can_delete = False
 
 
+class CandidateIdentityDecisionAdmin(_ReadOnlyDiscoveryView, model=CandidateIdentityDecision):
+    # Stage E: inspect-only. Decisions are recorded through the governed CLI
+    # (`discovery review same-as / not-same-as`); the table is append-only.
+    column_list = [
+        CandidateIdentityDecision.decision_seq, CandidateIdentityDecision.candidate_a_id,
+        CandidateIdentityDecision.candidate_b_id, CandidateIdentityDecision.decision,
+        CandidateIdentityDecision.decided_by, CandidateIdentityDecision.created_at,
+    ]
+    name_plural = "Candidate identity decisions (Stage E, append-only)"
+
+
 _VIEWS = [
     ManufacturerAdmin, ProviderAdmin, RobotAdmin, RobotVariantAdmin, RobotImageAdmin,
     UseCaseAdmin,
@@ -280,7 +292,7 @@ _VIEWS = [
     DeploymentAdmin, EvidenceSourceAdmin, BuyerRequirementAdmin, MatchResultAdmin,
     CommercialLeadAdmin, CommercialLeadProviderAdmin,
     DiscoverySourceAdmin, DiscoveryCandidateAdmin, CandidateClaimAdmin,
-    CandidateImageRefAdmin, PromotionAuditAdmin,
+    CandidateImageRefAdmin, PromotionAuditAdmin, CandidateIdentityDecisionAdmin,
 ]
 
 

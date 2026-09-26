@@ -10,8 +10,8 @@ gap it must work around — is stated here as an executable fact:
   match each other;
 - the same normalized manufacturer + model on another candidate is
   POSSIBLE_DUPLICATE;
-- a REJECTED candidate still takes part in duplicate detection (CURRENT
-  BEHAVIOUR, documented, deliberately not changed in this slice);
+- a REJECTED candidate no longer takes part in duplicate detection (changed
+  deliberately in Stage E; it was documented here as the earlier behaviour);
 - a manufacturer spelled differently stays unmatched: there is no manufacturer
   alias mechanism, and a confirmed robot alias does not cross manufacturers.
 """
@@ -167,13 +167,17 @@ def test_other_candidate_with_same_normalized_identity_is_possible_duplicate(dse
     assert cand.possible_robot_id is None
 
 
-def test_rejected_candidate_still_participates_in_duplicate_detection(dsession) -> None:
-    """CURRENT BEHAVIOUR, documented rather than changed (Stage C follow-up):
-    the duplicate check reads every other candidate, whatever its status."""
+def test_rejected_candidate_no_longer_causes_duplicate_detection(dsession) -> None:
+    """CHANGED DELIBERATELY in Stage E (docs/16 §17.1). Until then a REJECTED
+    candidate still made others POSSIBLE_DUPLICATE (documented in the Stage C
+    preflight). A rejection is terminal, so it now stops causing duplicate
+    review, while an open candidate with the same identity still does."""
     maker = f"Maker{uuid.uuid4().hex[:6]}"
     old = _candidate(dsession, _source(dsession), "EX-4", maker, status="REJECTED")
     assert old.status == "REJECTED"
     cand = _candidate(dsession, _source(dsession), "EX-4", maker)
+    assert resolve_identity(dsession, cand, aliases={}) == "NEW_ENTITY"
+    _candidate(dsession, _source(dsession), "EX-4", maker)   # an open one still counts
     assert resolve_identity(dsession, cand, aliases={}) == "POSSIBLE_DUPLICATE"
 
 

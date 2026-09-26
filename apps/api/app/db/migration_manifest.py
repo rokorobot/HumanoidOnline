@@ -65,4 +65,7 @@ MIGRATIONS: dict[str, str] = {
     "0014_fetched_page_retrieval_provenance": (
         "ad3d14f6b34e6e5a7b4635dff419346f4243249e978df602684f84918f93542f"
     ),
+    "0015_candidate_identity_decision": (
+        "b84a701ab92a6873a1a0e9ba4dd4626d968d1871b3a87f838705cf1f8115d65e"
+    ),
 }

@@ -34,6 +34,7 @@ from app.models.commercial_lead import (
 )
 from app.models.discovery import (
     CandidateClaim,
+    CandidateIdentityDecision,
     CandidateImageRef,
     DiscoveryCandidate,
     DiscoverySource,
@@ -74,6 +75,7 @@ __all__ = [
     "Manufacturer",
     "MatchResult",
     "PricingOffer",
+    "CandidateIdentityDecision",
     "PromotionAudit",
     "Provider",
     "Region",

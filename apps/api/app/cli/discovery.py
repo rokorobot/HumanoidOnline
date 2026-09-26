@@ -15,6 +15,21 @@
     python -m app.cli.discovery adapter run  <source-key> --operator "Name" [--resume <run-id>]
     python -m app.cli.discovery run fail <run-id> --by WHO --reason WHY
     python -m app.cli.discovery report <run-id>
+    python -m app.cli.discovery review list
+    python -m app.cli.discovery review show <candidate-id>
+    python -m app.cli.discovery review history <candidate-id>
+    python -m app.cli.discovery review same-as <candidate-a> <candidate-b> --by WHO --reason WHY
+    python -m app.cli.discovery review not-same-as <candidate-a> <candidate-b> --by WHO --reason WHY
+    python -m app.cli.discovery review reject <candidate-id> --reason-code OUT_OF_SCOPE
+                                       --by WHO --reason WHY
+    python -m app.cli.discovery review propose-alias <candidate-id> <robot-slug>
+
+- `review` is the Stage E exception-only workflow (docs/16 §17.1). `list`,
+  `show`, `history` and `propose-alias` never write; `propose-alias` only PRINTS
+  a register entry for a human to confirm in a reviewed change. `same-as`,
+  `not-same-as` and `reject` append attributed history (nothing is merged or
+  deleted) and re-run the deterministic pipeline on the affected candidates.
+  Nothing here promotes.
 
 - `--resume` continues a FAILED or CANCELLED run as a NEW run linked to it, with
   the parent's manifest and limits, fetching only planned URLs the run chain has
@@ -263,6 +278,50 @@ def _cmd_run(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_review(args: argparse.Namespace) -> int:
+    import json
+
+    from app.db.session import SessionLocal
+    from app.services.discovery import review
+
+    with SessionLocal() as session:
+        if args.action == "list":
+            items = review.review_queue(session)
+            print(f"REVIEW QUEUE ({len(items)} item(s) needing a human)")
+            for item in items:
+                ids = " ".join(str(i) for i in item.candidate_ids)
+                print(f"  {item.kind:<24} {item.summary}\n  {'':<24} {ids}")
+            return 0
+        if args.action == "show":
+            print("\n".join(review.show(session, uuid.UUID(args.candidate_id))))
+            return 0
+        if args.action == "history":
+            lines = review.history(session, uuid.UUID(args.candidate_id))
+            print("\n".join(lines) if lines else "(no history)")
+            return 0
+        if args.action == "propose-alias":
+            entry = review.propose_alias(session, uuid.UUID(args.candidate_id), args.robot_slug)
+            print("PROPOSAL ONLY: nothing was written. To make it effective, add this entry to")
+            print("db/discovery/identity_aliases.json in a reviewed change, with the confirming")
+            print("human's confirmed_by / confirmed_at set:")
+            print(json.dumps(entry, indent=2, ensure_ascii=False))
+            return 0
+        if args.action in ("same-as", "not-same-as"):
+            decision = review.SAME_ENTITY if args.action == "same-as" else review.NOT_SAME_ENTITY
+            row, created = review.decide_pair(
+                session, uuid.UUID(args.candidate_a), uuid.UUID(args.candidate_b), decision,
+                decided_by=args.by, reason=args.reason)
+            session.commit()
+            print(f"{'RECORDED' if created else 'ALREADY IN EFFECT'} {row.decision} "
+                  f"#{row.decision_seq} {row.candidate_a_id} {row.candidate_b_id}")
+            return 0
+        candidate = review.reject_candidate(session, uuid.UUID(args.candidate_id), by=args.by,
+                                            reason=args.reason, reason_code=args.reason_code)
+        session.commit()
+        print(f"REJECTED {candidate.id} ({args.reason_code or 'no code'})")
+        return 0
+
+
 def _cmd_report(args: argparse.Namespace) -> int:
     from app.db.session import SessionLocal
     from app.services.discovery.acquisition import build_report
@@ -355,6 +414,28 @@ def main(argv: list[str] | None = None) -> int:
     fail.add_argument("--reason", required=True)
     run_cmd.set_defaults(func=_cmd_run)
 
+    review_cmd = commands.add_parser("review", help="Stage E exception-only review (CLI)")
+    review_actions = review_cmd.add_subparsers(dest="action", required=True)
+    review_actions.add_parser("list", help="candidates needing a human; no write")
+    for name in ("show", "history"):
+        sub = review_actions.add_parser(name, help=f"{name} one candidate; no write")
+        sub.add_argument("candidate_id")
+    for name in ("same-as", "not-same-as"):
+        sub = review_actions.add_parser(name, help="record a pairwise identity decision")
+        sub.add_argument("candidate_a")
+        sub.add_argument("candidate_b")
+        sub.add_argument("--by", required=True)
+        sub.add_argument("--reason", required=True)
+    rej = review_actions.add_parser("reject", help="reject a candidate (existing path)")
+    rej.add_argument("candidate_id")
+    rej.add_argument("--reason-code", choices=["OUT_OF_SCOPE"])
+    rej.add_argument("--by", required=True)
+    rej.add_argument("--reason", required=True)
+    alias = review_actions.add_parser("propose-alias", help="print a register proposal; no write")
+    alias.add_argument("candidate_id")
+    alias.add_argument("robot_slug")
+    review_cmd.set_defaults(func=_cmd_review)
+
     report = commands.add_parser("report", help="print a run report from the database")
     report.add_argument("run_id")
     report.set_defaults(func=_cmd_report)
@@ -369,13 +450,15 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "crawl" and args.resume and (_urls(args) or args.dry_run):
         parser.error("--resume takes its URLs from the resumed run: no --url/--urls-file, "
                      "no --dry-run")
-    for run_id in (getattr(args, "resume", None),
-                   args.run_id if args.command == "run" else None):
+    ids = [getattr(args, "resume", None), args.run_id if args.command == "run" else None]
+    if args.command == "review":
+        ids += [getattr(args, n, None) for n in ("candidate_id", "candidate_a", "candidate_b")]
+    for run_id in ids:
         if run_id:
             try:
                 uuid.UUID(run_id)
             except ValueError:
-                parser.error(f"invalid run id {run_id!r}")
+                parser.error(f"invalid id {run_id!r}")
     if args.command in ("plan", "crawl") and not 1 <= args.limit <= 200:
         parser.error("--limit must be between 1 and 200")
     try:

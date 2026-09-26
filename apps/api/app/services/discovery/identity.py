@@ -29,6 +29,7 @@ from sqlalchemy.orm import Session
 from app.models.discovery import DiscoveryCandidate
 from app.models.manufacturer import Manufacturer
 from app.models.robot import Robot
+from app.services.discovery.identity_decisions import effective_decisions
 
 # Corporate / generic tokens that carry no model identity.
 _GENERIC = {
@@ -169,11 +170,21 @@ def resolve_identity(
 
     # Distinct model, no canonical match: check for a duplicate among other
     # candidates before declaring a new entity (DATA-D1.7).
+    #
+    # Stage E (docs/16 §17.1): a REJECTED candidate is terminal and no longer
+    # makes another candidate a POSSIBLE_DUPLICATE, and a pair a human has
+    # already decided (SAME_ENTITY or NOT_SAME_ENTITY) is never flagged again.
+    # Without a decision the behaviour is unchanged.
+    decided = effective_decisions(session, candidate.id)
     others = session.execute(
-        select(DiscoveryCandidate).where(DiscoveryCandidate.id != candidate.id)
+        select(DiscoveryCandidate).where(
+            DiscoveryCandidate.id != candidate.id,
+            DiscoveryCandidate.status != "REJECTED",
+        )
     ).scalars().all()
     dup = any(
-        normalize(o.candidate_manufacturer) == mfr_key
+        o.id not in decided
+        and normalize(o.candidate_manufacturer) == mfr_key
         and _model_key(o.candidate_name, mfr_key) == model_key
         for o in others
     )

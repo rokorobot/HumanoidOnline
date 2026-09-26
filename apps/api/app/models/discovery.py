@@ -14,13 +14,25 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Text, UniqueConstraint, event, text
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Identity,
+    Text,
+    UniqueConstraint,
+    event,
+    text,
+)
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 from app.models.enums import (
     candidate_entity_type,
+    candidate_identity_decision_kind,
     candidate_identity_status,
     candidate_status,
     claim_status,
@@ -337,4 +349,66 @@ def _promotion_audit_block_update(_mapper, _connection, target: PromotionAudit) 
 def _promotion_audit_block_delete(_mapper, _connection, target: PromotionAudit) -> None:
     raise PromotionAuditImmutableError(
         f"promotion_audit is append-only: refusing DELETE of row {target.id!r}"
+    )
+
+
+# ------------------------------------------------------------------ Stage E --
+class CandidateIdentityDecision(Base):
+    """Stage E (docs/16 §17.1, migration 0015): a human's decision that two
+    discovery candidates are, or are not, the same entity.
+
+    Pairwise with real foreign keys, stored in canonical order
+    (candidate_a_id < candidate_b_id), append-only. The newest `decision_seq` for
+    a pair is the effective decision; a reversal is a new row. A SAME_ENTITY
+    decision merges nothing. Candidate<->catalogue identity is not recorded here:
+    it stays in the confirmed alias register.
+    """
+
+    __tablename__ = "candidate_identity_decision"
+    __table_args__ = (
+        CheckConstraint("candidate_a_id < candidate_b_id",
+                        name="ck_identity_decision_pair_ordered"),
+        CheckConstraint("btrim(decided_by) <> ''", name="ck_identity_decision_attributed"),
+        CheckConstraint("btrim(reason) <> ''", name="ck_identity_decision_reasoned"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    decision_seq: Mapped[int] = mapped_column(
+        BigInteger, Identity(always=True), unique=True, nullable=False
+    )
+    candidate_a_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("discovery_candidate.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    candidate_b_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("discovery_candidate.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    decision: Mapped[str] = mapped_column(candidate_identity_decision_kind, nullable=False)
+    decided_by: Mapped[str] = mapped_column(Text, nullable=False)
+    reason: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=text("clock_timestamp()"), nullable=False
+    )
+
+
+class IdentityDecisionImmutableError(RuntimeError):
+    """Raised when an append-only identity decision is modified or removed."""
+
+
+# ORM backstop; the database trigger (trg_identity_decision_no_*) is the real gate.
+@event.listens_for(CandidateIdentityDecision, "before_update", propagate=True)
+def _identity_decision_block_update(_mapper, _connection, target) -> None:
+    raise IdentityDecisionImmutableError(
+        f"candidate_identity_decision is append-only: refusing UPDATE of row {target.id!r}. "
+        "Record a new decision instead."
+    )
+
+
+@event.listens_for(CandidateIdentityDecision, "before_delete", propagate=True)
+def _identity_decision_block_delete(_mapper, _connection, target) -> None:
+    raise IdentityDecisionImmutableError(
+        f"candidate_identity_decision is append-only: refusing DELETE of row {target.id!r}"
     )

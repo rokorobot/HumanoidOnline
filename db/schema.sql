@@ -1905,5 +1905,64 @@ BEGIN
 END$$;
 
 -- =============================================================================
+-- SECTION 11 — DISCOVERY STAGE E: CANDIDATE IDENTITY DECISIONS (docs/16 §17.1)
+-- =============================================================================
+-- A human's decision that two discovery candidates are, or are not, the same
+-- entity. Pairwise, so it cannot live in promotion_audit (one candidate FK).
+--
+--  * Both candidates are real foreign keys (ON DELETE RESTRICT: a candidate
+--    with identity history cannot be deleted out from under it).
+--  * The pair is stored in canonical order (candidate_a_id < candidate_b_id),
+--    so A/B and B/A are the same pair, and a candidate cannot be paired with
+--    itself.
+--  * Append-only: a reversal is a NEW row. The newest row for a pair (highest
+--    decision_seq) is the effective decision; earlier rows are history.
+--  * Candidate<->catalogue identity is NOT recorded here: that remains the
+--    confirmed alias register (db/discovery/identity_aliases.json).
+--  * A SAME_ENTITY decision merges nothing: both candidates, their claims and
+--    their evidence stay intact.
+CREATE TYPE candidate_identity_decision_kind AS ENUM ('SAME_ENTITY', 'NOT_SAME_ENTITY');
+
+CREATE TABLE candidate_identity_decision (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    decision_seq    BIGINT GENERATED ALWAYS AS IDENTITY UNIQUE,
+    candidate_a_id  UUID NOT NULL REFERENCES discovery_candidate(id) ON DELETE RESTRICT,
+    candidate_b_id  UUID NOT NULL REFERENCES discovery_candidate(id) ON DELETE RESTRICT,
+    decision        candidate_identity_decision_kind NOT NULL,
+    decided_by      TEXT NOT NULL,
+    reason          TEXT NOT NULL,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    CONSTRAINT ck_identity_decision_pair_ordered CHECK (candidate_a_id < candidate_b_id),
+    CONSTRAINT ck_identity_decision_attributed CHECK (btrim(decided_by) <> ''),
+    CONSTRAINT ck_identity_decision_reasoned CHECK (btrim(reason) <> '')
+);
+COMMENT ON TABLE candidate_identity_decision IS
+    'Stage E (docs/16 §17.1): attributed, append-only human decisions that two discovery '
+    'candidates are / are not the same entity. Newest decision_seq per pair is effective. '
+    'Merges nothing; candidate<->catalogue identity stays in the confirmed alias register.';
+
+CREATE INDEX idx_identity_decision_pair ON candidate_identity_decision
+    (candidate_a_id, candidate_b_id, decision_seq DESC);
+CREATE INDEX idx_identity_decision_b ON candidate_identity_decision (candidate_b_id);
+
+CREATE OR REPLACE FUNCTION refuse_identity_decision_mutation()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+    RAISE EXCEPTION
+        'candidate_identity_decision is append-only (docs/16 §17.1): % refused. '
+        'Record a NEW decision instead; the newest decision for a pair is effective.', TG_OP
+        USING ERRCODE = 'restrict_violation';
+END$$;
+COMMENT ON FUNCTION refuse_identity_decision_mutation() IS
+    'Stage E: refuses UPDATE/DELETE on candidate_identity_decision at the database level.';
+
+CREATE TRIGGER trg_identity_decision_no_update
+    BEFORE UPDATE ON candidate_identity_decision
+    FOR EACH STATEMENT EXECUTE FUNCTION refuse_identity_decision_mutation();
+CREATE TRIGGER trg_identity_decision_no_delete
+    BEFORE DELETE ON candidate_identity_decision
+    FOR EACH STATEMENT EXECUTE FUNCTION refuse_identity_decision_mutation();
+
+-- =============================================================================
 -- END OF SCHEMA
 -- =============================================================================

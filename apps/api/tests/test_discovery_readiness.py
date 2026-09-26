@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from sqlalchemy import event, update
@@ -35,7 +35,8 @@ def live_source(session, **overrides):
     fields = dict(
         key=f"test-live:{uuid.uuid4().hex}", name="Fixture manufacturer",
         source_class="MANUFACTURER", homepage_url="https://example.invalid/",
-        is_enabled=True, tos_status="ALLOWED", robots_status="ALLOWED",
+        allowed_path_prefixes=["/products/"], is_enabled=True,
+        tos_status="ALLOWED", robots_status="ALLOWED",
         eligibility_reviewed_at=datetime.now(UTC), eligibility_reviewed_by="fixture@test",
     )
     fields.update(overrides)
@@ -103,6 +104,27 @@ def test_full_dataset_under_other_source_does_not_satisfy_baseline(dsession):
 def test_ineligible_source_cannot_satisfy_initialization(dsession, overrides):
     live_source(dsession, **overrides)
     assert not check_readiness(dsession).eligible_source_keys
+
+
+@pytest.mark.parametrize("overrides", [
+    {"homepage_url": None},
+    {"allowed_path_prefixes": None},
+    {"allowed_path_prefixes": ["products/"]},
+])
+def test_source_without_approved_host_or_paths_is_not_counted(dsession, overrides):
+    live_source(dsession, **overrides)
+    assert not check_readiness(dsession).eligible_source_keys
+
+
+@pytest.mark.parametrize("overrides", [
+    {"tos_expires_at": None},
+    {"tos_expires_at": datetime.now(UTC) - timedelta(days=365)},
+    {"tos_page_hash": "0" * 64},
+])
+def test_tos_currency_does_not_affect_readiness(dsession, overrides):
+    """Owner decision DR-A4: ToS expiry and page-hash changes never gate."""
+    source = live_source(dsession, **overrides)
+    assert check_readiness(dsession).eligible_source_keys == (source.key,)
 
 
 def test_readiness_does_not_flush_pending_writes(dsession):

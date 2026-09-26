@@ -1,15 +1,18 @@
 """Runtime eligibility + effective execution mode — docs/22 Phase 3.
 
 `DiscoverySource.radar_eligible` (app/models/discovery.py) is DATA-D1.9's base
-gate, verified by direct inspection to check exactly five conditions
-(is_enabled, tos_status, robots_status, reviewer attribution) and NOT to check
-`tos_expires_at` or `last_robots_checked_at` recency at all. This module
-composes the missing, already-ratified currentness requirements on top of it
-— `radar_eligible` itself is never modified (it has other callers, notably
-`adapters.ingest()`, whose scope this module does not touch).
+gate (enabled, owner-recorded ToS ALLOWED, robots not a disallow, attributed
+approval). It does NOT check
+`last_robots_checked_at` recency. This module composes that already-ratified
+currentness requirement on top of it.
 
-No new expiry period is invented here: both numbers below (90 days, 24 hours)
-are exactly the ones already ratified in docs/16 §7 and LIVE.2.
+Owner decision DR-A4 (docs/decisions/DR-A4_TOS_NOT_TIME_GATED.md): the owner
+reads terms personally and records `tos_status` (enforced via `radar_eligible`).
+That decision does not expire: `tos_expires_at` and `tos_page_hash` are never
+read here, and the former 90-day ToS-expiry check was removed.
+
+No new period is invented here: the 24-hour robots ceiling is exactly the one
+already ratified in docs/16 LIVE.2.
 """
 from __future__ import annotations
 
@@ -25,19 +28,15 @@ ROBOTS_RECENCY_CEILING = timedelta(hours=24)
 
 
 def freshness_auto_check_eligible(source: DiscoverySource | None, now: datetime) -> bool:
-    """DATA-D1.9 (`radar_eligible`, unmodified) PLUS the currentness
-    requirements docs/16 §7 (90-day ToS expiry) and LIVE.2 (24h robots
-    recheck ceiling) already ratify but `radar_eligible` does not itself
-    check. Fails closed on every axis — a missing source or a missing/None
-    timestamp is treated as NOT current, never as "no expiry means forever
-    eligible."
+    """DATA-D1.9 (`radar_eligible`) PLUS the LIVE.2 24h robots recheck
+    ceiling, which `radar_eligible` does not itself check. Fails closed — a
+    missing source or a missing robots-check timestamp is treated as NOT
+    current. ToS expiry/hash are deliberately not consulted (DR-A4).
     """
     if source is None:
         return False
     if not source.radar_eligible:
         return False
-    if source.tos_expires_at is None or now > source.tos_expires_at:
-        return False  # docs/16 §7 requirement 9 — no verifiable current review
     if (
         source.last_robots_checked_at is None
         or now - source.last_robots_checked_at > ROBOTS_RECENCY_CEILING
@@ -86,13 +85,11 @@ def mode_reason(target: FreshnessTarget, source: DiscoverySource | None, mode: s
     if not source.is_enabled:
         return "source is not enabled"
     if source.tos_status != "ALLOWED":
-        return f"tos_status={source.tos_status} (DATA-D1.9 requires ALLOWED)"
+        return f"tos_status={source.tos_status} (owner-recorded terms decision must be ALLOWED)"
     if source.robots_status not in ("ALLOWED", "NOT_APPLICABLE"):
         return f"robots_status={source.robots_status} (DATA-D1.9 requires ALLOWED/NOT_APPLICABLE)"
     if source.eligibility_reviewed_at is None or not source.eligibility_reviewed_by:
         return "no attributed eligibility review is recorded"
-    if source.tos_expires_at is None:
-        return "no recorded ToS expiry (docs/16 §7 requires a current, non-expired review)"
     if source.last_robots_checked_at is None:
         return "robots policy has never been checked (docs/16 LIVE.2 requires a recheck within 24h)"
-    return "eligibility review or robots recheck has expired (docs/16 §7 / LIVE.2)"
+    return "robots recheck has expired (docs/16 LIVE.2 requires a recheck within 24h)"

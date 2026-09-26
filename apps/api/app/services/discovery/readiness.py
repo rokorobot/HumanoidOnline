@@ -1,7 +1,13 @@
 """Read-only foundation prerequisites; not permission or readiness to crawl.
 
-Live policy freshness, acquisition, extraction and storage belong to later
-slices. Passing these initialization checks never makes execution available.
+Reports initialization prerequisites only. A source counted here satisfies the
+source-level acquisition policy (`eligibility.source_acquisition_eligible`:
+radar-eligible, approved host and path prefixes). That never
+authorizes network acquisition by itself: a live run additionally needs
+robots.txt evaluated for each exact URL at fetch time (docs/16 LIVE.2) and a
+separately authorized operator run. ToS expiry and page-hash currency are not
+prerequisites (owner decision DR-A4). Passing these checks never makes execution
+available.
 """
 from __future__ import annotations
 
@@ -12,6 +18,7 @@ from sqlalchemy.orm import Session
 
 from app.models.discovery import DiscoveryCandidate, DiscoverySource
 from app.services.discovery.bootstrap import bootstrap_source_key, load_dataset, validate_dataset
+from app.services.discovery.eligibility import source_acquisition_eligible
 
 BASELINE_DATASET = "humanoid_radar_v1"
 
@@ -70,6 +77,6 @@ def check_readiness(session: Session) -> DiscoveryReadiness:
         missing_lead_refs=tuple(sorted(expected - present)),
         eligible_source_keys=tuple(sorted(
             s.key for s in sources
-            if not s.key.startswith("manual-bootstrap:") and s.radar_eligible
+            if not s.key.startswith("manual-bootstrap:") and source_acquisition_eligible(s)
         )),
     )

@@ -186,6 +186,13 @@ accident.
 
 ### 3.1 `radar_eligible` alone is confirmed **insufficient** (correction 3)
 
+> **Amended by DR-A4 (`docs/decisions/DR-A4_TOS_NOT_TIME_GATED.md`,
+> 2026-09-26):** the `tos_expires_at` / 90-day half of this section is withdrawn.
+> `freshness_auto_check_eligible` now composes only `radar_eligible` plus the
+> 24 h robots ceiling; ToS expiry never blocks `AUTO_CHECK`. The text below is
+> kept as the historical record. The same applies to test E's expired-ToS case
+> (§ tests) and the "Eligibility runtime" summary.
+
 Direct inspection of `apps/api/app/models/discovery.py:82-93` (Phase 1) shows
 `radar_eligible` checks exactly five conditions — `is_enabled`, `tos_status ==
 ALLOWED`, `robots_status`, and reviewer attribution — and **does not check

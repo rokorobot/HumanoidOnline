@@ -1,0 +1,12 @@
+{
+  "https://maker.example/robots.txt": "../v1/robots.txt",
+  "https://maker.example/products": "../v1/listing.html",
+  "https://maker.example/sitemap.xml": "../v1/sitemap.xml",
+  "https://maker.example/products/ex-alpha-7": "ex-alpha-7.html",
+  "https://maker.example/products/ex-beta-2": "ex-beta-2.html",
+  "https://maker.example/products/ex-gamma": {"status": 404},
+  "https://maker.example/products/ex-duo": "../v1/ex-duo.html",
+  "https://maker.example/products/ex-series": "../v1/ex-series.html",
+  "https://maker.example/news/2026/ex-omega-unveiled": "../v1/news-omega.html",
+  "https://maker.example/news/2026/company-update": "../v1/news-update.html"
+}

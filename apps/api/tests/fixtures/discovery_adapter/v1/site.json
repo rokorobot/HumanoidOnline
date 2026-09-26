@@ -1,0 +1,12 @@
+{
+  "https://maker.example/robots.txt": "robots.txt",
+  "https://maker.example/products": "listing.html",
+  "https://maker.example/sitemap.xml": "sitemap.xml",
+  "https://maker.example/products/ex-alpha-7": "ex-alpha-7.html",
+  "https://maker.example/products/ex-beta-2": "ex-beta-2.html",
+  "https://maker.example/products/ex-gamma": "ex-gamma.html",
+  "https://maker.example/products/ex-duo": "ex-duo.html",
+  "https://maker.example/products/ex-series": "ex-series.html",
+  "https://maker.example/news/2026/ex-omega-unveiled": "news-omega.html",
+  "https://maker.example/news/2026/company-update": "news-update.html"
+}

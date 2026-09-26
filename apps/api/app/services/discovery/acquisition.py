@@ -48,6 +48,11 @@ from app.services.discovery.fetcher import (
 from app.services.discovery.fingerprint import FINGERPRINT_VERSION, fingerprint, sha256_hex
 from app.services.discovery.robots import RobotsRules, parse
 
+#: One bounded enumeration step (docs/16 §12.1): given the seed pages this run
+#: fetched and the robots rules in force, return the target URLs to fetch next.
+#: Called once, after every seed; its URLs are never expanded again.
+Expander = Callable[[list[tuple[FetchedPage, bytes]], RobotsRules], list[str]]
+
 ADAPTER_KEY = "http-url-list"
 ADAPTER_VERSION = "1"
 #: docs/16 LIVE.2 — a robots evaluation older than this is re-read before use.
@@ -91,7 +96,8 @@ class RobotsSnapshot:
 
     def as_manifest(self) -> dict:
         return {"url": self.url, "http_status": self.http_status, "sha256": self.sha256,
-                "checked_at": self.checked_at.isoformat()}
+                "checked_at": self.checked_at.isoformat(),
+                "crawl_delay": self.rules.crawl_delay}
 
 
 @dataclass
@@ -270,22 +276,45 @@ def run_acquisition(
     cache_dir: Path = body_cache.DEFAULT_CACHE_DIR,
     now: Callable[[], datetime] = _utcnow,
     checkpoint: Callable[[], None] = lambda: None,
+    expand: Expander | None = None,
+    adapter: tuple[str, str] = (ADAPTER_KEY, ADAPTER_VERSION),
+    manifest_extra: dict | None = None,
 ) -> CrawlRun:
     """One MANUAL run over an explicit URL list. Refuses before any request if
     the source or any URL fails policy. `checkpoint` (e.g. session.commit) is
-    called after every durable step; the caller owns the transaction."""
+    called after every durable step; the caller owns the transaction.
+
+    With `expand`, `urls` are the run's seeds: after the last seed, `expand` is
+    called once with the fetched seed bodies and returns target URLs, which are
+    re-checked against the source policy and the page cap and then fetched. The
+    targets are never expanded (one level, no recursion)."""
     if not operator or not operator.strip():
         raise AcquisitionRefused([("-", "OPERATOR_REQUIRED")])
     _refuse_unless_planned(source, urls, fetcher.limits.page_cap)
 
     release = _guard_writes(session)
     try:
-        return _run(session, source, urls, operator.strip(), fetcher, cache_dir, now, checkpoint)
+        return _run(session, source, urls, operator.strip(), fetcher, cache_dir, now,
+                    checkpoint, expand, adapter, manifest_extra or {})
     finally:
         release()
 
 
-def _run(session, source, urls, operator, fetcher, cache_dir, now, checkpoint) -> CrawlRun:
+def _prior_body(session: Session, source: DiscoverySource, url: str,
+                cache_dir: Path) -> bytes | None:
+    """The cached body of the latest FETCHED observation of `url` (for a 304 seed)."""
+    prior = session.scalars(
+        select(FetchedPage)
+        .where(FetchedPage.source_id == source.id, FetchedPage.url == url,
+               FetchedPage.outcome == "FETCHED")
+        .order_by(FetchedPage.retrieved_at.desc())
+        .limit(1)
+    ).first()
+    return body_cache.read_observed_body(cache_dir, str(prior.id)) if prior else None
+
+
+def _run(session, source, urls, operator, fetcher, cache_dir, now, checkpoint,
+         expand, adapter, manifest_extra) -> CrawlRun:
     counters = {
         "requested": len(urls), "attempted": 0, "fetched": 0, "not_modified": 0,
         FIRST_OBSERVATION.lower(): 0, UNCHANGED.lower(): 0, CHANGED.lower(): 0,
@@ -294,7 +323,7 @@ def _run(session, source, urls, operator, fetcher, cache_dir, now, checkpoint) -
         "not_attempted": 0, "halt_reason": None, "canonical_rows_written": 0,
     }
     run = CrawlRun(
-        source_id=source.id, adapter_key=ADAPTER_KEY, adapter_version=ADAPTER_VERSION,
+        source_id=source.id, adapter_key=adapter[0], adapter_version=adapter[1],
         trigger="MANUAL", operator=operator, status="RUNNING", started_at=now(),
         run_manifest={
             "source_key": source.key,
@@ -306,6 +335,7 @@ def _run(session, source, urls, operator, fetcher, cache_dir, now, checkpoint) -
             "cache_dir": str(cache_dir),
             "dry_run": False,
             "robots": [],
+            **manifest_extra,
         },
         counters=counters,
     )
@@ -316,8 +346,18 @@ def _run(session, source, urls, operator, fetcher, cache_dir, now, checkpoint) -
     status = "COMPLETED"
     robots: RobotsSnapshot | None = None
     remaining = list(urls)
+    seeds: list[tuple[FetchedPage, bytes]] = []
+    expanded = expand is None
+    host = (urlsplit(source.homepage_url or "").hostname or "").lower()
     try:
-        while remaining:
+        while remaining or not expanded:
+            if not remaining:
+                expanded = True
+                targets = _expansion(source, expand(seeds, robots.rules) if robots else [],
+                                     urls, fetcher.limits.page_cap, run)
+                counters["requested"] += len(targets)
+                remaining = list(targets)
+                continue
             url = remaining[0]
             if robots is None or now() - robots.checked_at > ROBOTS_MAX_AGE:
                 try:
@@ -330,6 +370,9 @@ def _run(session, source, urls, operator, fetcher, cache_dir, now, checkpoint) -
                                     "robots": [*run.run_manifest["robots"], robots.as_manifest()]}
                 source.last_robots_hash = robots.sha256
                 source.last_robots_checked_at = robots.checked_at
+                interval = fetcher.honour_crawl_delay(host, robots.rules.crawl_delay)
+                run.run_manifest = {**run.run_manifest,
+                                    "effective_min_interval_seconds": interval}
 
             remaining.pop(0)
             counters["attempted"] += 1
@@ -344,6 +387,12 @@ def _run(session, source, urls, operator, fetcher, cache_dir, now, checkpoint) -
                     **page_cache_meta(page), "raw_sha256": raw_sha256, "change": state,
                     "fingerprint_version": FINGERPRINT_VERSION,
                 })
+            if not expanded:
+                body = (body_cache.read_body(cache_dir, raw_sha256) if raw_sha256
+                        else _prior_body(session, source, url, cache_dir)
+                        if page.outcome == "NOT_MODIFIED" else None)
+                if body is not None:
+                    seeds.append((page, body))
             checkpoint()
             if halt:
                 counters["halt_reason"] = halt
@@ -356,7 +405,7 @@ def _run(session, source, urls, operator, fetcher, cache_dir, now, checkpoint) -
     except KillSwitchEngaged:
         status = "CANCELLED"
         counters["halt_reason"] = "kill_switch"
-    counters["not_attempted"] = len(urls) - counters["attempted"]
+    counters["not_attempted"] = counters["requested"] - counters["attempted"]
     run.status = status
     run.finished_at = now()
     run.counters = counters
@@ -365,6 +414,28 @@ def _run(session, source, urls, operator, fetcher, cache_dir, now, checkpoint) -
     session.flush()
     checkpoint()
     return run
+
+
+def _expansion(source, targets, seeds, page_cap, run) -> list[str]:
+    """Re-check expanded targets against the source policy and the run's page
+    cap. Nothing is dropped silently: refused and over-cap URLs are recorded."""
+    accepted: list[str] = []
+    refused: list[dict] = []
+    over_cap: list[str] = []
+    room = page_cap - len(seeds)
+    for url in targets:
+        reason = url_ineligibility(source, url)
+        if reason is None and (url in seeds or url in accepted):
+            reason = "DUPLICATE_URL"
+        if reason:
+            refused.append({"url": url, "reason": reason})
+        elif len(accepted) >= room:
+            over_cap.append(url)
+        else:
+            accepted.append(url)
+    run.run_manifest = {**run.run_manifest, "expanded_urls": list(accepted),
+                        "expansion_refused": refused, "expansion_over_page_cap": over_cap}
+    return accepted
 
 
 def page_cache_meta(page: FetchedPage) -> dict:
@@ -497,4 +568,57 @@ def build_report(session: Session, run_id) -> str:
         f"Halt reason                          {counters.get('halt_reason') or '-'}",
         f"Canonical rows written               {counters.get('canonical_rows_written', 0)}",
     ]
-    return "\n".join(lines)
+    return "\n".join(lines + _adapter_report(manifest, counters))
+
+
+def _adapter_report(manifest: dict, counters: dict) -> list[str]:
+    """The Slice B additions to the §18 report: enumeration and extraction."""
+    extraction = counters.get("extraction")
+    enumeration = manifest.get("enumeration")
+    if extraction is None and enumeration is None:
+        return []
+    lines = ["", "ENUMERATION (one level from reviewed seeds)"]
+    enumeration = enumeration or {}
+    lines.append(f"  targets selected {len(enumeration.get('selected', []))}   "
+                 f"cap={manifest.get('target_cap')}   "
+                 f"deferred {len(enumeration.get('deferred', []))}   "
+                 f"excluded {len(enumeration.get('excluded', []))}")
+    lines += [f"  DEFERRED (not fetched this run)  {u}" for u in enumeration.get("deferred", [])]
+    lines += [f"  EXCLUDED {e['reason']:<16} {e['url']}" for e in enumeration.get("excluded", [])]
+    if extraction is None:
+        return lines
+    lines += ["", "EXTRACTION"]
+    lines += [f"  {p['change']:<18} {p['kind'] or '-':<12} {p['url']}  -> {p['result']}"
+              for p in counters.get("extraction_pages", [])]
+    changes = extraction.get("commercial_status_changes", {})
+    rows = [
+        ("New product URLs", "new_product_urls"),
+        ("Existing robots matched", "matched_existing"),
+        ("  of which known robot at a new URL", "known_robot_new_url"),
+        ("New robot candidates (NEW_ENTITY)", "new_entity"),
+        ("Possible duplicates", "possible_duplicate"),
+        ("Ambiguous identity", "ambiguous"),
+        ("Terminal candidates observed", "terminal_candidate_observed"),
+        ("Identity string changed", "identity_changed"),
+        ("Changed pages (re-extracted)", "changed_pages"),
+        ("Unchanged, not re-extracted", "unchanged_not_reextracted"),
+        ("Removed pages", "removed_pages"),
+        ("Changed specifications", "changed_specifications"),
+        ("Price or quote signals", "price_or_quote_signals"),
+        ("Price changes", "price_changes"),
+        ("Newly orderable / preorder", "newly_orderable"),
+        ("Real image references found", "image_refs"),
+        ("Claims written (all NOT_VERIFIED)", "claims_written"),
+        ("Signals written (all NOT_VERIFIED)", "signals_written"),
+        ("Rejected or unsupported values", "rejected_or_unsupported"),
+        ("New announcement URLs", "new_announcement_urls"),
+        ("Changed announcements", "announcements_changed"),
+        ("Candidates from announcements", "announcement_candidates"),
+        ("Extraction errors", "extraction_errors"),
+    ]
+    lines += [f"{label:<37}{extraction.get(key, 0)}" for label, key in rows]
+    lines.append(f"{'Commercial-status changes':<37}maturity {changes.get('MATURITY', 0)} / "
+                 f"obtainability {changes.get('OBTAINABILITY', 0)} / "
+                 f"price {changes.get('PRICE', 0)}")
+    lines.append(f"{'Canonical rows written':<37}{extraction.get('canonical_rows_written', 0)}")
+    return lines

@@ -2,18 +2,22 @@ name: Discovery observation (Stage F)
 
 # docs/16 §17.2. Two separate switches, deliberately:
 #
-#   DISPATCH GATE  repository variable DISCOVERY_OBSERVE_ENABLED == 'true'.
-#                  Without it even a manual dispatch runs nothing. It enables
-#                  manual runs only: this file has no `schedule:` trigger.
-#   RECURRING      a `schedule:` trigger. There is NONE. Adding one is the
-#                  owner's separate operational decision, in its own reviewed
-#                  change. Until then every cycle is started by a human.
+#   GATE       repository variable DISCOVERY_OBSERVE_ENABLED == 'true'. Without
+#              it NOTHING runs: neither a manual dispatch nor the schedule.
+#              Setting it to anything else disables recurring observation.
+#   RECURRING  the hourly `schedule:` below (owner-activated 2026-09-26). Each
+#              invocation only CHECKS the registered NEURA source: it observes
+#              (never plan, never run-now), and the source's own attributed
+#              cadence (24 h) decides whether anything is fetched. An hour in
+#              which the source is not due requests nothing.
 #
 # Production database access comes only from the `discovery-production`
 # environment's secret DISCOVERY_DATABASE_URL: the least-privilege
 # `discovery_observer` role (db/roles/discovery_observer.sql), never the owner.
 # Mode `plan` makes no manufacturer request and writes nothing.
 on:
+  schedule:
+    - cron: "37 * * * *"   # hourly at minute 37 (UTC)
   workflow_dispatch:
     inputs:
       mode:
@@ -52,9 +56,11 @@ jobs:
     env:
       DATABASE_URL: ${{ secrets.DISCOVERY_DATABASE_URL }}
       APP_ENV: production
-      MODE: ${{ inputs.mode }}
-      ONLY: ${{ inputs.source }}
-      RUN_NOW: ${{ inputs.run_now }}
+      # A scheduled event has no inputs: it always observes the one registered,
+      # approved NEURA source, and never skips the cadence wait.
+      MODE: ${{ github.event_name == 'schedule' && 'observe' || inputs.mode }}
+      ONLY: ${{ github.event_name == 'schedule' && 'neura-robotics-official' || inputs.source }}
+      RUN_NOW: ${{ github.event_name == 'schedule' && 'false' || inputs.run_now }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -111,7 +117,7 @@ jobs:
             echo
             echo "**$head**"
             echo
-            echo "Recurring schedule: none (manual dispatch only)."
+            echo "Trigger: ${{ github.event_name }} (recurring: hourly at :37 UTC; the source cadence decides fetching)."
             echo
             echo '```'
             cat "$RUNNER_TEMP/cycle.txt" 2>/dev/null || true
@@ -119,7 +125,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           [ "$CODE" = 0 ]
       - name: Save raw-body cache
-        if: always() && inputs.mode == 'observe'
+        if: always() && env.MODE == 'observe'
         uses: actions/cache/save@v4
         with:
           path: var/discovery/cache

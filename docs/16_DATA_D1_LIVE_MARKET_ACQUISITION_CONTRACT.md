@@ -301,6 +301,13 @@ policy is an operational signal that can change any day, which is why it is
 re-read every run and can never be answered from a stored decision. An expired
 review is **not** eligibility, and neither is a stale one.
 
+> **Amended by DR-A4 (`docs/decisions/DR-A4_TOS_NOT_TIME_GATED.md`, owner
+> decision 2026-09-26):** the terms row of the table above no longer applies.
+> The owner reads each site's terms personally and records `tos_status`; that
+> decision does **not** expire after 90 days, is **not** voided by a legal-page
+> URL or hash change, and no terms page is re-fetched to check it. The robots
+> row is unchanged and fully in force.
+
 **Amended by `docs/26` (Amendment A3), Revision 5 — ratified by owner
 2026-09-11; repository-effective upon merge:** LIVE.2 governs standing automated processes — adapters, the
 discovery radar and scheduled freshness. It no longer gates agent retrieval of
@@ -529,6 +536,12 @@ audited and re-reviewed rather than silently overwritten.
 decision, with robots `ALLOWED`/`NOT_APPLICABLE`, an attributed and unexpired
 review, and an explicit enable, means **the source is not fetched**. Silence is
 not permission (DATA-D1.9).
+
+> **Amended by DR-A4:** the review's `expires_at` / `tos_expires_at` is
+> informational only — "unexpired" above no longer applies to the terms
+> decision. An affirmative owner-recorded `tos_status = ALLOWED`, robots
+> `ALLOWED`/`NOT_APPLICABLE`, an attributed review and an explicit enable remain
+> required.
 
 **Applies identically to every source class.** An aggregator, a marketplace or
 an editorial outlet is reviewed by the exact same procedure as a manufacturer —
@@ -1106,6 +1119,11 @@ protects, printed on every run.
 | **V** | *(`MANUAL_BOOTSTRAP`, §2.1)* A manually recorded claim carries the same evidence shape as an automated one — excerpt, URL or document identifier, retrieved-at, `extraction_method = MANUAL` — and is rejected at write time if any is missing; it is discovery-layer-only, identically to Gate C. |
 | **W** | *(promotion trace, §11.1)* When an official-class (`MANUFACTURER` / `AUTHORIZED_DISTRIBUTOR` / `OFFICIAL_STORE`) source exists for an entity, promotion is refused unless the recorded trace (DATA-D1 P2) is to one of those classes — an aggregator-only trace does not satisfy P2 for that entity. |
 | **X** | *(claim provenance, §9.1)* Every claim, commercial signal and evidence excerpt resolves to exactly one classified source; a write without a resolvable `discovery_source_id` is rejected. Two sources asserting the same value produce two rows, never one merged row, and promotion never rewrites the class of an existing claim. |
+
+> **Gates A and B amended by DR-A4:** "unexpired" in Gate A and the final
+> sentence of Gate B (terms older than 90 days / page-hash change blocks the
+> run) no longer apply, and must **not** be implemented. Everything else in
+> Gates A and B — including every robots rule — stands.
 
 ## 20. Non-goals (v0.1)
 

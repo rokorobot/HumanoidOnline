@@ -160,6 +160,12 @@ access is **not radar-eligible even for discovery** (etiquette in §14 governs
 eligible at all). This protects the discovery layer legally at the point of
 inclusion, not merely at the point of promotion.
 
+> **Clarified by DR-A4 (`docs/decisions/DR-A4_TOS_NOT_TIME_GATED.md`,
+> 2026-09-26):** the terms review above is performed by the owner personally
+> and recorded as `tos_status`; it does not expire and is not machine-revalidated
+> (no 90-day expiry, no page-hash invalidation, no automated re-fetch). The
+> robots/access-policy half of this law is unchanged.
+
 ### DATA-D1.10 — The discovery layer is not a shadow database *(Refinement R2, v0.1)*
 DATA-D1.3 forbids copying competitor data into *canonical* tables. This law
 extends the boundary to the **candidate layer itself**: the EU *sui generis*

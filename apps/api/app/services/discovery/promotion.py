@@ -13,10 +13,17 @@ fields, and only into the approved set below; UNKNOWN/NOT_VERIFIED/CONFLICT clai
 are never written (Gate F), and an existing non-null canonical value is never
 overwritten (that path is a conflict for a later slice). Promotion is idempotent
 (H5): an already-promoted candidate is refused.
+
+Stage E convergence (docs/16 §17.1): immediately before the canonical write,
+`promote` locks the candidate's SAME_ENTITY group and re-resolves its identity
+against the current catalogue, confirmed aliases and the group's promotions. A
+stored NEW_ENTITY status is never trusted on its own, so a human-confirmed
+SAME_ENTITY group produces at most one canonical robot.
 """
 from __future__ import annotations
 
 import re
+import uuid
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 
@@ -28,8 +35,13 @@ from app.models.evidence import EvidenceSource
 from app.models.manufacturer import Manufacturer
 from app.models.robot import Robot
 from app.services.discovery import PromotionError
-from app.services.discovery.identity import normalize
-from app.services.discovery.identity_decisions import SAME_ENTITY, effective_decisions
+from app.services.discovery.identity import normalize, resolve_identity
+from app.services.discovery.identity_decisions import (
+    NOT_SAME_ENTITY,
+    SAME_ENTITY,
+    effective_decisions,
+    same_entity_group,
+)
 
 _PROMOTABLE_IDENTITY = {"MATCHED_EXISTING", "NEW_ENTITY"}
 
@@ -132,12 +144,17 @@ def promote(session: Session, candidate: DiscoveryCandidate, approved_by: str) -
     catalogue workflow, never a side effect of discovery. Does not commit."""
     if not approved_by or not approved_by.strip():
         raise PromotionError("promotion requires an approving human (approved_by)")
+    # Lock first, so every check below reads the committed state of the whole
+    # SAME_ENTITY group (this candidate included), and a concurrent promotion of
+    # any group member waits here until this transaction ends.
+    group = _lock_same_entity_group(session, candidate)
     if candidate.status == "PROMOTED" or candidate.promoted_robot_id is not None:
         raise PromotionError("candidate already promoted (idempotency guard)")
     fails = check_gates(session, candidate)
     if fails:
         raise PromotionError("; ".join(fails))
 
+    revalidation = _revalidate_identity(session, candidate, group)
     proposal = build_proposal(session, candidate)
 
     if candidate.identity_status == "MATCHED_EXISTING":
@@ -188,11 +205,106 @@ def promote(session: Session, candidate: DiscoveryCandidate, approved_by: str) -
             promoted_robot_id=robot.id,
             evidence_source_id=evidence.id,
             approved_by=approved_by,
-            detail={**proposal, "promoted_fields": promoted_fields},
+            detail={**proposal, "promoted_fields": promoted_fields,
+                    "identity_revalidation": revalidation},
         )
     )
     session.flush()
     return robot
+
+
+def _lock_same_entity_group(session: Session, candidate: DiscoveryCandidate) -> set[uuid.UUID]:
+    """Row-lock the candidate's SAME_ENTITY group (FOR UPDATE, in id order) and
+    reload the locked rows from the database. Returns the group's ids.
+
+    Two promotions of members of one group serialize here: the second waits for
+    the first to commit and then sees its `promoted_robot_id`. The group is read
+    again after locking, and a member added in the meantime is locked too.
+    """
+    locked: set[uuid.UUID] = set()
+    while True:
+        group = same_entity_group(session, candidate.id)
+        missing = group - locked
+        if not missing:
+            return group
+        session.scalars(
+            select(DiscoveryCandidate)
+            .where(DiscoveryCandidate.id.in_(missing))
+            .order_by(DiscoveryCandidate.id)
+            .with_for_update()
+            .execution_options(populate_existing=True)
+        ).all()
+        locked |= missing
+
+
+def _revalidate_identity(session: Session, candidate: DiscoveryCandidate,
+                         group: set[uuid.UUID]) -> dict:
+    """Re-resolve identity at canonical-write time; return the audit record.
+
+    The stored identity_status may be stale (resolved before a counterpart was
+    promoted). So re-run the deterministic resolver against the current catalogue
+    and confirmed aliases, then apply the human SAME_ENTITY group:
+
+    - no member promoted: the fresh resolution stands (one member may create);
+    - exactly one canonical robot among promoted members: converge onto it
+      (MATCHED_EXISTING), never create another;
+    - more than one: a governance conflict, refused for human repair.
+
+    Every refusal raises PromotionError before any canonical write.
+    """
+    fresh = resolve_identity(session, candidate)
+    if fresh not in _PROMOTABLE_IDENTITY:
+        raise PromotionError(
+            f"P1 identity re-resolved to {fresh} at promotion time; re-run the pipeline "
+            "and review before promoting")
+    members = session.scalars(
+        select(DiscoveryCandidate)
+        .where(DiscoveryCandidate.id.in_(group - {candidate.id}),
+               DiscoveryCandidate.promoted_robot_id.is_not(None))
+        .order_by(DiscoveryCandidate.id)
+    ).all()
+    promoted: dict[uuid.UUID, list[str]] = {}
+    for member in members:
+        promoted.setdefault(member.promoted_robot_id, []).append(str(member.id))
+    record: dict = {
+        "resolved": fresh,
+        "same_entity_group": sorted(str(i) for i in group - {candidate.id}),
+        "converged_on_robot_id": None,
+    }
+    if len(promoted) > 1:
+        raise PromotionError(
+            f"identity governance conflict: the SAME_ENTITY group of {candidate.id} already "
+            f"references {len(promoted)} canonical robots ("
+            + "; ".join(f"robot {rid} <- candidate(s) {', '.join(cids)}"
+                        for rid, cids in sorted(promoted.items(), key=lambda kv: str(kv[0])))
+            + "). Refused; a human must repair the identity decisions or the catalogue")
+    if promoted:
+        ((robot_id, via),) = promoted.items()
+        if fresh == "MATCHED_EXISTING" and candidate.possible_robot_id != robot_id:
+            raise PromotionError(
+                f"identity governance conflict: candidate {candidate.id} matches robot "
+                f"{candidate.possible_robot_id}, but its SAME_ENTITY group was promoted to "
+                f"robot {robot_id} (via {', '.join(via)}). Refused for human repair")
+        candidate.identity_status = "MATCHED_EXISTING"
+        candidate.possible_robot_id = robot_id
+        record.update(resolved="MATCHED_EXISTING", converged_on_robot_id=str(robot_id),
+                      converged_via_candidates=via)
+        return record
+    if fresh == "MATCHED_EXISTING":
+        # A human decided these are different entities; linking to the robot the
+        # counterpart created would silently override that decision.
+        apart = sorted(
+            str(other)
+            for other, decision in effective_decisions(session, candidate.id).items()
+            if decision == NOT_SAME_ENTITY
+            and session.get(DiscoveryCandidate, other).promoted_robot_id
+            == candidate.possible_robot_id)
+        if apart:
+            raise PromotionError(
+                f"identity governance conflict: candidate {candidate.id} matches robot "
+                f"{candidate.possible_robot_id}, which was promoted from NOT_SAME_ENTITY "
+                f"counterpart(s) {', '.join(apart)}. Refused for human repair")
+    return record
 
 
 #: Machine-readable rejection reasons (Stage E). Optional: a free-text reason is

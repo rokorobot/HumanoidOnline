@@ -1198,6 +1198,13 @@ The first capped NEURA crawl (production run `2c64d1f3`) is the real acquired da
   - Re-recording the identical trace is a no-op, and a different trace is refused rather than replacing it.
   - Recording a trace never promotes.
 - **Promotion remains a separate human act** (`app.cli.promote_candidate`). Nothing in Stage E promotes, and nothing writes a canonical table.
+- **Promotion revalidates identity at canonical-write time**, so a human-confirmed SAME_ENTITY group can produce at most one canonical robot:
+  - `promote` row-locks the candidate's SAME_ENTITY group, which is transitive (A~B and B~C is one group), so concurrent promotions of group members run one after another;
+  - it then re-resolves identity against the current catalogue and confirmed aliases, so a stored status is never trusted on its own;
+  - if no member is promoted yet, the normal behaviour applies and this candidate may create the robot;
+  - if members were promoted to exactly one robot, the candidate converges onto it as `MATCHED_EXISTING`. It keeps its own row, approval, trace and evidence, and nothing is merged;
+  - if members point to more than one robot, or a name match would override a `NOT_SAME_ENTITY` decision, promotion is refused as a governance conflict, with the IDs, for human repair;
+  - no alias is inferred.
 
 ## 18. The run report
 

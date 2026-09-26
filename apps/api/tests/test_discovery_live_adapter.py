@@ -233,6 +233,6 @@ def test_neura_module_is_registered_but_blocked() -> None:
     assert set(ADAPTERS) == {"neura-robotics-official"}
     assert NEURA.manufacturer == "Neura Robotics"          # canonical catalogue name
     assert NEURA.host == "neura-robotics.com"
-    assert NEURA.structural_review is not None and NEURA.blocked_reason
+    assert NEURA.structural_review is not None and NEURA.blocked_reason is None
     assert NEURA.target_cap == 50
     assert NEURA.kind_of("https://neura-robotics.com/anything") is None

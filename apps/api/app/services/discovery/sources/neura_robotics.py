@@ -30,8 +30,12 @@ and shipping; no actual purchase price was observed. All three stay UNKNOWN. The
 schema's `price_type=ESTIMATED` has no field for a quantity band, so it is not
 an unambiguous home for the estimate.
 
-The runner still refuses this module (`ADAPTER_BLOCKED`) until the owner
-approves the extractor for live use.
+Owner approval (2026-09-26): the identity-only extractor is approved for live
+use (`EXTRACTOR_APPROVAL`). The approval is identity-only: the reservation fee and
+the estimated price never become a PRICE, commercial fields stay UNKNOWN, and
+there is no 4NE-1/4NE1 alias, no fuzzy/LLM/embedding matching and no automatic
+duplicate resolution. Acquisition still requires the source's recorded ToS
+decision, enablement and a robots.txt check on every run.
 """
 from __future__ import annotations
 
@@ -44,7 +48,12 @@ from urllib.parse import urlsplit
 from app.services.discovery.live_adapter import ProductExtraction, SourceAdapterConfig
 from app.services.discovery.urlref import UnsupportedUrl, normalize_url
 
-BLOCK_CODE = "BLOCKED_PENDING_EXTRACTOR_APPROVAL"
+#: The owner's approval of the identity-only extractor. Replaces the former
+#: BLOCKED_PENDING_EXTRACTOR_APPROVAL block; extraction behaviour is unchanged.
+EXTRACTOR_APPROVAL = (
+    "2026-09-26 robert@humanoid.company: NEURA identity-only extractor approved for "
+    "live use; reservation fee and estimated price stay UNKNOWN (never PRICE); no alias"
+)
 
 #: What the inspection established, as data (asserted by the tests).
 STRUCTURAL_FINDINGS = {
@@ -266,11 +275,5 @@ CONFIG = SourceAdapterConfig(
     product_extractor=extract_neura_product,
     structural_review="2026-09-26 read-only inspection (7 requests); "
     "docs/discovery/NEURA_STRUCTURAL_REVIEW_2026-09-26.md",
-    blocked_reason=(
-        f"{BLOCK_CODE}: pages are HTTP/server-rendered and robots-compatible, and the "
-        "generic extractor is unsafe for them (no usable Product JSON-LD; <h1> is not a "
-        "safe identity source; the refundable reservation fee (deposit) and the estimated "
-        "robot price are not a purchase price). A NEURA identity-only extractor is wired "
-        "but has not been approved for live use"
-    ),
+    # No blocked_reason: see EXTRACTOR_APPROVAL.
 )

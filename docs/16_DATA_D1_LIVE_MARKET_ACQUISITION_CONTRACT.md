@@ -707,6 +707,18 @@ fetched_page
 whose `content_hash` is unchanged is not re-extracted unless extraction logic
 changed — which is why `adapter_version` is on the run.
 
+> **Extended by migration 0014 (Discovery Stage B, 2026-09-26):** `fetched_page`
+> gains `final_url` (where a bounded, policy-checked redirect chain ended — `url`
+> stays the requested URL) and `retrieval_method` (one-value enum `HTTP_GET`;
+> §20's no-browser rule means another method is a visible schema change). Stage B
+> (`app/services/discovery/acquisition.py`, `app.cli.discovery plan|crawl|report`)
+> implements the shared fetcher of §12/§13 over an explicit operator-supplied URL
+> list only — no link-following, sitemap expansion or scheduling — and stops at
+> retrieval, raw-body cache, immutable observation and change classification
+> (`FIRST_OBSERVATION` / `UNCHANGED` / `CHANGED` / `SOURCE_REMOVED` /
+> `FETCH_ERROR`). `content_hash` is the `html-text+jsonld/1` normalized
+> fingerprint; observations are compared only within one fingerprint version.
+
 ## 9. Extraction result and claim provenance
 
 ```

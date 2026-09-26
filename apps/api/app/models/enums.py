@@ -177,6 +177,9 @@ fetch_outcome = _pg_enum(
     "FETCHED", "NOT_MODIFIED", "FROM_CACHE", "BLOCKED_BY_ROBOTS",
     "BLOCKED_BY_SOURCE", "ERROR", "SKIPPED_UNCHANGED",
 )
+# Migration 0014: one value on purpose — docs/16 §20 forbids browser/JS
+# execution in v0.1, so another method is a visible schema change.
+retrieval_method = _pg_enum("retrieval_method", "HTTP_GET")
 extraction_method = _pg_enum(
     "extraction_method", "SELECTOR", "JSONLD", "MICRODATA", "PATTERN", "MANUAL"
 )

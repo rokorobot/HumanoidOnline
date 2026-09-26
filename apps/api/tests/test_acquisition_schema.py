@@ -822,8 +822,16 @@ def test_schema_sql_and_migration_0004_declare_the_same_tables() -> None:
 #   reached from, the acquisition/discovery models this file asserts are
 #   schema-only. See that module's own docstring for the full delivery/privacy
 #   contract.
+#
+#   apps/api/app/services/discovery/fetcher.py — Discovery Stage B (owner
+#   authorized 2026-09-26). The ONE module allowed to issue acquisition
+#   requests: HTTP GET only, exact docs/16 user agent, rate/redirect/body/retry
+#   bounds, kill switch. Everything else in the acquisition layer (runner,
+#   robots evaluation, cache, CLI) must still import no fetching library — the
+#   runner reaches the network only through this module.
 _SLICE_A_HTTP_EXCEPTIONS = frozenset(
-    {"apps/api/app/services/lead_notifications.py"}
+    {"apps/api/app/services/lead_notifications.py",
+     "apps/api/app/services/discovery/fetcher.py"}
 )
 
 

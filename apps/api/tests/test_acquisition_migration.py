@@ -28,6 +28,10 @@ from app.config import get_settings
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 SCHEMA_SQL = ROOT / "db" / "schema.sql"
 MIGRATION_0004 = ROOT / "db" / "migrations" / "0004_add_live_acquisition_layer.sql"
+#: 0014 adds two columns (+ one enum) to fetched_page, a table 0004 creates. A
+#: fetched_page rebuilt by 0004 alone is therefore the pre-0014 shape; the round
+#: trip applies 0014 after 0004 so the comparison is against the full baseline.
+MIGRATION_0014 = ROOT / "db" / "migrations" / "0014_fetched_page_retrieval_provenance.sql"
 
 #: Everything `0004` introduces. Dropping exactly this set puts a database back
 #: into its `0003` shape, which is what makes the round trip meaningful.
@@ -137,6 +141,7 @@ def test_migration_0004_converges_a_0003_database_onto_the_baseline(scratch_db) 
                 conn.execute(f"ALTER TABLE humanoid.{table} DROP COLUMN IF EXISTS {column}")
         for type_name in NEW_TYPES:
             conn.execute(f"DROP TYPE IF EXISTS humanoid.{type_name}")
+        conn.execute("DROP TYPE IF EXISTS humanoid.retrieval_method")
 
         reduced_columns, _ = _shape(conn)
         assert len(reduced_columns) < len(baseline_columns), (
@@ -145,6 +150,7 @@ def test_migration_0004_converges_a_0003_database_onto_the_baseline(scratch_db) 
 
         # --- apply the forward migration -----------------------------------
         conn.execute(MIGRATION_0004.read_text(encoding="utf-8"))
+        conn.execute(MIGRATION_0014.read_text(encoding="utf-8"))
         upgraded_columns, upgraded_constraints = _shape(conn)
 
     assert upgraded_columns == baseline_columns, (
@@ -238,3 +244,56 @@ def test_existing_0003_rows_survive_the_upgrade(scratch_db) -> None:
     assert claim[1] == "NOT_VERIFIED"
     assert claim[2] == source_id
     assert claim[3] is None
+
+
+# --------------------------------------------------------------------------- #
+# 0014 — fetched_page retrieval provenance (Discovery Stage B)
+# --------------------------------------------------------------------------- #
+
+def _wind_back_0014(conn) -> None:
+    conn.execute("ALTER TABLE humanoid.fetched_page DROP COLUMN IF EXISTS final_url")
+    conn.execute("ALTER TABLE humanoid.fetched_page DROP COLUMN IF EXISTS retrieval_method")
+    conn.execute("DROP TYPE IF EXISTS humanoid.retrieval_method")
+
+
+def test_migration_0014_upgrades_a_pre_0014_database_and_keeps_old_rows(scratch_db) -> None:
+    with psycopg.connect(scratch_db, autocommit=True) as conn:
+        conn.execute(SCHEMA_SQL.read_text(encoding="utf-8"))
+        baseline_columns, baseline_constraints = _shape(conn)
+        _wind_back_0014(conn)
+        conn.execute("SET search_path TO humanoid, public")
+
+        # A pre-0014 observation, written the way Slice A's schema allowed.
+        source_id = conn.execute(
+            "INSERT INTO discovery_source (key, name, source_class)"
+            " VALUES ('legacy-b', 'Legacy', 'MANUFACTURER') RETURNING id").fetchone()[0]
+        run_id = conn.execute(
+            "INSERT INTO crawl_run (source_id, adapter_key, adapter_version, operator,"
+            " status, finished_at) VALUES (%s, 'legacy', '0', 'op', 'COMPLETED', now())"
+            " RETURNING id", (source_id,)).fetchone()[0]
+        conn.execute(
+            "INSERT INTO fetched_page (crawl_run_id, source_id, url, outcome, http_status,"
+            " content_hash) VALUES (%s, %s, 'https://m.example/p', 'FETCHED', 200, %s)",
+            (run_id, source_id, "a" * 64))
+
+        migration = MIGRATION_0014.read_text(encoding="utf-8")
+        conn.execute(migration)
+        conn.execute(migration)  # idempotent
+        upgraded_columns, upgraded_constraints = _shape(conn)
+        row = conn.execute(
+            "SELECT url, outcome::text, http_status, content_hash, final_url, retrieval_method"
+            " FROM fetched_page WHERE source_id = %s", (source_id,)).fetchone()
+        nullable = dict(conn.execute(
+            "SELECT column_name, is_nullable FROM information_schema.columns"
+            " WHERE table_schema = 'humanoid' AND table_name = 'fetched_page'"
+            " AND column_name IN ('final_url', 'retrieval_method')").fetchall())
+        labels = [r[0] for r in conn.execute(
+            "SELECT e.enumlabel FROM pg_enum e JOIN pg_type t ON t.oid = e.enumtypid"
+            " WHERE t.typname = 'retrieval_method' ORDER BY e.enumsortorder").fetchall()]
+
+    assert upgraded_columns == baseline_columns
+    assert set(upgraded_constraints) == set(baseline_constraints)
+    # The old row is untouched and valid; new columns arrive NULL, never invented.
+    assert row == ("https://m.example/p", "FETCHED", 200, "a" * 64, None, None)
+    assert nullable == {"final_url": "YES", "retrieval_method": "YES"}
+    assert labels == ["HTTP_GET"]

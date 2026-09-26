@@ -23,6 +23,11 @@ dependencies = [
 ]
 
 [dependency-groups]
+# Discovery acquisition runner only (app.cli.discovery crawl). HTTP only:
+# docs/16 §20 forbids browser execution, so no browser package belongs here.
+discovery = [
+    "httpx>=0.27",
+]
 dev = [
     "pytest>=8",
     "httpx>=0.27",

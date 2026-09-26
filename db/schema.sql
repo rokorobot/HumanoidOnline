@@ -1201,6 +1201,11 @@ CREATE TYPE fetch_outcome AS ENUM (
     'FETCHED', 'NOT_MODIFIED', 'FROM_CACHE', 'BLOCKED_BY_ROBOTS',
     'BLOCKED_BY_SOURCE', 'ERROR', 'SKIPPED_UNCHANGED');
 
+-- How a fetched_page observation was retrieved (migration 0014). One value:
+-- docs/16 §20 forbids browser/JavaScript execution in v0.1, so adding another
+-- method is a visible schema change, never a configuration flag.
+CREATE TYPE retrieval_method AS ENUM ('HTTP_GET');
+
 CREATE TYPE extraction_method AS ENUM (
     'SELECTOR', 'JSONLD', 'MICRODATA', 'PATTERN', 'MANUAL');
 
@@ -1359,11 +1364,22 @@ CREATE TABLE fetched_page (
     outcome                  fetch_outcome NOT NULL,
     robots_decision_at_fetch robots_status,   -- what robots said AT the request
     error_class              TEXT,
-    created_at               TIMESTAMPTZ NOT NULL DEFAULT now()
+    created_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
+    -- Migration 0014. `url` stays the REQUESTED url; `final_url` is where the
+    -- bounded, policy-checked redirect chain ended. NULL on pre-0014 rows.
+    final_url                TEXT,
+    retrieval_method         retrieval_method
 );
 COMMENT ON TABLE fetched_page IS
     'DATA-D1.LIVE §8 per-URL fetch outcome. Deliberately has NO body column (LIVE.10): the '
     'evidence of what a page said is durable, the page itself is not.';
+COMMENT ON COLUMN fetched_page.url IS
+    'The REQUESTED url (operator-supplied, policy-checked).';
+COMMENT ON COLUMN fetched_page.final_url IS
+    'Where the bounded redirect chain ended; equals url when there was no redirect. '
+    'NULL on rows written before migration 0014.';
+COMMENT ON COLUMN fetched_page.retrieval_method IS
+    'How the observation was retrieved. HTTP_GET only in v0.1 (docs/16 §20).';
 
 CREATE TABLE discovery_candidate (
     id                        UUID PRIMARY KEY DEFAULT gen_random_uuid(),

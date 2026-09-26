@@ -229,6 +229,15 @@ Forward migrations:
   and its retrospective reconciliation are recorded in
   `db/catalogue/MANUFACTURER_PROFILE_ROLLOUT.md`.
 
+- `0014_fetched_page_retrieval_provenance.sql` — Discovery Stage B retrieval
+  provenance. `fetched_page` gains `final_url` (where a bounded, policy-checked
+  redirect chain ended; the existing `url` stays the requested URL) and
+  `retrieval_method`, a new one-value enum `retrieval_method` (`HTTP_GET`) —
+  docs/16 §20 forbids browser execution in v0.1, so another method must be a
+  visible schema change. Additive and idempotent; both columns nullable with no
+  default, so pre-existing rows stay valid and read as "not recorded". Names the
+  schema explicitly, as 0013 does.
+
 ## Checksum integrity (WS8.2 / R9)
 
 `schema_migrations` stores a `sha256` for every applied file, and

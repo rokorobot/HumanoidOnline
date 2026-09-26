@@ -31,8 +31,11 @@ from app.services.discovery.live_adapter import (
     seed_links,
 )
 from app.services.discovery.robots import parse
-from app.services.discovery.sources.neura_robotics import BLOCK_CODE, STRUCTURAL_FINDINGS
 from app.services.discovery.sources.neura_robotics import CONFIG as NEURA
+from app.services.discovery.sources.neura_robotics import (
+    EXTRACTOR_APPROVAL,
+    STRUCTURAL_FINDINGS,
+)
 from app.services.discovery.urlref import normalize_url
 
 FIXTURES = Path(__file__).parent / "fixtures" / "neura_structure"
@@ -66,12 +69,10 @@ def test_config_is_the_reviewed_structure():
     assert NEURA.property_map == {} and NEURA.quote_phrases == ()
     assert NEURA.structural_review and REVIEW.name in NEURA.structural_review
     assert REVIEW.is_file()
-    assert NEURA.blocked_reason.startswith(f"{BLOCK_CODE}: ")
-    assert NEURA.heading_identity is False
-    for phrase in ("server-rendered", "robots-compatible", "no usable Product JSON-LD",
-                   "<h1> is not a", "refundable reservation fee", "estimated",
-                   "not been approved for live use"):
-        assert phrase in NEURA.blocked_reason
+    assert NEURA.blocked_reason is None
+    assert NEURA.heading_identity is False and NEURA.product_extractor is not None
+    for phrase in ("identity-only", "never PRICE", "no alias"):
+        assert phrase in EXTRACTOR_APPROVAL
 
 
 def test_findings_record_only_what_the_seven_responses_established():
@@ -243,7 +244,7 @@ def dsession(database_url):
 
 
 @pytest.mark.usefixtures("no_external_network")
-def test_blocked_module_is_refused_even_for_an_approved_source(dsession):
+def test_a_blocked_module_is_refused_even_for_an_approved_source(dsession):
     source = DiscoverySource(
         key=f"neura-test-{uuid.uuid4().hex[:8]}",
         name="NEURA Robotics (test)", source_class="MANUFACTURER",
@@ -254,9 +255,11 @@ def test_blocked_module_is_refused_even_for_an_approved_source(dsession):
     )
     dsession.add(source)
     dsession.flush()
-    config = replace(NEURA, source_key=source.key)
-    assert adapter_problems(config, source) == [
-        f"ADAPTER_BLOCKED ({NEURA.blocked_reason})"]
+    # The approved NEURA module has no problem with an approved source...
+    assert adapter_problems(replace(NEURA, source_key=source.key), source) == []
+    # ...and the block mechanism itself still refuses before any request.
+    config = replace(NEURA, source_key=source.key, blocked_reason="TEST_BLOCK: reason")
+    assert adapter_problems(config, source) == ["ADAPTER_BLOCKED (TEST_BLOCK: reason)"]
 
     def canonical_counts():
         return (dsession.scalar(select(func.count()).select_from(Robot)),

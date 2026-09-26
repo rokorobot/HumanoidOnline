@@ -30,8 +30,8 @@ from app.services.discovery.live_adapter import (
     extraction_digest,
 )
 from app.services.discovery.robots import parse
-from app.services.discovery.sources.neura_robotics import BLOCK_CODE
 from app.services.discovery.sources.neura_robotics import CONFIG as NEURA
+from app.services.discovery.sources.neura_robotics import EXTRACTOR_APPROVAL
 
 FIXTURES = Path(__file__).parent / "fixtures" / "neura_structure"
 HOST = "https://neura-robotics.com"
@@ -143,9 +143,9 @@ def test_mini_is_discovered_from_one_level_links_despite_the_sitemap():
     assert len(result.selected) <= NEURA.target_cap and result.deferred == []
 
 
-def test_source_stays_blocked_from_live_execution():
-    problems = adapter_problems(NEURA, None)
-    assert any(p.startswith(f"ADAPTER_BLOCKED ({BLOCK_CODE}:") for p in problems)
+def test_source_is_approved_but_still_needs_a_registered_source():
+    assert NEURA.blocked_reason is None and "identity-only" in EXTRACTOR_APPROVAL
+    assert adapter_problems(NEURA, None) == ["SOURCE_NOT_REGISTERED"]
     assert NEURA.product_extractor is not None and NEURA.heading_identity is False
 
 
@@ -213,8 +213,7 @@ def test_offline_run_extracts_identity_only_and_leaves_review_to_humans(dsession
     dsession.flush()
     before = (dsession.scalar(select(func.count()).select_from(Robot)),
               dsession.scalar(select(func.count()).select_from(Manufacturer)))
-    # Approval is simulated for this offline test ONLY; the shipped CONFIG stays blocked.
-    config = replace(NEURA, source_key=source.key, blocked_reason=None)
+    config = replace(NEURA, source_key=source.key)
     assert adapter_problems(config, source) == []
 
     requests: list[str] = []

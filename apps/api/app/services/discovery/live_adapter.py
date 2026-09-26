@@ -31,7 +31,7 @@ from __future__ import annotations
 import html
 import json
 import re
-from collections.abc import Iterable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
@@ -105,6 +105,10 @@ class SourceAdapterConfig:
     #: May the page's first <h1> name a product when there is no JSON-LD Product?
     #: False for sources whose <h1> is known not to be a product name.
     heading_identity: bool = True
+    #: A reviewed source-specific extractor `(config, body, url) -> ProductExtraction`
+    #: that replaces the generic JSON-LD/<h1> rules for this source's product pages.
+    #: It must be pure and deterministic, like the generic one.
+    product_extractor: Callable[..., ProductExtraction] | None = None
     #: Set when the structural review found the source NOT safe to run with the
     #: current extraction rules. The runner refuses while it is set, whatever
     #: the source's approval state.
@@ -525,9 +529,13 @@ def _images(pointer: str, product: Mapping) -> list[ExtractedImage]:
     return out
 
 
-def extract_product(config: SourceAdapterConfig, body: bytes) -> ProductExtraction:
-    """Deterministic product-page extraction. Pure: the same bytes always give
-    the same result."""
+def extract_product(config: SourceAdapterConfig, body: bytes,
+                    url: str | None = None) -> ProductExtraction:
+    """Deterministic product-page extraction. Pure: the same bytes (and URL)
+    always give the same result. A source's reviewed `product_extractor`, when
+    configured, replaces the generic rules."""
+    if config.product_extractor is not None:
+        return config.product_extractor(config, body, url)
     page = parse_page(body)
     products = _nodes_of(page, "Product", "ProductModel", "IndividualProduct")
     named = [(p, n) for p, n in products if _text(n.get("name"))]

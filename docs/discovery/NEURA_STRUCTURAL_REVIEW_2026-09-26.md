@@ -126,3 +126,29 @@ This note uses only the responses already downloaded. There is no LLM, no fuzzy 
 4. **Identity-only first.** The safe first step is to extract names only (points 1–2) with no claims and no signals. Commercial fields stay UNKNOWN until point 3 is approved.
 5. **Discovery.** Combine the product sitemap with one-level link discovery from pages that list reservations, because the sitemap omitted `4ne1-mini-reservation`. With the current one-level rule, a seed is never itself a target. So either add a dedicated listing page as a seed once one is observed, or allow one reservation page to be both a seed and a target. That second option would be a small, reviewed framework change.
 6. **Unchanged guards:** the 50-target cap, unseen URLs first, same host, approved prefixes, robots checked on every target, a 3 s interval (`max(Crawl-delay, 2 s)`), and determinism, with fixture replay proving byte-identical output.
+
+## Update: identity-only extractor implemented (offline, NOT approved for live use)
+
+`extract_neura_product` in `sources/neura_robotics.py` (module 0.3.0) implements points 1, 2, 4 and 5 of the design note above.
+
+**How a name is accepted.** The URL slug must agree with at least one more locator:
+- on reservation pages: the `Reserve <name>:` title pattern, where `<title>` and og:title must agree, and the breadcrumb `Shop > "<name> Reservation"`;
+- on robot pages: the breadcrumb `Products > "<name>"`.
+
+A canonical URL that points elsewhere gives `AMBIGUOUS`. Reservation pages must also carry the WooCommerce `single-product` class.
+
+**Outcomes.**
+- Any disagreement gives `AMBIGUOUS`.
+- Missing evidence gives `NOTHING_FOUND`.
+- `<h1>` and Elementor ids are never read.
+- No claim, signal or image is emitted.
+
+**Commercial fields: none.** The reservation fee (a deposit), the quantity-banded estimated price, and any purchase price all stay UNKNOWN. The existing `price_type=ESTIMATED` has no field for a quantity band, so it is not an unambiguous representation of the estimate, and there is no schema change in this slice.
+
+**Discovery.** The 4NE1 reservation page becomes a third seed. It links every reservation page, including the sitemap-omitted `4ne1-mini-reservation`. Because it is itself a product page, the runner now extracts any seed that matches a product pattern from its seed fetch, and never requests it twice. The cap, unseen-first ordering, same-host and prefix limits, per-target robots checks and the 3 s delay are unchanged.
+
+**Offline resolver outcome with the fixtures.**
+- The reservation page and the robot page both yield `4NE1`.
+- Against a catalogue robot named `4NE-1`, the first resolves to `NEW_ENTITY` and the second to `POSSIBLE_DUPLICATE`. There is **no automatic match** to `4NE-1`, and both go to human review.
+
+**State:** `BLOCKED_PENDING_EXTRACTOR_APPROVAL`. The runner still refuses NEURA until the owner approves the extractor for live use.

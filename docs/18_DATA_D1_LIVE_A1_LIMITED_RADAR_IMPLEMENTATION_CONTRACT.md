@@ -1,0 +1,1067 @@
+# DATA-D1.LIVE A1 — Limited Radar Implementation Contract
+
+> **STATUS: PROPOSED — NOT RATIFIED.**
+>
+> **Revision 5 (2026-07-30)** — rebased onto `main @ 2573da9`. §1 re-inspected:
+> the acquisition stack has **merged**, so migration `0004` and `AGGREGATOR` are
+> on `main`, `MANUAL_BOOTSTRAP`, `/discovery-review` and the batch review CLI
+> exist, PR #36 was replaced by merged #41, and **the stack prerequisite is
+> satisfied** — A1-I1 is the next slice once this contract is ratified (§17).
+> Two pre-ratification corrections applied: communication lineage may never
+> cross sources, enforced by a composite foreign key (§9.2.1), and migration
+> `0005`'s statement order is frozen against the `ALTER TYPE ADD VALUE`
+> transaction rule (§5.1.1). Gates A1-G55…G57 added.
+>
+> **Revision 4 (2026-07-30)** — revocation exit split by cause (§9.1). A policy
+> or technical revocation may be cleared by a fresh complete attributed review;
+> **a direct publisher objection may not** — it stands until the publisher
+> explicitly withdraws, narrows or supersedes it in a recorded communication.
+> Ambiguous objections default to `ENTIRE_RELATIONSHIP`. New append-only
+> `source_communication` table (§9.2) plus `revocation_cause`. Gates
+> A1-G46…G54 added.
+>
+> **Revision 3 (2026-07-30)** — `PROHIBITED` persistence corrected (§4.1.2). The
+> *historical prohibition record* is permanent and append-only; the *current
+> eligibility result* remains effective until a fresh, complete, attributed
+> review establishes the prohibition genuinely ended, was superseded, or was
+> replaced by an affirmative permission. It never downgrades automatically, and
+> a publisher's later explicit permission can still be recorded. Gates
+> A1-G42…G45 added.
+>
+> **Revision 2 (2026-07-30)** — product-owner correction pass. `MANUAL_ONLY` is
+> **ADOPTED** (§4.1.1). The eligibility-to-mode contradiction is resolved:
+> automated eligibility states govern only the automated modes, and the mapping
+> is now two tables (§4.2). `MANUAL_ONLY` requires no `tos_status = ALLOWED`, no
+> expiry and no user agent (§5.4); revocation is scoped so an automated-access
+> revocation never bans human research; the MANUAL_BOOTSTRAP path must stop
+> writing `tos_status = ALLOWED` (§5.5); eleven `MANUAL_ONLY` gates are normative
+> (A1-G31…G41). **No open decisions remain**; ratification of the contract as a
+> whole is still outstanding.
+>
+> Documentation only. This document authorizes **no source, no fetch and no
+> code**. It exists so that the dangerous parts — mode widening, HTTP limits and
+> database enforcement — are frozen *before* any network-capable code exists to
+> shape the policy around.
+>
+> **Authority chain.** `docs/11` (DATA-D1, RATIFIED) → `docs/16` (DATA-D1.LIVE
+> v0.1, RATIFIED) → `docs/17` (Amendment A1, RATIFIED + merged at
+> `main @ 626d1ce`) → **this document**. Where any conflict appears, the earlier
+> document wins. Nothing here amends A1's `AGGREGATOR`-only scope, its 90-day
+> validity, its restriction-applicability rules, or any ratified law.
+>
+> Required by `docs/17` §13.1 step 1: *"a separate implementation contract
+> covering enums, limited-radar mode, database constraints, expiry behaviour and
+> the §10.3 numerical ceilings, ratified before any code is written."*
+
+---
+
+## 1. Repository truth as inspected
+
+Recorded because the contract must bind to what the repository actually
+contains, not to what a conversation asserted. **Re-inspected at
+`main @ 2573da9` after the acquisition stack merged.**
+
+### 1.1 What is on `main` today
+
+| Object | State on `main` |
+|---|---|
+| Migrations | `0001`, `0002`, `0003`, **`0004_add_live_acquisition_layer.sql`** |
+| `discovery_source_class` | Fourteen values — the original ten plus **`AGGREGATOR`**, `AUTHORIZED_DISTRIBUTOR`, `OFFICIAL_STORE`, `COMMUNITY`. **`AGGREGATOR` EXISTS.** |
+| `tos_status` | `UNKNOWN`, `ALLOWED`, `RESTRICTED`, `PROHIBITED` |
+| `robots_status` | `UNKNOWN`, `ALLOWED`, `DISALLOWED`, `NOT_APPLICABLE` |
+| `discovery_source` | the `0003` columns plus `allowed_path_prefixes`, `tos_reviewed_at`, `tos_expires_at`, `tos_page_hash`, `last_robots_hash`, `last_robots_checked_at`, `last_crawled_at` |
+| `ck_discovery_source_eligible` | `NOT is_enabled OR (tos_status = 'ALLOWED' AND robots_status IN ('ALLOWED','NOT_APPLICABLE') AND eligibility_reviewed_at IS NOT NULL AND eligibility_reviewed_by IS NOT NULL)` — unchanged by `0004` |
+| `candidate_claim.discovery_source_id` | **`NOT NULL`, `ON DELETE RESTRICT`** (tightened by `0004`) |
+| Acquisition layer | **present** — `source_eligibility_review`, `crawl_run`, `fetched_page`, `extraction_result`, `candidate_commercial_signal`, `discovery_evidence_excerpt`, plus `crawl_run_status`, `crawl_trigger` (`MANUAL` only), `fetch_outcome`, `extraction_method`, `extraction_confidence`, `signal_axis`, `eligibility_decision`, `extraction_status`, `evidence_subject_type` |
+| Trigger functions | `refuse_eligibility_review_mutation()`, `assert_acquisition_lineage()`, `assert_evidence_excerpt_subject()` |
+| `MANUAL_BOOTSTRAP` | **present** — `services/discovery/bootstrap.py`, `cli/bootstrap_inventory.py`, `db/discovery/bootstrap/humanoid_radar_v1.json` (43 candidates / 29 manufacturers) |
+| `/discovery-review` | **present** — `routers/discovery_review.py` mounted only under `if settings.is_relaxed:`; the page `notFound()`s outside relaxed |
+| Batch review | **present** — `services/discovery/batch_review.py` + `cli/batch_review.py` (worksheet export/apply, snapshot-hash bound, savepoint per action) |
+| Discovery services | `adapters.py`, `identity.py`, `pipeline.py`, `promotion.py`, `bootstrap.py`, `batch_review.py` |
+| CLI | `promote_candidate.py`, `bootstrap_inventory.py`, `batch_review.py` |
+| Gate tests | `test_discovery.py` (A–K, H1–H5) · `test_acquisition_schema.py` · `test_acquisition_migration.py` · `test_bootstrap_inventory.py` · `test_discovery_review.py` · `test_batch_review.py` |
+| CI | **seven jobs** — the sixth-and-seventh being `web-zero-match` and `web-discovery-review` (relaxed env, bootstrapped candidates) |
+
+### 1.2 How the stack landed
+
+| PR | Outcome |
+|---|---|
+| **#35** Slice A — acquisition schema | **MERGED** at `d174abc` |
+| **#36** Slice B — MANUAL_BOOTSTRAP | **CLOSED, replaced by #41.** GitHub auto-closed it when its base branch was deleted on the merge of #35, and a PR whose base branch is gone cannot be reopened. Recreated from the same rebased branch. |
+| **#41** Slice B — MANUAL_BOOTSTRAP (43 humanoids) | **MERGED** at `9d802c2` |
+| **#37** discovery review surface | **MERGED** at `0f2fb44`, after a real defect was fixed: its e2e specs asserted a fail-closed surface that the production-default `web-integration` job could not serve, so they had never passed. Now tagged `@discovery` and run by their own `web-discovery-review` job. |
+| **#40** batch trace + promotion review | **MERGED** at `2573da9` |
+
+### 1.3 The prerequisite is satisfied
+
+**A1 names `AGGREGATOR`, and `AGGREGATOR` arrived with migration `0004`, which
+is now on `main`.** The dependency that ordered the original draft is therefore
+**discharged**: this contract's migration remains **`0005`**, and it can now be
+written against a `main` that already contains everything it builds on.
+
+**The next implementation slice after this contract is ratified is A1-I1**
+(§16). Nothing else in the stack blocks it.
+
+## 2. Frozen scope
+
+**In scope:** enum widening required by A1 · an explicit limited-radar operating
+mode · source eligibility and owner enablement · structured eligibility-review
+evidence · database enforcement · bounded HTTP retrieval · discovery-layer
+extraction · expiry and revocation behaviour · operator run reporting · internal
+review-surface integration · implementation slices and acceptance gates.
+
+**Out of scope, and not authorized by ratification of this document:** any
+source, any live fetch, any implementation. See §22.
+
+## 3. Source-class boundary — FROZEN
+
+**`NO_EXPRESS_PROHIBITION` is available only when
+`discovery_source_class = AGGREGATOR`.**
+
+It is **not** available to `COMPETITOR_DIRECTORY`, `EDITORIAL`, `MANUFACTURER`,
+`OFFICIAL_STORE`, `AUTHORIZED_DISTRIBUTOR`, `MARKETPLACE`, `SEARCH_RESULT`,
+`DISTRIBUTOR`, `PRESS_RELEASE`, `OFFICIAL_DOCUMENT`, `OFFICIAL_VIDEO`,
+`COMMUNITY` or `OTHER` — that is, to any other class, present or future.
+
+This document does not redesign or broaden A1. **A source is never reclassified
+to make it eligible** (`docs/17` §2.1, adversarial example 16). A later widening
+requires a separate amendment to A1, not an implementation decision.
+
+## 4. Operating modes
+
+Boolean-only eligibility is replaced by an explicit mode. The existing
+`DiscoverySource.radar_eligible` Python property — which returns a single
+boolean and is consumed by `ingest()` — is **removed**, not widened, so that no
+call site can silently inherit a capability it was never granted.
+
+### 4.1 The enum
+
+```
+CREATE TYPE radar_mode AS ENUM (
+    'DISABLED',       -- no automated access of any kind
+    'MANUAL_ONLY',    -- MANUAL_BOOTSTRAP: human entry, no automated access
+    'LIMITED_RADAR',  -- A1 bounded radar; AGGREGATOR only
+    'FULL_RADAR'      -- ALLOWED sources, within their reviewed scope
+);
+```
+
+Stored as `discovery_source.radar_mode radar_mode NOT NULL DEFAULT 'DISABLED'`.
+
+### 4.1.1 `MANUAL_ONLY` — ADOPTED by product-owner instruction, 2026-07-30
+
+**Frozen meaning:**
+
+> The source is enabled for **attributed human-entered discovery ingestion** and
+> is permitted to construct **zero HTTP requests**.
+
+**`MANUAL_ONLY` is an operating mode. It is not an eligibility finding and it is
+not a form of automated-access permission.** It answers "may a named human enter
+records against this source", which is a different question from "may this
+platform send this publisher a request" — and the two must never be answered by
+the same field.
+
+A `MANUAL_ONLY` source:
+
+- **requires `robots_status = NOT_APPLICABLE`** — literally true: no automated
+  access occurs, so there is no robots policy being relied on;
+- **requires explicit owner enablement and attribution** (`enabled_by`,
+  `enabled_at`);
+- **requires named human-operator attribution for every ingest**;
+- **constructs zero HTTP requests**;
+- **follows no URLs**;
+- **performs no policy request** — not even `robots.txt`;
+- **uses no user agent**, because it issues nothing to declare one on;
+- **requires no automated-access eligibility finding whatsoever**;
+- **cannot be projected or converted into `LIMITED_RADAR` or `FULL_RADAR`**;
+- **cannot satisfy any fetch-eligibility check.**
+
+**A source may operate as `MANUAL_ONLY` while its `tos_status` is `UNKNOWN`,
+`PROHIBITED` or `ALLOWED`.** That field records the *automated-access
+assessment*; it does not authorize human entry and it is not consulted by the
+manual path. Manual entry therefore neither needs nor manufactures a permission
+finding.
+
+**An existing automated-access prohibition is never erased or weakened because
+manual ingestion is in use.** A source whose terms prohibit automation remains
+`PROHIBITED` for automated purposes and remains manually usable — anti-robot
+clauses govern automated access, not a person reading a public page
+(`docs/16` §2.1). Rewriting that field to something softer because a human is
+doing the work would destroy the very finding that keeps the crawler out.
+
+### 4.1.2 The persistence of `PROHIBITED` — FROZEN
+
+Two different things are permanent, and only one of them is the current status.
+
+> **`PROHIBITED` remains effective until a fresh, complete and attributed
+> eligibility review establishes that the prohibition genuinely ended, was
+> superseded, or was replaced by an affirmative permission. It never downgrades
+> automatically. The historical prohibition review and its evidence remain
+> permanently retained and are never overwritten or deleted.**
+
+| | |
+|---|---|
+| **The historical prohibition record** | **Permanent and append-only.** The `source_eligibility_review` row, its `source_eligibility_check` children, the excerpts, hashes and attribution are retained forever. `refuse_eligibility_review_mutation()` refuses `UPDATE` and `DELETE`, so a later finding is a *new row*, never an edit of the old one. |
+| **The current eligibility result** | **May change — only through a new complete review.** It is not frozen for all time; it is frozen against everything except a fresh, attributed, six-axis review. |
+
+What is **not** sufficient to change it: the disappearance of a terms page · a
+site redesign · the passage of time · the absence of complaints · a run
+completing without incident. A prohibition that vanishes from a website has not
+necessarily been withdrawn by its publisher, and `docs/17` §7 already forbids the
+automatic downgrade.
+
+What **is** sufficient: a fresh, complete, attributed review under §4 and §5.3
+that finds the prohibition genuinely ended or superseded — and, in the strongest
+case, **a publisher's explicit later permission, which may support `ALLOWED`
+through a new attributed review**. That is the intended outcome of the permission
+requests already drafted for Unitree, Agility Robotics, Engineered Arts and IEEE
+Robots Guide, and this contract must not make it unrecordable.
+
+**`MANUAL_ONLY` may remain in use throughout**, whatever the current automated
+status. **Manual use never softens, replaces or suppresses the prohibition
+record** — it does not touch it at all, because the manual path does not consult
+`tos_status` (§4.2.2).
+
+### 4.2 Required mapping — FROZEN
+
+**Automated eligibility states govern only the automated modes.** They do not
+govern whether a source may be used through a genuinely manual, zero-request
+ingestion path. The mapping is therefore two tables, not one — collapsing them
+into a single table is what produced the contradiction this section was
+corrected to remove.
+
+#### 4.2.1 Automated modes — governed by the eligibility state
+
+| Eligibility state | Permitted automated mode | Conditions |
+|---|---|---|
+| `ALLOWED` | **`FULL_RADAR`** | within the reviewed path scope, plus every existing full-radar condition |
+| `NO_EXPRESS_PROHIBITION` | **`LIMITED_RADAR`** | **`source_class = AGGREGATOR`**, an unexpired complete review, and explicit owner enablement |
+| `UNKNOWN` | **none** | — |
+| `PROHIBITED` | **none** | — |
+| `REVIEW_EXPIRED` (derived) | **none** | — |
+| no review at all | **none** | — |
+
+"None" means no automated mode. It does not mean the source must be `DISABLED` —
+see 4.2.2.
+
+#### 4.2.2 Manual mode — independent of automated eligibility
+
+| Mode | Governed by | Not governed by |
+|---|---|---|
+| **`MANUAL_ONLY`** | `robots_status = NOT_APPLICABLE` · explicit attributed owner enablement · named operator per ingest | `tos_status` — **any value**, including `PROHIBITED` · eligibility expiry · declared user agent · review presence |
+
+`MANUAL_ONLY` and `DISABLED` are available regardless of eligibility state.
+`DISABLED` is always available.
+
+Additional frozen rules:
+
+1. **Review completion does not enable a source.** Reviewing and enabling are
+   two acts, recorded separately (`docs/16` §5 step 5).
+2. **Owner enablement is explicit and separately attributed** — its own actor
+   and timestamp, distinct from the reviewer's. A source may not be enabled by
+   the same act that reviewed it.
+3. **No boolean compatibility mapping.** No property, projection, serializer,
+   API field, admin column, report line or test helper may reduce
+   `LIMITED_RADAR` to a truthy "eligible" value that `FULL_RADAR` also
+   satisfies. Where a boolean is genuinely needed, it must be named for the
+   specific question asked (`may_fetch_under_limited_radar`), never a general
+   `is_eligible`.
+4. **`LIMITED_RADAR` never escalates.** No code path may raise a source from
+   `LIMITED_RADAR` to `FULL_RADAR`; that requires a new review recording an
+   affirmative `ALLOWED` finding, plus a fresh enablement.
+5. **`MANUAL_ONLY` never escalates either.** Moving a source from `MANUAL_ONLY`
+   to any automated mode requires the corresponding eligibility review *and* a
+   fresh owner enablement. Time spent operating manually is not evidence about
+   automated access.
+6. **`tos_status = ALLOWED` is never synthesized because an operation is
+   manual.** No code path may write `ALLOWED` on the grounds that no automated
+   access occurred. `ALLOWED` means an affirmative permission was found, and
+   nothing else may produce it.
+
+## 5. Schema changes — migration `0005`
+
+Depends on `0004`. Additive only; no existing value or column is removed except
+the Python-level `radar_eligible` property, which is application code.
+
+### 5.1 Enum widening
+
+```
+ALTER TYPE tos_status           ADD VALUE IF NOT EXISTS 'NO_EXPRESS_PROHIBITION';
+ALTER TYPE eligibility_decision ADD VALUE IF NOT EXISTS 'NO_EXPRESS_PROHIBITION';
+
+ALTER TYPE fetch_outcome ADD VALUE IF NOT EXISTS 'NOT_FOUND';        -- 404, bounded run may continue
+ALTER TYPE fetch_outcome ADD VALUE IF NOT EXISTS 'TOO_LARGE';        -- ceiling exceeded, aborted
+ALTER TYPE fetch_outcome ADD VALUE IF NOT EXISTS 'BLOCKED_BY_SCOPE'; -- redirect left reviewed scope
+ALTER TYPE fetch_outcome ADD VALUE IF NOT EXISTS 'BUDGET_EXHAUSTED'; -- run ceiling reached
+
+CREATE TYPE radar_mode AS ENUM ('DISABLED','MANUAL_ONLY','LIMITED_RADAR','FULL_RADAR');
+CREATE TYPE eligibility_axis AS ENUM (
+    'ROBOTS_TXT','AGENT_DIRECTIVES','CONTENT_SIGNALS',
+    'TERMS','LICENSING','TECHNICAL_ACCESS');
+CREATE TYPE eligibility_check_result AS ENUM (
+    'NO_RESTRICTION_FOUND','RESTRICTION_FOUND_NOT_APPLICABLE',
+    'RESTRICTION_FOUND_APPLICABLE','INDETERMINATE','NOT_RETRIEVABLE');
+
+-- Revocation scope. A publisher who blocks our crawler has not necessarily
+-- objected to a human reading their public pages, and conflating the two would
+-- silently destroy the manual path (§4.1.1).
+CREATE TYPE revocation_scope AS ENUM ('AUTOMATED_ACCESS','ENTIRE_RELATIONSHIP');
+```
+
+### 5.1.1 Migration `0005` statement order — FROZEN
+
+**PostgreSQL will not let a value added by `ALTER TYPE … ADD VALUE` be
+referenced in the same transaction that added it.** `CREATE TYPE` carries no
+such restriction. That asymmetry dictates the migration's shape, and getting it
+wrong produces an error only when the migration is first applied to a real
+database — never in review. So the order is frozen rather than left to the
+implementer:
+
+| Step | Statements | Transaction |
+|---|---|---|
+| **1** | `ALTER TYPE tos_status ADD VALUE 'NO_EXPRESS_PROHIBITION'` · `ALTER TYPE eligibility_decision ADD VALUE 'NO_EXPRESS_PROHIBITION'` · `ALTER TYPE fetch_outcome ADD VALUE` ×4 (`NOT_FOUND`, `TOO_LARGE`, `BLOCKED_BY_SCOPE`, `BUDGET_EXHAUSTED`) | **its own, committed before step 2** |
+| **2** | `CREATE TYPE radar_mode` · `eligibility_axis` · `eligibility_check_result` · `revocation_scope` · `revocation_cause` · `source_communication_kind` | may share a transaction with step 3 |
+| **3** | `CREATE TABLE source_communication` (with its composite FK, §9.2.1) → `CREATE TABLE source_eligibility_check` → `ALTER TABLE discovery_source ADD COLUMN …` (including the FK to `source_communication`, which must therefore exist already) → drop and recreate `ck_discovery_source_eligible` → triggers | one transaction |
+
+Two ordering constraints inside step 3, both easy to get backwards:
+`source_communication` must be created **before** the `discovery_source` columns
+that reference it; and `ck_discovery_source_eligible` must be dropped **before**
+`radar_mode` is populated, or the old constraint will reject rows the new one
+would accept.
+
+The `0004` migration on `main` already uses `ADD VALUE IF NOT EXISTS` for its
+own widening, and `0005` follows that idiom so a partially applied migration can
+be re-run.
+
+`RESTRICTION_FOUND_NOT_APPLICABLE` is the `docs/17` §4.1 rule-2 outcome — a
+training-only restriction, found, recorded, binding against training, and not
+disqualifying. `INDETERMINATE` is the rule-5 outcome and forces `UNKNOWN`.
+
+### 5.2 `discovery_source` additions
+
+```
+ALTER TABLE discovery_source
+    ADD COLUMN IF NOT EXISTS radar_mode          radar_mode NOT NULL DEFAULT 'DISABLED',
+    ADD COLUMN IF NOT EXISTS enabled_by          TEXT,
+    ADD COLUMN IF NOT EXISTS enabled_at          TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS eligibility_expires_at TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS revoked_at          TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS revoked_reason      TEXT,
+    ADD COLUMN IF NOT EXISTS revocation_scope    revocation_scope,
+    ADD COLUMN IF NOT EXISTS declared_user_agent TEXT,
+    -- per-source ceilings, permitted to be STRICTER than the frozen maxima only
+    ADD COLUMN IF NOT EXISTS max_pages_per_run       INTEGER,
+    ADD COLUMN IF NOT EXISTS min_request_interval_ms INTEGER;
+```
+
+### 5.3 Structured eligibility evidence — `source_eligibility_check`
+
+An append-only normalized child of `source_eligibility_review` (which PR #35
+already creates as append-only). A `notes` field cannot carry a six-axis review
+auditably: it cannot be queried, cannot enforce that all six axes were
+attempted, and cannot distinguish "searched and found nothing" from "never
+looked" — the precise distinction A1 rests on.
+
+```
+CREATE TABLE source_eligibility_check (
+    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    review_id         UUID NOT NULL REFERENCES source_eligibility_review(id) ON DELETE RESTRICT,
+    axis              eligibility_axis NOT NULL,
+    ordinal           INTEGER NOT NULL DEFAULT 0,
+    url_attempted     TEXT,                    -- NULL only where the axis has no URL
+    http_status       INTEGER,
+    outcome_note      TEXT,
+    retrieved_at      TIMESTAMPTZ NOT NULL,
+    content_hash      TEXT,                    -- present iff content was obtained
+    excerpt           TEXT,
+    negative_finding  TEXT,                    -- REQUIRED when nothing was found
+    reviewer          TEXT NOT NULL,
+    declared_user_agent TEXT NOT NULL,
+    result            eligibility_check_result NOT NULL,
+    applied_rule      TEXT,                    -- docs/17 §4.1 rule applied, where relevant
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT uq_eligibility_check_axis_ordinal UNIQUE (review_id, axis, ordinal),
+    CONSTRAINT ck_eligibility_check_excerpt_len
+        CHECK (excerpt IS NULL OR char_length(excerpt) <= 1000),
+    CONSTRAINT ck_eligibility_check_hash_iff_content
+        CHECK ((content_hash IS NULL) OR (http_status IS NOT NULL)),
+    CONSTRAINT ck_eligibility_check_negative_finding
+        CHECK (result <> 'NO_RESTRICTION_FOUND' OR btrim(coalesce(negative_finding,'')) <> ''),
+    CONSTRAINT ck_eligibility_check_reviewer
+        CHECK (btrim(reviewer) <> '' AND btrim(declared_user_agent) <> '')
+);
+```
+
+**`ck_eligibility_check_negative_finding` is the load-bearing constraint.** A
+claim of "no restriction found" that does not say what was searched is refused
+by the database, not by convention. Excerpt limit is 1000 Unicode characters,
+matching `EVIDENCE_EXCERPT_MAX_CHARS` and `ck_evidence_excerpt_len`.
+
+Append-only, enforced by a trigger in the pattern of
+`refuse_eligibility_review_mutation()`:
+
+```
+CREATE TRIGGER trg_refuse_eligibility_check_mutation
+    BEFORE UPDATE OR DELETE ON source_eligibility_check
+    FOR EACH ROW EXECUTE FUNCTION refuse_eligibility_review_mutation();
+```
+
+### 5.4 Database enforcement
+
+**Extend `ck_discovery_source_eligible`** so the class precondition and the mode
+mapping are enforced by the database, not the application:
+
+```
+ALTER TABLE discovery_source DROP CONSTRAINT ck_discovery_source_eligible;
+ALTER TABLE discovery_source ADD CONSTRAINT ck_discovery_source_eligible CHECK (
+    -- unchanged: FULL_RADAR still requires affirmative permission
+    (radar_mode <> 'FULL_RADAR' OR (
+        tos_status = 'ALLOWED'
+        AND robots_status IN ('ALLOWED','NOT_APPLICABLE')
+        AND eligibility_reviewed_at IS NOT NULL
+        AND eligibility_reviewed_by IS NOT NULL))
+    -- A1: LIMITED_RADAR requires AGGREGATOR + the new state + attribution
+    AND (radar_mode <> 'LIMITED_RADAR' OR (
+        source_class = 'AGGREGATOR'
+        AND tos_status = 'NO_EXPRESS_PROHIBITION'
+        AND robots_status IN ('ALLOWED','NOT_APPLICABLE')
+        AND eligibility_reviewed_at IS NOT NULL
+        AND eligibility_reviewed_by IS NOT NULL
+        AND eligibility_expires_at IS NOT NULL
+        AND declared_user_agent IS NOT NULL
+        AND btrim(declared_user_agent) <> ''))
+    -- enablement is a separate attributed act for every non-DISABLED mode
+    AND (radar_mode = 'DISABLED' OR (
+        enabled_by IS NOT NULL AND btrim(enabled_by) <> '' AND enabled_at IS NOT NULL))
+    -- MANUAL_ONLY (§4.1.1): robots NOT_APPLICABLE is required because it is
+    -- literally true. tos_status is deliberately NOT constrained — a manual
+    -- source may be UNKNOWN, PROHIBITED or ALLOWED. No expiry is required, and
+    -- no user agent is required, because nothing is ever requested.
+    AND (radar_mode <> 'MANUAL_ONLY' OR robots_status = 'NOT_APPLICABLE')
+    -- Revocation is scoped. Revoking automated access disables the automated
+    -- modes and leaves the manual path intact; revoking the relationship
+    -- disables everything. An automated-access revocation must never be
+    -- silently widened into a ban on human research.
+    AND (revoked_at IS NULL OR revocation_scope IS NOT NULL)
+    AND (revoked_at IS NULL
+         OR (revocation_scope = 'AUTOMATED_ACCESS'
+             AND radar_mode IN ('DISABLED','MANUAL_ONLY'))
+         OR (revocation_scope = 'ENTIRE_RELATIONSHIP'
+             AND radar_mode = 'DISABLED'))
+    -- is_enabled may never contradict the mode
+    AND (is_enabled = (radar_mode <> 'DISABLED'))
+);
+```
+
+**What `MANUAL_ONLY` deliberately does *not* require**, restated because each
+omission is a decision and not an oversight: `tos_status = ALLOWED` · an
+eligibility expiry · a declared HTTP user agent · any eligibility review at all.
+
+**`is_enabled` is a generic operational-enable flag and nothing more.** It
+answers "is this source in use", not "is HTTP access permitted". It is kept in
+lockstep with `radar_mode <> 'DISABLED'` so the two can never disagree, and no
+code may consult it to decide whether a request may be made. **The only field
+that answers that question is `radar_mode`**, and `MANUAL_ONLY` answers it *no*.
+
+**Transport construction rejects `MANUAL_ONLY` before any URL or request object
+exists.** The check happens at the entry point of the transport layer, ahead of
+URL resolution, session creation and queue construction — so a `MANUAL_ONLY`
+source cannot produce a request object that is later discarded. Gates A1-G31 and
+A1-G34 assert this on the transport, not on the outcome.
+
+**Expiry cannot be enforced by `CHECK`.** PostgreSQL requires `CHECK`
+expressions to be immutable, and `now()` is `STABLE`; a constraint comparing
+`eligibility_expires_at` to the current time is not creatable, and one that
+appeared to work would be evaluated only on write. **Expiry is therefore
+enforced in the request-construction path (§12) and by a `BEFORE INSERT` trigger
+on `crawl_run` and `fetched_page`** that refuses a row whose source is expired
+or revoked. Stating this is not a caveat — it is the reason the expiry gate must
+be tested behaviourally rather than assumed structural.
+
+### 5.5 Required change to `MANUAL_BOOTSTRAP` in A1-I1
+
+**A `MANUAL_BOOTSTRAP` source that has not undergone an automated-access review
+must no longer set `tos_status = ALLOWED` merely to reach `ingest()`.**
+
+`services/discovery/bootstrap.py` is **now on `main`** (merged as #41), and it
+registers its source with `tos_status = ALLOWED` on the reasoning that no
+automated access occurs — that value is what carries it through
+`radar_eligible`. Before A1 that was loose; after A1 it is false. `ALLOWED` now
+means *an affirmative permission was found*, and manual entry must not
+manufacture that finding for a publisher who was never asked.
+
+Truthful default for a manual-bootstrap source:
+
+```
+radar_mode    = MANUAL_ONLY
+tos_status    = UNKNOWN          -- no automated-access assessment was made
+robots_status = NOT_APPLICABLE   -- literally true: nothing is requested
+is_enabled    = true             -- operationally in use
+```
+
+Where a **separate valid eligibility review actually exists** for that host, its
+real `tos_status` is recorded — `ALLOWED`, `NO_EXPRESS_PROHIBITION`,
+`PROHIBITED`, whatever was found — and **`MANUAL_ONLY` still authorizes zero
+network requests**. The two facts coexist without interacting.
+
+**The exact code change belongs to A1-I1 — the slice that removes
+`radar_eligible` — not to this docs-only PR.** It is recorded here so the change
+is specified rather than discovered, and so nobody "fixes" the resulting
+`test_bootstrap_inventory` failure by reinstating `ALLOWED`.
+
+## 6. Operational ceilings — FROZEN
+
+**Product limits, not adapter defaults.** A configuration that exceeds any
+ceiling is refused at startup. A ceiling that is unset, zero, negative or
+unlimited is invalid and fails closed. Per-source values may be **stricter
+only**; a per-source value looser than the frozen maximum is refused by
+`CHECK`.
+
+### 6.1 Concurrency and pacing
+
+| Limit | Value |
+|---|---|
+| Maximum concurrent requests per host | **1** |
+| Maximum global concurrent requests | **2** |
+| Minimum delay between requests to the same host | **5 seconds** |
+| Maximum request rate per host | **12 requests / minute** |
+| Publisher-declared `Crawl-delay` > 5 s | **becomes the minimum delay** |
+| Unlimited, zero-delay or missing-limit configuration | **invalid** |
+
+### 6.2 Run scope
+
+| Limit | Value |
+|---|---|
+| Maximum candidate-content pages per host per manual run | **60** |
+| Maximum total requests per host per run, including policy requests | **70** |
+| Maximum candidate-content pages across one run | **200** |
+| Maximum total run duration | **60 minutes** |
+| URL selection | only explicitly enumerated candidate URLs, or URLs matching a reviewed path-prefix allowlist |
+| Traversal | **no recursive traversal, no general link-following** |
+
+### 6.3 Response limits — decompressed bytes
+
+| Limit | Value |
+|---|---|
+| Maximum response body per content page | **2 MiB** |
+| Maximum response bytes per host per run | **64 MiB** |
+| Maximum response bytes across a complete run | **256 MiB** |
+| A response exceeding a limit | **aborted mid-stream and recorded `TOO_LARGE`** |
+| Partial oversized content | **cannot be extracted or stored** |
+
+Byte accounting is on **decompressed** bytes, measured as the stream is
+consumed, so a compression bomb is stopped by the same ceiling rather than after
+decompression.
+
+### 6.4 Request behaviour
+
+| Rule | Value |
+|---|---|
+| Methods allowed | **`GET` and `HEAD` only** |
+| Maximum redirects | **3** |
+| Redirect scope | only within the reviewed hostname, or an explicitly reviewed same-site hostname |
+| Unreviewed cross-host redirect | **halts retrieval of that URL**, recorded `BLOCKED_BY_SCOPE`, becomes a review lead |
+| TLS certificate validation | **mandatory** |
+| Cookies, login sessions, authenticated state | **prohibited** |
+| Browser automation, JavaScript execution | **prohibited** |
+| Proxy rotation, user-agent spoofing | **prohibited** |
+| CAPTCHA or Cloudflare circumvention | **prohibited** |
+| Undocumented or hidden APIs | **prohibited** |
+| External scripts, stylesheets, fonts, media, images | **never fetched** |
+
+### 6.5 Timeouts and retries
+
+| Limit | Value |
+|---|---|
+| Connection timeout | **10 seconds** |
+| Read timeout | **30 seconds** |
+| Total request timeout | **45 seconds** |
+| Maximum retries | **1** |
+| Retry permitted only for | transient network failure, or `5xx` |
+| Minimum wait before that retry | **30 seconds** |
+| Retry for `4xx` | **never** |
+| `404` | records a missing page (`NOT_FOUND`); the bounded run may continue |
+| `401`, `403`, `429`, CAPTCHA, challenge page, login wall, robots denial | **halts the source immediately** with `HALTED_BY_POLICY`; the source becomes disabled pending a fresh review |
+
+### 6.6 Identification
+
+The user agent must be honest, stable, and identify HumanoidOnline with a
+configured contact URI. The precise contact value is deployment configuration;
+the constraints are not:
+
+- it must be non-empty;
+- it must be present in **every** request;
+- **startup fails closed when it is missing**;
+- it may not impersonate a browser or another crawler;
+- a material change requires re-review (it changes what the publisher was
+  offered the chance to block).
+
+### 6.7 Content types
+
+**Candidate-content retrieval:** `text/html` and `application/xhtml+xml` only.
+Embedded JSON-LD **within a retrieved HTML page** may be parsed as part of that
+page. **Separate JSON endpoints are not fetched under limited mode.**
+
+**Policy-review artefacts** may additionally use `text/plain`, and a normally
+linked legal document only where the eligibility-review procedure explicitly
+records it (§5.3).
+
+**Binary product documents, images and media remain outside the limited-radar
+acquisition path** unless separately authorized by another contract.
+
+## 7. Run lifecycle — fail-closed
+
+1. A **named operator** manually starts the run (`crawl_trigger = MANUAL`,
+   LIVE.4). No scheduler, cron, queue or worker may start one.
+2. Validate **source class** and **explicit owner enablement**.
+3. Validate a **current, unexpired eligibility review**.
+4. Validate **all operational ceilings** are present and within the frozen
+   maxima.
+5. **Re-read `robots.txt`** (LIVE.2; never answered from a cache older than 24 h).
+6. Confirm the **reviewed path scope**.
+7. Create the **run record**.
+8. Retrieve **only enumerated pages**.
+9. Extract **only discovery-layer claims and evidence**.
+10. Produce the **run report**.
+11. Finish **without any canonical mutation**.
+
+**Before every single request**, re-check: the source remains enabled · the
+review remains unexpired · no revocation flag exists · the remaining request,
+page, byte and duration budgets · and that the target URL remains within the
+reviewed scope. A failure at any point aborts that request; a policy failure
+halts the source.
+
+## 8. Expiry semantics
+
+The ratified 90-day law of `docs/17` §7 and §7.1 is preserved exactly.
+Eligibility expiry:
+
+- sets or derives **`REVIEW_EXPIRED`** — **derived** from
+  `eligibility_expires_at` rather than stored, so it cannot go stale;
+- **disables new acquisition**;
+- **blocks request construction** (asserted before a request object exists);
+- **halts an in-flight run** as `HALTED_BY_POLICY`;
+- **triggers zero HTTP requests**;
+- **triggers no automatic review**;
+- **triggers no content refresh**;
+- **retains all existing discovery evidence and audit records**;
+- requires a **fresh complete review and explicit re-enablement**.
+
+**Acceptance tests must prove that expiry causes zero transport calls** — with a
+recording fake transport asserting an empty call list, not by inspecting a
+status field.
+
+## 9. Revocation
+
+Immediate revocation is required when: robots directives change materially ·
+terms or licensing change materially · an applicable rights reservation appears ·
+an agent-specific block appears · technical access denial occurs · the publisher
+objects · the review expires.
+
+**Disable first; investigate later.** `PROHIBITED` never automatically
+transitions to `NO_EXPRESS_PROHIBITION` or to any weaker state. Every state
+transition requires a new attributed review or an explicit owner action; no
+transition is a side effect of a run.
+
+### 9.1 Exiting a revocation depends on what caused it — FROZEN
+
+A revocation is not one thing. Some causes are facts about a website, which we
+can re-examine ourselves. One cause is a statement made to us by a person, which
+we cannot re-examine at all. **Reading a publisher's public pages can never
+establish that they have withdrawn something they told us directly.** The exit
+paths are therefore different, and `revocation_cause` records which applies.
+
+#### 9.1.1 Policy or technical revocation
+
+For revocation caused by: a changed `robots.txt` · changed terms or licensing ·
+a new applicable rights reservation · an agent-specific block · a
+technical-access denial · eligibility expiry.
+
+**A fresh, complete and attributed eligibility review may establish that the
+cause genuinely ended.** Re-enablement requires all three of: the new review ·
+preservation of the original revocation record · explicit owner enablement.
+
+#### 9.1.2 Direct publisher objection
+
+For revocation caused by a publisher communicating an objection directly to us.
+
+> **The revocation remains effective until the publisher explicitly withdraws,
+> narrows or supersedes that objection in a recorded communication.**
+
+**Not sufficient, individually or together:** a later public-policy change · a
+missing legal page · a permissive `robots.txt` · a successful request · elapsed
+time · **an internal review of any depth**. A six-axis review examines what a
+website says; an objection is what a person said. The second cannot be answered
+by the first, and a reviewer who concludes otherwise has substituted our reading
+for their statement.
+
+After an explicit withdrawal or superseding permission is received:
+
+1. **retain the original objection and communication permanently**;
+2. **record the new communication as a separate append-only artefact** (§9.2);
+3. **perform a fresh complete eligibility review**;
+4. **determine the resulting eligibility status honestly** — a withdrawn
+   objection is not by itself an affirmative permission, and may well leave the
+   source at `UNKNOWN`;
+5. **require fresh explicit owner enablement.**
+
+Note step 4. "They stopped objecting" and "they granted permission" are
+different findings, and only the second supports `ALLOWED`.
+
+#### 9.1.3 Scope of an objection
+
+| The publisher objects to | `revocation_scope` | Effect |
+|---|---|---|
+| automated access only | `AUTOMATED_ACCESS` | automated modes disabled; **`MANUAL_ONLY` may remain available** unless the communication also objects to human use or data entry |
+| all use, inclusion, research or relationship with HumanoidOnline | `ENTIRE_RELATIONSHIP` | **every mode disabled**, until the publisher explicitly withdraws or supersedes |
+
+**Ambiguity defaults to `ENTIRE_RELATIONSHIP` until clarified.** The narrower
+scope is never inferred from an unclear communication. Someone who writes
+"please stop using our content" has not told us they are content with continued
+human research, and reading them as if they had would be resolving their
+ambiguity in our own favour — the same move §4.1 rule 5 forbids for machine
+directives. The cost of over-applying is a conversation; the cost of
+under-applying is doing something a publisher asked us not to do.
+
+### 9.2 Recording the communication
+
+A direct objection and any later withdrawal are **communications**, not review
+findings, and need their own append-only home rather than a `notes` field:
+
+```
+CREATE TYPE source_communication_kind AS ENUM (
+    'OBJECTION','WITHDRAWAL','PERMISSION','CLARIFICATION','OTHER');
+
+CREATE TABLE source_communication (
+    id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    source_id      UUID NOT NULL REFERENCES discovery_source(id) ON DELETE RESTRICT,
+    kind           source_communication_kind NOT NULL,
+    received_at    TIMESTAMPTZ NOT NULL,
+    channel        TEXT NOT NULL,          -- email, web form, letter, call notes
+    counterparty   TEXT,                   -- as stated by them; never inferred
+    recorded_by    TEXT NOT NULL,          -- the named human who logged it
+    summary        TEXT NOT NULL,
+    excerpt        TEXT,                   -- their words, bounded
+    scope_claimed  revocation_scope,       -- NULL when ambiguous -> ENTIRE_RELATIONSHIP
+    supersedes_id  UUID,
+    created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT ck_source_communication_excerpt_len
+        CHECK (excerpt IS NULL OR char_length(excerpt) <= 1000),
+    CONSTRAINT ck_source_communication_attributed
+        CHECK (btrim(recorded_by) <> '' AND btrim(channel) <> '' AND btrim(summary) <> ''),
+    CONSTRAINT ck_source_communication_not_self_superseding
+        CHECK (supersedes_id IS DISTINCT FROM id),
+    -- Lineage may never cross sources (§9.2.1).
+    CONSTRAINT uq_source_communication_id_source UNIQUE (id, source_id),
+    CONSTRAINT fk_source_communication_supersedes
+        FOREIGN KEY (supersedes_id, source_id)
+        REFERENCES source_communication (id, source_id) ON DELETE RESTRICT
+);
+
+CREATE TRIGGER trg_refuse_source_communication_mutation
+    BEFORE UPDATE OR DELETE ON source_communication
+    FOR EACH ROW EXECUTE FUNCTION refuse_eligibility_review_mutation();
+```
+
+`supersedes_id` links a withdrawal to the objection it withdraws **without
+altering it**, so both remain separately queryable — which is what makes "the
+publisher objected, then later withdrew" a readable history rather than a field
+that once said something else.
+
+### 9.2.1 Communication lineage may never cross sources — FROZEN
+
+A plain `REFERENCES source_communication(id)` would let a withdrawal recorded
+against **one publisher** supersede an objection recorded against **another**.
+That is the worst available failure of this table: it would silently lift a
+stranger's objection, produce an audit trail that reads as legitimate, and do it
+through a foreign key that appears correct.
+
+The fix is declarative rather than a trigger, so it cannot be bypassed by any
+write path. `UNIQUE (id, source_id)` makes the pair addressable, and the
+**composite** foreign key `(supersedes_id, source_id) → (id, source_id)` forces
+a superseding communication to share the source of the one it supersedes. The
+database refuses the cross-source link; nothing has to remember to check.
+
+The same hazard applies to `discovery_source.revoking_communication_id` — a
+source could otherwise cite another source's communication as the cause of its
+own revocation — and it is closed the same way:
+
+```
+ALTER TABLE discovery_source
+    ADD COLUMN IF NOT EXISTS revocation_cause        revocation_cause,
+    ADD COLUMN IF NOT EXISTS revoking_communication_id UUID,
+    ADD CONSTRAINT fk_discovery_source_revoking_communication
+        FOREIGN KEY (revoking_communication_id, id)
+        REFERENCES source_communication (id, source_id) ON DELETE RESTRICT;
+```
+
+An acceptance gate asserts both refusals directly, against two real sources —
+not in the abstract.
+
+```
+CREATE TYPE revocation_cause AS ENUM ('POLICY_OR_TECHNICAL','PUBLISHER_OBJECTION');
+```
+
+with a `CHECK` binding the two together, so an objection-caused revocation
+cannot exist without the communication that caused it:
+
+```
+    AND (revocation_cause <> 'PUBLISHER_OBJECTION'
+         OR revoking_communication_id IS NOT NULL)
+```
+
+**Re-enablement appends; it never edits.** The original revocation record — its
+cause, reason, scope, timestamp, evidence and communication — is permanently
+retained in every case.
+
+## 10. Extraction outputs
+
+Limited radar writes **only** to the discovery layer (LIVE.5, Gate C). Every
+extracted claim is:
+
+- tied to a **discovery candidate**;
+- tied to the actual **`AGGREGATOR` source** (`discovery_source_id`, `NOT NULL`
+  + `RESTRICT` as of `0004`);
+- tied to the **fetched page** (`fetched_page_id`);
+- supported by **one or more bounded evidence excerpts**
+  (`discovery_evidence_excerpt`, ≤1000 characters);
+- marked **`NOT_VERIFIED`**;
+- **version- and generation-aware** — a claim is bound to the specific model
+  generation it describes, never merged across generations;
+- **preserved separately when conflicting** with another source (Gate T,
+  Gate X).
+
+Missing values remain **`UNKNOWN`**. The extractor may not infer: zero from
+absence · false from absence · unavailable from absence · maturity from
+availability · availability from pricing · obtainability from an announcement ·
+deployment from a partnership announcement · verification from source agreement.
+
+**No raw response body may be persisted after processing.** Hashes, metadata,
+excerpts and extraction results remain (LIVE.10, `fetched_page` has no body
+column by construction).
+
+## 11. Commercial axes
+
+The ratified independent axes are preserved: **maturity · availability ·
+obtainability · pricing · deployment**. One sentence may support multiple claims
+only when each claim carries its **own** explicit evidence excerpt and its own
+semantic review. An aggregator label such as "available now" does not
+automatically establish maturity, obtainability and deployment. All remain
+`NOT_VERIFIED`.
+
+## 12. Images
+
+Limited radar must never: request image URLs · download images · store image
+bytes · populate media records · infer MEDIA-01 permission · reuse an aggregator
+image credited to a manufacturer. Image acquisition remains a separate governed
+process (MEDIA-01, `docs/09`).
+
+## 13. Canonical and public isolation
+
+Structural and behavioural enforcement must prove:
+
+- limited-radar code **cannot import or map canonical writers** (import-level
+  assertion, in the pattern of `test_no_acquisition_model_maps_a_canonical_table`);
+- no canonical `robot`, `manufacturer`, `specification`, commercial or media row
+  can be written;
+- **Gate W, S, T and X remain unchanged**;
+- **canonical row counts before and after every run are identical**;
+- discovery data remains absent from the public API, MCP, sitemap, `llms.txt`
+  and every other machine surface (Gate I, Gate O, AGENT-01.7);
+- **`/discovery-review` remains internal and fail-closed** exactly as PR #37
+  establishes it (`main.py:105`, mounted only under `settings.is_relaxed`);
+- **`/api/robots` remains unchanged**.
+
+## 14. Run report
+
+Written to `crawl_run.counters` (JSONB, exists as of `0004`) and printed by the
+CLI. Every run report includes: run ID · named operator · source · source class ·
+eligibility state · **operating mode** · eligibility review ID and expiry ·
+declared user agent · the frozen ceilings in force · actual request count · pages
+attempted, fetched, missing, blocked and oversized · bytes received · retries ·
+candidates discovered or matched · claims created · conflicts found · ambiguous
+identities · policy halt reason · and **canonical rows written, which must equal
+`0`** and is printed on every run rather than assumed.
+
+## 15. Acceptance gates
+
+Numbered A1-G1 … A1-G30. Each is a test, not a statement.
+
+| # | Assertion |
+|---|---|
+| **G1** | Only `AGGREGATOR` can receive `LIMITED_RADAR` — refused at the database, exercised per class |
+| **G2** | `COMPETITOR_DIRECTORY` specifically cannot receive it |
+| **G3** | Reclassification is not an eligibility shortcut: changing `source_class` does not carry an existing mode or review with it; the mode resets to `DISABLED` and a new review is required |
+| **G4** | `ALLOWED` and `NO_EXPRESS_PROHIBITION` remain distinct in the database, the ORM, the run report, the admin and `/discovery-review` |
+| **G5** | `LIMITED_RADAR` can never become `FULL_RADAR` by projection, property or boolean conversion; no general `is_eligible` boolean exists |
+| **G6** | An expired review produces **zero transport calls** (recording fake transport, empty call list) |
+| **G7** | A missing review produces **zero transport calls** |
+| **G8** | Owner enablement is required, separately attributed from the reviewer |
+| **G9** | Manual operator attribution is required; no non-manual trigger exists |
+| **G10** | Run-start `robots.txt` check occurs **before** any candidate retrieval (call ordering asserted) |
+| **G11** | A named-agent `Disallow` halts **before** retrieval |
+| **G12** | `403`, `429`, CAPTCHA or challenge halts the source and disables it |
+| **G13** | No forbidden retry occurs — never on `4xx`, never more than once, never sooner than 30 s |
+| **G14** | Concurrency, rate, page, byte and duration ceilings are each enforced under a fast fake source |
+| **G15** | A missing or unlimited limit fails closed at startup |
+| **G16** | Redirects cannot escape the reviewed scope; an out-of-scope redirect records `BLOCKED_BY_SCOPE` |
+| **G17** | No recursive link-following occurs |
+| **G18** | No hidden API or separate JSON endpoint is fetched |
+| **G19** | **No image request occurs** — asserted on the transport, not on storage |
+| **G20** | No raw page body persists after processing |
+| **G21** | Every claim has a source, a fetched page and at least one evidence excerpt |
+| **G22** | Every claim remains `NOT_VERIFIED` |
+| **G23** | Conflicting values remain separate rows |
+| **G24** | `UNKNOWN` semantics remain intact; `QUOTE_ONLY` never degrades to `UNKNOWN` |
+| **G25** | Commercial axes remain independent; one sentence cannot set three axes without three excerpts |
+| **G26** | Repeated processing is idempotent |
+| **G27** | Canonical row count is identical before and after every run |
+| **G28** | Public API and machine surfaces are unchanged; `/api/robots` byte-identical for a fixed catalogue |
+| **G29** | Run reports expose mode and eligibility state honestly, including `canonical_rows_written = 0` |
+| **G30** | A recorded publisher objection immediately disables the source |
+
+**`MANUAL_ONLY` gates — normative** (A1-G31 … A1-G40). These are not
+conditional on any further decision; `MANUAL_ONLY` is adopted (§4.1.1).
+
+| # | Assertion |
+|---|---|
+| **G31** | A `MANUAL_ONLY` source constructs **zero HTTP requests** — asserted on a recording fake transport with an empty call list, not on stored outcomes |
+| **G32** | `MANUAL_ONLY` exists as a `radar_mode` value and is accepted by the database for a source with `robots_status = NOT_APPLICABLE` and attributed enablement |
+| **G33** | A manual-bootstrap source may operate with **`tos_status = UNKNOWN`**, and separately with `tos_status = PROHIBITED`, without being refused |
+| **G34** | **No request object, URL queue or transport session is created** for a `MANUAL_ONLY` source — asserted at the transport entry point, ahead of URL resolution, so nothing is built and discarded |
+| **G35** | `MANUAL_ONLY` **cannot satisfy** a limited-radar or full-radar eligibility check, by any property, projection or boolean conversion |
+| **G36** | Moving from `MANUAL_ONLY` to `LIMITED_RADAR` or `FULL_RADAR` requires the corresponding eligibility review **and** a fresh attributed owner enablement; neither alone suffices |
+| **G37** | **`tos_status = ALLOWED` is never synthesized because an operation is manual** — no code path writes `ALLOWED` on the grounds that no automated access occurred |
+| **G38** | The `MANUAL_BOOTSTRAP` path on `main` remains functional **without `radar_eligible`**, ingesting under `MANUAL_ONLY` with `tos_status = UNKNOWN` |
+| **G39** | Every manual ingest is attributed to a **named operator**; an unattributed ingest is refused |
+| **G40** | A `MANUAL_ONLY` ingest leaves **canonical row counts unchanged** |
+| **G41** | An `AUTOMATED_ACCESS` revocation disables the automated modes and **leaves `MANUAL_ONLY` available**; an `ENTIRE_RELATIONSHIP` revocation forces `DISABLED`. An automated-access prohibition is never silently widened into a ban on human research |
+| **G42** | **`PROHIBITED` does not downgrade without a fresh complete attributed review** — a disappeared terms page, a site redesign, elapsed time and a clean run each leave the status unchanged |
+| **G43** | **A publisher's later explicit permission CAN produce `ALLOWED`** through a new attributed review — the transition is possible, not merely permitted in prose |
+| **G44** | **The historical prohibition review survives that transition unaltered** — `UPDATE` and `DELETE` are refused by `refuse_eligibility_review_mutation()`, the superseding finding is a new row, and both rows remain queryable with their evidence |
+| **G45** | **Manual use never mutates `tos_status`** — an arbitrarily long series of `MANUAL_ONLY` ingests against a `PROHIBITED` source leaves the field, the review rows and the check rows byte-identical |
+| **G46** | **An internal fresh review alone cannot clear a direct publisher objection** — a complete six-axis review returning `NO_RESTRICTION_FOUND` on every axis leaves a `PUBLISHER_OBJECTION` revocation in force |
+| **G47** | **A policy-based revocation *can* be cleared** by a fresh complete review when the cause genuinely ended — the two exit paths are proven distinct, not merely described |
+| **G48** | **A direct objection requires a recorded withdrawal or superseding permission** — a `source_communication` row of kind `WITHDRAWAL` or `PERMISSION` linked via `supersedes_id`; nothing else lifts it |
+| **G49** | **The original objection and the later withdrawal remain separately queryable and append-only** — `UPDATE` and `DELETE` refused on both; the withdrawal is a new row |
+| **G50** | **An ambiguous publisher objection defaults to `ENTIRE_RELATIONSHIP`** — a communication with `scope_claimed IS NULL` disables every mode |
+| **G51** | **An automated-access-only objection may leave `MANUAL_ONLY` available** |
+| **G52** | **An entire-relationship objection forces `DISABLED`** — no mode survives it |
+| **G53** | **Fresh owner enablement is required after any revocation is cleared**, by either path; a cleared revocation alone never re-enables a source |
+| **G54** | A withdrawn objection **does not by itself produce `ALLOWED`** — the resulting status is whatever the fresh review honestly finds, which may be `UNKNOWN` |
+| **G55** | **A communication cannot supersede one belonging to a different source** — refused by the composite foreign key, exercised against two real sources |
+| **G56** | **`discovery_source.revoking_communication_id` cannot cite another source's communication** — same refusal, same mechanism |
+| **G57** | Migration `0005` applies cleanly to a database at `0004`, and **re-applies cleanly** (`ADD VALUE IF NOT EXISTS`), proving the §5.1.1 statement order |
+
+## 16. Implementation slices
+
+### A1-I1 — state and database enforcement
+Enum widening · `radar_mode` · `source_eligibility_check` · database constraints
+and triggers · expiry and transition rules · removal of `radar_eligible` with
+every call site updated explicitly. **No network client.** Mirrors the Slice A
+discipline, including a test in the pattern of
+`test_slice_a_adds_no_http_client_or_crawler`.
+
+### A1-I2 — bounded transport and run control
+Manual trigger only · every ceiling · every policy check · a **local fake/test
+server** for all tests. **No real external source adapter. No extraction into
+canonical structures.** The transport is written against the fake and never
+points at a real host in this slice.
+
+### A1-I3 — discovery extraction
+Discovery-layer claims · evidence excerpts · conflicts · identity ambiguity.
+**No images. No canonical path.**
+
+### A1-I4 — fresh source reviews
+Only after I1–I3 are merged and validated. Review The Mimic, Lineroid,
+WhichHumanoid and RoboZaps. **Classify each honestly before eligibility
+assessment.** Any source classified other than `AGGREGATOR` remains unavailable
+under A1.
+
+### A1-I5 — single-source proof
+Enable **at most one** qualifying `AGGREGATOR`. Run a manually triggered,
+bounded proof against a small named candidate subset. Review the result before
+enabling another source. **A four-source bulk run is not authorized as the first
+live proof.**
+
+## 17. Stack prerequisite — SATISFIED
+
+The original draft required the acquisition stack to land before A1-I1, because
+`AGGREGATOR` did not exist on `main`. **That sequence is complete.**
+
+```
+2573da9  #40  batch trace + promotion review
+0f2fb44  #37  discovery review surface (+ its own relaxed-env e2e job)
+9d802c2  #41  Slice B — 43 humanoids   (replaced closed #36)
+d174abc  #35  Slice A — acquisition schema
+626d1ce  #38  Amendment A1 — RATIFIED
+```
+
+**Remaining order:** ratify this contract → begin **A1-I1** from `main`. No
+other PR blocks it. PR #32 (WS8.7) is independent and untouched.
+
+**One operational lesson worth keeping**, because it cost a PR: **never merge
+with `--delete-branch` while another PR is based on that branch.** Deleting it
+auto-closes the child, and a PR whose base branch is gone cannot be reopened —
+#36 had to be recreated as #41. Merge without deleting, rebase the child from
+its *original* fork point, retarget it to `main`, then delete the branch.
+
+## 18. Non-goals
+
+This contract proposal does not: approve any source · perform an eligibility
+review · fetch any external page · implement any enum or migration · build an
+HTTP client · create an adapter · run extraction · change canonical data ·
+expose discovery publicly · acquire images · amend A1's `AGGREGATOR`-only scope ·
+mark another PR Ready · merge anything.
+
+## 19. Ratification record
+
+```
+STATUS:                      PROPOSED — NOT RATIFIED
+Proposed:                    2026-07-30
+Implements:                  docs/17 §13.1 step 1 (Amendment A1, RATIFIED,
+                             main @ 626d1ce)
+Base:                        main @ 626d1ce873d650a3f3a46381b33a3f970e9e8648
+Implementation authorized:   NONE — documentation only
+Sources approved:            NONE
+Eligible source class:       AGGREGATOR ONLY — unchanged from A1 §2.1
+Migration:                   0005. Depends on 0004, which is NOW ON MAIN
+                             (#35, merged) — prerequisite SATISFIED
+Default expiry:              90 days — unchanged from A1 §7
+Gate W / S / T / X, P2 / P8: UNCHANGED
+
+SUB-DECISION RESOLVED:       radar_mode value MANUAL_ONLY — **ADOPTED by
+                             product-owner instruction, 2026-07-30** (§4.1.1,
+                             §20). No open decisions remain.
+
+Ratified by:                 ____________________
+Ratification date:           ____________________
+```
+
+## 20. Resolved sub-decision — `MANUAL_ONLY`
+
+**`MANUAL_ONLY`: ADOPTED by product-owner instruction, 2026-07-30.** This
+resolves the sub-decision only; the contract as a whole remains **PROPOSED —
+NOT RATIFIED**.
+
+`MANUAL_BOOTSTRAP` reaches `ingest()` through `radar_eligible`, which this
+contract removes. With only `DISABLED` / `LIMITED_RADAR` / `FULL_RADAR`
+available, a bootstrap source would have to be recorded as `FULL_RADAR` — a
+record asserting automated-access capability for a source that performs none.
+The rejected alternatives are kept on the record: recording bootstrap sources as
+`FULL_RADAR` (writes a false capability that authorizes a fetch nobody
+reviewed), and a nullable `radar_mode` (reintroduces the ambiguity the column
+exists to remove, and `NULL` needs interpreting at every call site).
+
+**The owner's review also identified a contradiction in revision 1 of this
+document, now corrected.** The §4.2 mapping table said `UNKNOWN` and
+`PROHIBITED` permit only `DISABLED`, while the §5.4 `CHECK` permitted
+`MANUAL_ONLY` regardless of `tos_status`. Both could not be right. The
+resolution is that **automated eligibility states govern only the automated
+modes** — they were never the right instrument for deciding whether a human may
+type a record — and the mapping is now two tables rather than one.
+
+That correction is what makes §5.5 possible: because `MANUAL_ONLY` needs no
+eligibility finding, the MANUAL_BOOTSTRAP path can record `tos_status = UNKNOWN`
+truthfully instead of claiming `ALLOWED` to get past a gate. The old arrangement quietly required a
+false statement in order to do something entirely legitimate, which is the
+clearest sign a gate is measuring the wrong thing.

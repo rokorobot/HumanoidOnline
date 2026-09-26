@@ -7,8 +7,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import CrawlerPolicyPage from "@/app/crawler-policy/page";
-import { CRAWLER_USER_AGENT } from "@/lib/crawler-policy";
-import { ENTITY } from "@/lib/entity";
+import { CRAWLER_CONTACT_URL, CRAWLER_USER_AGENT } from "@/lib/crawler-policy";
 
 describe("/crawler-policy", () => {
   afterEach(cleanup);
@@ -27,14 +26,20 @@ describe("/crawler-policy", () => {
     expect(text).toContain("Crawl-delay: 30");
   });
 
-  it("never invents a contact address", () => {
+  it("points site owners to the contact form, not an email address", () => {
     const { container } = render(<CrawlerPolicyPage />);
-    const mailto = container.querySelectorAll('a[href^="mailto:"]');
-    if (ENTITY.contactEmail) {
-      expect(mailto).toHaveLength(1);
-    } else {
-      expect(mailto).toHaveLength(0);
-      expect(container.textContent).toContain("will be published on this page before");
+    const link = screen.getByRole("link", { name: CRAWLER_CONTACT_URL });
+    expect(link.getAttribute("href")).toBe("https://humanoidonline.com/contact");
+    const text = container.textContent ?? "";
+    for (const use of [
+      "ask questions about the crawler",
+      "request a reduced crawl frequency",
+      "report a problem caused by the crawler",
+      "request that your site be excluded",
+    ]) {
+      expect(text).toContain(use);
     }
+    expect(text).not.toContain("will be published on this page before");
+    expect(container.querySelectorAll('a[href^="mailto:"]')).toHaveLength(0);
   });
 });

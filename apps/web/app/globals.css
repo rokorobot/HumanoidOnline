@@ -981,3 +981,24 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-line); padding: var(
   .about-facts dd { max-width: 65%; }
 }
 
+
+/* ---- CONTACT (/contact) -------------------------------------------------- */
+/* Same field grammar as the lead dialog: hairline inputs, machine labels. */
+.contact-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ho-sp-6);
+  max-width: 72ch; margin-bottom: var(--ho-sp-8); }
+.contact-form { min-width: 0; }
+.contact-form .field input[type=email], .contact-form .field input[type=text],
+.contact-form .field textarea, .contact-form .field select {
+  border: var(--ho-rule-hair) solid var(--ho-grey-400); background: var(--ho-paper);
+  padding: 10px 12px; font-family: var(--ho-font-machine); font-size: var(--ho-fs-small);
+  width: 100%; min-height: 44px; }
+.contact-form .field textarea { resize: vertical; }
+.contact-form .field [aria-invalid="true"] { border-color: var(--ho-signal-ink); }
+.contact-form .actions { margin-top: var(--ho-sp-5); }
+.contact-honeypot { position: absolute; left: -10000px; width: 1px; height: 1px;
+  overflow: hidden; }
+.contact-status { border: var(--ho-rule-hair) solid var(--ho-grey-400); padding: var(--ho-sp-5);
+  margin-bottom: var(--ho-sp-5); background: var(--ho-paper); }
+.contact-status:focus { outline: 2px solid var(--ho-ink); outline-offset: 2px; }
+.contact-status--error { border-color: var(--ho-signal-ink); color: var(--ho-ink); }
+.contact-status h2 { margin-top: 0; }

@@ -7,3 +7,5 @@ export const CRAWLER_USER_AGENT =
 export const CRAWLER_PRODUCT_TOKEN = "HumanoidOnlineMarketBot";
 export const CRAWLER_MIN_INTERVAL_SECONDS = 2;
 export const CRAWLER_PAGES_PER_RUN = 50;
+/** The crawler contact mechanism (docs/16 §13): the public contact form. */
+export const CRAWLER_CONTACT_URL = "https://humanoidonline.com/contact";

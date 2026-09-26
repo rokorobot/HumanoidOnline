@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<!--
+  Netlify Forms detection file. Not a page for people.
+
+  With the Next.js runtime on Netlify, forms are detected by parsing STATIC
+  HTML at deploy time, so this copy of the /contact form declares its name and
+  every field. The live form (components/ContactForm.tsx) POSTs here, URL-
+  encoded, with form-name=contact. Field names must match lib/contact-form.ts.
+-->
+<html lang="en">
+  <head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Forms</title></head>
+  <body>
+    <form name="contact" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
+      <input type="hidden" name="form-name" value="contact">
+      <input name="bot-field">
+      <input name="name" type="text">
+      <input name="email" type="email">
+      <select name="category">
+        <option value="General inquiry">General inquiry</option>
+        <option value="Data correction">Data correction</option>
+        <option value="Manufacturer / provider">Manufacturer / provider</option>
+        <option value="Crawler / robots">Crawler / robots</option>
+        <option value="Crawler opt-out / rate-limit request">Crawler opt-out / rate-limit request</option>
+      </select>
+      <textarea name="message"></textarea>
+    </form>
+  </body>
+</html>

@@ -10,9 +10,20 @@
     python -m app.cli.discovery plan   <source-key> --url URL [--url URL ...] [--urls-file F]
     python -m app.cli.discovery crawl  <source-key> --operator "Name" --url URL ...
                                        [--limit N] [--dry-run] [--cache-dir DIR]
+    python -m app.cli.discovery crawl  <source-key> --operator "Name" --resume <run-id>
     python -m app.cli.discovery adapter plan <source-key>
-    python -m app.cli.discovery adapter run  <source-key> --operator "Name" [--cache-dir DIR]
+    python -m app.cli.discovery adapter run  <source-key> --operator "Name" [--resume <run-id>]
+    python -m app.cli.discovery run fail <run-id> --by WHO --reason WHY
     python -m app.cli.discovery report <run-id>
+
+- `--resume` continues a FAILED or CANCELLED run as a NEW run linked to it, with
+  the parent's manifest and limits, fetching only planned URLs the run chain has
+  not fetched successfully. It never re-requests or duplicates an observation.
+  A COMPLETED or HALTED_BY_POLICY run is not resumable; neither is a RUNNING
+  one until `run fail` has recorded that its process is gone.
+- `run fail` is the governed recovery for a run whose process died without
+  recording an end: attributed, with a reason, refused while the run shows
+  activity in the last 30 minutes.
 
 - `source *` never makes a network request. `review` records the owner's own
   decisions (DR-A4: he reads the terms himself) and never enables; `enable` is a
@@ -77,6 +88,16 @@ def _load_source(session, key: str):
     return session.scalars(select(DiscoverySource).where(DiscoverySource.key == key)).first()
 
 
+def _parent_limits(session, run_id: str):
+    """The resumed run's FetchLimits, read from its manifest (same manifest, §7)."""
+    from app.models.acquisition import CrawlRun
+    from app.services.discovery.fetcher import FetchLimits
+
+    parent = session.get(CrawlRun, uuid.UUID(run_id))
+    limits = (parent.run_manifest or {}).get("limits") if parent is not None else None
+    return FetchLimits(**limits) if limits else None
+
+
 def _print_refusal(exc) -> int:
     print("REFUSED: nothing was requested.", file=sys.stderr)
     for url, reason in exc.problems:
@@ -102,31 +123,39 @@ def _cmd_crawl(args: argparse.Namespace) -> int:
     from app.services.discovery.acquisition import (
         AcquisitionRefused,
         dry_run,
+        resume_acquisition,
         run_acquisition,
     )
     from app.services.discovery.fetcher import FetchLimits, HttpFetcher
 
-    limits = FetchLimits(page_cap=args.limit)
     urls = _urls(args)
-    with SessionLocal() as session, HttpFetcher(
-        limits=limits, kill_switch=kill_switch_for(args.source_key)
-    ) as fetcher:
-        source = _load_source(session, args.source_key)
-        try:
-            if args.dry_run:
-                result = dry_run(source, urls, fetcher)
-                print(f"DRY RUN source={args.source_key}: robots.txt only, "
-                      "no target page requested, nothing written")
-                for url, decision in result.decisions:
-                    print(f"  {decision:<40} {url}")
-                return 0
-            run = run_acquisition(
-                session, source=source, urls=urls, operator=args.operator or "",
-                fetcher=fetcher, cache_dir=Path(args.cache_dir), checkpoint=session.commit,
-            )
-        except AcquisitionRefused as exc:
-            session.rollback()
-            return _print_refusal(exc)
+    with SessionLocal() as session:
+        limits = FetchLimits(page_cap=args.limit)
+        if args.resume:
+            limits = _parent_limits(session, args.resume) or limits
+        with HttpFetcher(limits=limits, kill_switch=kill_switch_for(args.source_key)) as fetcher:
+            source = _load_source(session, args.source_key)
+            try:
+                if args.dry_run:
+                    result = dry_run(source, urls, fetcher)
+                    print(f"DRY RUN source={args.source_key}: robots.txt only, "
+                          "no target page requested, nothing written")
+                    for url, decision in result.decisions:
+                        print(f"  {decision:<40} {url}")
+                    return 0
+                if args.resume:
+                    run = resume_acquisition(
+                        session, parent_run_id=uuid.UUID(args.resume), source=source,
+                        operator=args.operator or "", fetcher=fetcher,
+                        cache_dir=Path(args.cache_dir), checkpoint=session.commit)
+                else:
+                    run = run_acquisition(
+                        session, source=source, urls=urls, operator=args.operator or "",
+                        fetcher=fetcher, cache_dir=Path(args.cache_dir),
+                        checkpoint=session.commit)
+            except AcquisitionRefused as exc:
+                session.rollback()
+                return _print_refusal(exc)
         print(f"RUN {run.id} status={run.status}")
         print(f"report: python -m app.cli.discovery report {run.id}")
         return _RUN_EXIT.get(run.status, 1)
@@ -163,7 +192,12 @@ def _cmd_source(args: argparse.Namespace) -> int:
 def _cmd_adapter(args: argparse.Namespace) -> int:
     from app.db.session import SessionLocal
     from app.services.discovery.acquisition import AcquisitionRefused
-    from app.services.discovery.adapter_run import AdapterRefused, plan_adapter, run_adapter
+    from app.services.discovery.adapter_run import (
+        AdapterRefused,
+        plan_adapter,
+        resume_adapter,
+        run_adapter,
+    )
     from app.services.discovery.fetcher import FetchLimits, HttpFetcher
     from app.services.discovery.sources import adapter_for
 
@@ -184,17 +218,39 @@ def _cmd_adapter(args: argparse.Namespace) -> int:
             print("  RUNNABLE" if not problems else "  NOT RUNNABLE")
             return 0 if not problems else REFUSED
         limits = FetchLimits(page_cap=min(200, len(config.seed_urls) + config.target_cap))
+        if args.resume:
+            limits = _parent_limits(session, args.resume) or limits
         with HttpFetcher(limits=limits, kill_switch=kill_switch_for(args.source_key)) as fetcher:
             try:
-                run = run_adapter(session, source=source, config=config,
-                                  operator=args.operator or "", fetcher=fetcher,
-                                  cache_dir=Path(args.cache_dir), checkpoint=session.commit)
+                if args.resume:
+                    run = resume_adapter(
+                        session, parent_run_id=uuid.UUID(args.resume), source=source,
+                        config=config, operator=args.operator or "", fetcher=fetcher,
+                        cache_dir=Path(args.cache_dir), checkpoint=session.commit)
+                else:
+                    run = run_adapter(
+                        session, source=source, config=config,
+                        operator=args.operator or "", fetcher=fetcher,
+                        cache_dir=Path(args.cache_dir), checkpoint=session.commit)
             except (AdapterRefused, AcquisitionRefused) as exc:
                 session.rollback()
                 return _print_refusal(exc)
         print(f"RUN {run.id} status={run.status}")
         print(f"report: python -m app.cli.discovery report {run.id}")
         return _RUN_EXIT.get(run.status, 1)
+
+
+def _cmd_run(args: argparse.Namespace) -> int:
+    from app.db.session import SessionLocal
+    from app.services.discovery.acquisition import mark_stale_run_failed
+
+    with SessionLocal() as session:
+        run = mark_stale_run_failed(session, uuid.UUID(args.run_id), by=args.by,
+                                    reason=args.reason)
+        session.commit()
+        print(f"RUN {run.id} status={run.status} ({run.counters.get('halt_reason')})")
+        print(f"resume: python -m app.cli.discovery crawl|adapter run ... --resume {run.id}")
+    return 0
 
 
 def _cmd_report(args: argparse.Namespace) -> int:
@@ -231,6 +287,8 @@ def main(argv: list[str] | None = None) -> int:
     crawl.add_argument("--dry-run", action="store_true",
                        help="robots.txt only; no target page, no database write")
     crawl.add_argument("--cache-dir", default=str(DEFAULT_CACHE_DIR))
+    crawl.add_argument("--resume", metavar="RUN_ID",
+                       help="continue a FAILED/CANCELLED run; no --url, no --dry-run")
     crawl.set_defaults(func=_cmd_crawl)
 
     source = commands.add_parser("source", help="governed source registration (no network)")
@@ -272,7 +330,17 @@ def main(argv: list[str] | None = None) -> int:
     adapter_run.add_argument("--operator", required=True,
                              help="the named human running this (LIVE.4)")
     adapter_run.add_argument("--cache-dir", default=str(DEFAULT_CACHE_DIR))
+    adapter_run.add_argument("--resume", metavar="RUN_ID",
+                             help="continue a FAILED/CANCELLED adapter run")
     adapter.set_defaults(func=_cmd_adapter)
+
+    run_cmd = commands.add_parser("run", help="governed run lifecycle (no network)")
+    run_actions = run_cmd.add_subparsers(dest="action", required=True)
+    fail = run_actions.add_parser("fail", help="mark a stale RUNNING run FAILED")
+    fail.add_argument("run_id")
+    fail.add_argument("--by", required=True)
+    fail.add_argument("--reason", required=True)
+    run_cmd.set_defaults(func=_cmd_run)
 
     report = commands.add_parser("report", help="print a run report from the database")
     report.add_argument("run_id")
@@ -283,6 +351,16 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("crawl requires --operator (LIVE.4: a named human starts every run)")
     if args.command == "adapter" and args.action == "run" and not args.operator.strip():
         parser.error("adapter run requires --operator (LIVE.4: a named human starts every run)")
+    if args.command == "crawl" and args.resume and (_urls(args) or args.dry_run):
+        parser.error("--resume takes its URLs from the resumed run: no --url/--urls-file, "
+                     "no --dry-run")
+    for run_id in (getattr(args, "resume", None),
+                   args.run_id if args.command == "run" else None):
+        if run_id:
+            try:
+                uuid.UUID(run_id)
+            except ValueError:
+                parser.error(f"invalid run id {run_id!r}")
     if args.command in ("plan", "crawl") and not 1 <= args.limit <= 200:
         parser.error("--limit must be between 1 and 200")
     try:

@@ -687,6 +687,32 @@ fetched successfully in the parent run, honours the same manifest, and produces 
 new run row linked by `resume_of_run_id`. Resume never re-fetches to "be safe" —
 re-fetching is a decision, not a default.
 
+> **Implemented (discovery-run hardening, 2026-09-26).** Observations are
+> committed one by one. When an exception reaches the runner, the uncommitted
+> remainder is rolled back, the run is durably marked `FAILED` (`CANCELLED` for
+> an operator interrupt) with counters rebuilt from its committed observations,
+> and the exception is re-raised. The same applies when an adapter run's
+> extraction fails; that run is marked `FAILED` too.
+>
+> A process that died without recording an end stays `RUNNING` until
+> `discovery run fail <run-id> --by … --reason …` marks it `FAILED`. That command
+> is attributed and refused while the run shows activity in the last 30 minutes.
+>
+> `crawl --resume` and `adapter run --resume` apply only to `FAILED` or
+> `CANCELLED` runs. `COMPLETED` and `HALTED_BY_POLICY` runs are never resumed. A
+> resume refuses unless:
+> - it is the first resume of that run;
+> - it uses the same source, adapter key and version, fingerprint version and
+>   limits as the parent;
+> - for an adapter run, the adapter is still reviewed.
+>
+> A resume fetches only the planned URLs that no run in the chain fetched
+> successfully (`FETCHED` / `NOT_MODIFIED`). An adapter resume does not
+> re-enumerate, and it extracts any page the chain fetched but never extracted.
+> The resulting `extraction_result` stays on the run that made the observation.
+> Cache pruning (Gate Q retention) remains deferred until before any recurring
+> or scheduled execution.
+
 ## 8. Fetched-page evidence model
 
 ```

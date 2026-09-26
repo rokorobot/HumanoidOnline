@@ -238,6 +238,12 @@ Forward migrations:
   default, so pre-existing rows stay valid and read as "not recorded". Names the
   schema explicitly, as 0013 does.
 
+- `0015_candidate_identity_decision.sql` — Discovery Stage E (docs/16 §17.1): the
+  append-only `candidate_identity_decision` table (+ enum and append-only trigger)
+  for attributed human SAME_ENTITY / NOT_SAME_ENTITY decisions between two
+  discovery candidates. Both candidates are foreign keys; the pair is stored in
+  canonical order; the newest `decision_seq` per pair is effective. Idempotent.
+
 ## Checksum integrity (WS8.2 / R9)
 
 `schema_migrations` stores a `sha256` for every applied file, and

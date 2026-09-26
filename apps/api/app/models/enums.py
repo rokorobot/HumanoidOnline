@@ -149,6 +149,10 @@ candidate_identity_status = _pg_enum(
     "candidate_identity_status",
     "UNRESOLVED", "MATCHED_EXISTING", "NEW_ENTITY", "AMBIGUOUS", "POSSIBLE_DUPLICATE",
 )
+# Stage E (migration 0015): a human's pairwise candidate identity decision.
+candidate_identity_decision_kind = _pg_enum(
+    "candidate_identity_decision_kind", "SAME_ENTITY", "NOT_SAME_ENTITY",
+)
 candidate_status = _pg_enum(
     "candidate_status",
     "DISCOVERED", "IDENTITY_REVIEW", "SOURCE_TRACE", "VERIFICATION",

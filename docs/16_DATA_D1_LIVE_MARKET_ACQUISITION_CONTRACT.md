@@ -1162,6 +1162,37 @@ The Operations Workbench is deferred **on purpose**: the right design for a
 review queue is not knowable before real acquired data shows which decisions
 reviewers actually make, and how often they disagree with the extractor.
 
+### 17.1 Stage E: exception-only review *(added 2026-09-26, after the first real crawl)*
+
+The first capped NEURA crawl (production run `2c64d1f3`) is the real acquired data §17 was waiting for. It produced 8 candidates, and its review cases define the workflow:
+- two same-source pairs (a reservation page and a robot page naming the same robot);
+- robots outside the catalogue's scope;
+- a variant;
+- a catalogue spelling (`4NE-1`) that the source writes differently (`4NE1`).
+
+- **CLI-first.** `python -m app.cli.discovery review list | show | history | same-as | not-same-as | reject | propose-alias`. The Operations Workbench and any `/discovery-review` UI stay deferred until this CLI behaviour is proven on real runs.
+- **Exception-only.** `review list` shows only situations that need a human, in a deterministic order:
+  - undecided duplicate pairs (both sides shown);
+  - ambiguous identity;
+  - conflicts and rechecks;
+  - pending alias proposals;
+  - insufficient evidence;
+  - promotion-ready candidates;
+  - candidates awaiting a trace.
+
+  A decision is made once. Later runs do not raise it again.
+- **Candidate ↔ candidate identity** decisions (`SAME_ENTITY` / `NOT_SAME_ENTITY`) are rows in `candidate_identity_decision` (migration 0015):
+  - attributed, with a mandatory reason;
+  - both candidates are foreign keys, and the pair is stored in canonical order;
+  - append-only, enforced by a database trigger;
+  - the newest row per pair is effective, and a reversal is a new row.
+
+  A decided pair is never flagged as a duplicate again.
+- **A SAME_ENTITY decision destroys nothing.** Both candidates keep their rows, claims and evidence. The relationship is exposed to the promoting human (`build_proposal` → `same_entity_candidates`); nothing is merged.
+- **Out of scope** uses the existing rejection path, with reason code `OUT_OF_SCOPE` recorded in `promotion_audit`. A rejected candidate is terminal, remains as research history, and **no longer causes another candidate to become `POSSIBLE_DUPLICATE`**. Before Stage E it did; that behaviour was changed deliberately.
+- **Candidate ↔ catalogue identity** stays with the confirmed alias register only. `review propose-alias` prints a register entry and writes nothing. A human confirms it in a reviewed change. No alias is inferred, and no variant is folded.
+- **Promotion remains a separate human act** (`app.cli.promote_candidate`). Nothing in Stage E promotes, and nothing writes a canonical table.
+
 ## 18. The run report
 
 Emitted at the end of every run and reproducible from the database afterwards

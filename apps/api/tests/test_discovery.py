@@ -44,6 +44,9 @@ DISCOVERY_TABLES = {
     # (docs/22 Phase 2), so it belongs in this set for the same reason —
     # listing it here does not weaken Gate K, the invariant is unchanged.
     "freshness_target", "freshness_observation",
+    # Stage E (migration 0015): pairwise candidate identity decisions. Both FKs
+    # point INTO discovery_candidate, so the Gate K invariant is unchanged.
+    "candidate_identity_decision",
 }
 
 

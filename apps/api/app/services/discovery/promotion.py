@@ -29,6 +29,7 @@ from app.models.manufacturer import Manufacturer
 from app.models.robot import Robot
 from app.services.discovery import PromotionError
 from app.services.discovery.identity import normalize
+from app.services.discovery.identity_decisions import SAME_ENTITY, effective_decisions
 
 _PROMOTABLE_IDENTITY = {"MATCHED_EXISTING", "NEW_ENTITY"}
 
@@ -115,6 +116,11 @@ def build_proposal(session: Session, candidate: DiscoveryCandidate) -> dict:
         "trace_verified_by": candidate.trace_verified_by,
         "verified_claims": verified,
         "unresolved_claims": unresolved,
+        # Stage E: candidates a human decided are the same entity. Exposed so the
+        # promoting human sees every row that describes this robot; nothing is merged.
+        "same_entity_candidates": sorted(
+            str(other) for other, decision in effective_decisions(session, candidate.id).items()
+            if decision == SAME_ENTITY),
         "gates_failed": check_gates(session, candidate),
     }
 
@@ -189,9 +195,18 @@ def promote(session: Session, candidate: DiscoveryCandidate, approved_by: str) -
     return robot
 
 
-def reject(session: Session, candidate: DiscoveryCandidate, approved_by: str, reason: str) -> None:
+#: Machine-readable rejection reasons (Stage E). Optional: a free-text reason is
+#: always required; a code classifies it for the review queue.
+REJECTION_REASON_CODES = ("OUT_OF_SCOPE",)
+
+
+def reject(session: Session, candidate: DiscoveryCandidate, approved_by: str, reason: str,
+           reason_code: str | None = None) -> None:
     """Human rejection — recorded, not deleted (research history, §21). Independently
-    requires an attributed human + a reason (H5); no canonical write."""
+    requires an attributed human + a reason (H5); no canonical write. A rejected
+    candidate is terminal and no longer causes duplicate review (Stage E)."""
+    if reason_code is not None and reason_code not in REJECTION_REASON_CODES:
+        raise PromotionError(f"reason code must be one of {REJECTION_REASON_CODES}")
     if not approved_by or not approved_by.strip():
         raise PromotionError("rejection requires an approving human (approved_by)")
     if not reason or not reason.strip():
@@ -204,7 +219,7 @@ def reject(session: Session, candidate: DiscoveryCandidate, approved_by: str, re
             candidate_id=candidate.id,
             action="REJECTED",
             approved_by=approved_by,
-            detail={"reason": reason},
+            detail={"reason": reason, **({"reason_code": reason_code} if reason_code else {})},
         )
     )
     session.flush()

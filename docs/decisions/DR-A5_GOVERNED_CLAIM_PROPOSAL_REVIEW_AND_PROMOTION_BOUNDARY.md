@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | **DECIDED — RATIFIED, 2026-10-02, Robert Konecny (product owner).** The decisions are adopted; **G2-1 (persistence foundation) and G2-2 (governed review) are implemented** (§18.1, §18.2); G2-3 onward has not begun. |
+| **Status** | **DECIDED — RATIFIED, 2026-10-02, Robert Konecny (product owner).** The decisions are adopted; **G2-1 (persistence), G2-2 (governed review) and the first vertical slice of G2-3 (accepted claims and materialization) are implemented** (§18.1 to §18.3); the rest of G2-3, G2-4 and G2-5 have not begun. |
 | **Raised** | 2026-10-02 |
 | **Decision owner** | Robert Konecny (product owner) — sole ratifying authority |
 | **Stage** | Stage G2 of the discovery programme (`docs/08_DEVELOPMENT_ROADMAP.md` §1.1) |
@@ -654,6 +654,42 @@ proposal_review.py` and the CLI `proposals list|show|accept|reject|defer`. A dec
   `fetched_page` and (read-only, for the identity gate) `robot`; INSERT on decisions only.
 - The prerequisite guard of section 5.3 (a variant accepted before its price) concerns accepted
   claims and is deferred to G2-3, which is where accepted claims first exist.
+
+### 18.3 G2-3, first vertical slice, as implemented (accepted claims and materialization)
+
+Migration `0019_accepted_claims.sql` (additive; no existing table touched) adds three append-only
+tables protected by the same `refuse_claim_proposal_mutation()` triggers: `accepted_claim` (immutable;
+one per decision and target; lineage by foreign key to the decision, proposal, the confirming
+sighting and the source; robot and variant by slug text, never a foreign key; typed accepted value,
+verbatim value, excerpt, locator, registry version, snapshot of the resolved choices),
+`claim_retraction` (a withdrawal, optionally naming the corrected claim; a claim is never edited) and
+`catalogue_write_audit` (method `IMPORTER_M2`, change reference, importer run reference, target row,
+after-hash; it records, it never writes the catalogue).
+
+- **Claims.** `claims create` requires an effective ACCEPT on a CURRENT, non-stale proposal and a
+  *registered* policy. The human's explicit mapping is read from the decision's resolved choices
+  (`target_kind`, `variant_slug`, `variant_name`, `spec_key`, `edition_scope`, `accepted_value`); a
+  missing or differing value refuses the claim. A specification claim needs its variant claim first.
+- **Registry (this slice only, owner-approved).** `robot_variant` (slug is the lower-cased header,
+  name is the verbatim header; `is_developer` is never set) and `specification[dexterous_hand_option]`
+  for the feature-grid row `Manipulation` (variant-scoped, `THIS_EDITION`, TEXT, verbatim). No price,
+  availability, reservation, use-case, interface or other mapping is registered; unregistered
+  proposals are refused even if accepted.
+- **Materialization (M2).** `claims materialize <robot> [--dry-run]` renders the active claims into
+  a deterministic patch of `db/catalogue/robots/<slug>.json` and refuses stale, superseded,
+  unregistered, retracted, conflicting or prerequisite-less claims. It writes only that file; the
+  change travels through a normal PR and the importer. Re-running once applied yields no diff.
+  `claims verify` runs after the import and appends `catalogue_write_audit`; it refuses on any
+  mismatch between the database and the claims.
+- **Importer.** An `extended_specs` entry may carry an optional `variant_slug`; the importer resolves
+  it through the robot's own variants and writes `specification.variant_id` (an unknown slug fails
+  loudly; absent means product-level, as before). The public read model exposes `variant_slug` on
+  extended specs. This extends the importer's representation only; the catalogue-of-record boundary
+  (M2) is unchanged.
+- **Reviewer role.** Adds INSERT on `accepted_claim` and `claim_retraction` and SELECT on the claim
+  tables; it cannot write the audit or any catalogue table.
+- Still not done: price, availability, reservation, use cases, interfaces (G2-4), scheduled ingest
+  (G2-5), and a claim policy for any other target.
 
 ---
 

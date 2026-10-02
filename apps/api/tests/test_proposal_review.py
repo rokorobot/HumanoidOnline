@@ -284,16 +284,14 @@ def test_reversal_and_repeat_compare_choices(dsession):
     assert c3
 
 
-def test_there_is_no_accepted_claim_store_and_accept_writes_only_a_decision(dsession):
-    names = {r[0] for r in dsession.execute(text(
-        "SELECT table_name FROM information_schema.tables WHERE table_schema = 'humanoid'"))}
-    assert not {n for n in names if "accepted_claim" in n or "claim_retraction" in n
-                or "catalogue_write_audit" in n}
+def test_a_decision_alone_creates_no_accepted_claim_and_writes_only_a_decision(dsession):
     w = seeded(dsession)
     p = prop(dsession, w, "DESIGN_CAVEAT")
     tables_changed(dsession, w, lambda: pr.decide(
         dsession, str(p.id), pr.ACCEPT, decided_by=WHO, rationale=WHY,
         choices={**all_choices(p), pr.HOME_KEY: pr.NO_CATALOGUE_HOME}))
+    assert dsession.scalar(text("SELECT count(*) FROM accepted_claim")) == 0
+    assert dsession.scalar(text("SELECT count(*) FROM catalogue_write_audit")) == 0
 
 
 # ----------------------------------------------------------- list and show ---

@@ -40,6 +40,7 @@ from app.models.claim_proposal import (
 from app.models.discovery import DiscoverySource
 from app.models.robot import Robot
 from app.services.discovery import DiscoveryError
+from app.services.discovery.field_policy import MAPPING_KEYS
 from app.services.discovery.sources import neura_mini_proposals as mini
 from app.services.discovery.urlref import UnsupportedUrl, normalize_url
 
@@ -138,6 +139,19 @@ def _stale_reasons(session: Session, p: DiscoveryClaimProposal,
     return reasons
 
 
+def latest_content_page(session: Session, p: DiscoveryClaimProposal) -> FetchedPage | None:
+    """The newest observation of the proposal's source page that carries content."""
+    try:
+        source_url = normalize_url(p.source_url)
+    except UnsupportedUrl:
+        return None
+    pages = (pg for pg in session.scalars(
+        select(FetchedPage).where(FetchedPage.source_id == p.source_id)
+        .order_by(FetchedPage.retrieved_at.desc(), FetchedPage.created_at.desc()))
+        if _page_urls_match(pg, source_url))
+    return next((pg for pg in pages if pg.content_hash), None)
+
+
 def derive_states(session: Session, proposals: list[DiscoveryClaimProposal]
                   ) -> list[ProposalState]:
     out: list[ProposalState] = []
@@ -219,12 +233,14 @@ def serialize_choices(choices: dict[str, str]) -> str:
 def _validate_choices(p: DiscoveryClaimProposal, decision: str,
                       choices: dict[str, str]) -> None:
     questions = list(p.review_questions)
-    allowed = {question_key(i) for i in range(1, len(questions) + 1)} | {HOME_KEY}
+    allowed = ({question_key(i) for i in range(1, len(questions) + 1)} | {HOME_KEY}
+               | set(MAPPING_KEYS))
     unknown = sorted(set(choices) - allowed)
     if unknown:
         raise DiscoveryError(
             f"unknown resolved-choice key(s) {unknown}; this proposal has questions "
-            f"{sorted(allowed - {HOME_KEY})} and the optional {HOME_KEY!r}")
+            f"{sorted(allowed - {HOME_KEY} - set(MAPPING_KEYS))}, the optional {HOME_KEY!r} "
+            f"and the mapping keys {list(MAPPING_KEYS)}")
     if decision != ACCEPT:
         return
     missing = [f"{question_key(i)}: {q}" for i, q in enumerate(questions, 1)

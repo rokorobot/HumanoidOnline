@@ -583,6 +583,7 @@ def serialize_detail(
         evidence_rows = load_evidence_rows(session, detail_subject_ids(robot))
     ev = {key: evidence_read(row) for key, row in evidence_rows.items()}
 
+    variant_slug_by_id = {v.id: v.slug for v in robot.variants}
     extended = [
         ExtendedSpec(
             key=s.definition.key,
@@ -598,6 +599,7 @@ def serialize_detail(
             source_kind=s.source_kind,
             edition_scope=s.edition_scope,
             observed_at=s.observed_at,
+            variant_slug=variant_slug_by_id.get(s.variant_id),
         )
         for s in sorted(
             robot.specifications,

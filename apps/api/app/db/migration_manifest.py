@@ -77,4 +77,7 @@ MIGRATIONS: dict[str, str] = {
     "0018_claim_proposal_persistence": (
         "4f677e16a88a36ed6a459efd868c8de4d108bd79838e80eb0d5f1a1f67841400"
     ),
+    "0019_accepted_claims": (
+        "a568ff5f418f1516e5262838c39320d3ac72bc702e9e6956845382d5e247a113"
+    ),
 }

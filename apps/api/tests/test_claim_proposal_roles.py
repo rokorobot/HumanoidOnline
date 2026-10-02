@@ -161,6 +161,47 @@ def test_the_review_service_runs_end_to_end_as_the_reviewer_role(dsession):
         _denied(dsession, role, sql)
 
 
+def test_the_reviewer_can_create_claims_but_never_audit_or_catalogue_rows(dsession):
+    """G2-3: INSERT on accepted_claim / claim_retraction only; the audit is not its record."""
+    from app.services.discovery import claims
+    from app.services.discovery import proposal_review as pr
+
+    w = _world(dsession)
+    p = next(s.proposal for s in pr.list_proposals(dsession, robot_slug=w.slug)
+             if s.proposal.kind == "VARIANT" and s.proposal.edition == "Pro")
+    choices = {**{pr.question_key(i): "answered" for i in range(1, len(p.review_questions) + 1)},
+               "target_kind": "robot_variant", "variant_slug": "pro", "variant_name": "Pro"}
+    pr.decide(dsession, str(p.id), pr.ACCEPT, decided_by="Robert Konecny", rationale="x",
+              choices=choices)
+    role = _role(dsession, "discovery_reviewer.sql", "discovery_reviewer")
+    dsession.execute(text(f"SET LOCAL ROLE {role}"))
+    claim, created = claims.create_claim(dsession, str(p.id), created_by="Robert Konecny")
+    assert created
+    row = claims.retract_claim(dsession, str(claim.id), retracted_by="Robert Konecny", reason="t")
+    assert row.claim_id == claim.id
+    dsession.execute(text("RESET ROLE"))
+    for sql in (
+        "INSERT INTO catalogue_write_audit (claim_id, robot_slug, method, change_ref, "
+        "target_table, target_row_id, after_hash, applied_by) SELECT id, 'x', 'IMPORTER_M2', "
+        "'c', 'robot_variant', gen_random_uuid(), repeat('a', 64), 'x' FROM accepted_claim",
+        "UPDATE accepted_claim SET created_by = 'x'", "DELETE FROM accepted_claim",
+        "UPDATE claim_retraction SET reason = 'x'", "DELETE FROM claim_retraction",
+        "INSERT INTO robot_variant (robot_id, slug, name) SELECT id, 'x', 'x' FROM robot LIMIT 1",
+        "INSERT INTO specification (robot_id, definition_id) SELECT r.id, d.id FROM robot r, "
+        "spec_definition d LIMIT 1", "UPDATE specification SET value_text = 'x'",
+    ):
+        _denied(dsession, role, sql)
+
+
+def test_the_observer_cannot_touch_claims_or_audit(dsession):
+    _world(dsession)
+    role = _role(dsession, "discovery_observer.sql", "discovery_observer")
+    for table in ("accepted_claim", "claim_retraction", "catalogue_write_audit"):
+        for priv in ("SELECT", "INSERT", "UPDATE", "DELETE"):
+            assert dsession.scalar(text(
+                f"SELECT has_table_privilege('{role}', 'humanoid.{table}', '{priv}')")) is False
+
+
 def test_a_role_with_no_g2_grants_has_no_access_to_the_new_tables(dsession):
     """Default deny: the production observer today holds no privilege on these tables."""
     _world(dsession)

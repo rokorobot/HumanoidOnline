@@ -271,6 +271,14 @@ Forward migrations:
   action can touch an immutable row; `candidate_claim` is not modified; no accepted
   claim exists. Additive and idempotent; an older application build keeps working.
 
+- `0019_accepted_claims.sql` — DR-A5 B-prime, stage G2-3 (owner-authorized): three new
+  discovery-layer tables, `accepted_claim` (immutable; one per decision and target),
+  `claim_retraction` (append-only withdrawal/correction) and `catalogue_write_audit`
+  (append-only record that a catalogue row exists because of an accepted claim), all
+  guarded by the existing `refuse_claim_proposal_mutation()` triggers. No foreign key to
+  any canonical table (robots and variants by slug text); the catalogue is still written
+  only through `db/catalogue/` and the importer. Additive and idempotent.
+
 ## Checksum integrity (WS8.2 / R9)
 
 `schema_migrations` stores a `sha256` for every applied file, and

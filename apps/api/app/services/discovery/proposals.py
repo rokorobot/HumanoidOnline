@@ -56,6 +56,7 @@ class IngestReport:
     observations_created: int = 0
     unchanged: int = 0
     notes: list[str] = field(default_factory=list)
+    rejected: list = field(default_factory=list)   # (item, why) the extractor refused
 
     def as_dict(self) -> dict:
         return {"status": self.status, "fetched_page_id": self.fetched_page_id,
@@ -63,6 +64,7 @@ class IngestReport:
                 "proposals_created": self.proposals_created,
                 "observations_created": self.observations_created,
                 "unchanged": self.unchanged, "notes": list(self.notes),
+                "rejected": [list(r) for r in self.rejected],
                 "writes_catalogue": False, "writes_decisions": False}
 
 
@@ -97,7 +99,8 @@ def ingest_neura_mini_proposals(session: Session, *, source_key: str, robot_slug
             "proposals attach to one existing robot identity")
 
     result = mini.propose_neura_mini_claims(body, page_url)
-    report = IngestReport(result.status, str(page.id), notes=list(result.notes))
+    report = IngestReport(result.status, str(page.id), notes=list(result.notes),
+                          rejected=[list(r) for r in result.rejected])
     if result.status != mini.PROPOSED:
         return report
 

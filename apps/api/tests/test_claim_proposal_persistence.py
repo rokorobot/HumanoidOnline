@@ -454,7 +454,9 @@ def test_field_policy_registry_is_the_three_column_skeleton_with_no_new_mapping(
 
 def test_proposal_ingest_is_not_wired_into_observation_or_the_neura_adapter():
     root = pathlib.Path(__file__).resolve().parents[1] / "app"
-    for rel in ("services/discovery/observe.py", "services/discovery/adapter_run.py",
+    # G2-5 wires ingest into observation ONLY through services/discovery/g2_ingest.py (one
+    # registered source/page); the adapter, the acquisition path and promotion stay unwired.
+    for rel in ("services/discovery/adapter_run.py",
                 "services/discovery/live_adapter.py",
                 "services/discovery/sources/neura_robotics.py",
                 "services/discovery/promotion.py"):

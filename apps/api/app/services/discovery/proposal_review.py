@@ -139,17 +139,22 @@ def _stale_reasons(session: Session, p: DiscoveryClaimProposal,
     return reasons
 
 
-def latest_content_page(session: Session, p: DiscoveryClaimProposal) -> FetchedPage | None:
-    """The newest observation of the proposal's source page that carries content."""
+def latest_content_page_for(session: Session, source_id, source_url: str) -> FetchedPage | None:
+    """The newest observation of `source_url` (for one source) that carries content."""
     try:
-        source_url = normalize_url(p.source_url)
+        wanted = normalize_url(source_url)
     except UnsupportedUrl:
         return None
     pages = (pg for pg in session.scalars(
-        select(FetchedPage).where(FetchedPage.source_id == p.source_id)
+        select(FetchedPage).where(FetchedPage.source_id == source_id)
         .order_by(FetchedPage.retrieved_at.desc(), FetchedPage.created_at.desc()))
-        if _page_urls_match(pg, source_url))
+        if _page_urls_match(pg, wanted))
     return next((pg for pg in pages if pg.content_hash), None)
+
+
+def latest_content_page(session: Session, p: DiscoveryClaimProposal) -> FetchedPage | None:
+    """The newest observation of the proposal's source page that carries content."""
+    return latest_content_page_for(session, p.source_id, p.source_url)
 
 
 def derive_states(session: Session, proposals: list[DiscoveryClaimProposal]

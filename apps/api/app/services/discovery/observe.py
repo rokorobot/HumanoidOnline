@@ -45,6 +45,7 @@ from sqlalchemy.orm import Session
 from app.models.acquisition import CrawlRun, ExtractionResult, FetchedPage
 from app.models.discovery import DiscoveryCandidate, DiscoverySource
 from app.services.discovery import cache as body_cache
+from app.services.discovery import g2_ingest
 from app.services.discovery.acquisition import (
     SOURCE_RUN_IN_PROGRESS,
     STALE_RUN_AFTER,
@@ -88,7 +89,8 @@ class SourceObservation:
 
     @property
     def attention(self) -> bool:
-        return self.status in ATTENTION or bool(self.counts.get("review_items_this_cycle"))
+        return (self.status in ATTENTION or bool(self.counts.get("review_items_this_cycle"))
+                or bool(self.counts.get("g2_attention")))
 
     def line(self) -> str:
         return f"{self.key:<28} {self.status:<16} {self.detail}".rstrip()
@@ -271,6 +273,11 @@ def observe(
     return result
 
 
+def g2_registry():
+    """The G2-5 wiring (one approved source/page); a function so tests can substitute it."""
+    return g2_ingest.G2_INGESTS
+
+
 def _run_one(session, source, config, parent, cache_dir, now, kill, fetcher_for,
              commit, run_now=False) -> SourceObservation:
     key, source_id = source.key, source.id
@@ -308,6 +315,15 @@ def _run_one(session, source, config, parent, cache_dir, now, kill, fetcher_for,
         status = RESUMED
     counts = _counts(session, run, source)
     detail = _summary(counts)
+    # G2-5: proposal ingest for the registered source. Same path for the scheduler, a
+    # manual dispatch and --run-now. It never raises; a failure is surfaced here (the
+    # observation above stays preserved) and makes the cycle need a human.
+    g2 = g2_ingest.ingest_for_source(session, source, cache_dir=cache_dir, operator=operator,
+                                     checkpoint=commit, registry=g2_registry())
+    if g2 is not None:
+        counts["g2_ingest"] = g2.as_dict()
+        counts["g2_attention"] = g2.attention
+        detail = f"{detail} | {g2.summary()}"
     if status in (HALTED, CANCELLED):
         detail = f"{(run.counters or {}).get('halt_reason') or run.status}; {detail}"
     return SourceObservation(key, status, detail, run_id=run.id, counts=counts)

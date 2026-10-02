@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | **DECIDED — RATIFIED, 2026-10-02, Robert Konecny (product owner).** The decisions are adopted; **G2-1 (persistence foundation) is implemented** (§18.1); G2-2 onward has not begun. |
+| **Status** | **DECIDED — RATIFIED, 2026-10-02, Robert Konecny (product owner).** The decisions are adopted; **G2-1 (persistence foundation) and G2-2 (governed review) are implemented** (§18.1, §18.2); G2-3 onward has not begun. |
 | **Raised** | 2026-10-02 |
 | **Decision owner** | Robert Konecny (product owner) — sole ratifying authority |
 | **Stage** | Stage G2 of the discovery programme (`docs/08_DEVELOPMENT_ROADMAP.md` §1.1) |
@@ -626,6 +626,34 @@ INSERT/SELECT block for proposals and sightings (to be applied only when ingest 
 access to decisions), and `db/roles/discovery_reviewer.sql` (new; SELECT, plus INSERT on decisions
 only) is not created or applied in production until G2-2. Not in G2-1: review commands, accepted
 claims, materialization, price or availability, any publication.
+
+### 18.2 G2-2 as implemented (governed review)
+
+No migration: the G2-1 tables already carry everything review needs. Added: `services/discovery/
+proposal_review.py` and the CLI `proposals list|show|accept|reject|defer`. A decision appends one
+`discovery_proposal_decision` row and writes nothing else (no accepted claim, catalogue row, proposal or
+`is_published`).
+
+- **State is derived, never stored.** `SUPERSEDED`: a newer proposal exists in the same `slot_key`.
+  `STALE` (fail closed), with reasons listed: the extractor key/version is no longer live; the
+  identity gate fails (robot missing or not the named robot); no observation of the source page
+  exists; the latest observation did not retrieve the page (error, block, non-2xx); no retrieved
+  content can be established; or the latest retrieved content hash is not one the proposal was
+  sighted on (the page changed and was not re-extracted). A not-modified answer confirms the
+  previous content and adds none. Missing data is never read as current.
+- **ACCEPT** requires a CURRENT, non-stale proposal, a named human, a non-blank rationale, and an
+  explicit resolved choice for every review question (`q1..qN`, in the proposal's order). Unknown
+  keys and blank values are refused; nothing is defaulted. An `UNREPRESENTABLE` proposal needs
+  `catalogue_home = NO_CATALOGUE_HOME` chosen explicitly, which authorizes no write. REJECT and
+  DEFER need a named human and a rationale; they may also be recorded on a superseded or stale
+  proposal (history).
+- **Effective decision** = newest `decision_seq`. Repeating it with identical resolved choices
+  (compared as canonical, sorted-key JSON; the rationale and reviewer are not compared) is a no-op;
+  any other decision appends. Concurrent decisions on one proposal serialize on an advisory lock.
+- **Role.** `discovery_reviewer`: SELECT on the proposal tables, `discovery_source`, `crawl_run`,
+  `fetched_page` and (read-only, for the identity gate) `robot`; INSERT on decisions only.
+- The prerequisite guard of section 5.3 (a variant accepted before its price) concerns accepted
+  claims and is deferred to G2-3, which is where accepted claims first exist.
 
 ---
 

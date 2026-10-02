@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | **DECIDED — RATIFIED, 2026-10-02, Robert Konecny (product owner).** The decisions are adopted; **implementation has not begun** (§18). |
+| **Status** | **DECIDED — RATIFIED, 2026-10-02, Robert Konecny (product owner).** The decisions are adopted; **G2-1 (persistence foundation) is implemented** (§18.1); G2-2 onward has not begun. |
 | **Raised** | 2026-10-02 |
 | **Decision owner** | Robert Konecny (product owner) — sole ratifying authority |
 | **Stage** | Stage G2 of the discovery programme (`docs/08_DEVELOPMENT_ROADMAP.md` §1.1) |
@@ -600,6 +600,32 @@ These were found while inspecting the repository. This record changes none of th
    (`catalogue_write_audit`, accepted-claim lineage) must key on stable values (robot slug, claim or
    proposal digest, evidence content hash), never on importer-managed evidence row ids. Not an importer
    redesign task; recorded for the G2-1 design.
+
+### 18.1 G2-1 as implemented (persistence foundation)
+
+Migration `0018_claim_proposal_persistence.sql` (additive; `candidate_claim` untouched) adds:
+
+| Table | Role | Protection |
+|---|---|---|
+| `discovery_claim_proposal` | immutable proposal: digest (content identity), `slot_key` (what it is about: source key, `robot_slug`, kind, edition, evidence locator), edition, kind, target hint, representability, verbatim value, parsed parts, bounded excerpt + locator, extractor key and version, parser confidence, `NOT_VERIFIED` only (CHECK), gap, review questions, first-observation provenance | UPDATE/DELETE refused by trigger; ORM backstop |
+| `discovery_proposal_observation` | append-only sighting of a proposal on an observed page; unique per (proposal, page) | same |
+| `discovery_proposal_decision` | append-only `ACCEPT`/`REJECT`/`DEFER` with `decided_by`, mandatory rationale and `resolved_choices` (JSON object); newest `decision_seq` is effective | same |
+
+Design points fixed in G2-1: a robot is referenced by `robot_slug` text, **not** a foreign key (an FK
+action would UPDATE or DELETE an immutable row, and this layer never reaches into the catalogue); all
+other FKs are `RESTRICT` into the discovery layer; lineage uses source key, proposal digest, observed
+page and content hashes, **never `evidence_source` row ids** (§19.5); supersession and staleness are
+derived on read (newest proposal per `slot_key` is `CURRENT`), never stored; Standard/Pro are `edition`
+context on one robot identity. The field-policy registry is a skeleton holding only the three columns
+the promotion gate already approves; no new semantic mapping exists. Manual, offline
+`python -m app.cli.discovery proposals ingest` (read-only `proposals list`) verifies the retained body
+against the observation's `content_hash`, is idempotent on digest, records later sightings only, and
+writes no decision, accepted claim, candidate claim, catalogue row or `is_published`. It is **not**
+wired into scheduled observation. Role files: `db/roles/discovery_observer.sql` gains an
+INSERT/SELECT block for proposals and sightings (to be applied only when ingest is wired, G2-5; no
+access to decisions), and `db/roles/discovery_reviewer.sql` (new; SELECT, plus INSERT on decisions
+only) is not created or applied in production until G2-2. Not in G2-1: review commands, accepted
+claims, materialization, price or availability, any publication.
 
 ---
 

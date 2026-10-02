@@ -18,6 +18,9 @@
     python -m app.cli.discovery adapter run  <source-key> --operator "Name" [--resume <run-id>]
     python -m app.cli.discovery run fail <run-id> --by WHO --reason WHY
     python -m app.cli.discovery report <run-id>
+    python -m app.cli.discovery proposals ingest <source-key> --robot-slug S
+                                       --fetched-page ID (--body-file F | --cache-dir DIR) --by WHO
+    python -m app.cli.discovery proposals list --robot-slug S
     python -m app.cli.discovery review list
     python -m app.cli.discovery review show <candidate-id>
     python -m app.cli.discovery review history <candidate-id>
@@ -46,6 +49,13 @@
 - `run fail` is the governed recovery for a run whose process died without
   recording an end: attributed, with a reason, refused while the run shows
   activity in the last 30 minutes.
+
+- `proposals ingest` (G2-1, DR-A5) is the MANUAL, OFFLINE ingest of the G1 4NE1 Mini
+  proposals from a retained page body: no network request. It persists immutable,
+  NOT_VERIFIED proposals and append-only sightings, idempotently, and verifies the
+  body against the observation's recorded content hash. It writes no decision, no
+  accepted claim, no candidate claim and no catalogue row, and it is not wired into
+  `observe`. `proposals list` is read-only.
 
 - `source *` never makes a network request. `review` records the owner's own
   decisions (DR-A4: he reads the terms himself) and never enables; `enable` is a
@@ -357,6 +367,37 @@ def _cmd_review(args: argparse.Namespace) -> int:
         return 0
 
 
+def _cmd_proposals(args: argparse.Namespace) -> int:
+    import json
+
+    from app.db.session import SessionLocal
+    from app.services.discovery import proposals
+    from app.services.discovery.cache import read_observed_body
+
+    with SessionLocal() as session:
+        if args.action == "list":
+            states = proposals.proposal_states(session, args.robot_slug)
+            print(f"PROPOSALS for {args.robot_slug} ({len(states)}); read-only")
+            for st in states:
+                print(f"  {st['state']:<10} {st['kind']:<20} {str(st['edition']):<9} "
+                      f"{st['representability']:<14} decision={st['decision']} "
+                      f"{st['digest'][:12]} {st['value'][:48]}")
+            return 0
+        if args.body_file:
+            body = Path(args.body_file).read_bytes()
+        else:
+            body = read_observed_body(Path(args.cache_dir), args.fetched_page)
+            if body is None:
+                print("ERROR: that observation's body is no longer in the cache", file=sys.stderr)
+                return 1
+        report = proposals.ingest_neura_mini_proposals(
+            session, source_key=args.source_key, robot_slug=args.robot_slug,
+            fetched_page_id=uuid.UUID(args.fetched_page), body=body, ingested_by=args.by)
+        session.commit()
+        print(json.dumps(report.as_dict(), indent=2))
+        return 0
+
+
 def _cmd_observe(args: argparse.Namespace) -> int:
     import json
 
@@ -532,6 +573,20 @@ def main(argv: list[str] | None = None) -> int:
     alias.add_argument("robot_slug")
     review_cmd.set_defaults(func=_cmd_review)
 
+    proposals_cmd = commands.add_parser("proposals", help="G2-1 claim proposals (offline)")
+    proposal_actions = proposals_cmd.add_subparsers(dest="action", required=True)
+    ingest = proposal_actions.add_parser("ingest", help="manual offline ingest; no network")
+    ingest.add_argument("source_key")
+    ingest.add_argument("--robot-slug", required=True)
+    ingest.add_argument("--fetched-page", required=True, help="the observation's fetched_page id")
+    body_src = ingest.add_mutually_exclusive_group(required=True)
+    body_src.add_argument("--body-file")
+    body_src.add_argument("--cache-dir")
+    ingest.add_argument("--by", required=True)
+    plist = proposal_actions.add_parser("list", help="proposals and derived state; no write")
+    plist.add_argument("--robot-slug", required=True)
+    proposals_cmd.set_defaults(func=_cmd_proposals)
+
     report = commands.add_parser("report", help="print a run report from the database")
     report.add_argument("run_id")
     report.set_defaults(func=_cmd_report)
@@ -551,6 +606,8 @@ def main(argv: list[str] | None = None) -> int:
     ids = [getattr(args, "resume", None), args.run_id if args.command == "run" else None]
     if args.command == "review":
         ids += [getattr(args, n, None) for n in ("candidate_id", "candidate_a", "candidate_b")]
+    if args.command == "proposals" and args.action == "ingest":
+        ids.append(args.fetched_page)
     for run_id in ids:
         if run_id:
             try:

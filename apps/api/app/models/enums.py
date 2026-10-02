@@ -153,6 +153,8 @@ candidate_identity_status = _pg_enum(
 candidate_identity_decision_kind = _pg_enum(
     "candidate_identity_decision_kind", "SAME_ENTITY", "NOT_SAME_ENTITY",
 )
+# G2-1 (migration 0018): a human decision on an extraction proposal (DR-A5).
+proposal_decision_kind = _pg_enum("proposal_decision_kind", "ACCEPT", "REJECT", "DEFER")
 candidate_status = _pg_enum(
     "candidate_status",
     "DISCOVERED", "IDENTITY_REVIEW", "SOURCE_TRACE", "VERIFICATION",

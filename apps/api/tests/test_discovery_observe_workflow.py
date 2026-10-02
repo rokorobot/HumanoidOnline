@@ -46,9 +46,9 @@ def _resolve(expr: str, event: str, inputs: dict) -> str:
     return str(value).lower() if isinstance(value, bool) else value
 
 
-def test_hourly_schedule_at_minute_37_and_manual_dispatch_kept(workflow):
+def test_twice_weekly_schedule_and_manual_dispatch_kept(workflow):
     triggers = _triggers(workflow)
-    assert triggers["schedule"] == [{"cron": "37 * * * *"}]
+    assert triggers["schedule"] == [{"cron": "37 6 * * 1,4"}]  # Mon + Thu 06:37 UTC
     inputs = triggers["workflow_dispatch"]["inputs"]
     assert inputs["mode"]["default"] == "plan" and inputs["run_now"]["default"] is False
     assert set(triggers) == {"schedule", "workflow_dispatch"}

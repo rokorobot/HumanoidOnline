@@ -32,6 +32,7 @@ MIGRATION_0004 = ROOT / "db" / "migrations" / "0004_add_live_acquisition_layer.s
 #: fetched_page rebuilt by 0004 alone is therefore the pre-0014 shape; the round
 #: trip applies 0014 after 0004 so the comparison is against the full baseline.
 MIGRATION_0014 = ROOT / "db" / "migrations" / "0014_fetched_page_retrieval_provenance.sql"
+MIGRATION_0018 = ROOT / "db" / "migrations" / "0018_claim_proposal_persistence.sql"
 
 #: Everything `0004` introduces. Dropping exactly this set puts a database back
 #: into its `0003` shape, which is what makes the round trip meaningful.
@@ -134,6 +135,10 @@ def test_migration_0004_converges_a_0003_database_onto_the_baseline(scratch_db) 
 
         # --- wind back to the 0003 shape -----------------------------------
         conn.execute("SET search_path TO humanoid, public")
+        # Later migrations (0018 G2-1) build on these types; unwind them first.
+        for table in ("discovery_proposal_decision", "discovery_proposal_observation",
+                      "discovery_claim_proposal"):
+            conn.execute(f"DROP TABLE IF EXISTS humanoid.{table} CASCADE")
         for table in NEW_TABLES:
             conn.execute(f"DROP TABLE IF EXISTS humanoid.{table} CASCADE")
         for table, columns in NEW_COLUMNS.items():
@@ -151,6 +156,7 @@ def test_migration_0004_converges_a_0003_database_onto_the_baseline(scratch_db) 
         # --- apply the forward migration -----------------------------------
         conn.execute(MIGRATION_0004.read_text(encoding="utf-8"))
         conn.execute(MIGRATION_0014.read_text(encoding="utf-8"))
+        conn.execute(MIGRATION_0018.read_text(encoding="utf-8"))   # re-add what was unwound
         upgraded_columns, upgraded_constraints = _shape(conn)
 
     assert upgraded_columns == baseline_columns, (

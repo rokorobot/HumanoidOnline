@@ -26,6 +26,12 @@ from app.models.acquisition import (
 )
 from app.models.buyer_requirement import BuyerRequirement
 from app.models.capability import Capability, RobotCapability
+from app.models.claim_proposal import (
+    DiscoveryClaimProposal,
+    DiscoveryProposalDecision,
+    DiscoveryProposalObservation,
+    ProposalImmutableError,
+)
 from app.models.commercial import AvailabilityOffer, Deployment, PricingOffer
 from app.models.commercial_lead import (
     CommercialLead,
@@ -76,6 +82,10 @@ __all__ = [
     "MatchResult",
     "PricingOffer",
     "CandidateIdentityDecision",
+    "DiscoveryClaimProposal",
+    "DiscoveryProposalDecision",
+    "DiscoveryProposalObservation",
+    "ProposalImmutableError",
     "PromotionAudit",
     "Provider",
     "Region",

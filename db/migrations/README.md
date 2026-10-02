@@ -261,6 +261,16 @@ Forward migrations:
   changes, INSERT is unaffected, and an older application build keeps working.
   Idempotent.
 
+- `0018_claim_proposal_persistence.sql` — DR-A5 B-prime, stage G2-1 (owner-authorized):
+  three new discovery-layer tables, `discovery_claim_proposal` (immutable extraction
+  proposals), `discovery_proposal_observation` (append-only sightings) and
+  `discovery_proposal_decision` (append-only human ACCEPT/REJECT/DEFER decisions), the
+  enum `proposal_decision_kind`, and one refuse-mutation function with six
+  statement-level triggers (UPDATE and DELETE are refused at the database). No foreign
+  key to any canonical table (a robot is referenced by slug text), so no referential
+  action can touch an immutable row; `candidate_claim` is not modified; no accepted
+  claim exists. Additive and idempotent; an older application build keeps working.
+
 ## Checksum integrity (WS8.2 / R9)
 
 `schema_migrations` stores a `sha256` for every applied file, and

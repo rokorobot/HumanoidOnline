@@ -74,4 +74,7 @@ MIGRATIONS: dict[str, str] = {
     "0017_promotion_audit_append_only": (
         "e8ff866e7ccf0de0a7be0d297a378f7c434555d5d1649537f9bf809cb3b464ca"
     ),
+    "0018_claim_proposal_persistence": (
+        "4f677e16a88a36ed6a459efd868c8de4d108bd79838e80eb0d5f1a1f67841400"
+    ),
 }

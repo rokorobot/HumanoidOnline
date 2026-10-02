@@ -47,6 +47,10 @@ DISCOVERY_TABLES = {
     # Stage E (migration 0015): pairwise candidate identity decisions. Both FKs
     # point INTO discovery_candidate, so the Gate K invariant is unchanged.
     "candidate_identity_decision",
+    # G2-1 (migration 0018, DR-A5): proposal persistence. FKs point INTO
+    # discovery_source / crawl_run / fetched_page, so Gate K is unchanged.
+    "discovery_claim_proposal", "discovery_proposal_observation",
+    "discovery_proposal_decision",
 }
 
 

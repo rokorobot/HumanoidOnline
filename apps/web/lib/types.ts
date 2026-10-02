@@ -17,7 +17,7 @@ export interface ManufacturerRef {
 }
 
 export interface PriceDisplay {
-  // `type` is a price_type enum: PUBLIC | FROM | RANGE | ESTIMATED | QUOTE_ONLY.
+  // `type` is a price_type enum: PUBLIC | FROM | RANGE | MANUFACTURER_ESTIMATE | ESTIMATED | QUOTE_ONLY.
   // The whole object is null (not present) when there are no pricing rows
   // (UNKNOWN price). QUOTE_ONLY is a *known* fact with amount null.
   type: string;

@@ -17,6 +17,7 @@
 
 - **B1.** Given the RaaS-only robot in the seed (maturity `RAAS_DEPLOYMENT`, no `PURCHASE` offer, deployment evidence attached), when its page renders, then maturity, obtainability, and deployment evidence appear as three distinct facts and the page does NOT claim the robot can be bought.
 - **B2.** Given a price with `price_type=ESTIMATED`, when displayed, then it is visibly marked "Estimated".
+- **B2b.** Given a price with `price_type=MANUFACTURER_ESTIMATE`, when displayed, then it is visibly marked "Manufacturer estimate" (never as a public price, never as `ESTIMATED`).
 - **B3.** Given an evidence record with `confidence=VERIFIED` and `verified_at` set, when the related fact renders, then a "Verified {date}" indicator with the source type is shown; facts without evidence show no such indicator.
 - **B3a.** Given an evidence record with `LOW`, `MEDIUM`, or `HIGH` confidence and no `verified_at`, when the related commercial fact renders, then its confidence state is displayed ("Low confidence" / "Medium confidence" / "High confidence") and NO "Verified" indicator appears. The full epistemic ladder `LOW → MEDIUM → HIGH → VERIFIED {date}` must be visually distinguishable (the seed exercises all four states).
 - **B4.** Given an unknown slug, when requested, then a 404 state renders with a link back to `/robots`.

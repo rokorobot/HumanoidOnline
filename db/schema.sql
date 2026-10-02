@@ -87,6 +87,9 @@ CREATE TYPE transaction_preference AS ENUM (
 CREATE TYPE price_type AS ENUM (
     'PUBLIC',      -- published MSRP / store price
     'ESTIMATED',   -- HumanoidOnline estimate
+    'MANUFACTURER_ESTIMATE',  -- a numeric estimate explicitly published by the robot
+                              -- MANUFACTURER itself (migration 0020/0021, DR-A5 G2-4).
+                              -- NOT 'ESTIMATED' (HumanoidOnline's own estimate), not MSRP.
     'QUOTE_ONLY',  -- price on request
     'FROM',        -- "from X" starting price
     'RANGE'        -- min-max band
@@ -640,7 +643,7 @@ CREATE TABLE pricing_offer (
     transaction_type transaction_type NOT NULL,
     price_type       price_type NOT NULL,
     currency         CHAR(3) NOT NULL DEFAULT 'USD',
-    price            NUMERIC(14,2),           -- point price (PUBLIC/FROM/ESTIMATED)
+    price            NUMERIC(14,2),           -- point price (PUBLIC/FROM/ESTIMATED/MANUFACTURER_ESTIMATE)
     price_min        NUMERIC(14,2),           -- for RANGE
     price_max        NUMERIC(14,2),           -- for RANGE
     billing_period   billing_period NOT NULL DEFAULT 'ONE_TIME',
@@ -671,7 +674,7 @@ CREATE TABLE pricing_offer (
      OR (price_type = 'RANGE'
             AND price IS NULL AND price_min IS NOT NULL AND price_max IS NOT NULL
             AND price_max >= price_min)
-     OR (price_type IN ('PUBLIC','FROM','ESTIMATED')
+     OR (price_type IN ('PUBLIC','FROM','ESTIMATED','MANUFACTURER_ESTIMATE')
             AND price IS NOT NULL AND price_min IS NULL AND price_max IS NULL)
     )
 );
@@ -2209,8 +2212,9 @@ CREATE TABLE accepted_claim (
     created_at               TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
     CONSTRAINT ck_accepted_claim_digest CHECK (claim_digest ~ '^[0-9a-f]{64}$'),
     CONSTRAINT ck_accepted_claim_target_kind
-        CHECK (target_kind IN ('robot_variant', 'specification', 'NO_CATALOGUE_HOME')),
-    CONSTRAINT ck_accepted_claim_value_type CHECK (value_type IN ('TEXT')),
+        CHECK (target_kind IN ('robot_variant', 'specification', 'pricing_offer',
+                               'availability_offer', 'NO_CATALOGUE_HOME')),
+    CONSTRAINT ck_accepted_claim_value_type CHECK (value_type IN ('TEXT', 'JSON')),
     CONSTRAINT ck_accepted_claim_scope
         CHECK (edition_scope IS NULL
                OR edition_scope IN ('THIS_EDITION', 'PRODUCT_LINE', 'PLATFORM')),
@@ -2267,7 +2271,8 @@ CREATE TABLE catalogue_write_audit (
     applied_at      TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
     CONSTRAINT ck_catalogue_write_audit_method CHECK (method IN ('IMPORTER_M2')),
     CONSTRAINT ck_catalogue_write_audit_table
-        CHECK (target_table IN ('robot_variant', 'specification')),
+        CHECK (target_table IN ('robot_variant', 'specification', 'pricing_offer',
+                                'availability_offer')),
     CONSTRAINT ck_catalogue_write_audit_after CHECK (after_hash ~ '^[0-9a-f]{64}$'),
     CONSTRAINT ck_catalogue_write_audit_change CHECK (btrim(change_ref) <> ''),
     CONSTRAINT ck_catalogue_write_audit_attributed CHECK (btrim(applied_by) <> '')

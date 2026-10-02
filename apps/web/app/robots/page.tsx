@@ -158,7 +158,7 @@ export default async function RobotsPage({
             )}
 
             <p className="note">
-              {"// PRICE STATES: PUBLIC · FROM · RANGE · ESTIMATED · QUOTE_ONLY · UNKNOWN."}
+              {"// PRICE STATES: PUBLIC · FROM · RANGE · MANUFACTURER_ESTIMATE · ESTIMATED · QUOTE_ONLY · UNKNOWN."}
               <br />
               {'// QUOTE_ONLY ("Price on request") ≠ UNKNOWN ("No confirmed pricing"). Absence of availability rows renders "Availability unknown", never NOT_AVAILABLE.'}
               <br />

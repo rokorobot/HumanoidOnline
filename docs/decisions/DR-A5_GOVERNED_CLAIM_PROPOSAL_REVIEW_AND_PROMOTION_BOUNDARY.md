@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | **DECIDED — RATIFIED, 2026-10-02, Robert Konecny (product owner).** The decisions are adopted; **G2-1 (persistence), G2-2 (governed review) and the first vertical slice of G2-3 (accepted claims and materialization) are implemented** (§18.1 to §18.3); the rest of G2-3 and G2-4 have not begun. **G2-5 (scheduled proposal ingestion) is operational for NEURA 4NE1 Mini only** (§18.4). |
+| **Status** | **DECIDED — RATIFIED, 2026-10-02, Robert Konecny (product owner).** The decisions are adopted; **G2-1 (persistence), G2-2 (governed review) and the first vertical slice of G2-3 (accepted claims and materialization) are implemented** (§18.1 to §18.3); the first G2-4 commercial/interface slice for NEURA 4NE1 Mini is implemented (§18.5). **G2-5 (scheduled proposal ingestion) is operational for NEURA 4NE1 Mini only** (§18.4). |
 | **Raised** | 2026-10-02 |
 | **Decision owner** | Robert Konecny (product owner) — sole ratifying authority |
 | **Stage** | Stage G2 of the discovery programme (`docs/08_DEVELOPMENT_ROADMAP.md` §1.1) |
@@ -738,6 +738,48 @@ scheduled observation -> bounded governed fetch -> identity extraction / source 
   write privilege.
 - **Schedule unchanged:** Monday and Thursday 06:37 UTC, 48 h source cadence. G2-4 commercial
   semantics (price, availability) remain deferred, and human review remains mandatory.
+
+### 18.5 G2-4 as implemented (4NE1 Mini commercial and interface semantics; owner decisions)
+
+Owner decisions recorded here (they settle the former "price_type", WAITLIST vs PREORDER, deposit,
+use-case and interface findings for this robot; no other robot is decided):
+
+- **Price.** New canonical `price_type` `MANUFACTURER_ESTIMATE`: a numeric estimate explicitly
+  published by the robot manufacturer itself. Distinct from `ESTIMATED` (HumanoidOnline's own
+  estimate), whose meaning is unchanged; never MSRP, public selling price or FROM. It is a positive
+  commercial fact and needs manufacturer evidence (`validate_catalogue.py` gates it whether or not the
+  robot is published). Migrations `0020` (declares the enum label, after `ESTIMATED`; a new label
+  cannot be used in the transaction that adds it) and `0021` (the price-shape CHECK accepts it as a
+  point price; the accepted-claim and write-audit CHECKs gain `pricing_offer` and `availability_offer`
+  targets and a `JSON` value type). Additive and backward compatible. Propagated to the pricing
+  service (a point type), the read-model rank, matching (an unconfirmed point price), the web display
+  ("Manufacturer estimate", no `~`), comparison policy, the data dictionary, API contract and visual
+  system. (`docs/01` is frozen; its enumeration is superseded by `docs/03` for this value.)
+- **4NE1 Mini prices.** Standard EUR 19,999.00 and Pro EUR 29,999.00: `PURCHASE`, `ONE_TIME`,
+  `MANUFACTURER_ESTIMATE`, region and provider unspecified, `edition_confirmed` true, price basis
+  "excluding taxes and shipping" preserved, variant-specific, with manufacturer evidence.
+- **Availability.** `WAITLIST` (not PREORDER): the manufacturer states that a reservation fee secures a
+  place in the delivery queue, which establishes a queue state, not a purchase order. Per variant,
+  `PURCHASE`, `available_from` NULL (no date is manufactured from the year),
+  `delivery_estimate_label` "Expected in 2026" and the source sentence as `seller_wording`. WAITLIST
+  rests on the accepted reservation statement (prerequisite enforced).
+- **Reservation fee (EUR 100 each) and terms; use cases:** accepted as governed knowledge with
+  provenance, `NO_CATALOGUE_HOME`; never materialized (the fee is not a price; the current schema
+  cannot say Standard and Pro have different use cases). No automatic use-case mapping.
+- **Interfaces.** Two long-tail TEXT definitions, `common_interfaces` and `additional_interfaces`
+  (category SOFTWARE), preserve the manufacturer's row wording verbatim, variant-scoped,
+  `THIS_EDITION`. Nothing is split, and no `has_sdk`, `ros_support`, `has_api`, `has_teleoperation`,
+  network boolean, autonomy or capability is derived. The Standard "/" placeholder yields no claim.
+- **Not materialized (unchanged):** Neuraverse integration, the datasheet reference or content (no
+  off-host fetch; no new source decision), the design-refinement caveat. `commercial_status` stays
+  UNKNOWN and nothing is published.
+- **Registry** (`field_policy.CLAIM_REGISTRY_VERSION` 0.3.0): adds `pricing_offer[variant]`,
+  `availability_offer[variant]`, `specification[common_interfaces]`,
+  `specification[additional_interfaces]` and three `NO_CATALOGUE_HOME` statement kinds
+  (reservation fee, reservation terms, use cases). Each owner mapping is checked value-for-value
+  against the proposal's source text and the human's resolved choices; a differing or missing value
+  refuses the claim.
+- The scheduled G2-5 pipeline is unchanged and human review stays mandatory.
 
 ---
 

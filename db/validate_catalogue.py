@@ -63,6 +63,18 @@ GAP_QUERIES = {
           AND NOT EXISTS (SELECT 1 FROM evidence_source e
                           WHERE e.subject_type='AVAILABILITY_OFFER' AND e.subject_id=a.id)
     """,
+    # A MANUFACTURER_ESTIMATE (migration 0020/0021) is a positive commercial fact asserted
+    # from the manufacturer's own publication, so it needs MANUFACTURER evidence whether or
+    # not the robot is published: it is never a bare number.
+    "pricing_offer (MANUFACTURER_ESTIMATE needs manufacturer evidence)": """
+        SELECT r.slug
+        FROM robot r JOIN pricing_offer p ON p.robot_id = r.id
+        WHERE p.price_type = 'MANUFACTURER_ESTIMATE'
+          AND NOT EXISTS (SELECT 1 FROM evidence_source e
+                          WHERE e.subject_type='PRICING_OFFER' AND e.subject_id=p.id
+                            AND e.source_type IN ('MANUFACTURER_SITE','MANUFACTURER_STORE')
+                            AND e.source_url IS NOT NULL AND e.excerpt IS NOT NULL)
+    """,
     "deployment": """
         SELECT r.slug
         FROM robot r JOIN deployment d ON d.robot_id = r.id
@@ -174,7 +186,7 @@ def main() -> None:
         )
 
     if gaps:
-        print("\nG2 VIOLATION — published commercial fact(s) without evidence:")
+        print("\nG2 VIOLATION — commercial fact(s) without the evidence they require:")
         for label, slugs in gaps.items():
             print(f"  {label}: {', '.join(slugs)}")
         sys.exit(1)

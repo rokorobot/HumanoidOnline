@@ -80,4 +80,10 @@ MIGRATIONS: dict[str, str] = {
     "0019_accepted_claims": (
         "a568ff5f418f1516e5262838c39320d3ac72bc702e9e6956845382d5e247a113"
     ),
+    "0020_price_type_manufacturer_estimate": (
+        "b7938e3f579add6fdef909f10f4e973e377c84024f475ebbeb851a84d51c3ec1"
+    ),
+    "0021_manufacturer_estimate_and_claim_targets": (
+        "589bfdef0725e444249883691b70691e0b35756995e7909ccd7595a6a586c8e6"
+    ),
 }

@@ -209,7 +209,7 @@ def test_accept_needs_every_review_question_resolved(dsession):
         pr.decide(dsession, str(p.id), pr.ACCEPT, decided_by=WHO, rationale=WHY, choices=blank)
     with pytest.raises(DiscoveryError, match="unknown"):
         pr.decide(dsession, str(p.id), pr.ACCEPT, decided_by=WHO, rationale=WHY,
-                  choices={**all_choices(p), "price_type": "ESTIMATE"})
+                  choices={**all_choices(p), "colour": "red"})
     assert not dsession.scalars(select(DiscoveryProposalDecision)).all()
     row, created = pr.decide(dsession, str(p.id), pr.ACCEPT, decided_by=WHO, rationale=WHY,
                              choices=all_choices(p))

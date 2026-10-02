@@ -104,7 +104,7 @@ accepted claim ≠ publication
 |---|---|---|
 | **A–F** | Read-only foundation; bounded HTTP acquisition and change detection; the adapter framework and the first source adapter; deterministic candidate extraction and identity resolution; **Stage E** exception-only human review (identity decisions, out-of-scope rejection, source trace, same-entity promotion convergence); **Stage F** scheduled observation (per-source cadence, redirect and cache handling, one-running-run guard, least-privilege database role) | ✅ **OPERATIONAL** |
 | **G1** | Proposal-only structured extraction | 🟢 **IMPLEMENTED FOUNDATION** (PR #84) |
-| **G2** | Governed proposal review and claim promotion | 🟡 **IN PROGRESS** — architecture ratified in DR-A5; **G2-1 persistence (0018), G2-2 governed review, and the first G2-3 slice (accepted claims, materialization; 0019) implemented**; **G2-5 scheduled proposal ingestion operational for NEURA 4NE1 Mini only**; price/availability (G2-4) pending |
+| **G2** | Governed proposal review and claim promotion | 🟡 **IN PROGRESS** — architecture ratified in DR-A5; **G2-1 persistence (0018), G2-2 governed review, and the first G2-3 slice (accepted claims, materialization; 0019) implemented**; **G2-5 scheduled proposal ingestion operational for NEURA 4NE1 Mini only**; **G2-4 4NE1 Mini commercial and interface slice implemented** (`MANUFACTURER_ESTIMATE`, WAITLIST, interface specs; 0020/0021) |
 | **G3** | Source expansion | ⏸ After G2 is proven |
 
 **NEURA is the first commissioned scheduled source.** Observation runs **Monday and
@@ -167,9 +167,12 @@ implemented; the first G2-3 vertical slice (immutable accepted claims, retractio
 audit, deterministic materialization into the catalogue of record, variant-scoped specifications; 0019)
 is implemented for `robot_variant` and `specification[dexterous_hand_option]` only. G2-5 scheduled
 proposal ingestion is operational for the NEURA 4NE1 Mini page only (human review stays mandatory;
-there is no automatic acceptance, materialization or publication). Price and availability (G2-4) and
-every other mapping remain pending; any further manufacturer needs separate source approval**, and this roadmap authorizes **no catalogue-writing code**. **Price and availability
-remain deferred**, as separate owner decisions. The open questions above are settled
+there is no automatic acceptance, materialization or publication). G2-4 for the 4NE1 Mini (the
+`MANUFACTURER_ESTIMATE` price type and manufacturer-estimate prices, WAITLIST availability, verbatim
+interface specs; reservation fee and use cases accepted with NO_CATALOGUE_HOME) is implemented
+(DR-A5 §18.5); commercial status, publication, every other mapping and any further manufacturer
+remain pending and need separate owner decisions or source approval**, and this roadmap authorizes
+**no catalogue-writing code** beyond the governed chain. The open questions above are settled
 phase by phase under DR-A5. The physical G2-1 design is recorded in DR-A5 §18.1.
 
 #### Stage G3 — Source expansion · after G2 is proven
@@ -467,7 +470,7 @@ Current programme:                Governed Catalogue Discovery & Live Operations
 Operational:                      Stages A–F; NEURA scheduled (Mon + Thu 06:37 UTC, 48 h cadence)
 Latest foundation:                Stage G1 proposal-only extraction (PR #84, merge 42954ed)
 Next:                             Stage G2 — governed proposal review and claim promotion
-                                  (DR-A5; G2-1, G2-2 and the first G2-3 slice implemented; G2-5 operational for NEURA Mini; G2-4 pending)
+                                  (DR-A5; G2-1, G2-2 and the first G2-3 slice implemented; G2-5 operational for NEURA Mini; G2-4 Mini slice implemented)
 Strategic, not immediate:         Commercial Architecture — Rent / Buy / Lease-RaaS
 
 Completed:  ✅ WS0  ✅ WS1  ✅ WS2A  ✅ WS2B  ✅ UI-D1  ✅ WS3  ✅ WS4  ✅ WS5  ✅ WS6  ✅ WS7

@@ -197,7 +197,7 @@ All enum labels (`commercial_status`, `transaction_type`, `price_type`,
 
 | `price_type` | price | price_min / price_max |
 |---|---|---|
-| `PUBLIC` / `FROM` / `ESTIMATED` | **set** | null |
+| `PUBLIC` / `FROM` / `ESTIMATED` / `MANUFACTURER_ESTIMATE` | **set** | null |
 | `RANGE` | null | **both set**, `price_max >= price_min` |
 | `QUOTE_ONLY` | null | null |
 

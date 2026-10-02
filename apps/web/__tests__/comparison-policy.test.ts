@@ -11,6 +11,15 @@ import {
   type OfferLike,
 } from "../lib/comparison-policy";
 
+describe("price types", () => {
+  it("MANUFACTURER_ESTIMATE is a comparable point price ranked below FROM and above ESTIMATED", async () => {
+    const mod = await import("../lib/comparison-policy");
+    expect(mod.COMPARABLE_PRICE_TYPES.has("MANUFACTURER_ESTIMATE")).toBe(true);
+    expect(mod.COMPARABLE_PRICE_TYPES.has("ESTIMATED")).toBe(true);
+    expect(mod.COMPARABLE_PRICE_TYPES.has("QUOTE_ONLY")).toBe(false);
+  });
+});
+
 describe("policyFor / eligibility", () => {
   it("classifies numeric leaders, comparable-but-no-leader, and display-only", () => {
     expect(policyFor("payload_kg").leader).toBe("HIGHER");

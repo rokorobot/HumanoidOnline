@@ -1198,6 +1198,12 @@ The first capped NEURA crawl (production run `2c64d1f3`) is the real acquired da
   A decided pair is never flagged as a duplicate again.
 - **A SAME_ENTITY decision destroys nothing.** Both candidates keep their rows, claims and evidence. The relationship is exposed to the promoting human (`build_proposal` → `same_entity_candidates`); nothing is merged.
 - **Out of scope** uses the existing rejection path, with reason code `OUT_OF_SCOPE` recorded in `promotion_audit`. A rejected candidate is terminal, remains as research history, and **no longer causes another candidate to become `POSSIBLE_DUPLICATE`**. Before Stage E it did; that behaviour was changed deliberately.
+- **Catalogue scope in review: humanoid robots only** *(owner policy, applied from 2026-09-26; it restates docs/01, which defines the product as the humanoid robotics economy, and does not change product scope)*.
+  - What counts as out of scope: a candidate whose source describes a **non-humanoid** platform, such as a collaborative or industrial robot arm, an autonomous mobile robot or transport vehicle, a wheeled service or assistant platform, or any other non-humanoid robot. This is judged from what the source's own page says the robot is.
+  - What happens: it is rejected with `OUT_OF_SCOPE` through the path above, and the reason says what the source calls the robot. It is never promoted, and a rejection is history, not a verdict on the product.
+  - Who decides: a human, per candidate. Discovery never classifies scope automatically, by keyword, model or any other rule.
+  - Applied so far (NEURA): LARA (cobot), MAV (mobile transport), MiPA (wheeled assistant platform) and MAiRA (robot arm).
+  - Widening the scope to non-humanoid robots needs a separate, explicit owner authorization and, because it changes docs/01, the product-scope approval process; it is never a review-time decision.
 - **Candidate ↔ catalogue identity** stays with the confirmed alias register only. `review propose-alias` prints a register entry and writes nothing. A human confirms it in a reviewed change. No alias is inferred, and no variant is folded.
 - **Trace recording** (`review trace <id> --source KEY --url URL --by WHO`) is the governed CLI path onto the existing `record_trace` (P2).
   - The source must be an official class (`MANUFACTURER` → `MANUFACTURER_SITE`, `OFFICIAL_STORE` → `MANUFACTURER_STORE`), and its approved host and paths must cover the URL.

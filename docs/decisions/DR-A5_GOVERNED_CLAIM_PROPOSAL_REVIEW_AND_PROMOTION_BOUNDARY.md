@@ -686,6 +686,16 @@ after-hash; it records, it never writes the catalogue).
   loudly; absent means product-level, as before). The public read model exposes `variant_slug` on
   extended specs. This extends the importer's representation only; the catalogue-of-record boundary
   (M2) is unchanged.
+- **Audit identity (clarified).** The importer recreates `robot_variant` rows and its own
+  `specification` rows (new UUIDs) on every run, so a physical row UUID is not a durable
+  identity. The materialization identity is the accepted claim, its logical target, the
+  canonical content hash and the catalogue `change_ref`. The logical target is derived from the
+  claim, never stored again: `robot_variant:<robot>:<variant>` and
+  `specification:<robot>:<variant>:<target_key>`. `catalogue_write_audit.target_row_id` is the
+  physical row observed at verification time: forensic metadata only. `claims verify` is a no-op
+  for an identical (claim, content hash, change_ref) even after the importer has recreated the
+  row; differing content is refused. Audit rows are never updated or deleted. No schema change
+  was needed.
 - **Reviewer role.** Adds INSERT on `accepted_claim` and `claim_retraction` and SELECT on the claim
   tables; it cannot write the audit or any catalogue table.
 - Still not done: price, availability, reservation, use cases, interfaces (G2-4), scheduled ingest

@@ -160,10 +160,24 @@ def _hash(payload: dict) -> str:
                                      separators=(",", ":")).encode("utf-8")).hexdigest()
 
 
+def logical_target(claim: AcceptedClaim) -> str:
+    """The durable identity of what a claim materializes, derived from the claim itself:
+    `robot_variant:<robot>:<variant>` or `specification:<robot>:<variant>:<target_key>`.
+    Never a database row id (the importer recreates those)."""
+    if claim.target_kind == "robot_variant":
+        return f"robot_variant:{claim.robot_slug}:{claim.variant_slug}"
+    if claim.target_kind == "specification":
+        return f"specification:{claim.robot_slug}:{claim.variant_slug}:{claim.target_key}"
+    raise DiscoveryError(f"{claim.target_kind!r} has no catalogue target")
+
+
 def verify_applied(session: Session, robot_slug: str, *, change_ref: str, applied_by: str,
                    importer_run_ref: str | None = None) -> list[CatalogueWriteAudit]:
     """Compare the imported rows with the active claims and append one audit row per
-    claim. Refuses (writing nothing) on any mismatch. Idempotent per (claim, row, hash)."""
+    claim. Refuses (writing nothing) on any mismatch. Idempotent per (claim, content hash,
+    change_ref): a later importer run that recreates an identical row under a new UUID
+    appends nothing, and old audit rows are never touched. `target_row_id` records the
+    physical row observed at verification time (forensic only, not an identity)."""
     if not change_ref.strip() or not applied_by.strip():
         raise DiscoveryError("verification needs a change reference and a named human")
     claims = _materializable(session, robot_slug)
@@ -207,9 +221,14 @@ def verify_applied(session: Session, robot_slug: str, *, change_ref: str, applie
             rows.append((c, "specification", r.id, _hash(payload)))
     written = []
     for c, table, row_id, after in rows:
+        # The materialization identity is (claim, logical target, content hash, change_ref).
+        # The physical row UUID is deliberately NOT part of it: the importer recreates
+        # variant and importer-owned specification rows (new UUIDs) on every run, so a
+        # row id is forensic metadata, never a durable identity. The logical target is
+        # derived from the claim (`logical_target`), the content from `after_hash`.
         dup = session.scalar(select(CatalogueWriteAudit).where(
-            CatalogueWriteAudit.claim_id == c.id, CatalogueWriteAudit.target_row_id == row_id,
-            CatalogueWriteAudit.after_hash == after, CatalogueWriteAudit.change_ref == change_ref))
+            CatalogueWriteAudit.claim_id == c.id, CatalogueWriteAudit.after_hash == after,
+            CatalogueWriteAudit.change_ref == change_ref.strip()))
         if dup is not None:
             continue
         audit = CatalogueWriteAudit(

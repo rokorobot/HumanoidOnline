@@ -34,11 +34,42 @@
   "specs_note": "Specifications not yet verified.",
   "official_url": null,
   "commercial_status_evidence": [],
-  "variants": [],
+  "variants": [
+    {
+      "slug": "pro",
+      "name": "Pro"
+    },
+    {
+      "slug": "standard",
+      "name": "Standard"
+    }
+  ],
   "pricing_offers": [],
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": []
+  "images": [],
+  "extended_specs": [
+    {
+      "key": "dexterous_hand_option",
+      "variant_slug": "pro",
+      "value": "12 DoF dexterous hands",
+      "source_label": "NEURA Robotics",
+      "source_url": "https://neura-robotics.com/product/4ne1-mini-reservation",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-02"
+    },
+    {
+      "key": "dexterous_hand_option",
+      "variant_slug": "standard",
+      "value": "Not included",
+      "source_label": "NEURA Robotics",
+      "source_url": "https://neura-robotics.com/product/4ne1-mini-reservation",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-02"
+    }
+  ]
 }

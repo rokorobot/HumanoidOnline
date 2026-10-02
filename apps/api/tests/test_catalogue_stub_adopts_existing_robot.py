@@ -11,8 +11,8 @@ scratch database holding the production-shaped state, importing the stub (twice)
 keeps the robot's UUID, adds no robot or manufacturer, leaves it unpublished, leaves
 the promotion's evidence row byte-identical, and creates (since G2-3) only the
 materialized variants, their variant-scoped specs and (G2-4) their two manufacturer-estimate
-prices and two WAITLIST availability rows: no capabilities, use-case rows, images or deployments. Only `updated_at` (a trigger
-column) moves, and it moves by design on any importer upsert.
+prices and two WAITLIST availability rows: no capabilities, use-case rows, images or
+deployments. Only `updated_at` (a trigger column) moves, and it moves by design on any importer upsert.
 """
 from __future__ import annotations
 

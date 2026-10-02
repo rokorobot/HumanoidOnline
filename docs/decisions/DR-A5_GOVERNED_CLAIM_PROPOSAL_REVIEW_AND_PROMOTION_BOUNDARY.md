@@ -1,35 +1,35 @@
-# DR-A5 (proposed) — Governed Claim Proposal Review and Promotion Boundary
+# DR-A5 — Governed Claim Proposal Review and Promotion Boundary
 
 | | |
 |---|---|
-| **Status** | **PROPOSED — NOT RATIFIED. Design only. Nothing here is binding or implemented.** |
+| **Status** | **DECIDED — RATIFIED, 2026-10-02, Robert Konecny (product owner).** The decisions are adopted; **implementation has not begun** (§18). |
 | **Raised** | 2026-10-02 |
 | **Decision owner** | Robert Konecny (product owner) — sole ratifying authority |
 | **Stage** | Stage G2 of the discovery programme (`docs/08_DEVELOPMENT_ROADMAP.md` §1.1) |
 | **Builds on** | Stage G1, PR #84 (`neura_mini_proposals.py`); `docs/16` §17.1 (Stage E review), §17.2 (Stage F observation) |
-| **Would amend** | `docs/16_DATA_D1_LIVE_MARKET_ACQUISITION_CONTRACT.md`: a new §17.3 on ratification |
+| **Amends** | `docs/16_DATA_D1_LIVE_MARKET_ACQUISITION_CONTRACT.md`: new §17.3 (the normative text) |
 | **Related** | `DR-C1` (publication is editorial), `DR-A4`, `docs/03` §6–§7 (NULL semantics, provenance), AGENTS.md rules 2, 6, 7 |
-| **Schema / code / migration** | **None.** The persistence boundary in §6 is logical and illustrative, not DDL. |
+| **Schema / code / migration** | **None in this record.** The persistence boundary in §6 is logical and illustrative, not DDL. Implementation is separate, reviewed PRs (§18). |
 
 **Numbering.** This repository does not use sequential ADR numbers (that scheme belongs to
 Cloudeo). Decision records here are `DR-<series><n>` under `docs/decisions/`: `DR-A1`, `DR-A2`,
 `DR-A4` and `DR-C1` exist, and amendment A3 lives in `docs/26`. The A-series amends the DATA-D1.LIVE
 acquisition contract, which is what this record does, so **`DR-A5` is the next free number in that
-series. It is provisional until the owner ratifies this record.**
+series. The owner confirmed this number on ratification (2026-10-02).**
 
-This record captures **why the decision is being asked for and what turns on it**. It becomes
-normative only when its decisions are folded into `docs/16` §17.3.
+This record captures **why the decision was asked for and what turns on it**. The normative text
+is `docs/16` §17.3; where the two differ, §17.3 governs.
 
 ---
 
-## 0. Summary and recommendation
+## 0. Summary and ratified decisions
 
-| Question | Recommendation (for owner ratification) |
+| Question | Ratified decision |
 |---|---|
 | Where do extraction proposals live? | **Approach B′**: a *dedicated, immutable* proposal store, with **append-only human decisions** and a separate **accepted-claim** store. Not `candidate_claim` (A), not artifacts-only (C). |
-| How does an accepted claim reach the catalogue? | Through a **governed materialization into the catalogue of record (`db/catalogue/`), applied by the existing importer** (boundary M2). Direct database writes (M1) are not safe today (§11). |
-| What is built first? | One end-to-end vertical slice on `4ne1-mini` (editions as variants, then one specification), before any price or availability semantics. |
-| What stays open? | The seven G1 findings (§13) are designed for and **explicitly not decided**. |
+| How does an accepted claim reach the catalogue? | Through a **governed materialization into the catalogue of record (`db/catalogue/`), applied by the existing importer** (boundary M2). **Direct production database writes are not used for G2 catalogue facts** (§11). |
+| What is built first? | One vertical slice on `4ne1-mini`, in this order: **Standard → robot variant; Pro → robot variant; then ONE specification**, which materializes only through an **explicitly proposed, approved and registered field policy** (§11.3). The specification's target is **not** chosen by this record. |
+| What stays open? | The seven G1 findings (§13) are designed for and **not decided**. **Price and availability are DEFERRED** as separate owner decisions (§13). |
 
 Three facts found while preparing this record shape it. They are verified against the repository
 and are **not** assumptions.
@@ -119,7 +119,7 @@ design makes "accepted, no catalogue home" a first-class outcome, not an error.
 
 ---
 
-## 3. Decision (proposed)
+## 3. Decision (ratified)
 
 1. **Proposals are persisted as immutable records** in a dedicated store, separate from
    `candidate_claim`. `candidate_claim` is not extended or overloaded.
@@ -132,24 +132,27 @@ design makes "accepted, no catalogue home" a first-class outcome, not an error.
    same *slot* supersedes the old one; a proposal the latest observation no longer confirms is
    stale. Neither can be accepted or materialized.
 5. **The catalogue is changed only by a governed materialization** of accepted claims through a
-   registered **field policy**. The first boundary is a **deterministic, reviewable change to the
-   catalogue of record, applied by the existing importer** (§11). It never touches `is_published`.
+   registered **field policy**. The boundary is a **deterministic, reviewable change to the
+   catalogue of record (`db/catalogue/`), applied by the existing importer through the normal PR
+   and validation path** (§11). Direct production database writes are **not** used for G2
+   catalogue facts. It never touches `is_published`.
 6. **Observation never decides.** The observation/extraction path and the review path run with
    separate, least-privilege database roles (§16).
 7. **No new field is promotable until it is registered** in a code-reviewed field policy registry.
-   Today that registry is the three approved robot columns.
+   Today that registry is the three approved robot columns; each addition, including the first
+   slice's, is proposed and approved explicitly (§11.3).
 8. **Unknown stays unknown.** An unresolved question produces no write and no default.
 
 ---
 
 ## 4. Persistence approaches compared
 
-Four approaches were evaluated against the sixteen criteria requested. **✅** = met by design,
+Four approaches were evaluated against sixteen criteria. **✅** = met by design,
 **⚠** = met only with caveats or extra machinery, **❌** = not met.
 
 - **A.** Extend or overload `candidate_claim`.
 - **B.** A dedicated, *mutable* proposal table (status column updated on review).
-- **B′.** Immutable proposal rows + append-only decisions + accepted claims **(recommended)**.
+- **B′.** Immutable proposal rows + append-only decisions + accepted claims **(ratified)**.
 - **C.** Proposals stay immutable *extraction artifacts*; persist only decisions and references.
 
 | Criterion | A. `candidate_claim` | B. mutable proposal table | **B′. immutable + append-only** | C. artifacts + decisions only |
@@ -241,10 +244,10 @@ State is **derived** from append-only rows. There is no mutable status column on
 
 ---
 
-## 6. Proposed persistence boundary (logical, illustrative; not DDL)
+## 6. Persistence boundary (logical, illustrative; not DDL)
 
 Names and columns below describe responsibilities and key attributes. The physical design,
-constraints and migration belong to the implementation phase **after** ratification.
+constraints and migration belong to the implementation phase (G2-1), as its own reviewed PR.
 
 | Entity | Role | Immutability |
 |---|---|---|
@@ -354,11 +357,11 @@ database, with no JSON file).
 
 | Boundary | What it is | Verdict |
 |---|---|---|
-| **M1. Direct database write** by a governed command (the shape of today's `promote()`) | Fast and simple | **Unsafe today** for any JSON-backed robot: the next import reverts variants, offers and spec columns. Viable only if the importer gains explicit ownership rules for discovery-managed rows (as `specification.managed_by` already does for specs), which is a separate, riskier decision. |
-| **M2. Materialize into the catalogue of record, applied by the importer** | A deterministic, reviewable change to `db/catalogue/robots/<slug>.json`, merged through the normal PR ritual (CI runs `validate_catalogue.py`, the G2 evidence gate and importer idempotency), then loaded by the importer | **Recommended first boundary.** It reuses owner review, CI and the existing import, and it cannot be silently reverted. |
-| **M3. Hybrid** | DB-managed discovery rows plus importer carve-outs | Deferred: needs importer changes and a new ownership model. |
+| **M1. Direct database write** by a governed command (the shape of today's `promote()`) | Fast and simple | **Rejected for G2 catalogue facts (owner decision, 2026-10-02).** It is also unsafe today for any JSON-backed robot: the next import reverts variants, offers and spec columns. Reconsidering it would need importer ownership rules for discovery-managed rows (as `specification.managed_by` already does for specs) and a **new decision record**. |
+| **M2. Materialize into the catalogue of record, applied by the importer** | A deterministic, reviewable change to `db/catalogue/robots/<slug>.json`, merged through the normal PR ritual (CI runs `validate_catalogue.py`, the G2 evidence gate and importer idempotency), then loaded by the importer | **Ratified boundary.** It reuses owner review, CI and the existing import, and it cannot be silently reverted. |
+| **M3. Hybrid** | DB-managed discovery rows plus importer carve-outs | Not adopted: needs importer changes and a new ownership model, hence a new decision record. |
 
-### 11.2 Recommended flow (M2)
+### 11.2 Flow (M2)
 
 1. **Precondition.** The robot must be catalogue-backed (a JSON file exists). A DB-only promoted
    robot first gets an identity-only stub through the existing `db/catalogue_entries.py`, a
@@ -378,8 +381,21 @@ database, with no JSON file).
 
 Each promotable target is a registry entry (type, unit, bounds, commercial or not, and for
 edition-scoped targets the variant rule). An unregistered target is refused. The initial registry
-is exactly today's three robot columns; every addition is a reviewed code change. Adding a target
-for the first slice is a deliberate, tested act, not a default.
+is exactly today's three robot columns; every addition is a reviewed code change.
+
+**No field mapping is chosen by default.** A target's exact mapping is **explicitly proposed and
+approved by the owner before it is registered**, and the extractor's `target` hint is only a hint.
+A registry proposal must state: the target (table and key); why it is semantically correct for
+this source statement; how the value is represented, including any caveat; what the mapping
+loses or cannot say; and its validation rules.
+
+**First slice.** The order is fixed: `Standard` → a `robot_variant`; `Pro` → a `robot_variant`;
+then **one** specification as the first edition-scoped factual materialization. That
+specification does not materialize until its own registry proposal is approved. If
+`specification[dexterous_hand_option]` is the candidate (as G1's hint suggests, and which is
+**not a decision**), the proposal must first show why it is semantically correct: what the
+definition means, how the "Manipulation" row's values ("Not included" and "12 DoF dexterous
+hands") fit it, and what it does not say.
 
 ---
 
@@ -398,7 +414,7 @@ Publication is the editorial act of DR-C1. Under this design:
 
 The design supplies a **mechanism** for each. The substantive answer is the owner's, recorded per
 decision in `resolved choices` and, where it is a rule, folded into the registry by a reviewed
-change. Each is **OPEN**.
+change. Each is **OPEN**, and two are explicitly **DEFERRED** by the owner (below).
 
 | Finding | What the design provides | Options (none chosen) |
 |---|---|---|
@@ -409,6 +425,17 @@ change. Each is **OPEN**.
 | **Free-text use cases** | The extractor never maps. The human selects the controlled use-case rows explicitly in the decision | a selection list per decision; no automatic mapping, ever |
 | **Interfaces / connectivity** | One proposal may yield several accepted claims, split by the human with verbatim sub-excerpts | which `spec_definition` keys; whether new keys are needed |
 | **Promotion beyond height / weight / payload** | The field policy registry (§11.3) | which targets to register first, and their validation |
+
+**Price and availability are DEFERRED (owner decision, 2026-10-02).** They remain separate
+owner decisions, and until the owner decides:
+
+- NEURA's manufacturer-estimated price is **not** mapped to the existing HumanoidOnline
+  `ESTIMATED` semantics;
+- **no** availability status (WAITLIST or PREORDER) is chosen;
+- "expected in 2026" is **not** converted into a stronger availability meaning.
+
+Their proposals may exist and may be reviewed, but nothing about them is accepted into the
+catalogue (phase G2-4 stays closed).
 
 Anything unresolved at ACCEPT time means **no write**.
 
@@ -441,7 +468,8 @@ Anything unresolved at ACCEPT time means **no write**.
   production **before** the application that needs it, with a checkpoint taken first.
 - A **`price_type` decision**, if it adds an enum value, is its own migration, taken only after the
   owner decides (§13).
-- `docs/16` gains §17.3 and `docs/03` gains the new entities on ratification. Public API and
+- `docs/16` §17.3 is added with this ratification; `docs/03` gains the new entities when they are
+  implemented (G2-1). Public API and
   machine surfaces are **unchanged**: they expose published canonical data only.
 
 ---
@@ -498,13 +526,15 @@ authorization**.
 
 | Phase | Scope | Gate |
 |---|---|---|
-| **G2-0** | Ratify this record; decide the persistence approach and the catalogue boundary; decide which §13 findings to settle first | owner |
+| **G2-0** | Ratify this record; decide the persistence approach and the catalogue boundary | **DONE: ratified 2026-10-02** |
 | **G2-1** | Persistence foundation: migration, models and triggers for proposals, observations, decisions; the registry skeleton (still three columns); a **manual**, offline ingest of G1 proposals from a retained page. **No scheduled ingest, no accepted claims, no catalogue effect.** | migration applied to production before merge; tests I1, I2, I5, I14 |
 | **G2-2** | Review commands (`list`, `show`, `decide`), supersession and stale detection, resolved-choice capture. Still no accepted claims. | I3, I8, I17 |
-| **G2-3** | Accepted claims and the **materialization** generator, as a **vertical slice**: the Mini's two `VARIANT` proposals and one specification, end to end into the catalogue of record, applied by the importer, verified, `catalogue_write_audit` recorded. Requires the `4ne1-mini` catalogue stub first. | I4, I6, I7, I9–I13, I15, I16 |
-| **G2-4** | Price and availability, **only after** the owner settles their semantics (§13). | owner decision |
+| **G2-3** | Accepted claims and the **materialization** generator, as a **vertical slice** on `4ne1-mini`: Standard → variant; Pro → variant; then **one** specification only through an explicitly proposed, approved and registered field policy (§11.3); end to end into the catalogue of record, applied by the importer, verified, `catalogue_write_audit` recorded. Requires the `4ne1-mini` catalogue stub first. | I4, I6, I7, I9–I13, I15, I16 |
+| **G2-4** | Price and availability. **DEFERRED:** only after the owner settles their semantics (§13). | owner decision |
 | **G2-5** | Wire proposal ingest into scheduled observation (observer role only). **Only after** review is proven on real proposals. | owner |
 | **G2-6** | A second manufacturer: separate source and ToS approval, a separate adapter and extractor. This is Stage G3. | owner |
+
+**Separately authorized follow-ups (owner, 2026-10-02):** the `4ne1-mini` catalogue stub and database-level immutability for `promotion_audit` (§19). They are their own narrowly scoped PRs and **begin only after this record's documentation (`docs/16` §17.3 and this record) is reviewed and merged**.
 
 Out of scope for every phase until separately authorized: automatic catalogue writes,
 automatic publication, the 43-lead baseline import, additional manufacturers without approval,
@@ -512,10 +542,10 @@ automatic cache pruning and a web review UI.
 
 ---
 
-## 19. Pre-existing findings surfaced by this work (not decided here)
+## 19. Pre-existing findings surfaced by this work, and their disposition
 
-These were found while inspecting the repository. They are **separate follow-ups**, recorded so
-they are not lost. None is changed by this record.
+These were found while inspecting the repository. This record changes none of them; items 2 and 3
+are authorized as separate PRs that have **not** started.
 
 1. **Importer reversal of existing promotions.** For a JSON-backed robot, an importer run would
    overwrite spec columns that `promote()` wrote (today's three fields) and delete its variants and
@@ -523,27 +553,49 @@ they are not lost. None is changed by this record.
 2. **`4ne1-mini` is database-only.** It was created by promotion and has no
    `db/catalogue/robots/` file. The importer neither reads nor removes it (DR-C1), but the
    catalogue of record does not describe it. Under M2 it needs an identity-only stub first.
+   **Authorized (owner, 2026-10-02), as a separate narrowly scoped PR with explicit before/after
+   verification.** The stub must: represent the existing robot identity `4ne1-mini`; reuse the
+   existing NEURA manufacturer identity; contain no unsupported specs, no pricing, no
+   availability and no inferred fields; contain **no variants** unless introduced by the
+   separately governed G2 slice; remain unpublished; preserve UNKNOWN/null semantics; and not
+   create a second database robot.
 3. **`promotion_audit` is append-only only in the ORM.** There is no database trigger, unlike
    `candidate_identity_decision`. Direct SQL could alter it.
+   **Authorized (owner, 2026-10-02), as a separate hardening PR:** an additive migration only;
+   UPDATE and DELETE refused at the database layer; INSERT still permitted through the existing
+   governed paths; existing rows unchanged; backward compatibility preserved; tests showing both
+   forbidden operations fail in the database.
 4. **A recorded audit-text discrepancy.** Five append-only rows (identity decisions #3 and #4 and the
    MiPA ×2 and MAiRA rejections in `promotion_audit`) say "2026-10-03" in their reason text while
    their database timestamps are 2026-10-02. The substantive decisions are correct. The repository
    has no append-only correction or annotation mechanism for these tables, and none is invented
-   here. It is recorded as a known discrepancy only.
+   here. **Owner decision (2026-10-02):** the rows remain immutable historical rows with correct
+   database timestamps and this documented discrepancy; the `promotion_audit` hardening above is
+   not used to correct them.
 
 ---
 
-## 20. Decisions requested from the owner
+## 20. Ratification record (owner decisions, 2026-10-02)
 
-1. **Ratify** the persistence approach: **B′** (immutable proposals, append-only decisions,
-   accepted claims), and the rejection of A and C.
-2. **Ratify** M2 as the first catalogue boundary, and that `db/catalogue/` is the catalogue of
-   record for catalogue facts.
-3. **Confirm the `DR-A5` number** and that ratification folds the normative text into `docs/16`
-   §17.3.
-4. **Confirm the first vertical slice** (editions as variants, then one specification, on
-   `4ne1-mini`) and that price and availability wait for their semantic decisions.
-5. **Authorize, separately,** the `4ne1-mini` catalogue stub and the `promotion_audit` trigger
-   follow-ups (§19), neither of which this record does.
+1. **Persistence approach B′ ratified:** immutable extraction proposals; append-only human proposal
+   decisions; separate append-only accepted claims; derived proposal state. `candidate_claim` is
+   **not** overloaded.
+2. **Catalogue boundary M2 ratified:** `db/catalogue/` is the catalogue of record for catalogue
+   facts; accepted claims materialize into deterministic, reviewable catalogue changes through the
+   normal PR, validation and importer path; **no direct production database writes for G2 catalogue
+   facts**; publication remains a completely separate decision.
+3. **Number confirmed:** `DR-A5`, the next A-series decision (`DR-A1`, `DR-A2`, A3 in `docs/26`,
+   `DR-A4`).
+4. **First vertical slice ratified** on `4ne1-mini`: Standard → robot variant; Pro → robot variant;
+   then **one** specification as the first edition-scoped materialization. The specification's
+   target and key are **not chosen silently**: its exact field-policy mapping must be explicitly
+   proposed and approved or registered first, with a semantic justification if
+   `dexterous_hand_option` is the candidate (§11.3).
+5. **Price and availability remain DEFERRED** (§13): the estimated price is not mapped to
+   `ESTIMATED`, no WAITLIST or PREORDER is chosen, and "expected in 2026" is not strengthened.
+6. **Follow-up A authorized:** the `4ne1-mini` identity-only catalogue stub (§19.2).
+7. **Follow-up B authorized:** database-level immutability for `promotion_audit` (§19.3).
+8. **Sequencing:** follow-ups A and B, and all G2 implementation, **begin only after this record and
+   `docs/16` §17.3 are reviewed and merged**.
 
-No part of this record authorizes implementation.
+This record authorizes no implementation beyond items 6 and 7, and they have not started.

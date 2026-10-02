@@ -88,7 +88,7 @@ def test_the_file_still_asserts_identity_and_no_commercial_or_derived_fact():
         assert doc[scalar] is None, scalar
     for collection in ("commercial_status_evidence", "deployments", "capabilities",
                        "use_case_fits", "images"):
-        assert doc[collection] == [], collection            # no capability, use case, deployment, image
+        assert doc[collection] == [], collection  # nothing else
     assert all("spec_overrides" not in v for v in doc["variants"])
 
 

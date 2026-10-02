@@ -1249,6 +1249,70 @@ Manual-only operation (LIVE.4) was the **commissioning phase**: it proved the ad
 - **Retention (Gate Q)** is `discovery cache prune`. It is a dry run unless `--apply`. It applies LIVE.10's 90 days to raw bodies, but always keeps the latest body of every URL and bodies of open runs. Sidecars and provenance are never removed.
 - **Recurring observation is owner-activated per workflow change.** Only the source(s) named in the workflow's schedule are observed automatically, currently NEURA alone. Automatic cache pruning stays off.
 
+### 17.3 Stage G2: governed proposal review and claim promotion *(ratified 2026-10-02, DR-A5)*
+
+`docs/decisions/DR-A5_GOVERNED_CLAIM_PROPOSAL_REVIEW_AND_PROMOTION_BOUNDARY.md` carries the
+rationale. **This section is the normative text; where the two differ, this section governs.**
+Stage G1 (proposal-only extraction) produces proposals. Stage G2 defines how a human turns a
+proposal into an accepted claim and how an accepted claim reaches the catalogue.
+
+**The flow, one governed step at a time:**
+
+```
+observation → proposal → human decision → accepted claim
+            → governed catalogue materialization → separate publication
+```
+
+**These are different things, and none implies the next:**
+
+```
+proposal ≠ accepted claim
+accepted claim ≠ catalogue representation
+catalogue representation ≠ publication
+```
+
+A value may validly stop at any layer. **An accepted claim with no catalogue home is valid.** For
+example, a refundable reservation deposit can be a faithful, accepted statement without being
+written to any catalogue field.
+
+- **Proposals** are immutable extraction records, kept separate from `candidate_claim`, which is
+  **not** extended or overloaded for this. A proposal states what a source says, with a verbatim
+  bounded excerpt, its observation and its open review questions. It is never a claim, and its
+  state (current, superseded, stale, decided) is **derived**, not stored as a mutable status.
+- **Decisions** are append-only: `ACCEPT`, `REJECT` or `DEFER`, by an attributed human, with a
+  mandatory rationale and the human's explicit answer to every open question. The newest decision
+  per proposal is effective, a reversal is a new row, and repeating the effective decision writes
+  nothing. An agent records a decision only on a named human's instruction and never decides.
+- **Accepted claims** are separate, append-only records created only from an effective `ACCEPT` of
+  a **current** proposal, with full lineage to the decision, the proposal and the observation.
+  A superseded or stale proposal can be neither accepted nor materialized.
+- **Catalogue boundary.** `db/catalogue/` is the catalogue of record for catalogue facts. An
+  accepted claim materializes into a **deterministic, reviewable catalogue change** that goes
+  through the normal pull-request, validation and importer path. **Direct production database
+  writes are not used for G2 catalogue facts.** A change is made only for a catalogue-backed robot
+  and only through a **registered field policy**; no target is promotable until it is registered,
+  and a mapping is never chosen by default. Evidence is built from the provenance chain.
+- **Publication** is a completely separate decision (DR-C1). No G2 operation sets or implies
+  `robot.is_published`.
+- **Unknown stays unknown.** An unresolved question produces no write and no default.
+- **Least privilege.** The observation role can only add proposals. It cannot read or write
+  decisions, accepted claims or any catalogue table.
+- **First slice (`4ne1-mini`).** In this order: Standard → a robot variant; Pro → a robot variant;
+  then **one** specification as the first edition-scoped materialization, which proceeds only
+  through an explicitly proposed, approved and registered field policy.
+- **Deferred.** Price and availability remain separate owner decisions. NEURA's
+  manufacturer-estimated price is **not** mapped to the HumanoidOnline `ESTIMATED` semantics,
+  no WAITLIST or PREORDER is chosen, and "expected in 2026" is not converted into a stronger
+  availability meaning. The same applies, until decided, to the reservation deposit and terms,
+  free-text use-case mapping, and interface mapping.
+
+**Boundaries that stand.** §20's "no canonical writes from any source class" and "no
+auto-verification or auto-promotion" are unchanged: no source or extractor writes a canonical
+table, and the catalogue changes only through a human-reviewed catalogue change. Scheduled
+ingestion of proposals, automatic catalogue writes, automatic publication, the 43-lead baseline
+and further manufacturers are **not** authorized by this section. Implementation is phased
+(DR-A5 §18), and each phase needs its own authorization.
+
 ## 18. The run report
 
 Emitted at the end of every run and reproducible from the database afterwards

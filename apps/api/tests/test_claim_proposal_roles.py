@@ -139,6 +139,28 @@ def test_reviewer_inserts_decisions_but_cannot_alter_proposals_or_run_observatio
         _denied(dsession, role, sql)
 
 
+def test_the_review_service_runs_end_to_end_as_the_reviewer_role(dsession):
+    """G2-2: list, derive state (supersession/staleness) and decide, all as the reviewer."""
+    from app.services.discovery import proposal_review as pr
+
+    w = _world(dsession)
+    role = _role(dsession, "discovery_reviewer.sql", "discovery_reviewer")
+    dsession.execute(text(f"SET LOCAL ROLE {role}"))
+    states = pr.list_proposals(dsession, robot_slug=w.slug)
+    assert states and all(st.state == pr.CURRENT for st in states)
+    target = next(st.proposal for st in states if st.proposal.kind == "DESIGN_CAVEAT")
+    row, created = pr.decide(dsession, str(target.id), pr.DEFER, decided_by="Robert Konecny",
+                             rationale="reviewer-role proof")
+    again, created2 = pr.decide(dsession, str(target.id), pr.DEFER, decided_by="Robert Konecny",
+                                rationale="reviewer-role proof")
+    assert created and not created2 and again.id == row.id
+    pr.render_show(dsession, target)
+    dsession.execute(text("RESET ROLE"))
+    for sql in ("UPDATE robot SET is_published = true", "UPDATE robot SET name = name",
+                "DELETE FROM robot"):
+        _denied(dsession, role, sql)
+
+
 def test_a_role_with_no_g2_grants_has_no_access_to_the_new_tables(dsession):
     """Default deny: the production observer today holds no privilege on these tables."""
     _world(dsession)

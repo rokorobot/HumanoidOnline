@@ -85,11 +85,16 @@ class World:
         session.flush()
 
     def page(self, body: bytes = BODY, *, url: str = mini.MINI_URL,
-             source: DiscoverySource | None = None) -> FetchedPage:
+             source: DiscoverySource | None = None, retrieved_at: datetime | None = None,
+             outcome: str = "FETCHED", http_status: int | None = 200,
+             content_hash: str | None = "auto") -> FetchedPage:
+        if content_hash == "auto":
+            content_hash = fingerprint(body, "text/html")
         page = FetchedPage(
             crawl_run_id=self.run.id, source_id=(source or self.source).id, url=url,
-            http_status=200, content_type="text/html", content_hash=fingerprint(body, "text/html"),
-            outcome="FETCHED", retrieved_at=datetime(2026, 9, 26, 8, 0, tzinfo=UTC))
+            http_status=http_status, content_type="text/html", content_hash=content_hash,
+            outcome=outcome,
+            retrieved_at=retrieved_at or datetime(2026, 9, 26, 8, 0, tzinfo=UTC))
         self.session.add(page)
         self.session.flush()
         return page

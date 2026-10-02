@@ -20,7 +20,11 @@
     python -m app.cli.discovery report <run-id>
     python -m app.cli.discovery proposals ingest <source-key> --robot-slug S
                                        --fetched-page ID (--body-file F | --cache-dir DIR) --by WHO
-    python -m app.cli.discovery proposals list --robot-slug S
+    python -m app.cli.discovery proposals list [--robot-slug S] [--source K] [--edition E]
+                                       [--kind K] [--all]
+    python -m app.cli.discovery proposals show <proposal-id|prefix>
+    python -m app.cli.discovery proposals accept|reject|defer <proposal> --by WHO --reason WHY
+                                       [--choice q1=...] [--no-catalogue-home]
     python -m app.cli.discovery review list
     python -m app.cli.discovery review show <candidate-id>
     python -m app.cli.discovery review history <candidate-id>
@@ -55,7 +59,13 @@
   NOT_VERIFIED proposals and append-only sightings, idempotently, and verifies the
   body against the observation's recorded content hash. It writes no decision, no
   accepted claim, no candidate claim and no catalogue row, and it is not wired into
-  `observe`. `proposals list` is read-only.
+  `observe`. `proposals list` and `show` are read-only.
+
+- `proposals accept|reject|defer` (G2-2, DR-A5) appends an attributed, append-only human
+  decision on one proposal and nothing else: no accepted claim, no catalogue write, no
+  publication. ACCEPT needs a CURRENT, non-STALE proposal and an explicit resolved choice
+  (`--choice qN=...`) for every review question; a proposal with no catalogue home needs
+  `--no-catalogue-home`. Repeating the effective decision with identical choices is a no-op.
 
 - `source *` never makes a network request. `review` records the owner's own
   decisions (DR-A4: he reads the terms himself) and never enables; `enable` is a
@@ -367,6 +377,50 @@ def _cmd_review(args: argparse.Namespace) -> int:
         return 0
 
 
+def _parse_choices(pairs: list[str] | None) -> dict[str, str]:
+    out: dict[str, str] = {}
+    for pair in pairs or []:
+        key, sep, value = pair.partition("=")
+        if not sep or not key.strip():
+            raise DiscoveryError(f"--choice must be KEY=VALUE (e.g. q1=...), got {pair!r}")
+        if key.strip() in out:
+            raise DiscoveryError(f"--choice {key.strip()!r} given twice")
+        out[key.strip()] = value
+    return out
+
+
+def _proposal_review(session, args: argparse.Namespace) -> int:
+    from app.services.discovery import proposal_review as pr
+
+    if args.action == "list":
+        states = pr.list_proposals(
+            session, robot_slug=args.robot_slug, source_key=args.source, edition=args.edition,
+            kind=args.kind, include_all=args.all)
+        print(f"PROPOSALS ({len(states)}"
+              f"{'' if args.all else ', needing a human: no decision or DEFER'}); read-only")
+        for st in states:
+            p = st.proposal
+            eff = st.effective.decision if st.effective else "-"
+            print(f"  {str(p.id)[:8]} {st.state:<10} {p.kind:<19} {str(p.edition or '-'):<9} "
+                  f"{p.representability:<14} decision={eff:<7} {p.value[:44]}")
+        return 0
+    proposal = pr.resolve_proposal(session, args.proposal)
+    if args.action == "show":
+        print("\n".join(pr.render_show(session, proposal)))
+        return 0
+    choices = _parse_choices(args.choice)
+    if getattr(args, "no_catalogue_home", False):
+        choices[pr.HOME_KEY] = pr.NO_CATALOGUE_HOME
+    row, created = pr.decide(session, str(proposal.id), args.action.upper(),
+                             decided_by=args.by, rationale=args.reason, choices=choices)
+    session.commit()
+    print(f"{'RECORDED' if created else 'ALREADY IN EFFECT (no-op)'} {row.decision} "
+          f"#{row.decision_seq} on {proposal.id} by {row.decided_by}; "
+          f"choices {pr.serialize_choices(dict(row.resolved_choices))}")
+    print("no accepted claim, catalogue write or publication was made")
+    return 0
+
+
 def _cmd_proposals(args: argparse.Namespace) -> int:
     import json
 
@@ -375,14 +429,8 @@ def _cmd_proposals(args: argparse.Namespace) -> int:
     from app.services.discovery.cache import read_observed_body
 
     with SessionLocal() as session:
-        if args.action == "list":
-            states = proposals.proposal_states(session, args.robot_slug)
-            print(f"PROPOSALS for {args.robot_slug} ({len(states)}); read-only")
-            for st in states:
-                print(f"  {st['state']:<10} {st['kind']:<20} {str(st['edition']):<9} "
-                      f"{st['representability']:<14} decision={st['decision']} "
-                      f"{st['digest'][:12]} {st['value'][:48]}")
-            return 0
+        if args.action in ("list", "show", "accept", "reject", "defer"):
+            return _proposal_review(session, args)
         if args.body_file:
             body = Path(args.body_file).read_bytes()
         else:
@@ -583,8 +631,26 @@ def main(argv: list[str] | None = None) -> int:
     body_src.add_argument("--body-file")
     body_src.add_argument("--cache-dir")
     ingest.add_argument("--by", required=True)
-    plist = proposal_actions.add_parser("list", help="proposals and derived state; no write")
-    plist.add_argument("--robot-slug", required=True)
+    plist = proposal_actions.add_parser(
+        "list", help="proposals needing a human (G2-2 review); no write")
+    plist.add_argument("--robot-slug")
+    plist.add_argument("--source", help="discovery source key")
+    plist.add_argument("--edition", help="Standard | Pro | none (whole product)")
+    plist.add_argument("--kind")
+    plist.add_argument("--all", action="store_true", help="include already-decided proposals")
+    pshow = proposal_actions.add_parser("show", help="one proposal in full; no write")
+    pshow.add_argument("proposal", help="proposal id, or a unique id/digest prefix (>= 8 chars)")
+    for name in ("accept", "reject", "defer"):
+        pd = proposal_actions.add_parser(
+            name, help=f"record an append-only {name.upper()} decision (no catalogue effect)")
+        pd.add_argument("proposal")
+        pd.add_argument("--by", required=True, help="the named human deciding")
+        pd.add_argument("--reason", required=True, help="the rationale")
+        pd.add_argument("--choice", action="append", metavar="KEY=VALUE",
+                        help="resolved answer to a review question, e.g. q1=... (repeatable)")
+        if name == "accept":
+            pd.add_argument("--no-catalogue-home", action="store_true",
+                            help="explicitly record NO_CATALOGUE_HOME (authorizes no write)")
     proposals_cmd.set_defaults(func=_cmd_proposals)
 
     report = commands.add_parser("report", help="print a run report from the database")
@@ -608,6 +674,9 @@ def main(argv: list[str] | None = None) -> int:
         ids += [getattr(args, n, None) for n in ("candidate_id", "candidate_a", "candidate_b")]
     if args.command == "proposals" and args.action == "ingest":
         ids.append(args.fetched_page)
+    if args.command == "proposals" and args.action in ("accept", "reject", "defer"):
+        if not args.by.strip() or not args.reason.strip():
+            parser.error(f"{args.action} requires a named human (--by) and a rationale (--reason)")
     for run_id in ids:
         if run_id:
             try:

@@ -16,6 +16,14 @@
       "proposed_at": "2026-09-10",
       "confirmed_by": "robert@humanoid.company",
       "confirmed_at": "2026-09-10"
+    },
+    {
+      "robot_slug": "neura-4ne-1",
+      "alias": "4NE1",
+      "basis": "Owner decision 2026-10-02: the robot NEURA's own site names '4NE1' (https://neura-robotics.com/products/4ne1 and its reservation page https://neura-robotics.com/product/4ne1-reservation, first observed in discovery run 2c64d1f3) is the same robot as this record, which the catalogue names '4NE-1'. The spellings differ only by the hyphen, which exact normalized matching does not bridge. It does not assert that '4NE1 Mini' is this record: that candidate is a separate, still-open decision and does not carry this alias.",
+      "proposed_at": "2026-10-02",
+      "confirmed_by": "robert@humanoid.company",
+      "confirmed_at": "2026-10-02"
     }
   ]
 }

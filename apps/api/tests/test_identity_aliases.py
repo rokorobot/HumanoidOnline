@@ -104,6 +104,19 @@ def test_no_two_radar_entries_resolve_to_the_same_robot() -> None:
             seen[slug] = record["name"]
 
 
+def test_neura_4ne1_resolves_to_the_catalogued_4ne_1_and_the_mini_does_not() -> None:
+    """Owner decision 2026-10-02: NEURA's own site writes the catalogue's '4NE-1'
+    as '4NE1'. The confirmed alias makes those discovery candidates match the
+    existing record instead of a NEW_ENTITY duplicate. It is exact: '4NE1 Mini'
+    (a separate, still-open decision) reaches nothing."""
+    rows, aliases = _catalogue_rows(), load_confirmed_aliases()
+    maker = "Neura Robotics"                     # the NEURA adapter's manufacturer
+    assert _resolve({"manufacturer": maker, "name": "4NE1"}, rows, aliases) == ["neura-4ne-1"]
+    assert _resolve({"manufacturer": maker, "name": "4NE-1"}, rows, aliases) == ["neura-4ne-1"]
+    assert _resolve({"manufacturer": maker, "name": "4NE1 Mini"}, rows, aliases) == []
+    assert _resolve({"manufacturer": maker, "name": "4NE1"}, rows, {}) == []  # alias, not luck
+
+
 # --------------------------------------------------------------------------- #
 # The register itself
 # --------------------------------------------------------------------------- #

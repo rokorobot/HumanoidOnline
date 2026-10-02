@@ -599,3 +599,60 @@ def test_every_catalogue_file_variant_slug_reference_resolves():
             if x.get("variant_slug") is not None and x["variant_slug"] not in slugs:
                 bad.append((path.name, x.get("key"), x["variant_slug"]))
     assert not bad, bad
+
+
+def test_audit_identity_survives_importer_uuid_churn(dsession, tmp_path):
+    """Part A hardening: the durable identity is claim + logical target + content hash +
+    change_ref, never the physical row UUID the importer recreates on every run."""
+    w = seeded(dsession)
+    made = slice_claims(dsession, w)
+    path = stub(w, tmp_path)
+    materialize.apply_plan(materialize.plan_materialization(dsession, w.slug, tmp_path))
+    _import(dsession, w, path)
+
+    def row_ids():
+        return {r.target_row_id for r in dsession.scalars(select(CatalogueWriteAudit))}
+
+    first = materialize.verify_applied(dsession, w.slug, change_ref="chg-1", applied_by=WHO)
+    assert len(first) == 4                                         # 1. one row per claim
+    original = {a.id: (a.target_row_id, a.after_hash, a.claim_id, a.change_ref) for a in first}
+    assert materialize.verify_applied(dsession, w.slug, change_ref="chg-1",
+                                      applied_by=WHO) == []        # 2. immediate re-verify
+    live_before = {r[0] for r in dsession.execute(text(
+        "SELECT v.id FROM robot_variant v JOIN robot r ON r.id = v.robot_id "
+        "WHERE r.slug = :s UNION SELECT s.id FROM specification s JOIN robot r "
+        "ON r.id = s.robot_id WHERE r.slug = :s"), {"s": w.slug})}
+    _import(dsession, w, path)                                     # 3. importer churns UUIDs
+    live_after = {r[0] for r in dsession.execute(text(
+        "SELECT v.id FROM robot_variant v JOIN robot r ON r.id = v.robot_id "
+        "WHERE r.slug = :s UNION SELECT s.id FROM specification s JOIN robot r "
+        "ON r.id = s.robot_id WHERE r.slug = :s"), {"s": w.slug})}
+    assert live_before and live_after and not (live_before & live_after)
+    assert materialize.verify_applied(dsession, w.slug, change_ref="chg-1",
+                                      applied_by=WHO) == []        # 4. still zero new rows
+    assert dsession.scalar(select(func.count()).select_from(CatalogueWriteAudit)) == 4
+    for a in dsession.scalars(select(CatalogueWriteAudit)):        # 5. history untouched
+        assert (a.target_row_id, a.after_hash, a.claim_id, a.change_ref) == original[a.id]
+    assert row_ids() == {o[0] for o in original.values()}
+    assert not (row_ids() & live_after)                            # forensic, not live
+    targets = {materialize.logical_target(c) for c in made.values()}   # 6. from the claim
+    assert targets == {
+        f"robot_variant:{w.slug}:standard", f"robot_variant:{w.slug}:pro",
+        f"specification:{w.slug}:standard:dexterous_hand_option",
+        f"specification:{w.slug}:pro:dexterous_hand_option"}
+    # 7. changed catalogue content is detected (refused), and a new change_ref after a
+    #    legitimate re-import appends fresh audit rows without touching the old ones
+    dsession.execute(text(
+        "UPDATE specification SET value_text = 'drift' WHERE robot_id = "
+        "(SELECT id FROM robot WHERE slug = :s)"), {"s": w.slug})
+    with pytest.raises(DiscoveryError, match="not in the database as accepted"):
+        materialize.verify_applied(dsession, w.slug, change_ref="chg-1", applied_by=WHO)
+    _import(dsession, w, path)                                     # restores the content
+    again = materialize.verify_applied(dsession, w.slug, change_ref="chg-2", applied_by=WHO)
+    assert len(again) == 4
+    assert dsession.scalar(select(func.count()).select_from(CatalogueWriteAudit)) == 8
+    # 8. append-only protections remain
+    with refused(dsession, op="UPDATE"):
+        dsession.execute(text("UPDATE catalogue_write_audit SET target_row_id = gen_random_uuid()"))
+    with refused(dsession, op="DELETE"):
+        dsession.execute(text("DELETE FROM catalogue_write_audit"))

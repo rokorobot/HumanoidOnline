@@ -544,8 +544,8 @@ automatic cache pruning and a web review UI.
 
 ## 19. Pre-existing findings surfaced by this work, and their disposition
 
-These were found while inspecting the repository. This record changes none of them; items 2 and 3
-are authorized as separate PRs that have **not** started.
+These were found while inspecting the repository. This record changes none of them. Item 2 is **done** (below); item 3 is authorized as a separate PR that has
+**not** started; item 5 is a new technical-debt item.
 
 1. **Importer reversal of existing promotions.** For a JSON-backed robot, an importer run would
    overwrite spec columns that `promote()` wrote (today's three fields) and delete its variants and
@@ -559,6 +559,12 @@ are authorized as separate PRs that have **not** started.
    availability and no inferred fields; contain **no variants** unless introduced by the
    separately governed G2 slice; remain unpublished; preserve UNKNOWN/null semantics; and not
    create a second database robot.
+   **Done (2026-10-02).** PR #88 (merge `2ff69f7`) added `db/catalogue/robots/4ne1-mini.json`, the
+   canonical identity-only stub, with a regression test. It was adopted in production by the existing
+   importer run **scoped** to `4ne1-mini` (`--only`), twice: the same robot UUID
+   (`21365087-7a99-4c5d-ae3b-852c5a994d42`), 57 robots and 29 manufacturers throughout, unpublished,
+   `UNKNOWN`, no child facts, and the promotion's evidence row byte-identical. Only `updated_at` (a
+   trigger column) moved, and the second run was semantically idempotent.
 3. **`promotion_audit` is append-only only in the ORM.** There is no database trigger, unlike
    `candidate_identity_decision`. Direct SQL could alter it.
    **Authorized (owner, 2026-10-02), as a separate hardening PR:** an additive migration only;
@@ -572,6 +578,17 @@ are authorized as separate PRs that have **not** started.
    here. **Owner decision (2026-10-02):** the rows remain immutable historical rows with correct
    database timestamps and this documented discrepancy; the `promotion_audit` hardening above is
    not used to correct them.
+5. **Technical debt: importer-managed evidence lacks stable row identity across imports.** Found during
+   follow-up A. Each importer run, even a scoped one, deletes and re-inserts the importer-owned
+   (`managed_by = CATALOGUE_IMPORT`) evidence it manages: NEURA's two company rows got new ids on both
+   scoped runs with identical content, and `created_at` reset to the import time (`observed_at` and
+   every content field were preserved). The same replacement applies to a robot's offer, availability,
+   deployment and commercial-status evidence on every import of a catalogue-backed robot. No row
+   references the old ids today. **This must be settled before G2 provenance or audit structures rely on
+   an `evidence_source` row id as a durable external identifier**: until then, G2 records
+   (`catalogue_write_audit`, accepted-claim lineage) must key on stable values (robot slug, claim or
+   proposal digest, evidence content hash), never on importer-managed evidence row ids. Not an importer
+   redesign task; recorded for the G2-1 design.
 
 ---
 
@@ -593,7 +610,7 @@ are authorized as separate PRs that have **not** started.
    `dexterous_hand_option` is the candidate (§11.3).
 5. **Price and availability remain DEFERRED** (§13): the estimated price is not mapped to
    `ESTIMATED`, no WAITLIST or PREORDER is chosen, and "expected in 2026" is not strengthened.
-6. **Follow-up A authorized:** the `4ne1-mini` identity-only catalogue stub (§19.2).
+6. **Follow-up A authorized:** the `4ne1-mini` identity-only catalogue stub (§19.2). **Done, 2026-10-02.**
 7. **Follow-up B authorized:** database-level immutability for `promotion_audit` (§19.3).
 8. **Sequencing:** follow-ups A and B, and all G2 implementation, **begin only after this record and
    `docs/16` §17.3 are reviewed and merged**.

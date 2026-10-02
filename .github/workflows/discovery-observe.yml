@@ -109,7 +109,7 @@ jobs:
         run: |
           case "$CODE" in
             0) head="NO ACTION NEEDED: cycle completed; nothing requires a human." ;;
-            4) head="REVIEW REQUIRED: a source or new Stage E item needs a human. Not an execution failure."
+            4) head="REVIEW REQUIRED: a source, a new Stage E item, a new G2 proposal needing review, or a G2 proposal-ingest failure needs a human. Not an execution failure."
                echo "::warning::Discovery observation: review required (exit 4)" ;;
             *) head="EXECUTION FAILURE (exit ${CODE:-none}): a source run failed or the cycle could not run."
                echo "::error::Discovery observation: execution failure (exit ${CODE:-none})" ;;

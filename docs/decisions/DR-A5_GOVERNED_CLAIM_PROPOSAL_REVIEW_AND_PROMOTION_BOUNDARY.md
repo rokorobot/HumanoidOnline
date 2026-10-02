@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | **DECIDED — RATIFIED, 2026-10-02, Robert Konecny (product owner).** The decisions are adopted; **G2-1 (persistence), G2-2 (governed review) and the first vertical slice of G2-3 (accepted claims and materialization) are implemented** (§18.1 to §18.3); the rest of G2-3, G2-4 and G2-5 have not begun. |
+| **Status** | **DECIDED — RATIFIED, 2026-10-02, Robert Konecny (product owner).** The decisions are adopted; **G2-1 (persistence), G2-2 (governed review) and the first vertical slice of G2-3 (accepted claims and materialization) are implemented** (§18.1 to §18.3); the rest of G2-3 and G2-4 have not begun. **G2-5 (scheduled proposal ingestion) is operational for NEURA 4NE1 Mini only** (§18.4). |
 | **Raised** | 2026-10-02 |
 | **Decision owner** | Robert Konecny (product owner) — sole ratifying authority |
 | **Stage** | Stage G2 of the discovery programme (`docs/08_DEVELOPMENT_ROADMAP.md` §1.1) |
@@ -700,6 +700,44 @@ after-hash; it records, it never writes the catalogue).
   tables; it cannot write the audit or any catalogue table.
 - Still not done: price, availability, reservation, use cases, interfaces (G2-4), scheduled ingest
   (G2-5), and a claim policy for any other target.
+
+### 18.4 G2-5 as implemented (scheduled proposal ingestion; NEURA 4NE1 Mini only)
+
+The scheduled NEURA observation cycle now ends with a proposal-ingest step, through the **same**
+code path the scheduler, a manual dispatch and `--run-now` all use (`observe._run_one`):
+
+```
+scheduled observation -> bounded governed fetch -> identity extraction / source guards
+  -> 4NE1 Mini proposal extraction (deterministic, offline, from the RETAINED body)
+  -> immutable proposal / sighting -> human review queue        (and it stops there)
+```
+
+- **Scope.** `services/discovery/g2_ingest.py` holds the only wiring: source
+  `neura-robotics-official`, page `https://neura-robotics.com/product/4ne1-mini-reservation`, robot
+  `4ne1-mini`. Another page, source or manufacturer needs its own approval and registry entry.
+- **What it does.** It takes the newest retrieved content of the registered page; if that
+  observation has no sighting yet and its body is retained, it runs the G2-1 ingest (all provenance
+  checks apply: source ownership, URL, body fingerprint against the recorded content hash,
+  identity gate). Unchanged content (a 304 answer) adds nothing and proposals stay CURRENT; the
+  same content re-fetched adds one sighting per proposal and no new proposal; a cosmetic change
+  the extractor ignores creates no proposal; a changed value creates a new immutable proposal in
+  its slot and the old one becomes derived SUPERSEDED; a newly supported slot inserts a proposal.
+  A failed earlier ingest heals on the next cycle (the newest content observation still has no
+  sighting).
+- **What it never does.** Write a decision, claim, retraction or audit row, touch a catalogue table
+  or JSON, change `is_published`, or interpret price or availability. ACCEPT, REJECT, DEFER, claim
+  creation, materialization and publication remain separate, human-governed acts.
+- **Failure is visible.** Ingest never raises into the cycle. A failure (body not retained,
+  hash mismatch, identity gate, no proposals, any exception) is reported in the cycle result
+  (`counts.g2_ingest`, a `G2 INGEST FAILED` detail line) and makes the cycle exit 4 (needs a
+  human); the observation itself stays preserved and nothing partial is written (savepoint). New
+  proposals and any fail-safe rejection other than the page's standing `/` placeholder also exit 4.
+- **Role.** `discovery_observer` gains SELECT and INSERT on `discovery_claim_proposal` and
+  `discovery_proposal_observation` only (it already reads source, fetched page and robot). It has
+  no privilege on decisions, accepted claims, retractions or the write audit, and no catalogue
+  write privilege.
+- **Schedule unchanged:** Monday and Thursday 06:37 UTC, 48 h source cadence. G2-4 commercial
+  semantics (price, availability) remain deferred, and human review remains mandatory.
 
 ---
 

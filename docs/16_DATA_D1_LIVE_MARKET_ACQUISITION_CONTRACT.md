@@ -1262,7 +1262,9 @@ offline ingest. **G2-2** adds governed review (`proposals list|show|accept|rejec
 supersession and staleness, the reviewer role); a decision writes only a decision row. No accepted
 claim or catalogue effect existed at that point. **G2-3 (first slice)** adds immutable accepted claims,
 retractions, the catalogue write audit and deterministic materialization into `db/catalogue/` for
-`robot_variant` and `specification[dexterous_hand_option]` only. See DR-A5 §18.1 to §18.3.
+`robot_variant` and `specification[dexterous_hand_option]` only. **G2-5** wires proposal ingest into the scheduled NEURA observation cycle for the 4NE1 Mini page only
+(proposals and sightings only; human review mandatory; no automatic decision, claim,
+materialization or publication). See DR-A5 §18.1 to §18.4.
 
 **The flow, one governed step at a time:**
 

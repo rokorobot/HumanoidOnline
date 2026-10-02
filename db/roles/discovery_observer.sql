@@ -39,11 +39,12 @@ TO discovery_observer;
 GRANT UPDATE (last_robots_hash, last_robots_checked_at, last_crawled_at, is_enabled)
     ON discovery_source TO discovery_observer;
 
--- G2-1 (migration 0018, DR-A5 section 16): the observation role may INSERT immutable
--- claim proposals and their sightings, and read them back to stay idempotent. It can
--- never UPDATE or DELETE them (the triggers refuse that for everyone anyway), and it
--- has NO privilege on discovery_proposal_decision: human decisions are not an
--- observation act. Apply this block only when proposal ingest is wired into
--- observation (a later G2 phase); until then the role has no access to these tables.
+-- G2-1 / G2-5 (migrations 0018, DR-A5 section 16): scheduled proposal ingestion. The
+-- observation role may INSERT immutable claim proposals and their sightings, and read
+-- them back to stay idempotent. It can never UPDATE or DELETE them (the triggers refuse
+-- that for everyone anyway), and it has NO privilege on discovery_proposal_decision,
+-- accepted_claim, claim_retraction or catalogue_write_audit: human decisions, claims and
+-- the write audit are not observation acts. It reads only what the ingest needs (source,
+-- fetched page, robot name for the identity gate: granted above).
 GRANT SELECT, INSERT ON discovery_claim_proposal, discovery_proposal_observation
     TO discovery_observer;

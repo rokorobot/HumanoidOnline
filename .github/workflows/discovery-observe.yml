@@ -5,10 +5,12 @@ name: Discovery observation (Stage F)
 #   GATE       repository variable DISCOVERY_OBSERVE_ENABLED == 'true'. Without
 #              it NOTHING runs: neither a manual dispatch nor the schedule.
 #              Setting it to anything else disables recurring observation.
-#   RECURRING  the hourly `schedule:` below (owner-activated 2026-09-26). Each
+#   RECURRING  the twice-weekly `schedule:` below (Monday and Thursday; owner
+#              decision 2026-10-02, replacing the hourly check). Each
 #              invocation only CHECKS the registered NEURA source: it observes
 #              (never plan, never run-now), and the source's own attributed
-#              cadence (24 h) decides whether anything is fetched. An hour in
+#              cadence (48 h, shorter than the 72 h between slots so a slot is
+#              never skipped as "not due") decides whether anything is fetched. A slot in
 #              which the source is not due requests nothing.
 #
 # Production database access comes only from the `discovery-production`
@@ -17,7 +19,7 @@ name: Discovery observation (Stage F)
 # Mode `plan` makes no manufacturer request and writes nothing.
 on:
   schedule:
-    - cron: "37 * * * *"   # hourly at minute 37 (UTC)
+    - cron: "37 6 * * 1,4"   # Monday and Thursday at 06:37 UTC
   workflow_dispatch:
     inputs:
       mode:
@@ -117,7 +119,7 @@ jobs:
             echo
             echo "**$head**"
             echo
-            echo "Trigger: ${{ github.event_name }} (recurring: hourly at :37 UTC; the source cadence decides fetching)."
+            echo "Trigger: ${{ github.event_name }} (recurring: Monday and Thursday 06:37 UTC; the source cadence decides fetching)."
             echo
             echo '```'
             cat "$RUNNER_TEMP/cycle.txt" 2>/dev/null || true

@@ -332,11 +332,10 @@ class PromotionAudit(Base):
 # The listeners are registered at model-import time so every ORM session is
 # covered: the API, the admin, and the governed promotion CLI alike.
 #
-# Honest scope: this is ORM-level enforcement. It stops `session.delete(...)`,
-# attribute mutation and SQLAdmin's edit/delete paths. It does **not** stop raw
-# SQL or a bulk Core `UPDATE`/`DELETE` issued against the table directly. A
-# database-level guarantee would need a trigger, i.e. new DDL — out of scope for
-# WS8.1, and any such enforcement must satisfy L7's database-enforcement clause.
+# Scope: these listeners are ORM-level enforcement. They stop `session.delete(...)`,
+# attribute mutation and SQLAdmin's edit/delete paths, but not raw SQL or a bulk Core
+# `UPDATE`/`DELETE`. The database-level guarantee is migration 0017 (DR-A5 §19.3):
+# triggers refuse those too. The listeners remain as the first, friendlier line of defence.
 
 
 class PromotionAuditImmutableError(RuntimeError):

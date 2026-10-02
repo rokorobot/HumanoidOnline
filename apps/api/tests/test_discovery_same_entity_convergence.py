@@ -283,12 +283,13 @@ def test_no_alias_is_inferred_for_a_differently_spelled_catalogue_robot(dsession
 
 def _cleanup(ids: dict) -> None:
     with engine.begin() as conn:
-        conn.execute(text("SET LOCAL session_replication_role = replica"))  # append-only trigger
+        # Test-only cleanup of rows the append-only triggers (0015, 0017) protect.
+        conn.execute(text("SET LOCAL session_replication_role = replica"))
         conn.execute(text("DELETE FROM candidate_identity_decision WHERE candidate_a_id = ANY(:c)"
                           " OR candidate_b_id = ANY(:c)"), {"c": ids["candidates"]})
-        conn.execute(text("SET LOCAL session_replication_role = origin"))
         conn.execute(text("DELETE FROM promotion_audit WHERE candidate_id = ANY(:c)"),
                      {"c": ids["candidates"]})
+        conn.execute(text("SET LOCAL session_replication_role = origin"))
         conn.execute(text("DELETE FROM evidence_source WHERE subject_id IN "
                           "(SELECT r.id FROM robot r JOIN manufacturer m"
                           " ON m.id = r.manufacturer_id WHERE m.name = :m)"),

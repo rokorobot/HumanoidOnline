@@ -71,4 +71,7 @@ MIGRATIONS: dict[str, str] = {
     "0016_stage_f_observation": (
         "2656961023871e872b83991e05acbe10640f4f4f88386dec4b1f1899b3830a99"
     ),
+    "0017_promotion_audit_append_only": (
+        "e8ff866e7ccf0de0a7be0d297a378f7c434555d5d1649537f9bf809cb3b464ca"
+    ),
 }

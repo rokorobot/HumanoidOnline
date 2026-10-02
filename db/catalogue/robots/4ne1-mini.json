@@ -44,8 +44,122 @@
       "name": "Standard"
     }
   ],
-  "pricing_offers": [],
-  "availability_offers": [],
+  "pricing_offers": [
+    {
+      "variant_slug": "pro",
+      "transaction_type": "PURCHASE",
+      "price_type": "MANUFACTURER_ESTIMATE",
+      "currency": "EUR",
+      "price": 29999.0,
+      "billing_period": "ONE_TIME",
+      "note": "Estimate published by the manufacturer itself on its official product page (stated there as an 'Estimated price'). Not an MSRP or public selling price, and not a HumanoidOnline estimate.",
+      "price_basis": "excluding taxes and shipping (as stated by the manufacturer)",
+      "edition_confirmed": true,
+      "evidence": [
+        {
+          "source_url": "https://neura-robotics.com/product/4ne1-mini-reservation",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "NEURA Robotics — official product page",
+          "excerpt": "29,999 € (excluding taxes and shipping)",
+          "published_at": null,
+          "observed_at": "2026-10-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "Governed extraction (DR-A5): proposal 9d078133cf02 at feature-grid/row[Estimated price]/col[Pro], sighted on page content hash 03d067f43080; accepted claim 0098e6407d92; owner ACCEPT decision. Retrieved by the governed observation; not human-verified on the page itself."
+        }
+      ]
+    },
+    {
+      "variant_slug": "standard",
+      "transaction_type": "PURCHASE",
+      "price_type": "MANUFACTURER_ESTIMATE",
+      "currency": "EUR",
+      "price": 19999.0,
+      "billing_period": "ONE_TIME",
+      "note": "Estimate published by the manufacturer itself on its official product page (stated there as an 'Estimated price'). Not an MSRP or public selling price, and not a HumanoidOnline estimate.",
+      "price_basis": "excluding taxes and shipping (as stated by the manufacturer)",
+      "edition_confirmed": true,
+      "evidence": [
+        {
+          "source_url": "https://neura-robotics.com/product/4ne1-mini-reservation",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "NEURA Robotics — official product page",
+          "excerpt": "19,999 € (excluding taxes and shipping)",
+          "published_at": null,
+          "observed_at": "2026-10-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "Governed extraction (DR-A5): proposal 118d7cb36790 at feature-grid/row[Estimated price]/col[Standard], sighted on page content hash 03d067f43080; accepted claim 709a92877973; owner ACCEPT decision. Retrieved by the governed observation; not human-verified on the page itself."
+        }
+      ]
+    }
+  ],
+  "availability_offers": [
+    {
+      "variant_slug": "pro",
+      "transaction_type": "PURCHASE",
+      "availability_status": "WAITLIST",
+      "delivery_estimate_label": "Expected in 2026",
+      "seller_wording": "Both 4NE1 Mini Standard and 4NE1 Mini Pro are expected to be available in 2026.",
+      "note": "WAITLIST: the manufacturer states that a reservation secures a place in the delivery queue; this is not a purchase order. No date is stated: 'Expected in 2026' is year-level seller wording, not a date.",
+      "evidence": [
+        {
+          "source_url": "https://neura-robotics.com/product/4ne1-mini-reservation",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "NEURA Robotics — official product page",
+          "excerpt": "Both 4NE1 Mini Standard and 4NE1 Mini Pro are expected to be available in 2026.",
+          "published_at": null,
+          "observed_at": "2026-10-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "Governed extraction (DR-A5): proposal a780dcaa3a65 at text-block[availability-year], sighted on page content hash 03d067f43080; accepted claim 75d102121702; owner ACCEPT decision. Retrieved by the governed observation; not human-verified on the page itself."
+        },
+        {
+          "source_url": "https://neura-robotics.com/product/4ne1-mini-reservation",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "NEURA Robotics — official product page",
+          "excerpt": "A reservation fee secures your place in the delivery queue. This fee is fully refundable and will be applied toward your final purchase price.",
+          "published_at": null,
+          "observed_at": "2026-10-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "Governed extraction (DR-A5): proposal 9fdf972512bd at text-block[reservation-terms], sighted on page content hash 03d067f43080; accepted claim d3b9545d48d2; owner ACCEPT decision. Retrieved by the governed observation; not human-verified on the page itself."
+        }
+      ]
+    },
+    {
+      "variant_slug": "standard",
+      "transaction_type": "PURCHASE",
+      "availability_status": "WAITLIST",
+      "delivery_estimate_label": "Expected in 2026",
+      "seller_wording": "Both 4NE1 Mini Standard and 4NE1 Mini Pro are expected to be available in 2026.",
+      "note": "WAITLIST: the manufacturer states that a reservation secures a place in the delivery queue; this is not a purchase order. No date is stated: 'Expected in 2026' is year-level seller wording, not a date.",
+      "evidence": [
+        {
+          "source_url": "https://neura-robotics.com/product/4ne1-mini-reservation",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "NEURA Robotics — official product page",
+          "excerpt": "Both 4NE1 Mini Standard and 4NE1 Mini Pro are expected to be available in 2026.",
+          "published_at": null,
+          "observed_at": "2026-10-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "Governed extraction (DR-A5): proposal cffcdee90cc9 at text-block[availability-year], sighted on page content hash 03d067f43080; accepted claim e2a2bd4dbec4; owner ACCEPT decision. Retrieved by the governed observation; not human-verified on the page itself."
+        },
+        {
+          "source_url": "https://neura-robotics.com/product/4ne1-mini-reservation",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "NEURA Robotics — official product page",
+          "excerpt": "A reservation fee secures your place in the delivery queue. This fee is fully refundable and will be applied toward your final purchase price.",
+          "published_at": null,
+          "observed_at": "2026-10-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "Governed extraction (DR-A5): proposal 9fdf972512bd at text-block[reservation-terms], sighted on page content hash 03d067f43080; accepted claim d3b9545d48d2; owner ACCEPT decision. Retrieved by the governed observation; not human-verified on the page itself."
+        }
+      ]
+    }
+  ],
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
@@ -65,6 +179,36 @@
       "key": "dexterous_hand_option",
       "variant_slug": "standard",
       "value": "Not included",
+      "source_label": "NEURA Robotics",
+      "source_url": "https://neura-robotics.com/product/4ne1-mini-reservation",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-02"
+    },
+    {
+      "key": "additional_interfaces",
+      "variant_slug": "pro",
+      "value": "C++ SDK, digital twin access, teleoperation, ready for Neura Gym training",
+      "source_label": "NEURA Robotics",
+      "source_url": "https://neura-robotics.com/product/4ne1-mini-reservation",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-02"
+    },
+    {
+      "key": "common_interfaces",
+      "variant_slug": "pro",
+      "value": "Wi-Fi 6, Ethernet, Python SDK, ROS 2 interface, NEURA Sync",
+      "source_label": "NEURA Robotics",
+      "source_url": "https://neura-robotics.com/product/4ne1-mini-reservation",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-02"
+    },
+    {
+      "key": "common_interfaces",
+      "variant_slug": "standard",
+      "value": "Wi-Fi 6, Ethernet, Python SDK, ROS 2 interface, NEURA Sync",
       "source_label": "NEURA Robotics",
       "source_url": "https://neura-robotics.com/product/4ne1-mini-reservation",
       "source_kind": "MANUFACTURER",

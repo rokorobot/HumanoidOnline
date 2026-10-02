@@ -9,10 +9,10 @@ file. The invariant these tests pin:
 The importer binds a JSON file to a database robot by slug. These prove that, on a
 scratch database holding the production-shaped state, importing the stub (twice):
 keeps the robot's UUID, adds no robot or manufacturer, leaves it unpublished, leaves
-the promotion's evidence row byte-identical, and creates (since G2-3) only the two
-materialized variants and their two variant-scoped specs: no offers, capabilities,
-use-case rows, images or deployments. Only `updated_at` (a trigger
-column) moves, and it moves by design on any importer upsert.
+the promotion's evidence row byte-identical, and creates (since G2-3 / G2-4) only the
+materialized variants, their variant-scoped specs, their two manufacturer-estimate prices and
+two WAITLIST availability rows: no capabilities, use-case rows, images or deployments. Only
+`updated_at` (a trigger column) moves, and it moves by design on any importer upsert.
 """
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ CHILD_TABLES = ("specification", "robot_variant", "pricing_offer", "availability
 
 
 #: The only keys G2-3 materialization (DR-A5 M2) may add to the adopted identity stub.
-MATERIALIZED_KEYS = ("variants", "extended_specs")
+MATERIALIZED_KEYS = ("variants", "extended_specs", "pricing_offers", "availability_offers")
 
 
 def test_the_file_is_the_canonical_stub_plus_only_the_materialized_delta():
@@ -53,13 +53,28 @@ def test_the_file_is_the_canonical_stub_plus_only_the_materialized_delta():
     assert {k: v for k, v in doc.items() if k not in MATERIALIZED_KEYS} == {
         k: v for k, v in stub.items() if k not in MATERIALIZED_KEYS}
     assert doc["slug"] == SLUG == STUB.stem
-    # the delta: exactly the two owner-approved variants and their variant-scoped specs
+    # the delta: exactly the two owner-approved variants and their variant-scoped facts
     assert doc["variants"] == [{"slug": "pro", "name": "Pro"},
                                {"slug": "standard", "name": "Standard"}]
     assert {(x["key"], x["variant_slug"], x["value"], x["edition_scope"])
             for x in doc["extended_specs"]} == {
         ("dexterous_hand_option", "pro", "12 DoF dexterous hands", "THIS_EDITION"),
-        ("dexterous_hand_option", "standard", "Not included", "THIS_EDITION")}
+        ("dexterous_hand_option", "standard", "Not included", "THIS_EDITION"),
+        ("common_interfaces", "standard",
+         "Wi-Fi 6, Ethernet, Python SDK, ROS 2 interface, NEURA Sync", "THIS_EDITION"),
+        ("common_interfaces", "pro",
+         "Wi-Fi 6, Ethernet, Python SDK, ROS 2 interface, NEURA Sync", "THIS_EDITION"),
+        ("additional_interfaces", "pro",
+         "C++ SDK, digital twin access, teleoperation, ready for Neura Gym training",
+         "THIS_EDITION")}
+    assert {(o["variant_slug"], o["price_type"], o["price"], o["currency"])
+            for o in doc["pricing_offers"]} == {
+        ("standard", "MANUFACTURER_ESTIMATE", 19999.0, "EUR"),
+        ("pro", "MANUFACTURER_ESTIMATE", 29999.0, "EUR")}
+    assert {(o["variant_slug"], o["availability_status"], o["delivery_estimate_label"])
+            for o in doc["availability_offers"]} == {
+        ("standard", "WAITLIST", "Expected in 2026"), ("pro", "WAITLIST", "Expected in 2026")}
+    assert all("available_from" not in o for o in doc["availability_offers"])
 
 
 def test_the_file_still_asserts_identity_and_no_commercial_or_derived_fact():
@@ -71,9 +86,9 @@ def test_the_file_still_asserts_identity_and_no_commercial_or_derived_fact():
     assert all(v is None for v in doc["specs"].values())   # hand_dof etc. stay UNKNOWN
     for scalar in ("model_code", "summary", "announced_year", "official_url"):
         assert doc[scalar] is None, scalar
-    for collection in ("commercial_status_evidence", "pricing_offers", "availability_offers",
-                       "deployments", "capabilities", "use_case_fits", "images"):
-        assert doc[collection] == [], collection            # no price, availability, ...
+    for collection in ("commercial_status_evidence", "deployments", "capabilities",
+                       "use_case_fits", "images"):
+        assert doc[collection] == [], collection  # nothing else
     assert all("spec_overrides" not in v for v in doc["variants"])
 
 
@@ -171,5 +186,6 @@ def test_the_stub_adopts_the_existing_database_robot(scratch_db):  # noqa: F811
         assert after["is_published"] is False and before["is_published"] is False
         assert after["evidence"] == before["evidence"]                # id AND content intact
         assert after["children"] == {**dict.fromkeys(CHILD_TABLES, 0),   # only the delta appeared
-                                     "robot_variant": 2, "specification": 2}
+                                     "robot_variant": 2, "specification": 5,
+                                     "pricing_offer": 2, "availability_offer": 2}
     assert states[0] == states[1]                                     # the 2nd run changes nothing

@@ -1982,6 +1982,54 @@ CREATE TRIGGER trg_identity_decision_no_delete
     BEFORE DELETE ON candidate_identity_decision
     FOR EACH STATEMENT EXECUTE FUNCTION refuse_identity_decision_mutation();
 
+-- -----------------------------------------------------------------------------
+-- promotion_audit is append-only AT THE DATABASE (migration 0017, DR-A5 section 19.3).
+-- Until now only an ORM listener refused changes; raw SQL could still alter the audit
+-- trail. Same class of protection as candidate_identity_decision above. Existing rows
+-- are untouched.
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION refuse_promotion_audit_delete()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+    RAISE EXCEPTION
+        'promotion_audit is append-only (DR-A5 section 19.3): % refused. '
+        'Record a NEW audit row instead; existing rows are never deleted.', TG_OP
+        USING ERRCODE = 'restrict_violation';
+END$$;
+COMMENT ON FUNCTION refuse_promotion_audit_delete() IS
+    'DR-A5 follow-up: refuses every DELETE on promotion_audit at the database level.';
+
+-- UPDATE is refused too, with ONE exception that is not an application write: the
+-- foreign key `promoted_robot_id ... ON DELETE SET NULL`. When a robot is deleted
+-- PostgreSQL itself updates the referencing audit rows, inside the referential-action
+-- trigger (pg_trigger_depth() > 1; a direct UPDATE runs this trigger at depth 1). That
+-- internal update may ONLY null the robot link and change nothing else, so deleting a
+-- robot keeps working exactly as before. A direct UPDATE, including one that nulls the
+-- link, is refused.
+CREATE OR REPLACE FUNCTION guard_promotion_audit_update()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+    IF pg_trigger_depth() > 1
+       AND OLD.promoted_robot_id IS NOT NULL
+       AND NEW.promoted_robot_id IS NULL
+       AND (to_jsonb(OLD) - 'promoted_robot_id') = (to_jsonb(NEW) - 'promoted_robot_id') THEN
+        RETURN NEW;
+    END IF;
+    RAISE EXCEPTION
+        'promotion_audit is append-only (DR-A5 section 19.3): % refused. '
+        'Record a NEW audit row instead; existing rows are never changed.', TG_OP
+        USING ERRCODE = 'restrict_violation';
+END$$;
+COMMENT ON FUNCTION guard_promotion_audit_update() IS
+    'DR-A5 follow-up: refuses UPDATE on promotion_audit except the FK ON DELETE SET NULL action.';
+
+CREATE TRIGGER trg_promotion_audit_no_update
+    BEFORE UPDATE ON promotion_audit
+    FOR EACH ROW EXECUTE FUNCTION guard_promotion_audit_update();
+CREATE TRIGGER trg_promotion_audit_no_delete
+    BEFORE DELETE ON promotion_audit
+    FOR EACH STATEMENT EXECUTE FUNCTION refuse_promotion_audit_delete();
+
 -- =============================================================================
 -- END OF SCHEMA
 -- =============================================================================

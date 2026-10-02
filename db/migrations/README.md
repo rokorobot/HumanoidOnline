@@ -252,6 +252,15 @@ Forward migrations:
   one RUNNING `crawl_run` per source. Every existing source stays unscheduled
   (NULL), so applying it starts no crawling. Additive and idempotent.
 
+- `0017_promotion_audit_append_only.sql` — DR-A5 §19.3 (owner-authorized hardening):
+  `promotion_audit` becomes append-only **at the database**. A `BEFORE DELETE`
+  statement trigger refuses every DELETE; a `BEFORE UPDATE` row trigger refuses every
+  UPDATE except PostgreSQL's own `ON DELETE SET NULL` action on `promoted_robot_id`
+  (recognised by trigger depth, and only able to null that one column), so deleting a
+  robot keeps working. Two functions and two triggers; no table, column, index or row
+  changes, INSERT is unaffected, and an older application build keeps working.
+  Idempotent.
+
 ## Checksum integrity (WS8.2 / R9)
 
 `schema_migrations` stores a `sha256` for every applied file, and

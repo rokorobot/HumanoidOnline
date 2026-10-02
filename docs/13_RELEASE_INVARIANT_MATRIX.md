@@ -88,7 +88,7 @@ recur. No other existing assertion was modified.
 | Structural isolation (no canonical → discovery FK) | Automated | `test_K_structural_isolation` | R12 | **PASS** |
 | Candidate data absent from public **response bodies** | Automated | `test_r12_candidate_data_never_appears_in_any_public_response_body` — real source/candidate/claim with sentinels, every public body searched | R12 | **PASS** |
 | Promotion is human-gated and idempotent | Automated | `test_H5_promotion_is_idempotent`, `test_discovery.py` | R12 | **PASS** |
-| **`promotion_audit` is append-only** | Automated | `test_r6_admin_cannot_create_edit_or_delete_audit_rows`, `test_r6_orm_listeners_are_registered`, `test_r6_update_is_refused`, `test_r6_delete_is_refused`, `test_r6_insert_is_still_allowed` | R6 | **PASS** |
+| **`promotion_audit` is append-only** | Automated | `test_r6_admin_cannot_create_edit_or_delete_audit_rows`, `test_r6_orm_listeners_are_registered`, `test_r6_update_is_refused`, `test_r6_delete_is_refused`, `test_r6_insert_is_still_allowed`; database-level since migration 0017 (DR-A5 §19.3): `test_promotion_audit_append_only.py`, `test_promotion_audit_migration.py` | R6 | **PASS** |
 | No live crawling (fixture-only) | Automated | `test_r13_*` — no HTTP client reachable from the adapter, FixtureAdapter is the only concrete adapter, and a public request sweep runs with outbound sockets made fatal | R13 | **PASS** |
 | Promotion docs truthful to implemented gates | Automated | `test_r12_promotion_docs_match_implemented_gates` + `test_r12_deferred_gates_are_still_deferred` | R12 | **PASS** |
 

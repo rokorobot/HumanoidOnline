@@ -136,6 +136,17 @@ export function resolvePriceState(
         context: variant === "short" ? joinCtx("ESTIMATED", billing) : "ESTIMATED",
         tone: "estimated",
       };
+    case "MANUFACTURER_ESTIMATE":
+      // A numeric estimate published by the manufacturer ITSELF. Never shown as a public
+      // selling price, and never as HumanoidOnline's own estimate (ESTIMATED, "~").
+      return {
+        label: pd.amount != null ? formatMoney(pd.amount, cur, false) : "—",
+        context:
+          variant === "short"
+            ? joinCtx("MANUFACTURER ESTIMATE", billing)
+            : "Manufacturer estimate",
+        tone: "estimated",
+      };
     case "QUOTE_ONLY":
       // A KNOWN commercial model — not unknown. Never a number.
       return {

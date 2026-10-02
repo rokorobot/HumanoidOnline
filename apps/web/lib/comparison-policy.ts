@@ -177,14 +177,20 @@ export function metricDelta(
  * RANGE (two bounds, no single value), QUOTE_ONLY (known, no number) and the
  * absence of any offer (UNKNOWN) are all excluded by construction.
  */
-export const COMPARABLE_PRICE_TYPES = new Set(["PUBLIC", "FROM", "ESTIMATED"]);
+export const COMPARABLE_PRICE_TYPES = new Set([
+  "PUBLIC",
+  "FROM",
+  "ESTIMATED",
+  "MANUFACTURER_ESTIMATE",
+]);
 
 const PRICE_TYPE_RANK: Record<string, number> = {
   PUBLIC: 0,
   FROM: 1,
-  ESTIMATED: 2,
-  RANGE: 3,
-  QUOTE_ONLY: 4,
+  MANUFACTURER_ESTIMATE: 2,
+  ESTIMATED: 3,
+  RANGE: 4,
+  QUOTE_ONLY: 5,
 };
 
 export interface NormalizedOffer {

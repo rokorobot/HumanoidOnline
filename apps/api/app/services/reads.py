@@ -63,7 +63,10 @@ def derive_portfolio_status(statuses: list[str]) -> str | None:
 # Headline-price preference: prefer a purchase-like mode, then the most concrete
 # price_type, then most recently updated.
 _TXN_PREF = {"PURCHASE": 0, "DEVELOPER": 1}
-_PRICE_TYPE_RANK = {"PUBLIC": 0, "FROM": 1, "ESTIMATED": 2, "RANGE": 3, "QUOTE_ONLY": 4}
+# MANUFACTURER_ESTIMATE ranks between FROM and ESTIMATED: a figure the maker itself
+# published is more concrete than a HumanoidOnline estimate; existing relative order unchanged.
+_PRICE_TYPE_RANK = {"PUBLIC": 0, "FROM": 1, "MANUFACTURER_ESTIMATE": 2, "ESTIMATED": 3,
+                    "RANGE": 4, "QUOTE_ONLY": 5}
 
 
 def _f(value: Decimal | None) -> float | None:

@@ -19,6 +19,9 @@ ROOT = pathlib.Path(__file__).resolve().parents[3]
 SCHEMA_SQL = ROOT / "db" / "schema.sql"
 MIGRATION_0018 = ROOT / "db" / "migrations" / "0018_claim_proposal_persistence.sql"
 MIGRATION_0019 = ROOT / "db" / "migrations" / "0019_accepted_claims.sql"
+MIGRATION_0020 = ROOT / "db" / "migrations" / "0020_price_type_manufacturer_estimate.sql"
+MIGRATION_0021 = (ROOT / "db" / "migrations"
+                  / "0021_manufacturer_estimate_and_claim_targets.sql")
 NEW_TABLES = ("discovery_claim_proposal", "discovery_proposal_observation",
               "discovery_proposal_decision")
 
@@ -71,6 +74,8 @@ def test_0018_converges_onto_the_baseline(scratch_db):  # noqa: F811
         assert any(_shape(conn)[k] != baseline[k] for k in INSPECT)
         conn.execute(MIGRATION_0018.read_text(encoding="utf-8"))
         conn.execute(MIGRATION_0019.read_text(encoding="utf-8"))   # restore the later layer
+        conn.execute(MIGRATION_0020.read_text(encoding="utf-8"))   # later layers (G2-4)
+        conn.execute(MIGRATION_0021.read_text(encoding="utf-8"))
         upgraded, upgraded_function = _shape(conn), _function(conn)
     for key in INSPECT:
         assert upgraded[key] == baseline[key], f"0018 and schema.sql disagree on {key}"

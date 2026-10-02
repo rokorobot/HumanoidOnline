@@ -48,6 +48,21 @@ describe("resolvePriceState — the six frozen price states", () => {
     expect(resolvePriceState(pd).tone).toBe("estimated");
   });
 
+  it("MANUFACTURER_ESTIMATE is marked as the manufacturer's own estimate, not ESTIMATED", () => {
+    const pd: PriceDisplay = { type: "MANUFACTURER_ESTIMATE", amount: 19999, currency: "EUR" };
+    const short = resolvePriceState(pd, "short");
+    const long = resolvePriceState(pd, "long");
+    expect(short.label).toBe("€19,999");
+    expect(short.label).not.toContain("~"); // "~" is HumanoidOnline's own ESTIMATED marker
+    expect(short.context).toBe("MANUFACTURER ESTIMATE");
+    expect(long.context).toBe("Manufacturer estimate");
+    expect(short.tone).toBe("estimated");
+    // ESTIMATED is unchanged
+    expect(resolvePriceState({ type: "ESTIMATED", amount: 30000, currency: "USD" }).label).toBe(
+      "~$30,000",
+    );
+  });
+
   it("QUOTE_ONLY is 'Price on request' — never a number, distinct from unknown", () => {
     const pd: PriceDisplay = { type: "QUOTE_ONLY", amount: null, currency: "USD" };
     expect(resolvePriceState(pd, "short").label).toBe("PRICE ON REQUEST");

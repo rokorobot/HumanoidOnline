@@ -315,6 +315,7 @@ Universal rules: primitives render enum labels verbatim; any commercial fact car
   | FROM | `FROM` | `From $40,000` | `From $40,000` |
   | RANGE | `RANGE` (`price_min`–`price_max`) | `$120k–$200k` | `$120,000 – $200,000` |
   | ESTIMATED | `ESTIMATED` | `~$30,000` (amber) | number + **`ESTIMATED`** flag (amber) |
+  | MANUFACTURER_ESTIMATE | `MANUFACTURER_ESTIMATE` | `€19,999` + `MANUFACTURER ESTIMATE` (amber, no `~`) | number + **"Manufacturer estimate"** (amber) |
   | QUOTE_ONLY | `price_type = QUOTE_ONLY` | **"PRICE ON REQUEST"** | **"Price on request"** |
   | UNKNOWN | *no `pricing_offer` rows* | **"NO PRICE DATA"** | **"No confirmed pricing"** |
 - **Hard law:** `QUOTE_ONLY ≠ UNKNOWN` — in **both** SHORT and LONG variants. Quote-only is

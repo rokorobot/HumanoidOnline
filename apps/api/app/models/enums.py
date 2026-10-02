@@ -29,7 +29,8 @@ transaction_type = _pg_enum(
     "PURCHASE", "RENTAL", "SUBSCRIPTION", "LEASE", "RAAS", "PILOT", "DEVELOPER", "OTHER",
 )
 price_type = _pg_enum(
-    "price_type", "PUBLIC", "ESTIMATED", "QUOTE_ONLY", "FROM", "RANGE"
+    "price_type", "PUBLIC", "ESTIMATED", "MANUFACTURER_ESTIMATE", "QUOTE_ONLY", "FROM",
+    "RANGE"
 )
 billing_period = _pg_enum(
     "billing_period",

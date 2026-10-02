@@ -17,6 +17,7 @@ import difflib
 import hashlib
 import json
 from dataclasses import dataclass, field
+from decimal import Decimal
 from pathlib import Path
 
 from sqlalchemy import select, text
@@ -26,11 +27,37 @@ from app.models.claim_proposal import AcceptedClaim, CatalogueWriteAudit, Discov
 from app.models.discovery import DiscoverySource
 from app.services.discovery import DiscoveryError
 from app.services.discovery import proposal_review as pr
-from app.services.discovery.claims import active_claims
+from app.services.discovery.claims import _active_claim, active_claims
 from app.services.discovery.field_policy import CLAIM_POLICIES
 
 CATALOGUE_ROBOTS = Path(__file__).resolve().parents[5] / "db" / "catalogue" / "robots"
 _SOURCE_KIND = {"MANUFACTURER": "MANUFACTURER"}
+_EVIDENCE_TYPE = {"MANUFACTURER": "MANUFACTURER_SITE"}
+#: Deterministic, owner-decided wording of what these two offers ARE (G2-4). It states the
+#: source's own semantics and the owner's mapping; it asserts nothing the source did not say.
+PRICE_NOTE = ("Estimate published by the manufacturer itself on its official product page "
+              "(stated there as an 'Estimated price'). Not an MSRP or public selling price, "
+              "and not a HumanoidOnline estimate.")
+WAITLIST_NOTE = ("WAITLIST: the manufacturer states that a reservation secures a place in the "
+                 "delivery queue; this is not a purchase order. No date is stated: 'Expected in "
+                 "2026' is year-level seller wording, not a date.")
+
+
+def _evidence(claim: AcceptedClaim, source: DiscoverySource) -> dict:
+    """The catalogue evidence block, built only from the accepted claim's own chain."""
+    if source.source_class not in _EVIDENCE_TYPE:
+        raise DiscoveryError(f"source {source.key} is not a manufacturer source")
+    return {
+        "source_url": claim.source_url, "source_type": _EVIDENCE_TYPE[source.source_class],
+        "source_title": f"{source.name} \u2014 official product page",
+        "excerpt": claim.evidence_excerpt, "published_at": None,
+        "observed_at": claim.observed_at.date().isoformat(), "verified_at": None,
+        "confidence": "HIGH",
+        "note": (f"Governed extraction (DR-A5): proposal {claim.proposal_digest[:12]} at "
+                 f"{claim.evidence_locator}, sighted on page content hash "
+                 f"{claim.observation_content_hash[:12]}; accepted claim "
+                 f"{claim.claim_digest[:12]}; owner ACCEPT decision. Retrieved by the "
+                 "governed observation; not human-verified on the page itself.")}
 
 
 @dataclass
@@ -141,7 +168,73 @@ def plan_materialization(session: Session, robot_slug: str,
         merged += [entries[k] for k in sorted(entries, key=lambda k: (k[0] or "", k[1]))
                    if k not in placed]
         doc["extended_specs"] = merged
+    offer_claims = [c for c in claims if c.target_kind in ("pricing_offer", "availability_offer")]
+    if offer_claims:
+        osources = {x.id: x for x in session.scalars(select(DiscoverySource).where(
+            DiscoverySource.id.in_({c.source_id for c in offer_claims})))}
+        prices = {}
+        for c in (c for c in offer_claims if c.target_kind == "pricing_offer"):
+            o = json.loads(c.accepted_value)
+            prices[c.variant_slug] = {
+                "variant_slug": c.variant_slug, "transaction_type": o["transaction_type"],
+                "price_type": o["price_type"], "currency": o["currency"],
+                "price": float(Decimal(o["price"])), "billing_period": o["billing_period"],
+                "note": PRICE_NOTE,
+                "price_basis": f"{o['price_basis']} (as stated by the manufacturer)",
+                "edition_confirmed": o["edition_confirmed"],
+                "evidence": [_evidence(c, osources[c.source_id])]}
+        if prices:
+            doc["pricing_offers"] = _merge_offers(
+                doc.get("pricing_offers", []), prices, "MANUFACTURER_ESTIMATE", "price_type")
+        avail = {}
+        terms = None
+        for c in (c for c in offer_claims if c.target_kind == "availability_offer"):
+            if terms is None:
+                terms = _reservation_terms(session, robot_slug)
+            o = json.loads(c.accepted_value)
+            avail[c.variant_slug] = {
+                "variant_slug": c.variant_slug, "transaction_type": o["transaction_type"],
+                "availability_status": o["availability_status"],
+                "delivery_estimate_label": o["delivery_estimate_label"],
+                "seller_wording": o["seller_wording"], "note": WAITLIST_NOTE,
+                "evidence": [_evidence(c, osources[c.source_id]),
+                             _evidence(terms, osources.get(terms.source_id)
+                                       or session.get(DiscoverySource, terms.source_id))]}
+        if avail:
+            doc["availability_offers"] = _merge_offers(
+                doc.get("availability_offers", []), avail, "WAITLIST", "availability_status")
     return MaterializationPlan(robot_slug, path, before, _dump(doc), claims)
+
+
+def _reservation_terms(session: Session, robot_slug: str) -> AcceptedClaim:
+    """The accepted RESERVATION_TERMS claim that the WAITLIST status rests on (it must exist
+    and its proposal must still be current)."""
+    terms = _active_claim(session, robot_slug, target_kind="NO_CATALOGUE_HOME",
+                          target_key="reservation_terms")
+    if terms is None:
+        raise DiscoveryError("WAITLIST needs the accepted RESERVATION_TERMS claim (its basis)")
+    [state] = pr.derive_states(session, [session.get(DiscoveryClaimProposal, terms.proposal_id)])
+    if not state.acceptable:
+        raise DiscoveryError("the RESERVATION_TERMS proposal is no longer current; "
+                             "materialization refuses")
+    return terms
+
+
+def _merge_offers(existing: list, new: dict, kind_value: str, kind_field: str) -> list:
+    """Replace this slice's own offers (same variant, PURCHASE, no provider/region, same
+    status/type) in place, keep everything else, append new ones ordered by variant slug."""
+    merged, placed = [], set()
+    for entry in existing:
+        slug = entry.get("variant_slug")
+        if (slug in new and entry.get(kind_field) == kind_value
+                and entry.get("transaction_type") == "PURCHASE"
+                and not entry.get("provider_slug") and not entry.get("region_code")):
+            merged.append(new[slug])
+            placed.add(slug)
+        else:
+            merged.append(entry)
+    merged += [new[slug] for slug in sorted(new) if slug not in placed]
+    return merged
 
 
 def apply_plan(plan: MaterializationPlan) -> bool:
@@ -166,9 +259,23 @@ def logical_target(claim: AcceptedClaim) -> str:
     Never a database row id (the importer recreates those)."""
     if claim.target_kind == "robot_variant":
         return f"robot_variant:{claim.robot_slug}:{claim.variant_slug}"
-    if claim.target_kind == "specification":
-        return f"specification:{claim.robot_slug}:{claim.variant_slug}:{claim.target_key}"
+    if claim.target_kind in ("specification", "pricing_offer", "availability_offer"):
+        return (f"{claim.target_kind}:{claim.robot_slug}:{claim.variant_slug}:"
+                f"{claim.target_key}")
     raise DiscoveryError(f"{claim.target_kind!r} has no catalogue target")
+
+
+def _offer_evidence(session: Session, subject: str, subject_id, source_url: str) -> list:
+    """The offer's evidence excerpts (sorted), requiring a manufacturer row with our URL."""
+    if subject_id is None:
+        return []
+    rows = session.execute(text(
+        "SELECT source_url, source_type, excerpt FROM evidence_source "
+        "WHERE subject_type = :t AND subject_id = :i ORDER BY source_url, excerpt"),
+        {"t": subject, "i": subject_id}).all()
+    ours = [r for r in rows if r.source_url == source_url
+            and r.source_type in ("MANUFACTURER_SITE", "MANUFACTURER_STORE") and r.excerpt]
+    return [[r.source_url, r.source_type, r.excerpt] for r in rows] if ours else []
 
 
 def verify_applied(session: Session, robot_slug: str, *, change_ref: str, applied_by: str,
@@ -197,6 +304,57 @@ def verify_applied(session: Session, robot_slug: str, *, change_ref: str, applie
             payload = {"robot_slug": robot_slug, "table": "robot_variant", "slug": r.slug,
                        "name": r.name}
             rows.append((c, "robot_variant", r.id, _hash(payload)))
+        elif c.target_kind == "pricing_offer":
+            o = json.loads(c.accepted_value)
+            r = session.execute(text(
+                "SELECT p.id, p.price, p.currency, p.billing_period, p.price_type, "
+                "p.transaction_type, p.edition_confirmed, p.price_basis, p.provider_id, "
+                "p.region_id, p.is_current FROM pricing_offer p JOIN robot_variant v "
+                "ON v.id = p.variant_id WHERE p.robot_id = :r AND v.slug = :v "
+                "AND p.price_type = 'MANUFACTURER_ESTIMATE' AND p.transaction_type = 'PURCHASE'"),
+                {"r": robot_id, "v": c.variant_slug}).one_or_none()
+            ev = _offer_evidence(session, "PRICING_OFFER", r.id if r else None, c.source_url)
+            if (r is None or r.price != Decimal(o["price"]) or r.currency != o["currency"]
+                    or r.billing_period != o["billing_period"] or r.edition_confirmed is not True
+                    or r.provider_id is not None or r.region_id is not None
+                    or not r.is_current or not ev
+                    or not (r.price_basis or "").startswith(o["price_basis"])):
+                raise DiscoveryError(
+                    f"pricing offer for variant {c.variant_slug!r} is not in the database as "
+                    "accepted (or lacks its manufacturer evidence); import the merged "
+                    "catalogue first")
+            payload = {"robot_slug": robot_slug, "table": "pricing_offer",
+                       "variant_slug": c.variant_slug, "price_type": r.price_type,
+                       "transaction_type": r.transaction_type, "price": str(r.price),
+                       "currency": r.currency, "billing_period": r.billing_period,
+                       "price_basis": r.price_basis, "evidence": ev}
+            rows.append((c, "pricing_offer", r.id, _hash(payload)))
+        elif c.target_kind == "availability_offer":
+            o = json.loads(c.accepted_value)
+            r = session.execute(text(
+                "SELECT a.id, a.availability_status, a.available_from, a.region_id, "
+                "a.provider_id, a.delivery_estimate_label, a.seller_wording, a.is_current, "
+                "a.transaction_type FROM availability_offer a JOIN robot_variant v "
+                "ON v.id = a.variant_id WHERE a.robot_id = :r AND v.slug = :v "
+                "AND a.transaction_type = 'PURCHASE'"),
+                {"r": robot_id, "v": c.variant_slug}).one_or_none()
+            ev = _offer_evidence(session, "AVAILABILITY_OFFER", r.id if r else None, c.source_url)
+            if (r is None or r.availability_status != o["availability_status"]
+                    or r.available_from is not None or r.provider_id is not None
+                    or r.region_id is not None or not r.is_current
+                    or r.delivery_estimate_label != o["delivery_estimate_label"]
+                    or r.seller_wording != o["seller_wording"] or not ev):
+                raise DiscoveryError(
+                    f"availability offer for variant {c.variant_slug!r} is not in the database "
+                    "as accepted (or lacks its manufacturer evidence); import the merged "
+                    "catalogue first")
+            payload = {"robot_slug": robot_slug, "table": "availability_offer",
+                       "variant_slug": c.variant_slug, "transaction_type": r.transaction_type,
+                       "availability_status": r.availability_status,
+                       "available_from": None,
+                       "delivery_estimate_label": r.delivery_estimate_label,
+                       "seller_wording": r.seller_wording, "evidence": ev}
+            rows.append((c, "availability_offer", r.id, _hash(payload)))
         else:
             r = session.execute(text(
                 "SELECT s.id, s.value_text, s.value_number, s.value_bool, s.edition_scope, "

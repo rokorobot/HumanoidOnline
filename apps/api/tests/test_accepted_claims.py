@@ -104,20 +104,22 @@ def stub(w, tmp):
 # ------------------------------------------------------------ registry ------
 
 
-def test_only_the_two_owner_approved_targets_are_registered(dsession):
-    assert set(CLAIM_POLICIES) == {"robot_variant", "specification[dexterous_hand_option]"}
+def test_the_slice_policies_resolve_the_expected_proposals_and_nothing_else(dsession):
+    # G2-3 slice (variants, hand option) plus the G2-4 additions; the full matrix is in
+    # test_g2_4_commercial.py. Anything outside it is refused even when accepted.
+    assert {"robot_variant", "specification[dexterous_hand_option]"} <= set(CLAIM_POLICIES)
     w = seeded(dsession)
     registered = {(p.kind, p.edition) for p in dsession.scalars(
         select(DiscoveryClaimProposal).where(DiscoveryClaimProposal.robot_slug == w.slug))
-        if claim_policy_for(p.kind, p.target, p.evidence_locator)}
-    assert registered == {("VARIANT", "Standard"), ("VARIANT", "Pro"),
-                          ("SPECIFICATION", "Standard"), ("SPECIFICATION", "Pro")}
+        if claim_policy_for(p.kind, p.target, p.evidence_locator, p.structured)}
+    assert {("VARIANT", "Standard"), ("VARIANT", "Pro"),
+            ("SPECIFICATION", "Standard"), ("SPECIFICATION", "Pro")} <= registered
+    assert not {k for k, _ in registered} & {"INTEGRATION", "DESIGN_CAVEAT",
+                                             "DATASHEET_REFERENCE"}
 
 
 @pytest.mark.parametrize("kind,edition", [
-    ("PRICE_ESTIMATE", "Standard"), ("AVAILABILITY", "Pro"), ("RESERVATION_FEE", "Pro"),
-    ("USE_CASES", "Standard"), ("INTEGRATION", "Pro"), ("DESIGN_CAVEAT", None),
-    ("DATASHEET_REFERENCE", None)])
+    ("INTEGRATION", "Pro"), ("DESIGN_CAVEAT", None), ("DATASHEET_REFERENCE", None)])
 def test_unregistered_proposals_are_refused_even_when_accepted(dsession, kind, edition):
     w = seeded(dsession)
     p = prop(dsession, w, kind, edition)

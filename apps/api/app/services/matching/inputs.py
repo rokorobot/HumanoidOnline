@@ -28,7 +28,8 @@ class OfferInput:
 @dataclass(frozen=True)
 class PriceInput:
     transaction_type: str
-    price_type: str          # PUBLIC | FROM | ESTIMATED | QUOTE_ONLY | RANGE
+    # PUBLIC | FROM | ESTIMATED | MANUFACTURER_ESTIMATE | QUOTE_ONLY | RANGE
+    price_type: str
     currency: str | None
     price: float | None
     price_min: float | None

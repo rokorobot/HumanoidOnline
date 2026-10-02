@@ -46,7 +46,7 @@ is ≤ X:
 
 | `price_type` | Comparable amount |
 |---|---|
-| `PUBLIC` / `FROM` / `ESTIMATED` | `price` |
+| `PUBLIC` / `FROM` / `ESTIMATED` / `MANUFACTURER_ESTIMATE` | `price` |
 | `RANGE` | `price_max` (the **upper bound** — the whole span must be under the ceiling) |
 | `QUOTE_ONLY` | none — never comparable |
 | no pricing rows | none — never comparable |

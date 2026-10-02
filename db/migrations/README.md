@@ -279,6 +279,17 @@ Forward migrations:
   any canonical table (robots and variants by slug text); the catalogue is still written
   only through `db/catalogue/` and the importer. Additive and idempotent.
 
+- `0020_price_type_manufacturer_estimate.sql` and
+  `0021_manufacturer_estimate_and_claim_targets.sql` — DR-A5 stage G2-4 (owner decision).
+  0020 adds the `price_type` label `MANUFACTURER_ESTIMATE` (a numeric estimate published
+  by the manufacturer itself; distinct from `ESTIMATED` = HumanoidOnline's own estimate;
+  placed after `ESTIMATED`). It only declares the label: a new enum label cannot be used in
+  the transaction that adds it, and each migration runs in its own (as 0006/0007). 0021
+  makes `chk_price_type_shape` accept it as a point price and widens the accepted-claim
+  and catalogue-write-audit CHECKs to the `pricing_offer` and `availability_offer` targets
+  (and a `JSON` value type). Additive, backward compatible, idempotent; no existing value
+  or row changes meaning.
+
 ## Checksum integrity (WS8.2 / R9)
 
 `schema_migrations` stores a `sha256` for every applied file, and

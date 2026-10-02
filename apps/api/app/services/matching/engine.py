@@ -304,12 +304,15 @@ def _budget(req: RequirementInput, r: RobotInput) -> _Criterion | None:
             w.append("only a starting ('from') price is published")
             if p.price > max_:
                 w.append("price exceeds the stated budget")
-        elif p.price_type in ("PUBLIC", "ESTIMATED") and p.price is not None:
+        elif p.price_type in ("PUBLIC", "ESTIMATED", "MANUFACTURER_ESTIMATE") and (
+                p.price is not None):
             bf = ramp(p.price)
             if p.price > max_:
                 w.append("price exceeds the stated budget")
             if p.price_type == "ESTIMATED":
                 w.append("price is an estimate, not confirmed")
+            elif p.price_type == "MANUFACTURER_ESTIMATE":
+                w.append("price is the manufacturer's estimate, not a confirmed selling price")
         else:
             bf = 0.5
             w.append("pricing is indicative")
@@ -324,7 +327,7 @@ def _budget(req: RequirementInput, r: RobotInput) -> _Criterion | None:
 def lower_cost_refs(req: RequirementInput, r: RobotInput) -> list[tuple[float, str]]:
     """ALL 'lower-cost'-eligible price references for BEST_LOWER_COST: current,
     transaction-compatible, geography-compatible (when a country is stated),
-    ONE_TIME, PUBLIC/ESTIMATED point prices. When the buyer stated a budget
+    ONE_TIME, PUBLIC/ESTIMATED/MANUFACTURER_ESTIMATE point prices. When the buyer stated a budget
     currency, only that currency is eligible. Returns every (price, currency) —
     the caller inspects the full set so a robot carrying two currencies makes the
     comparison incomparable (no FX)."""
@@ -334,7 +337,8 @@ def lower_cost_refs(req: RequirementInput, r: RobotInput) -> list[tuple[float, s
     for p in r.prices:
         if not p.is_current or p.price is None:
             continue
-        if p.billing_period != "ONE_TIME" or p.price_type not in ("PUBLIC", "ESTIMATED"):
+        if p.billing_period != "ONE_TIME" or p.price_type not in (
+                "PUBLIC", "ESTIMATED", "MANUFACTURER_ESTIMATE"):
             continue
         if not _txn_ok(p.transaction_type, allowed):
             continue

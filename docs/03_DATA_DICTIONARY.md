@@ -55,8 +55,9 @@ All six core modes are supported by the schema **now**, even though only Phase 1
 | `RANGE` | Known band (`price_min`–`price_max`) | show band |
 | `QUOTE_ONLY` | Price on request | "Price on request" — never a number |
 | `ESTIMATED` | HumanoidOnline estimate | must be visibly marked "Estimated" |
+| `MANUFACTURER_ESTIMATE` | A numeric price estimate explicitly published by the robot **manufacturer itself** (owner decision, DR-A5 G2-4; migrations 0020/0021). Not an MSRP, not a selling price, not HumanoidOnline's estimate | show the number marked "Manufacturer estimate" |
 
-`ESTIMATED` without an `evidence_source` row is not publishable.
+`ESTIMATED` without an `evidence_source` row is not publishable. `MANUFACTURER_ESTIMATE` is a positive commercial fact and requires manufacturer evidence (an `evidence_source` row from the manufacturer's own site or store); `ESTIMATED` keeps its meaning (HumanoidOnline's own estimate) unchanged.
 
 **Unknown price is NOT `QUOTE_ONLY`.** They are different facts with different displays:
 

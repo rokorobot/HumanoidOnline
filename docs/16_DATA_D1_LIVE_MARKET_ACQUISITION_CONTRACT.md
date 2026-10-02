@@ -1264,7 +1264,7 @@ claim or catalogue effect existed at that point. **G2-3 (first slice)** adds imm
 retractions, the catalogue write audit and deterministic materialization into `db/catalogue/` for
 `robot_variant` and `specification[dexterous_hand_option]` only. **G2-5** wires proposal ingest into the scheduled NEURA observation cycle for the 4NE1 Mini page only
 (proposals and sightings only; human review mandatory; no automatic decision, claim,
-materialization or publication). See DR-A5 §18.1 to §18.4.
+materialization or publication). **G2-4** (owner decisions, 4NE1 Mini only) adds the `MANUFACTURER_ESTIMATE` price type, WAITLIST availability and verbatim interface specs through the same governed chain, and records the reservation fee and use cases as accepted knowledge with `NO_CATALOGUE_HOME`. See DR-A5 §18.1 to §18.5.
 
 **The flow, one governed step at a time:**
 

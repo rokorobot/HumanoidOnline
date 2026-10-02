@@ -34,7 +34,9 @@ from app.models.robot import Robot
 
 #: Point-price types carrying a directly comparable number. `RANGE` is handled
 #: separately (upper bound); `QUOTE_ONLY` carries no number by construction.
-POINT_TYPES = ("PUBLIC", "FROM", "ESTIMATED")
+#: MANUFACTURER_ESTIMATE (migration 0020/0021) is the manufacturer's own published numeric
+#: estimate: a point price like ESTIMATED, but a different statement (never HumanoidOnline's).
+POINT_TYPES = ("PUBLIC", "FROM", "ESTIMATED", "MANUFACTURER_ESTIMATE")
 
 
 class InvalidPriceQuery(ValueError):
@@ -83,7 +85,8 @@ def comparable_amount():
     """The comparable figure of a `pricing_offer` row, or NULL if there is none.
 
     Leans on `chk_price_type_shape` (`db/schema.sql`) rather than inventing
-    states: that constraint already guarantees `PUBLIC`/`FROM`/`ESTIMATED` carry
+    states: that constraint already guarantees `PUBLIC`/`FROM`/`ESTIMATED`/
+    `MANUFACTURER_ESTIMATE` carry
     `price`, `RANGE` carries `price_min` + `price_max`, and `QUOTE_ONLY` carries
     none of them. So `QUOTE_ONLY` falls through to NULL and can never satisfy a
     ceiling — an exclusion by construction, not a special case.

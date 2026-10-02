@@ -759,7 +759,14 @@ function Legend() {
 }
 
 // ── shared helpers (kept identical in spirit to the WS3 base) ─────────────────
-const PRICE_TYPE_RANK: Record<string, number> = { PUBLIC: 0, FROM: 1, ESTIMATED: 2, RANGE: 3, QUOTE_ONLY: 4 };
+const PRICE_TYPE_RANK: Record<string, number> = {
+  PUBLIC: 0,
+  FROM: 1,
+  MANUFACTURER_ESTIMATE: 2,
+  ESTIMATED: 3,
+  RANGE: 4,
+  QUOTE_ONLY: 5,
+};
 
 function headlinePriceDisplay(offers: PricingOffer[]) {
   if (offers.length === 0) return null;

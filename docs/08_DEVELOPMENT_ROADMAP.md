@@ -104,7 +104,7 @@ accepted claim ≠ publication
 |---|---|---|
 | **A–F** | Read-only foundation; bounded HTTP acquisition and change detection; the adapter framework and the first source adapter; deterministic candidate extraction and identity resolution; **Stage E** exception-only human review (identity decisions, out-of-scope rejection, source trace, same-entity promotion convergence); **Stage F** scheduled observation (per-source cadence, redirect and cache handling, one-running-run guard, least-privilege database role) | ✅ **OPERATIONAL** |
 | **G1** | Proposal-only structured extraction | 🟢 **IMPLEMENTED FOUNDATION** (PR #84) |
-| **G2** | Governed proposal review and claim promotion | 🔜 **NEXT** — design not yet approved |
+| **G2** | Governed proposal review and claim promotion | 🔜 **NEXT** — architecture ratified in DR-A5; implementation pending |
 | **G3** | Source expansion | ⏸ After G2 is proven |
 
 **NEURA is the first commissioned scheduled source.** Observation runs **Monday and
@@ -146,7 +146,7 @@ here **without being decided**:
 - mapping free-text use cases;
 - claim promotion beyond height, weight and payload.
 
-#### Stage G2 — Governed proposal review and claim promotion · NEXT
+#### Stage G2 — Governed proposal review and claim promotion · architecture ratified (DR-A5); implementation pending
 
 Expected responsibility:
 
@@ -158,8 +158,13 @@ Expected responsibility:
 - catalogue mutation **only through an explicit governed boundary**;
 - publication remains separate.
 
-The six open questions above belong to G2's design. **No concrete database schema is
-specified here; that design is not yet approved.**
+The persistence architecture and the catalogue boundary are **ratified** in
+[`DR-A5`](decisions/DR-A5_GOVERNED_CLAIM_PROPOSAL_REVIEW_AND_PROMOTION_BOUNDARY.md); its normative
+text is `docs/16` §17.3. **Implementation is pending:** G2-1 persistence is not yet
+implemented, and this roadmap authorizes **no catalogue-writing code**. **Price and availability
+remain deferred**, as separate owner decisions. The open questions above are settled
+phase by phase under DR-A5. No concrete database schema is specified here; the physical design
+belongs to G2-1, a separate reviewed change.
 
 #### Stage G3 — Source expansion · after G2 is proven
 
@@ -456,7 +461,7 @@ Current programme:                Governed Catalogue Discovery & Live Operations
 Operational:                      Stages A–F; NEURA scheduled (Mon + Thu 06:37 UTC, 48 h cadence)
 Latest foundation:                Stage G1 proposal-only extraction (PR #84, merge 42954ed)
 Next:                             Stage G2 — governed proposal review and claim promotion
-                                  (design not yet approved)
+                                  (architecture ratified in DR-A5; implementation pending)
 Strategic, not immediate:         Commercial Architecture — Rent / Buy / Lease-RaaS
 
 Completed:  ✅ WS0  ✅ WS1  ✅ WS2A  ✅ WS2B  ✅ UI-D1  ✅ WS3  ✅ WS4  ✅ WS5  ✅ WS6  ✅ WS7

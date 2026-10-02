@@ -17,6 +17,12 @@
     python -m app.cli.discovery adapter plan <source-key>
     python -m app.cli.discovery adapter run  <source-key> --operator "Name" [--resume <run-id>]
     python -m app.cli.discovery run fail <run-id> --by WHO --reason WHY
+    python -m app.cli.discovery claims create <proposal> --by WHO
+    python -m app.cli.discovery claims list --robot-slug S
+    python -m app.cli.discovery claims retract <claim-id> --by WHO --reason WHY [--replacement ID]
+    python -m app.cli.discovery claims materialize <robot-slug> [--dry-run]
+    python -m app.cli.discovery claims verify <robot-slug> --change-ref REF --by WHO
+                                       [--importer-run-ref REF]
     python -m app.cli.discovery report <run-id>
     python -m app.cli.discovery proposals ingest <source-key> --robot-slug S
                                        --fetched-page ID (--body-file F | --cache-dir DIR) --by WHO
@@ -66,6 +72,14 @@
   publication. ACCEPT needs a CURRENT, non-STALE proposal and an explicit resolved choice
   (`--choice qN=...`) for every review question; a proposal with no catalogue home needs
   `--no-catalogue-home`. Repeating the effective decision with identical choices is a no-op.
+
+- `claims create|retract` (G2-3, DR-A5) turn an effective ACCEPT into an immutable accepted
+  claim (CURRENT, non-stale proposal; registered field policy only; the human's explicit
+  mapping read from the decision's resolved choices) or append a retraction. They write no
+  catalogue row. `claims materialize` renders the active claims into a deterministic patch of
+  `db/catalogue/robots/<slug>.json` (`--dry-run` prints the diff and writes nothing); the
+  change then goes through a normal PR and the importer. `claims verify` runs AFTER the
+  import: it compares the database rows with the claims and appends `catalogue_write_audit`.
 
 - `source *` never makes a network request. `review` records the owner's own
   decisions (DR-A4: he reads the terms himself) and never enables; `enable` is a
@@ -377,6 +391,50 @@ def _cmd_review(args: argparse.Namespace) -> int:
         return 0
 
 
+def _cmd_claims(args: argparse.Namespace) -> int:
+    from app.db.session import SessionLocal
+    from app.services.discovery import claims, materialize
+
+    with SessionLocal() as session:
+        if args.action == "list":
+            print("\n".join(claims.render_claims(session, args.robot_slug)))
+            return 0
+        if args.action == "create":
+            claim, created = claims.create_claim(session, args.proposal, created_by=args.by)
+            session.commit()
+            print(f"{'RECORDED' if created else 'ALREADY IN EFFECT (no-op)'} accepted claim "
+                  f"#{claim.claim_seq} {claim.id} {claim.target_kind}[{claim.target_key}] "
+                  f"variant={claim.variant_slug} value={claim.accepted_value!r}")
+            print("no catalogue write was made; materialize + PR + importer is the only path")
+            return 0
+        if args.action == "retract":
+            row = claims.retract_claim(session, args.claim_id, retracted_by=args.by,
+                                       reason=args.reason, replacement_id=args.replacement)
+            session.commit()
+            print(f"RETRACTED claim {row.claim_id} (retraction #{row.retraction_seq})")
+            return 0
+        if args.action == "materialize":
+            plan = materialize.plan_materialization(session, args.robot_slug)
+            if not plan.changed:
+                print(f"NO CHANGE: {plan.path.name} already matches {len(plan.claims)} "
+                      "active claim(s)")
+                return 0
+            print(plan.diff())
+            if args.dry_run:
+                print("DRY RUN: nothing written")
+                return 0
+            materialize.apply_plan(plan)
+            print(f"WROTE {plan.path}; commit it through a normal PR (the importer applies it)")
+            return 0
+        written = materialize.verify_applied(
+            session, args.robot_slug, change_ref=args.change_ref, applied_by=args.by,
+            importer_run_ref=args.importer_run_ref)
+        session.commit()
+        print(f"VERIFIED: {len(written)} catalogue_write_audit row(s) appended "
+              "(rows already audited for this change are not repeated)")
+        return 0
+
+
 def _parse_choices(pairs: list[str] | None) -> dict[str, str]:
     out: dict[str, str] = {}
     for pair in pairs or []:
@@ -653,6 +711,30 @@ def main(argv: list[str] | None = None) -> int:
                             help="explicitly record NO_CATALOGUE_HOME (authorizes no write)")
     proposals_cmd.set_defaults(func=_cmd_proposals)
 
+    claims_cmd = commands.add_parser("claims", help="G2-3 accepted claims and materialization")
+    claim_actions = claims_cmd.add_subparsers(dest="action", required=True)
+    cc = claim_actions.add_parser("create", help="accepted claim from an effective ACCEPT")
+    cc.add_argument("proposal")
+    cc.add_argument("--by", required=True)
+    cl = claim_actions.add_parser("list", help="accepted claims for a robot; no write")
+    cl.add_argument("--robot-slug", required=True)
+    cr = claim_actions.add_parser("retract", help="append a retraction (never an edit)")
+    cr.add_argument("claim_id")
+    cr.add_argument("--by", required=True)
+    cr.add_argument("--reason", required=True)
+    cr.add_argument("--replacement", help="the corrected accepted claim, if any")
+    cm = claim_actions.add_parser(
+        "materialize", help="render active claims into the catalogue JSON (M2); no DB write")
+    cm.add_argument("robot_slug")
+    cm.add_argument("--dry-run", action="store_true")
+    cv = claim_actions.add_parser(
+        "verify", help="after the import: compare rows with claims, append the write audit")
+    cv.add_argument("robot_slug")
+    cv.add_argument("--change-ref", required=True, help="the merged commit / PR reference")
+    cv.add_argument("--by", required=True)
+    cv.add_argument("--importer-run-ref")
+    claims_cmd.set_defaults(func=_cmd_claims)
+
     report = commands.add_parser("report", help="print a run report from the database")
     report.add_argument("run_id")
     report.set_defaults(func=_cmd_report)
@@ -674,6 +756,9 @@ def main(argv: list[str] | None = None) -> int:
         ids += [getattr(args, n, None) for n in ("candidate_id", "candidate_a", "candidate_b")]
     if args.command == "proposals" and args.action == "ingest":
         ids.append(args.fetched_page)
+    if args.command == "claims" and args.action in ("create", "retract", "verify") and (
+            not args.by.strip()):
+        parser.error(f"claims {args.action} requires a named human (--by)")
     if args.command == "proposals" and args.action in ("accept", "reject", "defer"):
         if not args.by.strip() or not args.reason.strip():
             parser.error(f"{args.action} requires a named human (--by) and a rationale (--reason)")

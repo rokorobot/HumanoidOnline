@@ -23,3 +23,10 @@ GRANT SELECT ON
 TO discovery_reviewer;
 
 GRANT INSERT ON discovery_proposal_decision TO discovery_reviewer;
+
+-- G2-3 (migration 0019): the reviewer turns an effective ACCEPT into an immutable accepted
+-- claim (and may append a retraction). It can read the claim tables and the audit, and it
+-- can NEVER write the catalogue write audit (that is the verification command's record) or
+-- any catalogue table; UPDATE and DELETE are refused by trigger for everyone.
+GRANT SELECT ON accepted_claim, claim_retraction, catalogue_write_audit TO discovery_reviewer;
+GRANT INSERT ON accepted_claim, claim_retraction TO discovery_reviewer;

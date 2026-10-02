@@ -27,6 +27,9 @@ from app.models.acquisition import (
 from app.models.buyer_requirement import BuyerRequirement
 from app.models.capability import Capability, RobotCapability
 from app.models.claim_proposal import (
+    AcceptedClaim,
+    CatalogueWriteAudit,
+    ClaimRetraction,
     DiscoveryClaimProposal,
     DiscoveryProposalDecision,
     DiscoveryProposalObservation,
@@ -81,6 +84,9 @@ __all__ = [
     "Manufacturer",
     "MatchResult",
     "PricingOffer",
+    "AcceptedClaim",
+    "CatalogueWriteAudit",
+    "ClaimRetraction",
     "CandidateIdentityDecision",
     "DiscoveryClaimProposal",
     "DiscoveryProposalDecision",

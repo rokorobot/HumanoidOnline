@@ -1,6 +1,6 @@
-"""Migration 0018 (G2-1 claim-proposal persistence) on a throwaway database.
+"""Migration 0019 (G2-3 accepted claims) on a throwaway database.
 
-- It converges a pre-0018 database onto db/schema.sql exactly (tables, columns,
+- It converges a pre-0019 database onto db/schema.sql exactly (tables, columns,
   indexes, constraints, triggers and the refuse function).
 - It is idempotent.
 - It is purely additive: every pre-existing table keeps its exact content (row count
@@ -17,23 +17,18 @@ from test_identity_decision_migration import INSPECT, _shape, scratch_db  # noqa
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 SCHEMA_SQL = ROOT / "db" / "schema.sql"
-MIGRATION_0018 = ROOT / "db" / "migrations" / "0018_claim_proposal_persistence.sql"
 MIGRATION_0019 = ROOT / "db" / "migrations" / "0019_accepted_claims.sql"
-NEW_TABLES = ("discovery_claim_proposal", "discovery_proposal_observation",
-              "discovery_proposal_decision")
+NEW_TABLES = ("accepted_claim", "claim_retraction", "catalogue_write_audit")
 
 
 def _wind_back(conn) -> None:
     conn.execute("SET search_path TO humanoid, public")
-    for later in ("catalogue_write_audit", "claim_retraction", "accepted_claim"):   # 0019
-        conn.execute(f"DROP TABLE IF EXISTS humanoid.{later} CASCADE")
     for table in reversed(NEW_TABLES):
         conn.execute(f"DROP TABLE IF EXISTS humanoid.{table} CASCADE")
-    conn.execute("DROP FUNCTION IF EXISTS humanoid.refuse_claim_proposal_mutation()")
-    conn.execute("DROP TYPE IF EXISTS humanoid.proposal_decision_kind")
 
 
 def _function(conn):
+    # the refuse function belongs to 0019 and must survive 0019 unchanged
     return conn.execute(
         "SELECT pg_get_functiondef(p.oid) FROM pg_proc p JOIN pg_namespace n "
         "ON n.oid = p.pronamespace WHERE n.nspname = 'humanoid' "
@@ -51,51 +46,50 @@ def _existing_content(conn) -> dict:
 
 def _populate(conn) -> None:
     conn.execute("""
-        INSERT INTO manufacturer (slug, name) VALUES ('m-0018', 'Maker 0018');
+        INSERT INTO manufacturer (slug, name) VALUES ('m-0019', 'Maker 0019');
         INSERT INTO robot (slug, manufacturer_id, name)
-            SELECT '4ne1-mini', id, '4NE1 Mini' FROM manufacturer WHERE slug = 'm-0018';
+            SELECT '4ne1-mini', id, '4NE1 Mini' FROM manufacturer WHERE slug = 'm-0019';
         INSERT INTO discovery_source (key, name, source_class)
-            VALUES ('s-0018', 'Source 0018', 'MANUFACTURER');
+            VALUES ('s-0019', 'Source 0019', 'MANUFACTURER');
         INSERT INTO discovery_candidate (source_id, external_ref, candidate_name,
                                          candidate_manufacturer)
-            SELECT id, 'ref-1', 'C-1', 'Maker 0018' FROM discovery_source WHERE key = 's-0018';
+            SELECT id, 'ref-1', 'C-1', 'Maker 0019' FROM discovery_source WHERE key = 's-0019';
     """)
 
 
-def test_0018_converges_onto_the_baseline(scratch_db):  # noqa: F811
+def test_0019_converges_onto_the_baseline(scratch_db):  # noqa: F811
     with psycopg.connect(scratch_db, autocommit=True) as conn:
         conn.execute(SCHEMA_SQL.read_text(encoding="utf-8"))
         baseline, function = _shape(conn), _function(conn)
         assert function
         _wind_back(conn)
         assert any(_shape(conn)[k] != baseline[k] for k in INSPECT)
-        conn.execute(MIGRATION_0018.read_text(encoding="utf-8"))
-        conn.execute(MIGRATION_0019.read_text(encoding="utf-8"))   # restore the later layer
+        conn.execute(MIGRATION_0019.read_text(encoding="utf-8"))
         upgraded, upgraded_function = _shape(conn), _function(conn)
     for key in INSPECT:
-        assert upgraded[key] == baseline[key], f"0018 and schema.sql disagree on {key}"
+        assert upgraded[key] == baseline[key], f"0019 and schema.sql disagree on {key}"
     assert upgraded_function == function
 
 
-def test_0018_is_idempotent(scratch_db):  # noqa: F811
+def test_0019_is_idempotent(scratch_db):  # noqa: F811
     with psycopg.connect(scratch_db, autocommit=True) as conn:
         conn.execute(SCHEMA_SQL.read_text(encoding="utf-8"))
         _wind_back(conn)
-        sql = MIGRATION_0018.read_text(encoding="utf-8")
+        sql = MIGRATION_0019.read_text(encoding="utf-8")
         conn.execute(sql)
         first = (_shape(conn), _function(conn))
         conn.execute(sql)
         assert (_shape(conn), _function(conn)) == first
 
 
-def test_0018_is_additive_and_the_new_tables_are_protected(scratch_db):  # noqa: F811
+def test_0019_is_additive_and_the_new_tables_are_protected(scratch_db):  # noqa: F811
     with psycopg.connect(scratch_db, autocommit=True) as conn:
         conn.execute(SCHEMA_SQL.read_text(encoding="utf-8"))
         _wind_back(conn)
         conn.execute("SET search_path TO humanoid, public")
         _populate(conn)
         before = _existing_content(conn)
-        conn.execute(MIGRATION_0018.read_text(encoding="utf-8"))
+        conn.execute(MIGRATION_0019.read_text(encoding="utf-8"))
         assert _existing_content(conn) == before   # every pre-existing row, byte for byte
         assert all(conn.execute(f"SELECT count(*) FROM {t}").fetchone()[0] == 0
                    for t in NEW_TABLES)

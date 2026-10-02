@@ -51,6 +51,8 @@ DISCOVERY_TABLES = {
     # discovery_source / crawl_run / fetched_page, so Gate K is unchanged.
     "discovery_claim_proposal", "discovery_proposal_observation",
     "discovery_proposal_decision",
+    # G2-3 (migration 0019): accepted claims, retractions, catalogue write audit.
+    "accepted_claim", "claim_retraction", "catalogue_write_audit",
 }
 
 

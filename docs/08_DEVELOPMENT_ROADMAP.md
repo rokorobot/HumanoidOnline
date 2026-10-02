@@ -104,7 +104,7 @@ accepted claim ≠ publication
 |---|---|---|
 | **A–F** | Read-only foundation; bounded HTTP acquisition and change detection; the adapter framework and the first source adapter; deterministic candidate extraction and identity resolution; **Stage E** exception-only human review (identity decisions, out-of-scope rejection, source trace, same-entity promotion convergence); **Stage F** scheduled observation (per-source cadence, redirect and cache handling, one-running-run guard, least-privilege database role) | ✅ **OPERATIONAL** |
 | **G1** | Proposal-only structured extraction | 🟢 **IMPLEMENTED FOUNDATION** (PR #84) |
-| **G2** | Governed proposal review and claim promotion | 🟡 **IN PROGRESS** — architecture ratified in DR-A5; **G2-1 persistence (migration 0018) and G2-2 governed review implemented**; G2-3 onward pending |
+| **G2** | Governed proposal review and claim promotion | 🟡 **IN PROGRESS** — architecture ratified in DR-A5; **G2-1 persistence (0018), G2-2 governed review, and the first G2-3 slice (accepted claims, materialization; 0019) implemented**; price/availability (G2-4) and scheduled ingest (G2-5) pending |
 | **G3** | Source expansion | ⏸ After G2 is proven |
 
 **NEURA is the first commissioned scheduled source.** Observation runs **Monday and
@@ -146,7 +146,7 @@ here **without being decided**:
 - mapping free-text use cases;
 - claim promotion beyond height, weight and payload.
 
-#### Stage G2 — Governed proposal review and claim promotion · architecture ratified (DR-A5); G2-1 and G2-2 implemented
+#### Stage G2 — Governed proposal review and claim promotion · architecture ratified (DR-A5); G2-1, G2-2 and the first G2-3 slice implemented
 
 Expected responsibility:
 
@@ -163,7 +163,10 @@ The persistence architecture and the catalogue boundary are **ratified** in
 text is `docs/16` §17.3. **G2-1 (persistence foundation: immutable proposals,
 append-only sightings and decisions, manual offline ingest; migration 0018) and G2-2 (governed
 human review: list/show/accept/reject/defer, derived supersession and staleness, reviewer role) are
-implemented; G2-3 onward is pending**, and this roadmap authorizes **no catalogue-writing code**. **Price and availability
+implemented; the first G2-3 vertical slice (immutable accepted claims, retraction, catalogue write
+audit, deterministic materialization into the catalogue of record, variant-scoped specifications; 0019)
+is implemented for `robot_variant` and `specification[dexterous_hand_option]` only. Price and
+availability (G2-4), scheduled ingest (G2-5) and every other mapping remain pending**, and this roadmap authorizes **no catalogue-writing code**. **Price and availability
 remain deferred**, as separate owner decisions. The open questions above are settled
 phase by phase under DR-A5. The physical G2-1 design is recorded in DR-A5 §18.1.
 
@@ -462,7 +465,7 @@ Current programme:                Governed Catalogue Discovery & Live Operations
 Operational:                      Stages A–F; NEURA scheduled (Mon + Thu 06:37 UTC, 48 h cadence)
 Latest foundation:                Stage G1 proposal-only extraction (PR #84, merge 42954ed)
 Next:                             Stage G2 — governed proposal review and claim promotion
-                                  (DR-A5; G2-1 persistence and G2-2 review implemented, G2-3 pending)
+                                  (DR-A5; G2-1, G2-2 and the first G2-3 slice implemented; G2-4/G2-5 pending)
 Strategic, not immediate:         Commercial Architecture — Rent / Buy / Lease-RaaS
 
 Completed:  ✅ WS0  ✅ WS1  ✅ WS2A  ✅ WS2B  ✅ UI-D1  ✅ WS3  ✅ WS4  ✅ WS5  ✅ WS6  ✅ WS7

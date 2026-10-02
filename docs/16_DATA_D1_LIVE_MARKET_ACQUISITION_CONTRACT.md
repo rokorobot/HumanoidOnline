@@ -1260,7 +1260,9 @@ proposal into an accepted claim and how an accepted claim reaches the catalogue.
 `discovery_proposal_observation` and `discovery_proposal_decision`, DB-level immutability, and a manual
 offline ingest. **G2-2** adds governed review (`proposals list|show|accept|reject|defer`, derived
 supersession and staleness, the reviewer role); a decision writes only a decision row. No accepted
-claim or catalogue effect exists yet. See DR-A5 §18.1 and §18.2.
+claim or catalogue effect existed at that point. **G2-3 (first slice)** adds immutable accepted claims,
+retractions, the catalogue write audit and deterministic materialization into `db/catalogue/` for
+`robot_variant` and `specification[dexterous_hand_option]` only. See DR-A5 §18.1 to §18.3.
 
 **The flow, one governed step at a time:**
 

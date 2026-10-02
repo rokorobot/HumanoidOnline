@@ -726,12 +726,25 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
         )
     for x in extended:
         definition_id, value_type = spec_definition(x["key"])
+        # An extended spec may identify ONE of this robot's own variants (G2-3, DR-A5):
+        # `variant_slug` resolves through the variants written above. Absent or null it
+        # is a product-level spec, exactly as before. An unknown slug fails loudly, never
+        # silently widening a variant-scoped fact to the whole product.
+        spec_variant_slug = x.get("variant_slug")
+        spec_variant_id = None
+        if spec_variant_slug is not None:
+            spec_variant_id = variant_id.get(spec_variant_slug)
+            if spec_variant_id is None:
+                raise SystemExit(
+                    f"robot {robot['slug']!r}: extended spec {x['key']!r} names variant "
+                    f"{spec_variant_slug!r}, which is not one of its variants"
+                )
         existing = cur.execute(
             """
             SELECT coalesce(managed_by, 'seed/hand-authored') FROM specification
-            WHERE robot_id = %s AND variant_id IS NULL AND definition_id = %s
+            WHERE robot_id = %s AND variant_id IS NOT DISTINCT FROM %s AND definition_id = %s
             """,
-            (robot_id, definition_id),
+            (robot_id, spec_variant_id, definition_id),
         ).fetchone()
         if existing is not None:
             # Our own rows were deleted above, so anything still here belongs to
@@ -750,10 +763,10 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
                 (robot_id, variant_id, definition_id, value_number, value_bool,
                  value_text, unit, managed_by, source_label, source_url, source_kind,
                  edition_scope, observed_at)
-            VALUES (%s,NULL,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """,
             (
-                robot_id, definition_id,
+                robot_id, spec_variant_id, definition_id,
                 value if value_type == "NUMBER" else None,
                 value if value_type == "BOOLEAN" else None,
                 value if value_type == "TEXT" else None,

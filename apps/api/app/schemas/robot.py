@@ -93,6 +93,9 @@ class ExtendedSpec(BaseModel):
     #: not read as confirmation for one configuration.
     edition_scope: str | None = None
     observed_at: date | None = None
+    #: Set when the value is scoped to ONE variant of this robot (e.g. Standard vs Pro);
+    #: None means a product-level spec.
+    variant_slug: str | None = None
 
 
 class SpecCaveat(BaseModel):

@@ -65,7 +65,7 @@ fetched_page (immutable observation) ──► candidate_claim / candidate_comme
 - Promotion is a **human act**; the approved field set is three robot columns
   (`promotion._APPROVED_FIELDS`). Everything else a claim could say is unwritable.
 - `promotion_audit` and `candidate_identity_decision` are append-only. The identity-decision table
-  is enforced by database triggers; **`promotion_audit` is enforced only by an ORM listener** (§19).
+  is enforced by database triggers, and **`promotion_audit` is too since migration 0017** (§19.3; it was ORM-only when this record was written).
 - The canonical schema can already hold what G1 proposes: `robot_variant`, `specification` (with
   `variant_id`, `edition_scope`, `managed_by`), `pricing_offer`, `availability_offer` and
   `evidence_source`.
@@ -169,7 +169,7 @@ Four approaches were evaluated against sixteen criteria. **✅** = met by design
 | Replayability | ⚠ | ✅ | ✅ stored excerpt + hash; re-extraction while the body is retained | ❌ after Gate Q pruning or an extractor change |
 | Stale-proposal detection | ❌ | ✅ | ✅ | ⚠ must recompute from a body that may be gone |
 | Accepted-claim lineage | ❌ the flag shares the row; lineage sits in `promotion_audit.detail` JSON | ⚠ | ✅ explicit FKs | ⚠ |
-| Catalogue-write audit | ⚠ `promotion_audit`, free-text `action`, ORM-only immutability | ⚠ | ✅ dedicated, trigger-enforced | ⚠ |
+| Catalogue-write audit | ⚠ `promotion_audit`, free-text `action` (database-level immutability since 0017) | ⚠ | ✅ dedicated, trigger-enforced | ⚠ |
 | Rollback / correction | ❌ in-place edits | ⚠ edits | ✅ retraction and correction are new rows | ⚠ |
 | Least-privilege execution | ❌ the observation role writes the table promotion trusts | ⚠ | ✅ observer inserts proposals only; reviewer inserts decisions only | ✅ (nothing to write) |
 | Multiple manufacturers later | ⚠ candidate-scoped | ✅ | ✅ source-scoped | ✅ |
@@ -487,7 +487,7 @@ Anything unresolved at ACCEPT time means **no write**.
 Additional controls:
 
 - **DB-level immutability** (triggers, as for `candidate_identity_decision`) on every append-only
-  G2 table. The `promotion_audit` ORM-only gap is a *separate* follow-up (§19).
+  G2 table. The `promotion_audit` gap was a *separate* follow-up and is closed (§19.3).
 - Excerpts are bounded (≤ 1000 characters) and stored as inert text, and any future UI escapes them.
 - No credential, cart link or off-host URL is fetched or followed. A datasheet URL is a *reference*
   until its host has its own source eligibility review.
@@ -565,12 +565,23 @@ These were found while inspecting the repository. This record changes none of th
    (`21365087-7a99-4c5d-ae3b-852c5a994d42`), 57 robots and 29 manufacturers throughout, unpublished,
    `UNKNOWN`, no child facts, and the promotion's evidence row byte-identical. Only `updated_at` (a
    trigger column) moved, and the second run was semantically idempotent.
-3. **`promotion_audit` is append-only only in the ORM.** There is no database trigger, unlike
-   `candidate_identity_decision`. Direct SQL could alter it.
+3. **`promotion_audit` was append-only only in the ORM.** There was no database trigger, unlike
+   `candidate_identity_decision`; direct SQL could alter it.
    **Authorized (owner, 2026-10-02), as a separate hardening PR:** an additive migration only;
    UPDATE and DELETE refused at the database layer; INSERT still permitted through the existing
    governed paths; existing rows unchanged; backward compatibility preserved; tests showing both
    forbidden operations fail in the database.
+   **Done (2026-10-02).** PR #90 (merge `0aa0ea1`) added migration `0017_promotion_audit_append_only.sql`:
+   a `BEFORE DELETE` statement trigger refuses every DELETE, and a `BEFORE UPDATE` row trigger
+   refuses every UPDATE except PostgreSQL's own `ON DELETE SET NULL` action on `promoted_robot_id`
+   (recognised by trigger depth, able to null only that one column), so deleting a robot still works.
+   It was applied to production before the merge, after a Neon checkpoint (`pre-0017-20261002`).
+   Verified in production: all 11 existing rows and the table hash identical before and after,
+   including the three rows with the historical wording; direct UPDATE (four variants) and DELETE
+   (two variants) refused with `restrict_violation`, run in rolled-back transactions; a legitimate
+   INSERT succeeded through both raw SQL and the ORM (rolled back); the previous build's full suite
+   passes on the migrated schema. Not covered, as for the identity-decision table: `TRUNCATE`, and a
+   table owner or superuser dropping or disabling the trigger.
 4. **A recorded audit-text discrepancy.** Five append-only rows (identity decisions #3 and #4 and the
    MiPA ×2 and MAiRA rejections in `promotion_audit`) say "2026-10-03" in their reason text while
    their database timestamps are 2026-10-02. The substantive decisions are correct. The repository

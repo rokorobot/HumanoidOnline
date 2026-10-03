@@ -128,3 +128,39 @@ All 31 are CURRENT (none superseded or stale). They never block publication.
 3. A projection for "hands present" tokens (class A candidate above).
 4. Commercial states for robots whose first-party pages show shipping.
 5. NAO / Pepper manufacturer attribution (Maxtronics / Aldebaran versus SoftBank Robotics).
+
+## 9. G4-4B result (2026-10-04): before / after
+
+Remediation PRs: #119 (stubs), #120 (legacy `false`), #121 (summaries); each applied to production with a
+scoped import and checked against a per-robot before/after snapshot (only the intended robots changed;
+no publication change; no price, offer, availability, variant, image or claim change; no NULL became
+false or 0).
+
+| Measure | Before | After |
+|---|---|---|
+| robots stored / published | 57 / 38 | 57 / 38 |
+| integrity blockers | 0 | 0 |
+| coverage bands LOW / PARTIAL / GOOD (informational) | 25 / 29 / 3 | 25 / 30 / 2 |
+| canonical direct | 279 | 274 |
+| canonical projected | 7 | 7 |
+| `DETAIL_ONLY` | 160 | 160 |
+| `NO_CATALOGUE_HOME` | 13 | 13 |
+| `UNMAPPED_KNOWLEDGE` | 9 | 9 |
+| `UNACCOUNTED_LOSS` | 0 | 0 |
+| `NOT_YET_REVIEWED` | 31 | 31 |
+| `CONFLICT` | 0 | 0 |
+| legacy unexplained `false` | 8 | 0 |
+| published robots without a summary | 4 | 0 |
+| unpublished robots asserting unsupported `ANNOUNCED` | 19 | 0 |
+| legacy baseline entries | 12 | 0 |
+
+Notes. *Canonical direct* fell by five because three robots' unsupported `false` values and the same
+number of other booleans became UNKNOWN: a deliberate trade of a count for truthfulness. The G1 Basic
+moved from the GOOD to the PARTIAL band for the same reason; coverage is informational and is not the
+objective. `NO_SDK_EVIDENCE` rose from 36 to 39 for the same three records. The 19 stubs now read
+`UNKNOWN`; seven of them had also been missing the manufacturer's `official_url`, which the scoped import
+supplied from the committed catalogue.
+
+Remaining coverage gaps (no price for 38, no availability for 44, no deployment evidence for 54, UNKNOWN
+buyer fields, 9 triaged hand-option descriptions and the pending proposals) are accepted normal
+incompleteness or queued enrichment, not publication barriers.

@@ -6,7 +6,7 @@
   "summary": "NEURA Robotics' compact humanoid, offered in Standard and Pro configurations. Reservations place customers in NEURA's delivery queue, with both expected in 2026. NEURA's own price estimates are €19,999 (Standard) and €29,999 (Pro), excluding taxes and shipping. Pro lists 12 DoF dexterous hands; Standard lists manipulation as not included.",
   "announced_year": null,
   "commercial_status": "UNKNOWN",
-  "is_published": false,
+  "is_published": true,
   "specs": {
     "height_cm": null,
     "weight_kg": null,
@@ -170,12 +170,14 @@
       "source_name": "NEURA Robotics",
       "source_type": "MANUFACTURER",
       "image_type": "FRONT",
-      "identity_status": "UNVERIFIED",
+      "identity_status": "VERIFIED",
       "rights_status": "UNKNOWN",
       "usage_basis": "OFFICIAL_MANUFACTURER_MEDIA",
       "is_official": true,
       "is_primary": true,
-      "attribution": "© NEURA Robotics"
+      "attribution": "© NEURA Robotics",
+      "last_verified_at": "2026-10-03T00:00:00Z",
+      "identity_confirmed_by": "robert@humanoid.company"
     }
   ],
   "extended_specs": [

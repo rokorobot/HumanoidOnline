@@ -306,28 +306,42 @@ def test_a_new_unexplained_false_is_an_integrity_failure_and_a_legacy_one_is_not
     assert any(f.code == "LEGACY_UNEXPLAINED_FALSE" and f.severity == rd.WARN for f in cov.findings)
     zero = sparse(is_published=True, core={"weight_kg": 0})
     assert "UNEXPLAINED_NEGATIVE" in codes(rd.integrity_check(zero, legacy=LEGACY))  # NULL -> 0
-    explained = sparse(
+    # spec_caveats is explanatory metadata ONLY: it can never establish a false (owner ruling)
+    caveated = sparse(
         is_published=True,
         core={"has_sdk": False},
-        spec_caveats=(
-            {
-                "field": "has_sdk",
-                "kind": rd.EXPLICIT_NEGATIVE,
-                "text": "Maker: 'no SDK is offered'.",
-            },
+        spec_caveats=({"field": "has_sdk", "kind": "EXPLICIT_NEGATIVE", "text": "Maker: no SDK."},),
+    )
+    assert "UNEXPLAINED_NEGATIVE" in codes(rd.integrity_check(caveated, legacy=LEGACY))
+    assert not hasattr(rd, "EXPLICIT_NEGATIVE")
+
+
+def test_a_negative_is_never_inferred_from_wording_that_has_no_ratified_mapping():
+    """The governed chain: wording is preserved verbatim as a scoped specification; a separately
+    ratified negative projection may resolve false. The initial registry has none, so an explicit
+    negative statement stays a projection candidate (UNMAPPED_KNOWLEDGE) and the property stays
+    UNKNOWN: never false, and never a publication blocker."""
+    specs = (
+        SpecRow("pro", "common_interfaces", "Common interfaces", "SDK not supported"),
+        SpecRow(
+            "standard", "additional_interfaces", "Additional interfaces", "No teleoperation support"
         ),
     )
-    assert "UNEXPLAINED_NEGATIVE" not in codes(rd.integrity_check(explained, legacy=LEGACY))
-    assert "UNEXPLAINED_NEGATIVE" in codes(
-        rd.integrity_check(
-            sparse(
-                is_published=True,
-                core={"has_sdk": False},
-                spec_caveats=({"field": "has_sdk", "kind": rd.EXPLICIT_NEGATIVE, "text": " "},),
-            ),
-            legacy=LEGACY,
-        )
-    )
+    rec = mini(specs=specs)
+    res = rd.resolve(rec)
+    assert res["has_sdk"].state is fr.State.UNKNOWN and res["has_sdk"].value is None
+    assert res["has_teleoperation"].state is fr.State.UNKNOWN
+    assert all(v.value is not False for f in res.values() for v in f.variants)
+    acc = rd.account_facts(rec)
+    assert "common_interfaces/SDK not supported" in acc.unmapped_candidates
+    assert "additional_interfaces/No teleoperation support" in acc.unmapped_candidates
+    assert blocks(rd.integrity_check(rec)) == []
+    # once an owner ratifies the exact mapping, the SAME chain yields false (G4-1 resolver contract)
+    neg = (*fr.PROJECTION_REGISTRY, fr.ProjectionRule("common_interfaces", "SDK not supported",
+                                                      "has_sdk", False))
+    only_pro = [fr.ScopedSpec("pro", "common_interfaces", "SDK not supported")]
+    got = fr.resolve_property("has_sdk", None, [("pro", "Pro")], only_pro, registry=neg)
+    assert got.state is fr.State.UNIFORM_VARIANTS and got.value is False
 
 
 def test_the_legacy_baseline_matches_the_catalogue_and_can_only_shrink():
@@ -355,18 +369,13 @@ def test_the_legacy_baseline_matches_the_catalogue_and_can_only_shrink():
             )
     listed = {(e["slug"], e["field"]) for e in entries}
     for slug, d in robots.items():  # and nothing new has appeared at the source
-        explicit = {
-            c.get("field")
-            for c in d.get("spec_caveats", [])
-            if c.get("kind") == rd.EXPLICIT_NEGATIVE and (c.get("text") or "").strip()
-        }
         for f in rd.BOOLEAN_FIELDS:
             if (d.get("specs") or {}).get(f) is False:
-                assert (slug, f) in listed or f in explicit, f"new unexplained false: {slug}.{f}"
+                assert (slug, f) in listed, f"new unexplained false: {slug}.{f}"
         for f in rd.IMPLAUSIBLE_ZERO_FIELDS:
             v = (d.get("specs") or {}).get(f)
             if v is not None and float(v) == 0.0:
-                assert (slug, f) in listed or f in explicit, f"new unexplained zero: {slug}.{f}"
+                assert (slug, f) in listed, f"new unexplained zero: {slug}.{f}"
 
 
 # ------------------------------------------------------------------------ summary at publication

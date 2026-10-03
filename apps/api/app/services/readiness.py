@@ -171,9 +171,11 @@ IMPLAUSIBLE_ZERO_FIELDS = (
     "battery_wh",
     "degrees_of_freedom",
 )
-#: The marker a catalogue may carry to establish an explicit negative (spec_caveats entry with
-#: `"kind": "EXPLICIT_NEGATIVE"` naming the field and quoting the source). No schema change.
-EXPLICIT_NEGATIVE = "EXPLICIT_NEGATIVE"
+# A NEGATIVE (`false`) is a factual assertion, established ONLY by the governed provenance chain
+# (owner ruling 2026-10-03): source statement -> proposal -> ACCEPT -> accepted claim -> a
+# provenance-bearing product- or variant-scoped `specification` carrying the source's own wording ->
+# an owner-ratified negative projection -> resolved `false`. Never by writing a core
+# column and never by `spec_caveats`, which is explanatory metadata only (why a field is UNKNOWN).
 
 #: Fields counted for the (informational) coverage band: what a buyer typically needs first.
 BUYER_FIELDS = (
@@ -277,22 +279,18 @@ def _display_eligible(img: ImageRow) -> bool:
     return True
 
 
-def _has_explicit_negative(rec: RobotRecord, fld: str) -> bool:
-    return any(
-        c.get("field") == fld and c.get("kind") == EXPLICIT_NEGATIVE and not _blank(c.get("text"))
-        for c in rec.spec_caveats
-    )
-
-
 def unexplained_negatives(rec: RobotRecord) -> list[str]:
-    """Core fields holding a `false` (or an implausible zero) with no explicit-negative marker."""
+    """Core fields holding a `false` (or an implausible zero).
+
+    A core column can never carry a governed negative (see the note above), so every such value is
+    unexplained; whether it is blocking or a legacy review finding is decided by the baseline."""
     out = []
     for f in BOOLEAN_FIELDS:
-        if rec.core.get(f) is False and not _has_explicit_negative(rec, f):
+        if rec.core.get(f) is False:
             out.append(f)
     for f in IMPLAUSIBLE_ZERO_FIELDS:
         v = rec.core.get(f)
-        if v is not None and float(v) == 0.0 and not _has_explicit_negative(rec, f):
+        if v is not None and float(v) == 0.0:
             out.append(f)
     return out
 
@@ -437,8 +435,9 @@ def integrity_check(
             continue  # legacy: a coverage review finding, never an integrity failure
         block(
             "UNEXPLAINED_NEGATIVE",
-            f"{fld} is {rec.core.get(fld)!r} with no explicit negative basis "
-            "(missing evidence must never create false or 0)",
+            f"{fld} is {rec.core.get(fld)!r} but a negative must come through the governed "
+            "chain (source statement, accepted claim, scoped specification, ratified negative "
+            "projection); missing evidence must never create false or 0",
             fld,
         )
 
@@ -654,7 +653,8 @@ def coverage_audit(
                 WARN,
                 "LEGACY_UNEXPLAINED_FALSE",
                 f"{fld} = {rec.core.get(fld)!r} predates G4-3 and lacks per-field provenance; "
-                "review (not an integrity failure)",
+                "review: find the source and record it through the governed chain, else prefer "
+                "NULL/UNKNOWN (not an integrity failure)",
                 fld,
             )
     known = sum(1 for f in BUYER_FIELDS if rec.core.get(f) is not None)

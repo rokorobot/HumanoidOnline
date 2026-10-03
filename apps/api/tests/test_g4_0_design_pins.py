@@ -228,3 +228,18 @@ def test_the_fresh_announcement_path_and_the_existing_robot_guarantee_are_record
     assert "never unpublishes" in dr and "Low coverage never unpublishes a robot" in dr
     assert "informational, non-blocking unless the owner explicitly upgrades it" in dr
     assert "not** a mass requirement to normalize every fact" in dr
+
+
+def test_explicit_negatives_use_the_governed_chain_never_spec_caveats():
+    """Owner ruling 2026-10-03."""
+    dr = flat(DR)
+    assert "### 4.3 Explicit negative facts" in dr
+    assert "`spec_caveats` is explanatory metadata only" in dr
+    assert "It never establishes `false`" in dr
+    assert "source statement -> proposal -> ACCEPT -> accepted claim" in dr
+    assert "registered negative projection -> resolved boolean false" in dr
+    assert "The initial registry contains **no** negative mapping" in dr
+    assert "prefer `NULL`/UNKNOWN" in dr and "do not invent source wording" in dr.lower()
+    assert "EXPLICIT_NEGATIVE" not in dr          # the retired spec_caveats convention
+    reg = registry()
+    assert all(e["value"] is True for e in reg["entries"])  # no negative mapping ratified yet

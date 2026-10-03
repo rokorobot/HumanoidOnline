@@ -105,7 +105,8 @@ accepted claim ≠ publication
 | **A–F** | Read-only foundation; bounded HTTP acquisition and change detection; the adapter framework and the first source adapter; deterministic candidate extraction and identity resolution; **Stage E** exception-only human review (identity decisions, out-of-scope rejection, source trace, same-entity promotion convergence); **Stage F** scheduled observation (per-source cadence, redirect and cache handling, one-running-run guard, least-privilege database role) | ✅ **OPERATIONAL** |
 | **G1** | Proposal-only structured extraction | 🟢 **IMPLEMENTED FOUNDATION** (PR #84) |
 | **G2** | Governed proposal review and claim promotion | 🟡 **IN PROGRESS** — architecture ratified in DR-A5; **G2-1 persistence (0018), G2-2 governed review, and the first G2-3 slice (accepted claims, materialization; 0019) implemented**; **G2-5 scheduled proposal ingestion operational for NEURA 4NE1 Mini only**; **G2-4 4NE1 Mini commercial and interface slice implemented** (`MANUFACTURER_ESTIMATE`, WAITLIST, interface specs; 0020/0021) |
-| **G3** | Source expansion | 🟡 **STARTED**: first expansion source XPENG (humanoid IRON only), under an explicit owner source approval (2026-10-03); every further source needs its own approval |
+| **G3** | Source expansion | 🟡 **STARTED**: first expansion source XPENG (humanoid IRON only), under an explicit owner source approval (2026-10-03); every further source needs its own approval. DR-A5's **G2-6** (a second manufacturer) is satisfied in substance by this work |
+| **G4** | Canonical scoped fact resolution (`DR-G4`) | 🟡 **G4-0 ratified 2026-10-03**: architecture, resolution states, projection registry contract and consumer semantics. G4-1 resolver + registry, G4-2 API integration, G4-3 readiness/audit gate, G4-4 catalogue-wide audit are separate phases, each its own PR and owner gate |
 
 **NEURA is the first commissioned scheduled source.** Observation runs **Monday and
 Thursday at 06:37 UTC**, governed by a **48-hour source cadence**, through the same
@@ -179,6 +180,17 @@ phase by phase under DR-A5. The physical G2-1 design is recorded in DR-A5 §18.1
 
 - extend proposal extraction to the full-size 4NE1;
 - onboard further manufacturers only after individual source and ToS approval.
+
+#### Stage G4 — Canonical scoped fact resolution · G4-0 ratified
+
+`UNKNOWN` must mean "no accepted canonical knowledge at product or variant scope", never "known but not
+exposed". One pure, versioned resolver (`resolved_fact = f(product value, scoped facts, registry version)`),
+compute-on-read, no derived table, `robot_variant.spec_overrides` unused. Phases: **G4-0** architecture +
+semantic ratification (done; `docs/decisions/DR-G4_CANONICAL_SCOPED_FACT_RESOLUTION.md`); **G4-1** resolver
+and projection registry; **G4-2** API / read-model integration (detail, filters ANY-VARIANT, matching
+conservative, compare, agent tools); **G4-3** generic readiness / audit gate with fact accounting
+(`unaccounted = 0`); **G4-4** read-only catalogue-wide audit. No schema migration is planned. G4 does not
+renumber G2-6.
 
 #### Deferred — not authorized
 

@@ -154,16 +154,21 @@ def main() -> None:
             if offenders:
                 gaps[label] = offenders
 
-        # MEDIA-01 imagery gate. Display-eligibility (canonical): identity VERIFIED
-        # AND rights <> RESTRICTED AND (rights PERMITTED/ATTRIBUTION_REQUIRED OR
-        # usage_basis OFFICIAL_MANUFACTURER_MEDIA). Every display-eligible image must
-        # carry provenance (source_url + source_name), and an ATTRIBUTION_REQUIRED
-        # image must carry attribution. (The DB enum already forbids a GENERATED
-        # source outright.)
+        # MEDIA-01 imagery gate. Display-eligibility mirrors RobotImage.is_display_eligible
+        # (docs/09_MEDIA_CONTRACT.md section 4): (identity VERIFIED OR a valid
+        # representative-image exception) AND rights <> RESTRICTED AND (rights
+        # PERMITTED/ATTRIBUTION_REQUIRED OR usage_basis OFFICIAL_MANUFACTURER_MEDIA /
+        # OWNER_APPROVED_DISPLAY). Every display-eligible image must carry provenance
+        # (source_url + source_name), and an ATTRIBUTION_REQUIRED image must carry
+        # attribution. (The DB enum already forbids a GENERATED source outright.)
         eligible_sql = (
-            "identity_status = 'VERIFIED' AND rights_status <> 'RESTRICTED' "
+            "(identity_status = 'VERIFIED' "
+            " OR (is_representative AND usage_basis = 'OWNER_APPROVED_DISPLAY' "
+            "     AND btrim(coalesce(representative_note, '')) <> '')) "
+            "AND rights_status <> 'RESTRICTED' "
             "AND (rights_status IN ('PERMITTED','ATTRIBUTION_REQUIRED') "
-            "     OR usage_basis = 'OFFICIAL_MANUFACTURER_MEDIA')"
+            "     OR usage_basis IN ('OFFICIAL_MANUFACTURER_MEDIA', 'OWNER_APPROVED_DISPLAY')) "
+            "AND (NOT is_representative OR btrim(coalesce(representative_note, '')) <> '')"
         )
         media_offenders = sorted({
             row[0] for row in conn.execute(

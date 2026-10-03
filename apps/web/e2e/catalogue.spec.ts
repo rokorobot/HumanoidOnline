@@ -178,12 +178,17 @@ test("manufacturers: a maker with no published models says NONE PUBLISHED, not U
   page,
 }) => {
   await page.goto("/manufacturers");
-  // RobotEra holds catalogue records but none is published (XPeng Robotics was the exemplar
-  // until IRON was published as ANNOUNCED on 2026-10-03).
-  const card = page.locator('a.mcard[href="/manufacturers/robotera"]');
+  // A CONTROLLED fixture maker (apps/web/e2e/fixtures/no-published-manufacturer.sql, loaded
+  // into the ephemeral CI database): one tracked model, none published. It does not depend
+  // on which real manufacturers the catalogue has published, so publishing real robots can
+  // never invalidate this test.
+  const card = page.locator('a.mcard[href="/manufacturers/e2e-fixture-maker"]');
+  if (!process.env.CI && (await card.count()) === 0) {
+    test.skip(true, "e2e fixture not loaded (CI loads it; see no-published-manufacturer.sql)");
+  }
   await expect(card).toBeVisible();
   await expect(card).toContainText("NONE PUBLISHED");
-  await expect(card).toContainText(/[1-9]\d* TRACKED · 0 PUBLISHED/);
+  await expect(card).toContainText("1 TRACKED · 0 PUBLISHED");
 });
 
 function factValue(page: import("@playwright/test").Page, label: string) {

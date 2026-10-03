@@ -201,7 +201,9 @@ test("4NE1 Mini: accepted variant-scoped knowledge is resolved by the API, never
   await expect(resolved("has_teleoperation")).toHaveAttribute("data-resolved-state", "PARTIAL_VARIANTS");
   await expect(resolved("has_manipulation")).toHaveAttribute("data-resolved-state", "PARTIAL_VARIANTS");
   await expect(resolved("has_sdk")).toContainText("Supported on all documented configurations");
-  await expect(resolved("has_sdk")).toContainText("Pro — Supported (Python SDK + C++ SDK)");
+  // Order of the tokens inside a configuration follows the API; assert content, not order.
+  await expect(resolved("has_sdk")).toContainText(/Pro — Supported \((?=[^)]*Python SDK)(?=[^)]*C\+\+ SDK)[^)]*\)/);
+  await expect(resolved("has_sdk")).toContainText(/Standard — Supported \(Python SDK\)/);
   await expect(resolved("has_teleoperation")).toContainText("Pro — Supported (teleoperation)");
   await expect(resolved("has_teleoperation")).toContainText("Standard — UNKNOWN");
   await expect(resolved("has_manipulation")).toContainText("Pro — Supported (12 DoF dexterous hands)");

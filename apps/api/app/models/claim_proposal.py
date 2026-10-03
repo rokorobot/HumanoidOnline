@@ -153,7 +153,7 @@ class AcceptedClaim(Base):
         CheckConstraint("claim_digest ~ '^[0-9a-f]{64}$'", name="ck_accepted_claim_digest"),
         CheckConstraint(
             "target_kind IN ('robot_variant', 'specification', 'pricing_offer', "
-            "'availability_offer', 'NO_CATALOGUE_HOME')",
+            "'availability_offer', 'robot_spec', 'NO_CATALOGUE_HOME')",
             name="ck_accepted_claim_target_kind"),
         CheckConstraint("value_type IN ('TEXT', 'JSON')", name="ck_accepted_claim_value_type"),
         CheckConstraint(
@@ -241,7 +241,7 @@ class CatalogueWriteAudit(Base):
         CheckConstraint("method IN ('IMPORTER_M2')", name="ck_catalogue_write_audit_method"),
         CheckConstraint(
             "target_table IN ('robot_variant', 'specification', 'pricing_offer', "
-            "'availability_offer')", name="ck_catalogue_write_audit_table"),
+            "'availability_offer', 'robot')", name="ck_catalogue_write_audit_table"),
         CheckConstraint("after_hash ~ '^[0-9a-f]{64}$'", name="ck_catalogue_write_audit_after"),
         CheckConstraint("btrim(change_ref) <> ''", name="ck_catalogue_write_audit_change"),
         CheckConstraint("btrim(applied_by) <> ''", name="ck_catalogue_write_audit_attributed"),

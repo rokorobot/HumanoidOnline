@@ -21,6 +21,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[3]
 SCHEMA_SQL = ROOT / "db" / "schema.sql"
 M0020 = ROOT / "db" / "migrations" / "0020_price_type_manufacturer_estimate.sql"
 M0021 = ROOT / "db" / "migrations" / "0021_manufacturer_estimate_and_claim_targets.sql"
+M0022 = ROOT / "db" / "migrations" / "0022_robot_spec_claim_target.sql"
 
 
 def pre_g24_schema() -> str:
@@ -85,6 +86,7 @@ def test_upgrade_converges_onto_the_baseline_and_keeps_existing_rows(scratch_db)
                          "'EUR', 1 FROM robot")
         conn.execute(M0020.read_text(encoding="utf-8"))
         conn.execute(M0021.read_text(encoding="utf-8"))
+        conn.execute(M0022.read_text(encoding="utf-8"))
         upgraded = _shape(conn)
         assert _labels(conn) == ["PUBLIC", "ESTIMATED", "MANUFACTURER_ESTIMATE", "QUOTE_ONLY",
                                  "FROM", "RANGE"]

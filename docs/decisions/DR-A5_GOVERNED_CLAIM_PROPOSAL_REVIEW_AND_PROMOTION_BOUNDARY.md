@@ -795,6 +795,26 @@ XPENG's Next-Gen IRON line; the 2024 first-generation robot is historical eviden
 registered claim policy, so nothing can be accepted into the catalogue without a new owner decision,
 and nothing is published.
 
+### 18.7 IRON current-configuration slice (owner decision, 2026-10-03)
+
+Owner decisions: the 2026 production configuration (XPENG release of 2026-09-08) is IRON's
+**current** configuration; the 2025 Next-Gen and 2024 first-generation statements remain
+historical evidence (never errors), and the product page's stale 22-DoF hand wording stays a recorded,
+unresolved statement. Two proposals, and only those, are mapped:
+
+- `BODY_DOF` ("76 degrees of freedom across the body") -> the first-class `robot.degrees_of_freedom`
+  column (new claim target `robot_spec`; migration `0022` widens the accepted-claim and write-audit
+  CHECKs; materialized through the catalogue file's `specs` block, audited with table `robot`).
+- `COMPUTE` -> the existing long-tail TEXT spec `compute_ai`, a verbatim fragment of the source
+  sentence ("three Turing AI chips delivering up to 2,250 TOPS of effective computing power"),
+  product-level, `THIS_EDITION`, manufacturer-sourced.
+
+The explicit mapping (`configuration` = "2026 production IRON", spec key, value) is checked
+value-for-value against the proposal; the 2025 statements and every other proposal stay
+unregistered. **Not decided and not done:** `hand_dof` (the source says 21 "in each hand", no
+total; the column's per-hand or total convention is undecided, so it stays NULL), maturity,
+summary, images, publication.
+
 ---
 
 ## 20. Ratification record (owner decisions, 2026-10-02)

@@ -2213,7 +2213,7 @@ CREATE TABLE accepted_claim (
     CONSTRAINT ck_accepted_claim_digest CHECK (claim_digest ~ '^[0-9a-f]{64}$'),
     CONSTRAINT ck_accepted_claim_target_kind
         CHECK (target_kind IN ('robot_variant', 'specification', 'pricing_offer',
-                               'availability_offer', 'NO_CATALOGUE_HOME')),
+                               'availability_offer', 'robot_spec', 'NO_CATALOGUE_HOME')),
     CONSTRAINT ck_accepted_claim_value_type CHECK (value_type IN ('TEXT', 'JSON')),
     CONSTRAINT ck_accepted_claim_scope
         CHECK (edition_scope IS NULL
@@ -2272,7 +2272,7 @@ CREATE TABLE catalogue_write_audit (
     CONSTRAINT ck_catalogue_write_audit_method CHECK (method IN ('IMPORTER_M2')),
     CONSTRAINT ck_catalogue_write_audit_table
         CHECK (target_table IN ('robot_variant', 'specification', 'pricing_offer',
-                                'availability_offer')),
+                                'availability_offer', 'robot')),
     CONSTRAINT ck_catalogue_write_audit_after CHECK (after_hash ~ '^[0-9a-f]{64}$'),
     CONSTRAINT ck_catalogue_write_audit_change CHECK (btrim(change_ref) <> ''),
     CONSTRAINT ck_catalogue_write_audit_attributed CHECK (btrim(applied_by) <> '')

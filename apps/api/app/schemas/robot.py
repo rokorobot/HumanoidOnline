@@ -96,6 +96,8 @@ class ExtendedSpec(BaseModel):
     #: Set when the value is scoped to ONE variant of this robot (e.g. Standard vs Pro);
     #: None means a product-level spec.
     variant_slug: str | None = None
+    #: Display name of that variant (e.g. "Pro"); None for a product-level spec.
+    variant: str | None = None
 
 
 class SpecCaveat(BaseModel):
@@ -128,6 +130,10 @@ class UseCaseFitRead(BaseModel):
 
 class PricingOfferRead(BaseModel):
     transaction_type: str
+    #: The configuration (variant) this offer is scoped to, or None for the whole robot.
+    #: A variant-scoped amount is never reported as though it applied to every edition.
+    variant: str | None = None
+    variant_slug: str | None = None
     price_type: str
     price: float | None = None
     price_min: float | None = None
@@ -154,6 +160,9 @@ class PricingOfferRead(BaseModel):
 
 class AvailabilityOfferRead(BaseModel):
     transaction_type: str
+    #: The configuration (variant) this availability is scoped to, or None for the whole robot.
+    variant: str | None = None
+    variant_slug: str | None = None
     availability_status: str
     region: str | None = None
     provider: str | None = None

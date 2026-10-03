@@ -82,7 +82,7 @@ function collectEvidence(robot: RobotDetail): EvidenceRow[] {
   for (const p of robot.pricing_offers) {
     if (p.evidence)
       rows.push({
-        subject: `Price — ${modeLabel(p.transaction_type)}${p.region ? ` · ${p.region}` : ""} · ${p.price_type}`,
+        subject: `Price — ${modeLabel(p.transaction_type)}${p.variant ? ` · ${p.variant}` : ""}${p.region ? ` · ${p.region}` : ""} · ${p.price_type}`,
         subjectCode: "SUBJECT: PRICING_OFFER",
         evidence: p.evidence,
       });
@@ -90,7 +90,7 @@ function collectEvidence(robot: RobotDetail): EvidenceRow[] {
   for (const a of robot.availability_offers) {
     if (a.evidence)
       rows.push({
-        subject: `Availability — ${modeLabel(a.transaction_type)}${a.region ? ` · ${a.region}` : ""} · ${a.availability_status}`,
+        subject: `Availability — ${modeLabel(a.transaction_type)}${a.variant ? ` · ${a.variant}` : ""}${a.region ? ` · ${a.region}` : ""} · ${a.availability_status}`,
         subjectCode: "SUBJECT: AVAILABILITY_OFFER",
         evidence: a.evidence,
       });
@@ -545,7 +545,7 @@ export default async function RobotDetailPage({
                   <div className="spectbl" key={category}>
                     <h3>{category}</h3>
                     {rows.map((x) => (
-                      <ExtendedSpecRow key={x.key} spec={x} />
+                      <ExtendedSpecRow key={`${x.key}:${x.variant_slug ?? ""}`} spec={x} />
                     ))}
                   </div>
                 ))}
@@ -661,7 +661,16 @@ function PricingRow({ offer }: { offer: PricingOffer }) {
   };
   return (
     <div className="prow">
-      <div>{modeLabel(offer.transaction_type)}</div>
+      <div>
+        {modeLabel(offer.transaction_type)}
+        {/* A variant-scoped price names its configuration, so Standard and Pro are never
+            read as two prices for one thing. */}
+        {offer.variant && (
+          <span className="ho-syslabel" style={{ display: "block" }}>
+            {offer.variant} configuration
+          </span>
+        )}
+      </div>
       <div className={offer.region ? "" : "val unknown"} style={{ textTransform: "none" }}>
         {offer.region ?? "—"}
       </div>
@@ -757,7 +766,14 @@ function ExtendedSpecRow({ spec }: { spec: ExtendedSpec }) {
 
   return (
     <div className="srow">
-      <span className="k">{spec.label}</span>
+      <span className="k">
+        {spec.label}
+        {spec.variant && (
+          <span className="ho-syslabel" style={{ display: "block" }}>
+            {spec.variant} configuration
+          </span>
+        )}
+      </span>
       <span style={{ display: "block" }}>
         <SpecValue value={spec.value} unit={spec.unit} />
         {attribution && (

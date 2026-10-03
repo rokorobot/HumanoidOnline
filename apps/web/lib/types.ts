@@ -125,6 +125,9 @@ export interface ExtendedSpec {
   // THIS_EDITION | PRODUCT_LINE | PLATFORM
   edition_scope?: string | null;
   observed_at?: string | null;
+  // Set when the value is scoped to ONE variant of this robot (e.g. Standard vs Pro).
+  variant_slug?: string | null;
+  variant?: string | null;
 }
 
 export interface SpecCaveat {
@@ -155,6 +158,9 @@ export interface UseCaseFit {
 
 export interface PricingOffer {
   transaction_type: string;
+  // The configuration this price is scoped to; absent = the whole robot.
+  variant?: string | null;
+  variant_slug?: string | null;
   price_type: string;
   price?: number | null;
   price_min?: number | null;
@@ -179,6 +185,8 @@ export interface PricingOffer {
 
 export interface AvailabilityOffer {
   transaction_type: string;
+  variant?: string | null;
+  variant_slug?: string | null;
   availability_status: string;
   region?: string | null;
   provider?: string | null;

@@ -638,3 +638,30 @@ def test_the_catalogue_data_dictionary_and_definitions_know_the_new_values():
             label, "SOFTWARE", "TEXT")
     dd = (REPO / "docs" / "03_DATA_DICTIONARY.md").read_text(encoding="utf-8")
     assert "MANUFACTURER_ESTIMATE" in dd and "HumanoidOnline estimate" in dd
+
+
+def test_the_public_read_model_names_the_variant_of_every_scoped_offer_and_spec(
+        dsession, tmp_path):
+    """Publication-readiness: Standard and Pro must be distinguishable in every read."""
+    from app.services import reads
+
+    w = seeded(dsession)
+    full_slice(dsession, w)
+    materialize_and_import(dsession, w, tmp_path)
+    # the public read model serves published robots only; publish inside this rolled-back test
+    dsession.execute(text("UPDATE robot SET is_published = true WHERE slug = :s"), {"s": w.slug})
+    dsession.expire_all()
+    robot = reads.load_detail(dsession, w.slug)
+    detail = reads.serialize_detail(dsession, robot)
+    assert {(p.variant, p.variant_slug, p.price_type, p.price)
+            for p in detail.pricing_offers} == {
+        ("Standard", "standard", "MANUFACTURER_ESTIMATE", 19999.0),
+        ("Pro", "pro", "MANUFACTURER_ESTIMATE", 29999.0)}
+    assert {(a.variant, a.availability_status, a.delivery_estimate_label, a.available_from)
+            for a in detail.availability_offers} == {
+        ("Standard", "WAITLIST", "Expected in 2026", None),
+        ("Pro", "WAITLIST", "Expected in 2026", None)}
+    specs = {(x.key, x.variant) for x in detail.extended_specs}
+    assert ("common_interfaces", "Standard") in specs and ("common_interfaces", "Pro") in specs
+    assert ("additional_interfaces", "Pro") in specs
+    assert not any(x.variant is None for x in detail.extended_specs)   # none left unscoped

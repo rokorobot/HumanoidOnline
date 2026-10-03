@@ -48,7 +48,14 @@ export function AvailabilityMatrix({
       </div>
       {offers.map((o, i) => (
         <div className="mrow" key={i}>
-          <span>{modeLabel(o.transaction_type)}</span>
+          <span>
+            {modeLabel(o.transaction_type)}
+            {o.variant && (
+              <span className="ho-syslabel" style={{ display: "block" }}>
+                {o.variant} configuration
+              </span>
+            )}
+          </span>
           <span className={o.region ? "" : "na"}>{o.region ?? "—"}</span>
           <span>
             {o.availability_status}

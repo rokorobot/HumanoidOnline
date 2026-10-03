@@ -3,7 +3,7 @@
   "name": "4NE1 Mini",
   "manufacturer_slug": "neura-robotics",
   "model_code": null,
-  "summary": null,
+  "summary": "NEURA Robotics' compact humanoid, offered in Standard and Pro configurations. Reservations place customers in NEURA's delivery queue, with both expected in 2026. NEURA's own price estimates are €19,999 (Standard) and €29,999 (Pro), excluding taxes and shipping. Pro lists 12 DoF dexterous hands; Standard lists manipulation as not included.",
   "announced_year": null,
   "commercial_status": "UNKNOWN",
   "is_published": false,
@@ -32,7 +32,7 @@
     "simulation_support": null
   },
   "specs_note": "Specifications not yet verified.",
-  "official_url": null,
+  "official_url": "https://neura-robotics.com/product/4ne1-mini-reservation",
   "commercial_status_evidence": [],
   "variants": [
     {
@@ -163,7 +163,21 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": [],
+  "images": [
+    {
+      "image_url": "/robots/4ne1-mini.webp",
+      "source_url": "https://neura-robotics.com/product/4ne1-mini-reservation",
+      "source_name": "NEURA Robotics",
+      "source_type": "MANUFACTURER",
+      "image_type": "FRONT",
+      "identity_status": "UNVERIFIED",
+      "rights_status": "UNKNOWN",
+      "usage_basis": "OFFICIAL_MANUFACTURER_MEDIA",
+      "is_official": true,
+      "is_primary": true,
+      "attribution": "© NEURA Robotics"
+    }
+  ],
   "extended_specs": [
     {
       "key": "dexterous_hand_option",

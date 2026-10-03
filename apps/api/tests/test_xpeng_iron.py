@@ -302,8 +302,20 @@ def test_the_catalogue_entry_is_identity_and_reference_only():
     assert compute["key"] == "compute_ai" and compute["value"].startswith("three Turing AI chips")
     assert compute["source_kind"] == "MANUFACTURER" and "variant_slug" not in compute
     for coll in ("variants", "pricing_offers", "availability_offers", "capabilities",
-                 "use_case_fits", "images", "deployments", "commercial_status_evidence"):
+                 "use_case_fits", "deployments", "commercial_status_evidence"):
         assert d[coll] == [], coll
+    # the owner's chosen image (2026-10-03): a derivative of XPENG's official product render,
+    # displayed by explicit owner decision (OWNER_APPROVED_DISPLAY); rights stay UNKNOWN
+    [img] = d["images"]
+    assert (img["image_url"], img["source_name"], img["source_type"], img["image_type"]) == (
+        "/robots/xpeng-iron.webp", "XPENG", "MANUFACTURER", "FRONT")
+    assert (img["identity_status"], img["rights_status"], img["usage_basis"]) == (
+        "VERIFIED", "UNKNOWN", "OWNER_APPROVED_DISPLAY")
+    assert img["is_official"] is True and img["is_primary"] is True
+    assert img["identity_confirmed_by"] == "robert@humanoid.company"
+    assert img["source_url"] == "https://www.xpeng.com/technology/ai_robot_iron"
+    assert "owner-supplied derivative" in img["attribution"]
+    assert (REPO / "apps" / "web" / "public" / "robots" / "xpeng-iron.webp").is_file()
 
 
 # ------------------------------------------------------------- persistence ---

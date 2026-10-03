@@ -294,9 +294,10 @@ def test_the_catalogue_entry_is_identity_and_reference_only():
     assert d["official_url"] == "https://www.xpeng.com/technology/ai_robot_iron"
     assert d["summary"] is None and d["announced_year"] is None
     # the owner-approved current-configuration slice (2026-10-03) and nothing else
-    assert d["specs"]["degrees_of_freedom"] == 76
-    assert all(v is None for k, v in d["specs"].items() if k != "degrees_of_freedom")
-    assert d["specs"]["hand_dof"] is None                    # per-hand convention undecided
+    # + hand_dof = 21 PER HAND (owner decision A, same date); never a two-hand total
+    assert (d["specs"]["degrees_of_freedom"], d["specs"]["hand_dof"]) == (76, 21)
+    assert all(v is None for k, v in d["specs"].items()
+               if k not in ("degrees_of_freedom", "hand_dof"))
     [compute] = d["extended_specs"]
     assert compute["key"] == "compute_ai" and compute["value"].startswith("three Turing AI chips")
     assert compute["source_kind"] == "MANUFACTURER" and "variant_slug" not in compute

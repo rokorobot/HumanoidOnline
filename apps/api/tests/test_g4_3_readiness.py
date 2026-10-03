@@ -300,9 +300,12 @@ def test_required_provenance_blocks_for_published_robots_only():
 def test_a_new_unexplained_false_is_an_integrity_failure_and_a_legacy_one_is_not():
     new = sparse(is_published=True, core={"has_sdk": False})
     assert "UNEXPLAINED_NEGATIVE" in codes(rd.integrity_check(new, legacy=LEGACY))
-    legacy_rec = RobotRecord(**{**new.__dict__, "slug": "unitree-h2"})
-    assert "UNEXPLAINED_NEGATIVE" not in codes(rd.integrity_check(legacy_rec, legacy=LEGACY))
-    cov = rd.coverage_audit(legacy_rec, legacy=LEGACY)
+    # the production legacy falses were all corrected in G4-4, so use a synthetic baseline entry
+    synthetic = frozenset({("legacy-robot", "has_sdk")})
+    legacy_rec = RobotRecord(**{**new.__dict__, "slug": "legacy-robot"})
+    assert "UNEXPLAINED_NEGATIVE" in codes(rd.integrity_check(legacy_rec, legacy=LEGACY))
+    assert "UNEXPLAINED_NEGATIVE" not in codes(rd.integrity_check(legacy_rec, legacy=synthetic))
+    cov = rd.coverage_audit(legacy_rec, legacy=synthetic)
     assert any(f.code == "LEGACY_UNEXPLAINED_FALSE" and f.severity == rd.WARN for f in cov.findings)
     zero = sparse(is_published=True, core={"weight_kg": 0})
     assert "UNEXPLAINED_NEGATIVE" in codes(rd.integrity_check(zero, legacy=LEGACY))  # NULL -> 0
@@ -346,7 +349,8 @@ def test_a_negative_is_never_inferred_from_wording_that_has_no_ratified_mapping(
 
 def test_the_legacy_baseline_matches_the_catalogue_and_can_only_shrink():
     entries = json.loads(BASELINE.read_text(encoding="utf-8"))["entries"]
-    assert len([e for e in entries if e["field"] != "summary"]) == 8
+    # the 8 legacy falses were corrected to NULL in G4-4 (PR B): none remain in the baseline
+    assert [e for e in entries if e["field"] != "summary"] == []
     assert {e["slug"] for e in entries if e["field"] == "summary"} == {
         "honda-asimo",
         "rainbow-hubo",

@@ -2,46 +2,6 @@
   "_comment": "G4-3 (DR-G4 7.1 D, 8.3): PRE-EXISTING weaknesses that are COVERAGE review findings and never integrity failures (owner ruling 2026-10-03): hand-entered false/0 values without per-field provenance, and published robots without a summary. They are never unpublished and never fail CI. The list may only SHRINK. A NEW or CHANGED false/0 is an integrity failure: a negative is established only through the governed chain (source statement -> accepted claim -> scoped specification -> ratified negative projection), never by a core column or spec_caveats. When a legacy false is reviewed and no explicit negative source is found, prefer NULL/UNKNOWN; never invent source wording to justify it.",
   "entries": [
     {
-      "slug": "unitree-g1-edu-plus-u2",
-      "field": "has_manipulation",
-      "value": false
-    },
-    {
-      "slug": "unitree-g1",
-      "field": "has_manipulation",
-      "value": false
-    },
-    {
-      "slug": "unitree-g1",
-      "field": "has_sdk",
-      "value": false
-    },
-    {
-      "slug": "unitree-g1",
-      "field": "developer_edition",
-      "value": false
-    },
-    {
-      "slug": "unitree-h2",
-      "field": "has_sdk",
-      "value": false
-    },
-    {
-      "slug": "unitree-h2",
-      "field": "developer_edition",
-      "value": false
-    },
-    {
-      "slug": "unitree-r1",
-      "field": "has_sdk",
-      "value": false
-    },
-    {
-      "slug": "unitree-r1",
-      "field": "developer_edition",
-      "value": false
-    },
-    {
       "slug": "honda-asimo",
       "field": "summary",
       "value": null

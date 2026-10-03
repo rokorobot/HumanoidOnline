@@ -302,8 +302,18 @@ def test_the_catalogue_entry_is_identity_and_reference_only():
     assert compute["key"] == "compute_ai" and compute["value"].startswith("three Turing AI chips")
     assert compute["source_kind"] == "MANUFACTURER" and "variant_slug" not in compute
     for coll in ("variants", "pricing_offers", "availability_offers", "capabilities",
-                 "use_case_fits", "images", "deployments", "commercial_status_evidence"):
+                 "use_case_fits", "deployments", "commercial_status_evidence"):
         assert d[coll] == [], coll
+    # one real manufacturer photograph of the production IRON (owner-confirmed 2026-10-03)
+    [img] = d["images"]
+    assert (img["image_url"], img["source_name"], img["source_type"], img["image_type"]) == (
+        "/robots/xpeng-iron.webp", "XPENG", "MANUFACTURER", "ACTION")
+    assert (img["identity_status"], img["rights_status"], img["usage_basis"]) == (
+        "VERIFIED", "UNKNOWN", "OFFICIAL_MANUFACTURER_MEDIA")
+    assert img["is_official"] is True and img["is_primary"] is True
+    assert img["identity_confirmed_by"] == "robert@humanoid.company"
+    assert img["source_url"] == NEWS_2026
+    assert (REPO / "apps" / "web" / "public" / "robots" / "xpeng-iron.webp").is_file()
 
 
 # ------------------------------------------------------------- persistence ---

@@ -348,13 +348,16 @@ def test_the_importer_and_verification_close_the_chain_idempotently(site, tmp_pa
 def test_nothing_else_in_the_catalogue_or_decision_layers_moves(site, tmp_path):
     ingest_all(site)
     tables = ("robot_variant", "pricing_offer", "availability_offer", "robot_capability",
-              "use_case_fit", "robot_image", "evidence_source", "promotion_audit")
+              "use_case_fit", "evidence_source", "promotion_audit")
     before = {t: site.session.scalar(text(f"SELECT count(*) FROM {t}")) for t in tables}
+    images_before = site.session.scalar(text("SELECT count(*) FROM robot_image"))
     make_claims(site)
     path = stub(site, tmp_path)
     materialize.apply_plan(materialize.plan_materialization(site.session, site.slug, tmp_path))
     do_import(site, path)
     assert {t: site.session.scalar(text(f"SELECT count(*) FROM {t}")) for t in tables} == before
+    # the catalogue file carries IRON's one photograph (2026-10-03): the importer adds exactly it
+    assert site.session.scalar(text("SELECT count(*) FROM robot_image")) == images_before + 1
     decisions = site.session.scalar(select(func.count()).select_from(AcceptedClaim))
     assert decisions == 3
     states = pr.derive_states(site.session, site.all_proposals())

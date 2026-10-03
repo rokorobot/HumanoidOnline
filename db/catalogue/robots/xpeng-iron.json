@@ -40,7 +40,23 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": [],
+  "images": [
+    {
+      "image_url": "/robots/xpeng-iron.webp",
+      "source_url": "https://www.xpeng.com/news/01a080371029a057bc8e8a02a2c6012b",
+      "source_name": "XPENG",
+      "source_type": "MANUFACTURER",
+      "image_type": "ACTION",
+      "identity_status": "VERIFIED",
+      "rights_status": "UNKNOWN",
+      "usage_basis": "OFFICIAL_MANUFACTURER_MEDIA",
+      "is_official": true,
+      "is_primary": true,
+      "attribution": "© XPENG",
+      "last_verified_at": "2026-10-03T00:00:00Z",
+      "identity_confirmed_by": "robert@humanoid.company"
+    }
+  ],
   "extended_specs": [
     {
       "key": "compute_ai",

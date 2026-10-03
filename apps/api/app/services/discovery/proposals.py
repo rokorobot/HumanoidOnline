@@ -19,7 +19,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Callable
 from dataclasses import dataclass, field
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -35,6 +37,7 @@ from app.models.robot import Robot
 from app.services.discovery import DiscoveryError
 from app.services.discovery.fingerprint import fingerprint
 from app.services.discovery.sources import neura_mini_proposals as mini
+from app.services.discovery.sources import xpeng_iron_proposals as xpeng
 from app.services.discovery.urlref import UnsupportedUrl, normalize_url
 
 CURRENT, SUPERSEDED = "CURRENT", "SUPERSEDED"
@@ -68,9 +71,43 @@ class IngestReport:
                 "writes_catalogue": False, "writes_decisions": False}
 
 
-def ingest_neura_mini_proposals(session: Session, *, source_key: str, robot_slug: str,
-                                fetched_page_id, body: bytes, ingested_by: str) -> IngestReport:
-    """Persist the G1 proposals read from `body`, observed as `fetched_page_id`."""
+@dataclass(frozen=True)
+class ExtractorSpec:
+    """One reviewed, deterministic proposal extractor and the identity it may attach to."""
+
+    key: str
+    version: str
+    robot_name: str              # the catalogue name the robot must carry (identity gate)
+    page_urls: tuple[str, ...]   # the only normalized page URLs it reads
+    propose: Callable[[bytes, str], Any]
+    proposed_status: str = "PROPOSED"
+
+
+NEURA_MINI_SPEC = ExtractorSpec(
+    key=mini.EXTRACTOR_KEY, version=mini.EXTRACTOR_VERSION, robot_name=mini.ROBOT_NAME,
+    page_urls=(mini.MINI_URL,),
+    propose=lambda body, url: mini.propose_neura_mini_claims(body, url))
+
+XPENG_IRON_SPEC = ExtractorSpec(
+    key=xpeng.EXTRACTOR_KEY, version=xpeng.EXTRACTOR_VERSION, robot_name=xpeng.ROBOT_NAME,
+    page_urls=tuple(xpeng.PAGE_URLS),
+    propose=lambda body, url: xpeng.propose_xpeng_iron_claims(body, url))
+
+
+def ingest_neura_mini_proposals(session: Session, **kw) -> IngestReport:
+    """Persist the G1 4NE1 Mini proposals read from `body`, observed as `fetched_page_id`."""
+    return ingest_proposals(session, spec=NEURA_MINI_SPEC, **kw)
+
+
+def ingest_xpeng_iron_proposals(session: Session, **kw) -> IngestReport:
+    """Persist the XPENG IRON proposals read from `body`, observed as `fetched_page_id`."""
+    return ingest_proposals(session, spec=XPENG_IRON_SPEC, **kw)
+
+
+def ingest_proposals(session: Session, *, spec: ExtractorSpec, source_key: str,
+                     robot_slug: str, fetched_page_id, body: bytes,
+                     ingested_by: str) -> IngestReport:
+    """Persist the proposals `spec` reads from `body`, observed as `fetched_page_id`."""
     if not ingested_by or not ingested_by.strip():
         raise DiscoveryError("ingest must name the human who ran it (--by)")
     who = ingested_by.strip()
@@ -86,22 +123,23 @@ def ingest_neura_mini_proposals(session: Session, *, source_key: str, robot_slug
         page_url = normalize_url(page.final_url or page.url)
     except UnsupportedUrl as exc:
         raise DiscoveryError(f"fetched page has no usable URL: {exc}") from exc
-    if page_url != mini.MINI_URL:
-        raise DiscoveryError(f"this ingest reads {mini.MINI_URL} only, not {page_url}")
+    if page_url not in spec.page_urls:
+        raise DiscoveryError(
+            f"this ingest reads {' or '.join(spec.page_urls)} only, not {page_url}")
     if not page.content_hash or fingerprint(body, page.content_type) != page.content_hash:
         raise DiscoveryError(
             "the supplied body does not match the observation's recorded content_hash; "
             "refusing to attribute these bytes to that observation")
     robot = session.scalar(select(Robot).where(Robot.slug == robot_slug))
-    if robot is None or robot.name != mini.ROBOT_NAME:
+    if robot is None or robot.name != spec.robot_name:
         raise DiscoveryError(
-            f"robot {robot_slug!r} is not the catalogue's {mini.ROBOT_NAME!r}; "
+            f"robot {robot_slug!r} is not the catalogue's {spec.robot_name!r}; "
             "proposals attach to one existing robot identity")
 
-    result = mini.propose_neura_mini_claims(body, page_url)
+    result = spec.propose(body, page_url)
     report = IngestReport(result.status, str(page.id), notes=list(result.notes),
                           rejected=[list(r) for r in result.rejected])
-    if result.status != mini.PROPOSED:
+    if result.status != spec.proposed_status:
         return report
 
     for p in result.proposals:
@@ -124,7 +162,7 @@ def ingest_neura_mini_proposals(session: Session, *, source_key: str, robot_slug
                 evidence_locator=p.evidence.locator, extraction_method=p.method,
                 extraction_confidence=p.confidence, claim_status=p.claim_status, gap=p.gap,
                 review_questions=list(p.review_required),
-                extractor_key=mini.EXTRACTOR_KEY, extractor_version=mini.EXTRACTOR_VERSION,
+                extractor_key=spec.key, extractor_version=spec.version,
                 origin_fetched_page_id=page.id, origin_crawl_run_id=page.crawl_run_id,
                 origin_content_hash=page.content_hash, origin_retrieved_at=page.retrieved_at,
                 ingested_by=who)

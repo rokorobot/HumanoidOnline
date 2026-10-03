@@ -253,7 +253,7 @@ def test_the_module_imports_no_database_or_orm_and_does_no_io():
 def test_the_live_adapter_is_untouched_and_the_proposals_are_not_wired_in():
     assert CONFIG.version == "0.3.0"
     assert CONFIG.product_extractor is extract_neura_product
-    assert set(ADAPTERS) == {"neura-robotics-official"}
+    assert set(ADAPTERS) == {"neura-robotics-official", "xpeng-official"}   # + XPENG, 2026-10-03
     assert ADAPTERS["neura-robotics-official"] is CONFIG
     # The production path still extracts identity only: no claim, signal or image.
     identity = extract_neura_product(CONFIG, PAGE.encode("utf-8"), MINI_URL)

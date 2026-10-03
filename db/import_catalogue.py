@@ -45,6 +45,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 from pathlib import Path
 
 import psycopg
@@ -902,6 +903,42 @@ def _narrow(data: dict, key: str, field: str, keep: set[str]) -> dict:
 
 
 # --------------------------------------------------------------------------- #
+def _check_publication_transitions(cur, loaded: list[dict], was_published: dict) -> None:
+    """G4-3 (DR-G4 section 8.3): refuse an `is_published` false -> true flip that would make the
+    public record misleading. INTEGRITY blocks; COVERAGE never does (UNKNOWN fields, a missing price,
+    detail-only knowledge, low coverage ... are reported as warnings and the robot still publishes).
+    Raising here aborts the whole transaction: nothing is written and nothing is published."""
+    transitioning = sorted(
+        r["slug"] for r in loaded
+        if r.get("is_published") is True and was_published.get(r["slug"]) is not True)
+    if not transitioning:
+        return
+    sys.path.insert(0, str(REPO_ROOT / "apps" / "api"))
+    from app.services import readiness as rd
+    from app.services.readiness_loader import load_records
+
+    baseline = CATALOGUE_DIR / "legacy_readiness_baseline.json"
+    legacy = rd.load_legacy_baseline(
+        baseline.read_text(encoding="utf-8") if baseline.exists() else None)
+    blocked = False
+    for rec in load_records(cur, set(transitioning)):
+        blockers = rd.publication_check(rec, legacy=legacy)
+        coverage = rd.coverage_audit(rec, legacy=legacy)
+        warnings = [f for f in coverage.findings if f.severity == rd.WARN]
+        print(f"PUBLICATION CHECK {rec.slug}: "
+              + ("integrity PASS" if not blockers else "integrity FAIL")
+              + f"; coverage {coverage.band} ({len(coverage.findings)} non-blocking finding(s))")
+        for f in blockers:
+            print(f"  BLOCK {f.code}: {f.message}")
+        for f in warnings:
+            print(f"  warn  {f.code}: {f.message}")
+        blocked = blocked or bool(blockers)
+    if blocked:
+        raise SystemExit(
+            "PUBLICATION REFUSED (integrity): fix the BLOCK findings above. Nothing was written. "
+            "Incomplete is publishable; misleading is not.")
+
+
 def run(url: str, *, apply_publication_state: bool = False,
         only: set[str] | None = None) -> None:
     regions = _load(CATALOGUE_DIR / "regions.json")
@@ -997,12 +1034,22 @@ def run(url: str, *, apply_publication_state: bool = False,
             import_use_cases(cur, use_cases)
             import_spec_definitions(cur, spec_definitions, collisions)
 
+            # G4-3: which robots are about to go from NOT published to published? Captured BEFORE
+            # the import so the transition is judged against what the public sees today.
+            was_published = (
+                dict(cur.execute("SELECT slug, is_published FROM robot").fetchall())
+                if apply_publication_state else {}
+            )
+
             n_robots = 0
             for robot in loaded:
                 import_robot(cur, robot, region_id, manufacturer_id,
                              capability_id, use_case_id, spec_definition, collisions,
                              apply_publication_state=apply_publication_state)
                 n_robots += 1
+
+            if apply_publication_state:
+                _check_publication_transitions(cur, loaded, was_published)
 
             stored, displayed = cur.execute(
                 "SELECT count(*), count(*) FILTER (WHERE is_published) FROM robot"

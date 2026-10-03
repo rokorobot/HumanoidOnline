@@ -66,6 +66,12 @@ jobs:
         run: uv run db/import_catalogue.py
       - name: Validate catalogue provenance (G2)
         run: uv run db/validate_catalogue.py
+      # G4-3 (DR-G4 7-8): two clearly separate outputs. The INTEGRITY gate is required: it fails only
+      # for truthfulness defects. The COVERAGE audit is informational and exits 0 whatever it finds.
+      - name: Integrity gate (G4-3, required)
+        run: uv run db/readiness_check.py integrity
+      - name: Coverage audit (G4-3, informational, non-blocking)
+        run: uv run db/readiness_check.py coverage
 
   api-test:
     name: Backend (FastAPI + pytest)

@@ -1,0 +1,65 @@
+{
+  "_comment": "G4-3 (DR-G4 7.1 D, 8.3): PRE-EXISTING weaknesses that are COVERAGE review findings and never integrity failures (owner ruling 2026-10-03): hand-entered false/0 values without per-field provenance, and published robots without a summary. They are never unpublished and never fail CI. The list may only SHRINK: a NEW or CHANGED false/0 without an EXPLICIT_NEGATIVE spec_caveat, or a NEW publication without a summary, is an integrity failure.",
+  "entries": [
+    {
+      "slug": "unitree-g1-edu-plus-u2",
+      "field": "has_manipulation",
+      "value": false
+    },
+    {
+      "slug": "unitree-g1",
+      "field": "has_manipulation",
+      "value": false
+    },
+    {
+      "slug": "unitree-g1",
+      "field": "has_sdk",
+      "value": false
+    },
+    {
+      "slug": "unitree-g1",
+      "field": "developer_edition",
+      "value": false
+    },
+    {
+      "slug": "unitree-h2",
+      "field": "has_sdk",
+      "value": false
+    },
+    {
+      "slug": "unitree-h2",
+      "field": "developer_edition",
+      "value": false
+    },
+    {
+      "slug": "unitree-r1",
+      "field": "has_sdk",
+      "value": false
+    },
+    {
+      "slug": "unitree-r1",
+      "field": "developer_edition",
+      "value": false
+    },
+    {
+      "slug": "honda-asimo",
+      "field": "summary",
+      "value": null
+    },
+    {
+      "slug": "rainbow-hubo",
+      "field": "summary",
+      "value": null
+    },
+    {
+      "slug": "softbank-nao",
+      "field": "summary",
+      "value": null
+    },
+    {
+      "slug": "softbank-pepper",
+      "field": "summary",
+      "value": null
+    }
+  ]
+}

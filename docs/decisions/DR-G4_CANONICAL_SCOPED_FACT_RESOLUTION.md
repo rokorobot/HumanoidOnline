@@ -342,3 +342,39 @@ cannot meet. Until then correctness and one truth model outrank query optimizati
 * **JSON-LD:** the structured data never asserted these capabilities and still does not; a test pins
   that PARTIAL / VARIES facts are not published as product-wide claims.
 * **Deferred to G4-3:** generic fact accounting, the readiness / publication gate and the audit command.
+
+## 13. G4-3 implementation record (integrity gate and coverage audit)
+
+* **Code:** `apps/api/app/services/readiness.py` (pure; stdlib plus the G4 resolver), `readiness_loader.py`
+  (a read-only DB-API loader, fixed number of queries), `db/readiness_check.py` (`integrity`, `coverage`,
+  `publish`), and the publication-transition hook in `db/import_catalogue.py`.
+* **Integrity (`integrity_check`)** blocks only: identity (blank name, no manufacturer, invalid slug, a
+  CURRENT unresolved `POSSIBLE_DUPLICATE` / `AMBIGUOUS` candidate attached to the robot; the candidate's
+  effective state is read, never the append-only history, so a resolved ambiguity does not block);
+  `CANONICAL_CONFLICT`; `PUBLIC_CONTRADICTS_CANONICAL`; fabricated transformations (year-level statement to
+  exact date, accepted price type changed on publication, a historical figure given a catalogue home, a
+  variant flattened to product scope, a NEW `false`/implausible `0` with no explicit negative basis);
+  missing required provenance; broken publication mechanics; `UNACCOUNTED_LOSS`; and, only at the
+  false-to-true transition, a missing or placeholder summary.
+* **Public-assertion findings apply to published or publishing robots.** For an UNPUBLISHED record they are
+  reported as coverage warnings ("resolve before publishing"): an unpublished stub is not a public assertion.
+* **New versus legacy:** `db/catalogue/legacy_readiness_baseline.json` lists the 8 pre-existing hand-entered
+  `false` values (unitree-g1, unitree-g1-edu-plus-u2, unitree-h2, unitree-r1) and the 4 published robots
+  without a summary (honda-asimo, rainbow-hubo, softbank-nao, softbank-pepper). They are coverage review
+  findings, never integrity failures, never unpublished, never a CI failure. A test fails when an entry has
+  been fixed (the baseline may only shrink) and when any NEW unexplained `false`/zero appears in the catalogue
+  source. An explicit negative is a `spec_caveats` entry `{"field": F, "kind": "EXPLICIT_NEGATIVE", "text":
+  "<the source's own words>"}`; no schema change.
+* **Coverage (`coverage_audit`)** has no failing outcome. It reports UNKNOWN density, no price/availability/
+  SDK/deployment evidence, legacy findings, `DETAIL_ONLY` (with the recorded reason), `UNMAPPED_KNOWLEDGE`
+  (projection candidates), `NO_CATALOGUE_HOME`, `NOT_YET_REVIEWED`, an informational band (LOW / PARTIAL /
+  GOOD) and the fact accounting. The band thresholds are informational and never gate anything.
+* **Publication transition:** `--apply-publication-state` judges every robot going false to true; an
+  integrity failure aborts the whole transaction (nothing written, nothing published); coverage warnings are
+  printed and allowed.
+* **CI:** `db/readiness_check.py integrity` is a required step; `coverage` is an informational step that exits
+  0 unless the command itself fails technically.
+* **Golden:** a synthetic fresh announcement (identity, source, summary, ANNOUNCED, one technical fact, no
+  price or availability, everything else UNKNOWN) is publishable with coverage LOW, and a robot that is 90%
+  UNKNOWN publishes when the known part is truthful. These tests exist so the gate cannot drift into an
+  encyclopedia-style completeness check.

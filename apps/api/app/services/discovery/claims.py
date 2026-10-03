@@ -34,6 +34,7 @@ from app.services.discovery.field_policy import (
     CLAIM_REGISTRY_VERSION,
     IRON_CURRENT_CONFIGURATION,
     NO_CATALOGUE_HOME,
+    PRODUCT_PAGE_CONFIGURATION,
     SPEC_DEFINITION_KEY,
     ClaimPolicy,
     claim_policy_for,
@@ -107,6 +108,10 @@ def _plan(session: Session, p: DiscoveryClaimProposal, policy: ClaimPolicy,
         # Accepted knowledge with provenance; it authorizes no catalogue write and is never
         # materialized. The human must state both the target kind and the home explicitly.
         _need(choices, HOME_KEY, NO_CATALOGUE_HOME)
+        if policy.target_key.startswith("historical_"):
+            # The configuration the statement describes travels with the claim (never "current").
+            _need(choices, "configuration",
+                  structured.get("configuration") or PRODUCT_PAGE_CONFIGURATION)
         value = _need(choices, "accepted_value", verbatim)
         return {"variant_slug": p.edition.lower() if p.edition else None,
                 "accepted_value": value,

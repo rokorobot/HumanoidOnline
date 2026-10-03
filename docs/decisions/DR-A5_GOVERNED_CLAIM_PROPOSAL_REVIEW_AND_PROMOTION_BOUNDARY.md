@@ -829,6 +829,18 @@ Supersedes the "hand_dof not decided" remark in the section above.
 
 ---
 
+### 18.9 IRON historical factual figures (owner decision 2026-10-03, option B)
+
+Eight proposals state BODY_DOF / HAND_DOF / COMPUTE / BATTERY figures for configurations that are
+not IRON's current one: the 2025 Next-Gen release (4) and the product page (4). They are
+registered (registry 0.6.0) as `no_catalogue_home[historical_*]`: accepted as governed knowledge
+with provenance, the human mapping must name the configuration the statement describes, and they
+are never materialized, never a catalogue fact, and never evidence of maturity. Plans, production
+and deployment state, morphology, generation history, SDK plan, marketing and the 2024 figures
+stay unreviewed proposals.
+
+---
+
 ## 20. Ratification record (owner decisions, 2026-10-02)
 
 1. **Persistence approach B′ ratified:** immutable extraction proposals; append-only human proposal

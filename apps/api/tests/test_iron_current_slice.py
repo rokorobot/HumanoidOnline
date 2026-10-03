@@ -133,15 +133,20 @@ def test_exactly_the_three_current_configuration_proposals_have_policies(site):
             "specification[compute_ai]"} <= set(CLAIM_POLICIES)
     registered = [p for p in site.all_proposals()
                   if claims.claim_policy_for(p.kind, p.target, p.evidence_locator, p.structured)]
-    assert {(p.source_url, p.kind) for p in registered} == {
+    current = [p for p in registered
+               if claims.claim_policy_for(p.kind, p.target, p.evidence_locator,
+                                          p.structured).target_kind != "NO_CATALOGUE_HOME"]
+    assert {(p.source_url, p.kind) for p in current} == {
         (NEWS_2026, "BODY_DOF"), (NEWS_2026, "HAND_DOF"), (NEWS_2026, "COMPUTE")}
+    assert len(registered) == 3 + 8                    # + the eight historical figures
     assert len(site.all_proposals()) == sum(EXPECTED_COUNTS.values())
 
 
 @pytest.mark.parametrize("url,kind", [
-    (NEWS_2025, "BODY_DOF"), (NEWS_2025, "COMPUTE"), (NEWS_2025, "HAND_DOF"),
-    (NEWS_2026, "LAUNCH_PLAN"), (NEWS_2026, "MANUFACTURING_STATE")])
-def test_historical_and_other_proposals_stay_unregistered(site, url, kind):
+    (NEWS_2026, "LAUNCH_PLAN"), (NEWS_2026, "MANUFACTURING_STATE"),
+    (NEWS_2026, "MASS_PRODUCTION_PLAN"), (NEWS_2025, "MASS_PRODUCTION_PLAN"),
+    (NEWS_2025, "GENERATION_HISTORY"), (NEWS_2025, "SDK_PLAN"), (NEWS_2025, "MORPHOLOGY")])
+def test_plans_state_and_descriptions_stay_unregistered(site, url, kind):
     ingest_all(site)
     for p in site.all_proposals():
         if p.source_url == url and p.kind == kind:
@@ -153,13 +158,53 @@ def test_historical_and_other_proposals_stay_unregistered(site, url, kind):
     assert site.session.scalar(select(func.count()).select_from(AcceptedClaim)) == 0
 
 
-def test_the_product_page_22_dof_hand_statements_stay_unregistered(site):
-    ingest_all(site)
+def historical(site):
     page = [u for u in PAGES if u not in (NEWS_2025, NEWS_2026) and "ai_robot_iron" in u]
-    hands = [p for p in site.all_proposals() if p.kind == "HAND_DOF" and p.source_url in page]
-    assert hands and all(
-        claims.claim_policy_for(p.kind, p.target, p.evidence_locator, p.structured) is None
-        for p in hands)
+    return [p for p in site.all_proposals()
+            if p.source_url in (NEWS_2025, *page)
+            and p.kind in ("BODY_DOF", "HAND_DOF", "COMPUTE", "BATTERY")]
+
+
+def historical_choices(p):
+    cfg = (p.structured or {}).get("configuration") or "Next-Gen IRON (product page)"
+    return {**answers(p), pr.HOME_KEY: pr.NO_CATALOGUE_HOME, "target_kind": "NO_CATALOGUE_HOME",
+            "configuration": cfg,
+            "accepted_value": p.value}
+
+
+def test_exactly_the_eight_historical_figures_are_no_catalogue_home_policies(site):
+    ingest_all(site)
+    hist = historical(site)
+    assert len(hist) == 8 and sorted(p.kind for p in hist) == sorted(
+        ["BODY_DOF", "HAND_DOF", "HAND_DOF", "HAND_DOF", "COMPUTE", "COMPUTE", "BATTERY",
+         "BATTERY"])
+    for p in hist:
+        pol = claims.claim_policy_for(p.kind, p.target, p.evidence_locator, p.structured)
+        assert pol is not None and pol.target_kind == "NO_CATALOGUE_HOME"
+        assert pol.target_key.startswith("historical_")
+
+
+def test_historical_figures_become_governed_knowledge_and_never_a_catalogue_fact(site, tmp_path):
+    ingest_all(site)
+    path = stub(site, tmp_path)
+    before = path.read_text(encoding="utf-8")
+    for p in historical(site):
+        accept(site, p, historical_choices(p))
+        c, created = claims.create_claim(site.session, str(p.id), created_by=WHO)
+        assert created and c.target_kind == "NO_CATALOGUE_HOME"
+        assert c.accepted_value == p.value and c.source_url == p.source_url
+    assert site.session.scalar(select(func.count()).select_from(AcceptedClaim)) == 8
+    plan = materialize.plan_materialization(site.session, site.slug, tmp_path)
+    assert not plan.changed and path.read_text(encoding="utf-8") == before   # nothing written
+
+
+def test_a_historical_figure_cannot_pose_as_the_current_configuration(site):
+    ingest_all(site)
+    p = proposal(site, NEWS_2025, "BODY_DOF")
+    accept(site, p, historical_choices(p) | {"configuration": IRON_CURRENT_CONFIGURATION})
+    with pytest.raises(DiscoveryError, match="configuration"):
+        claims.create_claim(site.session, str(p.id), created_by=WHO)
+    assert site.session.scalar(select(func.count()).select_from(AcceptedClaim)) == 0
 
 
 @pytest.mark.parametrize("which,over,needle", [

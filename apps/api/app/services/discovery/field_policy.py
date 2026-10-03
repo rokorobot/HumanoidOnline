@@ -41,7 +41,7 @@ def policy_for(target_hint: str) -> FieldPolicy | None:
 # Exactly two registered targets, nothing else. Price, availability, reservation, use
 # cases, interfaces and every other mapping are NOT registered and are refused.
 # --------------------------------------------------------------------------------------
-CLAIM_REGISTRY_VERSION = "0.5.0-xpeng-iron-hand-dof"
+CLAIM_REGISTRY_VERSION = "0.6.0-xpeng-iron-historical-knowledge"
 
 # The resolved-choice keys that carry the human's explicit catalogue mapping.
 MAPPING_KEYS = ("target_kind", "variant_slug", "variant_name", "spec_key", "edition_scope",
@@ -70,6 +70,16 @@ AVAILABILITY_LOCATOR = "text-block[availability-year]"
 # NO_CATALOGUE_HOME: an accepted statement preserved with its provenance, never materialized.
 NO_HOME_KINDS = {"RESERVATION_FEE": "reservation_fee", "RESERVATION_TERMS": "reservation_terms",
                  "USE_CASES": "use_cases"}
+
+
+# XPENG IRON historical factual figures (owner decision 2026-10-03, option B): the 2025 Next-Gen
+# release and the product page state BODY_DOF / HAND_DOF / COMPUTE / BATTERY figures for
+# configurations that are NOT the current one. They are accepted as governed knowledge with
+# provenance (NO_CATALOGUE_HOME): never materialized, never a catalogue fact, never maturity.
+HISTORICAL_NO_HOME_KINDS = {"BODY_DOF": "historical_body_dof", "HAND_DOF": "historical_hand_dof",
+                            "COMPUTE": "historical_compute", "BATTERY": "historical_battery"}
+HISTORICAL_PAGES = ("news-2025-11-05", "product-page")
+PRODUCT_PAGE_CONFIGURATION = "Next-Gen IRON (product page)"
 
 
 @dataclass(frozen=True)
@@ -124,6 +134,9 @@ CLAIM_POLICIES: dict[str, ClaimPolicy] = {
     **{f"no_catalogue_home[{name}]": ClaimPolicy(
         key=f"no_catalogue_home[{name}]", proposal_kind=kind, target_kind=NO_CATALOGUE_HOME,
         target_key=name) for kind, name in NO_HOME_KINDS.items()},
+    **{f"no_catalogue_home[{name}]": ClaimPolicy(
+        key=f"no_catalogue_home[{name}]", proposal_kind=kind, target_kind=NO_CATALOGUE_HOME,
+        target_key=name) for kind, name in HISTORICAL_NO_HOME_KINDS.items()},
 }
 
 
@@ -156,6 +169,9 @@ def claim_policy_for(kind: str, target_hint: str, locator: str,
     if (kind == "COMPUTE" and cfg == IRON_CURRENT_CONFIGURATION
             and locator.startswith(f"{IRON_CURRENT_PAGE}/")):
         return CLAIM_POLICIES["specification[compute_ai]"]
+    if (kind in HISTORICAL_NO_HOME_KINDS and cfg != IRON_CURRENT_CONFIGURATION
+            and any(locator.startswith(f"{page}/") for page in HISTORICAL_PAGES)):
+        return CLAIM_POLICIES[f"no_catalogue_home[{HISTORICAL_NO_HOME_KINDS[kind]}]"]
     if kind in NO_HOME_KINDS:
         return CLAIM_POLICIES[f"no_catalogue_home[{NO_HOME_KINDS[kind]}]"]
     return None

@@ -17,7 +17,7 @@
     "runtime_minutes": null,
     "battery_wh": null,
     "mobility": null,
-    "degrees_of_freedom": null,
+    "degrees_of_freedom": 76,
     "hand_type": null,
     "hand_dof": null,
     "autonomy": null,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Specifications not yet verified.",
+  "specs_note": "degrees of freedom (76) as stated by XPENG for its 2026 production IRON (https://www.xpeng.com/news/01a080371029a057bc8e8a02a2c6012b, observed 2026-10-03). All other specifications are not yet verified.",
   "official_url": "https://www.xpeng.com/technology/ai_robot_iron",
   "commercial_status_evidence": [],
   "variants": [],
@@ -40,5 +40,16 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": []
+  "images": [],
+  "extended_specs": [
+    {
+      "key": "compute_ai",
+      "value": "three Turing AI chips delivering up to 2,250 TOPS of effective computing power",
+      "source_label": "XPENG",
+      "source_url": "https://www.xpeng.com/news/01a080371029a057bc8e8a02a2c6012b",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-03"
+    }
+  ]
 }

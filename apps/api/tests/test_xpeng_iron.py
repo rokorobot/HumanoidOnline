@@ -293,7 +293,13 @@ def test_the_catalogue_entry_is_identity_and_reference_only():
     assert d["commercial_status"] == "UNKNOWN" and d["is_published"] is False
     assert d["official_url"] == "https://www.xpeng.com/technology/ai_robot_iron"
     assert d["summary"] is None and d["announced_year"] is None
-    assert all(v is None for v in d["specs"].values())
+    # the owner-approved current-configuration slice (2026-10-03) and nothing else
+    assert d["specs"]["degrees_of_freedom"] == 76
+    assert all(v is None for k, v in d["specs"].items() if k != "degrees_of_freedom")
+    assert d["specs"]["hand_dof"] is None                    # per-hand convention undecided
+    [compute] = d["extended_specs"]
+    assert compute["key"] == "compute_ai" and compute["value"].startswith("three Turing AI chips")
+    assert compute["source_kind"] == "MANUFACTURER" and "variant_slug" not in compute
     for coll in ("variants", "pricing_offers", "availability_offers", "capabilities",
                  "use_case_fits", "images", "deployments", "commercial_status_evidence"):
         assert d[coll] == [], coll

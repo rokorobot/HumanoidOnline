@@ -177,6 +177,12 @@ jobs:
         run: uv run db/bootstrap.py
       - name: Import the verified catalogue
         run: uv run db/import_catalogue.py
+      # E2E-only fixture in this EPHEMERAL database: a manufacturer with zero published
+      # models, so the NONE PUBLISHED test never depends on real catalogue publication.
+      - name: Load the e2e no-published-models fixture
+        env:
+          PGPASSWORD: humanoid
+        run: psql -h localhost -U humanoid -d catalogue -v ON_ERROR_STOP=1 -f apps/web/e2e/fixtures/no-published-manufacturer.sql
 
       # 2) FastAPI against the imported catalogue (background)
       - name: Install API dependencies

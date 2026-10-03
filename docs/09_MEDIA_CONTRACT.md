@@ -107,11 +107,19 @@ for the robots it markets, always credited to and linked from the manufacturer).
 **Display-eligibility rule (canonical, one place):**
 
 ```
-display_eligible  ⇔  identity_status = VERIFIED
+display_eligible  ⇔  ( identity_status = VERIFIED
+                       OR valid representative-image exception )   -- see Representative imagery
                      AND rights_status <> RESTRICTED
                      AND ( rights_status IN (PERMITTED, ATTRIBUTION_REQUIRED)
-                           OR usage_basis = OFFICIAL_MANUFACTURER_MEDIA )
+                           OR usage_basis IN (OFFICIAL_MANUFACTURER_MEDIA,
+                                              OWNER_APPROVED_DISPLAY) )
 ```
+
+The representative-image exception is the one defined above: `is_representative` with
+`identity_status = UNVERIFIED`, `usage_basis = OWNER_APPROVED_DISPLAY` **and** a
+`representative_note` caption. It never makes an unlabelled stand-in eligible.
+Attribution is unchanged: a display-eligible image must still carry `source_name`,
+`source_url` and `attribution` (the catalogue gate enforces this).
 
 `RESTRICTED` **always** blocks display (even with a usage_basis). `rights_status =
 UNKNOWN` never behaves like `PERMITTED` (mirrors `UNKNOWN != 0/false`). A non-null
@@ -150,7 +158,7 @@ robot_image {
   image_type          -- FRONT | SIDE | REAR | ACTION | WORKPLACE | DETAIL | DIMENSIONS
   identity_status     -- VERIFIED | UNVERIFIED (depicts THIS exact robot)
   rights_status       -- PERMITTED | ATTRIBUTION_REQUIRED | UNKNOWN | RESTRICTED (legal evidence)
-  usage_basis         -- NONE | OFFICIAL_MANUFACTURER_MEDIA (platform display policy)
+  usage_basis         -- NONE | OFFICIAL_MANUFACTURER_MEDIA | OWNER_APPROVED_DISPLAY (platform display policy)
   is_official
   is_primary
   attribution

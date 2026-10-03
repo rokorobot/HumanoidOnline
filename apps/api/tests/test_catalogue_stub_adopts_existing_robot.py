@@ -46,7 +46,7 @@ CHILD_TABLES = ("specification", "robot_variant", "pricing_offer", "availability
 #: The only keys G2-3 materialization (DR-A5 M2) may add to the adopted identity stub.
 MATERIALIZED_KEYS = ("variants", "extended_specs", "pricing_offers", "availability_offers")
 #: Publication-readiness metadata (identity/reference, not maturity): added after G2-4.
-READINESS_KEYS = ("summary", "official_url", "images")
+READINESS_KEYS = ("summary", "official_url", "images", "is_published")
 
 
 def test_the_file_is_the_canonical_stub_plus_only_the_materialized_delta():
@@ -83,7 +83,7 @@ def test_the_file_is_the_canonical_stub_plus_only_the_materialized_delta():
 def test_the_file_still_asserts_identity_and_no_commercial_or_derived_fact():
     doc = json.loads(STUB.read_text(encoding="utf-8"))
     assert (doc["slug"], doc["name"], doc["manufacturer_slug"]) == (SLUG, NAME, MAKER)
-    assert doc["is_published"] is False
+    assert doc["is_published"] is True        # published by the owner decision of 2026-10-03
     assert doc["commercial_status"] == "UNKNOWN"           # asserts no maturity
     assert set(doc["specs"]) == set(ce.SPEC_FIELDS)         # the full field set, all UNKNOWN
     assert all(v is None for v in doc["specs"].values())   # hand_dof etc. stay UNKNOWN
@@ -93,9 +93,21 @@ def test_the_file_still_asserts_identity_and_no_commercial_or_derived_fact():
     assert doc["summary"].startswith("NEURA Robotics' compact humanoid")
     for banned in ("available now", "ships ", "shipping today", "in stock", "MSRP", "2026-"):
         assert banned.lower() not in doc["summary"].lower(), banned
-    [image] = doc["images"]                  # the candidate is NOT identity-verified yet
+    [image] = doc["images"]                  # identity confirmed by the owner (2026-10-03)
     assert (image["identity_status"], image["usage_basis"], image["is_official"]) == (
-        "UNVERIFIED", "OFFICIAL_MANUFACTURER_MEDIA", True)
+        "VERIFIED", "OFFICIAL_MANUFACTURER_MEDIA", True)
+    assert image["identity_confirmed_by"] == "robert@humanoid.company"
+    assert image["last_verified_at"].startswith("2026-10-03")     # owner confirmation recorded
+    # rights are NOT upgraded: official manufacturer media is displayed on its usage basis
+    assert (image["rights_status"], image["is_official"]) == ("UNKNOWN", True)
+    assert image["source_type"] == "MANUFACTURER"
+    assert image["attribution"].endswith("NEURA Robotics")
+    # the MEDIA-01 display-eligibility rule, evaluated on the canonical file
+    assert (image["identity_status"] == "VERIFIED" and image["rights_status"] != "RESTRICTED"
+            and image["usage_basis"] == "OFFICIAL_MANUFACTURER_MEDIA")
+    # publication does not imply maturity, and no unknown spec was filled
+    assert doc["commercial_status"] == "UNKNOWN"
+    assert all(v is None for v in doc["specs"].values())
     assert image["source_url"] == doc["official_url"]
     for collection in ("commercial_status_evidence", "deployments", "capabilities",
                        "use_case_fits"):

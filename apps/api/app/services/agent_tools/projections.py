@@ -34,6 +34,7 @@ from app.schemas.common import PriceDisplay
 from app.schemas.robot import (
     CapabilityRead,
     ExtendedSpec,
+    ResolvedFactRead,
     RobotDetail,
     RobotImagePrimary,
     RobotImageRead,
@@ -261,6 +262,9 @@ class AgentRobotDetail(BaseModel):
     availability_offers: list[AgentAvailabilityOffer]
     deployments: list[AgentDeployment]
     images: list[RobotImageRead] = []
+    #: G4: the same scoped resolution the website shows (never re-derived here), so an agent can
+    #: tell UNKNOWN from PARTIAL_VARIANTS from VARIES_BY_VARIANT.
+    resolved_facts: list[ResolvedFactRead] = []
 
 
 def _agent_evidence(
@@ -393,4 +397,5 @@ def project_detail(
         availability_offers=availability,
         deployments=deployments,
         images=detail.images,
+        resolved_facts=detail.resolved_facts,
     )

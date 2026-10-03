@@ -191,6 +191,27 @@ test("manufacturers: a maker with no published models says NONE PUBLISHED, not U
   await expect(card).toContainText("1 TRACKED · 0 PUBLISHED");
 });
 
+test("4NE1 Mini: accepted variant-scoped knowledge is resolved by the API, never a blanket UNKNOWN (G4)", async ({
+  page,
+}) => {
+  await page.goto("/robots/4ne1-mini");
+  const resolved = (prop: string) => page.locator(`[data-resolved-property="${prop}"]`);
+  await expect(resolved("has_sdk")).toHaveAttribute("data-resolved-state", "UNIFORM_VARIANTS");
+  await expect(resolved("ros_support")).toHaveAttribute("data-resolved-state", "UNIFORM_VARIANTS");
+  await expect(resolved("has_teleoperation")).toHaveAttribute("data-resolved-state", "PARTIAL_VARIANTS");
+  await expect(resolved("has_manipulation")).toHaveAttribute("data-resolved-state", "PARTIAL_VARIANTS");
+  await expect(resolved("has_sdk")).toContainText("Supported on all documented configurations");
+  // Order of the tokens inside a configuration follows the API; assert content, not order.
+  await expect(resolved("has_sdk")).toContainText(/Pro — Supported \((?=[^)]*Python SDK)(?=[^)]*C\+\+ SDK)[^)]*\)/);
+  await expect(resolved("has_sdk")).toContainText(/Standard — Supported \(Python SDK\)/);
+  await expect(resolved("has_teleoperation")).toContainText("Pro — Supported (teleoperation)");
+  await expect(resolved("has_teleoperation")).toContainText("Standard — UNKNOWN");
+  await expect(resolved("has_manipulation")).toContainText("Pro — Supported (12 DoF dexterous hands)");
+  // The Standard configuration's richer fact stays visible and is NOT turned into "no".
+  await expect(resolved("has_manipulation")).toContainText("Dexterous hand option: Not included");
+  await expect(resolved("has_manipulation")).not.toContainText(/not supported/i);
+});
+
 function factValue(page: import("@playwright/test").Page, label: string) {
   return page.locator("dl.mfr-facts .cf-row", { has: page.locator("dt", { hasText: label }) }).locator("dd");
 }

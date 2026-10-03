@@ -35,8 +35,9 @@ import { RobotGallery } from "@/components/RobotGallery";
 import { MachineCode } from "@/components/MachineCode";
 import { PriceStateLong } from "@/components/PricingState";
 import { SpecRow, SpecValue } from "@/components/DataCell";
-import { InterfaceFactsValue, VariantFactValue } from "@/components/VariantFactCell";
-import { interfaceFacts, variantFact, type VariantFact, type VariantProperty } from "@/lib/variant-facts";
+import { ResolvedFactCell } from "@/components/ResolvedFactCell";
+import { factsByProperty, hasScopedKnowledge } from "@/lib/resolved-facts";
+import type { ResolvedFact } from "@/lib/types";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SystemHeader } from "@/components/SystemHeader";
 import { SystemLabel } from "@/components/SystemLabel";
@@ -165,9 +166,9 @@ export default async function RobotDetailPage({
   // record holds (usually the UNKNOWN state), with the explanation beneath it.
   const caveats = new Map(robot.spec_caveats.map((c) => [c.field, c.text]));
 
-  // UNKNOWN only when neither robot scope nor variant scope has evidence.
-  const vfact = (p: VariantProperty) => variantFact(p, robot.extended_specs, robot.variants);
-  const ifaces = interfaceFacts(robot.extended_specs, robot.variants);
+  // G4: scoped facts are resolved once, by the API. UNKNOWN here means no accepted canonical
+  // knowledge at product or variant scope; nothing is re-derived in the web layer.
+  const resolved = factsByProperty(robot.resolved_facts);
 
   const evidenceStatusField = conf
     ? { label: "EVIDENCE STATUS:", value: conf, emphasis: conf === "VERIFIED" || conf === "HIGH" }
@@ -526,24 +527,18 @@ export default async function RobotDetailPage({
             <div className="spectbl">
               <h3>Intelligence</h3>
               <SpecRow label="Autonomy" value={s.autonomy} note={caveats.get("autonomy")} />
-              <VariantAwareRow label="Manipulation" value={s.has_manipulation} fact={vfact("has_manipulation")} note={caveats.get("has_manipulation")} />
-              <VariantAwareRow label="Teleoperation" value={s.has_teleoperation} fact={vfact("has_teleoperation")} note={caveats.get("has_teleoperation")} />
+              <ResolvedRow label="Manipulation" value={s.has_manipulation} fact={resolved.has_manipulation} note={caveats.get("has_manipulation")} />
+              <ResolvedRow label="Teleoperation" value={s.has_teleoperation} fact={resolved.has_teleoperation} note={caveats.get("has_teleoperation")} />
               <SpecRow label="Vision" value={s.has_vision} note={caveats.get("has_vision")} />
               <SpecRow label="Language UI" value={s.has_language_ui} note={caveats.get("has_language_ui")} />
               <SpecRow label="Hand type" value={s.hand_type} note={caveats.get("hand_type")} />
-              <VariantAwareRow label="Hand DOF" value={s.hand_dof} fact={vfact("hand_dof")} note={caveats.get("hand_dof")} />
+              <SpecRow label="Hand DOF" value={s.hand_dof} note={caveats.get("hand_dof")} />
             </div>
             <div className="spectbl">
               <h3>Developer</h3>
-              <VariantAwareRow label="SDK" value={s.has_sdk} fact={vfact("has_sdk")} note={caveats.get("has_sdk")} />
+              <ResolvedRow label="SDK" value={s.has_sdk} fact={resolved.has_sdk} note={caveats.get("has_sdk")} />
               <SpecRow label="API" value={s.has_api} note={caveats.get("has_api")} />
-              <VariantAwareRow label="ROS support" value={s.ros_support} fact={vfact("ros_support")} note={caveats.get("ros_support")} />
-              {ifaces && (
-                <div className="srow">
-                  <span className="k">Connectivity &amp; interfaces</span>
-                  <InterfaceFactsValue facts={ifaces} />
-                </div>
-              )}
+              <ResolvedRow label="ROS support" value={s.ros_support} fact={resolved.ros_support} note={caveats.get("ros_support")} />
               <SpecRow label="Developer edition" value={s.developer_edition} note={caveats.get("developer_edition")} />
               <SpecRow label="Simulation support" value={s.simulation_support} note={caveats.get("simulation_support")} />
               <SpecRow label="Announced" value={robot.announced_year} />
@@ -759,9 +754,10 @@ function groupExtendedSpecs(specs: ExtendedSpec[]): [string, ExtendedSpec[]][] {
   return [...groups.entries()];
 }
 
-// A robot-level value always wins. Only when it is NULL do accepted
-// variant-scoped facts replace the blanket UNKNOWN; the record is not altered.
-function VariantAwareRow({
+// A row for a capability resolved by the API (G4). A plain product value renders exactly as
+// before; a scoped resolution (uniform / varies / partial / conflict) renders its words; and a
+// truly UNKNOWN property keeps the ordinary UNKNOWN. Nothing is inferred here.
+function ResolvedRow({
   label,
   value,
   fact,
@@ -769,16 +765,15 @@ function VariantAwareRow({
 }: {
   label: string;
   value: number | string | boolean | null | undefined;
-  fact: VariantFact | null;
+  fact: ResolvedFact | undefined;
   note?: string | null;
 }) {
-  if (value !== null && value !== undefined) return <SpecRow label={label} value={value} note={note} />;
-  if (!fact) return <SpecRow label={label} value={value} note={note} />;
+  if (!hasScopedKnowledge(fact)) return <SpecRow label={label} value={value} note={note} />;
   return (
     <div className="srow">
       <span className="k">{label}</span>
       <span style={{ display: "block" }}>
-        <VariantFactValue fact={fact} />
+        <ResolvedFactCell fact={fact} />
         {note && (
           <span className="ho-syslabel" style={{ display: "block" }}>
             {note}

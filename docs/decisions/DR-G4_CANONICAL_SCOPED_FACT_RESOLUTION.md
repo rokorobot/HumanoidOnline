@@ -221,3 +221,26 @@ cannot meet. Until then correctness and one truth model outrank query optimizati
 | API contract | none | none | additive (`resolved_facts`) | none | none |
 | Catalogue JSON format | none | none | none | none | none |
 | Stored data | none | none | none | none | none |
+
+## 12. G4-2 implementation record (API / consumer integration)
+
+* **Adapter:** `apps/api/app/services/resolved_facts.py` turns catalogue rows into the plain inputs of
+  the pure resolver and shapes its output. It holds no semantics. Batch resolution is three queries
+  (robots, variants, specifications), never one per property or variant.
+* **API (additive):** `RobotDetail.resolved_facts[]` (`property`, `state`, `value`, `product_value`,
+  `product_source`, `variants[]` with `slug`, `name`, `value`, projection `evidence` and verbatim
+  `source_facts`, `registry_version`, `detail`). The `specs` object is unchanged and the robot-level
+  columns are never written. `CompareRow.resolved` carries the per-robot state; a Teleoperation compare
+  row was added. List items carry `scope_notes` and the agent search result carries `scope_notes` per
+  slug ("Available on some configurations").
+* **Consumers on the one resolver:** detail, compare, list filters (`has_sdk`, `ros_support`,
+  `has_manipulation`: ANY-VARIANT, positive match only; an explicit `false` matches only a known
+  product-wide absence), the matching inputs (conservative: only `PRODUCT_VALUE` / `UNIFORM_VARIANTS`
+  true is true), the agent `get_robot` and `search_robots`. `CONFLICT` is exposed, never counted as support.
+* **Web:** PR #105's client-side reconciliation (`variant-facts.ts`) is removed. The web layer only
+  displays the API's resolved facts; a test forbids registry tokens in the web sources. The synthetic
+  "Connectivity & interfaces" row of PR #105 is not carried over (it required token logic); those
+  verbatim facts remain in the SOFTWARE long-tail group.
+* **JSON-LD:** the structured data never asserted these capabilities and still does not; a test pins
+  that PARTIAL / VARIES facts are not published as product-wide claims.
+* **Deferred to G4-3:** generic fact accounting, the readiness / publication gate and the audit command.

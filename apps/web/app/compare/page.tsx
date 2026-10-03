@@ -15,6 +15,7 @@ import Link from "next/link";
 
 import { compareRobots } from "@/lib/api-client";
 import { isUnitSystem, type UnitSystem } from "@/lib/units";
+import type { CompareResponse, ResolvedFact } from "@/lib/types";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
@@ -32,6 +33,23 @@ export const metadata = {
   description:
     "Side-by-side comparison of humanoid robots across capabilities, pricing and availability.",
 };
+
+// G4: send the client only what it renders. The view shows a scoped state (uniform / varies /
+// partial / conflict) from `rows[].resolved`; a product value or a truly unknown property renders
+// from `values` exactly as before, so those entries (and the per-robot `resolved_facts` copy) are
+// not delivered. Pure selection by the API-provided state; nothing is resolved here.
+function slimForClient(data: CompareResponse): CompareResponse {
+  const scoped = (f: ResolvedFact) => f.state !== "PRODUCT_VALUE" && f.state !== "UNKNOWN";
+  return {
+    robots: data.robots.map((r) => ({ ...r, resolved_facts: undefined })),
+    rows: data.rows.map((row) => ({
+      ...row,
+      resolved: row.resolved
+        ? Object.fromEntries(Object.entries(row.resolved).filter(([, f]) => scoped(f)))
+        : row.resolved,
+    })),
+  };
+}
 
 export default async function ComparePage({
   searchParams,
@@ -90,7 +108,10 @@ export default async function ComparePage({
           </div>
         ) : (
           <CompareView
-            data={data}
+            // G4: the scoped resolution travels once, on the rows (`rows[].resolved`). The per-robot
+            // copy in `robots[].resolved_facts` is not needed by this view, and sending it twice
+            // would only grow the delivered document (perf budget).
+            data={slimForClient(data)}
             ids={data.robots.map((r) => r.slug)}
             state={{ ref, units, view }}
           />

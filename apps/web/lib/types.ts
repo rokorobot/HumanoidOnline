@@ -59,6 +59,40 @@ export interface RobotImagePrimary {
   is_official: boolean;
 }
 
+// G4 (DR-G4): scoped fact resolution computed once by the API. The web layer only displays it.
+export type ResolutionState =
+  | "PRODUCT_VALUE"
+  | "UNIFORM_VARIANTS"
+  | "VARIES_BY_VARIANT"
+  | "PARTIAL_VARIANTS"
+  | "UNKNOWN"
+  | "CONFLICT";
+
+export interface ResolvedVariantValue {
+  slug: string;
+  name: string;
+  value: boolean | null;
+  evidence: { spec_key: string; token: string }[];
+  source_facts: { key: string; label: string; value: string }[];
+}
+
+export interface ResolvedFact {
+  property: string;
+  state: ResolutionState;
+  value: boolean | null;
+  product_value: boolean | null;
+  product_source: string | null;
+  variants: ResolvedVariantValue[];
+  registry_version: string;
+  detail?: string | null;
+}
+
+export interface ScopeNote {
+  property: string;
+  label: string;
+  configurations: string[];
+}
+
 export interface RobotListItem {
   id: string;
   slug: string;
@@ -76,6 +110,8 @@ export interface RobotListItem {
   available_modes: string[];
   deployment_count: number;
   updated_at: string; // sitemap lastmod (AGENT-01)
+  // G4: present when a positive capability filter matched on only some configurations.
+  scope_notes?: ScopeNote[];
 }
 
 export interface StatusHistoryEntry {
@@ -211,6 +247,8 @@ export interface Deployment {
 }
 
 export interface RobotDetail {
+  // G4: scoped resolution of the registered capability properties (additive).
+  resolved_facts?: ResolvedFact[];
   id: string;
   slug: string;
   name: string;
@@ -259,6 +297,8 @@ export interface CompareRow {
   key: string;
   label: string;
   values: Record<string, number | boolean | string | null>;
+  // G4: the scoped resolution per robot slug for the registered capability rows.
+  resolved?: Record<string, ResolvedFact> | null;
 }
 
 export interface CompareResponse {

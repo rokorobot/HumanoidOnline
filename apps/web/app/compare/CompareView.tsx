@@ -12,6 +12,7 @@
 // All comparison SEMANTICS live in lib/comparison-policy.ts (tested). This file
 // only renders the answers. UNKNOWN stays UNKNOWN; QUOTE_ONLY ≠ UNKNOWN.
 // ============================================================================
+import { ResolvedFactCell } from "@/components/ResolvedFactCell";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -519,6 +520,15 @@ function ApiRow({
       <th className="rowlab">{row.label}</th>
       {slugs.map((slug) => {
         const v = row.values[slug];
+        // G4: a scoped state is shown as such, never collapsed to a plain UNKNOWN or YES/NO.
+        const rf = row.resolved?.[slug];
+        if (rf && rf.state !== "PRODUCT_VALUE" && rf.state !== "UNKNOWN") {
+          return (
+            <td className="cell" key={slug}>
+              <ResolvedFactCell fact={rf} />
+            </td>
+          );
+        }
         if (v == null) {
           return (
             <td className="cell unk" key={slug}>

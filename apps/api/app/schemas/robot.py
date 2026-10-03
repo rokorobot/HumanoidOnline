@@ -21,6 +21,50 @@ class RobotImagePrimary(BaseModel):
     is_official: bool
 
 
+class ProjectionEvidenceRead(BaseModel):
+    """The registered (spec key, token) pair that established a projected value."""
+    spec_key: str
+    token: str
+
+
+class SourceFactRead(BaseModel):
+    """A verbatim accepted fact kept visible beside a projected value (never replaced by it)."""
+    key: str
+    label: str
+    value: str
+
+
+class ResolvedVariantValueRead(BaseModel):
+    slug: str
+    name: str
+    #: None = unknown for this configuration (never a fabricated false).
+    value: bool | None = None
+    evidence: list[ProjectionEvidenceRead] = []
+    source_facts: list[SourceFactRead] = []
+
+
+class ResolvedFactRead(BaseModel):
+    """G4 (DR-G4): one property resolved by the single shared resolver
+    (`services/fact_resolution.py`). The six states are distinct and never flattened to a
+    nullable boolean. `value` is set only for PRODUCT_VALUE and UNIFORM_VARIANTS.
+    """
+    property: str
+    state: str
+    value: bool | None = None
+    product_value: bool | None = None
+    product_source: str | None = None
+    variants: list[ResolvedVariantValueRead] = []
+    registry_version: str
+    detail: str | None = None
+
+
+class ScopeNoteRead(BaseModel):
+    """Why a robot matched a positive capability filter on only SOME configurations."""
+    property: str
+    label: str
+    configurations: list[str]
+
+
 class RobotListItem(BaseModel):
     id: str
     slug: str
@@ -38,6 +82,9 @@ class RobotListItem(BaseModel):
     available_modes: list[str]
     deployment_count: int
     updated_at: datetime  # sitemap lastmod (AGENT-01)
+    #: Present only when a positive capability filter matched on some configurations
+    #: (ANY-VARIANT, DR-G4). Empty otherwise.
+    scope_notes: list[ScopeNoteRead] = []
 
 
 class StatusHistoryEntry(BaseModel):
@@ -239,6 +286,8 @@ class RobotDetail(BaseModel):
     # MEDIA-01: display-eligible verified images only, primary first. Empty -> the
     # UI renders IMAGE_UNAVAILABLE (never a generated/placeholder fill).
     images: list[RobotImageRead] = []
+    #: G4 scoped resolution of the registered capability properties (additive).
+    resolved_facts: list[ResolvedFactRead] = []
 
 
 class CompareRow(BaseModel):
@@ -246,6 +295,10 @@ class CompareRow(BaseModel):
     key: str
     label: str
     values: dict[str, float | bool | str | None]
+    #: G4: the scoped resolution per robot slug for the registered properties, so a PARTIAL or
+    #: VARIES state is never collapsed to a plain unknown. `values` keeps the resolved scalar
+    #: only where the state is PRODUCT_VALUE / UNIFORM_VARIANTS.
+    resolved: dict[str, ResolvedFactRead] | None = None
 
 
 class CompareResponse(BaseModel):

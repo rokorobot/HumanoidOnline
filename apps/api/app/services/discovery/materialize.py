@@ -141,13 +141,21 @@ def plan_materialization(session: Session, robot_slug: str,
         rsrc = {x.id: x for x in session.scalars(select(DiscoverySource).where(
             DiscoverySource.id.in_({c.source_id for c in robot_specs})))}
         parts = [
-            f"{c.target_key.replace('_', ' ')} ({c.accepted_value}) as stated by "
+            f"{c.target_key.replace('_', ' ')} ({c.accepted_value}"
+            f"{', per hand' if c.target_key == 'hand_dof' else ''}) as stated by "
             f"{rsrc[c.source_id].name} for its "
             f"{c.resolved_choices.get('configuration', 'current')} "
             f"({c.source_url}, observed {c.observed_at.date().isoformat()})"
             for c in sorted(robot_specs, key=lambda c: c.target_key)]
         note = "; ".join(parts) + ". All other specifications are not yet verified."
-        if doc.get("specs_note") in (None, "Specifications not yet verified.", note):
+        if "hand_dof" in {c.target_key for c in robot_specs}:
+            note = note.replace(". All other", "; whether the hand figure counts only actuated "
+                                "joints is not stated. All other")
+        # A note this module derived earlier (it always ends so) is refreshed; a hand-written
+        # note is never overwritten.
+        if (doc.get("specs_note") in (None, "Specifications not yet verified.", note)
+                or str(doc.get("specs_note", "")).endswith(
+                    ". All other specifications are not yet verified.")):
             doc["specs_note"] = note
 
     if variants:
@@ -384,7 +392,7 @@ def verify_applied(session: Session, robot_slug: str, *, change_ref: str, applie
             rows.append((c, "availability_offer", r.id, _hash(payload)))
         elif c.target_kind == "robot_spec":
             col = c.target_key
-            if col not in ("degrees_of_freedom",):          # only registered columns
+            if col not in ("degrees_of_freedom", "hand_dof"):          # only registered columns
                 raise DiscoveryError(f"{col!r} is not a registered robot column")
             val = session.execute(text(f"SELECT {col} FROM robot WHERE id = :r"),
                                   {"r": robot_id}).scalar()

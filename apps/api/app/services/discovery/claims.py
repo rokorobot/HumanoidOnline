@@ -125,6 +125,18 @@ def _plan(session: Session, p: DiscoveryClaimProposal, policy: ClaimPolicy,
         # the robot's own degrees_of_freedom column, exactly as stated "across the body".
         _need(choices, "spec_key", policy.target_key)
         _need(choices, "configuration", IRON_CURRENT_CONFIGURATION)
+        if policy.target_key == "hand_dof":
+            # Owner decision 2026-10-03 (option A): per hand, as XPENG states it "in each hand".
+            # The source does not say whether the figure counts only actuated joints; that
+            # caveat travels in the catalogue note, and no two-hand total is ever derived.
+            _need(choices, "convention", "per hand")
+            if structured.get("scope") != "in each hand" or not str(
+                    structured.get("hand_dof_each", "")).isdigit():
+                raise DiscoveryError("the proposal does not state a per-hand DoF figure; "
+                                     "nothing is claimed")
+            value = _need(choices, "accepted_value", structured["hand_dof_each"])
+            return {"variant_slug": None, "accepted_value": value, "edition_scope": None,
+                    "target_key": policy.target_key}
         if structured.get("scope") != "across the body" or not str(
                 structured.get("body_dof", "")).isdigit():
             raise DiscoveryError("the proposal does not state a whole-body DoF figure; "

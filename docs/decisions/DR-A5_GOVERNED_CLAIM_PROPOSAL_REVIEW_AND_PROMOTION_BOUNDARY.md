@@ -817,6 +817,18 @@ summary, images, publication.
 
 ---
 
+### 18.8 IRON hand DoF convention (owner decision 2026-10-03, option A)
+
+`robot.hand_dof` is **per hand**. XPENG's 2026-09-08 statement "21 ... in each hand" is accepted
+as the manufacturer's own figure for the 2026 production IRON and registered as
+`robot_spec[hand_dof]` (registry 0.5.0; the human mapping must state `convention: per hand`,
+the configuration and the value 21). No two-hand total is ever derived. The source does not say
+whether the figure counts only actuated joints; the catalogue note says so. The 22-DoF
+statements (product page, 2025 Next-Gen release) remain historical, unregistered proposals.
+Supersedes the "hand_dof not decided" remark in the section above.
+
+---
+
 ## 20. Ratification record (owner decisions, 2026-10-02)
 
 1. **Persistence approach B′ ratified:** immutable extraction proposals; append-only human proposal

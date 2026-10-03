@@ -1,4 +1,9 @@
-"""IRON current-configuration slice (owner decision 2026-10-03).
+"""IRON current-configuration slice (owner decisions 2026-10-03).
+
+Hand DoF (owner decision, option A): `robot.hand_dof` is PER HAND; XPENG states 21 "in each hand"
+for the 2026 production configuration, taken as the manufacturer's own figure (actuated vs
+passive is not stated and is recorded as a caveat). The 2022-style 22 (2025 / product page)
+stays historical, unregistered evidence.
 
 The 2026 production configuration is IRON's CURRENT one. Its whole-body DoF goes to the robot's
 `degrees_of_freedom` column and its compute goes to the existing long-tail `compute_ai` TEXT
@@ -61,6 +66,12 @@ def body_choices(p, **over):
             "configuration": IRON_CURRENT_CONFIGURATION, "accepted_value": "76", **over}
 
 
+def hand_choices(p, **over):
+    return {**answers(p), "target_kind": "robot_spec", "spec_key": "hand_dof",
+            "configuration": IRON_CURRENT_CONFIGURATION, "convention": "per hand",
+            "accepted_value": "21", **over}
+
+
 def compute_choices(p, **over):
     return {**answers(p), "target_kind": "specification", "spec_key": "compute_ai",
             "edition_scope": "THIS_EDITION", "configuration": IRON_CURRENT_CONFIGURATION,
@@ -75,10 +86,13 @@ def accept(site, p, choices):
 def make_claims(site):
     body = proposal(site, NEWS_2026, "BODY_DOF")
     compute = proposal(site, NEWS_2026, "COMPUTE")
+    hand = proposal(site, NEWS_2026, "HAND_DOF")
     accept(site, body, body_choices(body))
+    accept(site, hand, hand_choices(hand))
     accept(site, compute, compute_choices(compute))
     return (claims.create_claim(site.session, str(body.id), created_by=WHO)[0],
-            claims.create_claim(site.session, str(compute.id), created_by=WHO)[0])
+            claims.create_claim(site.session, str(compute.id), created_by=WHO)[0],
+            claims.create_claim(site.session, str(hand.id), created_by=WHO)[0])
 
 
 def materialize_date(site) -> str:
@@ -113,18 +127,19 @@ def do_import(site, path):
 # ------------------------------------------------------------------ policies ---
 
 
-def test_exactly_the_two_current_configuration_proposals_have_policies(site):
+def test_exactly_the_three_current_configuration_proposals_have_policies(site):
     ingest_all(site)
-    assert {"robot_spec[degrees_of_freedom]", "specification[compute_ai]"} <= set(CLAIM_POLICIES)
+    assert {"robot_spec[degrees_of_freedom]", "robot_spec[hand_dof]",
+            "specification[compute_ai]"} <= set(CLAIM_POLICIES)
     registered = [p for p in site.all_proposals()
                   if claims.claim_policy_for(p.kind, p.target, p.evidence_locator, p.structured)]
     assert {(p.source_url, p.kind) for p in registered} == {
-        (NEWS_2026, "BODY_DOF"), (NEWS_2026, "COMPUTE")}
+        (NEWS_2026, "BODY_DOF"), (NEWS_2026, "HAND_DOF"), (NEWS_2026, "COMPUTE")}
     assert len(site.all_proposals()) == sum(EXPECTED_COUNTS.values())
 
 
 @pytest.mark.parametrize("url,kind", [
-    (NEWS_2025, "BODY_DOF"), (NEWS_2025, "COMPUTE"), (NEWS_2026, "HAND_DOF"),
+    (NEWS_2025, "BODY_DOF"), (NEWS_2025, "COMPUTE"), (NEWS_2025, "HAND_DOF"),
     (NEWS_2026, "LAUNCH_PLAN"), (NEWS_2026, "MANUFACTURING_STATE")])
 def test_historical_and_other_proposals_stay_unregistered(site, url, kind):
     ingest_all(site)
@@ -138,7 +153,21 @@ def test_historical_and_other_proposals_stay_unregistered(site, url, kind):
     assert site.session.scalar(select(func.count()).select_from(AcceptedClaim)) == 0
 
 
+def test_the_product_page_22_dof_hand_statements_stay_unregistered(site):
+    ingest_all(site)
+    page = [u for u in PAGES if u not in (NEWS_2025, NEWS_2026) and "ai_robot_iron" in u]
+    hands = [p for p in site.all_proposals() if p.kind == "HAND_DOF" and p.source_url in page]
+    assert hands and all(
+        claims.claim_policy_for(p.kind, p.target, p.evidence_locator, p.structured) is None
+        for p in hands)
+
+
 @pytest.mark.parametrize("which,over,needle", [
+    ("hand", {"accepted_value": "22"}, "accepted_value"),
+    ("hand", {"accepted_value": "42"}, "accepted_value"),
+    ("hand", {"convention": "total"}, "convention"),
+    ("hand", {"configuration": "2025 Next-Gen IRON"}, "configuration"),
+    ("hand", {"spec_key": "degrees_of_freedom"}, "spec_key"),
     ("body", {"configuration": "2025 Next-Gen IRON"}, "configuration"),
     ("body", {"accepted_value": "82"}, "accepted_value"),
     ("body", {"spec_key": "hand_dof"}, "spec_key"),
@@ -149,8 +178,10 @@ def test_historical_and_other_proposals_stay_unregistered(site, url, kind):
     ("compute", {"spec_key": "compute_base"}, "spec_key")])
 def test_a_mapping_that_differs_from_the_owner_decision_is_refused(site, which, over, needle):
     ingest_all(site)
-    p = proposal(site, NEWS_2026, "BODY_DOF" if which == "body" else "COMPUTE")
-    choices = (body_choices if which == "body" else compute_choices)(p, **over)
+    kind = {"body": "BODY_DOF", "hand": "HAND_DOF", "compute": "COMPUTE"}[which]
+    p = proposal(site, NEWS_2026, kind)
+    choices = {"body": body_choices, "hand": hand_choices, "compute": compute_choices}[which](
+        p, **over)
     accept(site, p, choices)
     with pytest.raises(DiscoveryError, match=needle):
         claims.create_claim(site.session, str(p.id), created_by=WHO)
@@ -159,7 +190,11 @@ def test_a_mapping_that_differs_from_the_owner_decision_is_refused(site, which, 
 
 def test_the_claims_carry_the_exact_current_values_and_full_lineage(site):
     ingest_all(site)
-    body, compute = make_claims(site)
+    body, compute, hand = make_claims(site)
+    assert (hand.target_kind, hand.target_key, hand.accepted_value, hand.variant_slug) == (
+        "robot_spec", "hand_dof", "21", None)
+    assert hand.source_url == NEWS_2026
+    assert materialize.logical_target(hand) == f"robot_spec:{site.slug}:hand_dof"
     assert (body.target_kind, body.target_key, body.accepted_value, body.variant_slug) == (
         "robot_spec", "degrees_of_freedom", "76", None)
     assert (compute.target_kind, compute.target_key, compute.accepted_value) == (
@@ -187,7 +222,7 @@ def test_the_claims_carry_the_exact_current_values_and_full_lineage(site):
 # --------------------------------------------------------------- materialize ---
 
 
-def test_materialization_adds_exactly_two_facts_and_nothing_else(site, tmp_path):
+def test_materialization_adds_exactly_three_facts_and_nothing_else(site, tmp_path):
     ingest_all(site)
     make_claims(site)
     path = stub(site, tmp_path)
@@ -198,13 +233,17 @@ def test_materialization_adds_exactly_two_facts_and_nothing_else(site, tmp_path)
     materialize.apply_plan(plan)
     after = json.loads(path.read_text(encoding="utf-8"))
     assert after["specs"]["degrees_of_freedom"] == 76
-    assert {k: v for k, v in after["specs"].items() if k != "degrees_of_freedom"} == {
-        k: v for k, v in before["specs"].items() if k != "degrees_of_freedom"}
-    assert after["specs"]["hand_dof"] is None                  # per-hand convention undecided
+    moved = ("degrees_of_freedom", "hand_dof")
+    assert {k: v for k, v in after["specs"].items() if k not in moved} == {
+        k: v for k, v in before["specs"].items() if k not in moved}
+    assert after["specs"]["hand_dof"] == 21                    # per hand, never a 42 total
+    assert after["specs"]["hand_type"] is None
+    d = materialize_date(site)
     assert after["specs_note"] == (
-        "degrees of freedom (76) as stated by XPENG for its 2026 production IRON "
-        f"({NEWS_2026}, observed {materialize_date(site)}). All other specifications are not yet "
-        "verified.")
+        f"degrees of freedom (76) as stated by XPENG for its 2026 production IRON ({NEWS_2026}, "
+        f"observed {d}); hand dof (21, per hand) as stated by XPENG for its 2026 production IRON "
+        f"({NEWS_2026}, observed {d}); whether the hand figure counts only actuated joints is "
+        "not stated. All other specifications are not yet verified.")
     [compute] = after["extended_specs"]
     assert compute == {
         "key": "compute_ai", "value": FRAGMENT, "source_label": "XPENG",
@@ -238,7 +277,7 @@ def test_the_importer_and_verification_close_the_chain_idempotently(site, tmp_pa
         "SELECT degrees_of_freedom, hand_dof, hand_type, autonomy::text, has_sdk, "
         "is_published, commercial_status::text FROM robot WHERE slug = :s"),
         {"s": site.slug}).one()
-    assert tuple(row) == (76, None, None, None, None, False, "UNKNOWN")
+    assert tuple(row) == (76, 21, None, None, None, False, "UNKNOWN")
     spec = site.session.execute(text(
         "SELECT s.value_text, s.variant_id IS NULL AS product_level, s.edition_scope, "
         "s.source_kind, s.source_url FROM specification s JOIN spec_definition d "
@@ -248,7 +287,7 @@ def test_the_importer_and_verification_close_the_chain_idempotently(site, tmp_pa
         FRAGMENT, True, "THIS_EDITION", "MANUFACTURER")
     written = materialize.verify_applied(site.session, site.slug, change_ref="chg-iron",
                                          applied_by=WHO)
-    assert {a.target_table for a in written} == {"robot", "specification"} and len(written) == 2
+    assert {a.target_table for a in written} == {"robot", "specification"} and len(written) == 3
     do_import(site, path)                                          # importer churns the rows
     assert materialize.verify_applied(site.session, site.slug, change_ref="chg-iron",
                                       applied_by=WHO) == []
@@ -258,7 +297,7 @@ def test_the_importer_and_verification_close_the_chain_idempotently(site, tmp_pa
         materialize.verify_applied(site.session, site.slug, change_ref="chg-x", applied_by=WHO)
     with refused(site.session, op="UPDATE"):
         site.session.execute(text("UPDATE catalogue_write_audit SET claim_id = claim_id"))
-    assert site.session.scalar(select(func.count()).select_from(CatalogueWriteAudit)) == 2
+    assert site.session.scalar(select(func.count()).select_from(CatalogueWriteAudit)) == 3
 
 
 def test_nothing_else_in_the_catalogue_or_decision_layers_moves(site, tmp_path):
@@ -272,7 +311,7 @@ def test_nothing_else_in_the_catalogue_or_decision_layers_moves(site, tmp_path):
     do_import(site, path)
     assert {t: site.session.scalar(text(f"SELECT count(*) FROM {t}")) for t in tables} == before
     decisions = site.session.scalar(select(func.count()).select_from(AcceptedClaim))
-    assert decisions == 2
+    assert decisions == 3
     states = pr.derive_states(site.session, site.all_proposals())
     assert all(s.state == pr.CURRENT for s in states)               # no proposal was touched
     assert site.session.scalar(select(func.count()).select_from(DiscoveryClaimProposal)) == 38

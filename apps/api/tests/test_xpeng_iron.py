@@ -472,13 +472,17 @@ def test_a_changed_value_supersedes_and_the_old_proposal_stays_history(site):
 def test_only_the_current_configuration_proposals_have_a_claim_policy(site):
     for url in PAGES:
         site.ingest(site.observe(url), body_of(url))
-    # only the three 2026 current-configuration proposals have a policy (owner decisions 2026-10-03)
+    # three 2026 current-configuration policies (catalogue facts) + the historical factual
+    # figures of the 2025 release / product page (NO_CATALOGUE_HOME); nothing else (2026-10-03)
     registered = {(p.source_url, p.kind) for p in site.all_proposals() if claims.claim_policy_for(
         p.kind, p.target, p.evidence_locator, p.structured)}
+    historical = {(u, k) for u in (NEWS_2025, x.PRODUCT_PAGE_URL)
+                  for k in ("BODY_DOF", "HAND_DOF", "COMPUTE", "BATTERY")}
     assert registered == {(NEWS_2026, "BODY_DOF"), (NEWS_2026, "HAND_DOF"),
-                          (NEWS_2026, "COMPUTE")}
+                          (NEWS_2026, "COMPUTE")} | (historical & {
+        (p.source_url, p.kind) for p in site.all_proposals()})
     one = next(p for p in site.all_proposals()
-               if p.kind == "BODY_DOF" and p.source_url == NEWS_2025)
+               if p.kind == "LAUNCH_PLAN" and p.source_url == NEWS_2026)
     answers = {pr.question_key(i): "answered" for i in range(1, len(one.review_questions) + 1)}
     pr.decide(site.session, str(one.id), pr.ACCEPT, decided_by="test", rationale="x",
               choices={**answers, pr.HOME_KEY: pr.NO_CATALOGUE_HOME})

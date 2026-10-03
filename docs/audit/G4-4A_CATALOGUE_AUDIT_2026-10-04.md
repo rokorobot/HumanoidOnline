@@ -158,8 +158,9 @@ Notes. *Canonical direct* fell by five because three robots' unsupported `false`
 number of other booleans became UNKNOWN: a deliberate trade of a count for truthfulness. The G1 Basic
 moved from the GOOD to the PARTIAL band for the same reason; coverage is informational and is not the
 objective. `NO_SDK_EVIDENCE` rose from 36 to 39 for the same three records. The 19 stubs now read
-`UNKNOWN`; seven of them had also been missing the manufacturer's `official_url`, which the scoped import
-supplied from the committed catalogue.
+`UNKNOWN`; all 19 (and unitree-g1-edu-plus-u2, honda-asimo, rainbow-hubo, softbank-nao and
+softbank-pepper) had also been missing the `official_url` that the committed catalogue already carried, which
+the scoped imports supplied (identity link only; no other drift was found).
 
 Remaining coverage gaps (no price for 38, no availability for 44, no deployment evidence for 54, UNKNOWN
 buyer fields, 9 triaged hand-option descriptions and the pending proposals) are accepted normal

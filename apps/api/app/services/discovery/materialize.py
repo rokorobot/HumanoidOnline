@@ -135,6 +135,20 @@ def plan_materialization(session: Session, robot_slug: str,
         for c in sorted(robot_specs, key=lambda c: c.target_key):
             block[c.target_key] = int(c.accepted_value)
         doc["specs"] = block
+        # The canonical model carries no per-field evidence for robot columns, so the catalogue
+        # gate requires the file to say where its specs came from. The note is derived only from
+        # the claims (deterministic) and replaces nothing but the "not yet verified" default.
+        rsrc = {x.id: x for x in session.scalars(select(DiscoverySource).where(
+            DiscoverySource.id.in_({c.source_id for c in robot_specs})))}
+        parts = [
+            f"{c.target_key.replace('_', ' ')} ({c.accepted_value}) as stated by "
+            f"{rsrc[c.source_id].name} for its "
+            f"{c.resolved_choices.get('configuration', 'current')} "
+            f"({c.source_url}, observed {c.observed_at.date().isoformat()})"
+            for c in sorted(robot_specs, key=lambda c: c.target_key)]
+        note = "; ".join(parts) + ". All other specifications are not yet verified."
+        if doc.get("specs_note") in (None, "Specifications not yet verified.", note):
+            doc["specs_note"] = note
 
     if variants:
         merged, placed = [], set()

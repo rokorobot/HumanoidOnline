@@ -81,6 +81,11 @@ def make_claims(site):
             claims.create_claim(site.session, str(compute.id), created_by=WHO)[0])
 
 
+def materialize_date(site) -> str:
+    return site.session.scalar(select(AcceptedClaim.observed_at).where(
+        AcceptedClaim.robot_slug == site.slug).limit(1)).date().isoformat()
+
+
 def stub(site, tmp_path) -> Path:
     doc = json.loads((REPO / "db" / "catalogue" / "robots" / "xpeng-iron.json").read_text(
         encoding="utf-8"))
@@ -196,6 +201,10 @@ def test_materialization_adds_exactly_two_facts_and_nothing_else(site, tmp_path)
     assert {k: v for k, v in after["specs"].items() if k != "degrees_of_freedom"} == {
         k: v for k, v in before["specs"].items() if k != "degrees_of_freedom"}
     assert after["specs"]["hand_dof"] is None                  # per-hand convention undecided
+    assert after["specs_note"] == (
+        "degrees of freedom (76) as stated by XPENG for its 2026 production IRON "
+        f"({NEWS_2026}, observed {materialize_date(site)}). All other specifications are not yet "
+        "verified.")
     [compute] = after["extended_specs"]
     assert compute == {
         "key": "compute_ai", "value": FRAGMENT, "source_label": "XPENG",

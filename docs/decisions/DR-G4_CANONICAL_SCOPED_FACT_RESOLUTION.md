@@ -174,31 +174,129 @@ No false value is fabricated. The Standard `Dexterous hand option — Not includ
   `CONFLICT` do not; they resolve as unknown/ineligible for a hard requirement. Variant-aware matching is a
   later step.
 
-## 7. Fact accounting (G4-3)
+## 7. Integrity versus coverage (G4-3, as corrected by the owner on 2026-10-03)
 
-Every accepted **current** fact, or atomic registered token inside a list-valued claim, ends in **exactly
-one** class:
+> **Incomplete is publishable. Misleading is not.**
+> Fresh + truthful + incomplete is preferable to complete-but-late.
+
+HumanoidOnline is a live market-intelligence source, not a static encyclopedia: publish early, attribute
+clearly, distinguish fact from uncertainty, update continuously. G4-3 therefore keeps **two separate
+concepts**, and only the first may ever block publication:
+
+| Concept | Question | Effect |
+|---|---|---|
+| **INTEGRITY / TRUTHFULNESS** | could the public record be materially false, self-contradictory or unverifiable? | **blocks** publication (and the integrity CI job) |
+| **COVERAGE / COMPLETENESS** | how much do we know, and what could we still normalize or enrich? | **never blocks**: warnings and audit findings that feed the enrichment queue |
+
+A robot may be `publication_integrity = PASS` with `coverage = LOW` and publish. Coverage is an internal
+audit result only: **no public label and no schema field is introduced** for it.
+
+### 7.1 Hard publication blockers (integrity)
+
+Publication may be refused only for a condition that makes the public record materially false,
+internally contradictory or unverifiable:
+
+* **A. Identity unresolved:** we cannot establish which robot/product the record represents.
+* **B. Canonical `CONFLICT` on a fact we intend to publish** (e.g. two equally current accepted statements
+  for the same configuration, 76 versus 82 body DoF, with no temporal or configuration explanation).
+  Never choose arbitrarily.
+* **C. Public value contradicts canonical evidence** (e.g. the public output asserts a product-wide
+  "supported" where the resolved state is `UNKNOWN`/`PARTIAL`, or asserts `false` where only `UNKNOWN` exists).
+* **D. Fabricated precision or unsupported inference:** `NULL` converted to `false` or `0`, "planned in
+  2027" converted to `2027-01-01`, a manufacturer estimate presented as MSRP, a variant-specific capability
+  presented as product-wide.
+* **E. Required provenance missing** for an asserted fact whose contract requires it: commercial status,
+  pricing, availability, deployment, regional availability, image identity / display policy.
+* **F. Publication mechanics or invariants broken:** an invalid canonical record, importer corruption, an
+  unrelated catalogue mutation, a publication flag that cannot be applied deterministically.
+* **G. Loss (`UNACCOUNTED_LOSS`) affecting the intended public representation** (see 7.3).
+
+### 7.2 Never blockers (coverage)
+
+These must **not** prevent publication by themselves: UNKNOWN physical specifications, developer
+capabilities or autonomy; a missing price, availability, dimensions, runtime, payload or battery capacity;
+`DETAIL_ONLY` information; `NO_CATALOGUE_HOME` facts; a manufacturer statement that has not yet gained a
+semantic projection; a missing optional projection mapping; incomplete use-case classification; incomplete
+historical chronology; an accepted fact safely preserved verbatim but not yet normalized into a first-class
+field. A first-class property need not be populated merely for publication: *Pro — teleoperation /
+Standard — UNKNOWN* is truthful and publishable without a robot-wide `has_teleoperation`.
+
+### 7.3 Fact accounting: observability and loss prevention
+
+Every accepted **current** fact, or atomic registered token inside a list-valued claim, is classified for
+the audit as exactly one of:
 
 * `CANONICAL_DIRECT` — written to a core column, `robot_variant` or an offer
 * `CANONICAL_PROJECTED` — has a registered projection
-* `DETAIL_ONLY` — verbatim specification with **an explicit recorded reason**
+* `DETAIL_ONLY` — deliberately preserved verbatim, with an explicit recorded reason
 * `NO_CATALOGUE_HOME` — accepted knowledge with provenance and no home (e.g. the reservation fee)
+* `UNMAPPED_KNOWLEDGE` — accepted and safely retained with provenance, but with **no semantic projection
+  yet** (e.g. `digital twin access`, a new manufacturer-specific feature): shown as detail and recorded as
+  a *projection candidate / owner mapping required*. **Not a blocker.**
 
-`CONFLICT` is an **error state**, not a terminal class. Invariant: **`unaccounted = 0`**.
+and two **error** states that are not valid terminal classes:
 
-## 8. Readiness / publication gate (G4-3)
+* `UNACCOUNTED_LOSS` — accepted knowledge that should exist in the canonical/public chain but has
+  accidentally disappeared (e.g. a Python SDK fact was materialized, but neither the canonical detail nor
+  the resolved projection contains it). An **integrity defect**; it blocks only when the robot is about to
+  be published with misleading output.
+* `CONFLICT` — see section 3.
 
-The generic gate fails publication and CI when any of the following holds:
+`NOT_YET_REVIEWED` (discovered or proposed information that has not crossed the human acceptance boundary)
+is **not canonical knowledge**, does not affect publication eligibility, and stays in the review pipeline.
 
-* accepted facts are unaccounted;
-* a registered projection is missing;
-* canonical facts are in `CONFLICT`;
-* the public resolved output is blanket `UNKNOWN` despite registered canonical scoped evidence;
-* scoped facts are flattened into a false universal product claim.
+The audit reports, per robot and in total: accepted canonical facts, direct, projected, detail-only, no
+catalogue home, unmapped knowledge, lost/unrepresented, conflicts. For publication, **lost = 0 for the facts
+required by the intended public representation** and **conflicts = 0 for current public assertions**; detail
+only, no-home and unmapped counts may be any value without blocking.
 
-The gate is generic. Robot-specific golden tests (4NE1 Mini, IRON) are regressions only.
+## 8. Readiness (G4-3): the integrity gate, the fresh-announcement path and the coverage audit
+
+### 8.1 The lightweight readiness concept for a newly announced robot
+
+A newly announced humanoid is **publication-ready** when we have, at minimum: a resolved robot identity and
+manufacturer; at least one authoritative first-party or approved source; an honest commercial maturity
+(`UNKNOWN` where appropriate); enough summary / identity information to explain what the robot is;
+provenance for the facts actually asserted; no unresolved contradiction in those asserted facts; a safe image
+state or `IMAGE_UNAVAILABLE`; and no fabricated values. Everything else may remain UNKNOWN. A manufacturer
+announcing "Robot X, 80 body DoF, a new AI processor, commercial release planned in 2028" is enough for a
+useful page; height, weight, payload, runtime, SDK, ROS, price, availability, battery capacity and
+teleoperation are never awaited.
+
+### 8.2 Two outputs
+
+* **Integrity gate** (must be green): truthfulness and representation invariants, evaluated generically for
+  every robot. CI fails on an integrity failure. It **never unpublishes** an existing robot by itself.
+* **Coverage audit** (informational, non-blocking unless the owner explicitly upgrades it): UNKNOWN density,
+  unmapped knowledge, detail-only facts, missing projections, enrichment opportunities (no price, no
+  availability, no SDK evidence, no deployment evidence, historical data not yet normalized). It drives the
+  enrichment queue and never suppresses a fresh page.
+
+### 8.3 Publication transition (`is_published` false to true)
+
+* **BLOCK:** identity ambiguity; a current canonical contradiction; a fabricated or unsupported public value;
+  missing required provenance; a scoped fact falsely flattened; a known accepted fact lost from the
+  canonical/public representation; an invalid image display; a destructive catalogue-invariant failure.
+* **WARN / ALLOW:** missing optional facts; UNKNOWN values; `DETAIL_ONLY` facts; unmapped but preserved
+  knowledge; missing normalization or projection; incomplete chronology; incomplete commercial information;
+  low overall coverage.
+
+### 8.4 Existing published robots
+
+Low coverage never unpublishes a robot. Existing published robots stay live unless a genuine integrity
+problem means their public information is materially false or unsafe. Coverage findings feed the
+enrichment queue.
+
+### 8.5 Genericity
+
+The gate is generic and deterministic. Robot-specific golden tests (4NE1 Mini, IRON) are regressions only.
 
 ## 9. Backfill (G4-4)
+
+G4-4 uses the **coverage audit** to find high-value enrichment opportunities across the catalogue. It is
+**not** a mass requirement to normalize every fact before a robot may remain public. Priority order:
+(1) public contradictions or loss, (2) fresh announced robots, (3) high-value buyer fields, (4) semantic
+projections, (5) optional enrichment.
 
 A **read-only** audit first. It reports robots inspected, accepted facts, `CANONICAL_DIRECT`,
 `CANONICAL_PROJECTED`, `DETAIL_ONLY`, `NO_CATALOGUE_HOME`, conflicts, unaccounted, and the public

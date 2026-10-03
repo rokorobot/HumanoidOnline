@@ -3,10 +3,10 @@
   "name": "IRON",
   "manufacturer_slug": "xpeng-robotics",
   "model_code": null,
-  "summary": null,
+  "summary": "XPENG's general-purpose humanoid robot. XPENG states that its 2026 production IRON has 76 degrees of freedom across the body, 21 in each hand, and three Turing AI chips delivering up to 2,250 TOPS of effective computing power. XPENG commissioned its humanoid robot production lines in September 2026. In XPENG's words: \"Official market launch and delivery in China and overseas markets are planned for 2027.\" No price or availability has been published. All other specifications are not yet verified.",
   "announced_year": null,
-  "commercial_status": "UNKNOWN",
-  "is_published": false,
+  "commercial_status": "ANNOUNCED",
+  "is_published": true,
   "specs": {
     "height_cm": null,
     "weight_kg": null,
@@ -33,7 +33,19 @@
   },
   "specs_note": "degrees of freedom (76) as stated by XPENG for its 2026 production IRON (https://www.xpeng.com/news/01a080371029a057bc8e8a02a2c6012b, observed 2026-10-03); hand dof (21, per hand) as stated by XPENG for its 2026 production IRON (https://www.xpeng.com/news/01a080371029a057bc8e8a02a2c6012b, observed 2026-10-03); whether the hand figure counts only actuated joints is not stated. All other specifications are not yet verified.",
   "official_url": "https://www.xpeng.com/technology/ai_robot_iron",
-  "commercial_status_evidence": [],
+  "commercial_status_evidence": [
+    {
+      "source_url": "https://www.xpeng.com/news/01a080371029a057bc8e8a02a2c6012b",
+      "source_type": "MANUFACTURER_SITE",
+      "source_title": "XPENG IRON Humanoid Robot Now Walks Off the Production Line",
+      "excerpt": "XPENG robots are scheduled to enter mass production by the end of this year, with initial commercial-scenario rollouts beginning in XPENG's own stores and campuses. Official market launch and delivery in China and overseas markets are planned for 2027.",
+      "published_at": "2026-09-08",
+      "observed_at": "2026-10-03",
+      "verified_at": null,
+      "confidence": "HIGH",
+      "note": "Manufacturer's own statement (XPENG news release, 2026-09-08). ANNOUNCED = publicly revealed, no hardware shipping to customers: launch and delivery are stated as planned for 2027. Owner decision 2026-10-03; no announcement date is stated, so announced_year stays unknown."
+    }
+  ],
   "variants": [],
   "pricing_offers": [],
   "availability_offers": [],

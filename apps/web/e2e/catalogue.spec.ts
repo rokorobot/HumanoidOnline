@@ -178,8 +178,9 @@ test("manufacturers: a maker with no published models says NONE PUBLISHED, not U
   page,
 }) => {
   await page.goto("/manufacturers");
-  // XPeng Robotics holds catalogue records but none is published.
-  const card = page.locator('a.mcard[href="/manufacturers/xpeng-robotics"]');
+  // RobotEra holds catalogue records but none is published (XPeng Robotics was the exemplar
+  // until IRON was published as ANNOUNCED on 2026-10-03).
+  const card = page.locator('a.mcard[href="/manufacturers/robotera"]');
   await expect(card).toBeVisible();
   await expect(card).toContainText("NONE PUBLISHED");
   await expect(card).toContainText(/[1-9]\d* TRACKED · 0 PUBLISHED/);

@@ -32,6 +32,7 @@ from app.services.discovery import proposal_review as pr
 from app.services.discovery.field_policy import (
     CLAIM_POLICIES,
     CLAIM_REGISTRY_VERSION,
+    IRON_CURRENT_CONFIGURATION,
     NO_CATALOGUE_HOME,
     SPEC_DEFINITION_KEY,
     ClaimPolicy,
@@ -119,6 +120,35 @@ def _plan(session: Session, p: DiscoveryClaimProposal, policy: ClaimPolicy,
         name = _need(choices, "variant_name", verbatim)
         return {"variant_slug": slug, "accepted_value": name, "edition_scope": None,
                 "target_key": policy.target_key}
+    if policy.target_kind == "robot_spec":
+        # IRON body DoF (owner decision 2026-10-03): the current (2026 production) figure goes to
+        # the robot's own degrees_of_freedom column, exactly as stated "across the body".
+        _need(choices, "spec_key", policy.target_key)
+        _need(choices, "configuration", IRON_CURRENT_CONFIGURATION)
+        if structured.get("scope") != "across the body" or not str(
+                structured.get("body_dof", "")).isdigit():
+            raise DiscoveryError("the proposal does not state a whole-body DoF figure; "
+                                 "nothing is claimed")
+        value = _need(choices, "accepted_value", structured["body_dof"])
+        return {"variant_slug": None, "accepted_value": value, "edition_scope": None,
+                "target_key": policy.target_key}
+    if policy.key == "specification[compute_ai]":
+        # IRON compute (owner decision 2026-10-03): a verbatim fragment of the source sentence.
+        _need(choices, "spec_key", policy.target_key)
+        _need(choices, "edition_scope", policy.edition_scope)
+        _need(choices, "configuration", IRON_CURRENT_CONFIGURATION)
+        tops = structured.get("tops_up_to")
+        if structured.get("chips") != "3" or not tops:
+            raise DiscoveryError("the proposal does not state the chip count and TOPS; "
+                                 "nothing is claimed")
+        fragment = (f"three Turing AI chips delivering up to {int(tops):,} TOPS of effective "
+                    "computing power")
+        if fragment not in verbatim:
+            raise DiscoveryError("the expected wording is not in the source sentence; "
+                                 "nothing is claimed")
+        value = _need(choices, "accepted_value", fragment)
+        return {"variant_slug": None, "accepted_value": value,
+                "edition_scope": policy.edition_scope, "target_key": policy.target_key}
     slug = _need(choices, "variant_slug")
     _variant_prerequisite(session, p, slug)
     if policy.target_kind == "specification":

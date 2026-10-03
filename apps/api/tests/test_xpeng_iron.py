@@ -462,12 +462,15 @@ def test_a_changed_value_supersedes_and_the_old_proposal_stays_history(site):
     assert {k[2]: v.state for k, v in states.items()} == {"21": pr.SUPERSEDED, "20": pr.CURRENT}
 
 
-def test_no_proposal_has_a_registered_claim_policy_so_nothing_can_materialize(site):
+def test_only_the_current_configuration_proposals_have_a_claim_policy(site):
     for url in PAGES:
         site.ingest(site.observe(url), body_of(url))
-    for p in site.all_proposals():
-        assert claims.claim_policy_for(p.kind, p.target, p.evidence_locator, p.structured) is None
-    one = next(p for p in site.all_proposals() if p.kind == "BODY_DOF")
+    # only the two 2026 current-configuration proposals have a policy (owner decision 2026-10-03)
+    registered = {(p.source_url, p.kind) for p in site.all_proposals() if claims.claim_policy_for(
+        p.kind, p.target, p.evidence_locator, p.structured)}
+    assert registered == {(NEWS_2026, "BODY_DOF"), (NEWS_2026, "COMPUTE")}
+    one = next(p for p in site.all_proposals()
+               if p.kind == "BODY_DOF" and p.source_url == NEWS_2025)
     answers = {pr.question_key(i): "answered" for i in range(1, len(one.review_questions) + 1)}
     pr.decide(site.session, str(one.id), pr.ACCEPT, decided_by="test", rationale="x",
               choices={**answers, pr.HOME_KEY: pr.NO_CATALOGUE_HOME})

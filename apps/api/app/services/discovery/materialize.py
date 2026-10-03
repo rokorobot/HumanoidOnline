@@ -129,6 +129,12 @@ def plan_materialization(session: Session, robot_slug: str,
 
     variants = {c.variant_slug: c for c in claims if c.target_kind == "robot_variant"}
     specs = [c for c in claims if c.target_kind == "specification"]
+    robot_specs = [c for c in claims if c.target_kind == "robot_spec"]
+    if robot_specs:                  # first-class robot columns: the catalogue `specs` block
+        block = dict(doc.get("specs") or {})
+        for c in sorted(robot_specs, key=lambda c: c.target_key):
+            block[c.target_key] = int(c.accepted_value)
+        doc["specs"] = block
 
     if variants:
         merged, placed = [], set()
@@ -149,12 +155,15 @@ def plan_materialization(session: Session, robot_slug: str,
             if src.source_class not in _SOURCE_KIND:
                 raise DiscoveryError(f"source {src.key} is not a manufacturer source; "
                                      "a MANUFACTURER attribution cannot be claimed")
-            entries[(c.variant_slug, c.target_key)] = {
-                "key": c.target_key, "variant_slug": c.variant_slug,
+            entry = {"key": c.target_key}
+            if c.variant_slug is not None:           # a product-level spec names no variant
+                entry["variant_slug"] = c.variant_slug
+            entry.update({
                 "value": c.accepted_value, "source_label": src.name,
                 "source_url": c.source_url, "source_kind": _SOURCE_KIND[src.source_class],
                 "edition_scope": c.edition_scope,
-                "observed_at": c.observed_at.date().isoformat()}
+                "observed_at": c.observed_at.date().isoformat()})
+            entries[(c.variant_slug, c.target_key)] = entry
         existing = doc.get("extended_specs", [])
         merged = []
         placed = set()
@@ -259,6 +268,10 @@ def logical_target(claim: AcceptedClaim) -> str:
     Never a database row id (the importer recreates those)."""
     if claim.target_kind == "robot_variant":
         return f"robot_variant:{claim.robot_slug}:{claim.variant_slug}"
+    if claim.target_kind == "robot_spec":
+        return f"robot_spec:{claim.robot_slug}:{claim.target_key}"
+    if claim.target_kind == "specification" and claim.variant_slug is None:
+        return f"specification:{claim.robot_slug}:{claim.target_key}"
     if claim.target_kind in ("specification", "pricing_offer", "availability_offer"):
         return (f"{claim.target_kind}:{claim.robot_slug}:{claim.variant_slug}:"
                 f"{claim.target_key}")
@@ -355,13 +368,27 @@ def verify_applied(session: Session, robot_slug: str, *, change_ref: str, applie
                        "delivery_estimate_label": r.delivery_estimate_label,
                        "seller_wording": r.seller_wording, "evidence": ev}
             rows.append((c, "availability_offer", r.id, _hash(payload)))
+        elif c.target_kind == "robot_spec":
+            col = c.target_key
+            if col not in ("degrees_of_freedom",):          # only registered columns
+                raise DiscoveryError(f"{col!r} is not a registered robot column")
+            val = session.execute(text(f"SELECT {col} FROM robot WHERE id = :r"),
+                                  {"r": robot_id}).scalar()
+            if val is None or int(val) != int(c.accepted_value):
+                raise DiscoveryError(
+                    f"robot.{col} is not in the database as accepted; import the merged "
+                    "catalogue first")
+            rows.append((c, "robot", robot_id, _hash({
+                "robot_slug": robot_slug, "table": "robot", "column": col, "value": int(val)})))
         else:
             r = session.execute(text(
                 "SELECT s.id, s.value_text, s.value_number, s.value_bool, s.edition_scope, "
                 "s.source_url, s.source_label, s.source_kind, s.observed_at, d.key "
                 "FROM specification s JOIN spec_definition d ON d.id = s.definition_id "
-                "JOIN robot_variant v ON v.id = s.variant_id "
-                "WHERE s.robot_id = :r AND v.slug = :v AND d.key = :k"),
+                "LEFT JOIN robot_variant v ON v.id = s.variant_id "
+                "WHERE s.robot_id = :r AND d.key = :k AND "
+                "((CAST(:v AS TEXT) IS NULL AND s.variant_id IS NULL) "
+                "OR v.slug = CAST(:v AS TEXT))"),
                 {"r": robot_id, "v": c.variant_slug, "k": c.target_key}).one_or_none()
             if (r is None or r.value_text != c.accepted_value or r.value_number is not None
                     or r.value_bool is not None or r.edition_scope != c.edition_scope

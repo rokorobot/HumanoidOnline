@@ -41,7 +41,7 @@ def policy_for(target_hint: str) -> FieldPolicy | None:
 # Exactly two registered targets, nothing else. Price, availability, reservation, use
 # cases, interfaces and every other mapping are NOT registered and are refused.
 # --------------------------------------------------------------------------------------
-CLAIM_REGISTRY_VERSION = "0.3.0-g2-4-mini-commercial"
+CLAIM_REGISTRY_VERSION = "0.4.0-xpeng-iron-current-configuration"
 
 # The resolved-choice keys that carry the human's explicit catalogue mapping.
 MAPPING_KEYS = ("target_kind", "variant_slug", "variant_name", "spec_key", "edition_scope",
@@ -49,9 +49,14 @@ MAPPING_KEYS = ("target_kind", "variant_slug", "variant_name", "spec_key", "edit
                 # G2-4 offer mapping (owner decisions): every value is stated, none defaulted.
                 "price_type", "transaction_type", "billing_period", "currency", "price",
                 "region", "provider", "edition_confirmed", "availability_status",
-                "available_from", "delivery_estimate_label")
+                "available_from", "delivery_estimate_label",
+                # XPENG IRON (owner decision 2026-10-03): which configuration is current.
+                "configuration")
 
 NO_CATALOGUE_HOME = "NO_CATALOGUE_HOME"
+#: Owner decision 2026-10-03: the 2026 production configuration is IRON's CURRENT one.
+IRON_CURRENT_CONFIGURATION = "2026 production IRON"
+IRON_CURRENT_PAGE = "news-2026-09-08"
 SPEC_DEFINITION_KEY = "dexterous_hand_option"
 SPEC_LOCATOR_PREFIX = "feature-grid/row[Manipulation]/"
 #: Source row label -> the long-tail TEXT definition that preserves the maker's own row
@@ -84,6 +89,15 @@ def _spec(key: str, proposal_kind: str) -> ClaimPolicy:
 
 
 CLAIM_POLICIES: dict[str, ClaimPolicy] = {
+    # IRON's current-configuration body DoF -> the first-class robot column (owner decision).
+    "robot_spec[degrees_of_freedom]": ClaimPolicy(
+        key="robot_spec[degrees_of_freedom]", proposal_kind="BODY_DOF",
+        target_kind="robot_spec", target_key="degrees_of_freedom"),
+    # IRON's current-configuration compute -> the existing long-tail TEXT spec, verbatim.
+    "specification[compute_ai]": ClaimPolicy(
+        key="specification[compute_ai]", proposal_kind="COMPUTE",
+        target_kind="specification", target_key="compute_ai",
+        edition_scope="THIS_EDITION"),
     "robot_variant": ClaimPolicy(
         key="robot_variant", proposal_kind="VARIANT", target_kind="robot_variant",
         target_key="variant"),
@@ -125,6 +139,13 @@ def claim_policy_for(kind: str, target_hint: str, locator: str,
     if (kind == "AVAILABILITY" and locator == AVAILABILITY_LOCATOR
             and target_hint.startswith("availability_offer.available_from")):
         return CLAIM_POLICIES["availability_offer[variant]"]
+    cfg = (structured or {}).get("configuration")
+    if (kind == "BODY_DOF" and cfg == IRON_CURRENT_CONFIGURATION
+            and locator.startswith(f"{IRON_CURRENT_PAGE}/")):
+        return CLAIM_POLICIES["robot_spec[degrees_of_freedom]"]
+    if (kind == "COMPUTE" and cfg == IRON_CURRENT_CONFIGURATION
+            and locator.startswith(f"{IRON_CURRENT_PAGE}/")):
+        return CLAIM_POLICIES["specification[compute_ai]"]
     if kind in NO_HOME_KINDS:
         return CLAIM_POLICIES[f"no_catalogue_home[{NO_HOME_KINDS[kind]}]"]
     return None

@@ -290,6 +290,12 @@ Forward migrations:
   (and a `JSON` value type). Additive, backward compatible, idempotent; no existing value
   or row changes meaning.
 
+- `0022_robot_spec_claim_target.sql` — DR-A5 (owner-authorized IRON current-configuration
+  slice): the accepted-claim target kinds gain `robot_spec` (a first-class `robot` column
+  written through the catalogue file's `specs` block) and the write-audit target tables gain
+  `robot`. Only two CHECK constraints are replaced; triggers and rows are untouched.
+  Additive, backward compatible, idempotent.
+
 ## Checksum integrity (WS8.2 / R9)
 
 `schema_migrations` stores a `sha256` for every applied file, and

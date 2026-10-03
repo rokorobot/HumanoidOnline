@@ -247,7 +247,9 @@ def test_the_registry_contains_exactly_the_approved_targets_and_nothing_commerci
         "specification[common_interfaces]", "specification[additional_interfaces]",
         "pricing_offer[variant]", "availability_offer[variant]",
         "no_catalogue_home[reservation_fee]", "no_catalogue_home[reservation_terms]",
-        "no_catalogue_home[use_cases]"}
+        "no_catalogue_home[use_cases]",
+        # XPENG IRON current-configuration slice (owner decision 2026-10-03)
+        "robot_spec[degrees_of_freedom]", "specification[compute_ai]"}
 
 
 def test_proposals_resolve_to_the_expected_policies_and_the_rest_stay_unregistered(dsession):

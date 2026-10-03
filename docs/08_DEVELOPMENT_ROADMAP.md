@@ -188,8 +188,9 @@ exposed". One pure, versioned resolver (`resolved_fact = f(product value, scoped
 compute-on-read, no derived table, `robot_variant.spec_overrides` unused. Phases: **G4-0** architecture +
 semantic ratification (done; `docs/decisions/DR-G4_CANONICAL_SCOPED_FACT_RESOLUTION.md`); **G4-1** resolver
 and projection registry; **G4-2** API / read-model integration (detail, filters ANY-VARIANT, matching
-conservative, compare, agent tools); **G4-3** generic readiness / audit gate with fact accounting
-(`unaccounted = 0`); **G4-4** read-only catalogue-wide audit. No schema migration is planned. G4 does not
+conservative, compare, agent tools); **G4-3** an **integrity gate** (only truthfulness can block publication) plus a non-blocking **coverage
+audit** and loss-preventing fact accounting (*incomplete is publishable, misleading is not*); **G4-4**
+read-only catalogue-wide coverage audit for enrichment priorities. No schema migration is planned. G4 does not
 renumber G2-6.
 
 #### Deferred — not authorized

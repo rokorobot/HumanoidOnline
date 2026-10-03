@@ -66,8 +66,11 @@ def test_the_dr_names_every_state_and_accounting_class():
     dr = text(DR)
     for name in STATES + CLASSES:
         assert f"`{name}`" in dr, name
-    assert "unaccounted = 0" in dr
     assert "integrity failure" in dr
+    for name in ("UNMAPPED_KNOWLEDGE", "UNACCOUNTED_LOSS", "NOT_YET_REVIEWED"):
+        assert f"`{name}`" in dr, name
+    # the retired design made accounting completeness a publication blocker
+    assert "unaccounted = 0" not in dr
 
 
 # ------------------------------------------------------------------ storage ---
@@ -170,3 +173,58 @@ def test_the_mini_golden_matches_the_real_catalogue_facts():
 ])
 def test_consumer_and_governance_semantics_are_recorded(needle):
     assert needle in flat(DR)
+
+
+# ------------------------------------------------------------------ G4-3: integrity vs coverage ---
+
+
+def test_g4_3_is_an_integrity_gate_not_a_completeness_gate():
+    """Owner correction 2026-10-03: incomplete is publishable, misleading is not."""
+    dr = flat(DR)
+    assert "Incomplete is publishable. Misleading is not." in dr
+    assert "Fresh + truthful + incomplete is preferable to complete-but-late" in dr
+    # two separate concepts; only integrity blocks
+    assert "INTEGRITY / TRUTHFULNESS" in dr and "COVERAGE / COMPLETENESS" in dr
+    assert "never blocks" in dr
+    assert "no public label and no schema field is introduced" in dr
+
+
+def test_the_hard_blockers_are_exactly_the_integrity_conditions():
+    dr = flat(DR)
+    for blocker in ("Identity unresolved", "Canonical `CONFLICT`",
+                    "Public value contradicts canonical evidence",
+                    "Fabricated precision or unsupported inference", "Required provenance missing",
+                    "Publication mechanics or invariants broken"):
+        assert blocker in dr, blocker
+
+
+@pytest.mark.parametrize("never_a_blocker", [
+    "UNKNOWN physical specifications", "a missing price, availability",
+    "`DETAIL_ONLY` information", "`NO_CATALOGUE_HOME` facts",
+    "a manufacturer statement that has not yet gained a semantic projection",
+    "a missing optional projection mapping", "incomplete use-case classification",
+    "incomplete historical chronology",
+    "safely preserved verbatim but not yet normalized into a first-class field",
+])
+def test_completeness_conditions_never_block_publication(never_a_blocker):
+    dr = flat(DR)
+    section = dr[dr.index("### 7.2 Never blockers"):dr.index("### 7.3")]
+    assert never_a_blocker in section
+
+
+def test_unaccounted_is_split_and_only_loss_is_an_integrity_defect():
+    dr = flat(DR)
+    assert "`UNMAPPED_KNOWLEDGE`" in dr and "Not a blocker" in dr
+    assert "`UNACCOUNTED_LOSS`" in dr and "integrity defect" in dr
+    assert "`NOT_YET_REVIEWED`" in dr and "is **not canonical knowledge**" in dr
+    assert "lost = 0 for the facts required by the intended public representation" in dr
+    assert "conflicts = 0 for current public assertions" in dr
+
+
+def test_the_fresh_announcement_path_and_the_existing_robot_guarantee_are_recorded():
+    dr = flat(DR)
+    assert "A newly announced humanoid is **publication-ready**" in dr
+    assert "80 body DoF" in dr and "are never awaited" in dr
+    assert "never unpublishes" in dr and "Low coverage never unpublishes a robot" in dr
+    assert "informational, non-blocking unless the owner explicitly upgrades it" in dr
+    assert "not** a mass requirement to normalize every fact" in dr

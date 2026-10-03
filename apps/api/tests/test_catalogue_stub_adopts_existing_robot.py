@@ -97,6 +97,17 @@ def test_the_file_still_asserts_identity_and_no_commercial_or_derived_fact():
     assert (image["identity_status"], image["usage_basis"], image["is_official"]) == (
         "VERIFIED", "OFFICIAL_MANUFACTURER_MEDIA", True)
     assert image["identity_confirmed_by"] == "robert@humanoid.company"
+    assert image["last_verified_at"].startswith("2026-10-03")     # owner confirmation recorded
+    # rights are NOT upgraded: official manufacturer media is displayed on its usage basis
+    assert (image["rights_status"], image["is_official"]) == ("UNKNOWN", True)
+    assert image["source_type"] == "MANUFACTURER"
+    assert image["attribution"].endswith("NEURA Robotics")
+    # the MEDIA-01 display-eligibility rule, evaluated on the canonical file
+    assert (image["identity_status"] == "VERIFIED" and image["rights_status"] != "RESTRICTED"
+            and image["usage_basis"] == "OFFICIAL_MANUFACTURER_MEDIA")
+    # publication does not imply maturity, and no unknown spec was filled
+    assert doc["commercial_status"] == "UNKNOWN"
+    assert all(v is None for v in doc["specs"].values())
     assert image["source_url"] == doc["official_url"]
     for collection in ("commercial_status_evidence", "deployments", "capabilities",
                        "use_case_fits"):

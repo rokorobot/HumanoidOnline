@@ -129,6 +129,35 @@ Either SDK token suffices for `has_sdk`; the language/tooling distinction stays 
   `DETAIL_ONLY` and the audit reports it as *projection candidate / owner mapping required*. It is not
   `UNKNOWN` (the detailed fact is known) and not a production failure.
 
+### 4.3 Explicit negative facts (owner ruling 2026-10-03)
+
+An explicit negative is a **factual assertion** and uses the **same governed provenance chain as a positive
+fact**:
+
+```
+source statement -> proposal -> ACCEPT -> accepted claim
+  -> provenance-bearing canonical specification (product- or variant-scoped, the source's own wording)
+  -> registered negative projection -> resolved boolean false
+```
+
+Example: the manufacturer states `SDK not supported`. The wording is preserved as a canonical specification
+with normal source provenance; only an owner-ratified rule `<registered spec key> / "SDK not supported"` ->
+`has_sdk = false` may then resolve `false`. `No teleoperation support` -> `has_teleoperation = false` likewise,
+and only after that exact mapping is separately ratified. The initial registry contains **no** negative
+mapping.
+
+* **`spec_caveats` is explanatory metadata only** (why a field remains UNKNOWN, or that sources disagree).
+  It never establishes `false` and is never the evidence or the home of a negative.
+* Absence of a positive token is never `false`; absence of an option is not absence of a broader capability.
+* A core column is not a home for a new negative: a new or changed `false` (or implausible `0`) written
+  directly is an integrity failure (section 13).
+* **Legacy hand-entered `false` values** remain coverage review findings until sourced. Do not invent source
+  wording to justify an existing `false`; when one is reviewed and no explicit negative source is found,
+  prefer `NULL`/UNKNOWN.
+* No schema change is required where an existing product/variant-scoped `specification` row can carry the
+  wording and provenance. A negative that cannot be represented faithfully that way comes back as a semantic
+  decision, never as a `spec_caveats` shortcut.
+
 ## 5. Resolution algorithm (deterministic)
 
 For one robot and one property `P`:
@@ -353,7 +382,8 @@ cannot meet. Until then correctness and one truth model outrank query optimizati
   effective state is read, never the append-only history, so a resolved ambiguity does not block);
   `CANONICAL_CONFLICT`; `PUBLIC_CONTRADICTS_CANONICAL`; fabricated transformations (year-level statement to
   exact date, accepted price type changed on publication, a historical figure given a catalogue home, a
-  variant flattened to product scope, a NEW `false`/implausible `0` with no explicit negative basis);
+  variant flattened to product scope, a NEW `false`/implausible `0` written outside the governed
+  chain of section 4.3);
   missing required provenance; broken publication mechanics; `UNACCOUNTED_LOSS`; and, only at the
   false-to-true transition, a missing or placeholder summary.
 * **Public-assertion findings apply to published or publishing robots.** For an UNPUBLISHED record they are
@@ -363,8 +393,9 @@ cannot meet. Until then correctness and one truth model outrank query optimizati
   without a summary (honda-asimo, rainbow-hubo, softbank-nao, softbank-pepper). They are coverage review
   findings, never integrity failures, never unpublished, never a CI failure. A test fails when an entry has
   been fixed (the baseline may only shrink) and when any NEW unexplained `false`/zero appears in the catalogue
-  source. An explicit negative is a `spec_caveats` entry `{"field": F, "kind": "EXPLICIT_NEGATIVE", "text":
-  "<the source's own words>"}`; no schema change.
+  source. An explicit negative is established only by the governed chain of section 4.3 (never a core
+  column, never `spec_caveats`); when a legacy `false` is reviewed without a source it becomes
+  `NULL`/UNKNOWN, and the entry leaves the baseline.
 * **Coverage (`coverage_audit`)** has no failing outcome. It reports UNKNOWN density, no price/availability/
   SDK/deployment evidence, legacy findings, `DETAIL_ONLY` (with the recorded reason), `UNMAPPED_KNOWLEDGE`
   (projection candidates), `NO_CATALOGUE_HOME`, `NOT_YET_REVIEWED`, an informational band (LOW / PARTIAL /

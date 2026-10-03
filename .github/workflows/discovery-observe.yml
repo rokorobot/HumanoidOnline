@@ -7,11 +7,11 @@ name: Discovery observation (Stage F)
 #              Setting it to anything else disables recurring observation.
 #   RECURRING  the twice-weekly `schedule:` below (Monday and Thursday; owner
 #              decision 2026-10-02, replacing the hourly check). Each
-#              invocation only CHECKS the registered NEURA source: it observes
-#              (never plan, never run-now), and the source's own attributed
-#              cadence (48 h, shorter than the 72 h between slots so a slot is
-#              never skipped as "not due") decides whether anything is fetched. A slot in
-#              which the source is not due requests nothing.
+#              invocation only CHECKS the registered, enabled sources (NEURA, XPENG): it
+#              observes (never plan, never run-now), and each source's own attributed
+#              cadence decides whether anything is fetched (NEURA 48 h; XPENG 120 h, so a
+#              Monday slot is due again the next Monday while the Thursday slot, 72 h
+#              later, requests nothing). A slot in which a source is not due requests nothing.
 #
 # Production database access comes only from the `discovery-production`
 # environment's secret DISCOVERY_DATABASE_URL: the least-privilege
@@ -58,10 +58,11 @@ jobs:
     env:
       DATABASE_URL: ${{ secrets.DISCOVERY_DATABASE_URL }}
       APP_ENV: production
-      # A scheduled event has no inputs: it always observes the one registered,
-      # approved NEURA source, and never skips the cadence wait.
+      # A scheduled event has no inputs: it observes EVERY registered source that is enabled
+      # AND has an attributed cadence (NEURA and, since 2026-10-03, XPENG), and never skips
+      # the cadence wait. A source that is not due requests nothing.
       MODE: ${{ github.event_name == 'schedule' && 'observe' || inputs.mode }}
-      ONLY: ${{ github.event_name == 'schedule' && 'neura-robotics-official' || inputs.source }}
+      ONLY: ${{ github.event_name == 'schedule' && '' || inputs.source }}
       RUN_NOW: ${{ github.event_name == 'schedule' && 'false' || inputs.run_now }}
     steps:
       - uses: actions/checkout@v4

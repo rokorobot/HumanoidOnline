@@ -5,7 +5,7 @@
   "model_code": null,
   "summary": null,
   "announced_year": null,
-  "commercial_status": "ANNOUNCED",
+  "commercial_status": "UNKNOWN",
   "is_published": false,
   "specs": {
     "height_cm": null,
@@ -32,7 +32,7 @@
     "simulation_support": null
   },
   "specs_note": "Specifications not yet verified.",
-  "official_url": "https://www.xpeng.com/",
+  "official_url": "https://www.xpeng.com/technology/ai_robot_iron",
   "commercial_status_evidence": [],
   "variants": [],
   "pricing_offers": [],

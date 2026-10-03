@@ -60,7 +60,8 @@
   recording an end: attributed, with a reason, refused while the run shows
   activity in the last 30 minutes.
 
-- `proposals ingest` (G2-1, DR-A5) is the MANUAL, OFFLINE ingest of the G1 4NE1 Mini
+- `proposals ingest` (G2-1, DR-A5) is the MANUAL, OFFLINE ingest (the source's registered
+  extractor: the 4NE1 Mini page, or XPENG's four reviewed IRON pages) of the G1 4NE1 Mini
   proposals from a retained page body: no network request. It persists immutable,
   NOT_VERIFIED proposals and append-only sightings, idempotently, and verifies the
   body against the observation's recorded content hash. It writes no decision, no
@@ -483,7 +484,6 @@ def _cmd_proposals(args: argparse.Namespace) -> int:
     import json
 
     from app.db.session import SessionLocal
-    from app.services.discovery import proposals
     from app.services.discovery.cache import read_observed_body
 
     with SessionLocal() as session:
@@ -496,7 +496,12 @@ def _cmd_proposals(args: argparse.Namespace) -> int:
             if body is None:
                 print("ERROR: that observation's body is no longer in the cache", file=sys.stderr)
                 return 1
-        report = proposals.ingest_neura_mini_proposals(
+        from app.services.discovery.g2_ingest import G2_INGESTS
+
+        registered = G2_INGESTS.get(args.source_key)
+        if registered is None:
+            raise DiscoveryError(f"{args.source_key!r} has no registered proposal extractor")
+        report = registered.ingest(
             session, source_key=args.source_key, robot_slug=args.robot_slug,
             fetched_page_id=uuid.UUID(args.fetched_page), body=body, ingested_by=args.by)
         session.commit()

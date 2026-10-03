@@ -781,6 +781,20 @@ use-case and interface findings for this robot; no other robot is decided):
   refuses the claim.
 - The scheduled G2-5 pipeline is unchanged and human review stays mandatory.
 
+### 18.6 First expansion source: XPENG IRON (owner source approval, 2026-10-03)
+
+Robert Konecny approved XPENG official `xpeng.com` sources for governed research of the humanoid IRON
+(`docs/discovery/XPENG_STRUCTURAL_REVIEW_2026-10-03.md`). The existing machinery is reused without
+change in kind: a fixed four-page adapter (`xpeng-official`, no link-following), an identity-only
+product extractor, and a versioned proposal-only extractor (`xpeng-iron-proposals`) whose proposals
+persist through the G2-1 tables. The G2-5 scheduled step now lists XPENG's four pages explicitly
+(`G2_INGESTS`); the scheduled workflow observes every enabled, scheduled source and each source's
+cadence decides (NEURA 48 h; XPENG 120 h). Identity: one catalogue robot, `xpeng-iron`, representing
+XPENG's Next-Gen IRON line; the 2024 first-generation robot is historical evidence; the 2025 and
+2026 figures are independent statements and stay independent proposals. No XPENG proposal has a
+registered claim policy, so nothing can be accepted into the catalogue without a new owner decision,
+and nothing is published.
+
 ---
 
 ## 20. Ratification record (owner decisions, 2026-10-02)

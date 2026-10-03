@@ -235,7 +235,7 @@ def test_only_the_registered_source_is_ingested(site, dsession):  # noqa: F811
     assert g2_ingest.ingest_for_source(
         dsession, other.source, cache_dir=site.cache, operator=OPERATOR,
         registry=site.registry) is None
-    assert set(g2_ingest.G2_INGESTS) == {"neura-robotics-official"}
+    assert set(g2_ingest.G2_INGESTS) == {"neura-robotics-official", "xpeng-official"}
     assert g2_ingest.G2_INGESTS["neura-robotics-official"].robot_slug == "4ne1-mini"
 
 
@@ -414,5 +414,6 @@ def test_the_schedule_and_cadence_are_unchanged():
     wf = (pathlib.Path(__file__).resolve().parents[3] / ".github" / "workflows"
           / "discovery-observe.yml").read_text(encoding="utf-8")
     assert 'cron: "37 6 * * 1,4"' in wf                       # Monday and Thursday 06:37 UTC
-    assert "ONLY: ${{ github.event_name == 'schedule' && 'neura-robotics-official'" in wf
+    # a scheduled event observes every enabled+scheduled source (each cadence decides)
+    assert "ONLY: ${{ github.event_name == 'schedule' && '' || inputs.source }}" in wf
     assert "RUN_NOW: ${{ github.event_name == 'schedule' && 'false'" in wf

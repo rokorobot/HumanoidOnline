@@ -66,12 +66,13 @@ def test_gate_role_and_concurrency_are_unchanged(workflow):
     assert not any("prune" in str(s.get("run", "")) for s in job["steps"])  # pruning stays off
 
 
-def test_scheduled_source_is_the_registered_neura_adapter():
-    assert NEURA in ADAPTERS
+def test_scheduled_event_observes_every_registered_enabled_source():
+    # NEURA, and since 2026-10-03 XPENG: each source's own cadence decides whether it fetches
+    assert NEURA in ADAPTERS and "xpeng-official" in ADAPTERS
 
 
 @pytest.mark.parametrize(("event", "inputs", "expected"), [
-    ("schedule", {}, ("observe", NEURA, "false")),
+    ("schedule", {}, ("observe", "", "false")),
     ("workflow_dispatch", {"mode": "plan", "source": "", "run_now": False}, ("plan", "", "false")),
     ("workflow_dispatch", {"mode": "observe", "source": NEURA, "run_now": True},
      ("observe", NEURA, "true")),
@@ -103,7 +104,7 @@ def _cycle_args(workflow, tmp_path, mode, only, run_now) -> list[str]:
 @pytest.mark.skipif(os.name == "nt" or shutil.which("bash") is None,
                     reason="runs the workflow's bash step; covered on the Linux CI runner")
 @pytest.mark.parametrize(("event", "inputs", "want", "absent"), [
-    ("schedule", {}, ["observe", "--only", NEURA], ["--plan", "--run-now"]),
+    ("schedule", {}, ["observe"], ["--plan", "--run-now", "--only"]),
     ("workflow_dispatch", {"mode": "plan", "source": NEURA, "run_now": False},
      ["--plan", "--only", NEURA], ["--run-now"]),
     ("workflow_dispatch", {"mode": "observe", "source": NEURA, "run_now": True},

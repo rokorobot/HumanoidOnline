@@ -105,7 +105,7 @@ accepted claim ≠ publication
 | **A–F** | Read-only foundation; bounded HTTP acquisition and change detection; the adapter framework and the first source adapter; deterministic candidate extraction and identity resolution; **Stage E** exception-only human review (identity decisions, out-of-scope rejection, source trace, same-entity promotion convergence); **Stage F** scheduled observation (per-source cadence, redirect and cache handling, one-running-run guard, least-privilege database role) | ✅ **OPERATIONAL** |
 | **G1** | Proposal-only structured extraction | 🟢 **IMPLEMENTED FOUNDATION** (PR #84) |
 | **G2** | Governed proposal review and claim promotion | 🟡 **IN PROGRESS** — architecture ratified in DR-A5; **G2-1 persistence (0018), G2-2 governed review, and the first G2-3 slice (accepted claims, materialization; 0019) implemented**; **G2-5 scheduled proposal ingestion operational for NEURA 4NE1 Mini only**; **G2-4 4NE1 Mini commercial and interface slice implemented** (`MANUFACTURER_ESTIMATE`, WAITLIST, interface specs; 0020/0021) |
-| **G3** | Source expansion | ⏸ After G2 is proven |
+| **G3** | Source expansion | 🟡 **STARTED**: first expansion source XPENG (humanoid IRON only), under an explicit owner source approval (2026-10-03); every further source needs its own approval |
 
 **NEURA is the first commissioned scheduled source.** Observation runs **Monday and
 Thursday at 06:37 UTC**, governed by a **48-hour source cadence**, through the same
@@ -175,7 +175,7 @@ remain pending and need separate owner decisions or source approval**, and this 
 **no catalogue-writing code** beyond the governed chain. The open questions above are settled
 phase by phase under DR-A5. The physical G2-1 design is recorded in DR-A5 §18.1.
 
-#### Stage G3 — Source expansion · after G2 is proven
+#### Stage G3 — Source expansion · first source (XPENG IRON) onboarded
 
 - extend proposal extraction to the full-size 4NE1;
 - onboard further manufacturers only after individual source and ToS approval.

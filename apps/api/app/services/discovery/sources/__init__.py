@@ -6,10 +6,10 @@ extraction rules are never read from the database.
 from __future__ import annotations
 
 from app.services.discovery.live_adapter import SourceAdapterConfig
-from app.services.discovery.sources import neura_robotics
+from app.services.discovery.sources import neura_robotics, xpeng_robotics
 
 ADAPTERS: dict[str, SourceAdapterConfig] = {
-    config.source_key: config for config in (neura_robotics.CONFIG,)
+    config.source_key: config for config in (neura_robotics.CONFIG, xpeng_robotics.CONFIG)
 }
 
 

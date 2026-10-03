@@ -532,7 +532,7 @@ authorization**.
 | **G2-3** | Accepted claims and the **materialization** generator, as a **vertical slice** on `4ne1-mini`: Standard → variant; Pro → variant; then **one** specification only through an explicitly proposed, approved and registered field policy (§11.3); end to end into the catalogue of record, applied by the importer, verified, `catalogue_write_audit` recorded. Requires the `4ne1-mini` catalogue stub first. | I4, I6, I7, I9–I13, I15, I16 |
 | **G2-4** | Price and availability. **DEFERRED:** only after the owner settles their semantics (§13). | owner decision |
 | **G2-5** | Wire proposal ingest into scheduled observation (observer role only). **Only after** review is proven on real proposals. | owner |
-| **G2-6** | A second manufacturer: separate source and ToS approval, a separate adapter and extractor. This is Stage G3. | owner |
+| **G2-6** | A second manufacturer: separate source and ToS approval, a separate adapter and extractor. This is Stage G3. **Satisfied in substance by the XPENG / Stage G3 work (2026-10-03); the identifier is unchanged and not repurposed. Canonical scoped fact resolution is the separate Stage G4 (`DR-G4`).** | owner |
 
 **Separately authorized follow-ups (owner, 2026-10-02):** the `4ne1-mini` catalogue stub and database-level immutability for `promotion_audit` (§19). They are their own narrowly scoped PRs and **begin only after this record's documentation (`docs/16` §17.3 and this record) is reviewed and merged**.
 

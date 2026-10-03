@@ -1,0 +1,81 @@
+{
+  "registry_version": "0.1.0-g4-initial",
+  "ratified": "2026-10-03",
+  "matching": "exact, whitespace-normalized, case-sensitive token; no fuzzy matching",
+  "entries": [
+    {
+      "spec_key": "common_interfaces",
+      "token": "Python SDK",
+      "property": "has_sdk",
+      "value": true
+    },
+    {
+      "spec_key": "additional_interfaces",
+      "token": "C++ SDK",
+      "property": "has_sdk",
+      "value": true
+    },
+    {
+      "spec_key": "common_interfaces",
+      "token": "ROS 2 interface",
+      "property": "ros_support",
+      "value": true
+    },
+    {
+      "spec_key": "additional_interfaces",
+      "token": "teleoperation",
+      "property": "has_teleoperation",
+      "value": true
+    },
+    {
+      "spec_key": "dexterous_hand_option",
+      "token": "12 DoF dexterous hands",
+      "property": "has_manipulation",
+      "value": true
+    }
+  ],
+  "explicitly_not_mapped": [
+    {
+      "spec_key": "dexterous_hand_option",
+      "token": "Not included",
+      "never_projects": "has_manipulation = false",
+      "reason": "absence of an option is not absence of a capability"
+    },
+    {
+      "spec_key": "dexterous_hand_option",
+      "token": "12 DoF dexterous hands",
+      "never_projects": "hand_dof",
+      "reason": "hand-DoF convention (per hand) and source scope do not independently permit it"
+    },
+    {
+      "spec_key": "additional_interfaces",
+      "token": "digital twin access",
+      "never_projects": "any core property",
+      "reason": "DETAIL_ONLY until a canonical property exists"
+    },
+    {
+      "spec_key": "additional_interfaces",
+      "token": "ready for Neura Gym training",
+      "never_projects": "any core property",
+      "reason": "DETAIL_ONLY until a canonical property exists"
+    },
+    {
+      "spec_key": "common_interfaces",
+      "token": "Wi-Fi 6",
+      "never_projects": "any core property",
+      "reason": "DETAIL_ONLY"
+    },
+    {
+      "spec_key": "common_interfaces",
+      "token": "Ethernet",
+      "never_projects": "any core property",
+      "reason": "DETAIL_ONLY"
+    },
+    {
+      "spec_key": "common_interfaces",
+      "token": "NEURA Sync",
+      "never_projects": "any core property",
+      "reason": "DETAIL_ONLY"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "robot": "4ne1-mini",
+  "registry_version": "0.1.0-g4-initial",
+  "variants": [
+    "standard",
+    "pro"
+  ],
+  "resolution": {
+    "has_sdk": {
+      "state": "UNIFORM_VARIANTS",
+      "value": true,
+      "variants": {
+        "standard": true,
+        "pro": true
+      }
+    },
+    "ros_support": {
+      "state": "UNIFORM_VARIANTS",
+      "value": true,
+      "variants": {
+        "standard": true,
+        "pro": true
+      }
+    },
+    "has_teleoperation": {
+      "state": "PARTIAL_VARIANTS",
+      "value": null,
+      "variants": {
+        "standard": null,
+        "pro": true
+      }
+    },
+    "has_manipulation": {
+      "state": "PARTIAL_VARIANTS",
+      "value": null,
+      "variants": {
+        "standard": null,
+        "pro": true
+      }
+    }
+  },
+  "detail_facts_retained": {
+    "standard": [
+      "Not included",
+      "Wi-Fi 6",
+      "Ethernet",
+      "Python SDK",
+      "ROS 2 interface",
+      "NEURA Sync"
+    ],
+    "pro": [
+      "12 DoF dexterous hands",
+      "Wi-Fi 6",
+      "Ethernet",
+      "Python SDK",
+      "ROS 2 interface",
+      "NEURA Sync",
+      "C++ SDK",
+      "digital twin access",
+      "teleoperation",
+      "ready for Neura Gym training"
+    ]
+  },
+  "never_fabricated": [
+    "has_manipulation=false",
+    "has_teleoperation=false",
+    "hand_dof=12"
+  ]
+}

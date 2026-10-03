@@ -45,13 +45,16 @@ CHILD_TABLES = ("specification", "robot_variant", "pricing_offer", "availability
 
 #: The only keys G2-3 materialization (DR-A5 M2) may add to the adopted identity stub.
 MATERIALIZED_KEYS = ("variants", "extended_specs", "pricing_offers", "availability_offers")
+#: Publication-readiness metadata (identity/reference, not maturity): added after G2-4.
+READINESS_KEYS = ("summary", "official_url", "images")
 
 
 def test_the_file_is_the_canonical_stub_plus_only_the_materialized_delta():
     doc = json.loads(STUB.read_text(encoding="utf-8"))
     stub = ce.make_stub(slug=SLUG, name=NAME, mfr_slug=MAKER, official_url=None)
-    assert {k: v for k, v in doc.items() if k not in MATERIALIZED_KEYS} == {
-        k: v for k, v in stub.items() if k not in MATERIALIZED_KEYS}
+    skip = MATERIALIZED_KEYS + READINESS_KEYS
+    assert {k: v for k, v in doc.items() if k not in skip} == {
+        k: v for k, v in stub.items() if k not in skip}
     assert doc["slug"] == SLUG == STUB.stem
     # the delta: exactly the two owner-approved variants and their variant-scoped facts
     assert doc["variants"] == [{"slug": "pro", "name": "Pro"},
@@ -84,10 +87,18 @@ def test_the_file_still_asserts_identity_and_no_commercial_or_derived_fact():
     assert doc["commercial_status"] == "UNKNOWN"           # asserts no maturity
     assert set(doc["specs"]) == set(ce.SPEC_FIELDS)         # the full field set, all UNKNOWN
     assert all(v is None for v in doc["specs"].values())   # hand_dof etc. stay UNKNOWN
-    for scalar in ("model_code", "summary", "announced_year", "official_url"):
+    for scalar in ("model_code", "announced_year"):
         assert doc[scalar] is None, scalar
+    assert doc["official_url"] == "https://neura-robotics.com/product/4ne1-mini-reservation"
+    assert doc["summary"].startswith("NEURA Robotics' compact humanoid")
+    for banned in ("available now", "ships ", "shipping today", "in stock", "MSRP", "2026-"):
+        assert banned.lower() not in doc["summary"].lower(), banned
+    [image] = doc["images"]                  # the candidate is NOT identity-verified yet
+    assert (image["identity_status"], image["usage_basis"], image["is_official"]) == (
+        "UNVERIFIED", "OFFICIAL_MANUFACTURER_MEDIA", True)
+    assert image["source_url"] == doc["official_url"]
     for collection in ("commercial_status_evidence", "deployments", "capabilities",
-                       "use_case_fits", "images"):
+                       "use_case_fits"):
         assert doc[collection] == [], collection  # nothing else
     assert all("spec_overrides" not in v for v in doc["variants"])
 
@@ -126,7 +137,9 @@ def _state(conn, robot_id, maker_id):
         "manufacturers": q("SELECT count(*) FROM manufacturer"),
         "same_name_or_slug": q("SELECT count(*) FROM robot WHERE name = %s OR slug = %s",
                                NAME, SLUG),
-        "robot": q("SELECT md5((to_jsonb(r) - 'updated_at')::text) FROM robot r WHERE id = %s",
+        "robot": q("SELECT md5((to_jsonb(r) - 'updated_at' - 'summary' - 'official_url' "
+                   "- 'search_vector')::text) "
+                   "FROM robot r WHERE id = %s",
                    robot_id),
         "manufacturer": q("SELECT md5((to_jsonb(m) - 'updated_at')::text) "
                           "FROM manufacturer m WHERE id = %s", maker_id),
@@ -187,5 +200,6 @@ def test_the_stub_adopts_the_existing_database_robot(scratch_db):  # noqa: F811
         assert after["evidence"] == before["evidence"]                # id AND content intact
         assert after["children"] == {**dict.fromkeys(CHILD_TABLES, 0),   # only the delta appeared
                                      "robot_variant": 2, "specification": 5,
-                                     "pricing_offer": 2, "availability_offer": 2}
+                                     "pricing_offer": 2, "availability_offer": 2,
+                                     "robot_image": 1}
     assert states[0] == states[1]                                     # the 2nd run changes nothing

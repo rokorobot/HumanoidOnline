@@ -587,6 +587,7 @@ def serialize_detail(
     ev = {key: evidence_read(row) for key, row in evidence_rows.items()}
 
     variant_slug_by_id = {v.id: v.slug for v in robot.variants}
+    variant_name_by_id = {v.id: v.name for v in robot.variants}
     extended = [
         ExtendedSpec(
             key=s.definition.key,
@@ -603,6 +604,7 @@ def serialize_detail(
             edition_scope=s.edition_scope,
             observed_at=s.observed_at,
             variant_slug=variant_slug_by_id.get(s.variant_id),
+            variant=variant_name_by_id.get(s.variant_id),
         )
         for s in sorted(
             robot.specifications,
@@ -642,6 +644,8 @@ def serialize_detail(
     pricing = [
         PricingOfferRead(
             transaction_type=p.transaction_type,
+            variant=variant_name_by_id.get(p.variant_id),
+            variant_slug=variant_slug_by_id.get(p.variant_id),
             price_type=p.price_type,
             price=_f(p.price),
             price_min=_f(p.price_min),
@@ -664,6 +668,8 @@ def serialize_detail(
     availability = [
         AvailabilityOfferRead(
             transaction_type=a.transaction_type,
+            variant=variant_name_by_id.get(a.variant_id),
+            variant_slug=variant_slug_by_id.get(a.variant_id),
             availability_status=a.availability_status,
             region=a.region.code if a.region else None,
             provider=a.provider.slug if a.provider else None,

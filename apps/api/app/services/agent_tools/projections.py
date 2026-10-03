@@ -162,6 +162,8 @@ class AgentPricingOffer(BaseModel):
     the governed read — nothing here recomputes an amount, a type or a currency."""
 
     transaction_type: str
+    variant: str | None = None
+    variant_slug: str | None = None
     price_type: str
     price: float | None = None
     price_min: float | None = None
@@ -188,6 +190,8 @@ class AgentAvailabilityOffer(BaseModel):
     """`AvailabilityOfferRead` with agent provenance (§11)."""
 
     transaction_type: str
+    variant: str | None = None
+    variant_slug: str | None = None
     availability_status: str
     region: str | None = None
     provider: str | None = None

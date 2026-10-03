@@ -26,6 +26,10 @@
     { "key": "additional_interfaces",  "label": "Additional interfaces",        "category": "SOFTWARE",     "value_type": "TEXT",    "unit": null,     "sort_order": 64 },
     { "key": "ota_updates",            "label": "OTA updates",                  "category": "SOFTWARE",     "value_type": "BOOLEAN", "unit": null,     "sort_order": 62 },
     { "key": "configurations",         "label": "Configurations offered",       "category": "OTHER",        "value_type": "TEXT",    "unit": null,     "sort_order": 70 },
-    { "key": "manufacturer_warranty_months", "label": "Manufacturer warranty (edition-level)", "category": "OTHER", "value_type": "NUMBER", "unit": "months", "sort_order": 71 }
+    { "key": "manufacturer_warranty_months", "label": "Manufacturer warranty (edition-level)", "category": "OTHER", "value_type": "NUMBER", "unit": "months", "sort_order": 71 },
+    { "key": "max_speed", "label": "Maximum speed (as stated)", "category": "MOBILITY", "value_type": "TEXT", "unit": null, "sort_order": 72 },
+    { "key": "operating_time", "label": "Operating time (as stated)", "category": "OTHER", "value_type": "TEXT", "unit": null, "sort_order": 73 },
+    { "key": "motion_endurance", "label": "Motion endurance (as stated)", "category": "OTHER", "value_type": "TEXT", "unit": null, "sort_order": 74 },
+    { "key": "safety_sensors", "label": "Safety human-detection sensors", "category": "SAFETY", "value_type": "TEXT", "unit": null, "sort_order": 75 }
   ]
 }

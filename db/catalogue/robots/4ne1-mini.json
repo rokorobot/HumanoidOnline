@@ -8,16 +8,16 @@
   "commercial_status": "UNKNOWN",
   "is_published": true,
   "specs": {
-    "height_cm": null,
-    "weight_kg": null,
+    "height_cm": 132,
+    "weight_kg": 36,
     "arm_span_cm": null,
     "reach_cm": null,
-    "payload_kg": null,
+    "payload_kg": 3.0,
     "walk_speed_ms": null,
-    "runtime_minutes": null,
+    "runtime_minutes": 150,
     "battery_wh": null,
     "mobility": null,
-    "degrees_of_freedom": null,
+    "degrees_of_freedom": 25,
     "hand_type": null,
     "hand_dof": null,
     "autonomy": null,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Specifications not yet verified.",
+  "specs_note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude (curl; PDF sha256 1e8d135d28d2f0e0d55496aca93f66793f83bf63f2438045170a12d349e12087) in a session initiated by Robert Konecny, under his instruction 'Start with the 4NE1 Mini datasheet extraction' (2026-10-04). Not a MANUAL_BOOTSTRAP reading; not human-verified. Source: NEURA Robotics '4NE1 Mini' datasheet (https://neurarobotics.px.media/plk/Jj/4NE1Minidatasheet.pdf; 2 pages; 'All rights reserved V1 / 01.01.2026'). Values as stated: Height 132 cm (4'4\"); Weight 36 kg (79 lbs); Payload 3 kg (6.6 lbs), not stated per arm or in total; DoF 25, base unit only, excluding hands and end effectors (which 'may each have up to 12 DoF independently'); Motion Endurance 2.5 h recorded as runtime_minutes 150 (a unit conversion of the stated endurance). 'Operating Time (h) 24/7' and 'Speed Max. 4.6 km/h (2.9 mph)' are kept verbatim as long-tail specifications and NOT mapped to runtime or walk speed: the sheet does not say walking speed or what 24/7 operation requires. Deliberately not derived: has_manipulation and hand_dof (owner rulings of 2026-10-03), has_vision, has_language_ui. The sheet says delivery 'in Spring 2026'; the stored availability remains the product page's 'Expected in 2026' and is not changed here. The sheet's family-level interfaces ('Wi-Fi 6, Gigabit Ethernet, ROS2, C++ & Python SDK, NeuraSync') do not replace the variant-scoped interface specifications.",
   "official_url": "https://neura-robotics.com/product/4ne1-mini-reservation",
   "commercial_status_evidence": [],
   "variants": [
@@ -230,6 +230,52 @@
       "source_kind": "MANUFACTURER",
       "edition_scope": "THIS_EDITION",
       "observed_at": "2026-10-02"
+    },
+    {
+      "key": "max_speed",
+      "value": "Max. 4.6 km/h (2.9 mph)",
+      "source_label": "NEURA Robotics — 4NE1 Mini datasheet (V1 / 01.01.2026)",
+      "source_url": "https://neurarobotics.px.media/plk/Jj/4NE1Minidatasheet.pdf",
+      "source_kind": "MANUFACTURER_DOC",
+      "edition_scope": "PRODUCT_LINE",
+      "observed_at": "2026-10-04"
+    },
+    {
+      "key": "operating_time",
+      "value": "24/7",
+      "source_label": "NEURA Robotics — 4NE1 Mini datasheet (V1 / 01.01.2026)",
+      "source_url": "https://neurarobotics.px.media/plk/Jj/4NE1Minidatasheet.pdf",
+      "source_kind": "MANUFACTURER_DOC",
+      "edition_scope": "PRODUCT_LINE",
+      "observed_at": "2026-10-04"
+    },
+    {
+      "key": "motion_endurance",
+      "value": "2.5 h",
+      "source_label": "NEURA Robotics — 4NE1 Mini datasheet (V1 / 01.01.2026)",
+      "source_url": "https://neurarobotics.px.media/plk/Jj/4NE1Minidatasheet.pdf",
+      "source_kind": "MANUFACTURER_DOC",
+      "edition_scope": "PRODUCT_LINE",
+      "observed_at": "2026-10-04"
+    },
+    {
+      "key": "safety_sensors",
+      "value": "Human detection: optional, available at an additional cost",
+      "source_label": "NEURA Robotics — 4NE1 Mini datasheet (V1 / 01.01.2026)",
+      "source_url": "https://neurarobotics.px.media/plk/Jj/4NE1Minidatasheet.pdf",
+      "source_kind": "MANUFACTURER_DOC",
+      "edition_scope": "PRODUCT_LINE",
+      "observed_at": "2026-10-04"
+    }
+  ],
+  "spec_caveats": [
+    {
+      "field": "degrees_of_freedom",
+      "text": "NEURA states 25 DoF for the base unit only; hands and end effectors are not included and 'may each have up to 12 DoF independently'."
+    },
+    {
+      "field": "payload_kg",
+      "text": "The datasheet states 'Payload 3 kg' without saying whether it is per arm or in total."
     }
   ]
 }

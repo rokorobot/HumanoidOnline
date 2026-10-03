@@ -47,19 +47,24 @@ CHILD_TABLES = ("specification", "robot_variant", "pricing_offer", "availability
 MATERIALIZED_KEYS = ("variants", "extended_specs", "pricing_offers", "availability_offers")
 #: Publication-readiness metadata (identity/reference, not maturity): added after G2-4.
 READINESS_KEYS = ("summary", "official_url", "images", "is_published")
+#: Datasheet enrichment (owner instruction 2026-10-04): first-party NEURA datasheet values and
+#: their provenance note and caveats, pinned exactly in the datasheet-delta test below.
+DATASHEET_KEYS = ("specs", "specs_note", "spec_caveats")
+DATASHEET_SPECS = {"height_cm": 132, "weight_kg": 36, "payload_kg": 3.0, "runtime_minutes": 150,
+                   "degrees_of_freedom": 25}
 
 
 def test_the_file_is_the_canonical_stub_plus_only_the_materialized_delta():
     doc = json.loads(STUB.read_text(encoding="utf-8"))
     stub = ce.make_stub(slug=SLUG, name=NAME, mfr_slug=MAKER, official_url=None)
-    skip = MATERIALIZED_KEYS + READINESS_KEYS
+    skip = MATERIALIZED_KEYS + READINESS_KEYS + DATASHEET_KEYS
     assert {k: v for k, v in doc.items() if k not in skip} == {
         k: v for k, v in stub.items() if k not in skip}
     assert doc["slug"] == SLUG == STUB.stem
     # the delta: exactly the two owner-approved variants and their variant-scoped facts
     assert doc["variants"] == [{"slug": "pro", "name": "Pro"},
                                {"slug": "standard", "name": "Standard"}]
-    assert {(x["key"], x["variant_slug"], x["value"], x["edition_scope"])
+    assert {(x["key"], x.get("variant_slug"), x["value"], x["edition_scope"])
             for x in doc["extended_specs"]} == {
         ("dexterous_hand_option", "pro", "12 DoF dexterous hands", "THIS_EDITION"),
         ("dexterous_hand_option", "standard", "Not included", "THIS_EDITION"),
@@ -69,7 +74,13 @@ def test_the_file_is_the_canonical_stub_plus_only_the_materialized_delta():
          "Wi-Fi 6, Ethernet, Python SDK, ROS 2 interface, NEURA Sync", "THIS_EDITION"),
         ("additional_interfaces", "pro",
          "C++ SDK, digital twin access, teleoperation, ready for Neura Gym training",
-         "THIS_EDITION")}
+         "THIS_EDITION"),
+        # first-party datasheet, product-level (no variant), verbatim long-tail specifications
+        ("max_speed", None, "Max. 4.6 km/h (2.9 mph)", "PRODUCT_LINE"),
+        ("operating_time", None, "24/7", "PRODUCT_LINE"),
+        ("motion_endurance", None, "2.5 h", "PRODUCT_LINE"),
+        ("safety_sensors", None, "Human detection: optional, available at an additional cost",
+         "PRODUCT_LINE")}
     assert {(o["variant_slug"], o["price_type"], o["price"], o["currency"])
             for o in doc["pricing_offers"]} == {
         ("standard", "MANUFACTURER_ESTIMATE", 19999.0, "EUR"),
@@ -85,8 +96,10 @@ def test_the_file_still_asserts_identity_and_no_commercial_or_derived_fact():
     assert (doc["slug"], doc["name"], doc["manufacturer_slug"]) == (SLUG, NAME, MAKER)
     assert doc["is_published"] is True        # published by the owner decision of 2026-10-03
     assert doc["commercial_status"] == "UNKNOWN"           # asserts no maturity
-    assert set(doc["specs"]) == set(ce.SPEC_FIELDS)         # the full field set, all UNKNOWN
-    assert all(v is None for v in doc["specs"].values())   # hand_dof etc. stay UNKNOWN
+    assert set(doc["specs"]) == set(ce.SPEC_FIELDS)         # the full field set
+    # only the five datasheet-stated values are known; everything else (hand_dof, manipulation,
+    # vision, ...) stays UNKNOWN
+    assert {k: v for k, v in doc["specs"].items() if v is not None} == DATASHEET_SPECS
     for scalar in ("model_code", "announced_year"):
         assert doc[scalar] is None, scalar
     assert doc["official_url"] == "https://neura-robotics.com/product/4ne1-mini-reservation"
@@ -107,12 +120,43 @@ def test_the_file_still_asserts_identity_and_no_commercial_or_derived_fact():
             and image["usage_basis"] == "OFFICIAL_MANUFACTURER_MEDIA")
     # publication does not imply maturity, and no unknown spec was filled
     assert doc["commercial_status"] == "UNKNOWN"
-    assert all(v is None for v in doc["specs"].values())
+    assert {k: v for k, v in doc["specs"].items() if v is not None} == DATASHEET_SPECS
     assert image["source_url"] == doc["official_url"]
     for collection in ("commercial_status_evidence", "deployments", "capabilities",
                        "use_case_fits"):
         assert doc[collection] == [], collection  # nothing else
     assert all("spec_overrides" not in v for v in doc["variants"])
+
+
+def test_the_datasheet_delta_is_exactly_what_the_sheet_states():
+    """Owner instruction 2026-10-04: extract the NEURA datasheet. Only values the sheet states,
+    under the existing semantics; the ambiguous lines stay verbatim; nothing is derived."""
+    doc = json.loads(STUB.read_text(encoding="utf-8"))
+    specs = doc["specs"]
+    assert {k: specs[k] for k in DATASHEET_SPECS} == DATASHEET_SPECS
+    # NOT mapped: the sheet does not say walking speed, hand DoF, manipulation, vision or UI
+    for unmapped in ("walk_speed_ms", "hand_dof", "hand_type", "has_manipulation", "has_vision",
+                     "has_language_ui", "has_sdk", "ros_support", "has_teleoperation",
+                     "battery_wh", "arm_span_cm", "reach_cm", "autonomy", "mobility"):
+        assert specs[unmapped] is None, unmapped
+    note = doc["specs_note"]
+    assert "AGENT_ASSISTED_RESEARCH" in note and "not human-verified" in note.lower()
+    assert "MANUAL_BOOTSTRAP reading" in note
+    assert "1e8d135d28d2f0e0d55496aca93f66793f83bf63f2438045170a12d349e12087" in note
+    # the materializer rewrites only the derived default ending, never this note
+    assert not note.endswith(". All other specifications are not yet verified.")
+    caveats = {c["field"]: c["text"] for c in doc["spec_caveats"]}
+    assert "base unit only" in caveats["degrees_of_freedom"]
+    assert "12 DoF" in caveats["degrees_of_freedom"]
+    assert "per arm or in total" in caveats["payload_kg"]
+    sheet = [x for x in doc["extended_specs"] if x.get("source_kind") == "MANUFACTURER_DOC"]
+    assert {x["key"] for x in sheet} == {"max_speed", "operating_time", "motion_endurance",
+                                         "safety_sensors"}
+    url = "https://neurarobotics.px.media/plk/Jj/4NE1Minidatasheet.pdf"
+    assert all(x["source_url"] == url and "variant_slug" not in x
+               and x["observed_at"] == "2026-10-04" for x in sheet)
+    # the variant-scoped, claim-materialized facts are untouched
+    assert doc["availability_offers"][0]["delivery_estimate_label"] == "Expected in 2026"
 
 
 class _Recording:
@@ -149,10 +193,16 @@ def _state(conn, robot_id, maker_id):
         "manufacturers": q("SELECT count(*) FROM manufacturer"),
         "same_name_or_slug": q("SELECT count(*) FROM robot WHERE name = %s OR slug = %s",
                                NAME, SLUG),
+        # everything but the identity/readiness metadata and the datasheet-stated values, which
+        # are asserted explicitly below ("datasheet" key)
         "robot": q("SELECT md5((to_jsonb(r) - 'updated_at' - 'summary' - 'official_url' "
-                   "- 'search_vector')::text) "
+                   "- 'search_vector' - 'height_cm' - 'weight_kg' - 'payload_kg' "
+                   "- 'runtime_minutes' - 'degrees_of_freedom' - 'spec_caveats')::text) "
                    "FROM robot r WHERE id = %s",
                    robot_id),
+        "datasheet": conn.execute(
+            "SELECT height_cm, weight_kg, payload_kg, runtime_minutes, degrees_of_freedom "
+            "FROM robot WHERE id = %s", (robot_id,)).fetchone(),
         "manufacturer": q("SELECT md5((to_jsonb(m) - 'updated_at')::text) "
                           "FROM manufacturer m WHERE id = %s", maker_id),
         "is_published": q("SELECT is_published FROM robot WHERE id = %s", robot_id),
@@ -207,11 +257,13 @@ def test_the_stub_adopts_the_existing_database_robot(scratch_db):  # noqa: F811
         assert after["manufacturers"] == before["manufacturers"]
         assert after["same_name_or_slug"] == 1                        # no duplicate identity
         assert after["robot"] == before["robot"]                      # identical but updated_at
+        assert tuple(float(x) for x in after["datasheet"]) == (132.0, 36.0, 3.0, 150.0, 25.0)
+        assert all(x is None for x in before["datasheet"])            # nothing was there before
         assert after["manufacturer"] == before["manufacturer"]
         assert after["is_published"] is False and before["is_published"] is False
         assert after["evidence"] == before["evidence"]                # id AND content intact
         assert after["children"] == {**dict.fromkeys(CHILD_TABLES, 0),   # only the delta appeared
-                                     "robot_variant": 2, "specification": 5,
+                                     "robot_variant": 2, "specification": 9,
                                      "pricing_offer": 2, "availability_offer": 2,
                                      "robot_image": 1}
     assert states[0] == states[1]                                     # the 2nd run changes nothing

@@ -43,16 +43,16 @@
   "images": [
     {
       "image_url": "/robots/xpeng-iron.webp",
-      "source_url": "https://www.xpeng.com/news/01a080371029a057bc8e8a02a2c6012b",
+      "source_url": "https://www.xpeng.com/technology/ai_robot_iron",
       "source_name": "XPENG",
       "source_type": "MANUFACTURER",
-      "image_type": "ACTION",
+      "image_type": "FRONT",
       "identity_status": "VERIFIED",
       "rights_status": "UNKNOWN",
       "usage_basis": "OFFICIAL_MANUFACTURER_MEDIA",
       "is_official": true,
       "is_primary": true,
-      "attribution": "© XPENG",
+      "attribution": "© XPENG (official product render)",
       "last_verified_at": "2026-10-03T00:00:00Z",
       "identity_confirmed_by": "robert@humanoid.company"
     }

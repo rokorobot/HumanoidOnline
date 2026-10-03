@@ -299,7 +299,7 @@ def test_materialization_adds_exactly_three_facts_and_nothing_else(site, tmp_pat
             "availability_offers", "capabilities", "use_case_fits", "images", "summary",
             "announced_year")
     assert {k: after[k] for k in keep} == {k: before[k] for k in keep}
-    assert after["commercial_status"] == "UNKNOWN" and after["is_published"] is False
+    assert after["commercial_status"] == "ANNOUNCED" and after["is_published"] is True
     assert not materialize.plan_materialization(site.session, site.slug, tmp_path).changed
 
 
@@ -322,7 +322,8 @@ def test_the_importer_and_verification_close_the_chain_idempotently(site, tmp_pa
         "SELECT degrees_of_freedom, hand_dof, hand_type, autonomy::text, has_sdk, "
         "is_published, commercial_status::text FROM robot WHERE slug = :s"),
         {"s": site.slug}).one()
-    assert tuple(row) == (76, 21, None, None, None, False, "UNKNOWN")
+    # a default import never publishes (DR-C1): only --apply-publication-state does
+    assert tuple(row) == (76, 21, None, None, None, False, "ANNOUNCED")
     spec = site.session.execute(text(
         "SELECT s.value_text, s.variant_id IS NULL AS product_level, s.edition_scope, "
         "s.source_kind, s.source_url FROM specification s JOIN spec_definition d "
@@ -348,9 +349,10 @@ def test_the_importer_and_verification_close_the_chain_idempotently(site, tmp_pa
 def test_nothing_else_in_the_catalogue_or_decision_layers_moves(site, tmp_path):
     ingest_all(site)
     tables = ("robot_variant", "pricing_offer", "availability_offer", "robot_capability",
-              "use_case_fit", "evidence_source", "promotion_audit")
+              "use_case_fit", "promotion_audit")
     before = {t: site.session.scalar(text(f"SELECT count(*) FROM {t}")) for t in tables}
     images_before = site.session.scalar(text("SELECT count(*) FROM robot_image"))
+    evidence_before = site.session.scalar(text("SELECT count(*) FROM evidence_source"))
     make_claims(site)
     path = stub(site, tmp_path)
     materialize.apply_plan(materialize.plan_materialization(site.session, site.slug, tmp_path))
@@ -358,6 +360,8 @@ def test_nothing_else_in_the_catalogue_or_decision_layers_moves(site, tmp_path):
     assert {t: site.session.scalar(text(f"SELECT count(*) FROM {t}")) for t in tables} == before
     # the catalogue file carries IRON's one photograph (2026-10-03): the importer adds exactly it
     assert site.session.scalar(text("SELECT count(*) FROM robot_image")) == images_before + 1
+    # ... and its one COMMERCIAL_STATUS evidence row (ANNOUNCED, 2026-10-03)
+    assert site.session.scalar(text("SELECT count(*) FROM evidence_source")) == evidence_before + 1
     decisions = site.session.scalar(select(func.count()).select_from(AcceptedClaim))
     assert decisions == 3
     states = pr.derive_states(site.session, site.all_proposals())

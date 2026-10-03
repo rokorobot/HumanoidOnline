@@ -290,9 +290,15 @@ def test_the_catalogue_entry_is_identity_and_reference_only():
         encoding="utf-8"))
     assert (d["slug"], d["name"], d["manufacturer_slug"]) == ("xpeng-iron", "IRON",
                                                               "xpeng-robotics")
-    assert d["commercial_status"] == "UNKNOWN" and d["is_published"] is False
+    # published as ANNOUNCED by owner decision 2026-10-03 (launch "planned for 2027", XPENG)
+    assert d["commercial_status"] == "ANNOUNCED" and d["is_published"] is True
+    [ev] = d["commercial_status_evidence"]
+    assert ev["source_url"].endswith("01a080371029a057bc8e8a02a2c6012b")
+    assert "planned for 2027" in ev["excerpt"] and ev["verified_at"] is None
+    assert ev["confidence"] == "HIGH"
     assert d["official_url"] == "https://www.xpeng.com/technology/ai_robot_iron"
-    assert d["summary"] is None and d["announced_year"] is None
+    assert "planned for 2027" in d["summary"] and d["announced_year"] is None
+    assert "price" in d["summary"] and "$" not in d["summary"]
     # the owner-approved current-configuration slice (2026-10-03) and nothing else
     # + hand_dof = 21 PER HAND (owner decision A, same date); never a two-hand total
     assert (d["specs"]["degrees_of_freedom"], d["specs"]["hand_dof"]) == (76, 21)
@@ -302,7 +308,7 @@ def test_the_catalogue_entry_is_identity_and_reference_only():
     assert compute["key"] == "compute_ai" and compute["value"].startswith("three Turing AI chips")
     assert compute["source_kind"] == "MANUFACTURER" and "variant_slug" not in compute
     for coll in ("variants", "pricing_offers", "availability_offers", "capabilities",
-                 "use_case_fits", "deployments", "commercial_status_evidence"):
+                 "use_case_fits", "deployments"):
         assert d[coll] == [], coll
     # the owner's chosen image (2026-10-03): a derivative of XPENG's official product render,
     # displayed by explicit owner decision (OWNER_APPROVED_DISPLAY); rights stay UNKNOWN

@@ -304,17 +304,17 @@ def test_the_catalogue_entry_is_identity_and_reference_only():
     for coll in ("variants", "pricing_offers", "availability_offers", "capabilities",
                  "use_case_fits", "deployments", "commercial_status_evidence"):
         assert d[coll] == [], coll
-    # XPENG's own official product render of IRON, cropped from the product-page original
-    # (owner-directed 2026-10-03; a render, recorded as such in the attribution)
+    # the owner's chosen image (2026-10-03): a derivative of XPENG's official product render,
+    # displayed by explicit owner decision (OWNER_APPROVED_DISPLAY); rights stay UNKNOWN
     [img] = d["images"]
     assert (img["image_url"], img["source_name"], img["source_type"], img["image_type"]) == (
         "/robots/xpeng-iron.webp", "XPENG", "MANUFACTURER", "FRONT")
     assert (img["identity_status"], img["rights_status"], img["usage_basis"]) == (
-        "VERIFIED", "UNKNOWN", "OFFICIAL_MANUFACTURER_MEDIA")
+        "VERIFIED", "UNKNOWN", "OWNER_APPROVED_DISPLAY")
     assert img["is_official"] is True and img["is_primary"] is True
     assert img["identity_confirmed_by"] == "robert@humanoid.company"
     assert img["source_url"] == "https://www.xpeng.com/technology/ai_robot_iron"
-    assert "official product render" in img["attribution"]
+    assert "owner-supplied derivative" in img["attribution"]
     assert (REPO / "apps" / "web" / "public" / "robots" / "xpeng-iron.webp").is_file()
 
 

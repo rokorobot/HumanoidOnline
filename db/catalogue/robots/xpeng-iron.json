@@ -49,10 +49,10 @@
       "image_type": "FRONT",
       "identity_status": "VERIFIED",
       "rights_status": "UNKNOWN",
-      "usage_basis": "OFFICIAL_MANUFACTURER_MEDIA",
+      "usage_basis": "OWNER_APPROVED_DISPLAY",
       "is_official": true,
       "is_primary": true,
-      "attribution": "© XPENG (official product render)",
+      "attribution": "© XPENG — owner-supplied derivative of XPENG's official product render",
       "last_verified_at": "2026-10-03T00:00:00Z",
       "identity_confirmed_by": "robert@humanoid.company"
     }

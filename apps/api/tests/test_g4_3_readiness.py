@@ -349,14 +349,10 @@ def test_a_negative_is_never_inferred_from_wording_that_has_no_ratified_mapping(
 
 def test_the_legacy_baseline_matches_the_catalogue_and_can_only_shrink():
     entries = json.loads(BASELINE.read_text(encoding="utf-8"))["entries"]
-    # the 8 legacy falses were corrected to NULL in G4-4 (PR B): none remain in the baseline
+    # the legacy baseline is now EMPTY: the 8 legacy falses were corrected to NULL (G4-4 PR B) and
+    # the 4 summary-less published robots got summaries (G4-4 PR C)
     assert [e for e in entries if e["field"] != "summary"] == []
-    assert {e["slug"] for e in entries if e["field"] == "summary"} == {
-        "honda-asimo",
-        "rainbow-hubo",
-        "softbank-nao",
-        "softbank-pepper",
-    }
+    assert {e["slug"] for e in entries if e["field"] == "summary"} == set()
     robots = {}
     for p in sorted((REPO / "db" / "catalogue" / "robots").glob("*.json")):
         d = json.loads(p.read_text(encoding="utf-8"))
@@ -397,13 +393,19 @@ def test_a_summary_is_required_only_when_a_robot_becomes_published():
             rd.integrity_check(sparse(summary=bad), transition=True)
         ), bad
     # legacy published robots that predate the rule are a coverage warning, never a failure
-    legacy_rec = RobotRecord(**{**none.__dict__, "slug": "honda-asimo", "is_published": True})
-    assert blocks(rd.integrity_check(legacy_rec, legacy=LEGACY)) == []
-    assert blocks(rd.integrity_check(legacy_rec, legacy=LEGACY, transition=True)) == []
+    # (the four production cases got summaries in G4-4, so a synthetic baseline entry is used)
+    synthetic = frozenset({("legacy-robot", "summary")})
+    legacy_rec = RobotRecord(**{**none.__dict__, "slug": "legacy-robot", "is_published": True})
+    assert blocks(rd.integrity_check(legacy_rec, legacy=synthetic)) == []
+    assert blocks(rd.integrity_check(legacy_rec, legacy=synthetic, transition=True)) == []
     assert any(
         f.code == "SUMMARY_MISSING" and f.severity == rd.WARN
-        for f in rd.coverage_audit(legacy_rec, legacy=LEGACY).findings
+        for f in rd.coverage_audit(legacy_rec, legacy=synthetic).findings
     )
+    # without a baseline entry the same robot's missing summary only blocks a NEW publication
+    flip = rd.integrity_check(legacy_rec, legacy=LEGACY, transition=True)
+    assert "SUMMARY_MISSING" in codes(flip)
+    assert blocks(rd.integrity_check(legacy_rec, legacy=LEGACY)) == []
     # a sparse summary is enough: it does not have to summarize every field
     assert "SUMMARY_NOT_USEFUL" not in codes(rd.integrity_check(sparse(), transition=True))
 

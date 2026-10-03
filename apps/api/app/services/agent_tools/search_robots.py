@@ -28,6 +28,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.models.robot import Robot
+from app.schemas.robot import ScopeNoteRead
 from app.services import reads
 from app.services.agent_tools.errors import (
     InvalidArgument,
@@ -46,6 +47,7 @@ from app.services.pricing import (
     ceiling_exclusions,
     validate_price_pair,
 )
+from app.services.resolved_facts import scope_notes_for
 from app.services.robot_filters import (
     InvalidFilterEnum,
     InvalidRegion,
@@ -81,6 +83,9 @@ class SearchResult:
     offset: int
     warnings: list[str] = field(default_factory=list)
     contract_version: str = CONTRACT_VERSION
+    #: G4 (ANY-VARIANT): per robot slug, why a result matched a positive capability filter on
+    #: only SOME configurations ("Available on some configurations"). Empty when none applies.
+    scope_notes: dict[str, list[ScopeNoteRead]] = field(default_factory=dict)
 
 
 def search_robots(
@@ -185,6 +190,8 @@ def search_robots(
         ros_support=ros_support,
         developer_edition=developer_edition,
         has_manipulation=has_manipulation,
+        # G4: capability filters are resolved by the shared resolver (same as /api/robots).
+        session=session,
     )
 
     base = apply_catalogue_filters(
@@ -247,11 +254,17 @@ def search_robots(
         project_list_item(reads.serialize_list_item(r, snapshot)) for r in robots
     ]
 
+    notes = scope_notes_for(
+        session, [r.id for r in robots],
+        {"has_sdk": has_sdk, "ros_support": ros_support, "has_manipulation": has_manipulation})
+    scope_notes = {r.slug: notes[r.id] for r in robots if r.id in notes}
+
     return SearchResult(
         items=items,
         total=total,
         limit=limit,
         offset=offset,
+        scope_notes=scope_notes,
         # Deterministic and deduplicated: a caller diffing two responses should
         # see a change in meaning, never a change in ordering.
         warnings=sorted(set(warnings)),

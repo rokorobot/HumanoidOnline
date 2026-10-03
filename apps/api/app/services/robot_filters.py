@@ -212,6 +212,25 @@ def resolve_sort(sort: str, *, price_currency: str | None = None):
     return column.desc().nullslast() if descending else column.asc().nullslast()
 
 
+#: The capability filters resolved by the single G4 resolver (DR-G4 section 6, ANY-VARIANT).
+#: Their predicates are robot-id sets computed from the resolved facts, never the raw column.
+_RESOLVED_FILTERS = ("has_sdk", "ros_support", "has_manipulation")
+
+
+def _resolved_sets(session, **requested):
+    """{property: (satisfied ids, unknown ids)} for the active resolver-governed filters."""
+    active = {p: v for p, v in requested.items() if p in _RESOLVED_FILTERS and v is not None}
+    if not active:
+        return {}
+    if session is None:
+        raise ValueError(
+            "a session is required to apply a capability filter: it is resolved by the shared "
+            "G4 resolver, never by the raw robot column")
+    from app.services.resolved_facts import capability_id_sets
+
+    return {p: capability_id_sets(session, p, v) for p, v in active.items()}
+
+
 def _nullable_fact_constraints(
     *,
     payload_min,
@@ -223,6 +242,7 @@ def _nullable_fact_constraints(
     ros_support,
     developer_edition,
     has_manipulation,
+    session=None,
 ) -> list[tuple]:
     """Active hard constraints on **nullable first-class robot facts**.
 
@@ -262,14 +282,17 @@ def _nullable_fact_constraints(
     if autonomy_min:
         allowed = AUTONOMY_ORDER[AUTONOMY_ORDER.index(autonomy_min):]
         constraints.append((Robot.autonomy.in_(allowed), Robot.autonomy.is_(None)))
-    for column, value in (
-        (Robot.has_sdk, has_sdk),
-        (Robot.ros_support, ros_support),
-        (Robot.developer_edition, developer_edition),
-        (Robot.has_manipulation, has_manipulation),
-    ):
-        if value is not None:
-            constraints.append((column.is_(value), column.is_(None)))
+    # G4: SDK / ROS / manipulation are resolved by the shared resolver (ANY-VARIANT for a
+    # positive filter), then expressed as robot-id sets so SQL pagination and counts still work.
+    resolved = _resolved_sets(
+        session, has_sdk=has_sdk, ros_support=ros_support, has_manipulation=has_manipulation)
+    for prop in _RESOLVED_FILTERS:
+        if prop in resolved:
+            satisfied_ids, unknown_ids = resolved[prop]
+            constraints.append((Robot.id.in_(satisfied_ids), Robot.id.in_(unknown_ids)))
+    if developer_edition is not None:
+        constraints.append(
+            (Robot.developer_edition.is_(developer_edition), Robot.developer_edition.is_(None)))
     return constraints
 
 
@@ -304,7 +327,7 @@ def unknown_exclusion_query(**filters):
     ask (an `EXISTS`, never a materialised list).
     """
     constraints = _nullable_fact_constraints(
-        **{k: filters[k] for k in _NULLABLE_FACT_INPUTS}
+        **{k: filters[k] for k in _NULLABLE_FACT_INPUTS}, session=filters.get("session")
     )
     if not constraints:
         return None
@@ -341,6 +364,7 @@ def apply_catalogue_filters(
     has_manipulation,
     region_ids: Collection[uuid.UUID] | None = None,
     offered_in_region_ids: Collection[uuid.UUID] | None = None,
+    session=None,
 ):
     """Apply the governed catalogue predicates to `stmt`.
 
@@ -406,6 +430,7 @@ def apply_catalogue_filters(
         ros_support=ros_support,
         developer_edition=developer_edition,
         has_manipulation=has_manipulation,
+        session=session,
     ):
         stmt = stmt.where(satisfied)
 

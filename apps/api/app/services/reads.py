@@ -33,6 +33,7 @@ from app.schemas.robot import (
     UseCaseFitRead,
     VariantRead,
 )
+from app.services.resolved_facts import resolved_facts_for
 
 # Maturity ranking for a manufacturer's PORTFOLIO status (display-only, derived
 # from an existing canonical fact — the published robots' commercial_status).
@@ -751,6 +752,8 @@ def serialize_detail(
         availability_offers=availability,
         deployments=deployments,
         images=images,
+        # G4: scoped resolution by the ONE shared resolver (services/fact_resolution.py).
+        resolved_facts=resolved_facts_for(robot),
     )
 
 
@@ -767,6 +770,7 @@ COMPARE_FIELDS: list[tuple[str, str, str]] = [
     ("manipulation", "hand_dof", "Hand DOF"),
     ("manipulation", "has_manipulation", "Manipulation"),
     ("intelligence", "autonomy", "Autonomy"),
+    ("intelligence", "has_teleoperation", "Teleoperation"),
     ("intelligence", "has_vision", "Vision"),
     ("intelligence", "has_language_ui", "Language UI"),
     ("developer", "has_sdk", "SDK"),

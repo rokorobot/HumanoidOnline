@@ -13,7 +13,13 @@ from app.config import get_settings
 from app.db.session import get_session
 from app.models.robot import Robot
 from app.schemas.common import Page
-from app.schemas.robot import CompareResponse, CompareRow, RobotDetail, RobotListItem
+from app.schemas.robot import (
+    CompareResponse,
+    CompareRow,
+    ResolvedFactRead,
+    RobotDetail,
+    RobotListItem,
+)
 from app.services import compare_cache, reads
 from app.services.pricing import (
     InvalidPriceQuery,
@@ -21,6 +27,7 @@ from app.services.pricing import (
     validate_price_pair,
 )
 from app.services.regions import discovery_market_rank
+from app.services.resolved_facts import RESOLVED_PROPERTIES, scope_notes_for
 from app.services.robot_filters import (
     InvalidFilterValue,
     apply_catalogue_filters,
@@ -110,6 +117,8 @@ def list_robots(
             mobility=mobility, autonomy_min=autonomy_min, has_sdk=has_sdk,
             ros_support=ros_support, developer_edition=developer_edition,
             has_manipulation=has_manipulation,
+            # G4: capability filters are resolved by the shared resolver (ANY-VARIANT).
+            session=session,
         )
 
         count_stmt = _apply_filters(select(func.count(Robot.id)), **filters)
@@ -141,6 +150,13 @@ def list_robots(
     items = [
         reads.serialize_list_item(r, snapshot, market_rank=market_rank) for r in robots
     ]
+    # G4: disclose a match that holds on only some configurations (never a product-wide claim).
+    notes = scope_notes_for(
+        session, [r.id for r in robots],
+        {"has_sdk": has_sdk, "ros_support": ros_support, "has_manipulation": has_manipulation})
+    if notes:
+        for r, item in zip(robots, items, strict=True):
+            item.scope_notes = notes.get(r.id, [])
     return Page(items=items, total=total, limit=limit, offset=offset)
 
 
@@ -170,6 +186,9 @@ def _reordered_for_request(cached: CompareResponse, order: list[str]) -> Compare
             key=row.key,
             label=row.label,
             values={slug: row.values[slug] for slug in order},
+            resolved=(
+                {slug: row.resolved[slug] for slug in order}
+                if row.resolved is not None else None),
         )
         for row in cached.rows
     ]
@@ -231,12 +250,21 @@ def compare_robots(
         reads.serialize_detail(session, r, evidence_rows=evidence_rows) for r in robots
     ]
     rows: list[CompareRow] = []
+    resolved_by_slug = {d.slug: {f.property: f for f in d.resolved_facts} for d in details}
     for group, attr, label in reads.COMPARE_FIELDS:
         values: dict[str, float | bool | str | None] = {}
-        for r in robots:
-            raw = getattr(r, attr)
-            values[r.slug] = float(raw) if isinstance(raw, Decimal) else raw
-        rows.append(CompareRow(group=group, key=attr, label=label, values=values))
+        resolved: dict[str, ResolvedFactRead] | None = None
+        if attr in RESOLVED_PROPERTIES:
+            # G4: the scoped state is exposed per robot; the scalar is only the resolved value
+            # for PRODUCT_VALUE / UNIFORM_VARIANTS (PARTIAL / VARIES are never a plain unknown).
+            resolved = {r.slug: resolved_by_slug[r.slug][attr] for r in robots}
+            values = {slug: f.value for slug, f in resolved.items()}
+        else:
+            for r in robots:
+                raw = getattr(r, attr)
+                values[r.slug] = float(raw) if isinstance(raw, Decimal) else raw
+        rows.append(CompareRow(
+            group=group, key=attr, label=label, values=values, resolved=resolved))
     result = CompareResponse(robots=details, rows=rows)
 
     compare_cache.put(key, result, ttl_seconds=ttl)

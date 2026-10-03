@@ -22,6 +22,7 @@ from app.services.matching.inputs import (
     RequirementInput,
     RobotInput,
 )
+from app.services.resolved_facts import conservative_boolean, load_resolutions
 
 
 def _f(v) -> float | None:
@@ -114,8 +115,14 @@ def load_candidates(session: Session, req: RequirementInput) -> list[RobotInput]
         )
     ).scalars().all()
 
+    # G4: robot-level capability booleans come from the shared resolver, conservatively
+    # (satisfies_hard_requirement): only PRODUCT_VALUE / UNIFORM_VARIANTS true is True; PARTIAL,
+    # VARIES, UNKNOWN and CONFLICT stay unknown; the raw column never stands in for them.
+    resolved = load_resolutions(session, [r.id for r in robots])
+
     out: list[RobotInput] = []
     for r in robots:
+        facts = resolved[r.id]
         uc_fit = None
         if target_uc_id is not None:
             for f in r.use_case_fits:
@@ -170,11 +177,11 @@ def load_candidates(session: Session, req: RequirementInput) -> list[RobotInput]
                 manufacturer_country=None,
                 commercial_status=r.commercial_status,
                 payload_kg=_f(r.payload_kg),
-                has_manipulation=r.has_manipulation,
+                has_manipulation=conservative_boolean(facts["has_manipulation"]),
                 autonomy=r.autonomy,
                 runtime_minutes=r.runtime_minutes,
-                has_sdk=r.has_sdk,
-                ros_support=r.ros_support,
+                has_sdk=conservative_boolean(facts["has_sdk"]),
+                ros_support=conservative_boolean(facts["ros_support"]),
                 developer_edition=r.developer_edition,
                 use_case_fit=uc_fit,
                 offers=offers,

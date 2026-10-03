@@ -78,6 +78,11 @@ export function RobotCard({
           <Metric label="Height" value={robot.height_cm} unit="cm" />
           <Metric label="Mobility" value={robot.mobility} />
         </div>
+        {(robot.scope_notes ?? []).map((n) => (
+          <div key={n.property} className="ho-syslabel" data-scope-note={n.property}>
+            {n.label}
+          </div>
+        ))}
       </div>
       <div className="rcard-foot">
         <PriceStateCard price={robot.price_display} />

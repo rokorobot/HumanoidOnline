@@ -1,8 +1,11 @@
 // SiteNav — the restrained PERMANENT nav (system header). One row:
-// HUMANOIDONLINE · ROBOTS · COMPARE · MANUFACTURERS · USE CASES · ABOUT · FIND A HUMANOID.
+// HUMANOIDONLINE · ROBOTS · COMPARE · MANUFACTURERS · USE CASES · [RESEARCH] · ABOUT · FIND A
+// HUMANOID. RESEARCH is shown only once a Research Resource is published.
 // Orange marks the active section. No bulky SaaS navbar. Two registers:
 // `light` (data pages) and `dark` (used inside the hero/identity top strips).
 import Link from "next/link";
+
+import { researchNavVisible } from "@/lib/research";
 
 import { GraphicMarker } from "./GraphicMarker";
 
@@ -11,6 +14,7 @@ export type NavSection =
   | "compare"
   | "manufacturers"
   | "use-cases"
+  | "research"
   | "about"
   | "find"
   | null;
@@ -23,6 +27,16 @@ const LINKS: { key: Exclude<NavSection, null>; href: string; label: string }[] =
   { key: "about", href: "/about", label: "About" },
 ];
 
+// Research is part of the nav only while at least one Research Resource is
+// published (RESEARCH_PUBLISHED_REGIONS); before that the nav is unchanged.
+const RESEARCH_LINK = { key: "research" as const, href: "/research", label: "Research" };
+
+function primaryLinks() {
+  if (!researchNavVisible()) return LINKS;
+  const aboutAt = LINKS.findIndex((l) => l.key === "about");
+  return [...LINKS.slice(0, aboutAt), RESEARCH_LINK, ...LINKS.slice(aboutAt)];
+}
+
 export function SiteNav({ active = null }: { active?: NavSection }) {
   return (
     <header className="site-head">
@@ -32,7 +46,7 @@ export function SiteNav({ active = null }: { active?: NavSection }) {
         </Link>
       </div>
       <nav className="nav" aria-label="Primary">
-        {LINKS.map((l) => (
+        {primaryLinks().map((l) => (
           <Link
             key={l.key}
             href={l.href}
@@ -75,6 +89,11 @@ export function DarkNav({ active = null }: { active?: NavSection }) {
       >
         Use Cases
       </Link>
+      {researchNavVisible() && (
+        <Link href="/research" aria-current={active === "research" ? "page" : undefined}>
+          Research
+        </Link>
+      )}
       <Link href="/about" aria-current={active === "about" ? "page" : undefined}>
         About
       </Link>
@@ -97,6 +116,13 @@ const FOOTER_LINKS: { href: string; label: string }[] = [
 ];
 
 export function SiteFooter() {
+  const footerLinks = researchNavVisible()
+    ? [
+        ...FOOTER_LINKS.slice(0, FOOTER_LINKS.findIndex((l) => l.href === "/about")),
+        { href: "/research", label: "Research" },
+        ...FOOTER_LINKS.slice(FOOTER_LINKS.findIndex((l) => l.href === "/about")),
+      ]
+    : FOOTER_LINKS;
   return (
     <footer className="foot ho-dark">
       <div className="wrap foot-grid">
@@ -132,7 +158,7 @@ export function SiteFooter() {
         </div>
         <nav className="foot-nav" aria-label="Footer">
           <ul>
-            {FOOTER_LINKS.map((l) => (
+            {footerLinks.map((l) => (
               <li key={l.href}>
                 <Link href={l.href}>{l.label}</Link>
               </li>

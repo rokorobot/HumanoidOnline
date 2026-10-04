@@ -12,7 +12,7 @@ import {
   researchSitemapEntries,
   resolveResearchAccess,
 } from "../lib/research";
-import { EDITORIAL, editorialState } from "../lib/research-editorial";
+import { EDITORIAL, editorialSourceLabel, editorialState } from "../lib/research-editorial";
 import { buildResearchJsonLd } from "../lib/research-jsonld";
 import { projection } from "./research-fixture";
 
@@ -270,6 +270,35 @@ describe("editorial fragment", () => {
   it("cites an official UN M49 source for the Europe classification statement", () => {
     expect(EDITORIAL.europe.sources).toEqual(["https://unstats.un.org/unsd/methodology/m49/overview/"]);
     expect(EDITORIAL.europe.paragraphs[0]).toContain("UN M49 Europe classification");
+  });
+
+  it("renders the UN M49 citation as a visible link inside the editorial section", () => {
+    renderPage(projection(), false);
+    const source = within(screen.getByTestId("editorial")).getByTestId("editorial-source");
+    expect(source.textContent).toBe(
+      "Source: UN Statistics Division \u2014 M49 Standard Country or Area Codes",
+    );
+    const link = within(source).getByRole("link");
+    expect(link.getAttribute("href")).toBe(EDITORIAL.europe.sources[0]);
+    expect(link.getAttribute("href")).toBe("https://unstats.un.org/unsd/methodology/m49/overview/");
+  });
+
+  it("renders no source block when the fragment has no sources", () => {
+    const original = EDITORIAL.europe.sources;
+    EDITORIAL.europe.sources = [];
+    try {
+      renderPage(projection(), false);
+      expect(screen.getByTestId("editorial")).toBeTruthy(); // the paragraphs still render
+      expect(screen.queryByTestId("editorial-source")).toBeNull();
+      expect(screen.getByTestId("editorial").textContent).not.toContain("Source:");
+    } finally {
+      EDITORIAL.europe.sources = original;
+    }
+  });
+
+  it("labels an unlisted source host by its hostname rather than showing a bare URL", () => {
+    expect(editorialSourceLabel("https://example.org/page")).toBe("example.org");
+    expect(editorialSourceLabel("https://unstats.un.org/x")).toContain("M49");
   });
 
   it("still treats an unreviewed fragment as DRAFT: hidden publicly, marked in preview", () => {

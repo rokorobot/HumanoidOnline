@@ -35,6 +35,21 @@ export const EDITORIAL: Record<ResearchRegion, EditorialFragment> = {
   },
 };
 
+// Readable citation text for a source URL (shown beside the link). An unlisted host
+// falls back to its hostname, so a source is never shown without a label.
+const SOURCE_LABELS: Record<string, string> = {
+  "unstats.un.org": "UN Statistics Division \u2014 M49 Standard Country or Area Codes",
+};
+
+export function editorialSourceLabel(url: string): string {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    return SOURCE_LABELS[host] ?? host;
+  } catch {
+    return url;
+  }
+}
+
 export type EditorialState =
   | { show: false }
   | { show: true; draft: boolean; outdated: boolean; fragment: EditorialFragment };

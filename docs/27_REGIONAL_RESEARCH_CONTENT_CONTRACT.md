@@ -183,6 +183,10 @@ A regional page MAY be published only when all hold:
 6. Robots excluded because unpublished are not leaked anywhere in output.
 7. Owner approval of the region's editorial fragment and of publication itself. Publication is the owner's decision; it is not implied by this contract or by the data being ready.
 
+**Human verification is not required for regional-resource publication.** A current, evidence-linked regional commercial offer may qualify when `verified_at` is null, provided its confidence and provenance are shown honestly. `verified_at` represents a stronger verification state; it is not a publication prerequisite. Freshness is measured from `verified_at` when present, otherwise from `observed_at`.
+
+**Confidence must not be upgraded by publication.** A MEDIUM agent-observed row remains MEDIUM on the Regional Research Resource and must not be presented as verified.
+
 Pages failing freshness after publication degrade visibly ("Last observed …, some entries stale") rather than disappearing silently.
 
 ## 13. Tests (AGENTS.md rule 5)

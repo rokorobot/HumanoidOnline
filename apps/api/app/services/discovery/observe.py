@@ -53,6 +53,7 @@ from app.services.discovery.acquisition import (
     _utcnow,
 )
 from app.services.discovery.adapter_run import adapter_problems, resume_adapter, run_adapter
+from app.services.discovery.enrichment import DOCUMENT_SOURCES
 from app.services.discovery.fetcher import FetchLimits, HttpFetcher
 from app.services.discovery.live_adapter import SourceAdapterConfig
 from app.services.discovery.review import review_queue
@@ -64,6 +65,8 @@ COMPLETED, RESUMED, HALTED, FAILED, CANCELLED = (
 # Outcomes that ran nothing.
 DISABLED, NOT_SCHEDULED, NOT_DUE, NO_ADAPTER, INELIGIBLE = (
     "DISABLED", "NOT_SCHEDULED", "NOT_DUE", "NO_ADAPTER", "INELIGIBLE")
+#: A document-host source (G5): scheduled by its own cadence, observed by Lane B (no radar adapter).
+LANE_B_OWNED = "LANE_B_OWNED"
 RUN_IN_PROGRESS, NEEDS_HUMAN, KILL_SWITCH, REFUSED = (
     "RUN_IN_PROGRESS", "NEEDS_HUMAN", "KILL_SWITCH", "REFUSED")
 # Plan mode (no network, no writes): what a cycle would do now.
@@ -207,6 +210,8 @@ def assess(session: Session, source: DiscoverySource, config: SourceAdapterConfi
         return DISABLED, "", None
     if source.observation_interval_hours is None:
         return NOT_SCHEDULED, "no cadence set (source cadence <key> --every ...)", None
+    if config is None and source.key in DOCUMENT_SOURCES:
+        return LANE_B_OWNED, "document source: its cadence is read by Lane B, not the radar", None
     if config is None:
         return NO_ADAPTER, "enabled and scheduled, but no reviewed adapter module", None
     problems = adapter_problems(config, source)

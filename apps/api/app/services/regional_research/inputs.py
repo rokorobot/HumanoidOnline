@@ -58,6 +58,20 @@ class PriceRow:
 
 
 @dataclass(frozen=True)
+class DeploymentRow:
+    """A deployment: evidence of real-world use, NOT of purchasability."""
+
+    region_code: str | None
+    customer_name: str | None
+    provider_slug: str | None
+    transaction_type: str | None
+    unit_count: int | None
+    started_on: date | None
+    status: str | None
+    evidence: tuple[EvidenceRow, ...]
+
+
+@dataclass(frozen=True)
 class RobotRow:
     slug: str
     name: str
@@ -67,6 +81,7 @@ class RobotRow:
     commercial_status: str
     offers: tuple[OfferRow, ...] = ()
     prices: tuple[PriceRow, ...] = ()
+    deployments: tuple[DeploymentRow, ...] = ()
 
 
 @dataclass(frozen=True)

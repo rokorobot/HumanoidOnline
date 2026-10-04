@@ -101,10 +101,34 @@ class QualifyingOffer:
 
 
 @dataclass(frozen=True)
+class RegionalDeployment:
+    """Evidenced use in the region. Separate from purchasability: a deployment
+    never makes a robot a qualifying offer, and carries no freshness window
+    (it records something that happened)."""
+
+    robot_slug: str
+    robot_name: str
+    manufacturer_slug: str
+    manufacturer_name: str
+    region_code: str
+    customer_name: str | None       # None = undisclosed
+    provider_slug: str | None
+    transaction_type: str | None
+    unit_count: int | None
+    started_on: date | None
+    status: str | None
+    evidence_date: date
+    confidence: str                 # weakest confidence; never upgraded
+    human_verified: bool
+    source_urls: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class RobotRef:
     slug: str
     name: str
     manufacturer_slug: str
+    manufacturer_name: str
 
 
 @dataclass(frozen=True)
@@ -150,6 +174,7 @@ class RegionalAvailability:
     member_region_codes: tuple[str, ...]
     key_figures: KeyFigures
     qualifying_offers: tuple[QualifyingOffer, ...]
+    deployments: tuple[RegionalDeployment, ...]
     groups: tuple[GroupSummary, ...]
     reconciles: bool
     gate: GateResult
@@ -312,6 +337,39 @@ def _classify(
 
 
 # --------------------------------------------------------------------------- #
+# Deployments
+# --------------------------------------------------------------------------- #
+def _regional_deployments(
+    robot: RobotRow, members: frozenset[str]
+) -> tuple[RegionalDeployment, ...]:
+    out = []
+    for d in robot.deployments:
+        if d.region_code not in members or not d.evidence:
+            continue  # unresolved/other region, or no evidence: not a regional fact
+        out.append(
+            RegionalDeployment(
+                robot_slug=robot.slug,
+                robot_name=robot.name,
+                manufacturer_slug=robot.manufacturer_slug,
+                manufacturer_name=robot.manufacturer_name,
+                region_code=d.region_code or "",
+                customer_name=d.customer_name,
+                provider_slug=d.provider_slug,
+                transaction_type=d.transaction_type,
+                unit_count=d.unit_count,
+                started_on=d.started_on,
+                status=d.status,
+                evidence_date=max(_evidence_date(e) for e in d.evidence),
+                confidence=min((e.confidence for e in d.evidence),
+                               key=lambda c: _CONFIDENCE_RANK.get(c, -1)),
+                human_verified=all(e.verified_at is not None for e in d.evidence),
+                source_urls=tuple(sorted({e.source_url for e in d.evidence})),
+            )
+        )
+    return tuple(out)
+
+
+# --------------------------------------------------------------------------- #
 # Direct answer
 # --------------------------------------------------------------------------- #
 def _fmt_money(amount: float) -> str:
@@ -433,6 +491,13 @@ def build_regional_availability(
     region_name = next(r.name for r in snapshot.regions if r.code == region_code)
 
     published = sorted((r for r in snapshot.robots if r.is_published), key=lambda r: r.slug)
+    deployments = tuple(
+        sorted(
+            (d for r in published for d in _regional_deployments(r, members)),
+            key=lambda d: (d.robot_slug, d.region_code, d.customer_name or "",
+                           d.started_on or date.min),
+        )
+    )
     grouped: dict[str, list[RobotRow]] = {g: [] for g in GROUP_ORDER}
     offers_by_robot: dict[str, tuple[QualifyingOffer, ...]] = {}
     for robot in published:
@@ -451,7 +516,10 @@ def build_regional_availability(
     groups = tuple(
         GroupSummary(
             reason=g,
-            robots=tuple(RobotRef(r.slug, r.name, r.manufacturer_slug) for r in grouped[g]),
+            robots=tuple(
+                RobotRef(r.slug, r.name, r.manufacturer_slug, r.manufacturer_name)
+                for r in grouped[g]
+            ),
         )
         for g in GROUP_ORDER
     )
@@ -521,6 +589,7 @@ def build_regional_availability(
         member_region_codes=tuple(sorted(members)),
         key_figures=kf,
         qualifying_offers=qualifying_offers,
+        deployments=deployments,
         groups=groups,
         reconciles=reconciles,
         gate=gate,

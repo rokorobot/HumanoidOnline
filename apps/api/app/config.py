@@ -193,6 +193,17 @@ class Settings(BaseSettings):
     # request. A single env var to override — no code change needed to retune.
     compare_cache_ttl_s: int = 60
 
+    # ------------------------------------------- regional research (ADR-027) --
+    # Publication gate for Regional Research Resources. EMPTY (the default) means
+    # NO region is public: GET /api/research/humanoid-availability/{region}
+    # answers 404 to everyone except a holder of the preview token. Publication
+    # is the owner's decision (ADR-027 §12), made by setting this variable to a
+    # comma-separated list of region slugs, e.g. "europe".
+    research_published_regions: str = ""
+    # Review access for a not-yet-published region (sent as X-Research-Preview).
+    # Absent by default = no preview access at all (fail closed).
+    research_preview_token: str | None = None
+
     # -- derived / validated -------------------------------------------------
 
     @model_validator(mode="after")

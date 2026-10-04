@@ -31,6 +31,7 @@ from app.routers import (
     health,
     manufacturers,
     regions,
+    research,
     robots,
     stats,
     use_cases,
@@ -87,6 +88,7 @@ app.include_router(robots.router)
 app.include_router(manufacturers.router)
 app.include_router(use_cases.router)
 app.include_router(regions.router)
+app.include_router(research.router)
 app.include_router(stats.router)
 # WS5 — Phase-2 buyer intent (first write path).
 app.include_router(buyer_requirements.router)

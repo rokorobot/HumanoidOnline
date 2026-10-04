@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+import { fetchResearchProjection, researchSitemapEntries } from "@/lib/research";
 import { siteUrl } from "@/lib/site";
 import {
   lastMod,
@@ -68,7 +69,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  // ADR-027: regional research resources appear ONLY once published (closed and
+  // preview-only resources must not be discoverable); lastModified is the real
+  // latest evidence date, never the render time.
+  const researchPages = await researchSitemapEntries(origin, (region) =>
+    fetchResearchProjection(region, { mode: "published" }),
+  );
+
   // Grouped by entity type. At catalogue scale this is one file; Next's
   // generateSitemaps() is the split-by-type path when the catalogue grows.
-  return [...core, ...robotPages, ...mfrPages, ...useCasePages];
+  return [...core, ...robotPages, ...mfrPages, ...useCasePages, ...researchPages];
 }

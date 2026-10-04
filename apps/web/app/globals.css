@@ -1002,3 +1002,48 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-line); padding: var(
 .contact-status:focus { outline: 2px solid var(--ho-ink); outline-offset: 2px; }
 .contact-status--error { border-color: var(--ho-signal-ink); color: var(--ho-ink); }
 .contact-status h2 { margin-top: 0; }
+
+/* ADR-027 — Regional Research Resource (presentation only; all content is
+   generated from the governed projection). */
+.research-resource { padding: var(--ho-sp-6) 0 var(--ho-sp-8); }
+.research-resource h1 { margin: 0 0 var(--ho-sp-3, 12px); line-height: 1.1; }
+.research-resource h2 {
+  margin: var(--ho-sp-7) 0 var(--ho-sp-3, 12px);
+  padding-top: var(--ho-sp-3, 12px);
+  border-top: var(--ho-rule-med) solid var(--ho-ink);
+}
+.research-resource h3 { margin: var(--ho-sp-4, 16px) 0 4px; font-size: 1rem; }
+.research-resource p, .research-resource dd { max-width: 75ch; }
+.research-resource .table-scroll {
+  overflow-x: auto; background: var(--ho-paper-2);
+  border: var(--ho-rule-hair) solid var(--ho-ink);
+}
+.research-resource .table-scroll--narrow { max-width: 640px; }
+.research-resource table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.research-resource caption {
+  text-align: left; padding: 8px 12px; font-size: 0.8rem; color: var(--ho-grey-600);
+}
+.research-resource th, .research-resource td {
+  text-align: left; vertical-align: top; padding: 8px 12px;
+  border-top: var(--ho-rule-hair) solid var(--ho-grey-300);
+}
+.research-resource thead th {
+  border-top: 0; border-bottom: var(--ho-rule-med) solid var(--ho-ink); white-space: nowrap;
+}
+.research-resource tbody th[scope="row"] { font-weight: 600; }
+.research-resource td small {
+  display: block; margin-top: 2px; max-width: 30ch; line-height: 1.3;
+  font-size: 0.75rem; color: var(--ho-grey-600);
+}
+.research-resource td .src { display: block; }
+.research-resource ul { columns: 3 15rem; column-gap: var(--ho-sp-5); padding-left: 1.1rem; margin: 8px 0 0; }
+.research-resource dl > div { margin: 0 0 var(--ho-sp-3, 12px); }
+.research-resource dt { font-weight: 600; text-transform: capitalize; }
+.research-resource dd { margin: 2px 0 0; }
+.research-resource [role="note"] {
+  padding: 8px 12px; background: var(--ho-caution-bg);
+  border-left: 4px solid var(--ho-caution); max-width: none;
+}
+.research-resource [role="note"] { margin: 0 0 var(--ho-sp-4, 16px); }
+.research-resource details summary { cursor: pointer; font-size: 0.75rem; color: var(--ho-grey-600); }
+.research-resource p { margin: 0 0 0.75em; }

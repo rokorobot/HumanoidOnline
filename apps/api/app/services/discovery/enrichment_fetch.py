@@ -256,7 +256,10 @@ def not_restated(session: Session, source: DiscoverySource, cfg: g2_ingest.G2Ing
             select(DiscoveryClaimProposal.slot_key, DiscoveryClaimProposal.kind,
                    DiscoveryClaimProposal.evidence_locator, DiscoveryClaimProposal.edition)
             .where(DiscoveryClaimProposal.source_id == source.id,
-                   DiscoveryClaimProposal.robot_slug == cfg.robot_slug)).all()
+                   DiscoveryClaimProposal.robot_slug == cfg.robot_slug,
+                   # a multi-page source (XPENG) proposes from several pages: only slots
+                   # proposed from THIS page can be "not restated" by it
+                   DiscoveryClaimProposal.source_url == url)).all()
         gone = {}
         for slot, kind, locator, edition in seen:
             if slot not in sighted:

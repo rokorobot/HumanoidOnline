@@ -363,6 +363,24 @@ def test_not_restated_is_reported_but_nothing_is_deleted_or_unknowned(lane):
                ((n["kind"], n["url"]) for n in res.not_restated))
 
 
+def test_not_restated_is_judged_per_page_of_a_multi_page_source(lane):
+    """Live finding 2026-10-04: XPENG's four pages produced 114 false NOT_RESTATED because each
+    page was compared with the proposals of the OTHER pages of the same source and robot."""
+    lane.run()
+    first = lane.proposals()[0]
+    clone = DiscoveryClaimProposal(**{
+        c.name: getattr(first, c.name) for c in DiscoveryClaimProposal.__table__.columns
+        if c.name not in ("id", "proposal_seq", "created_at")})
+    clone.digest = "d" * 64
+    clone.slot_key = "e" * 64
+    clone.source_url = PX + "/plk/Jj/another-page.pdf"      # proposed from a DIFFERENT page
+    lane.session.add(clone)
+    lane.session.flush()
+    lane.advance(8)
+    res = lane.run()
+    assert res.not_restated == []
+
+
 def test_changed_document_without_a_registered_extractor_is_reported_only(lane):
     other = PX + "/plk/Jj/other-datasheet.pdf"
     lane.net.put(other, make_pdf([["v1"]]), "application/pdf")

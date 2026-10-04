@@ -11,7 +11,6 @@ from dataclasses import asdict
 
 from .readmodel import (
     QUALIFYING,
-    STALE_OR_NON_CURRENT,
     QualifyingOffer,
     RegionalAvailability,
     RegionalDeployment,
@@ -152,13 +151,15 @@ def _plural(n: int, one: str, many: str) -> str:
 def _health(r: RegionalAvailability) -> dict:
     """Public, deterministic evidence health (not the review-only gate object).
 
-    CURRENT: the normal publication threshold is met AND no published robot is
-    classified STALE_OR_NON_CURRENT for the region.
-    LIMITED_EVIDENCE: the threshold is missed, OR at least one published robot has
-    only stale/non-current regional offer evidence (excluded from current figures).
-    A robot that still has another qualifying current offer is classified QUALIFYING,
-    so an alternate old offer on it never triggers a warning. Stale offers are already
-    excluded from every count and table; this only describes the evidence picture.
+    CURRENT: the normal publication threshold is met AND no published robot has only
+    AGED-OUT regional offer evidence (older than the freshness window).
+    LIMITED_EVIDENCE: the threshold is missed (insufficient current evidence), OR at
+    least one published robot has only aged-out evidence (lost freshness).
+    Fresh evidence that an offer was explicitly withdrawn (`is_current` false) is
+    resolved current knowledge: the offer is excluded from current offers and counts
+    but does NOT by itself downgrade health. A robot that still has another qualifying
+    current offer is QUALIFYING, so an alternate old or withdrawn offer on it never
+    warns. Excluded offers are never shown as current either way.
     """
     g = r.gate
     reasons = []
@@ -173,12 +174,12 @@ def _health(r: RegionalAvailability) -> dict:
             f"{_plural(g.qualifying_manufacturers, 'manufacturer', 'manufacturers')}; "
             f"minimum {g.min_manufacturers}"
         )
-    stale = next((g for g in r.groups if g.reason == STALE_OR_NON_CURRENT), None)
-    stale_n = stale.count if stale else 0
-    if stale_n:
+    aged_n = len(r.aged_out)
+    if aged_n:
         reasons.append(
-            f"{stale_n} published {_plural(stale_n, 'robot has', 'robots have')} only stale or "
-            f"non-current {r.region_name} offer evidence excluded from current figures."
+            f"{aged_n} published {_plural(aged_n, 'robot has', 'robots have')} only aged-out "
+            f"{r.region_name} offer evidence (older than {r.freshness_days} days) excluded "
+            f"from current figures."
         )
     return {
         "status": "LIMITED_EVIDENCE" if reasons else "CURRENT",

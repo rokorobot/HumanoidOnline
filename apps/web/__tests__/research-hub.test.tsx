@@ -142,9 +142,18 @@ describe("hub with zero published resources", () => {
     expect(urls.filter((u) => u.includes("/research"))).toEqual([]);
   });
 
-  it("is still a 404 when a region is flagged but the API does not serve it (readiness)", async () => {
+  it("is omitted when a region is flagged but the API does not serve it (or is unavailable)", async () => {
     publish("europe");
     apiServes = false;
+    await expect(ResearchHubPage()).rejects.toThrow();
+    expect((await sitemap()).map((e) => e.url).filter((u) => u.includes("/research"))).toEqual([]);
+  });
+
+  it("is omitted when the API is unreachable", async () => {
+    publish("europe");
+    fetchMock.mockImplementation(async () => {
+      throw new Error("connect ECONNREFUSED");
+    });
     await expect(ResearchHubPage()).rejects.toThrow();
     expect((await sitemap()).map((e) => e.url).filter((u) => u.includes("/research"))).toEqual([]);
   });

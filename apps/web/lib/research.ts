@@ -174,8 +174,10 @@ export function researchNavVisible(
 }
 
 /**
- * Regions that are published AND actually served publicly (the API also requires
- * data readiness, ADR-027 section 12). The hub exists only while this is non-empty.
+ * Regions that are published AND actually served by the API. The flag is the
+ * owner's persistent publication decision; this additionally confirms the resource
+ * can be read, so the hub is never linked to a page that cannot be served. The hub
+ * exists only while this is non-empty.
  */
 export async function liveResearchRegions(
   fetchProjection: (region: ResearchRegion) => Promise<ResearchProjection | null> = (r) =>
@@ -307,9 +309,8 @@ export async function fetchResearchProjection(
 
 /**
  * The gate + the governed read, together. If a region is flagged published but the
- * API declines to serve it publicly (ADR-027 §12: data readiness not met), a
- * reviewer holding the preview token still gets the review-only view; everyone
- * else gets null (404).
+ * API does not serve it publicly, a reviewer holding the preview token still gets
+ * the review-only view; everyone else gets null (404).
  */
 export async function loadResearch(
   region: ResearchRegion,

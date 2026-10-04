@@ -68,7 +68,7 @@ export default async function EuropeResearchPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <SiteNav />
-      <main id="main">
+      <main id="main" className="wrap">
         <ResearchResource data={data} preview={preview} canonicalUrl={canonicalUrl} />
       </main>
     </>

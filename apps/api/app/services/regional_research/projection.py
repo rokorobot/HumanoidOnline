@@ -177,7 +177,12 @@ def build_projection(
                 "reason": g.reason,
                 "label": _REASON_LABELS[g.reason],
                 "robots": [
-                    {"slug": x.slug, "name": x.name, "manufacturer_slug": x.manufacturer_slug}
+                    {
+                        "slug": x.slug,
+                        "name": x.name,
+                        "manufacturer_slug": x.manufacturer_slug,
+                        "manufacturer_name": x.manufacturer_name,
+                    }
                     for x in g.robots
                 ],
             }

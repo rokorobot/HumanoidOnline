@@ -109,12 +109,12 @@ export function projection(overrides: Partial<ResearchProjection> = {}): Researc
       {
         reason: "GLOBAL_ONLY",
         label: "Global offer only; no region-specific offer",
-        robots: [{ slug: "bot-g", name: "Bot G", manufacturer_slug: "maker-g" }],
+        robots: [{ slug: "bot-g", name: "Bot G", manufacturer_slug: "maker-g", manufacturer_name: "Maker G" }],
       },
       {
         reason: "NO_OFFERS",
         label: "No offer on file",
-        robots: [{ slug: "bot-z", name: "Bot Z", manufacturer_slug: "maker-z" }],
+        robots: [{ slug: "bot-z", name: "Bot Z", manufacturer_slug: "maker-z", manufacturer_name: "Maker Z" }],
       },
     ],
     methodology: {

@@ -66,7 +66,7 @@ export interface ResearchDeployment {
 export interface ResearchGroup {
   reason: string;
   label: string;
-  robots: { slug: string; name: string; manufacturer_slug: string }[];
+  robots: { slug: string; name: string; manufacturer_slug: string; manufacturer_name: string }[];
 }
 
 export interface ResearchProjection {

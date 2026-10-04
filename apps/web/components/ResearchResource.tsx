@@ -26,24 +26,41 @@ import {
 // are waitlist, preorder or contact/quote-gated.
 const DIRECT_STATUSES = new Set(["AVAILABLE", "LIMITED"]);
 
-function host(url: string): string {
+function sourceLabel(url: string): string {
   try {
-    return new URL(url).hostname.replace(/^www\./, "");
+    const u = new URL(url);
+    const label = `${u.hostname.replace(/^www\./, "")}${u.pathname === "/" ? "" : u.pathname}`;
+    return label.length > 44 ? `${label.slice(0, 43)}\u2026` : label;
   } catch {
     return url;
   }
 }
 
+// Sources are separate links, one per line, so they stay readable in a narrow column.
+const robotLabel = (r: { name: string; manufacturer_name: string }) =>
+  `${r.name} (${r.manufacturer_name})`;
+
 function Sources({ urls }: { urls: string[] }) {
   return (
     <>
-      {urls.map((u, i) => (
-        <span key={u}>
-          {i > 0 && ", "}
-          <a href={u} rel="nofollow noopener">{host(u)}</a>
+      {urls.map((u) => (
+        <span key={u} className="src">
+          <a href={u} rel="nofollow noopener">{sourceLabel(u)}</a>
         </span>
       ))}
     </>
+  );
+}
+
+// A short basis ("incl VAT") stays inline, because it decides whether two prices are
+// comparable. A long one is kept in full behind a disclosure so rows stay compact.
+function PriceBasis({ text }: { text: string }) {
+  if (text.length <= 60) return <small>{text}</small>;
+  return (
+    <details>
+      <summary>Price basis</summary>
+      <small>{text}</small>
+    </details>
   );
 }
 
@@ -57,6 +74,7 @@ function OfferTable({
   caption: string;
 }) {
   return (
+    <div className="table-scroll">
     <table data-testid={testId}>
       <caption>{caption}</caption>
       <thead>
@@ -90,7 +108,7 @@ function OfferTable({
                 <span key={i} data-price-kind={p.kind}>
                   {i > 0 && <br />}
                   {formatPriceState(p)}
-                  {p.kind === "PUBLISHED" && p.price_basis ? <small> ({p.price_basis})</small> : null}
+                  {p.kind === "PUBLISHED" && p.price_basis ? <PriceBasis text={p.price_basis} /> : null}
                 </span>
               ))}
             </td>
@@ -101,6 +119,7 @@ function OfferTable({
         ))}
       </tbody>
     </table>
+    </div>
   );
 }
 
@@ -144,6 +163,7 @@ export function ResearchResource({
 
       <section aria-labelledby="figures">
         <h2 id="figures">Key figures</h2>
+        <div className="table-scroll table-scroll--narrow">
         <table>
           <caption>Counts at the snapshot date</caption>
           <tbody>
@@ -168,6 +188,7 @@ export function ResearchResource({
             ))}
           </tbody>
         </table>
+        </div>
       </section>
 
       <section aria-labelledby="offers">
@@ -213,7 +234,7 @@ export function ResearchResource({
           </p>
           <ul>
             {globalOnly.robots.map((r) => (
-              <li key={r.slug}><Link href={`/robots/${r.slug}`}>{r.name}</Link></li>
+              <li key={r.slug}><Link href={`/robots/${r.slug}`}>{robotLabel(r)}</Link></li>
             ))}
           </ul>
         </section>
@@ -231,7 +252,7 @@ export function ResearchResource({
               <h3>{g.label} ({g.robots.length})</h3>
               <ul>
                 {g.robots.map((r) => (
-                  <li key={r.slug}><Link href={`/robots/${r.slug}`}>{r.name}</Link></li>
+                  <li key={r.slug}><Link href={`/robots/${r.slug}`}>{robotLabel(r)}</Link></li>
                 ))}
               </ul>
             </div>
@@ -250,6 +271,7 @@ export function ResearchResource({
             No evidenced deployment in {region} is on file for a published humanoid robot.
           </p>
         ) : (
+          <div className="table-scroll">
           <table data-testid="deployments-table">
             <caption>Evidenced deployments, shown regardless of age</caption>
             <thead>
@@ -283,6 +305,7 @@ export function ResearchResource({
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </section>
 

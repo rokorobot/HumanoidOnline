@@ -148,7 +148,7 @@ describe("rendering", () => {
     const { container } = renderPage(projection());
     const global = screen.getByTestId("global-only");
     expect(global.textContent).toContain("Global availability, region unconfirmed");
-    expect(within(global).getByText("Bot G")).toBeTruthy();
+    expect(within(global).getByText("Bot G (Maker G)")).toBeTruthy();
     expect(container.querySelector('[data-group="GLOBAL_ONLY"]')).toBeNull();
     expect(container.querySelector('[data-group="NO_OFFERS"]')?.textContent).toContain("Bot Z");
     expect(container.querySelector('[data-group="NO_OFFERS"]')?.textContent).not.toContain("Bot G");

@@ -177,13 +177,13 @@ A regional page MAY be published only when all hold:
 
 1. The relevant region rows and membership list exist in the catalogue.
 2. At least **5 published robots from at least 3 manufacturers** have a current, evidence-linked, region-specific availability offer (owner decision 2026-10-04; a region below this minimum is held back or published as "limited evidence" with that stated plainly). Counting follows §4 and §7: GLOBAL offers and price-only rows do not count.
-3. Every rendered price/availability row has `evidence_source` with `verified_at` inside the freshness window (doc 25 §14).
+3. Every rendered price/availability row has `evidence_source` whose latest evidence date is within the **90-day freshness window** for regional commercial-offer evidence (owner decision 2026-10-04; doc 25 §14 leaves TTLs per field, this sets it for v0.1). The evidence date is `verified_at` when set, otherwise `observed_at`, measured against the page snapshot date. A row older than 90 days is stale: it is not counted toward the §12 minimum and is not rendered as current.
 4. Counts reconcile: sections 3–7 sum to the stated population.
 5. Rendered facts match JSON-LD and JSON endpoint (contract test).
 6. Robots excluded because unpublished are not leaked anywhere in output.
 7. Owner approval of the region's editorial fragment and of publication itself. Publication is the owner's decision; it is not implied by this contract or by the data being ready.
 
-Pages failing freshness after publication degrade visibly ("Last verified …, some entries stale") rather than disappearing silently.
+Pages failing freshness after publication degrade visibly ("Last observed …, some entries stale") rather than disappearing silently.
 
 ## 13. Tests (AGENTS.md rule 5)
 

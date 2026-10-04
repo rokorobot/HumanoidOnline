@@ -1,9 +1,10 @@
 """Regional Research Resources (ADR-027): GET /api/research/humanoid-availability/{region}.
 
-Publication-gated. `RESEARCH_PUBLISHED_REGIONS` (default empty) lists the public
-regions; any other region answers 404 unless the caller presents the review
-token (`X-Research-Preview`). The aggregation is `services/regional_research`;
-this router only loads, projects and gates.
+Publication-gated. A region is public only when `RESEARCH_PUBLISHED_REGIONS`
+(default empty) lists it AND the live data passes the ADR-027 §12 readiness
+gate (5 robots / 3 manufacturers, groups reconcile); otherwise it answers 404
+unless the caller presents the review token (`X-Research-Preview`). The aggregation is
+`services/regional_research`; this router only loads, projects and gates.
 """
 from __future__ import annotations
 
@@ -48,19 +49,27 @@ def regional_availability(
 ) -> dict[str, Any]:
     slug = region.lower()
     code = REGION_SLUGS.get(slug)
-    published = _published(slug)
+    flagged = _published(slug)
     preview = _preview_ok(x_research_preview)
-    # Unknown region, or not published and no valid review token: 404 either way,
-    # so an unpublished resource's existence is not disclosed.
-    if code is None or not (published or preview):
+    # Unknown region, or neither flagged for publication nor a valid review token:
+    # 404, so an unpublished resource's existence is not disclosed.
+    if code is None or not (flagged or preview):
         raise HTTPException(status_code=404, detail="Not found")
 
     snapshot_date = datetime.now(UTC).date()
     result = build_regional_availability(load_regional_snapshot(session, snapshot_date), code)
+    # ADR-027 §12: publication needs the owner's flag AND data readiness. A flagged
+    # region whose live data no longer passes the gate is not public (it falls back
+    # to review-only), rather than silently publishing a thin or inconsistent page.
+    ready = result.gate.passes and result.reconciles
+    public = flagged and ready
+    if not (public or preview):
+        raise HTTPException(status_code=404, detail="Not found")
+
     # The publication gate result is review-only; it is never part of a public body.
-    body = build_projection(result, slug, include_readiness=preview and not published)
-    body["published"] = published
-    response.headers["Cache-Control"] = "public, max-age=300" if published else "no-store"
-    if not published:
+    body = build_projection(result, slug, include_readiness=not public)
+    body["published"] = public
+    response.headers["Cache-Control"] = "public, max-age=300" if public else "no-store"
+    if not public:
         response.headers["X-Robots-Tag"] = "noindex, nofollow"
     return body

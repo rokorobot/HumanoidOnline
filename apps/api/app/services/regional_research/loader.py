@@ -17,6 +17,7 @@ from app.models.region import Region
 from app.models.robot import Robot
 
 from .inputs import (
+    DeploymentRow,
     EvidenceRow,
     OfferRow,
     PriceRow,
@@ -71,6 +72,7 @@ def load_regional_snapshot(session: Session, snapshot_date: date) -> RegionalSna
                 selectinload(Robot.manufacturer),
                 selectinload(Robot.availability_offers),
                 selectinload(Robot.pricing_offers),
+                selectinload(Robot.deployments),
             )
         )
         .scalars()
@@ -78,6 +80,8 @@ def load_regional_snapshot(session: Session, snapshot_date: date) -> RegionalSna
     )
     offer_ids = [o.id for r in robots for o in r.availability_offers]
     price_ids = [p.id for r in robots for p in r.pricing_offers]
+    deployment_ids = [d.id for r in robots for d in r.deployments]
+    deployment_ev = _evidence_by_subject(session, "DEPLOYMENT", deployment_ids)
     offer_ev = _evidence_by_subject(session, "AVAILABILITY_OFFER", offer_ids)
     price_ev = _evidence_by_subject(session, "PRICING_OFFER", price_ids)
 
@@ -112,6 +116,19 @@ def load_regional_snapshot(session: Session, snapshot_date: date) -> RegionalSna
             )
             for p in r.pricing_offers
         )
+        deployments = tuple(
+            DeploymentRow(
+                region_code=code_by_id.get(d.region_id),
+                customer_name=d.customer_name,
+                provider_slug=d.provider.slug if d.provider else None,
+                transaction_type=d.transaction_type,
+                unit_count=d.unit_count,
+                started_on=d.started_on,
+                status=d.status,
+                evidence=tuple(deployment_ev.get(d.id, ())),
+            )
+            for d in r.deployments
+        )
         rows.append(
             RobotRow(
                 slug=r.slug,
@@ -122,6 +139,7 @@ def load_regional_snapshot(session: Session, snapshot_date: date) -> RegionalSna
                 commercial_status=r.commercial_status,
                 offers=offers,
                 prices=prices,
+                deployments=deployments,
             )
         )
     return RegionalSnapshot(snapshot_date, nodes, tuple(rows))

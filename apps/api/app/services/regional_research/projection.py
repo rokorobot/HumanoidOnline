@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import asdict
 
-from .readmodel import QUALIFYING, QualifyingOffer, RegionalAvailability
+from .readmodel import QUALIFYING, QualifyingOffer, RegionalAvailability, RegionalDeployment
 
 REGION_SLUGS = {"europe": "EUROPE"}
 
@@ -43,6 +43,26 @@ def _offer_dict(o: QualifyingOffer) -> dict:
         "human_verified": o.human_verified,
         "source_urls": list(o.source_urls),
         "prices": [asdict(p) for p in o.prices],
+    }
+
+
+def _deployment_dict(d: RegionalDeployment) -> dict:
+    return {
+        "robot_slug": d.robot_slug,
+        "robot_name": d.robot_name,
+        "manufacturer_slug": d.manufacturer_slug,
+        "manufacturer_name": d.manufacturer_name,
+        "region_code": d.region_code,
+        "customer_name": d.customer_name,
+        "provider_slug": d.provider_slug,
+        "transaction_type": d.transaction_type,
+        "unit_count": d.unit_count,
+        "started_on": d.started_on.isoformat() if d.started_on else None,
+        "status": d.status,
+        "evidence_date": d.evidence_date.isoformat(),
+        "confidence": d.confidence,
+        "human_verified": d.human_verified,
+        "source_urls": list(d.source_urls),
     }
 
 
@@ -150,6 +170,8 @@ def build_projection(
             "purchase_robots_price_not_published": kf.purchase_robots_price_not_published,
         },
         "offers": [_offer_dict(o) for o in offers],
+        # Deployment evidence (use), kept apart from offers (purchasability).
+        "deployments": [_deployment_dict(d) for d in r.deployments],
         "no_confirmed_offer": [
             {
                 "reason": g.reason,
@@ -183,6 +205,11 @@ def build_projection(
             "confidence": (
                 "Confidence is shown per offer exactly as recorded and is not upgraded by "
                 "publication. Human verification is not required for inclusion."
+            ),
+            "deployments": (
+                "Deployments are evidence that a robot has been used in the region. They are "
+                "listed separately and never make a robot purchasable; an evidenced deployment "
+                "is shown regardless of age, with its evidence date."
             ),
             "calculation": "Deterministic and reproducible from the declared snapshot.",
         },

@@ -2,18 +2,29 @@
 //
 // Pure rendering of the governed projection: every number, status, price and
 // sentence comes from `data`; nothing is computed or authored here except
-// labels. Unknown stays unknown ("Not published"); a missing offer is never
-// rendered as "not available".
+// labels and the §8 section split. Unknown stays unknown ("Not published"); a
+// missing offer is never rendered as "not available".
+//
+// Fixed section order (ADR-027 §8): direct answer, key figures, offers that are
+// available/limited, waitlist/preorder/quote-only offers (kept apart from
+// AVAILABLE), global-only robots (region unconfirmed), robots with no confirmed
+// offer, deployments (use, not purchasability), editorial context, methodology,
+// FAQ, citation. "What changed" is omitted: no reproducible delta exists yet.
 import Link from "next/link";
 
 import { editorialState } from "@/lib/research-editorial";
 import {
+  type ResearchOffer,
   type ResearchProjection,
+  type ResearchRegion,
   formatPriceState,
   statusLabel,
   transactionLabel,
 } from "@/lib/research";
-import type { ResearchRegion } from "@/lib/research";
+
+// AVAILABLE (and constrained-but-orderable LIMITED) stay apart from offers that
+// are waitlist, preorder or contact/quote-gated.
+const DIRECT_STATUSES = new Set(["AVAILABLE", "LIMITED"]);
 
 function host(url: string): string {
   try {
@@ -21,6 +32,76 @@ function host(url: string): string {
   } catch {
     return url;
   }
+}
+
+function Sources({ urls }: { urls: string[] }) {
+  return (
+    <>
+      {urls.map((u, i) => (
+        <span key={u}>
+          {i > 0 && ", "}
+          <a href={u} rel="nofollow noopener">{host(u)}</a>
+        </span>
+      ))}
+    </>
+  );
+}
+
+function OfferTable({
+  offers,
+  testId,
+  caption,
+}: {
+  offers: ResearchOffer[];
+  testId: string;
+  caption: string;
+}) {
+  return (
+    <table data-testid={testId}>
+      <caption>{caption}</caption>
+      <thead>
+        <tr>
+          <th scope="col">Robot</th>
+          <th scope="col">Manufacturer</th>
+          <th scope="col">Transaction</th>
+          <th scope="col">Status</th>
+          <th scope="col">Seller</th>
+          <th scope="col">Region</th>
+          <th scope="col">Price</th>
+          <th scope="col">Evidence date</th>
+          <th scope="col">Confidence</th>
+          <th scope="col">Sources</th>
+        </tr>
+      </thead>
+      <tbody>
+        {offers.map((o) => (
+          <tr key={`${o.robot_slug}|${o.provider_slug}|${o.region_code}|${o.transaction_type}`}>
+            <th scope="row"><Link href={`/robots/${o.robot_slug}`}>{o.robot_name}</Link></th>
+            <td><Link href={`/manufacturers/${o.manufacturer_slug}`}>{o.manufacturer_name}</Link></td>
+            <td>{transactionLabel(o.transaction_type)}</td>
+            <td>{statusLabel(o.availability_status)}</td>
+            <td>
+              {o.provider_slug ?? "Seller not recorded"}
+              {o.provider_type ? ` (${o.provider_type.toLowerCase()})` : ""}
+            </td>
+            <td>{o.region_code}</td>
+            <td>
+              {o.prices.map((p, i) => (
+                <span key={i} data-price-kind={p.kind}>
+                  {i > 0 && <br />}
+                  {formatPriceState(p)}
+                  {p.kind === "PUBLISHED" && p.price_basis ? <small> ({p.price_basis})</small> : null}
+                </span>
+              ))}
+            </td>
+            <td><time dateTime={o.evidence_date}>{o.evidence_date}</time></td>
+            <td>{o.confidence}{o.human_verified ? "" : " · no human verification recorded"}</td>
+            <td><Sources urls={o.source_urls} /></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
 }
 
 export function ResearchResource({
@@ -35,6 +116,10 @@ export function ResearchResource({
   const region = data.region.name;
   const kf = data.key_figures;
   const editorial = editorialState(data.region.slug as ResearchRegion, data.snapshot_date, preview);
+  const direct = data.offers.filter((o) => DIRECT_STATUSES.has(o.availability_status));
+  const gated = data.offers.filter((o) => !DIRECT_STATUSES.has(o.availability_status));
+  const globalOnly = data.no_confirmed_offer.find((g) => g.reason === "GLOBAL_ONLY");
+  const otherGroups = data.no_confirmed_offer.filter((g) => g.reason !== "GLOBAL_ONLY");
 
   return (
     <article className="research-resource" data-region={data.region.slug}>
@@ -86,66 +171,62 @@ export function ResearchResource({
       </section>
 
       <section aria-labelledby="offers">
-        <h2 id="offers">Confirmed offers in {region}</h2>
-        {data.offers.length === 0 ? (
-          <p>No confirmed {region} offer is on file for any published humanoid robot.</p>
+        <h2 id="offers">Confirmed offers in {region}: available or limited</h2>
+        {direct.length === 0 ? (
+          <p data-testid="offers-available-empty">
+            No offer with an available or limited status is on file for {region}.
+          </p>
         ) : (
-          <table data-testid="offers-table">
-            <caption>One row per robot, seller, country and transaction type</caption>
-            <thead>
-              <tr>
-                <th scope="col">Robot</th>
-                <th scope="col">Manufacturer</th>
-                <th scope="col">Transaction</th>
-                <th scope="col">Status</th>
-                <th scope="col">Seller</th>
-                <th scope="col">Country</th>
-                <th scope="col">Price</th>
-                <th scope="col">Evidence date</th>
-                <th scope="col">Confidence</th>
-                <th scope="col">Sources</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.offers.map((o) => (
-                <tr key={`${o.robot_slug}|${o.provider_slug}|${o.region_code}|${o.transaction_type}`}>
-                  <th scope="row"><Link href={`/robots/${o.robot_slug}`}>{o.robot_name}</Link></th>
-                  <td>{o.manufacturer_name}</td>
-                  <td>{transactionLabel(o.transaction_type)}</td>
-                  <td>{statusLabel(o.availability_status)}</td>
-                  <td>{o.provider_slug ?? "Seller not recorded"}{o.provider_type ? ` (${o.provider_type.toLowerCase()})` : ""}</td>
-                  <td>{o.region_code}</td>
-                  <td>
-                    {o.prices.map((p, i) => (
-                      <span key={i} data-price-kind={p.kind}>
-                        {i > 0 && <br />}
-                        {formatPriceState(p)}
-                        {p.kind === "PUBLISHED" && p.price_basis ? <small> ({p.price_basis})</small> : null}
-                      </span>
-                    ))}
-                  </td>
-                  <td><time dateTime={o.evidence_date}>{o.evidence_date}</time></td>
-                  <td>{o.confidence}{o.human_verified ? "" : " · no human verification recorded"}</td>
-                  <td>
-                    {o.source_urls.map((u, i) => (
-                      <span key={u}>{i > 0 && ", "}<a href={u} rel="nofollow noopener">{host(u)}</a></span>
-                    ))}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <OfferTable
+            offers={direct}
+            testId="offers-available-table"
+            caption="One row per robot, seller, region and transaction type"
+          />
         )}
       </section>
 
-      {data.no_confirmed_offer.length > 0 && (
+      <section aria-labelledby="gated">
+        <h2 id="gated">Waitlist, preorder and quote-only offers in {region}</h2>
+        <p>
+          These offers are confirmed on file but cannot be ordered directly: the buyer joins a
+          waitlist, preorders, or must request a quote or contact the seller.
+        </p>
+        {gated.length === 0 ? (
+          <p data-testid="offers-gated-empty">
+            No waitlist, preorder or quote-only offer is on file for {region}.
+          </p>
+        ) : (
+          <OfferTable
+            offers={gated}
+            testId="offers-gated-table"
+            caption="One row per robot, seller, region and transaction type"
+          />
+        )}
+      </section>
+
+      {globalOnly && (
+        <section aria-labelledby="global" data-testid="global-only">
+          <h2 id="global">Global availability, region unconfirmed</h2>
+          <p>
+            These robots have only a global (or region-unspecific) offer on file. That is not
+            evidence of availability in {region}, so they are not counted above.
+          </p>
+          <ul>
+            {globalOnly.robots.map((r) => (
+              <li key={r.slug}><Link href={`/robots/${r.slug}`}>{r.name}</Link></li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {otherGroups.length > 0 && (
         <section aria-labelledby="none">
           <h2 id="none">No confirmed {region} offer on file</h2>
           <p>
             This lists robots for which HumanoidOnline holds no qualifying {region} evidence. It
             does not mean they are unavailable in {region}.
           </p>
-          {data.no_confirmed_offer.map((g) => (
+          {otherGroups.map((g) => (
             <div key={g.reason} data-group={g.reason}>
               <h3>{g.label} ({g.robots.length})</h3>
               <ul>
@@ -157,6 +238,53 @@ export function ResearchResource({
           ))}
         </section>
       )}
+
+      <section aria-labelledby="deployments" data-testid="deployments">
+        <h2 id="deployments">Deployments in {region}</h2>
+        <p>
+          Deployment evidence shows that a robot has been used in {region}. It does not show that
+          the robot can be purchased there.
+        </p>
+        {data.deployments.length === 0 ? (
+          <p data-testid="deployments-empty">
+            No evidenced deployment in {region} is on file for a published humanoid robot.
+          </p>
+        ) : (
+          <table data-testid="deployments-table">
+            <caption>Evidenced deployments, shown regardless of age</caption>
+            <thead>
+              <tr>
+                <th scope="col">Robot</th>
+                <th scope="col">Manufacturer</th>
+                <th scope="col">Customer</th>
+                <th scope="col">Region</th>
+                <th scope="col">Status</th>
+                <th scope="col">Units</th>
+                <th scope="col">Started</th>
+                <th scope="col">Evidence date</th>
+                <th scope="col">Confidence</th>
+                <th scope="col">Sources</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.deployments.map((d, i) => (
+                <tr key={`${d.robot_slug}|${d.region_code}|${d.customer_name}|${i}`}>
+                  <th scope="row"><Link href={`/robots/${d.robot_slug}`}>{d.robot_name}</Link></th>
+                  <td><Link href={`/manufacturers/${d.manufacturer_slug}`}>{d.manufacturer_name}</Link></td>
+                  <td>{d.customer_name ?? "Undisclosed"}</td>
+                  <td>{d.region_code}</td>
+                  <td>{d.status ?? "Not stated"}</td>
+                  <td>{d.unit_count ?? "Not stated"}</td>
+                  <td>{d.started_on ?? "Not stated"}</td>
+                  <td><time dateTime={d.evidence_date}>{d.evidence_date}</time></td>
+                  <td>{d.confidence}{d.human_verified ? "" : " · no human verification recorded"}</td>
+                  <td><Sources urls={d.source_urls} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
 
       {editorial.show && (
         <section aria-labelledby="context" data-testid="editorial">

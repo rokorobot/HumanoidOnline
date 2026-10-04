@@ -95,17 +95,110 @@ describe("rendering", () => {
     );
   });
 
-  it("renders one offers row per projected offer with links to published robot pages", () => {
+  it("renders one offers row per projected offer with links to published robot and manufacturer pages", () => {
     renderPage(projection());
-    const table = screen.getByTestId("offers-table");
-    const rows = within(table).getAllByRole("row").slice(1);
+    const rows = [
+      ...within(screen.getByTestId("offers-available-table")).getAllByRole("row").slice(1),
+      ...within(screen.getByTestId("offers-gated-table")).getAllByRole("row").slice(1),
+    ];
     expect(rows).toHaveLength(3);
+    const table = screen.getByTestId("offers-available-table");
     expect(within(table).getByRole("link", { name: "Bot A" }).getAttribute("href")).toBe("/robots/bot-a");
+    expect(within(table).getByRole("link", { name: "Maker A" }).getAttribute("href")).toBe("/manufacturers/maker-a");
+  });
+
+  it("keeps AVAILABLE apart from waitlist, preorder and quote-only offers", () => {
+    renderPage(projection());
+    const available = within(screen.getByTestId("offers-available-table"));
+    const gated = within(screen.getByTestId("offers-gated-table"));
+    expect(available.getByText("Bot A")).toBeTruthy();
+    expect(available.getByText("Bot C")).toBeTruthy(); // rental, AVAILABLE
+    expect(available.queryByText("Bot B")).toBeNull(); // ON_REQUEST
+    expect(gated.getByText("Bot B")).toBeTruthy();
+    expect(gated.queryByText("Bot A")).toBeNull();
+    expect(screen.getByTestId("offers-available-table").textContent).not.toContain("On request");
+    expect(screen.getByTestId("offers-gated-table").textContent).not.toContain("Available");
+  });
+
+  it("puts waitlist/preorder in the gated table and limited with the available one", () => {
+    const base = projection();
+    const mk = (slug: string, status: string) => ({
+      ...base.offers[0],
+      robot_slug: slug,
+      robot_name: slug,
+      availability_status: status,
+    });
+    renderPage(projection({ offers: [mk("lim", "LIMITED"), mk("pre", "PREORDER"), mk("wl", "WAITLIST")] }));
+    expect(within(screen.getByTestId("offers-available-table")).getByText("lim")).toBeTruthy();
+    const gated = within(screen.getByTestId("offers-gated-table"));
+    expect(gated.getByText("pre")).toBeTruthy();
+    expect(gated.getByText("wl")).toBeTruthy();
+  });
+
+  it("labels the geography column Region (EU is a valid value, not a country)", () => {
+    renderPage(projection());
+    const headers = within(screen.getByTestId("offers-available-table"))
+      .getAllByRole("columnheader")
+      .map((h) => h.textContent);
+    expect(headers).toContain("Region");
+    expect(headers).not.toContain("Country");
+  });
+
+  it("gives global-only robots their own section, apart from no-confirmed-offer", () => {
+    const { container } = renderPage(projection());
+    const global = screen.getByTestId("global-only");
+    expect(global.textContent).toContain("Global availability, region unconfirmed");
+    expect(within(global).getByText("Bot G")).toBeTruthy();
+    expect(container.querySelector('[data-group="GLOBAL_ONLY"]')).toBeNull();
+    expect(container.querySelector('[data-group="NO_OFFERS"]')?.textContent).toContain("Bot Z");
+    expect(container.querySelector('[data-group="NO_OFFERS"]')?.textContent).not.toContain("Bot G");
+  });
+
+  it("states factually that no deployment is on file, and never invents one", () => {
+    renderPage(projection());
+    expect(screen.getByTestId("deployments-empty").textContent).toBe(
+      "No evidenced deployment in Europe is on file for a published humanoid robot.",
+    );
+    expect(screen.queryByTestId("deployments-table")).toBeNull();
+    expect(screen.getByTestId("deployments").textContent).toContain("does not show that the robot can be purchased");
+  });
+
+  it("renders evidenced deployments apart from offers, with undisclosed fields explicit", () => {
+    renderPage(
+      projection({
+        deployments: [
+          {
+            robot_slug: "bot-d",
+            robot_name: "Bot D",
+            manufacturer_slug: "maker-d",
+            manufacturer_name: "Maker D",
+            region_code: "DE",
+            customer_name: null,
+            provider_slug: null,
+            transaction_type: "RAAS",
+            unit_count: null,
+            started_on: "2024-06-01",
+            status: "production",
+            evidence_date: "2024-06-27",
+            confidence: "MEDIUM",
+            human_verified: false,
+            source_urls: ["https://news.example/d"],
+          },
+        ],
+      }),
+    );
+    const t = within(screen.getByTestId("deployments-table"));
+    expect(t.getByText("Undisclosed")).toBeTruthy();
+    expect(t.getByText("Not stated")).toBeTruthy(); // units
+    expect(t.getByText("2024-06-01")).toBeTruthy();
+    expect(screen.queryByTestId("deployments-empty")).toBeNull();
+    expect(within(screen.getByTestId("offers-available-table")).queryByText("Bot D")).toBeNull();
+    expect(within(screen.getByTestId("offers-gated-table")).queryByText("Bot D")).toBeNull();
   });
 
   it("keeps unknowns unknown and estimates distinct from published prices", () => {
     renderPage(projection());
-    const table = screen.getByTestId("offers-table");
+    const table = document.body;
     expect(within(table).getByText("Not published")).toBeTruthy();
     expect(table.textContent).toContain("9,930 EUR");
     expect(table.textContent).toContain("6,500 EUR / week");
@@ -115,7 +208,7 @@ describe("rendering", () => {
 
   it("shows confidence as recorded and never implies verification", () => {
     renderPage(projection());
-    const table = screen.getByTestId("offers-table");
+    const table = document.body;
     expect(table.textContent).toContain("MEDIUM · no human verification recorded");
     expect(table.textContent).toContain("HIGH");
   });
@@ -125,13 +218,15 @@ describe("rendering", () => {
     expect(container.textContent!.toLowerCase()).not.toContain("not_available");
     expect(container.textContent!.toLowerCase()).not.toMatch(/\bnot available\b/);
     expect(container.textContent).toContain("does not mean they are unavailable");
-    expect(container.querySelector('[data-group="GLOBAL_ONLY"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="global-only"]')).toBeTruthy();
   });
 
   it("handles a region with no confirmed offers without claiming availability", () => {
     renderPage(projection({ offers: [], latest_evidence_date: null }));
-    expect(screen.queryByTestId("offers-table")).toBeNull();
-    expect(screen.getByText(/No confirmed Europe offer is on file/)).toBeTruthy();
+    expect(screen.queryByTestId("offers-available-table")).toBeNull();
+    expect(screen.queryByTestId("offers-gated-table")).toBeNull();
+    expect(screen.getByTestId("offers-available-empty")).toBeTruthy();
+    expect(screen.getByTestId("offers-gated-empty")).toBeTruthy();
   });
 
   it("marks a preview and shows readiness only in preview", () => {
@@ -207,10 +302,11 @@ describe("JSON-LD and parity", () => {
     expect(list.itemListElement.map((i: any) => i.url)).toEqual(slugs.map((s) => `${ORIGIN}/robots/${s}`));
 
     const { container } = renderPage(data);
-    const htmlSlugs = [...container.querySelectorAll('[data-testid="offers-table"] tbody th a')].map((a) =>
+    const htmlSlugs = [...container.querySelectorAll('[data-testid^="offers-"][data-testid$="-table"] tbody th a')].map((a) =>
       (a.getAttribute("href") ?? "").replace("/robots/", ""),
     );
-    expect(htmlSlugs).toEqual(data.offers.map((o) => o.robot_slug));
+    // The page splits offers into the section 8 tables; membership must still match exactly.
+    expect([...htmlSlugs].sort()).toEqual(data.offers.map((o) => o.robot_slug).sort());
     expect(names).toEqual(slugs.map((s) => data.offers.find((o) => o.robot_slug === s)!.robot_name));
   });
 
@@ -229,6 +325,15 @@ describe("JSON-LD and parity", () => {
     const ld = JSON.stringify(graph);
     expect(ld).not.toContain("bot-g");
     expect(ld).not.toContain("bot-z");
+  });
+
+  it("a range is shown only with both bounds; a missing bound is Not published, never 0", () => {
+    const base = projection().offers[0].prices[0];
+    const range = { ...base, amount: null, price_min: 8000, price_max: 9000 };
+    expect(formatPriceState(range)).toBe("8,000\u20139,000 EUR");
+    expect(formatPriceState({ ...range, price_max: null })).toBe("Not published");
+    expect(formatPriceState({ ...range, price_min: null })).toBe("Not published");
+    expect(formatPriceState({ ...range, price_min: null, price_max: null })).toBe("Not published");
   });
 
   it("price formatting never turns UNKNOWN into a number", () => {

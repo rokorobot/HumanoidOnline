@@ -13,6 +13,7 @@ from pathlib import Path
 import pytest
 
 from app.services.regional_research.inputs import (
+    DeploymentRow,
     EvidenceRow,
     OfferRow,
     PriceRow,
@@ -460,9 +461,15 @@ def _catalogue_snapshot(snapshot_date: date) -> RegionalSnapshot:
                      p.get("price_max"), p.get("billing_period", "ONE_TIME"), p.get("price_basis"),
                      p.get("is_current", True), _evidence(p.get("evidence", [])))
             for p in d.get("pricing_offers", []))
+        deployments = tuple(
+            DeploymentRow(x.get("region_code"), x.get("customer_name"), x.get("provider_slug"),
+                          x.get("transaction_type"), x.get("unit_count"), _d(x.get("started_on")),
+                          x.get("status"), _evidence(x.get("evidence", [])))
+            for x in d.get("deployments", []))
         robots.append(RobotRow(d["slug"], d["name"], d["manufacturer_slug"],
                                makers.get(d["manufacturer_slug"], d["manufacturer_slug"]),
-                               d["is_published"], d["commercial_status"], offers, prices))
+                               d["is_published"], d["commercial_status"], offers, prices,
+                               deployments))
     return RegionalSnapshot(snapshot_date, regions, tuple(robots))
 
 
@@ -488,3 +495,49 @@ def test_real_catalogue_known_europe_robots_qualify_at_the_adoption_snapshot():
              "unitree-r1-edu-u4"}
     assert known <= {o.robot_slug for o in r.qualifying_offers}
     assert r.gate.passes
+
+
+# --- deployments (separate from purchasability) --------------------------------------
+
+def _dep(region="DE", *, evidence=None, customer="Acme GmbH", started=date(2024, 6, 1)):
+    return DeploymentRow(
+        region, customer, None, "RAAS", 10, started, "production",
+        (ev(400),) if evidence is None else tuple(evidence),
+    )
+
+
+def test_a_regional_evidenced_deployment_is_listed_even_when_old_but_never_qualifies():
+    r = build(RobotRow("d", "D", "m1", "M1", True, "COMMERCIAL", (), (), (_dep(),)))
+    assert [d.robot_slug for d in r.deployments] == ["d"]
+    assert r.deployments[0].customer_name == "Acme GmbH"
+    assert r.key_figures.qualifying_robots == 0
+    assert group_of(r, "d") == NO_OFFERS
+
+
+def test_deployments_outside_the_region_unresolved_or_unevidenced_are_excluded():
+    robots = RobotRow(
+        "d", "D", "m1", "M1", True, "COMMERCIAL", (), (),
+        (_dep("US"), _dep(None), _dep("DE", evidence=[])),
+    )
+    assert build(robots).deployments == ()
+
+
+def test_deployments_of_unpublished_robots_never_appear():
+    r = build(RobotRow("hidden", "H", "m1", "M1", False, "COMMERCIAL", (), (), (_dep(),)))
+    assert r.deployments == ()
+    assert "hidden" not in repr(r)
+
+
+def test_undisclosed_customer_stays_none_and_confidence_is_not_upgraded():
+    r = build(RobotRow("d", "D", "m1", "M1", True, "COMMERCIAL", (), (),
+                       (_dep(customer=None, evidence=[ev(5, conf="HIGH"), ev(6, conf="LOW")]),)))
+    d = r.deployments[0]
+    assert d.customer_name is None
+    assert (d.confidence, d.human_verified) == ("LOW", False)
+
+
+def test_deployments_do_not_change_the_pinned_direct_answer():
+    base = build(robot("a", offers=[offer()]))
+    with_dep = build(RobotRow("a", "A", "m1", "M1", True, "COMMERCIAL",
+                              (offer(),), (), (_dep(),)))
+    assert base.direct_answer == with_dep.direct_answer

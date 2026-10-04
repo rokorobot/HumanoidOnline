@@ -104,6 +104,7 @@ export function projection(overrides: Partial<ResearchProjection> = {}): Researc
         human_verified: true,
       }),
     ],
+    deployments: [],
     no_confirmed_offer: [
       {
         reason: "GLOBAL_ONLY",

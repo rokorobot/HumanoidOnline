@@ -45,6 +45,24 @@ export interface ResearchOffer {
   prices: ResearchPriceState[];
 }
 
+export interface ResearchDeployment {
+  robot_slug: string;
+  robot_name: string;
+  manufacturer_slug: string;
+  manufacturer_name: string;
+  region_code: string;
+  customer_name: string | null;
+  provider_slug: string | null;
+  transaction_type: string | null;
+  unit_count: number | null;
+  started_on: string | null;
+  status: string | null;
+  evidence_date: string;
+  confidence: string;
+  human_verified: boolean;
+  source_urls: string[];
+}
+
 export interface ResearchGroup {
   reason: string;
   label: string;
@@ -70,6 +88,7 @@ export interface ResearchProjection {
     purchase_robots_price_not_published: number;
   };
   offers: ResearchOffer[];
+  deployments: ResearchDeployment[];
   no_confirmed_offer: ResearchGroup[];
   methodology: Record<string, string>;
   faq: { question: string; answer: string }[];
@@ -204,7 +223,11 @@ export function formatPriceState(p: ResearchPriceState): string {
   switch (p.kind) {
     case "PUBLISHED":
       if (p.amount !== null) return `${money(p.amount)}${cur}${per}`;
-      return `${money(p.price_min ?? 0)}–${money(p.price_max ?? 0)}${cur}${per}`;
+      // A range is shown only with BOTH bounds; there is no path to a made-up 0.
+      if (p.price_min !== null && p.price_max !== null) {
+        return `${money(p.price_min)}–${money(p.price_max)}${cur}${per}`;
+      }
+      return "Not published";
     case "PRICE_ON_REQUEST":
       return "Price on request";
     case "ESTIMATE":
@@ -230,4 +253,30 @@ export async function fetchResearchProjection(
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`API ${res.status} for research/${region}`);
   return (await res.json()) as ResearchProjection;
+}
+
+/**
+ * The gate + the governed read, together. If a region is flagged published but the
+ * API declines to serve it publicly (ADR-027 §12: data readiness not met), a
+ * reviewer holding the preview token still gets the review-only view; everyone
+ * else gets null (404).
+ */
+export async function loadResearch(
+  region: ResearchRegion,
+  previewParam: string | null | undefined,
+  env: Record<string, string | undefined> = process.env,
+): Promise<{ access: ResearchAccess; data: ResearchProjection | null }> {
+  let access = resolveResearchAccess(region, previewParam, env);
+  let data = await fetchResearchProjection(region, access);
+  if (!data && access.mode === "published") {
+    const review = resolveResearchAccess(region, previewParam, {
+      ...env,
+      RESEARCH_PUBLISHED_REGIONS: "",
+    });
+    if (review.mode === "preview") {
+      access = review;
+      data = await fetchResearchProjection(region, review);
+    }
+  }
+  return data ? { access, data } : { access: { mode: "closed" }, data: null };
 }

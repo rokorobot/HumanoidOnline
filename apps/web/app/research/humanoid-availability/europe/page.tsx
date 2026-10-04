@@ -10,12 +10,7 @@ import { cache } from "react";
 
 import { ResearchResource } from "@/components/ResearchResource";
 import { SiteNav } from "@/components/SiteNav";
-import {
-  type ResearchAccess,
-  fetchResearchProjection,
-  researchPath,
-  resolveResearchAccess,
-} from "@/lib/research";
+import { loadResearch, researchPath } from "@/lib/research";
 import { buildResearchJsonLd } from "@/lib/research-jsonld";
 import { absoluteUrl, siteUrl } from "@/lib/site";
 
@@ -29,20 +24,11 @@ function previewParam(sp: { preview?: string | string[] }): string | undefined {
   return Array.isArray(sp.preview) ? sp.preview[0] : sp.preview;
 }
 
-// One governed read shared by the page and generateMetadata (per-request memo).
-const load = cache(async (mode: string, token: string) => {
-  const access: ResearchAccess =
-    mode === "published"
-      ? { mode: "published" }
-      : mode === "preview"
-        ? { mode: "preview", token }
-        : { mode: "closed" };
-  return { access, data: await fetchResearchProjection(REGION, access) };
-});
+// One gate + governed read shared by the page and generateMetadata (per-request memo).
+const load = cache((preview: string) => loadResearch(REGION, preview || null));
 
 async function resolve(searchParams: SearchParams) {
-  const access = resolveResearchAccess(REGION, previewParam(await searchParams));
-  return load(access.mode, access.mode === "preview" ? access.token : "");
+  return load((previewParam(await searchParams) ?? ""));
 }
 
 export async function generateMetadata({

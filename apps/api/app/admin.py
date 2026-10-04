@@ -15,6 +15,7 @@ import logging
 from fastapi import FastAPI
 from sqladmin import Admin, ModelView
 
+from app.admin_ops import OpsDashboardView
 from app.config import get_settings
 from app.db.session import engine
 from app.models.buyer_requirement import BuyerRequirement
@@ -335,4 +336,5 @@ def mount_admin(app: FastAPI) -> Admin | None:
     )
     for view in _VIEWS:
         admin.add_view(view)
+    admin.add_view(OpsDashboardView)  # HO CONTROL — read-only, GET only
     return admin

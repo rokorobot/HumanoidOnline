@@ -343,6 +343,80 @@ def test_projection_failure_fails_closed(client, journey, monkeypatch):
     assert client.get(URL).status_code == 404
 
 
+def _partially_aged_snapshot():
+    """Six current robots from three manufacturers (still clears 5/3) plus one robot
+    whose only Europe offer has just aged past the 90-day window."""
+    current = [
+        fx.robot(f"c{i}", maker=f"m{i % 3}", offers=[fx.offer("DE" if i % 2 else "EU")])
+        for i in range(6)
+    ]
+    aged = fx.robot("aged", maker="m1", offers=[fx.offer("DE", evidence=[fx.ev(91)])])
+    return fx.snap(*current, aged)
+
+
+def test_partial_ageing_is_visible_even_when_5_3_is_still_met(client, journey):
+    journey(_partially_aged_snapshot(), published="europe")
+    r = client.get(URL)
+    assert r.status_code == 200  # still public
+    body = r.json()
+    assert body["published"] is True
+    # the threshold is still met on current evidence alone...
+    assert body["key_figures"]["robots_with_confirmed_offer"] == 6
+    assert body["key_figures"]["manufacturers_with_confirmed_offer"] == 3
+    # ...but the page says plainly that one robot's evidence aged out
+    assert body["publication_health"] == {
+        "status": "LIMITED_EVIDENCE",
+        "reasons": [
+            "1 published robot has only stale or non-current Europe offer evidence "
+            "excluded from current figures."
+        ],
+    }
+    # stale evidence stays excluded from offers and counts
+    assert "aged" not in [o["robot_slug"] for o in body["offers"]]
+    assert [g["robots"][0]["slug"] for g in body["no_confirmed_offer"]
+            if g["reason"] == "STALE_OR_NON_CURRENT"] == ["aged"]
+    assert "readiness" not in body
+
+
+def test_health_stale_reason_is_pluralized_and_ordered_after_threshold_reasons():
+    two = _projection(
+        *[fx.robot(f"c{i}", maker=f"m{i % 3}", offers=[fx.offer()]) for i in range(6)],
+        fx.robot("a1", offers=[fx.offer(evidence=[fx.ev(120)])]),
+        fx.robot("a2", offers=[fx.offer(current=False)]),
+    )
+    assert two["publication_health"]["reasons"] == [
+        "2 published robots have only stale or non-current Europe offer evidence "
+        "excluded from current figures."
+    ]
+    both = _projection(fx.robot("c", offers=[fx.offer()]),
+                       fx.robot("a", offers=[fx.offer(evidence=[fx.ev(120)])]))
+    assert both["publication_health"]["reasons"] == [
+        "1 qualifying robot; minimum 5",
+        "1 manufacturer; minimum 3",
+        "1 published robot has only stale or non-current Europe offer evidence "
+        "excluded from current figures.",
+    ]
+
+
+def test_an_alternate_old_offer_on_a_still_current_robot_does_not_warn():
+    robots = [
+        fx.robot(f"c{i}", maker=f"m{i % 3}", offers=[fx.offer()]) for i in range(5)
+    ]
+    # This robot has a current Europe offer AND an older, aged one: it is QUALIFYING.
+    robots.append(fx.robot("both", maker="m0", offers=[
+        fx.offer("DE"), fx.offer("EU", evidence=[fx.ev(200)])]))
+    p = _projection(*robots)
+    assert p["publication_health"] == {"status": "CURRENT", "reasons": []}
+    assert p["key_figures"]["robots_with_confirmed_offer"] == 6
+
+
+def test_confirmed_not_obtainable_or_missing_offers_are_not_staleness():
+    robots = [fx.robot(f"c{i}", maker=f"m{i % 3}", offers=[fx.offer()]) for i in range(5)]
+    robots += [fx.robot("na", offers=[fx.offer(status="NOT_AVAILABLE")]),
+               fx.robot("none"), fx.robot("glob", offers=[fx.offer("GLOBAL")])]
+    assert _projection(*robots)["publication_health"] == {"status": "CURRENT", "reasons": []}
+
+
 # publication_health (pure) --------------------------------------------------------
 
 def test_health_current_and_limited_reasons_are_deterministic_and_factual():

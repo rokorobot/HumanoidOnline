@@ -9,7 +9,13 @@ from __future__ import annotations
 
 from dataclasses import asdict
 
-from .readmodel import QUALIFYING, QualifyingOffer, RegionalAvailability, RegionalDeployment
+from .readmodel import (
+    QUALIFYING,
+    STALE_OR_NON_CURRENT,
+    QualifyingOffer,
+    RegionalAvailability,
+    RegionalDeployment,
+)
 
 REGION_SLUGS = {"europe": "EUROPE"}
 
@@ -146,9 +152,13 @@ def _plural(n: int, one: str, many: str) -> str:
 def _health(r: RegionalAvailability) -> dict:
     """Public, deterministic evidence health (not the review-only gate object).
 
-    CURRENT when the data meets the normal publication threshold; LIMITED_EVIDENCE
-    when it does not, with factual reasons. Stale offers are already excluded from
-    every count, so this only describes how much current evidence there is.
+    CURRENT: the normal publication threshold is met AND no published robot is
+    classified STALE_OR_NON_CURRENT for the region.
+    LIMITED_EVIDENCE: the threshold is missed, OR at least one published robot has
+    only stale/non-current regional offer evidence (excluded from current figures).
+    A robot that still has another qualifying current offer is classified QUALIFYING,
+    so an alternate old offer on it never triggers a warning. Stale offers are already
+    excluded from every count and table; this only describes the evidence picture.
     """
     g = r.gate
     reasons = []
@@ -162,6 +172,13 @@ def _health(r: RegionalAvailability) -> dict:
             f"{g.qualifying_manufacturers} "
             f"{_plural(g.qualifying_manufacturers, 'manufacturer', 'manufacturers')}; "
             f"minimum {g.min_manufacturers}"
+        )
+    stale = next((g for g in r.groups if g.reason == STALE_OR_NON_CURRENT), None)
+    stale_n = stale.count if stale else 0
+    if stale_n:
+        reasons.append(
+            f"{stale_n} published {_plural(stale_n, 'robot has', 'robots have')} only stale or "
+            f"non-current {r.region_name} offer evidence excluded from current figures."
         )
     return {
         "status": "LIMITED_EVIDENCE" if reasons else "CURRENT",

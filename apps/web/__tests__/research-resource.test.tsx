@@ -269,6 +269,15 @@ describe("limited-evidence warning", () => {
     expect(w.getAttribute("role")).toBe("note");
   });
 
+  it("shows the partial-ageing reason in full while the offers stay as projected", () => {
+    const reason =
+      "1 published robot has only stale or non-current Europe offer evidence excluded from current figures.";
+    renderPage(projection({ publication_health: { status: "LIMITED_EVIDENCE", reasons: [reason] } }));
+    const w = screen.getByTestId("limited-evidence-warning");
+    expect(within(w).getByText(reason)).toBeTruthy();
+    expect(screen.getByTestId("offers-available-table")).toBeTruthy();
+  });
+
   it("renders without a reasons list when none are given, and still shows no zeros or removals", () => {
     renderPage(projection({ publication_health: { status: "LIMITED_EVIDENCE", reasons: [] } }));
     const w = screen.getByTestId("limited-evidence-warning");

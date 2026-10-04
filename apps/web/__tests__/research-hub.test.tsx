@@ -229,7 +229,7 @@ describe("landmarks", () => {
   it("the Europe resource page does not nest a second <main> inside the layout's", async () => {
     publish("europe");
     apiServes = true;
-    const { container } = render(await EuropeResearchPage({ searchParams: Promise.resolve({}) }));
+    const { container } = render(await EuropeResearchPage());
     expect(container.querySelector("main")).toBeNull();
   });
 

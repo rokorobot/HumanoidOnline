@@ -14,6 +14,7 @@ import {
 } from "../lib/research";
 import { EDITORIAL, editorialSourceLabel, editorialState } from "../lib/research-editorial";
 import { buildResearchJsonLd } from "../lib/research-jsonld";
+import { issuePreviewSession } from "../lib/research-preview";
 import { projection } from "./research-fixture";
 
 const ORIGIN = "https://research.test.invalid";
@@ -24,9 +25,12 @@ afterEach(cleanup);
 // --- publication gate ---------------------------------------------------------
 
 describe("publication gate", () => {
+  const session = (token: string, region = "europe") => issuePreviewSession(token, region);
+
   it("is closed by default", () => {
     expect(resolveResearchAccess("europe", null, {})).toEqual({ mode: "closed" });
     expect(resolveResearchAccess("europe", "anything", {})).toEqual({ mode: "closed" });
+    expect(resolveResearchAccess("europe", session("tok"), {})).toEqual({ mode: "closed" });
   });
 
   it("opens only for a region the owner listed as published", () => {
@@ -34,22 +38,32 @@ describe("publication gate", () => {
     expect(resolveResearchAccess("europe", null, env)).toEqual({ mode: "published" });
   });
 
-  it("opens a preview only with the exact review token", () => {
+  it("opens a preview only with a valid session signed under the configured token", () => {
     const env = { RESEARCH_PREVIEW_TOKEN: "s3cret" };
-    expect(resolveResearchAccess("europe", "s3cret", env)).toEqual({ mode: "preview", token: "s3cret" });
-    expect(resolveResearchAccess("europe", "s3cre", env)).toEqual({ mode: "closed" });
+    expect(resolveResearchAccess("europe", session("s3cret"), env)).toEqual({ mode: "preview", token: "s3cret" });
+    expect(resolveResearchAccess("europe", session("other"), env)).toEqual({ mode: "closed" });
     expect(resolveResearchAccess("europe", "", env)).toEqual({ mode: "closed" });
     expect(resolveResearchAccess("europe", null, env)).toEqual({ mode: "closed" });
   });
 
-  it("an unset token never grants preview, even for an empty param", () => {
-    expect(resolveResearchAccess("europe", "", { RESEARCH_PREVIEW_TOKEN: "" })).toEqual({ mode: "closed" });
+  it("the raw token itself is not a credential, in any form", () => {
+    const env = { RESEARCH_PREVIEW_TOKEN: "s3cret" };
+    expect(resolveResearchAccess("europe", "s3cret", env)).toEqual({ mode: "closed" });
+  });
+
+  it("a session for another region grants nothing for this one", () => {
+    const env = { RESEARCH_PREVIEW_TOKEN: "s3cret" };
+    expect(resolveResearchAccess("europe", session("s3cret", "asia"), env)).toEqual({ mode: "closed" });
+  });
+
+  it("an unset token never grants preview", () => {
+    expect(resolveResearchAccess("europe", session(""), { RESEARCH_PREVIEW_TOKEN: "" })).toEqual({ mode: "closed" });
   });
 
   it("published wins over preview; other regions stay closed", () => {
     const env = { RESEARCH_PUBLISHED_REGIONS: "europe", RESEARCH_PREVIEW_TOKEN: "t" };
-    expect(resolveResearchAccess("europe", "t", env)).toEqual({ mode: "published" });
-    expect(resolveResearchAccess("north-america", "t", env)).toEqual({ mode: "closed" });
+    expect(resolveResearchAccess("europe", session("t"), env)).toEqual({ mode: "published" });
+    expect(resolveResearchAccess("north-america", session("t"), env)).toEqual({ mode: "closed" });
     expect(resolveResearchAccess("asia", null, { RESEARCH_PUBLISHED_REGIONS: "asia" })).toEqual({ mode: "closed" });
   });
 });

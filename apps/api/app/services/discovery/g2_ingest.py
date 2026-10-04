@@ -37,9 +37,12 @@ from app.models.discovery import DiscoverySource
 from app.services.discovery import cache as body_cache
 from app.services.discovery.proposal_review import latest_content_page_for
 from app.services.discovery.proposals import (
+    CATALOGUE_ENRICHMENT,
     ingest_neura_mini_datasheet_proposals,
     ingest_neura_mini_proposals,
+    ingest_proposals,
     ingest_xpeng_iron_proposals,
+    maturity_spec,
 )
 from app.services.discovery.sources import neura_mini_datasheet_proposals as mini_ds
 from app.services.discovery.sources import neura_mini_proposals as mini
@@ -60,6 +63,9 @@ class G2Ingest:
     ingest: Callable = ingest_neura_mini_proposals
     #: Further approved pages of the same source (read by the same extractor), if any.
     more_page_urls: tuple[str, ...] = ()
+    #: G5 Lane B: the catalogue name of the (existing) robot this source's approved pages may carry
+    #: commercial-maturity wording about. None = the cycle extracts no maturity proposals.
+    maturity_robot_name: str | None = None
 
     @property
     def page_urls(self) -> tuple[str, ...]:
@@ -68,7 +74,8 @@ class G2Ingest:
 
 #: The ONLY wiring. Another page, source or manufacturer needs its own approval and entry.
 G2_INGESTS: Mapping[str, G2Ingest] = {
-    "neura-robotics-official": G2Ingest(page_url=mini.MINI_URL, robot_slug="4ne1-mini"),
+    "neura-robotics-official": G2Ingest(page_url=mini.MINI_URL, robot_slug="4ne1-mini",
+                                        maturity_robot_name=mini.ROBOT_NAME),
     # G5-2 (owner source decision 2026-10-04): the Mini datasheet on the approved document host.
     "neura-documents-official": G2Ingest(
         page_url=mini_ds.DATASHEET_URL, robot_slug="4ne1-mini",
@@ -76,7 +83,7 @@ G2_INGESTS: Mapping[str, G2Ingest] = {
     # XPENG IRON (owner source approval 2026-10-03): the four reviewed xpeng.com pages only.
     "xpeng-official": G2Ingest(
         page_url=xpeng.PAGE_URLS[0], robot_slug="xpeng-iron", ingest=ingest_xpeng_iron_proposals,
-        more_page_urls=tuple(xpeng.PAGE_URLS[1:])),
+        more_page_urls=tuple(xpeng.PAGE_URLS[1:]), maturity_robot_name=xpeng.ROBOT_NAME),
 }
 
 
@@ -89,13 +96,19 @@ class G2Result:
     proposals_created: int = 0
     sightings_created: int = 0
     rejected: list = field(default_factory=list)
+    #: G5 Lane B: COMMERCIAL_MATURITY proposals read from the same approved pages. Reported
+    #: separately from the technical proposals above; never a status, never a decision.
+    maturity_seen: int = 0
+    maturity_created: int = 0
+    maturity_failure: str = ""
 
     @property
     def attention(self) -> bool:
         """A human must look: an ingest failure, a fail-safe rejection (the page no longer
         reads as expected), or new proposals (new slot or changed value: re-review)."""
         return (self.status == FAILED or bool(self.unexpected_rejections)
-                or self.proposals_created > 0)
+                or self.proposals_created > 0 or self.maturity_created > 0
+                or bool(self.maturity_failure))
 
     @property
     def unexpected_rejections(self) -> list:
@@ -105,6 +118,15 @@ class G2Result:
         return [r for r in self.rejected if not str(r[1]).startswith(BENIGN_REJECTION)]
 
     def summary(self) -> str:
+        text = self._technical_summary()
+        if self.maturity_created:
+            text += (f" / {self.maturity_created} new commercial-maturity proposal(s) "
+                     "(human review required; no status is changed)")
+        if self.maturity_failure:
+            text += f" / MATURITY EXTRACTION FAILED: {self.maturity_failure}"
+        return text
+
+    def _technical_summary(self) -> str:
         if self.status == FAILED:
             return f"G2 INGEST FAILED: {self.detail}"
         if self.status in (UP_TO_DATE, NO_OBSERVATION):
@@ -124,6 +146,9 @@ class G2Result:
                 "proposals_seen": self.proposals_seen,
                 "proposals_created": self.proposals_created,
                 "sightings_created": self.sightings_created,
+                "maturity_proposals_seen": self.maturity_seen,
+                "maturity_proposals_created": self.maturity_created,
+                "maturity_failure": self.maturity_failure,
                 "rejected": [list(r) for r in self.rejected],
                 "unexpected_rejections": [list(r) for r in self.unexpected_rejections],
                 "attention": self.attention,
@@ -162,6 +187,27 @@ def _ingest_page(session: Session, source: DiscoverySource, cfg: G2Ingest, page_
                     proposals_created=report.proposals_created,
                     sightings_created=report.observations_created,
                     rejected=list(report.rejected))
+
+
+def _maturity_page(session: Session, source: DiscoverySource, cfg: G2Ingest, page_url: str,
+                   cache_dir: Path, operator: str) -> tuple[int, int]:
+    """G5 Lane B for one approved page: extract COMMERCIAL_MATURITY proposals about the registered
+    EXISTING robot from the newest retained content (never a new candidate, never a status).
+
+    Idempotent and quiet: identical wording has the same digest, so an unchanged page creates
+    nothing; only wording that is new or changed creates a proposal. Returns (seen, created)."""
+    page = latest_content_page_for(session, source.id, page_url)
+    if page is None:
+        return 0, 0
+    body = body_cache.read_observed_body(cache_dir, str(page.id))
+    if body is None:                      # the technical ingest already reports a missing body
+        return 0, 0
+    with session.begin_nested():
+        report = ingest_proposals(
+            session, spec=maturity_spec(cfg.maturity_robot_name), source_key=source.key,
+            robot_slug=cfg.robot_slug, fetched_page_id=page.id, body=body,
+            ingested_by=operator, origin=CATALOGUE_ENRICHMENT)
+    return report.proposals_seen, report.proposals_created
 
 
 def _combine(results: list[G2Result]) -> G2Result:
@@ -206,4 +252,19 @@ def ingest_for_source(session: Session, source: DiscoverySource, *, cache_dir: P
             except Exception:  # noqa: BLE001
                 pass
             results.append(G2Result(FAILED, f"{page_url}: {type(exc).__name__}: {exc}"))
-    return _combine(results)
+    combined = _combine(results)
+    if cfg.maturity_robot_name:
+        for page_url in cfg.page_urls:
+            try:
+                seen, created = _maturity_page(session, source, cfg, page_url, cache_dir, operator)
+                combined.maturity_seen += seen
+                combined.maturity_created += created
+            except Exception as exc:  # noqa: BLE001 - surfaced; never fails the technical ingest
+                try:
+                    session.rollback()
+                except Exception:  # noqa: BLE001
+                    pass
+                combined.maturity_failure = f"{page_url}: {type(exc).__name__}: {exc}"
+        if combined.maturity_created and checkpoint is not None:
+            checkpoint()
+    return combined

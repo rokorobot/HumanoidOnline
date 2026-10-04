@@ -252,7 +252,9 @@ def test_the_registry_contains_exactly_the_approved_targets_and_nothing_commerci
         "robot_spec[degrees_of_freedom]", "robot_spec[hand_dof]", "specification[compute_ai]",
         # XPENG IRON historical factual knowledge, no catalogue home (option B)
         "no_catalogue_home[historical_body_dof]", "no_catalogue_home[historical_hand_dof]",
-        "no_catalogue_home[historical_compute]", "no_catalogue_home[historical_battery]"}
+        "no_catalogue_home[historical_compute]", "no_catalogue_home[historical_battery]",
+        # commercial maturity (owner ruling 2026-10-04): reviewer-chosen frozen status
+        "commercial_status[current]"}
 
 
 def test_proposals_resolve_to_the_expected_policies_and_the_rest_stay_unregistered(dsession):

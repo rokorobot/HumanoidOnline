@@ -296,6 +296,13 @@ Forward migrations:
   `robot`. Only two CHECK constraints are replaced; triggers and rows are untouched.
   Additive, backward compatible, idempotent.
 
+- `0023_commercial_status_claim_target_and_proposal_origin.sql` — G5 (owner ruling 2026-10-04):
+  the accepted-claim target kinds gain `commercial_status` (the robot's own maturity column
+  and its `commercial_status_evidence`, written through the catalogue file), and every claim
+  proposal carries an operational `origin` (`NEW_MODEL` | `CATALOGUE_ENRICHMENT`, default the
+  latter) that never changes proposal semantics. One CHECK replaced, one defaulted column added;
+  triggers and rows untouched. Additive, backward compatible, idempotent.
+
 ## Checksum integrity (WS8.2 / R9)
 
 `schema_migrations` stores a `sha256` for every applied file, and

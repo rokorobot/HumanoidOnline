@@ -142,6 +142,9 @@ class CycleResult:
             "CATALOGUE_ENRICHMENT": {
                 "proposals_created": sum(x["proposals_created"] for x in g2),
                 "proposals_seen": sum(x["proposals_seen"] for x in g2),
+                "maturity_proposals_created": sum(
+                    x.get("maturity_proposals_created", 0) for x in g2),
+                "maturity_proposals_seen": sum(x.get("maturity_proposals_seen", 0) for x in g2),
                 "planner": self.enrichment,
                 "lane_b": self.lane_b.as_dict() if self.lane_b is not None else None},
         }
@@ -154,7 +157,9 @@ class CycleResult:
                f"identity-review items={nm['identity_review_items']}",
                "CATALOGUE ENRICHMENT",
                f"  proposals on existing robots: {ce['proposals_created']} new / "
-               f"{ce['proposals_seen']} seen"]
+               f"{ce['proposals_seen']} seen",
+               f"  commercial-maturity proposals: {ce['maturity_proposals_created']} new / "
+               f"{ce['maturity_proposals_seen']} seen (human review required; no status changes)"]
         if self.enrichment is None:
             out.append("  planner: unavailable this cycle (informational; not an error)")
         else:

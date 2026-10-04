@@ -203,7 +203,8 @@ DETAIL_ONLY_TOKENS: dict[tuple[str, str], str] = {
     ("additional_interfaces", "ready for Neura Gym training"): "no canonical property yet",
 }
 
-DIRECT_KINDS = {"robot_variant", "robot_spec", "pricing_offer", "availability_offer"}
+DIRECT_KINDS = {"robot_variant", "robot_spec", "pricing_offer", "availability_offer",
+                "commercial_status"}
 
 #: Findings about what the PUBLIC sees. An unpublished catalogue record is not a public assertion,
 #: so
@@ -544,6 +545,10 @@ def loss_findings(rec: RobotRecord, resolved: Mapping[str, fr.ResolvedFact]) -> 
             col = rec.core.get(c.target_key)
             if col is None or str(int(col)) != str(c.accepted_value):
                 lost.append(f"accepted {c.target_key} = {c.accepted_value} is not on the robot")
+        elif c.target_kind == "commercial_status":
+            if rec.commercial_status != c.accepted_value:
+                lost.append(f"accepted commercial status {c.accepted_value} is not on the robot "
+                            f"(it is {rec.commercial_status})")
         elif c.target_kind == "pricing_offer":
             if not any(p.variant_slug == c.variant_slug for p in rec.pricing):
                 lost.append(f"accepted price for {c.variant_slug!r} is not published")

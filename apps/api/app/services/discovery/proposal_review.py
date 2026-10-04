@@ -41,6 +41,7 @@ from app.models.discovery import DiscoverySource
 from app.models.robot import Robot
 from app.services.discovery import DiscoveryError
 from app.services.discovery.field_policy import MAPPING_KEYS
+from app.services.discovery.sources import neura_mini_datasheet_proposals as mini_ds
 from app.services.discovery.sources import neura_mini_proposals as mini
 from app.services.discovery.sources import xpeng_iron_proposals as xpeng
 from app.services.discovery.urlref import UnsupportedUrl, normalize_url
@@ -53,9 +54,11 @@ CURRENT, SUPERSEDED, STALE = "CURRENT", "SUPERSEDED", "STALE"
 
 #: Extractors whose output is still trusted. Retiring one makes its proposals stale.
 LIVE_EXTRACTORS = frozenset({(mini.EXTRACTOR_KEY, mini.EXTRACTOR_VERSION),
+                             (mini_ds.EXTRACTOR_KEY, mini_ds.EXTRACTOR_VERSION),
                              (xpeng.EXTRACTOR_KEY, xpeng.EXTRACTOR_VERSION)})
 #: Identity gate: the catalogue name a live extractor's proposals must attach to.
 EXTRACTOR_ROBOT_NAME = {mini.EXTRACTOR_KEY: mini.ROBOT_NAME,
+                        mini_ds.EXTRACTOR_KEY: mini_ds.ROBOT_NAME,
                         xpeng.EXTRACTOR_KEY: xpeng.ROBOT_NAME}
 
 _UNCHANGED = {"NOT_MODIFIED", "SKIPPED_UNCHANGED"}

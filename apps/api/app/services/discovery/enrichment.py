@@ -392,6 +392,23 @@ def source_status(source: DiscoverySource | None) -> str:
 
 
 @dataclass(frozen=True)
+class Target:
+    """One eligible known URL with its own cadence state (G5-2 fetches `due` targets only)."""
+
+    url: str
+    source_key: str
+    last_observed: datetime | None
+    next_eligible: datetime | None
+    due: bool
+
+    def as_dict(self) -> dict:
+        iso = lambda d: d.isoformat() if d else None  # noqa: E731
+        return {"url": self.url, "source": self.source_key,
+                "last_observed": iso(self.last_observed),
+                "next_eligible": iso(self.next_eligible), "due": self.due}
+
+
+@dataclass(frozen=True)
 class QueueRow:
     robot_slug: str
     manufacturer_slug: str | None
@@ -411,6 +428,7 @@ class QueueRow:
     pending_proposals: int
     gaps: GapProfile = field(repr=False, default=None)  # type: ignore[assignment]
     lane: str = CATALOGUE_ENRICHMENT
+    targets: tuple[Target, ...] = ()
 
     @property
     def fetch_planned(self) -> bool:
@@ -428,6 +446,7 @@ class QueueRow:
             "next_eligible": iso(self.next_eligible), "due": self.due,
             "source": self.source_key, "source_status": self.source_status,
             "eligible_urls": list(self.eligible_urls),
+            "targets": [t.as_dict() for t in self.targets],
             "excluded_urls": [v.as_dict() for v in self.excluded_urls],
             "pending_proposals": self.pending_proposals,
             "has_pending_proposals": self.pending_proposals > 0,
@@ -435,8 +454,10 @@ class QueueRow:
         }
 
 
-def plan_robot(inp: RobotInput, source,
-               last_observation: datetime | None, now: datetime) -> QueueRow:
+def plan_robot(inp: RobotInput, source, last_observed, now: datetime) -> QueueRow:
+    """`last_observed`: normalized URL -> last retrieval time (or one datetime for all URLs).
+    Each eligible URL has its OWN next-eligible time (band interval after ITS last retrieval),
+    so a newly eligible document is not held back by a recently fetched sibling page."""
     rec = inp.record
     gaps = gap_profile(inp, now)
     band, why = priority(inp, gaps, now)
@@ -446,19 +467,33 @@ def plan_robot(inp: RobotInput, source,
     approved = [x for x in sorted(_as_sources(source), key=lambda x: x.key)
                 if source_status(x) == APPROVED]
     status = APPROVED if approved else NO_APPROVED_SOURCE
-    nxt = next_eligible_at(band, last_observation)
+
+    def seen(url: str) -> datetime | None:
+        return last_observed if isinstance(last_observed, datetime) else (
+            (last_observed or {}).get(url))
+
+    targets = tuple(
+        Target(v.url, v.source_key, seen(v.url), nxt,
+               nxt is None or nxt <= now)
+        for v in verdicts if v.reason is None and status == APPROVED
+        for nxt in [next_eligible_at(band, seen(v.url))])
+    obs = max((t.last_observed for t in targets if t.last_observed), default=None)
+    nxt_row = min((t.next_eligible for t in targets if t.next_eligible), default=None)
     if status != APPROVED:
         due = NO_APPROVED_SOURCE
     elif not eligible:
         due = NO_ELIGIBLE_URL
     else:
-        due = DUE_NOW if nxt is None or nxt <= now else NOT_DUE
+        due = DUE_NOW if any(t.due for t in targets) else NOT_DUE
+    if due == DUE_NOW:
+        nxt_row = None
     return QueueRow(
         rec.slug, rec.manufacturer_slug, rec.is_published, str(rec.commercial_status),
-        gaps.band, tuple(gaps.reasons()), band, tuple(why), last_observation, nxt, due,
+        gaps.band, tuple(gaps.reasons()), band, tuple(why), obs, nxt_row, due,
         next((v.source_key for v in verdicts if v.source_key),
              approved[0].key if approved else None), status,
-        eligible if status == APPROVED else (), excluded, rec.not_yet_reviewed, gaps)
+        eligible if status == APPROVED else (), excluded, rec.not_yet_reviewed, gaps,
+        targets=targets)
 
 
 _BAND_ORDER = {HIGH: 0, MEDIUM: 1, LOW: 2}
@@ -476,12 +511,7 @@ def build_queue(
     rows = []
     for inp in inputs:
         src = sources.get(inp.record.manufacturer_slug or "")
-        obs = None
-        for url in collect_known_urls(inp):
-            seen = last_observed.get(url)
-            if seen is not None and (obs is None or seen > obs):
-                obs = seen
-        rows.append(plan_robot(inp, src, obs, now))
+        rows.append(plan_robot(inp, src, last_observed, now))
     rows.sort(key=lambda r: (_BAND_ORDER[r.priority], r.due != DUE_NOW, r.robot_slug))
     return rows
 
@@ -606,9 +636,16 @@ def load_last_observed(session: Session) -> dict[str, datetime]:
     return last
 
 
+def plan_catalogue_with_sources(
+    session: Session, adapters: Mapping[str, SourceAdapterConfig], now: datetime | None = None,
+) -> tuple[list[QueueRow], dict[str, list[DiscoverySource]]]:
+    """The queue plus the manufacturer -> sources map it was planned with. SELECT only."""
+    when = (now or datetime.now(UTC)).astimezone(UTC)
+    sources = sources_by_manufacturer(session.scalars(select(DiscoverySource)).all(), adapters)
+    return build_queue(load_inputs(session), sources, load_last_observed(session), when), sources
+
+
 def plan_catalogue(session: Session, adapters: Mapping[str, SourceAdapterConfig],
                    now: datetime | None = None) -> list[QueueRow]:
     """The computed enrichment queue from the live database. SELECT only."""
-    when = (now or datetime.now(UTC)).astimezone(UTC)
-    sources = sources_by_manufacturer(session.scalars(select(DiscoverySource)).all(), adapters)
-    return build_queue(load_inputs(session), sources, load_last_observed(session), when)
+    return plan_catalogue_with_sources(session, adapters, now)[0]

@@ -108,18 +108,26 @@ class CycleResult:
     sources: list[SourceObservation] = field(default_factory=list)
     #: G5-1: the Lane B planner summary (informational; never affects the exit code).
     enrichment: dict | None = None
+    #: G5-2: the Lane B (catalogue enrichment) fetch/report result (enrichment_fetch.LaneBResult).
+    lane_b: object | None = None
+
+    @property
+    def needs_attention(self) -> bool:
+        return (any(s.attention for s in self.sources)
+                or bool(self.lane_b is not None and self.lane_b.attention))
 
     @property
     def exit_code(self) -> int:
-        if any(s.status == FAILED for s in self.sources):
+        if any(s.status == FAILED for s in self.sources) or (
+                self.lane_b is not None and self.lane_b.failed):
             return EXIT_FAILED
-        return EXIT_ATTENTION if any(s.attention for s in self.sources) else EXIT_OK
+        return EXIT_ATTENTION if self.needs_attention else EXIT_OK
 
     def lines(self) -> list[str]:
         mode = "PLAN (no request, no write)" if self.plan_only else "OBSERVATION CYCLE"
         head = f"{mode} started={self.started_at.isoformat()}  sources={len(self.sources)}"
         return [head, *(s.line() for s in self.sources), *self.lane_lines(),
-                f"attention={'yes' if any(s.attention for s in self.sources) else 'no'}  "
+                f"attention={'yes' if self.needs_attention else 'no'}  "
                 f"exit={self.exit_code}  canonical_rows_written=0"]
 
     def lane_summary(self) -> dict:
@@ -134,7 +142,8 @@ class CycleResult:
             "CATALOGUE_ENRICHMENT": {
                 "proposals_created": sum(x["proposals_created"] for x in g2),
                 "proposals_seen": sum(x["proposals_seen"] for x in g2),
-                "planner": self.enrichment},
+                "planner": self.enrichment,
+                "lane_b": self.lane_b.as_dict() if self.lane_b is not None else None},
         }
 
     def lane_lines(self) -> list[str]:
@@ -151,6 +160,8 @@ class CycleResult:
         else:
             from app.services.discovery.enrichment import summary_lines
             out.extend(summary_lines(self.enrichment)[1:])
+        if self.lane_b is not None:
+            out.extend(self.lane_b.lines())
         return out
 
     def as_dict(self) -> dict:

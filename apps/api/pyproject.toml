@@ -27,8 +27,11 @@ dependencies = [
 # docs/16 §20 forbids browser execution, so no browser package belongs here.
 discovery = [
     "httpx>=0.27",
+    # G5-2: text layer of first-party PDF datasheets (pure Python, no network).
+    "pypdf>=5",
 ]
 dev = [
+    "pypdf>=5",
     "pytest>=8",
     "httpx>=0.27",
     "ruff>=0.6",

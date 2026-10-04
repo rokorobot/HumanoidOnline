@@ -521,6 +521,7 @@ def _cmd_observe(args: argparse.Namespace) -> int:
             session, ADAPTERS, plan_only=args.plan, cache_dir=Path(args.cache_dir),
             kill_switch_for=kill_switch_for, only=args.only, run_now=args.run_now,
             checkpoint=None if args.plan else session.commit)
+        result.enrichment = _enrichment_summary(session)
         if args.plan:
             session.rollback()
     print("\n".join(result.lines()))
@@ -529,6 +530,45 @@ def _cmd_observe(args: argparse.Namespace) -> int:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(result.as_dict(), indent=2, sort_keys=True), encoding="utf-8")
     return result.exit_code
+
+
+def _enrichment_summary(session) -> dict | None:
+    """The Lane B planner summary for the cycle report. Best effort and read-only: the
+    least-privilege observer role may lack SELECT on some catalogue tables, and an
+    informational report must never fail or alter a cycle."""
+    from app.services.discovery import enrichment
+    from app.services.discovery.sources import ADAPTERS
+
+    try:
+        with session.begin_nested():
+            return enrichment.summarize(enrichment.plan_catalogue(session, ADAPTERS))
+    except Exception:  # noqa: BLE001 - informational only
+        return None
+
+
+def _cmd_enrichment(args: argparse.Namespace) -> int:
+    import json
+
+    from app.db.session import SessionLocal
+    from app.services.discovery import enrichment
+    from app.services.discovery.sources import ADAPTERS
+
+    with SessionLocal() as session:
+        rows = enrichment.plan_catalogue(session, ADAPTERS)
+        session.rollback()
+    summary = enrichment.summarize(rows)
+    if args.json:
+        print(json.dumps({"summary": summary, "queue": [r.as_dict() for r in rows]},
+                         indent=2, sort_keys=True))
+        return 0
+    print("\n".join(enrichment.summary_lines(summary)))
+    print(f"{'ROBOT':<34}{'PRI':<7}{'COV':<9}{'DUE':<20}{'PUB':<5}{'URLS':<6}{'PEND':<5}GAPS")
+    for r in rows:
+        gaps = "; ".join(r.gap_reasons) or "-"
+        print(f"{r.robot_slug:<34}{r.priority:<7}{r.coverage_band:<9}{r.due:<20}"
+              f"{'yes' if r.is_published else 'no':<5}{len(r.eligible_urls):<6}"
+              f"{r.pending_proposals:<5}{gaps}")
+    return 0
 
 
 def _cmd_cache(args: argparse.Namespace) -> int:
@@ -625,6 +665,14 @@ def main(argv: list[str] | None = None) -> int:
                              help="also write the machine-readable cycle result")
     observe_cmd.add_argument("--cache-dir", default=str(DEFAULT_CACHE_DIR))
     observe_cmd.set_defaults(func=_cmd_observe)
+
+    enrichment_cmd = commands.add_parser(
+        "enrichment", help="G5-1 Lane B planner (read-only; fetches nothing)")
+    enrichment_actions = enrichment_cmd.add_subparsers(dest="action", required=True)
+    queue_cmd = enrichment_actions.add_parser(
+        "queue", help="the computed catalogue enrichment queue (not a source of truth)")
+    queue_cmd.add_argument("--json", action="store_true", help="full machine-readable queue")
+    enrichment_cmd.set_defaults(func=_cmd_enrichment)
 
     cache_cmd = commands.add_parser("cache", help="raw-body cache retention (LIVE.10)")
     cache_actions = cache_cmd.add_subparsers(dest="action", required=True)

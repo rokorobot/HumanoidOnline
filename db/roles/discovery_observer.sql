@@ -48,3 +48,15 @@ GRANT UPDATE (last_robots_hash, last_robots_checked_at, last_crawled_at, is_enab
 -- fetched page, robot name for the identity gate: granted above).
 GRANT SELECT, INSERT ON discovery_claim_proposal, discovery_proposal_observation
     TO discovery_observer;
+
+-- G5-1 (catalogue enrichment planner): the read-only Lane B queue is computed inside the
+-- observation cycle report. These are exactly the relations its query path SELECTs beyond the
+-- grants above (services/readiness_loader.load_records and discovery/enrichment.load_inputs).
+-- SELECT ONLY: no write, no DELETE/TRUNCATE, no sequence, no default privileges for future
+-- tables. The planner fetches nothing and writes nothing; without these grants it degrades to
+-- "planner: unavailable" in the cycle report and never changes the cycle result.
+GRANT SELECT ON
+    robot_variant, specification, spec_definition, evidence_source, pricing_offer,
+    availability_offer, deployment, accepted_claim, claim_retraction,
+    discovery_proposal_decision
+TO discovery_observer;

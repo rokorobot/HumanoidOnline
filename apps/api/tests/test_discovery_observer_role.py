@@ -116,3 +116,106 @@ def test_one_cycle_runs_as_the_observer_role_and_nothing_else_is_writable(
                 conn.rollback()
     finally:
         _cleanup(source_id)
+
+
+# ---------------------------------------------------------------------------------------------
+# G5-1: the Lane B enrichment planner under the SAME least-privilege role.
+# ---------------------------------------------------------------------------------------------
+
+#: The relations the planner's query path reads beyond the Stage F baseline (derived from
+#: services/readiness_loader.load_records and services/discovery/enrichment.load_inputs), and
+#: granted SELECT-only by db/roles/discovery_observer.sql. Nothing here is granted "just in case".
+PLANNER_READ_ONLY = (
+    "robot_variant", "specification", "spec_definition", "evidence_source", "pricing_offer",
+    "availability_offer", "deployment", "accepted_claim", "claim_retraction",
+    "discovery_proposal_decision",
+)
+
+
+def _role_name(engine) -> str:
+    return engine.url.username
+
+
+def test_enrichment_planner_runs_as_the_observer_role(observer_role):
+    from app.cli.discovery import _enrichment_summary
+    from app.services.discovery import enrichment
+    from app.services.discovery.sources import ADAPTERS
+
+    with Session(owner_engine) as owner:
+        expected = owner.scalar(text("SELECT count(*) FROM robot"))
+    assert expected > 0
+    with Session(observer_role) as session:
+        rows = enrichment.plan_catalogue(session, ADAPTERS)
+        assert len(rows) == expected                       # every robot is in the queue
+        summary = _enrichment_summary(session)
+        assert summary is not None and summary["catalogue_robots"] == expected
+        assert summary["fetches_made"] == 0 and summary["canonical_rows_written"] == 0
+        session.rollback()
+
+
+def test_planner_relations_are_select_only_and_nothing_mutates(observer_role):
+    role = _role_name(observer_role)
+    with owner_engine.connect() as conn:
+        grants = conn.execute(text(
+            "SELECT table_name, privilege_type FROM information_schema.role_table_grants "
+            "WHERE grantee = :r AND table_schema = 'humanoid'"), {"r": role}).all()
+        schema_privs = conn.execute(text(
+            "SELECT has_schema_privilege(:r, 'humanoid', 'CREATE')"), {"r": role}).scalar()
+    by_table: dict[str, set[str]] = {}
+    for table, priv in grants:
+        by_table.setdefault(table, set()).add(priv)
+    for table in PLANNER_READ_ONLY:
+        assert by_table.get(table) == {"SELECT"}, (table, by_table.get(table))
+    for table in ("robot", "manufacturer", "robot_image"):   # baseline reads stay read-only
+        assert by_table[table] == {"SELECT"}
+    forbidden = {"DELETE", "TRUNCATE", "REFERENCES", "TRIGGER"}
+    assert not [t for t, p in by_table.items() if p & forbidden]
+    assert schema_privs is False
+    with observer_role.connect() as conn:
+        for sql in (
+            "UPDATE specification SET value_text = value_text",
+            "DELETE FROM pricing_offer",
+            "UPDATE availability_offer SET is_current = is_current",
+            "INSERT INTO deployment (robot_id) SELECT id FROM robot LIMIT 1",
+            "UPDATE robot SET is_published = is_published",
+            "UPDATE robot_variant SET name = name",
+            "DELETE FROM accepted_claim",
+            "DELETE FROM claim_retraction",
+            "INSERT INTO discovery_proposal_decision (proposal_id, decision, decided_by, "
+            "rationale) VALUES (gen_random_uuid(), 'ACCEPT', 'x', 'x')",
+            "UPDATE spec_definition SET label = label",
+            "TRUNCATE evidence_source",
+        ):
+            with pytest.raises(ProgrammingError, match="permission denied"):
+                conn.execute(text(sql))
+            conn.rollback()
+
+
+def test_planner_never_changes_the_cycle_exit_status(observer_role, monkeypatch):
+    from app.cli import discovery as cli
+    from app.services.discovery import enrichment
+    from app.services.discovery.observe import CycleResult
+
+    def boom(*a, **k):
+        raise RuntimeError("planner unavailable")
+
+    monkeypatch.setattr(enrichment, "plan_catalogue", boom)
+    with Session(observer_role) as session:
+        assert cli._enrichment_summary(session) is None     # swallowed, session still usable
+        assert session.scalar(text("SELECT 1")) == 1
+    from datetime import UTC, datetime
+    bare = CycleResult(started_at=datetime.now(UTC), plan_only=False)
+    with_planner = CycleResult(started_at=bare.started_at, plan_only=False,
+                               enrichment={"catalogue_robots": 1})
+    assert bare.exit_code == with_planner.exit_code == 0
+
+
+def test_observe_cli_prints_the_enrichment_section(capsys, tmp_path):
+    """The wiring: `discovery observe --plan` reports the planner (not 'unavailable')."""
+    from app.cli.discovery import main
+
+    code = main(["observe", "--plan", "--cache-dir", str(tmp_path)])
+    out = capsys.readouterr().out
+    assert code == 0
+    assert "NEW MODEL RADAR" in out and "CATALOGUE ENRICHMENT" in out
+    assert "catalogue robots=" in out and "unavailable" not in out

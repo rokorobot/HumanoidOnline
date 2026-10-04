@@ -267,8 +267,8 @@ def test_the_observer_role_can_run_the_ingest_and_nothing_more(site):
     for sql in (
         "INSERT INTO discovery_proposal_decision (proposal_id, decision, decided_by, rationale)"
         " SELECT id, 'DEFER', 'x', 'x' FROM discovery_claim_proposal LIMIT 1",
-        "SELECT count(*) FROM discovery_proposal_decision",
-        "SELECT count(*) FROM accepted_claim", "SELECT count(*) FROM claim_retraction",
+        "DELETE FROM discovery_proposal_decision", "DELETE FROM accepted_claim",
+        "DELETE FROM claim_retraction",   # G5-1: readable (planner), never writable
         "SELECT count(*) FROM catalogue_write_audit",
         "UPDATE discovery_claim_proposal SET gap = 'x'", "DELETE FROM discovery_claim_proposal",
         "UPDATE discovery_proposal_observation SET observed_by = 'x'",

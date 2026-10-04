@@ -23,6 +23,7 @@ vi.mock("@/lib/seo", () => ({
 import { GET } from "../app/research/humanoid-availability/europe.json/route";
 import EuropeResearchPage, { generateMetadata } from "../app/research/humanoid-availability/europe/page";
 import sitemap from "../app/sitemap";
+import { EDITORIAL } from "../lib/research-editorial";
 import { buildResearchJsonLd } from "../lib/research-jsonld";
 
 const ORIGIN = "https://journey.test.invalid";
@@ -96,6 +97,8 @@ const researchUrls = async () =>
 
 describe("closed (default)", () => {
   it("page, metadata and JSON are 404 and the API is never called", async () => {
+    // Editorial approval is one publication prerequisite; it must not publish.
+    expect(EDITORIAL.europe.reviewed_at).not.toBeNull();
     await expect(EuropeResearchPage(sp())).rejects.toThrow();
     expect((await generateMetadata(sp())).title).toBe("Not found");
     expect((await GET(jsonRequest())).status).toBe(404);
@@ -119,11 +122,13 @@ describe("valid preview", () => {
     apiToken = TOKEN;
   });
 
-  it("renders 200 with a preview banner, readiness and a DRAFT editorial section", async () => {
+  it("renders 200 with a preview banner, readiness and the reviewed editorial section", async () => {
     const { container } = render(await EuropeResearchPage(sp(TOKEN)));
     expect(container.querySelector('[data-testid="preview-banner"]')).toBeTruthy();
     expect(container.querySelector('[data-testid="readiness"]')).toBeTruthy();
-    expect(container.querySelector('[data-testid="editorial"]')?.textContent).toContain("DRAFT");
+    const editorial = container.querySelector('[data-testid="editorial"]')?.textContent ?? "";
+    expect(editorial).toContain("Reviewed 2026-10-04.");
+    expect(editorial).not.toContain("DRAFT");
   });
 
   it("is noindex in metadata, and the JSON is noindex and no-store", async () => {
@@ -158,7 +163,10 @@ describe("published and ready", () => {
     const { container } = render(await EuropeResearchPage(sp()));
     expect(container.querySelector('[data-testid="preview-banner"]')).toBeNull();
     expect(container.querySelector('[data-testid="readiness"]')).toBeNull();
-    expect(container.querySelector('[data-testid="editorial"]')).toBeNull(); // unreviewed draft stays hidden
+    const editorial = container.querySelector('[data-testid="editorial"]')?.textContent ?? "";
+    expect(editorial).toContain("Reviewed 2026-10-04."); // approved text is part of the public page
+    expect(editorial).not.toContain("DRAFT");
+    expect(editorial).not.toContain("outdated");
     const meta = await generateMetadata(sp());
     expect(meta.robots).toBeUndefined();
     expect(meta.alternates?.canonical).toBe(PAGE_URL);

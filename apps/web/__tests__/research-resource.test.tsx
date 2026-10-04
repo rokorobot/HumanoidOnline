@@ -246,16 +246,46 @@ describe("rendering", () => {
 // --- editorial fragment ----------------------------------------------------------
 
 describe("editorial fragment", () => {
-  it("is unreviewed (DRAFT) today: hidden publicly, marked DRAFT in preview", () => {
-    expect(EDITORIAL.europe.reviewed_at).toBeNull();
-    expect(editorialState("europe", "2026-10-04", false)).toEqual({ show: false });
-    const preview = editorialState("europe", "2026-10-04", true);
-    expect(preview).toMatchObject({ show: true, draft: true });
-    renderPage(projection(), true);
-    expect(screen.getByTestId("editorial").textContent).toContain("DRAFT");
-    cleanup();
-    renderPage(projection(), false);
-    expect(screen.queryByTestId("editorial")).toBeNull();
+  it("is owner-reviewed: shown without a DRAFT label, in public and in preview", () => {
+    expect(EDITORIAL.europe.reviewed_at).toBe("2026-10-04");
+    expect(EDITORIAL.europe.reviewed_by).toBeTruthy();
+    for (const preview of [false, true]) {
+      expect(editorialState("europe", "2026-10-04", preview)).toMatchObject({
+        show: true,
+        draft: false,
+        outdated: false,
+      });
+      renderPage(projection(), preview);
+      const section = screen.getByTestId("editorial").textContent ?? "";
+      expect(section).not.toContain("DRAFT");
+      expect(section).not.toContain("outdated");
+      expect(section).toContain("Reviewed 2026-10-04.");
+      for (const paragraph of EDITORIAL.europe.paragraphs) {
+        expect(section).toContain(paragraph);
+      }
+      cleanup();
+    }
+  });
+
+  it("cites an official UN M49 source for the Europe classification statement", () => {
+    expect(EDITORIAL.europe.sources).toEqual(["https://unstats.un.org/unsd/methodology/m49/overview/"]);
+    expect(EDITORIAL.europe.paragraphs[0]).toContain("UN M49 Europe classification");
+  });
+
+  it("still treats an unreviewed fragment as DRAFT: hidden publicly, marked in preview", () => {
+    const original = EDITORIAL.europe.reviewed_at;
+    EDITORIAL.europe.reviewed_at = null;
+    try {
+      expect(editorialState("europe", "2026-10-04", false)).toEqual({ show: false });
+      expect(editorialState("europe", "2026-10-04", true)).toMatchObject({ show: true, draft: true });
+      renderPage(projection(), true);
+      expect(screen.getByTestId("editorial").textContent).toContain("DRAFT");
+      cleanup();
+      renderPage(projection(), false);
+      expect(screen.queryByTestId("editorial")).toBeNull();
+    } finally {
+      EDITORIAL.europe.reviewed_at = original;
+    }
   });
 
   it("contains no price, status, count or robot-specific commercial claim", () => {
@@ -265,14 +295,12 @@ describe("editorial fragment", () => {
     expect(text).not.toMatch(/\b(unitree|booster|agibot|neura|price|priced|cost)\b/i);
   });
 
-  it("flags a reviewed fragment older than 180 days as possibly outdated", () => {
-    EDITORIAL.europe.reviewed_at = "2026-01-01";
-    try {
-      expect(editorialState("europe", "2026-10-04", false)).toMatchObject({ show: true, draft: false, outdated: true });
-      expect(editorialState("europe", "2026-02-01", false)).toMatchObject({ outdated: false });
-    } finally {
-      EDITORIAL.europe.reviewed_at = null;
-    }
+  it("keeps the 180-day review rule: not outdated through day 180, outdated from day 181", () => {
+    // Reviewed 2026-10-04: day 180 is 2027-04-02, day 181 is 2027-04-03.
+    expect(editorialState("europe", "2027-04-02", false)).toMatchObject({ outdated: false });
+    expect(editorialState("europe", "2027-04-03", false)).toMatchObject({ show: true, outdated: true });
+    renderPage(projection({ snapshot_date: "2027-04-03" }), false);
+    expect(screen.getByTestId("editorial").textContent).toContain("may be outdated");
   });
 });
 

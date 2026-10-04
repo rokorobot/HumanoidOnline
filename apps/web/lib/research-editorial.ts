@@ -13,16 +13,20 @@ export interface EditorialFragment {
   /** ISO date of the owner's review; null = DRAFT, never shown publicly. */
   reviewed_at: string | null;
   reviewed_by: string | null;
-  /** Externally verifiable claims need a source; this draft makes none. */
+  /** Sources for any externally verifiable claim in the paragraphs. */
   sources: string[];
   paragraphs: string[];
 }
 
 export const EDITORIAL: Record<ResearchRegion, EditorialFragment> = {
   europe: {
-    reviewed_at: null,
-    reviewed_by: null,
-    sources: [],
+    // Owner-reviewed 2026-10-04. Review approves this text only; it does not
+    // publish the resource (publication is gated separately, ADR-027 §12).
+    reviewed_at: "2026-10-04",
+    reviewed_by: "Robert Konecny (Product Owner)",
+    // Paragraph 1: UN Statistics Division, M49 standard country or area codes
+    // (region 150 "Europe"). Paragraphs 2-3 explain HumanoidOnline's own semantics.
+    sources: ["https://unstats.un.org/unsd/methodology/m49/overview/"],
     paragraphs: [
       "In this resource \"Europe\" is a research grouping, not a political claim. It combines the European Union with the other sovereign European states in the UN M49 Europe classification.",
       "Each offer names its seller. Read a row's status, seller, evidence date and confidence together rather than any one of them alone.",

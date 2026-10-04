@@ -516,7 +516,10 @@ def build_regional_availability(
     groups = tuple(
         GroupSummary(
             reason=g,
-            robots=tuple(RobotRef(r.slug, r.name, r.manufacturer_slug, r.manufacturer_name) for r in grouped[g]),
+            robots=tuple(
+                RobotRef(r.slug, r.name, r.manufacturer_slug, r.manufacturer_name)
+                for r in grouped[g]
+            ),
         )
         for g in GROUP_ORDER
     )

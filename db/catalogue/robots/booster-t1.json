@@ -5,7 +5,7 @@
   "model_code": null,
   "summary": null,
   "announced_year": null,
-  "commercial_status": "UNKNOWN",
+  "commercial_status": "COMMERCIAL",
   "is_published": false,
   "specs": {
     "height_cm": null,
@@ -31,9 +31,32 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Specifications not yet verified.",
+  "specs_note": "Commercial maturity COMMERCIAL recorded 2026-10-04 (owner decision, six-robot review). Basis: manufacturer states it is now shipping worldwide, with institutional customers. Specifications not yet verified.",
   "official_url": "https://www.boosterobotics.com/",
-  "commercial_status_evidence": [],
+  "commercial_status_evidence": [
+    {
+      "source_url": "https://www.booster.tech/booster-t1/",
+      "source_type": "MANUFACTURER_SITE",
+      "source_title": "Booster T1 — official product page",
+      "excerpt": "the preferred choice of 50+ top global robotics teams and research institutes.",
+      "published_at": null,
+      "observed_at": "2026-10-04",
+      "verified_at": null,
+      "confidence": "MEDIUM",
+      "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude in a session initiated by Robert Konecny, under the owner WorkOrder implementing the six-robot commercial-status review decisions (2026-10-04). Not a MANUAL_BOOTSTRAP reading; not human-verified. Product page (Made for Developers, 'Buy Now' to the store). Excerpt is the tail of the sentence on the 2025 RoboCup Soccer 'AdultSize' category."
+    },
+    {
+      "source_url": "https://www.booster.tech/news/",
+      "source_type": "MANUFACTURER_SITE",
+      "source_title": "Booster Robotics — news",
+      "excerpt": "Booster T1, featured at NVIDIA’s Spring Party and signed by Jensen Huang, is now shipping worldwide.",
+      "published_at": "2025-01-23",
+      "observed_at": "2026-10-04",
+      "verified_at": null,
+      "confidence": "MEDIUM",
+      "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude in a session initiated by Robert Konecny, under the owner WorkOrder implementing the six-robot commercial-status review decisions (2026-10-04). Not a MANUAL_BOOTSTRAP reading; not human-verified. Manufacturer news item dated 01/23/2025. Not marked DISCONTINUED merely because the current store lists K1 and T2 only; current stock or ordering is not inferred."
+    }
+  ],
   "variants": [],
   "pricing_offers": [],
   "availability_offers": [],

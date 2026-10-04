@@ -5,7 +5,7 @@
   "model_code": null,
   "summary": null,
   "announced_year": null,
-  "commercial_status": "UNKNOWN",
+  "commercial_status": "COMMERCIAL",
   "is_published": false,
   "specs": {
     "height_cm": null,
@@ -31,9 +31,32 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Specifications not yet verified.",
+  "specs_note": "Commercial maturity COMMERCIAL recorded 2026-10-04 (owner decision, six-robot review). Basis: external deployments stated by the manufacturer and a public purchase link. Specifications not yet verified.",
   "official_url": "https://www.galbot.com/",
-  "commercial_status_evidence": [],
+  "commercial_status_evidence": [
+    {
+      "source_url": "http://www.galbot.com/g1/",
+      "source_type": "MANUFACTURER_SITE",
+      "source_title": "Galbot G1 — official product page",
+      "excerpt": "銀河太空舱 已在全国 40 余个城市落地超 170 个点位，全球首批实现城市级、规模化运营的人形机器人案例。",
+      "published_at": null,
+      "observed_at": "2026-10-04",
+      "verified_at": null,
+      "confidence": "HIGH",
+      "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude in a session initiated by Robert Konecny, under the owner WorkOrder implementing the six-robot commercial-status review decisions (2026-10-04). Not a MANUAL_BOOTSTRAP reading; not human-verified. Galbot-stated external deployments (Galaxy Space Capsule, 170+ sites in 40+ cities). Page undated. Galbot G1 is distinct from Unitree G1; identity is kept by the manufacturer-qualified slug."
+    },
+    {
+      "source_url": "http://www.galbot.com/g1/",
+      "source_type": "MANUFACTURER_SITE",
+      "source_title": "Galbot G1 — public purchase link",
+      "excerpt": "前往购买 Buy Now",
+      "published_at": null,
+      "observed_at": "2026-10-04",
+      "verified_at": null,
+      "confidence": "HIGH",
+      "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude in a session initiated by Robert Konecny, under the owner WorkOrder implementing the six-robot commercial-status review decisions (2026-10-04). Not a MANUAL_BOOTSTRAP reading; not human-verified. Product page CTA \"Buy Now\" links to https://item.m.jd.com/product/100296074780.html (JD.com). Observed as a public purchase link only; no price or availability is recorded."
+    }
+  ],
   "variants": [],
   "pricing_offers": [],
   "availability_offers": [],

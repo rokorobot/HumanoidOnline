@@ -521,6 +521,7 @@ def _cmd_observe(args: argparse.Namespace) -> int:
             session, ADAPTERS, plan_only=args.plan, cache_dir=Path(args.cache_dir),
             kill_switch_for=kill_switch_for, only=args.only, run_now=args.run_now,
             checkpoint=None if args.plan else session.commit)
+        result.enrichment = _enrichment_summary(session)
         if args.plan:
             session.rollback()
     print("\n".join(result.lines()))

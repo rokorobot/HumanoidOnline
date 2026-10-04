@@ -109,7 +109,8 @@ def test_observer_inserts_proposals_and_sightings_but_never_decisions(dsession):
     _as(dsession, role, OBSERVATION_INSERT)
     _as(dsession, role, "SELECT count(*) FROM discovery_claim_proposal")
     _denied(dsession, role, DECISION_INSERT)
-    _denied(dsession, role, "SELECT count(*) FROM discovery_proposal_decision")
+    # G5-1: READ is granted (the enrichment planner counts pending proposals); writes are not.
+    _as(dsession, role, "SELECT count(*) FROM discovery_proposal_decision")
     for sql in ("UPDATE discovery_claim_proposal SET gap = 'x'",
                 "DELETE FROM discovery_claim_proposal",
                 "UPDATE discovery_proposal_observation SET observed_by = 'x'",
@@ -196,10 +197,13 @@ def test_the_reviewer_can_create_claims_but_never_audit_or_catalogue_rows(dsessi
 def test_the_observer_cannot_touch_claims_or_audit(dsession):
     _world(dsession)
     role = _role(dsession, "discovery_observer.sql", "discovery_observer")
+    # G5-1: the planner's coverage read needs SELECT on the claims (never any write); the write
+    # audit stays fully closed.
     for table in ("accepted_claim", "claim_retraction", "catalogue_write_audit"):
         for priv in ("SELECT", "INSERT", "UPDATE", "DELETE"):
+            expected = priv == "SELECT" and table != "catalogue_write_audit"
             assert dsession.scalar(text(
-                f"SELECT has_table_privilege('{role}', 'humanoid.{table}', '{priv}')")) is False
+                f"SELECT has_table_privilege('{role}', 'humanoid.{table}', '{priv}')")) is expected
 
 
 def test_a_role_with_no_g2_grants_has_no_access_to_the_new_tables(dsession):

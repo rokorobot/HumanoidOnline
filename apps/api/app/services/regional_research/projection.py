@@ -9,7 +9,13 @@ from __future__ import annotations
 
 from dataclasses import asdict
 
-from .readmodel import QUALIFYING, QualifyingOffer, RegionalAvailability, RegionalDeployment
+from .readmodel import (
+    QUALIFYING,
+    STALE_OR_NON_CURRENT,
+    QualifyingOffer,
+    RegionalAvailability,
+    RegionalDeployment,
+)
 
 REGION_SLUGS = {"europe": "EUROPE"}
 
@@ -139,6 +145,47 @@ def _faq(r: RegionalAvailability) -> list[dict]:
     ]
 
 
+def _plural(n: int, one: str, many: str) -> str:
+    return one if n == 1 else many
+
+
+def _health(r: RegionalAvailability) -> dict:
+    """Public, deterministic evidence health (not the review-only gate object).
+
+    CURRENT: the normal publication threshold is met AND no published robot is
+    classified STALE_OR_NON_CURRENT for the region.
+    LIMITED_EVIDENCE: the threshold is missed, OR at least one published robot has
+    only stale/non-current regional offer evidence (excluded from current figures).
+    A robot that still has another qualifying current offer is classified QUALIFYING,
+    so an alternate old offer on it never triggers a warning. Stale offers are already
+    excluded from every count and table; this only describes the evidence picture.
+    """
+    g = r.gate
+    reasons = []
+    if g.qualifying_robots < g.min_robots:
+        reasons.append(
+            f"{g.qualifying_robots} qualifying {_plural(g.qualifying_robots, 'robot', 'robots')}; "
+            f"minimum {g.min_robots}"
+        )
+    if g.qualifying_manufacturers < g.min_manufacturers:
+        reasons.append(
+            f"{g.qualifying_manufacturers} "
+            f"{_plural(g.qualifying_manufacturers, 'manufacturer', 'manufacturers')}; "
+            f"minimum {g.min_manufacturers}"
+        )
+    stale = next((g for g in r.groups if g.reason == STALE_OR_NON_CURRENT), None)
+    stale_n = stale.count if stale else 0
+    if stale_n:
+        reasons.append(
+            f"{stale_n} published {_plural(stale_n, 'robot has', 'robots have')} only stale or "
+            f"non-current {r.region_name} offer evidence excluded from current figures."
+        )
+    return {
+        "status": "LIMITED_EVIDENCE" if reasons else "CURRENT",
+        "reasons": reasons,
+    }
+
+
 def build_projection(
     r: RegionalAvailability, region_slug: str, *, include_readiness: bool = False
 ) -> dict:
@@ -152,6 +199,7 @@ def build_projection(
             max(o.evidence_date for o in offers).isoformat() if offers else None
         ),
         "direct_answer": r.direct_answer,
+        "publication_health": _health(r),
         "key_figures": {
             "published_population": kf.population,
             "robots_with_confirmed_offer": kf.qualifying_robots,

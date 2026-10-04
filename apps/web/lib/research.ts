@@ -70,12 +70,20 @@ export interface ResearchGroup {
   robots: { slug: string; name: string; manufacturer_slug: string; manufacturer_name: string }[];
 }
 
+export interface ResearchHealth {
+  /** CURRENT: meets the normal publication threshold. LIMITED_EVIDENCE: it no
+   *  longer does (stale or too few current offers); the resource stays published. */
+  status: "CURRENT" | "LIMITED_EVIDENCE";
+  reasons: string[];
+}
+
 export interface ResearchProjection {
   region: { slug: string; code: string; name: string };
   snapshot_date: string;
   freshness_days: number;
   latest_evidence_date: string | null;
   direct_answer: string;
+  publication_health: ResearchHealth;
   key_figures: {
     published_population: number;
     robots_with_confirmed_offer: number;

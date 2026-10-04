@@ -6,6 +6,7 @@ DB-backed and skip locally without DATABASE_URL (CI runs them).
 """
 from __future__ import annotations
 
+import dataclasses
 import json
 import sys
 from datetime import date
@@ -233,17 +234,210 @@ def test_journey_published_and_ready_is_public_indexable_without_readiness(clien
     assert body["key_figures"]["robots_with_confirmed_offer"] == 6
 
 
-def test_journey_published_but_failing_gate_is_not_public(client, journey):
-    """ADR-027 §12: the owner flag alone must not publish a region whose data
-    no longer meets the minimum."""
-    journey(_thin_snapshot(), published="europe", token="tok")
+def _stale_snapshot():
+    """Six robots from three manufacturers whose only evidence is long out of date."""
+    robots = [
+        fx.robot(f"s{i}", maker=f"m{i % 3}",
+                 offers=[fx.offer("DE", evidence=[fx.ev(200)])],
+                 prices=[fx.price("DE", amount=1000.0 + i, evidence=[fx.ev(200)])])
+        for i in range(6)
+    ]
+    return fx.snap(*robots)
+
+
+# The four publication-lifecycle states (ADR-027 section 12) ----------------------
+
+def test_state_1_unpublished_and_ready_is_preview_only(client, journey):
+    journey(_ready_snapshot(), token="tok")
     assert client.get(URL).status_code == 404
-    # A reviewer still sees why: review-only, noindex, with the failing gate.
+    r = client.get(URL, headers={"X-Research-Preview": "tok"})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["published"] is False
+    assert body["readiness"]["gate_passes"] is True  # 5/3 is verified here, before launch
+    assert body["publication_health"] == {"status": "CURRENT", "reasons": []}
+    assert "noindex" in r.headers["x-robots-tag"]
+
+
+def test_state_2_published_and_ready_is_normal_public(client, journey):
+    journey(_ready_snapshot(), published="europe", token="tok")
+    r = client.get(URL)
+    assert r.status_code == 200
+    body = r.json()
+    assert body["published"] is True
+    assert body["publication_health"] == {"status": "CURRENT", "reasons": []}
+    assert "readiness" not in body
+    assert "x-robots-tag" not in {k.lower() for k in r.headers}
+
+
+def test_state_3_published_but_degraded_stays_public_with_a_limited_evidence_status(
+    client, journey
+):
+    """The 5/3 threshold is a launch check, not a runtime kill switch."""
+    journey(_thin_snapshot(), published="europe", token="tok")
+    r = client.get(URL)
+    assert r.status_code == 200
+    body = r.json()
+    assert body["published"] is True
+    assert body["publication_health"] == {
+        "status": "LIMITED_EVIDENCE",
+        "reasons": ["1 qualifying robot; minimum 5", "1 manufacturer; minimum 3"],
+    }
+    assert "max-age=300" in r.headers["cache-control"]
+    assert "x-robots-tag" not in {k.lower() for k in r.headers}
+    # The internal gate object is never exposed publicly just to explain the warning.
+    assert "readiness" not in body
+    assert "gate" not in json.dumps(body).lower()
+
+
+def test_state_3b_evidence_ageing_degrades_visibly_without_resurrecting_old_facts(
+    client, journey
+):
+    journey(_stale_snapshot(), published="europe")
+    r = client.get(URL)
+    assert r.status_code == 200
+    body = r.json()
+    assert body["publication_health"]["status"] == "LIMITED_EVIDENCE"
+    assert body["key_figures"]["robots_with_confirmed_offer"] == 0
+    assert body["offers"] == []  # stale offers are excluded, never shown as current
+    assert body["key_figures"]["purchase_robots_with_published_price"] == 0
+    assert all(g["reason"] != "QUALIFYING" for g in body["no_confirmed_offer"])
+    assert any(g["reason"] == "STALE_OR_NON_CURRENT" for g in body["no_confirmed_offer"])
+    assert "no confirmed offer on file for a published humanoid robot" in body["direct_answer"]
+
+
+def test_state_4_published_but_reconciliation_failure_fails_closed(
+    client, journey, monkeypatch
+):
+    journey(_ready_snapshot(), published="europe", token="tok")
+    real = build_regional_availability
+
+    def broken(snapshot, region):
+        return dataclasses.replace(real(snapshot, region), reconciles=False)
+
+    monkeypatch.setattr("app.routers.research.build_regional_availability", broken)
+    assert client.get(URL).status_code == 404
+    # A reviewer can still see the review-only report; it is never public.
     r = client.get(URL, headers={"X-Research-Preview": "tok"})
     assert r.status_code == 200
     assert r.json()["published"] is False
-    assert r.json()["readiness"]["gate_passes"] is False
+    assert r.json()["readiness"]["groups_reconcile"] is False
     assert "noindex" in r.headers["x-robots-tag"]
+
+
+def test_missing_region_structure_fails_closed_even_when_published(client, journey):
+    no_europe = tuple(n for n in fx.REGIONS if n.code != "EUROPE")
+    snap = fx.RegionalSnapshot(fx.SNAP, no_europe, _ready_snapshot().robots)
+    journey(snap, published="europe", token="tok")
+    assert client.get(URL).status_code == 404
+    assert client.get(URL, headers={"X-Research-Preview": "tok"}).status_code == 404
+
+
+def test_projection_failure_fails_closed(client, journey, monkeypatch):
+    journey(_ready_snapshot(), published="europe")
+
+    def boom(*a, **k):
+        raise KeyError("missing label")
+
+    monkeypatch.setattr("app.routers.research.build_projection", boom)
+    assert client.get(URL).status_code == 404
+
+
+def _partially_aged_snapshot():
+    """Six current robots from three manufacturers (still clears 5/3) plus one robot
+    whose only Europe offer has just aged past the 90-day window."""
+    current = [
+        fx.robot(f"c{i}", maker=f"m{i % 3}", offers=[fx.offer("DE" if i % 2 else "EU")])
+        for i in range(6)
+    ]
+    aged = fx.robot("aged", maker="m1", offers=[fx.offer("DE", evidence=[fx.ev(91)])])
+    return fx.snap(*current, aged)
+
+
+def test_partial_ageing_is_visible_even_when_5_3_is_still_met(client, journey):
+    journey(_partially_aged_snapshot(), published="europe")
+    r = client.get(URL)
+    assert r.status_code == 200  # still public
+    body = r.json()
+    assert body["published"] is True
+    # the threshold is still met on current evidence alone...
+    assert body["key_figures"]["robots_with_confirmed_offer"] == 6
+    assert body["key_figures"]["manufacturers_with_confirmed_offer"] == 3
+    # ...but the page says plainly that one robot's evidence aged out
+    assert body["publication_health"] == {
+        "status": "LIMITED_EVIDENCE",
+        "reasons": [
+            "1 published robot has only stale or non-current Europe offer evidence "
+            "excluded from current figures."
+        ],
+    }
+    # stale evidence stays excluded from offers and counts
+    assert "aged" not in [o["robot_slug"] for o in body["offers"]]
+    assert [g["robots"][0]["slug"] for g in body["no_confirmed_offer"]
+            if g["reason"] == "STALE_OR_NON_CURRENT"] == ["aged"]
+    assert "readiness" not in body
+
+
+def test_health_stale_reason_is_pluralized_and_ordered_after_threshold_reasons():
+    two = _projection(
+        *[fx.robot(f"c{i}", maker=f"m{i % 3}", offers=[fx.offer()]) for i in range(6)],
+        fx.robot("a1", offers=[fx.offer(evidence=[fx.ev(120)])]),
+        fx.robot("a2", offers=[fx.offer(current=False)]),
+    )
+    assert two["publication_health"]["reasons"] == [
+        "2 published robots have only stale or non-current Europe offer evidence "
+        "excluded from current figures."
+    ]
+    both = _projection(fx.robot("c", offers=[fx.offer()]),
+                       fx.robot("a", offers=[fx.offer(evidence=[fx.ev(120)])]))
+    assert both["publication_health"]["reasons"] == [
+        "1 qualifying robot; minimum 5",
+        "1 manufacturer; minimum 3",
+        "1 published robot has only stale or non-current Europe offer evidence "
+        "excluded from current figures.",
+    ]
+
+
+def test_an_alternate_old_offer_on_a_still_current_robot_does_not_warn():
+    robots = [
+        fx.robot(f"c{i}", maker=f"m{i % 3}", offers=[fx.offer()]) for i in range(5)
+    ]
+    # This robot has a current Europe offer AND an older, aged one: it is QUALIFYING.
+    robots.append(fx.robot("both", maker="m0", offers=[
+        fx.offer("DE"), fx.offer("EU", evidence=[fx.ev(200)])]))
+    p = _projection(*robots)
+    assert p["publication_health"] == {"status": "CURRENT", "reasons": []}
+    assert p["key_figures"]["robots_with_confirmed_offer"] == 6
+
+
+def test_confirmed_not_obtainable_or_missing_offers_are_not_staleness():
+    robots = [fx.robot(f"c{i}", maker=f"m{i % 3}", offers=[fx.offer()]) for i in range(5)]
+    robots += [fx.robot("na", offers=[fx.offer(status="NOT_AVAILABLE")]),
+               fx.robot("none"), fx.robot("glob", offers=[fx.offer("GLOBAL")])]
+    assert _projection(*robots)["publication_health"] == {"status": "CURRENT", "reasons": []}
+
+
+# publication_health (pure) --------------------------------------------------------
+
+def test_health_current_and_limited_reasons_are_deterministic_and_factual():
+    ready = _projection(*_ready_snapshot().robots)
+    assert ready["publication_health"] == {"status": "CURRENT", "reasons": []}
+    limited = _projection(fx.robot("a", maker="m1", offers=[fx.offer()]),
+                          fx.robot("b", maker="m1", offers=[fx.offer("EU")]))
+    assert limited["publication_health"] == {
+        "status": "LIMITED_EVIDENCE",
+        "reasons": ["2 qualifying robots; minimum 5", "1 manufacturer; minimum 3"],
+    }
+    assert _projection(fx.robot("z"))["publication_health"]["reasons"] == [
+        "0 qualifying robots; minimum 5", "0 manufacturers; minimum 3"]
+
+
+def test_health_manufacturer_shortfall_alone_is_reported_alone():
+    robots = [fx.robot(f"r{i}", maker="solo", offers=[fx.offer()]) for i in range(6)]
+    assert _projection(*robots)["publication_health"] == {
+        "status": "LIMITED_EVIDENCE",
+        "reasons": ["1 manufacturer; minimum 3"],
+    }
 
 
 def test_journey_json_equals_the_pure_projection(client, journey):

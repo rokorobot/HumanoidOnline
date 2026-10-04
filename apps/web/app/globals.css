@@ -1059,3 +1059,5 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-line); padding: var(
 .research-regions > li { display: flex; }
 .research-regions > li > .app { flex: 1; }
 .research-regions div.app { color: var(--ho-text-muted); }
+.research-resource [role="note"] ul { columns: 1; margin: 4px 0 0; }
+.research-resource [role="note"] p { margin: 0; }

@@ -1,10 +1,20 @@
 """Regional Research Resources (ADR-027): GET /api/research/humanoid-availability/{region}.
 
-Publication-gated. A region is public only when `RESEARCH_PUBLISHED_REGIONS`
-(default empty) lists it AND the live data passes the ADR-027 §12 readiness
-gate (5 robots / 3 manufacturers, groups reconcile); otherwise it answers 404
-unless the caller presents the review token (`X-Research-Preview`). The aggregation is
-`services/regional_research`; this router only loads, projects and gates.
+Publication lifecycle (ADR-027 §12):
+
+* `RESEARCH_PUBLISHED_REGIONS` (default empty) is the owner's PERSISTENT publication
+  decision. A flagged region stays public unless its data is structurally invalid
+  (groups do not reconcile, region structure missing, projection failure): then 404.
+* The 5 robots / 3 manufacturers threshold is a launch readiness check, verified in
+  the review-only preview BEFORE the flag is first set. After publication, a decline
+  below it (or evidence ageing) is not a kill switch: the page stays public and
+  carries a `publication_health` of LIMITED_EVIDENCE with deterministic reasons.
+  Stale offers are never counted as current.
+* Not flagged: 404 unless the caller presents the review token (`X-Research-Preview`),
+  which returns the full, noindex readiness report.
+
+The aggregation is `services/regional_research`; this router only loads, projects
+and gates.
 """
 from __future__ import annotations
 
@@ -57,17 +67,27 @@ def regional_availability(
         raise HTTPException(status_code=404, detail="Not found")
 
     snapshot_date = datetime.now(UTC).date()
-    result = build_regional_availability(load_regional_snapshot(session, snapshot_date), code)
-    # ADR-027 §12: publication needs the owner's flag AND data readiness. A flagged
-    # region whose live data no longer passes the gate is not public (it falls back
-    # to review-only), rather than silently publishing a thin or inconsistent page.
-    ready = result.gate.passes and result.reconciles
-    public = flagged and ready
+    try:
+        result = build_regional_availability(
+            load_regional_snapshot(session, snapshot_date), code
+        )
+    except ValueError:
+        # The region structure is missing from the catalogue: structural failure.
+        raise HTTPException(status_code=404, detail="Not found") from None
+
+    # Structural integrity, not evidence health: ordinary ageing or a thin dataset
+    # must not take a published resource down (it degrades visibly instead).
+    structurally_sound = result.reconciles
+    public = flagged and structurally_sound
     if not (public or preview):
         raise HTTPException(status_code=404, detail="Not found")
 
-    # The publication gate result is review-only; it is never part of a public body.
-    body = build_projection(result, slug, include_readiness=not public)
+    try:
+        # The review-only gate/readiness report is never part of a public body; the
+        # public body carries only the small `publication_health` summary.
+        body = build_projection(result, slug, include_readiness=not public)
+    except (KeyError, ValueError, TypeError):
+        raise HTTPException(status_code=404, detail="Not found") from None
     body["published"] = public
     response.headers["Cache-Control"] = "public, max-age=300" if public else "no-store"
     if not public:

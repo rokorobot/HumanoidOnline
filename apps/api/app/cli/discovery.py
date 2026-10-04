@@ -547,6 +547,28 @@ def _enrichment_summary(session) -> dict | None:
         return None
 
 
+def _cmd_enrichment_plan(args: argparse.Namespace) -> int:
+    import json
+
+    from app.db.session import SessionLocal
+    from app.services.discovery import enrichment_plan as ep
+    from app.services.discovery.sources import ADAPTERS
+
+    with SessionLocal() as session:
+        try:
+            plan = ep.plan_source(session, ADAPTERS, args.source, bound=args.bound,
+                                  assume_due=args.assume_due)
+        except ValueError as exc:
+            print(f"error: {exc}")
+            return 2
+        session.rollback()
+    if args.json:
+        print(json.dumps(plan.as_dict(), indent=2, sort_keys=True))
+    else:
+        print(chr(10).join(ep.plan_lines(plan)))
+    return 0
+
+
 def _enrichment_cycle(session, *, plan_only: bool, cache_dir: Path):
     """(planner summary, Lane B result) for the cycle. The planner is informational and best
     effort (the observer role may lack SELECT on some tables). Lane B only fetches after the
@@ -573,6 +595,9 @@ def _enrichment_cycle(session, *, plan_only: bool, cache_dir: Path):
 
 def _cmd_enrichment(args: argparse.Namespace) -> int:
     import json
+
+    if args.action == "plan":
+        return _cmd_enrichment_plan(args)
 
     from app.db.session import SessionLocal
     from app.services.discovery import enrichment
@@ -697,6 +722,14 @@ def main(argv: list[str] | None = None) -> int:
     queue_cmd = enrichment_actions.add_parser(
         "queue", help="the computed catalogue enrichment queue (not a source of truth)")
     queue_cmd.add_argument("--json", action="store_true", help="full machine-readable queue")
+    plan_cmd = enrichment_actions.add_parser(
+        "plan", help="G5-3 bounded Lane B target plan for ONE source (read-only; fetches nothing)")
+    plan_cmd.add_argument("--source", required=True, help="registered discovery source key")
+    plan_cmd.add_argument("--bound", type=int, default=8,
+                          help="maximum targets planned for one source cycle (default 8)")
+    plan_cmd.add_argument("--assume-due", action="store_true",
+                          help="report what the source WOULD plan when due (changes no schedule)")
+    plan_cmd.add_argument("--json", action="store_true", help="full machine-readable plan")
     enrichment_cmd.set_defaults(func=_cmd_enrichment)
 
     cache_cmd = commands.add_parser("cache", help="raw-body cache retention (LIVE.10)")

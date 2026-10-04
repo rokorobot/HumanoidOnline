@@ -39,8 +39,10 @@ on:
         default: false
         type: boolean
 
+# issues: write is used ONLY by the 'Review queue issue' step (one deduplicated inbox issue).
 permissions:
   contents: read
+  issues: write
 
 # Never two cycles at once: a second dispatch waits for the first. (Across
 # manual CLI runs and this workflow, the database allows one RUNNING run per
@@ -98,23 +100,23 @@ jobs:
           set -e
           cat "$RUNNER_TEMP/cycle.txt"
           echo "code=$code" >> "$GITHUB_OUTPUT"
-      # Exit codes (app.services.discovery.observe): 0 no action needed,
-      # 4 human review required, anything else an execution failure. 4 and
-      # failures both fail the job, so GitHub notifies the owner, but the
-      # summary headline says which it is.
+      # Exit codes (app.services.discovery.observe): 0 no action needed, 4 human review
+      # required, anything else an execution failure. G5-4 (owner decision 2026-10-04): only an
+      # execution failure turns the job RED. Exit 4 is a SUCCESSFUL discovery that created review
+      # work: the job stays green with a ::warning:: annotation and a REVIEW REQUIRED headline,
+      # and the persistent attention lives in the 'Discovery review queue' issue below.
       - name: Summary
         if: always()
         shell: bash
         env:
           CODE: ${{ steps.cycle.outputs.code }}
         run: |
-          case "$CODE" in
-            0) head="NO ACTION NEEDED: cycle completed; nothing requires a human." ;;
-            4) head="REVIEW REQUIRED: a source, a new Stage E item, a new G2 proposal needing review, or a G2 proposal-ingest failure needs a human. Not an execution failure."
-               echo "::warning::Discovery observation: review required (exit 4)" ;;
-            *) head="EXECUTION FAILURE (exit ${CODE:-none}): a source run failed or the cycle could not run."
-               echo "::error::Discovery observation: execution failure (exit ${CODE:-none})" ;;
-          esac
+          set +e
+          python3 scripts/discovery_review_queue.py headline --code "$CODE" > "$RUNNER_TEMP/headline.txt"
+          rc=$?
+          set -e
+          cat "$RUNNER_TEMP/headline.txt"
+          head="$(sed 's/^::[a-z]*:://' "$RUNNER_TEMP/headline.txt")"
           {
             echo "## Discovery observation ($MODE${ONLY:+, source $ONLY}$([ "$RUN_NOW" = true ] && echo ', run-now'))"
             echo
@@ -126,7 +128,18 @@ jobs:
             cat "$RUNNER_TEMP/cycle.txt" 2>/dev/null || true
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-          [ "$CODE" = 0 ]
+          exit "$rc"
+      # One deduplicated inbox issue. Only after a valid cycle (exit 0 or 4); never after a
+      # technical failure, and never from a plan. See scripts/discovery_review_queue.py.
+      - name: Review queue issue
+        if: always() && env.MODE == 'observe' && (steps.cycle.outputs.code == '0' || steps.cycle.outputs.code == '4')
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          CODE: ${{ steps.cycle.outputs.code }}
+        run: |
+          python3 scripts/discovery_review_queue.py issue             --report "$GITHUB_WORKSPACE/var/discovery/observe/cycle.json" --code "$CODE"             --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
       - name: Save raw-body cache
         if: always() && env.MODE == 'observe'
         uses: actions/cache/save@v4

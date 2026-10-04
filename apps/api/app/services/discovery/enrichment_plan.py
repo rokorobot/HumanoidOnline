@@ -402,9 +402,9 @@ def plan_unsourced(inputs: Sequence[PlanInput], sourced_manufacturers: set[str],
 
 
 def rank_key(t: Target) -> tuple:
-    """The one ordering of planned targets: priority, then more reasons, then never-observed first and
-    otherwise longest-unobserved first (so targets deferred by the bound cannot starve), then a
-    stable robot / type / URL tie-break. Tolerates a malformed target (it is refused later)."""
+    """The one ordering of planned targets: priority, then more reasons, then never-observed
+    first and otherwise longest-unobserved first (so targets deferred by the bound cannot
+    starve), then a stable robot / type / URL tie-break. Tolerates a malformed target."""
     seen = t.last_observed.timestamp() if t.last_observed else float("-inf")
     return (_PRIORITY_ORDER.get(t.priority, 99), -len(t.reason_codes), seen, t.robot,
             _TYPE_ORDER.get(t.target_type, 99), t.url)

@@ -113,6 +113,8 @@ class CycleResult:
     enrichment: dict | None = None
     #: G5-2: the Lane B (catalogue enrichment) fetch/report result (enrichment_fetch.LaneBResult).
     lane_b: object | None = None
+    #: G5-4: the HUMAN REVIEW summary (human_review.compute); informational, never an exit code.
+    human_review: dict | None = None
 
     @property
     def needs_attention(self) -> bool:
@@ -129,7 +131,10 @@ class CycleResult:
     def lines(self) -> list[str]:
         mode = "PLAN (no request, no write)" if self.plan_only else "OBSERVATION CYCLE"
         head = f"{mode} started={self.started_at.isoformat()}  sources={len(self.sources)}"
+        from app.services.discovery import human_review as hr
+
         return [head, *(s.line() for s in self.sources), *self.lane_lines(),
+                *hr.lines(self.human_review),
                 f"attention={'yes' if self.needs_attention else 'no'}  "
                 f"exit={self.exit_code}  canonical_rows_written=0"]
 
@@ -175,7 +180,7 @@ class CycleResult:
     def as_dict(self) -> dict:
         return {"started_at": self.started_at.isoformat(), "plan_only": self.plan_only,
                 "exit_code": self.exit_code, "canonical_rows_written": 0,
-                "lanes": self.lane_summary(),
+                "lanes": self.lane_summary(), "human_review": self.human_review,
                 "sources": [s.as_dict() for s in self.sources]}
 
 

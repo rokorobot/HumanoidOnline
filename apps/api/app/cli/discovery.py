@@ -523,6 +523,14 @@ def _cmd_observe(args: argparse.Namespace) -> int:
             checkpoint=None if args.plan else session.commit)
         result.enrichment, result.lane_b = _enrichment_cycle(
             session, plan_only=args.plan, cache_dir=Path(args.cache_dir))
+        from app.services.discovery import human_review
+
+        if result.lane_b is None:     # the planner failed: source review is unknown, not zero
+            result.human_review = human_review.incomplete("lane B plan unavailable")
+        else:
+            result.human_review = human_review.compute(
+                session, result.started_at, result.lane_b.source_review_items,
+                result.lane_summary()["NEW_MODEL"]["identity_review_items"])
         if args.plan:
             session.rollback()
     print("\n".join(result.lines()))

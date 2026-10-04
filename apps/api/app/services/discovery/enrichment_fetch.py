@@ -138,6 +138,7 @@ class LaneBResult:
     targets_planned: int = 0
     targets_fetched: int = 0
     source_review_required: int = 0
+    source_review_items: list[str] = field(default_factory=list)
     deferred_by_bound: list[str] = field(default_factory=list)
     refused_targets: list[dict] = field(default_factory=list)
     maturity_proposals: int = 0
@@ -174,6 +175,7 @@ class LaneBResult:
             "robots_considered": self.robots_considered, "targets_planned": self.targets_planned,
             "targets_fetched": self.targets_fetched,
             "source_review_required": self.source_review_required,
+            "source_review_items": self.source_review_items,
             "deferred_by_bound": self.deferred_by_bound,
             "refused_targets": self.refused_targets,
             "maturity_proposals_created": self.maturity_proposals,
@@ -410,9 +412,10 @@ def run_lane_b(
     clock = now()
 
     result.robots_considered = len({p.robot_slug for pl in plans.values() for p in pl.profiles})
-    result.source_review_required = len({
-        (t.robot, t.url) for pl in plans.values() for t in pl.skipped
+    result.source_review_items = sorted({
+        f"{t.robot}|{t.url}" for pl in plans.values() for t in pl.skipped
         if t.decision == ep.SOURCE_REVIEW_REQUIRED})
+    result.source_review_required = len(result.source_review_items)
     result.robots_deferred_cadence = len({
         t.robot for pl in plans.values() for t in pl.skipped
         if t.decision in (ep.NOT_DUE, ep.UNCHANGED_RECENTLY)})

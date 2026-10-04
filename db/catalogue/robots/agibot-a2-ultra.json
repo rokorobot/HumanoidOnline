@@ -58,8 +58,214 @@
     }
   ],
   "variants": [],
-  "pricing_offers": [],
-  "availability_offers": [],
+  "pricing_offers": [
+    {
+      "provider_slug": "robotoplus",
+      "region_code": "BG",
+      "transaction_type": "RENTAL",
+      "price_type": "PUBLIC",
+      "currency": "EUR",
+      "price": 6500.0,
+      "billing_period": "WEEKLY",
+      "price_basis": "Distributor weekly rental rate per unit, net of VAT and shipping (VAT treatment confirmed in the quotation; reverse charge for VAT-registered businesses in another member state)",
+      "shipping_terms": "Net of shipping and transport; quoted with the rental quotation",
+      "note": "Robotoplus published weekly rental rate for 'A2 Ultra' (6,500 EUR per week). Rental rate only: NO purchase price is published, so none is recorded (UNKNOWN). Region BG per the appointed-distributor wording.",
+      "evidence": [
+        {
+          "source_url": "https://robotoplus.com/rent-it",
+          "source_type": "OTHER",
+          "source_title": "Rent a robot — Robotoplus",
+          "excerpt": "AGIBOT A2 Ultra — 'Rental unit in stock'; 'A2 Ultra, 6,500 EUR per week.' Weekly rates per unit, net of VAT and shipping.",
+          "published_at": null,
+          "observed_at": "2026-10-04",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude (curl, default user agent, public GET, no login; raw HTML parsed locally) in a session initiated by Robert Konecny, under owner work order 'Europe Readiness Enrichment 01 — Third-Manufacturer Europe Discovery' (2026-10-04; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (Robotoplus, Bulgaria), not the manufacturer. CAVEAT: Robotoplus's authorization as AGIBOT's distributor is SELF-DECLARED on its own site and was not confirmed on an AgiBot first-party source. Region BG/RO follows the 'appointed distributor for Bulgaria and Romania' wording; the homepage also says it delivers to Greece and Cyprus, which is NOT recorded here."
+        }
+      ]
+    },
+    {
+      "provider_slug": "robotoplus",
+      "region_code": "RO",
+      "transaction_type": "RENTAL",
+      "price_type": "PUBLIC",
+      "currency": "EUR",
+      "price": 6500.0,
+      "billing_period": "WEEKLY",
+      "price_basis": "Distributor weekly rental rate per unit, net of VAT and shipping (VAT treatment confirmed in the quotation; reverse charge for VAT-registered businesses in another member state)",
+      "shipping_terms": "Net of shipping and transport; quoted with the rental quotation",
+      "note": "Robotoplus published weekly rental rate for 'A2 Ultra' (6,500 EUR per week). Rental rate only: NO purchase price is published, so none is recorded (UNKNOWN). Region RO per the appointed-distributor wording.",
+      "evidence": [
+        {
+          "source_url": "https://robotoplus.com/rent-it",
+          "source_type": "OTHER",
+          "source_title": "Rent a robot — Robotoplus",
+          "excerpt": "AGIBOT A2 Ultra — 'Rental unit in stock'; 'A2 Ultra, 6,500 EUR per week.' Weekly rates per unit, net of VAT and shipping.",
+          "published_at": null,
+          "observed_at": "2026-10-04",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude (curl, default user agent, public GET, no login; raw HTML parsed locally) in a session initiated by Robert Konecny, under owner work order 'Europe Readiness Enrichment 01 — Third-Manufacturer Europe Discovery' (2026-10-04; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (Robotoplus, Bulgaria), not the manufacturer. CAVEAT: Robotoplus's authorization as AGIBOT's distributor is SELF-DECLARED on its own site and was not confirmed on an AgiBot first-party source. Region BG/RO follows the 'appointed distributor for Bulgaria and Romania' wording; the homepage also says it delivers to Greece and Cyprus, which is NOT recorded here."
+        }
+      ]
+    }
+  ],
+  "availability_offers": [
+    {
+      "transaction_type": "PURCHASE",
+      "availability_status": "ON_REQUEST",
+      "region_code": "BG",
+      "provider_slug": "robotoplus",
+      "variant_slug": null,
+      "lead_time_days": null,
+      "note": "Supplied to order: quote/contact required (Request a quote). No price, cart or stock status published for purchase. Region BG per the distributor's 'appointed distributor for Bulgaria and Romania' wording.",
+      "evidence": [
+        {
+          "source_url": "https://robotoplus.com/products/agibot-a2-ultra",
+          "source_type": "OTHER",
+          "source_title": "AGIBOT A2 Ultra — Robotoplus product page",
+          "excerpt": "This platform is supplied to order. Tell us your application and we will confirm configuration and availability. [Request a quote] … Robotoplus is an authorised distributor.",
+          "published_at": null,
+          "observed_at": "2026-10-04",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude (curl, default user agent, public GET, no login; raw HTML parsed locally) in a session initiated by Robert Konecny, under owner work order 'Europe Readiness Enrichment 01 — Third-Manufacturer Europe Discovery' (2026-10-04; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (Robotoplus, Bulgaria), not the manufacturer. CAVEAT: Robotoplus's authorization as AGIBOT's distributor is SELF-DECLARED on its own site and was not confirmed on an AgiBot first-party source. Region BG/RO follows the 'appointed distributor for Bulgaria and Romania' wording; the homepage also says it delivers to Greece and Cyprus, which is NOT recorded here."
+        },
+        {
+          "source_url": "https://robotoplus.com/about",
+          "source_type": "OTHER",
+          "source_title": "Robotoplus — About (self-declared AGIBOT appointed distributor, BG/RO)",
+          "excerpt": "we are their appointed distributor for Bulgaria and Romania",
+          "published_at": null,
+          "observed_at": "2026-10-04",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude (curl, default user agent, public GET, no login; raw HTML parsed locally) in a session initiated by Robert Konecny, under owner work order 'Europe Readiness Enrichment 01 — Third-Manufacturer Europe Discovery' (2026-10-04; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (Robotoplus, Bulgaria), not the manufacturer. CAVEAT: Robotoplus's authorization as AGIBOT's distributor is SELF-DECLARED on its own site and was not confirmed on an AgiBot first-party source. Region BG/RO follows the 'appointed distributor for Bulgaria and Romania' wording; the homepage also says it delivers to Greece and Cyprus, which is NOT recorded here."
+        },
+        {
+          "source_url": "https://robotoplus.com/terms",
+          "source_type": "OTHER",
+          "source_title": "Robotoplus — Terms & Conditions",
+          "excerpt": "Prices for robots are quoted individually.",
+          "published_at": null,
+          "observed_at": "2026-10-04",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude (curl, default user agent, public GET, no login; raw HTML parsed locally) in a session initiated by Robert Konecny, under owner work order 'Europe Readiness Enrichment 01 — Third-Manufacturer Europe Discovery' (2026-10-04; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (Robotoplus, Bulgaria), not the manufacturer. CAVEAT: Robotoplus's authorization as AGIBOT's distributor is SELF-DECLARED on its own site and was not confirmed on an AgiBot first-party source. Region BG/RO follows the 'appointed distributor for Bulgaria and Romania' wording; the homepage also says it delivers to Greece and Cyprus, which is NOT recorded here."
+        }
+      ]
+    },
+    {
+      "transaction_type": "PURCHASE",
+      "availability_status": "ON_REQUEST",
+      "region_code": "RO",
+      "provider_slug": "robotoplus",
+      "variant_slug": null,
+      "lead_time_days": null,
+      "note": "Supplied to order: quote/contact required (Request a quote). No price, cart or stock status published for purchase. Region RO per the distributor's 'appointed distributor for Bulgaria and Romania' wording.",
+      "evidence": [
+        {
+          "source_url": "https://robotoplus.com/products/agibot-a2-ultra",
+          "source_type": "OTHER",
+          "source_title": "AGIBOT A2 Ultra — Robotoplus product page",
+          "excerpt": "This platform is supplied to order. Tell us your application and we will confirm configuration and availability. [Request a quote] … Robotoplus is an authorised distributor.",
+          "published_at": null,
+          "observed_at": "2026-10-04",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude (curl, default user agent, public GET, no login; raw HTML parsed locally) in a session initiated by Robert Konecny, under owner work order 'Europe Readiness Enrichment 01 — Third-Manufacturer Europe Discovery' (2026-10-04; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (Robotoplus, Bulgaria), not the manufacturer. CAVEAT: Robotoplus's authorization as AGIBOT's distributor is SELF-DECLARED on its own site and was not confirmed on an AgiBot first-party source. Region BG/RO follows the 'appointed distributor for Bulgaria and Romania' wording; the homepage also says it delivers to Greece and Cyprus, which is NOT recorded here."
+        },
+        {
+          "source_url": "https://robotoplus.com/about",
+          "source_type": "OTHER",
+          "source_title": "Robotoplus — About (self-declared AGIBOT appointed distributor, BG/RO)",
+          "excerpt": "we are their appointed distributor for Bulgaria and Romania",
+          "published_at": null,
+          "observed_at": "2026-10-04",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude (curl, default user agent, public GET, no login; raw HTML parsed locally) in a session initiated by Robert Konecny, under owner work order 'Europe Readiness Enrichment 01 — Third-Manufacturer Europe Discovery' (2026-10-04; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (Robotoplus, Bulgaria), not the manufacturer. CAVEAT: Robotoplus's authorization as AGIBOT's distributor is SELF-DECLARED on its own site and was not confirmed on an AgiBot first-party source. Region BG/RO follows the 'appointed distributor for Bulgaria and Romania' wording; the homepage also says it delivers to Greece and Cyprus, which is NOT recorded here."
+        },
+        {
+          "source_url": "https://robotoplus.com/terms",
+          "source_type": "OTHER",
+          "source_title": "Robotoplus — Terms & Conditions",
+          "excerpt": "Prices for robots are quoted individually.",
+          "published_at": null,
+          "observed_at": "2026-10-04",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude (curl, default user agent, public GET, no login; raw HTML parsed locally) in a session initiated by Robert Konecny, under owner work order 'Europe Readiness Enrichment 01 — Third-Manufacturer Europe Discovery' (2026-10-04; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (Robotoplus, Bulgaria), not the manufacturer. CAVEAT: Robotoplus's authorization as AGIBOT's distributor is SELF-DECLARED on its own site and was not confirmed on an AgiBot first-party source. Region BG/RO follows the 'appointed distributor for Bulgaria and Romania' wording; the homepage also says it delivers to Greece and Cyprus, which is NOT recorded here."
+        }
+      ]
+    },
+    {
+      "transaction_type": "RENTAL",
+      "availability_status": "AVAILABLE",
+      "region_code": "BG",
+      "provider_slug": "robotoplus",
+      "variant_slug": null,
+      "lead_time_days": null,
+      "note": "Rental unit listed as 'Rental unit in stock'. Booking and VAT treatment are confirmed through a quotation; the transaction path is separate from the availability state. Unit shown as in stock with you inside 48 hours of a confirmed booking (the page's own wording; a unit that must come from the manufacturer takes about a week). Region BG per the distributor's 'appointed distributor for Bulgaria and Romania' wording.",
+      "evidence": [
+        {
+          "source_url": "https://robotoplus.com/rent-it",
+          "source_type": "OTHER",
+          "source_title": "Rent a robot — Robotoplus",
+          "excerpt": "AGIBOT A2 Ultra — 'Rental unit in stock'; 'A2 Ultra, 6,500 EUR per week.' Weekly rates per unit, net of VAT and shipping.",
+          "published_at": null,
+          "observed_at": "2026-10-04",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude (curl, default user agent, public GET, no login; raw HTML parsed locally) in a session initiated by Robert Konecny, under owner work order 'Europe Readiness Enrichment 01 — Third-Manufacturer Europe Discovery' (2026-10-04; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (Robotoplus, Bulgaria), not the manufacturer. CAVEAT: Robotoplus's authorization as AGIBOT's distributor is SELF-DECLARED on its own site and was not confirmed on an AgiBot first-party source. Region BG/RO follows the 'appointed distributor for Bulgaria and Romania' wording; the homepage also says it delivers to Greece and Cyprus, which is NOT recorded here."
+        },
+        {
+          "source_url": "https://robotoplus.com/about",
+          "source_type": "OTHER",
+          "source_title": "Robotoplus — About (self-declared AGIBOT appointed distributor, BG/RO)",
+          "excerpt": "we are their appointed distributor for Bulgaria and Romania",
+          "published_at": null,
+          "observed_at": "2026-10-04",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude (curl, default user agent, public GET, no login; raw HTML parsed locally) in a session initiated by Robert Konecny, under owner work order 'Europe Readiness Enrichment 01 — Third-Manufacturer Europe Discovery' (2026-10-04; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (Robotoplus, Bulgaria), not the manufacturer. CAVEAT: Robotoplus's authorization as AGIBOT's distributor is SELF-DECLARED on its own site and was not confirmed on an AgiBot first-party source. Region BG/RO follows the 'appointed distributor for Bulgaria and Romania' wording; the homepage also says it delivers to Greece and Cyprus, which is NOT recorded here."
+        }
+      ]
+    },
+    {
+      "transaction_type": "RENTAL",
+      "availability_status": "AVAILABLE",
+      "region_code": "RO",
+      "provider_slug": "robotoplus",
+      "variant_slug": null,
+      "lead_time_days": null,
+      "note": "Rental unit listed as 'Rental unit in stock'. Booking and VAT treatment are confirmed through a quotation; the transaction path is separate from the availability state. Unit shown as in stock with you inside 48 hours of a confirmed booking (the page's own wording; a unit that must come from the manufacturer takes about a week). Region RO per the distributor's 'appointed distributor for Bulgaria and Romania' wording.",
+      "evidence": [
+        {
+          "source_url": "https://robotoplus.com/rent-it",
+          "source_type": "OTHER",
+          "source_title": "Rent a robot — Robotoplus",
+          "excerpt": "AGIBOT A2 Ultra — 'Rental unit in stock'; 'A2 Ultra, 6,500 EUR per week.' Weekly rates per unit, net of VAT and shipping.",
+          "published_at": null,
+          "observed_at": "2026-10-04",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude (curl, default user agent, public GET, no login; raw HTML parsed locally) in a session initiated by Robert Konecny, under owner work order 'Europe Readiness Enrichment 01 — Third-Manufacturer Europe Discovery' (2026-10-04; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (Robotoplus, Bulgaria), not the manufacturer. CAVEAT: Robotoplus's authorization as AGIBOT's distributor is SELF-DECLARED on its own site and was not confirmed on an AgiBot first-party source. Region BG/RO follows the 'appointed distributor for Bulgaria and Romania' wording; the homepage also says it delivers to Greece and Cyprus, which is NOT recorded here."
+        },
+        {
+          "source_url": "https://robotoplus.com/about",
+          "source_type": "OTHER",
+          "source_title": "Robotoplus — About (self-declared AGIBOT appointed distributor, BG/RO)",
+          "excerpt": "we are their appointed distributor for Bulgaria and Romania",
+          "published_at": null,
+          "observed_at": "2026-10-04",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude (curl, default user agent, public GET, no login; raw HTML parsed locally) in a session initiated by Robert Konecny, under owner work order 'Europe Readiness Enrichment 01 — Third-Manufacturer Europe Discovery' (2026-10-04; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party distributor (Robotoplus, Bulgaria), not the manufacturer. CAVEAT: Robotoplus's authorization as AGIBOT's distributor is SELF-DECLARED on its own site and was not confirmed on an AgiBot first-party source. Region BG/RO follows the 'appointed distributor for Bulgaria and Romania' wording; the homepage also says it delivers to Greece and Cyprus, which is NOT recorded here."
+        }
+      ]
+    }
+  ],
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],

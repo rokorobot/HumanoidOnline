@@ -36,11 +36,17 @@ from app.models.discovery import DiscoverySource
 from app.models.robot import Robot
 from app.services.discovery import DiscoveryError
 from app.services.discovery.fingerprint import fingerprint
+from app.services.discovery.sources import maturity_proposals as maturity
 from app.services.discovery.sources import neura_mini_proposals as mini
 from app.services.discovery.sources import xpeng_iron_proposals as xpeng
 from app.services.discovery.urlref import UnsupportedUrl, normalize_url
 
 CURRENT, SUPERSEDED = "CURRENT", "SUPERSEDED"
+
+#: Operational origin of a proposal (G5, migration 0023). Metadata only: both origins use the
+#: same governed review and accepted-claim pipeline and the same truth semantics.
+NEW_MODEL, CATALOGUE_ENRICHMENT = "NEW_MODEL", "CATALOGUE_ENRICHMENT"
+ORIGINS = (NEW_MODEL, CATALOGUE_ENRICHMENT)
 
 
 def slot_key(source_key: str, robot_slug: str, kind: str, edition: str | None,
@@ -78,7 +84,8 @@ class ExtractorSpec:
     key: str
     version: str
     robot_name: str              # the catalogue name the robot must carry (identity gate)
-    page_urls: tuple[str, ...]   # the only normalized page URLs it reads
+    page_urls: tuple[str, ...] | None   # the only normalized page URLs it reads; None = any
+                                        # page the governed fetcher already retrieved
     propose: Callable[[bytes, str], Any]
     proposed_status: str = "PROPOSED"
 
@@ -94,6 +101,18 @@ XPENG_IRON_SPEC = ExtractorSpec(
     propose=lambda body, url: xpeng.propose_xpeng_iron_claims(body, url))
 
 
+def maturity_spec(robot_name: str, page_scope: str = maturity.SHARED_PAGE) -> ExtractorSpec:
+    """The COMMERCIAL_MATURITY extractor bound to one robot (identity) and one page scope.
+
+    It reads whatever first-party page the governed fetcher already retrieved for an approved
+    source (eligibility was enforced at fetch time), and attaches wording to this robot only."""
+    return ExtractorSpec(
+        key=maturity.EXTRACTOR_KEY, version=maturity.EXTRACTOR_VERSION, robot_name=robot_name,
+        page_urls=None,
+        propose=lambda body, url: maturity.propose_maturity_clues(
+            body, url, robot_name=robot_name, page_scope=page_scope))
+
+
 def ingest_neura_mini_proposals(session: Session, **kw) -> IngestReport:
     """Persist the G1 4NE1 Mini proposals read from `body`, observed as `fetched_page_id`."""
     return ingest_proposals(session, spec=NEURA_MINI_SPEC, **kw)
@@ -106,8 +125,10 @@ def ingest_xpeng_iron_proposals(session: Session, **kw) -> IngestReport:
 
 def ingest_proposals(session: Session, *, spec: ExtractorSpec, source_key: str,
                      robot_slug: str, fetched_page_id, body: bytes,
-                     ingested_by: str) -> IngestReport:
+                     ingested_by: str, origin: str = CATALOGUE_ENRICHMENT) -> IngestReport:
     """Persist the proposals `spec` reads from `body`, observed as `fetched_page_id`."""
+    if origin not in ORIGINS:
+        raise DiscoveryError(f"proposal origin must be one of {ORIGINS}")
     if not ingested_by or not ingested_by.strip():
         raise DiscoveryError("ingest must name the human who ran it (--by)")
     who = ingested_by.strip()
@@ -123,7 +144,7 @@ def ingest_proposals(session: Session, *, spec: ExtractorSpec, source_key: str,
         page_url = normalize_url(page.final_url or page.url)
     except UnsupportedUrl as exc:
         raise DiscoveryError(f"fetched page has no usable URL: {exc}") from exc
-    if page_url not in spec.page_urls:
+    if spec.page_urls is not None and page_url not in spec.page_urls:
         raise DiscoveryError(
             f"this ingest reads {' or '.join(spec.page_urls)} only, not {page_url}")
     if not page.content_hash or fingerprint(body, page.content_type) != page.content_hash:
@@ -165,7 +186,7 @@ def ingest_proposals(session: Session, *, spec: ExtractorSpec, source_key: str,
                 extractor_key=spec.key, extractor_version=spec.version,
                 origin_fetched_page_id=page.id, origin_crawl_run_id=page.crawl_run_id,
                 origin_content_hash=page.content_hash, origin_retrieved_at=page.retrieved_at,
-                ingested_by=who)
+                ingested_by=who, origin=origin)
             session.add(row)
             session.flush()
             report.proposals_created += 1

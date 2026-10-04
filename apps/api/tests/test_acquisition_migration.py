@@ -34,6 +34,8 @@ MIGRATION_0004 = ROOT / "db" / "migrations" / "0004_add_live_acquisition_layer.s
 MIGRATION_0014 = ROOT / "db" / "migrations" / "0014_fetched_page_retrieval_provenance.sql"
 MIGRATION_0018 = ROOT / "db" / "migrations" / "0018_claim_proposal_persistence.sql"
 MIGRATION_0019 = ROOT / "db" / "migrations" / "0019_accepted_claims.sql"
+MIGRATION_0023 = (ROOT / "db" / "migrations"
+                  / "0023_commercial_status_claim_target_and_proposal_origin.sql")
 
 #: Everything `0004` introduces. Dropping exactly this set puts a database back
 #: into its `0003` shape, which is what makes the round trip meaningful.
@@ -160,6 +162,7 @@ def test_migration_0004_converges_a_0003_database_onto_the_baseline(scratch_db) 
         conn.execute(MIGRATION_0014.read_text(encoding="utf-8"))
         conn.execute(MIGRATION_0018.read_text(encoding="utf-8"))   # re-add what was unwound
         conn.execute(MIGRATION_0019.read_text(encoding="utf-8"))
+        conn.execute(MIGRATION_0023.read_text(encoding="utf-8"))   # later layer (G5)
         upgraded_columns, upgraded_constraints = _shape(conn)
 
     assert upgraded_columns == baseline_columns, (

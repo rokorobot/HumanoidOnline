@@ -23,7 +23,12 @@ from pathlib import Path
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
-from app.models.claim_proposal import AcceptedClaim, CatalogueWriteAudit, DiscoveryClaimProposal
+from app.models.claim_proposal import (
+    AcceptedClaim,
+    CatalogueWriteAudit,
+    ClaimRetraction,
+    DiscoveryClaimProposal,
+)
 from app.models.discovery import DiscoverySource
 from app.services.discovery import DiscoveryError
 from app.services.discovery import proposal_review as pr
@@ -92,6 +97,11 @@ def _materializable(session: Session, robot_slug: str) -> list[AcceptedClaim]:
             raise DiscoveryError(
                 f"claim {c.id} targets {c.target_kind}[{c.target_key}] under policy "
                 f"{c.policy_key!r}, which is not registered; unregistered claims are refused")
+        if c.target_kind == "commercial_status":
+            # Source wording that later disappears or changes never retracts an accepted maturity
+            # claim and never blocks materialization (owner ruling 2026-10-04): it surfaces as
+            # REVIEW REQUIRED (`maturity_review_required`) and a human decides the consequence.
+            continue
         proposal = session.get(DiscoveryClaimProposal, c.proposal_id)
         [state] = pr.derive_states(session, [proposal])
         if state.superseded:
@@ -105,7 +115,8 @@ def _materializable(session: Session, robot_slug: str) -> list[AcceptedClaim]:
         key = (c.target_kind, c.target_key, c.variant_slug)
         if key in seen and seen[key].accepted_value != c.accepted_value:
             raise DiscoveryError(
-                f"two active claims disagree on {key}: retract one before materializing")
+                f"CONFLICT: two active claims disagree on {key} ({seen[key].accepted_value!r} vs "
+                f"{c.accepted_value!r}): retract one (naming its replacement) before materializing")
         seen[key] = c
     variants = {c.variant_slug for c in seen.values() if c.target_kind == "robot_variant"}
     for c in seen.values():
@@ -157,6 +168,15 @@ def plan_materialization(session: Session, robot_slug: str,
                 or str(doc.get("specs_note", "")).endswith(
                     ". All other specifications are not yet verified.")):
             doc["specs_note"] = note
+
+    status_claims = [c for c in claims if c.target_kind == "commercial_status"]
+    if status_claims:
+        _apply_commercial_status(session, doc, status_claims)
+    elif _has_retracted_status_claim(session, robot_slug):
+        # Every governed maturity claim was retracted with no active replacement: UNKNOWN is the
+        # explicit, governed outcome ("no accepted current maturity claim"). Evidence rows stay as
+        # history; only a retraction through the governed mechanism can produce this.
+        doc["commercial_status"] = "UNKNOWN"
 
     if variants:
         merged, placed = [], set()
@@ -237,6 +257,79 @@ def plan_materialization(session: Session, robot_slug: str,
     return MaterializationPlan(robot_slug, path, before, _dump(doc), claims)
 
 
+MATURITY_NOTE_MARK = "Governed maturity claim"
+
+
+def _has_retracted_status_claim(session: Session, robot_slug: str) -> bool:
+    return session.scalar(
+        select(AcceptedClaim.id).where(
+            AcceptedClaim.robot_slug == robot_slug,
+            AcceptedClaim.target_kind == "commercial_status",
+            AcceptedClaim.id.in_(select(ClaimRetraction.claim_id))).limit(1)) is not None
+
+
+def maturity_evidence(session: Session, claim: AcceptedClaim) -> dict:
+    """The catalogue evidence row of one accepted maturity claim, from its own chain only."""
+    source = session.get(DiscoverySource, claim.source_id)
+    if source is None or source.source_class not in _EVIDENCE_TYPE:
+        raise DiscoveryError("a maturity claim must rest on a manufacturer source")
+    proposal = session.get(DiscoveryClaimProposal, claim.proposal_id)
+    published = (proposal.structured or {}).get("context_date") if proposal else None
+    return {
+        "source_url": claim.source_url, "source_type": _EVIDENCE_TYPE[source.source_class],
+        "source_title": f"{source.name} \u2014 official page",
+        "excerpt": claim.evidence_excerpt, "published_at": published,
+        "observed_at": claim.observed_at.date().isoformat(), "verified_at": None,
+        "confidence": "MEDIUM",
+        "note": (f"{MATURITY_NOTE_MARK} (G5): {claim.accepted_value}, chosen by {claim.created_by} "
+                 f"from proposal {claim.proposal_digest[:12]} at {claim.evidence_locator}, sighted "
+                 f"on page content hash {claim.observation_content_hash[:12]}; accepted claim "
+                 f"{claim.claim_digest[:12]}. The status is the reviewer's decision, not the "
+                 "wording's. Retrieved by the governed observation; not human-verified on the "
+                 "page itself.")}
+
+
+def _apply_commercial_status(session: Session, doc: dict, claims: list[AcceptedClaim]) -> None:
+    """Write robot.commercial_status and derive its evidence rows from the active claims.
+
+    A row is replaced only if it is this claim's own derived row (same accepted-claim digest in
+    its note); every other row (manual, older or historical evidence) is preserved untouched."""
+    values = {c.accepted_value for c in claims}
+    if len(values) != 1:        # _materializable already refuses; defence in depth
+        raise DiscoveryError("CONFLICT: active commercial-status claims disagree")
+    doc["commercial_status"] = values.pop()
+    rows = list(doc.get("commercial_status_evidence") or [])
+    for c in sorted(claims, key=lambda c: c.claim_seq):
+        row = maturity_evidence(session, c)
+        marker = f"accepted claim {c.claim_digest[:12]}"
+        for i, existing in enumerate(rows):
+            if marker in (existing.get("note") or ""):
+                rows[i] = row
+                break
+        else:
+            rows.append(row)
+    doc["commercial_status_evidence"] = rows
+
+
+def maturity_review_required(session: Session, robot_slug: str) -> list[str]:
+    """REVIEW REQUIRED reasons for ACTIVE maturity claims whose proposal's source wording no longer
+    stands (page changed, wording removed, proposal superseded). Read-only; it retracts nothing and
+    changes no status: the page may have been redesigned, reworded, replaced by a newer model's
+    page, or a real commercial transition may have happened. A human decides."""
+    out: list[str] = []
+    for c in active_claims(session, robot_slug):
+        if c.target_kind != "commercial_status":
+            continue
+        proposal = session.get(DiscoveryClaimProposal, c.proposal_id)
+        [state] = pr.derive_states(session, [proposal])
+        reasons = list(state.stale_reasons) + (["its proposal is superseded"]
+                                                if state.superseded else [])
+        if reasons:
+            out.append(f"REVIEW REQUIRED: {robot_slug} commercial_status {c.accepted_value} "
+                       f"(claim {str(c.id)[:8]}): " + "; ".join(reasons))
+    return out
+
+
 def _reservation_terms(session: Session, robot_slug: str) -> AcceptedClaim:
     """The accepted RESERVATION_TERMS claim that the WAITLIST status rests on (it must exist
     and its proposal must still be current)."""
@@ -292,6 +385,8 @@ def logical_target(claim: AcceptedClaim) -> str:
         return f"robot_variant:{claim.robot_slug}:{claim.variant_slug}"
     if claim.target_kind == "robot_spec":
         return f"robot_spec:{claim.robot_slug}:{claim.target_key}"
+    if claim.target_kind == "commercial_status":
+        return f"commercial_status:{claim.robot_slug}"
     if claim.target_kind == "specification" and claim.variant_slug is None:
         return f"specification:{claim.robot_slug}:{claim.target_key}"
     if claim.target_kind in ("specification", "pricing_offer", "availability_offer"):
@@ -390,6 +485,21 @@ def verify_applied(session: Session, robot_slug: str, *, change_ref: str, applie
                        "delivery_estimate_label": r.delivery_estimate_label,
                        "seller_wording": r.seller_wording, "evidence": ev}
             rows.append((c, "availability_offer", r.id, _hash(payload)))
+        elif c.target_kind == "commercial_status":
+            val = session.execute(text("SELECT commercial_status::text FROM robot WHERE id = :r"),
+                                  {"r": robot_id}).scalar()
+            ev = session.execute(text(
+                "SELECT source_type::text AS st, excerpt FROM evidence_source WHERE "
+                "subject_type = 'COMMERCIAL_STATUS' AND subject_id = :r AND source_url = :u "
+                "AND excerpt = :e"),
+                {"r": robot_id, "u": c.source_url, "e": c.evidence_excerpt}).all()
+            if val != c.accepted_value or not ev:
+                raise DiscoveryError(
+                    "robot.commercial_status is not in the database as accepted (or lacks its "
+                    "evidence row); import the merged catalogue first")
+            rows.append((c, "robot", robot_id, _hash({
+                "robot_slug": robot_slug, "table": "robot", "column": "commercial_status",
+                "value": val, "evidence": sorted([e.st, e.excerpt] for e in ev)})))
         elif c.target_kind == "robot_spec":
             col = c.target_key
             if col not in ("degrees_of_freedom", "hand_dof"):          # only registered columns

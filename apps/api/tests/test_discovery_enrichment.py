@@ -218,7 +218,7 @@ def test_sources_by_manufacturer_needs_a_reviewed_adapter():
     neura = DiscoverySource(key="neura-robotics-official", name="n", source_class="MANUFACTURER")
     orphan = DiscoverySource(key="no-adapter", name="o", source_class="MANUFACTURER")
     out = en.sources_by_manufacturer([neura, orphan], ADAPTERS)
-    assert out == {"neura-robotics": neura}
+    assert out == {"neura-robotics": [neura]}
 
 
 # ------------------------------------------------------------------ queue & quietness
@@ -302,3 +302,69 @@ def test_priority_and_freshness_are_not_inputs_to_readiness():
     plan(inp(rec, commercial_days=999, spec_days=999))
     assert rd.publication_check(rec) == base == []
     assert "discovery.enrichment" not in inspect.getsource(rd)   # readiness cannot see it
+
+
+# ------------------------------------------------------------------ document host source (px.media)
+
+PX = "https://neurarobotics.px.media/"
+DATASHEET = PX + "plk/Jj/4NE1Minidatasheet.pdf"
+
+
+def neura_main() -> DiscoverySource:
+    s = source(prefixes=("/products/", "/product/", "/product-sitemap.xml", "/news/"))
+    s.key, s.homepage_url = "neura-robotics-official", "https://neura-robotics.com/"
+    return s
+
+
+def px_docs(*, enabled=True) -> DiscoverySource:
+    s = source(enabled=enabled, prefixes=("/plk/",))
+    s.key, s.homepage_url, s.source_class = "neura-documents-official", PX, "OFFICIAL_DOCUMENT"
+    return s
+
+
+def _mini(**over):
+    return inp(rich(manufacturer_slug="neura-robotics", official_url=None, images=(), **over),
+               urls=[("specification", DATASHEET),
+                     ("official_url", "https://neura-robotics.com/product/4ne1-mini-reservation"),
+                     ("specification", "https://neura-robotics.com/"),
+                     ("specification", PX + "other/secret.pdf"),
+                     ("specification", "https://evil.px.media/plk/x.pdf")])
+
+
+def _verdicts(sources):
+    return {v.url: v for v in plan(_mini(), sources).excluded_urls}
+
+
+def test_datasheet_is_fetch_eligible_under_the_enabled_plk_document_source():
+    row = plan(_mini(), [neura_main(), px_docs()])
+    assert DATASHEET in row.eligible_urls
+    assert "https://neura-robotics.com/product/4ne1-mini-reservation" in row.eligible_urls
+    assert row.source_status == en.APPROVED
+
+
+def test_only_plk_paths_of_the_document_host_become_eligible():
+    ex = _verdicts([neura_main(), px_docs()])
+    assert ex[PX + "other/secret.pdf"].reason == en.NEEDS_SOURCE_APPROVAL     # not under /plk/
+    assert ex["https://evil.px.media/plk/x.pdf"].reason == en.NEEDS_SOURCE_APPROVAL  # subdomain
+    assert DATASHEET not in ex
+
+
+def test_neura_root_stays_outside_the_main_prefixes():
+    v = _verdicts([neura_main(), px_docs()])["https://neura-robotics.com/"]
+    assert (v.reason, v.detail) == (en.NEEDS_SOURCE_APPROVAL, "URL_OUTSIDE_APPROVED_PATHS")
+
+
+def test_datasheet_needs_approval_without_an_enabled_document_source():
+    for docs in ([neura_main()], [neura_main(), px_docs(enabled=False)]):
+        v = _verdicts(docs)[DATASHEET]
+        assert (v.reason, v.detail) == (en.NEEDS_SOURCE_APPROVAL, "URL_OUTSIDE_APPROVED_HOST")
+
+
+def test_document_source_maps_to_its_manufacturer_by_reviewed_code_only():
+    from app.services.discovery.sources import ADAPTERS
+    main, docs = neura_main(), px_docs()
+    stray = DiscoverySource(key="unlisted-docs", name="u", source_class="OFFICIAL_DOCUMENT")
+    out = en.sources_by_manufacturer([stray, docs, main], ADAPTERS)
+    assert out == {"neura-robotics": [docs, main]} or out == {"neura-robotics": [main, docs]}
+    assert stray not in out["neura-robotics"]
+    assert en.DOCUMENT_SOURCES == {"neura-documents-official": "neura-robotics"}

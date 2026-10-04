@@ -45,7 +45,6 @@ from app.models.discovery import DiscoverySource
 from app.services import fact_resolution as fr
 from app.services import readiness as rd
 from app.services.discovery.eligibility import (
-    URL_OUTSIDE_APPROVED_HOST,
     URL_OUTSIDE_APPROVED_PATHS,
     url_ineligibility,
 )
@@ -287,10 +286,11 @@ class UrlVerdict:
     origins: tuple[str, ...]
     reason: str | None  # None = eligible target; else NEEDS_SOURCE_APPROVAL / UNUSABLE_URL ...
     detail: str | None = None
+    source_key: str | None = None   # the approved source whose boundary admits an eligible URL
 
     def as_dict(self) -> dict:
         return {"url": self.url, "origins": list(self.origins), "reason": self.reason,
-                "detail": self.detail}
+                "detail": self.detail, "source": self.source_key}
 
 
 def collect_known_urls(inp: RobotInput) -> dict[str, tuple[str, ...]]:
@@ -312,11 +312,20 @@ def collect_known_urls(inp: RobotInput) -> dict[str, tuple[str, ...]]:
     return {u: tuple(sorted(o)) for u, o in sorted(found.items())}
 
 
-def classify_urls(known: Mapping[str, tuple[str, ...]],
-                  source: DiscoverySource | None) -> list[UrlVerdict]:
-    """Eligible targets vs. excluded ones with a reason. With no approved source nothing is
-    eligible. Redirect escape and robots are enforced at fetch time (G5-2): a verdict here
-    is necessary, never sufficient, for a request."""
+def _as_sources(source) -> list[DiscoverySource]:
+    if source is None:
+        return []
+    return [source] if isinstance(source, DiscoverySource) else list(source)
+
+
+def classify_urls(known: Mapping[str, tuple[str, ...]], source) -> list[UrlVerdict]:
+    """Eligible targets vs. excluded ones with a reason. `source` is one source, several
+    (a manufacturer's website and its approved document host) or None. A URL is eligible
+    when ANY approved source's host/path boundary admits it; with no approved source
+    nothing is eligible. Redirect escape and robots are enforced at fetch time (G5-2): a
+    verdict here is necessary, never sufficient, for a request."""
+    sources = sorted(_as_sources(source), key=lambda s: s.key)
+    usable = [s for s in sources if source_status(s) == APPROVED]
     out = []
     for url, origins in known.items():
         try:
@@ -324,16 +333,22 @@ def classify_urls(known: Mapping[str, tuple[str, ...]],
         except UnsupportedUrl:
             out.append(UrlVerdict(url, origins, UNUSABLE_URL, "not an absolute http(s) URL"))
             continue
-        if source is None:
-            out.append(UrlVerdict(url, origins, NO_APPROVED_SOURCE))
-            continue
-        why = url_ineligibility(source, url)
-        if why is None:
-            out.append(UrlVerdict(url, origins, None))
-        elif why in (URL_OUTSIDE_APPROVED_HOST, URL_OUTSIDE_APPROVED_PATHS):
-            out.append(UrlVerdict(url, origins, NEEDS_SOURCE_APPROVAL, why))
-        else:   # the source itself cannot be acquired from: it authorizes nothing
+        if not usable:
+            why = url_ineligibility(sources[0], url) if sources else None
             out.append(UrlVerdict(url, origins, NO_APPROVED_SOURCE, why))
+            continue
+        reasons = []
+        for s in usable:
+            why = url_ineligibility(s, url)
+            if why is None:
+                out.append(UrlVerdict(url, origins, None, source_key=s.key))
+                break
+            reasons.append(why)
+        else:
+            # a host that matches some approved source but not its paths is the closer miss
+            detail = (URL_OUTSIDE_APPROVED_PATHS if URL_OUTSIDE_APPROVED_PATHS in reasons
+                      else reasons[0])
+            out.append(UrlVerdict(url, origins, NEEDS_SOURCE_APPROVAL, detail))
     return out
 
 
@@ -343,17 +358,25 @@ def _slugify(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
+#: Reviewed (code-only) mapping of an approved DOCUMENT host source to the manufacturer whose
+#: documentation it carries. A document source has no radar adapter, so this is its only link to
+#: a manufacturer. Adding an entry is a reviewed code change, never database data.
+DOCUMENT_SOURCES: Mapping[str, str] = {"neura-documents-official": "neura-robotics"}
+
+
 def sources_by_manufacturer(
     sources: Iterable[DiscoverySource],
     adapters: Mapping[str, SourceAdapterConfig],
-) -> dict[str, DiscoverySource]:
-    """manufacturer_slug -> the registered source whose reviewed adapter is for that
-    manufacturer. A source with no reviewed adapter names no manufacturer: not mapped."""
-    out: dict[str, DiscoverySource] = {}
+) -> dict[str, list[DiscoverySource]]:
+    """manufacturer_slug -> its registered sources, by key: the one whose reviewed adapter is
+    for that manufacturer, plus any reviewed DOCUMENT_SOURCES entry. A source with neither
+    names no manufacturer: not mapped."""
+    out: dict[str, list[DiscoverySource]] = {}
     for s in sorted(sources, key=lambda s: s.key):
         cfg = adapters.get(s.key)
-        if cfg is not None:
-            out.setdefault(_slugify(cfg.manufacturer), s)
+        slug = _slugify(cfg.manufacturer) if cfg is not None else DOCUMENT_SOURCES.get(s.key)
+        if slug is not None:
+            out.setdefault(slug, []).append(s)
     return out
 
 
@@ -412,7 +435,7 @@ class QueueRow:
         }
 
 
-def plan_robot(inp: RobotInput, source: DiscoverySource | None,
+def plan_robot(inp: RobotInput, source,
                last_observation: datetime | None, now: datetime) -> QueueRow:
     rec = inp.record
     gaps = gap_profile(inp, now)
@@ -420,7 +443,9 @@ def plan_robot(inp: RobotInput, source: DiscoverySource | None,
     verdicts = classify_urls(collect_known_urls(inp), source)
     eligible = tuple(v.url for v in verdicts if v.reason is None)
     excluded = tuple(v for v in verdicts if v.reason is not None)
-    status = source_status(source)
+    approved = [x for x in sorted(_as_sources(source), key=lambda x: x.key)
+                if source_status(x) == APPROVED]
+    status = APPROVED if approved else NO_APPROVED_SOURCE
     nxt = next_eligible_at(band, last_observation)
     if status != APPROVED:
         due = NO_APPROVED_SOURCE
@@ -431,7 +456,8 @@ def plan_robot(inp: RobotInput, source: DiscoverySource | None,
     return QueueRow(
         rec.slug, rec.manufacturer_slug, rec.is_published, str(rec.commercial_status),
         gaps.band, tuple(gaps.reasons()), band, tuple(why), last_observation, nxt, due,
-        source.key if source is not None and status == APPROVED else None, status,
+        next((v.source_key for v in verdicts if v.source_key),
+             approved[0].key if approved else None), status,
         eligible if status == APPROVED else (), excluded, rec.not_yet_reviewed, gaps)
 
 
@@ -440,7 +466,7 @@ _BAND_ORDER = {HIGH: 0, MEDIUM: 1, LOW: 2}
 
 def build_queue(
     inputs: Sequence[RobotInput],
-    sources: Mapping[str, DiscoverySource],
+    sources: Mapping[str, DiscoverySource | Sequence[DiscoverySource]],
     last_observed: Mapping[str, datetime],
     now: datetime,
 ) -> list[QueueRow]:

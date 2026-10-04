@@ -4,7 +4,7 @@
  * publication rules.
  *
  *   closed -> 404                                  (no fetch is even made)
- *   valid preview -> 200, noindex, no-store, not in the sitemap
+ *   valid preview SESSION -> 200, noindex, no-store, not in the sitemap
  *   published + ready -> 200, indexable, in the sitemap, JSON == HTML == JSON-LD
  *   published but readiness failing -> not public, not in the sitemap
  */
@@ -25,6 +25,8 @@ import { GET } from "../app/research/humanoid-availability/europe.json/route";
 import EuropeResearchPage, { generateMetadata } from "../app/research/humanoid-availability/europe/page";
 import sitemap from "../app/sitemap";
 import { SiteNav } from "../components/SiteNav";
+import { PREVIEW_COOKIE, issuePreviewSession } from "../lib/research-preview";
+import { __setTestCookies } from "../test/stubs/next-headers";
 import { EDITORIAL } from "../lib/research-editorial";
 import { buildResearchJsonLd } from "../lib/research-jsonld";
 
@@ -87,6 +89,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  __setTestCookies({});
   vi.unstubAllGlobals();
   for (const k of ENV_KEYS) {
     if (saved[k] === undefined) delete process.env[k];
@@ -94,9 +97,23 @@ afterEach(() => {
   }
 });
 
-const sp = (preview?: string) => ({ searchParams: Promise.resolve(preview ? { preview } : {}) });
-const jsonRequest = (preview?: string) =>
-  new Request(`${PAGE_URL}.json${preview ? `?preview=${preview}` : ""}`);
+// A browser holding a preview session signed with `token` (or no session at all).
+// The session is a signed assertion; the secret itself is never in the cookie.
+const sessionFor = (token?: string) => (token ? issuePreviewSession(token, "europe") : undefined);
+const visitPage = (token?: string) => {
+  const session = sessionFor(token);
+  __setTestCookies(session ? { [PREVIEW_COOKIE]: session } : {});
+  return EuropeResearchPage();
+};
+const visitMeta = (token?: string) => {
+  const session = sessionFor(token);
+  __setTestCookies(session ? { [PREVIEW_COOKIE]: session } : {});
+  return generateMetadata();
+};
+const jsonRequest = (token?: string) => {
+  const session = sessionFor(token);
+  return new Request(`${PAGE_URL}.json`, session ? { headers: { cookie: `${PREVIEW_COOKIE}=${session}` } } : undefined);
+};
 const researchUrls = async () =>
   (await sitemap()).map((e) => e.url).filter((u) => u.includes("/research/"));
 
@@ -104,16 +121,16 @@ describe("closed (default)", () => {
   it("page, metadata and JSON are 404 and the API is never called", async () => {
     // Editorial approval is one publication prerequisite; it must not publish.
     expect(EDITORIAL.europe.reviewed_at).not.toBeNull();
-    await expect(EuropeResearchPage(sp())).rejects.toThrow();
-    expect((await generateMetadata(sp())).title).toBe("Not found");
+    await expect(visitPage()).rejects.toThrow();
+    expect((await visitMeta()).title).toBe("Not found");
     expect((await GET(jsonRequest())).status).toBe(404);
     expect(fetchMock).not.toHaveBeenCalled();
     expect(await researchUrls()).toEqual([]);
   });
 
-  it("a wrong or unconfigured preview token stays closed", async () => {
+  it("a session signed with the wrong key, or with no token configured, stays closed", async () => {
     process.env.RESEARCH_PREVIEW_TOKEN = TOKEN;
-    await expect(EuropeResearchPage(sp("nope"))).rejects.toThrow();
+    await expect(visitPage("nope")).rejects.toThrow();
     expect((await GET(jsonRequest("nope"))).status).toBe(404);
     delete process.env.RESEARCH_PREVIEW_TOKEN;
     expect((await GET(jsonRequest(TOKEN))).status).toBe(404);
@@ -128,7 +145,7 @@ describe("valid preview", () => {
   });
 
   it("renders 200 with a preview banner, readiness and the reviewed editorial section", async () => {
-    const { container } = render(await EuropeResearchPage(sp(TOKEN)));
+    const { container } = render(await visitPage(TOKEN));
     expect(container.querySelector('[data-testid="preview-banner"]')).toBeTruthy();
     expect(container.querySelector('[data-testid="readiness"]')).toBeTruthy();
     const editorial = container.querySelector('[data-testid="editorial"]')?.textContent ?? "";
@@ -137,7 +154,7 @@ describe("valid preview", () => {
   });
 
   it("is noindex in metadata, and the JSON is noindex and no-store", async () => {
-    const meta = await generateMetadata(sp(TOKEN));
+    const meta = await visitMeta(TOKEN);
     expect(meta.robots).toEqual({ index: false, follow: false });
     const res = await GET(jsonRequest(TOKEN));
     expect(res.status).toBe(200);
@@ -165,14 +182,14 @@ describe("published and ready", () => {
   });
 
   it("renders 200 as an indexable page with canonical metadata and no preview chrome", async () => {
-    const { container } = render(await EuropeResearchPage(sp()));
+    const { container } = render(await visitPage());
     expect(container.querySelector('[data-testid="preview-banner"]')).toBeNull();
     expect(container.querySelector('[data-testid="readiness"]')).toBeNull();
     const editorial = container.querySelector('[data-testid="editorial"]')?.textContent ?? "";
     expect(editorial).toContain("Reviewed 2026-10-04."); // approved text is part of the public page
     expect(editorial).not.toContain("DRAFT");
     expect(editorial).not.toContain("outdated");
-    const meta = await generateMetadata(sp());
+    const meta = await visitMeta();
     expect(meta.robots).toBeUndefined();
     expect(meta.alternates?.canonical).toBe(PAGE_URL);
   });
@@ -187,7 +204,7 @@ describe("published and ready", () => {
 
   it("HTML, JSON and JSON-LD agree on the same projection", async () => {
     const data = apiBody(true);
-    const { container } = render(await EuropeResearchPage(sp()));
+    const { container } = render(await visitPage());
     const ld = JSON.parse(container.querySelector('script[type="application/ld+json"]')!.textContent!);
     expect(ld).toEqual(buildResearchJsonLd(data, ORIGIN));
     expect(container.querySelector('[data-testid="direct-answer"]')?.textContent).toBe(data.direct_answer);
@@ -217,14 +234,14 @@ describe("published but degraded: limited evidence stays public (ADR-027 section
   });
 
   it("renders publicly, indexable, with a visible factual warning and its reasons", async () => {
-    const { container } = render(await EuropeResearchPage(sp()));
+    const { container } = render(await visitPage());
     expect(container.querySelector('[data-testid="preview-banner"]')).toBeNull();
     const warning = container.querySelector('[data-testid="limited-evidence-warning"]');
     expect(warning?.textContent).toContain("Limited current evidence.");
     expect(warning?.textContent).toContain("This resource remains published");
     expect(warning?.textContent).toContain("Stale offers are excluded from current availability figures.");
     expect(warning?.textContent).toContain("4 qualifying robots; minimum 5");
-    expect((await generateMetadata(sp())).robots).toBeUndefined();
+    expect((await visitMeta()).robots).toBeUndefined();
   });
 
   it("the JSON carries the machine-readable health and is public-cacheable", async () => {
@@ -243,7 +260,7 @@ describe("published but degraded: limited evidence stays public (ADR-027 section
   });
 
   it("the JSON-LD still describes only the projected (current) offers", async () => {
-    const { container } = render(await EuropeResearchPage(sp()));
+    const { container } = render(await visitPage());
     const ld = JSON.parse(container.querySelector('script[type="application/ld+json"]')!.textContent!);
     expect(ld).toEqual(buildResearchJsonLd(apiBody(true), ORIGIN));
   });
@@ -256,7 +273,7 @@ describe("published but structurally invalid: the API fails closed", () => {
   });
 
   it("is not public: 404 page, 404 JSON, absent from the sitemap and the hub", async () => {
-    await expect(EuropeResearchPage(sp())).rejects.toThrow();
+    await expect(visitPage()).rejects.toThrow();
     expect((await GET(jsonRequest())).status).toBe(404);
     expect(await researchUrls()).toEqual([]);
   });
@@ -264,10 +281,119 @@ describe("published but structurally invalid: the API fails closed", () => {
   it("a reviewer with the token still sees the review-only report", async () => {
     process.env.RESEARCH_PREVIEW_TOKEN = TOKEN;
     apiToken = TOKEN;
-    const { container } = render(await EuropeResearchPage(sp(TOKEN)));
+    const { container } = render(await visitPage(TOKEN));
     expect(container.querySelector('[data-testid="preview-banner"]')).toBeTruthy();
     expect(container.querySelector('[data-testid="readiness"]')?.textContent).toContain("Gate fails");
-    expect((await generateMetadata(sp(TOKEN))).robots).toEqual({ index: false, follow: false });
+    expect((await visitMeta(TOKEN)).robots).toEqual({ index: false, follow: false });
     expect(await researchUrls()).toEqual([]);
+  });
+});
+
+describe("preview session security", () => {
+  const ENV_TOKEN = TOKEN;
+
+  beforeEach(() => {
+    process.env.RESEARCH_PREVIEW_TOKEN = ENV_TOKEN;
+    apiToken = ENV_TOKEN;
+  });
+
+  it("a valid session cookie opens the HTML and the JSON preview, noindex and no-store", async () => {
+    const { container } = render(await visitPage(ENV_TOKEN));
+    expect(container.querySelector('[data-testid="preview-banner"]')).toBeTruthy();
+    expect((await visitMeta(ENV_TOKEN)).robots).toEqual({ index: false, follow: false });
+    const res = await GET(jsonRequest(ENV_TOKEN));
+    expect(res.status).toBe(200);
+    expect(res.headers.get("cache-control")).toBe("no-store");
+    expect(res.headers.get("x-robots-tag")).toContain("noindex");
+  });
+
+  it("the correct secret in the URL (?preview=) no longer grants anything", async () => {
+    // The page no longer reads query parameters at all, and the JSON route ignores them.
+    const res = await GET(new Request(`${PAGE_URL}.json?preview=${ENV_TOKEN}`));
+    expect(res.status).toBe(404);
+    __setTestCookies({});
+    await expect(EuropeResearchPage()).rejects.toThrow();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("a tampered cookie grants nothing", async () => {
+    const good = issuePreviewSession(ENV_TOKEN, "europe");
+    const [v, payload, sig] = good.split(".");
+    const forgedPayload = Buffer.from(
+      JSON.stringify({ v: 1, r: "europe", exp: Math.floor(Date.now() / 1000) + 3000 }),
+    ).toString("base64url");
+    for (const bad of [`${v}.${forgedPayload}.${sig}`, `${v}.${payload}.${sig}x`, `${v}.${payload}`, "garbage", ""]) {
+      const res = await GET(new Request(`${PAGE_URL}.json`, { headers: { cookie: `${PREVIEW_COOKIE}=${bad}` } }));
+      expect(res.status, bad).toBe(404);
+    }
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("an expired cookie grants nothing", async () => {
+    const expired = issuePreviewSession(ENV_TOKEN, "europe", Date.now() - 2 * 3600 * 1000);
+    const res = await GET(new Request(`${PAGE_URL}.json`, { headers: { cookie: `${PREVIEW_COOKIE}=${expired}` } }));
+    expect(res.status).toBe(404);
+    __setTestCookies({ [PREVIEW_COOKIE]: expired });
+    await expect(EuropeResearchPage()).rejects.toThrow();
+  });
+
+  it("rotating RESEARCH_PREVIEW_TOKEN invalidates every existing session", async () => {
+    const session = issuePreviewSession(ENV_TOKEN, "europe");
+    const withSession = () =>
+      new Request(`${PAGE_URL}.json`, { headers: { cookie: `${PREVIEW_COOKIE}=${session}` } });
+    expect((await GET(withSession())).status).toBe(200);
+    process.env.RESEARCH_PREVIEW_TOKEN = "rotated-token";
+    apiToken = "rotated-token";
+    expect((await GET(withSession())).status).toBe(404);
+  });
+
+  it("the API credential travels only as a server-side header; the cookie never carries it", async () => {
+    const session = issuePreviewSession(ENV_TOKEN, "europe");
+    expect(session).not.toContain(ENV_TOKEN);
+    expect(Buffer.from(session.split(".")[1], "base64url").toString()).not.toContain(ENV_TOKEN);
+    await GET(jsonRequest(ENV_TOKEN));
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(String(url)).not.toContain(ENV_TOKEN);
+    expect((init.headers as Record<string, string>)["X-Research-Preview"]).toBe(ENV_TOKEN);
+    // Nothing a browser receives contains the secret: not the page markup, not the JSON.
+    const { container } = render(await visitPage(ENV_TOKEN));
+    expect(container.innerHTML).not.toContain(ENV_TOKEN);
+    expect(await (await GET(jsonRequest(ENV_TOKEN))).text()).not.toContain(ENV_TOKEN);
+  });
+
+  it("clearing the cookie closes access again", async () => {
+    expect((await GET(jsonRequest(ENV_TOKEN))).status).toBe(200);
+    expect((await GET(jsonRequest())).status).toBe(404);
+    __setTestCookies({});
+    await expect(EuropeResearchPage()).rejects.toThrow();
+  });
+
+  it("a session never exposes the preview: absent from the sitemap, hub and llms nav", async () => {
+    expect(await researchUrls()).toEqual([]);
+    const { container } = render(<SiteNav />);
+    expect(container.querySelector('a[href="/research"]')).toBeNull();
+  });
+
+  it("when Europe is published the cookie is irrelevant: the public path wins", async () => {
+    process.env.RESEARCH_PUBLISHED_REGIONS = "europe";
+    apiPublic = true;
+    for (const token of [undefined, ENV_TOKEN, "wrong"]) {
+      const { container } = render(await visitPage(token));
+      expect(container.querySelector('[data-testid="preview-banner"]'), String(token)).toBeNull();
+      expect((await visitMeta(token)).robots).toBeUndefined();
+      cleanup();
+    }
+    const res = await GET(jsonRequest(ENV_TOKEN));
+    expect(res.headers.get("cache-control")).toContain("max-age=300");
+    expect(res.headers.get("x-robots-tag")).toBeNull();
+  });
+
+  it("the preview banner offers End preview as a POST, with no secret", async () => {
+    const { container } = render(await visitPage(ENV_TOKEN));
+    const form = container.querySelector('[data-testid="preview-banner"] form') as HTMLFormElement;
+    expect(form.getAttribute("method")).toBe("post");
+    expect(form.getAttribute("action")).toBe("/research/preview");
+    expect((form.querySelector('input[name="action"]') as HTMLInputElement).value).toBe("end");
+    expect(form.outerHTML).not.toContain(ENV_TOKEN);
   });
 });

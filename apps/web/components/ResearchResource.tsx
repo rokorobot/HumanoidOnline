@@ -146,6 +146,10 @@ export function ResearchResource({
         <p role="note" data-testid="preview-banner">
           <strong>Preview — not published.</strong> This resource is not public, is excluded from
           the sitemap and is marked noindex.
+          <form method="post" action="/research/preview" style={{ display: "inline", marginLeft: 12 }}>
+            <input type="hidden" name="action" value="end" />
+            <button type="submit">End preview</button>
+          </form>
         </p>
       )}
 

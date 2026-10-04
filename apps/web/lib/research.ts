@@ -2,8 +2,7 @@
 // governed read. The aggregation lives in the API read model
 // (apps/api/app/services/regional_research); this module only gates, fetches and
 // labels. It never recomputes a count, status or price.
-import { timingSafeEqual } from "node:crypto";
-
+import { verifyPreviewSession } from "./research-preview";
 import { API_BASE_URL } from "./server";
 
 export const RESEARCH_REGIONS = ["europe"] as const;
@@ -122,21 +121,17 @@ export type ResearchAccess =
   | { mode: "preview"; token: string }
   | { mode: "closed" };
 
-function safeEqual(a: string, b: string): boolean {
-  const x = Buffer.from(a);
-  const y = Buffer.from(b);
-  return x.length === y.length && timingSafeEqual(x, y);
-}
-
 /**
  * Who may see a regional resource. Closed by default: a region is public only
  * when RESEARCH_PUBLISHED_REGIONS lists it (the owner's publication decision,
- * ADR-027 §12). Otherwise a reviewer holding RESEARCH_PREVIEW_TOKEN may open it
- * with `?preview=<token>`. Anything else is closed (404, no disclosure).
+ * ADR-027 §12). Otherwise a reviewer holding a valid, unexpired preview SESSION
+ * (a signed cookie issued after posting RESEARCH_PREVIEW_TOKEN to /research/preview)
+ * may open it. A token in a URL grants nothing. Anything else is closed (404, no
+ * disclosure).
  */
 export function resolveResearchAccess(
   region: string,
-  previewParam: string | null | undefined,
+  sessionCookie: string | null | undefined,
   env: Record<string, string | undefined> = process.env,
 ): ResearchAccess {
   if (!(RESEARCH_REGIONS as readonly string[]).includes(region)) return { mode: "closed" };
@@ -146,7 +141,8 @@ export function resolveResearchAccess(
     .filter(Boolean);
   if (published.includes(region)) return { mode: "published" };
   const token = (env.RESEARCH_PREVIEW_TOKEN ?? "").trim();
-  if (token && previewParam && safeEqual(token, previewParam)) {
+  if (token && verifyPreviewSession(sessionCookie, token) === region) {
+    // The server alone sends the real token to the API (X-Research-Preview).
     return { mode: "preview", token };
   }
   return { mode: "closed" };
@@ -322,13 +318,13 @@ export async function fetchResearchProjection(
  */
 export async function loadResearch(
   region: ResearchRegion,
-  previewParam: string | null | undefined,
+  sessionCookie: string | null | undefined,
   env: Record<string, string | undefined> = process.env,
 ): Promise<{ access: ResearchAccess; data: ResearchProjection | null }> {
-  let access = resolveResearchAccess(region, previewParam, env);
+  let access = resolveResearchAccess(region, sessionCookie, env);
   let data = await fetchResearchProjection(region, access);
   if (!data && access.mode === "published") {
-    const review = resolveResearchAccess(region, previewParam, {
+    const review = resolveResearchAccess(region, sessionCookie, {
       ...env,
       RESEARCH_PUBLISHED_REGIONS: "",
     });

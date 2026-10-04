@@ -37,6 +37,7 @@ from app.models.robot import Robot
 from app.services.discovery import DiscoveryError
 from app.services.discovery.fingerprint import fingerprint
 from app.services.discovery.sources import maturity_proposals as maturity
+from app.services.discovery.sources import neura_mini_datasheet_proposals as mini_ds
 from app.services.discovery.sources import neura_mini_proposals as mini
 from app.services.discovery.sources import xpeng_iron_proposals as xpeng
 from app.services.discovery.urlref import UnsupportedUrl, normalize_url
@@ -100,6 +101,11 @@ XPENG_IRON_SPEC = ExtractorSpec(
     page_urls=tuple(xpeng.PAGE_URLS),
     propose=lambda body, url: xpeng.propose_xpeng_iron_claims(body, url))
 
+NEURA_MINI_DATASHEET_SPEC = ExtractorSpec(
+    key=mini_ds.EXTRACTOR_KEY, version=mini_ds.EXTRACTOR_VERSION, robot_name=mini_ds.ROBOT_NAME,
+    page_urls=tuple(mini_ds.PAGE_URLS),
+    propose=lambda body, url: mini_ds.propose_neura_mini_datasheet_claims(body, url))
+
 
 def maturity_spec(robot_name: str, page_scope: str = maturity.SHARED_PAGE) -> ExtractorSpec:
     """The COMMERCIAL_MATURITY extractor bound to one robot (identity) and one page scope.
@@ -116,6 +122,11 @@ def maturity_spec(robot_name: str, page_scope: str = maturity.SHARED_PAGE) -> Ex
 def ingest_neura_mini_proposals(session: Session, **kw) -> IngestReport:
     """Persist the G1 4NE1 Mini proposals read from `body`, observed as `fetched_page_id`."""
     return ingest_proposals(session, spec=NEURA_MINI_SPEC, **kw)
+
+
+def ingest_neura_mini_datasheet_proposals(session: Session, **kw) -> IngestReport:
+    """Persist the 4NE1 Mini datasheet (PDF) proposals read from `body`."""
+    return ingest_proposals(session, spec=NEURA_MINI_DATASHEET_SPEC, **kw)
 
 
 def ingest_xpeng_iron_proposals(session: Session, **kw) -> IngestReport:

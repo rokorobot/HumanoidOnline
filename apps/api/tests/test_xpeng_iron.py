@@ -408,7 +408,8 @@ def site(dsession, tmp_path):
 def test_the_g2_registry_lists_exactly_the_four_reviewed_pages():
     reg = g2_ingest.G2_INGESTS["xpeng-official"]
     assert reg.robot_slug == "xpeng-iron" and set(reg.page_urls) == set(PAGES)
-    assert set(g2_ingest.G2_INGESTS) == {"neura-robotics-official", "xpeng-official"}
+    assert set(g2_ingest.G2_INGESTS) == {
+        "neura-robotics-official", "neura-documents-official", "xpeng-official"}
     assert ("xpeng-iron-proposals", x.EXTRACTOR_VERSION) in pr.LIVE_EXTRACTORS
 
 

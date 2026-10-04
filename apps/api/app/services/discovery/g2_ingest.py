@@ -38,11 +38,13 @@ from app.services.discovery import cache as body_cache
 from app.services.discovery.proposal_review import latest_content_page_for
 from app.services.discovery.proposals import (
     CATALOGUE_ENRICHMENT,
+    ingest_neura_mini_datasheet_proposals,
     ingest_neura_mini_proposals,
     ingest_proposals,
     ingest_xpeng_iron_proposals,
     maturity_spec,
 )
+from app.services.discovery.sources import neura_mini_datasheet_proposals as mini_ds
 from app.services.discovery.sources import neura_mini_proposals as mini
 from app.services.discovery.sources import xpeng_iron_proposals as xpeng
 
@@ -74,6 +76,10 @@ class G2Ingest:
 G2_INGESTS: Mapping[str, G2Ingest] = {
     "neura-robotics-official": G2Ingest(page_url=mini.MINI_URL, robot_slug="4ne1-mini",
                                         maturity_robot_name=mini.ROBOT_NAME),
+    # G5-2 (owner source decision 2026-10-04): the Mini datasheet on the approved document host.
+    "neura-documents-official": G2Ingest(
+        page_url=mini_ds.DATASHEET_URL, robot_slug="4ne1-mini",
+        ingest=ingest_neura_mini_datasheet_proposals),
     # XPENG IRON (owner source approval 2026-10-03): the four reviewed xpeng.com pages only.
     "xpeng-official": G2Ingest(
         page_url=xpeng.PAGE_URLS[0], robot_slug="xpeng-iron", ingest=ingest_xpeng_iron_proposals,

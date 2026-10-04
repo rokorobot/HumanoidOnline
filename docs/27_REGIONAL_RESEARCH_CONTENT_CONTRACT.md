@@ -176,7 +176,7 @@ Links point to canonical robot, manufacturer and evidence pages; the page is a h
 A regional page MAY be published only when all hold:
 
 1. The relevant region rows and membership list exist in the catalogue.
-2. At least a defined minimum of published robots have a current, evidence-linked regional offer (threshold set by the owner; a page that would show a near-empty confirmed table is held back or published as "limited evidence" with that stated plainly).
+2. At least **5 published robots from at least 3 manufacturers** have a current, evidence-linked, region-specific availability offer (owner decision 2026-10-04; a region below this minimum is held back or published as "limited evidence" with that stated plainly). Counting follows §4 and §7: GLOBAL offers and price-only rows do not count.
 3. Every rendered price/availability row has `evidence_source` with `verified_at` inside the freshness window (doc 25 §14).
 4. Counts reconcile: sections 3–7 sum to the stated population.
 5. Rendered facts match JSON-LD and JSON endpoint (contract test).

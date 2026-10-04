@@ -37,11 +37,9 @@ REFRESH_SECONDS = 60
 
 HEALTHY, ATTENTION, CRITICAL = "HEALTHY", "ATTENTION", "CRITICAL"
 UNKNOWN = "UNKNOWN"
-DUE, NOT_DUE, NEVER_RUN = "DUE", "NOT_DUE", "NEVER_RUN"
+DUE, NOT_DUE, NEVER_RUN, DISABLED = "DUE", "NOT_DUE", "NEVER_RUN", "DISABLED"
 
-# Candidates whose identity still needs a human, excluding terminal states.
-_UNRESOLVED_IDENTITIES = ("UNRESOLVED", "AMBIGUOUS", "POSSIBLE_DUPLICATE")
-_TERMINAL_CANDIDATE_STATUSES = ("PROMOTED", "REJECTED")
+REVIEW_QUEUE_UNKNOWN = "REVIEW QUEUE UNKNOWN"
 
 EXTERNAL_SIGNALS = (
     ("GitHub CI", "NOT CONNECTED — V1"),
@@ -60,6 +58,8 @@ class Snapshot:
     governance: dict[str, Any] = field(default_factory=dict)
     freshness: dict[str, Any] = field(default_factory=dict)
     schedule: list[dict[str, Any]] = field(default_factory=list)
+    #: G5-4 human_review summary (canonical). `complete: False` = queue unknown.
+    review: dict[str, Any] = field(default_factory=lambda: {"complete": False})
     activity: list[dict[str, Any]] = field(default_factory=list)
 
     @property
@@ -67,10 +67,14 @@ class Snapshot:
         """Actionable conditions with a non-zero count."""
         if not self.database_ok:
             return []
-        items = [
-            ("Proposals awaiting a first human decision", self.governance["undecided"]),
-            ("Proposals whose latest decision is DEFER", self.governance["deferred"]),
-            ("Unresolved / ambiguous discovery identities", self.governance["unresolved"]),
+        items: list[tuple[str, int]] = []
+        if self.review.get("complete"):
+            items += [
+                ("Proposals awaiting decision", self.review["proposals_awaiting_decision"]),
+                ("Identity review items", self.review["identity_review_items"]),
+                ("Source review items", self.review["source_review_items"]),
+            ]
+        items += [
             ("Manual freshness targets due", self.freshness["manual_due"]),
             (f"Failed crawl runs (last {RECENT_WINDOW_DAYS}d)", self.discovery["failed_recent"]),
             (f"Freshness fetch errors (last {RECENT_WINDOW_DAYS}d)",
@@ -82,6 +86,8 @@ class Snapshot:
     def overall(self) -> str:
         if not self.database_ok:
             return CRITICAL
+        if not self.review.get("complete"):
+            return ATTENTION
         return ATTENTION if self.attention else HEALTHY
 
 
@@ -93,7 +99,11 @@ def _rows(s: Session, sql: str, **params: Any) -> list[dict[str, Any]]:
     return [dict(r) for r in s.execute(text(sql), params).mappings()]
 
 
-def _schedule_state(interval_hours: int, last: datetime | None, now: datetime):
+def _schedule_state(interval_hours: int, last: datetime | None, now: datetime,
+                    enabled: bool = True):
+    """Mirrors the scheduler (observe.assess): a disabled source is never considered."""
+    if not enabled:
+        return DISABLED, None
     if last is None:
         return NEVER_RUN, None
     next_due = last + timedelta(hours=interval_hours)
@@ -127,9 +137,10 @@ def collect_snapshot(now: datetime | None = None) -> Snapshot:
             for src in sources:
                 if src["hours"] is None:
                     continue
-                state, next_due = _schedule_state(src["hours"], src["last"], now)
+                state, next_due = _schedule_state(
+                    src["hours"], src["last"], now, bool(src["is_enabled"]))
                 scheduled.append({**src, "state": state, "next_due": next_due})
-            order = {DUE: 0, NEVER_RUN: 1, NOT_DUE: 2}
+            order = {DUE: 0, NEVER_RUN: 1, DISABLED: 2, NOT_DUE: 3}
             scheduled.sort(key=lambda r: (order[r["state"]], r["key"]))
             latest_run = _rows(
                 s, "SELECT status, started_at FROM crawl_run ORDER BY started_at DESC LIMIT 1"
@@ -151,20 +162,7 @@ def collect_snapshot(now: datetime | None = None) -> Snapshot:
             }
 
             snap.governance = {
-                "unresolved": _scalar(
-                    s,
-                    "SELECT count(*) FROM discovery_candidate "
-                    "WHERE identity_status::text = ANY(:ids) "
-                    "AND status::text <> ALL(:terminal)",
-                    ids=list(_UNRESOLVED_IDENTITIES),
-                    terminal=list(_TERMINAL_CANDIDATE_STATUSES),
-                ),
                 "proposals": _scalar(s, "SELECT count(*) FROM discovery_claim_proposal"),
-                "undecided": _scalar(
-                    s,
-                    "SELECT count(*) FROM discovery_claim_proposal p WHERE NOT EXISTS "
-                    "(SELECT 1 FROM discovery_proposal_decision d WHERE d.proposal_id = p.id)",
-                ),
                 "deferred": _scalar(
                     s,
                     "SELECT count(*) FROM discovery_claim_proposal p WHERE "
@@ -235,10 +233,35 @@ def collect_snapshot(now: datetime | None = None) -> Snapshot:
             )
             activity.sort(key=lambda r: r["at"], reverse=True)
             snap.activity = activity[:ACTIVITY_ROW_LIMIT]
-    except Exception:  # noqa: BLE001 — fail closed; never surface the exception text
-        logger.exception("HO CONTROL snapshot failed")
+    except Exception as exc:  # noqa: BLE001 — fail closed; never surface the exception
+        # PII-safe: fixed message + exception TYPE only (no str(exc), args or traceback).
+        logger.error("HO CONTROL snapshot failed", extra={"exc_type": type(exc).__name__})
         return Snapshot(generated_at=now, database_ok=False)
+    snap.review = _collect_review(now)
     return snap
+
+
+def _collect_review(now: datetime) -> dict[str, Any]:
+    """Canonical G5-4 actionable queue, read-only: no fetch, no write, no network.
+
+    Separate transaction so a failure cannot poison the main snapshot. Anything that
+    prevents establishing the queue yields an incomplete summary — never zero.
+    """
+    from app.services.discovery import enrichment_plan as ep
+    from app.services.discovery import human_review
+    from app.services.discovery.sources import ADAPTERS
+
+    try:
+        with Session(engine) as s:
+            s.execute(text("SET TRANSACTION READ ONLY"))
+            plans, _sources = ep.plan_sources(s, ADAPTERS)
+            source_items = sorted({
+                f"{t.robot}|{t.url}" for pl in plans.values() for t in pl.skipped
+                if t.decision == ep.SOURCE_REVIEW_REQUIRED})
+            return human_review.compute(s, now, source_items)
+    except Exception as exc:  # noqa: BLE001
+        logger.error("HO CONTROL review queue failed", extra={"exc_type": type(exc).__name__})
+        return human_review.incomplete(type(exc).__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -302,7 +325,7 @@ h2{margin:0 0 12px;font-size:12px;letter-spacing:.2em;color:var(--unk)}
 table{width:100%;border-collapse:collapse;font-size:12px}
 th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #2c2a26}
 th{color:var(--unk);font-weight:normal;letter-spacing:.1em}
-.DUE,.NEVER_RUN{color:var(--warn)}.NOT_DUE{color:var(--unk)}
+.DUE,.NEVER_RUN{color:var(--warn)}.NOT_DUE,.DISABLED{color:var(--unk)}
 .unk{color:var(--unk)}
 .note{font-size:11px;color:var(--unk);margin-top:12px}
 @media(max-width:1000px){main{grid-template-columns:1fr}}
@@ -310,11 +333,18 @@ th{color:var(--unk);font-weight:normal;letter-spacing:.1em}
 
 
 def _render_attention(snap: Snapshot) -> str:
-    if not snap.attention:
+    stats = "".join(_stat(label, n, "warn") for label, n in snap.attention)
+    unknown = ""
+    if not snap.review.get("complete"):
+        unknown = ('<div class="big" style="color:var(--warn)">'
+                   f"{REVIEW_QUEUE_UNKNOWN}</div>"
+                   '<div class="note">The canonical human-review queue could not be '
+                   "established; it is not assumed to be empty.</div>")
+    if not snap.attention and not unknown:
         return _panel("NEEDS ATTENTION",
                       '<div class="big">NO HUMAN ACTION REQUIRED</div>', "wide attn clear")
-    stats = "".join(_stat(label, n, "warn") for label, n in snap.attention)
-    return _panel("NEEDS ATTENTION", f'<div class="stats">{stats}</div>', "wide attn")
+    return _panel("NEEDS ATTENTION", unknown + f'<div class="stats">{stats}</div>',
+                  "wide attn")
 
 
 def _render_table(headers: list[str], rows: list[list[str]], empty: str) -> str:
@@ -348,10 +378,8 @@ def render_dashboard(snap: Snapshot) -> str:
             _text_stat("latest crawl status", d["latest_status"]),
         ]) + "</div>" + f'<div class="note">Latest crawl: {_e(_ts(d["latest_at"]))}</div>')
         panels += _panel("GOVERNANCE", '<div class="stats">' + "".join([
-            _stat("unresolved identities", g["unresolved"]),
-            _stat("structured proposals", g["proposals"]),
-            _stat("no human decision", g["undecided"]),
-            _stat("latest decision DEFER", g["deferred"]),
+            _stat("proposals (all, historical)", g["proposals"]),
+            _stat("latest decision DEFER (info)", g["deferred"]),
             _stat("active accepted claims", g["active_claims"]),
             _stat("catalogue write audits", g["write_audits"]),
         ]) + "</div>" + '<div class="note">proposal ≠ accepted claim ≠ catalogue mutation '

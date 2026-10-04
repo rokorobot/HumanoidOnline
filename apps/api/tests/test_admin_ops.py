@@ -24,6 +24,12 @@ ADMIN_ENV = {
 }
 
 
+COMPLETE_EMPTY_REVIEW = {
+    "complete": True, "proposals_awaiting_decision": 0, "identity_review_items": 0,
+    "source_review_items": 0, "total": 0,
+}
+
+
 @pytest.fixture
 def admin_app(monkeypatch):
     for key, value in ADMIN_ENV.items():
@@ -115,13 +121,14 @@ def test_database_derived_text_is_escaped():
                    "availability": 0, "evidence": 0, "evidence_latest": None},
         discovery={"enabled": 1, "scheduled": 1, "due": 0, "running": 0, "failed_recent": 0,
                    "latest_status": "<b>x</b>", "latest_at": None},
-        governance={"unresolved": 0, "proposals": 0, "undecided": 0, "deferred": 0,
+        governance={"proposals": 0, "deferred": 0,
                     "active_claims": 0, "write_audits": 0},
         freshness={"active": 0, "due": 0, "manual_due": 0, "fetch_errors_recent": 0,
                    "latest_check": None, "latest_change": None},
         schedule=[{"key": "<script>alert(1)</script>", "name": "<img src=x onerror=1>",
                    "hours": 24, "last": None, "next_due": None, "state": admin_ops.NEVER_RUN}],
         activity=[{"at": now, "process": "CRAWL", "ref": "<svg onload=1>", "outcome": "a&b"}],
+        review=COMPLETE_EMPTY_REVIEW,
     )
     html = admin_ops.render_dashboard(snap)
     for raw in ("<script>alert", "<img src=x", "<svg onload", "<b>x</b>"):
@@ -130,25 +137,34 @@ def test_database_derived_text_is_escaped():
     assert "NO HUMAN ACTION REQUIRED" in html
 
 
-def test_database_down_fails_closed_without_exception_text(operator, monkeypatch):
+def test_database_down_fails_closed_without_exception_text(operator, monkeypatch, caplog):
     def boom(*a, **kw):
         raise RuntimeError("password=hunter2 host=secret.internal")
 
     monkeypatch.setattr(admin_ops, "Session", boom)
-    resp = operator.get("/admin/ops")
+    with caplog.at_level("DEBUG"):
+        resp = operator.get("/admin/ops")
     assert resp.status_code == 200
     assert "CRITICAL / DATABASE DOWN" in resp.text
     assert "hunter2" not in resp.text and "secret.internal" not in resp.text
+    # PII-safe logging: the type name is allowed; the message/traceback never are.
+    assert any(getattr(r, "exc_type", None) == "RuntimeError" for r in caplog.records)
+    assert all(r.exc_info is None for r in caplog.records)
+    assert "hunter2" not in caplog.text and "secret.internal" not in caplog.text
+    from app.observability import JsonLogFormatter
+    rendered = " ".join(JsonLogFormatter().format(r) for r in caplog.records)
+    assert "hunter2" not in rendered and "secret.internal" not in rendered
 
 
 def test_overall_state_rules():
     now = datetime.now(UTC)
     base = dict(
         generated_at=now,
-        governance={"unresolved": 0, "proposals": 0, "undecided": 0, "deferred": 0,
+        governance={"proposals": 0, "deferred": 0,
                     "active_claims": 0, "write_audits": 0},
         freshness={"manual_due": 0, "fetch_errors_recent": 0},
         discovery={"failed_recent": 0, "running": 3},
+        review=COMPLETE_EMPTY_REVIEW,
     )
     assert admin_ops.Snapshot(**base).overall == admin_ops.HEALTHY  # RUNNING is not an error
     base["discovery"] = {"failed_recent": 1, "running": 0}
@@ -156,11 +172,89 @@ def test_overall_state_rules():
     assert admin_ops.Snapshot(generated_at=now, database_ok=False).overall == admin_ops.CRITICAL
 
 
+def test_canonical_review_queue_drives_attention():
+    now = datetime.now(UTC)
+    snap = admin_ops.Snapshot(
+        generated_at=now,
+        governance={"proposals": 9, "deferred": 4, "active_claims": 0, "write_audits": 0},
+        freshness={"manual_due": 0, "fetch_errors_recent": 0},
+        discovery={"failed_recent": 0, "running": 0},
+        review={"complete": True, "proposals_awaiting_decision": 2,
+                "identity_review_items": 1, "source_review_items": 3, "total": 6},
+    )
+    assert dict(snap.attention) == {"Proposals awaiting decision": 2,
+                                    "Identity review items": 1, "Source review items": 3}
+    assert snap.overall == admin_ops.ATTENTION
+    # historical/DEFER totals are informational only and never become actionable
+    snap.review = COMPLETE_EMPTY_REVIEW
+    assert snap.attention == [] and snap.overall == admin_ops.HEALTHY
+
+
+def test_incomplete_review_queue_is_unknown_not_zero():
+    now = datetime.now(UTC)
+    snap = admin_ops.Snapshot(
+        generated_at=now,
+        catalogue={"robots": 0, "published": 0, "manufacturers": 0, "pricing": 0,
+                   "availability": 0, "evidence": 0, "evidence_latest": None},
+        discovery={"enabled": 0, "scheduled": 0, "due": 0, "running": 0, "failed_recent": 0,
+                   "latest_status": None, "latest_at": None},
+        governance={"proposals": 0, "deferred": 0, "active_claims": 0, "write_audits": 0},
+        freshness={"active": 0, "due": 0, "manual_due": 0, "fetch_errors_recent": 0,
+                   "latest_check": None, "latest_change": None},
+        review={"complete": False, "reason": "OperationalError"},
+    )
+    html = admin_ops.render_dashboard(snap)
+    assert snap.overall == admin_ops.ATTENTION
+    assert "REVIEW QUEUE UNKNOWN" in html and "NO HUMAN ACTION REQUIRED" not in html
+
+
+def test_review_failure_yields_incomplete_queue(operator, database_url, monkeypatch):
+    import app.services.discovery.enrichment_plan as ep
+
+    def boom(*a, **kw):
+        raise RuntimeError("top-secret-planner-detail")
+
+    monkeypatch.setattr(ep, "plan_sources", boom)
+    resp = operator.get("/admin/ops")
+    assert resp.status_code == 200
+    assert "REVIEW QUEUE UNKNOWN" in resp.text
+    assert "NO HUMAN ACTION REQUIRED" not in resp.text
+    assert "top-secret-planner-detail" not in resp.text
+
+
+def test_disabled_source_is_never_due():
+    now = datetime.now(UTC)
+    assert admin_ops._schedule_state(24, None, now, enabled=False)[0] == admin_ops.DISABLED
+    assert admin_ops._schedule_state(
+        24, now - timedelta(days=9), now, enabled=False)[0] == admin_ops.DISABLED
+
+
 def test_schedule_state_vocabulary():
     now = datetime.now(UTC)
     assert admin_ops._schedule_state(24, None, now)[0] == admin_ops.NEVER_RUN
     assert admin_ops._schedule_state(24, now - timedelta(hours=25), now)[0] == admin_ops.DUE
     assert admin_ops._schedule_state(24, now - timedelta(hours=1), now)[0] == admin_ops.NOT_DUE
+
+
+def test_live_disabled_scheduled_source_is_shown_disabled_not_due(database_url):
+    tag = uuid.uuid4().hex[:8]
+    with Session(engine) as s:
+        s.add(DiscoverySource(
+            key=f"ops-dis-{tag}", name="Disabled", source_class="MANUFACTURER",
+            homepage_url="https://fixture.test", observation_interval_hours=24,
+            observation_cadence_set_by="ops-test", observation_cadence_set_at=datetime.now(UTC)))
+        s.commit()
+    try:
+        before = admin_ops.collect_snapshot()
+        row = next(r for r in before.schedule if r["key"] == f"ops-dis-{tag}")
+        assert row["state"] == admin_ops.DISABLED
+        # a disabled, never-run source must not inflate the "sources due" count
+        assert before.discovery["due"] == sum(
+            1 for r in before.schedule if r["state"] in (admin_ops.DUE, admin_ops.NEVER_RUN))
+    finally:
+        with Session(engine) as s:
+            s.query(DiscoverySource).filter_by(key=f"ops-dis-{tag}").delete()
+            s.commit()
 
 
 def test_snapshot_is_read_only_and_reports_scheduled_source(database_url):
@@ -171,7 +265,10 @@ def test_snapshot_is_read_only_and_reports_scheduled_source(database_url):
     with Session(engine) as s:
         s.add(DiscoverySource(
             key=f"ops-{tag}", name="Ops fixture", source_class="MANUFACTURER",
-            homepage_url="https://fixture.test", observation_interval_hours=24,
+            homepage_url="https://fixture.test", is_enabled=True,
+            tos_status="ALLOWED", robots_status="ALLOWED",
+            eligibility_reviewed_at=datetime.now(UTC), eligibility_reviewed_by="ops-test",
+            observation_interval_hours=24,
             observation_cadence_set_by="ops-test", observation_cadence_set_at=datetime.now(UTC)))
         s.commit()
     try:

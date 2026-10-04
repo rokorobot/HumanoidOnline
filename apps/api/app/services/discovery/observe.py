@@ -106,6 +106,8 @@ class CycleResult:
     started_at: datetime
     plan_only: bool
     sources: list[SourceObservation] = field(default_factory=list)
+    #: G5-1: the Lane B planner summary (informational; never affects the exit code).
+    enrichment: dict | None = None
 
     @property
     def exit_code(self) -> int:
@@ -116,13 +118,45 @@ class CycleResult:
     def lines(self) -> list[str]:
         mode = "PLAN (no request, no write)" if self.plan_only else "OBSERVATION CYCLE"
         head = f"{mode} started={self.started_at.isoformat()}  sources={len(self.sources)}"
-        return [head, *(s.line() for s in self.sources),
+        return [head, *(s.line() for s in self.sources), *self.lane_lines(),
                 f"attention={'yes' if any(s.attention for s in self.sources) else 'no'}  "
                 f"exit={self.exit_code}  canonical_rows_written=0"]
+
+    def lane_summary(self) -> dict:
+        """The two concerns, reported separately (G5). Counts only; informational."""
+        c = [s.counts for s in self.sources]
+        g2 = [x["g2_ingest"] for x in c if x.get("g2_ingest")]
+        return {
+            "NEW_MODEL": {
+                "new_candidates": sum(x.get("new_entity", 0) + x.get("possible_duplicate", 0)
+                                      for x in c),
+                "identity_review_items": sum(x.get("review_items_this_cycle", 0) for x in c)},
+            "CATALOGUE_ENRICHMENT": {
+                "proposals_created": sum(x["proposals_created"] for x in g2),
+                "proposals_seen": sum(x["proposals_seen"] for x in g2),
+                "planner": self.enrichment},
+        }
+
+    def lane_lines(self) -> list[str]:
+        lanes = self.lane_summary()
+        nm, ce = lanes["NEW_MODEL"], lanes["CATALOGUE_ENRICHMENT"]
+        out = ["NEW MODEL RADAR",
+               f"  new candidates={nm['new_candidates']}  "
+               f"identity-review items={nm['identity_review_items']}",
+               "CATALOGUE ENRICHMENT",
+               f"  proposals on existing robots: {ce['proposals_created']} new / "
+               f"{ce['proposals_seen']} seen"]
+        if self.enrichment is None:
+            out.append("  planner: unavailable this cycle (informational; not an error)")
+        else:
+            from app.services.discovery.enrichment import summary_lines
+            out.extend(summary_lines(self.enrichment)[1:])
+        return out
 
     def as_dict(self) -> dict:
         return {"started_at": self.started_at.isoformat(), "plan_only": self.plan_only,
                 "exit_code": self.exit_code, "canonical_rows_written": 0,
+                "lanes": self.lane_summary(),
                 "sources": [s.as_dict() for s in self.sources]}
 
 

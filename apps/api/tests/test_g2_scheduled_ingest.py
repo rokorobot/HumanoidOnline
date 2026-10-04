@@ -235,7 +235,8 @@ def test_only_the_registered_source_is_ingested(site, dsession):  # noqa: F811
     assert g2_ingest.ingest_for_source(
         dsession, other.source, cache_dir=site.cache, operator=OPERATOR,
         registry=site.registry) is None
-    assert set(g2_ingest.G2_INGESTS) == {"neura-robotics-official", "xpeng-official"}
+    assert set(g2_ingest.G2_INGESTS) == {
+        "neura-robotics-official", "neura-documents-official", "xpeng-official"}
     assert g2_ingest.G2_INGESTS["neura-robotics-official"].robot_slug == "4ne1-mini"
 
 

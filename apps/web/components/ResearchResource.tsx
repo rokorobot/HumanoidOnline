@@ -12,7 +12,7 @@
 // FAQ, citation. "What changed" is omitted: no reproducible delta exists yet.
 import Link from "next/link";
 
-import { editorialState } from "@/lib/research-editorial";
+import { editorialSourceLabel, editorialState } from "@/lib/research-editorial";
 import {
   type ResearchOffer,
   type ResearchProjection,
@@ -315,6 +315,16 @@ export function ResearchResource({
           {editorial.draft && <p role="note"><strong>DRAFT — editorial text not yet reviewed.</strong></p>}
           {editorial.outdated && <p role="note">This context was last reviewed more than 180 days before the snapshot and may be outdated.</p>}
           {editorial.fragment.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
+          {editorial.fragment.sources.length > 0 && (
+            <p data-testid="editorial-source">
+              <small>
+                Source:{" "}
+                <a href={editorial.fragment.sources[0]} rel="noopener">
+                  {editorialSourceLabel(editorial.fragment.sources[0])}
+                </a>
+              </small>
+            </p>
+          )}
           {editorial.fragment.reviewed_at && (
             <p><small>Reviewed {editorial.fragment.reviewed_at}.</small></p>
           )}

@@ -1047,3 +1047,15 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-line); padding: var(
 .research-resource [role="note"] { margin: 0 0 var(--ho-sp-4, 16px); }
 .research-resource details summary { cursor: pointer; font-size: 0.75rem; color: var(--ho-grey-600); }
 .research-resource p { margin: 0 0 0.75em; }
+
+/* /research hub — principle tiles and region tiles on the .apps grammar. The tiles are
+   not all links, so non-link tiles do not invert on hover. */
+.research-principles, .research-regions { list-style: none; margin: 0; padding: 0;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.research-principles .app { min-height: 170px; justify-content: flex-start; }
+.research-principles .app:hover, .research-regions div.app:hover { background: transparent; color: inherit; }
+.research-principles .app:hover .ho-syslabel, .research-regions div.app:hover .ho-syslabel { color: inherit; }
+.research-principle-body { font-size: var(--ho-fs-small); line-height: 1.55; color: var(--ho-text-muted); }
+.research-regions > li { display: flex; }
+.research-regions > li > .app { flex: 1; }
+.research-regions div.app { color: var(--ho-text-muted); }

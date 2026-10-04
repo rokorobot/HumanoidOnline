@@ -10,6 +10,7 @@ export const RESEARCH_REGIONS = ["europe"] as const;
 export type ResearchRegion = (typeof RESEARCH_REGIONS)[number];
 
 export const RESEARCH_BASE_PATH = "/research/humanoid-availability";
+export const RESEARCH_HUB_PATH = "/research";
 
 export function researchPath(region: ResearchRegion): string {
   return `${RESEARCH_BASE_PATH}/${region}`;
@@ -143,6 +144,57 @@ export function resolveResearchAccess(
   return { mode: "closed" };
 }
 
+// ---- Hub and navigation --------------------------------------------------------
+
+/** Regions the hub presents. Only those with a built resource (RESEARCH_REGIONS)
+ *  can ever be live; the others are shown as "in preparation", never as links. */
+export const HUB_REGIONS = [
+  { slug: "europe", name: "Europe" },
+  { slug: "north-america", name: "North America" },
+  { slug: "asia", name: "Asia" },
+] as const;
+
+/**
+ * Regions the owner has switched on for THIS web app (RESEARCH_PUBLISHED_REGIONS)
+ * that actually have a built resource. Synchronous and env-only, so navigation
+ * can use it everywhere; whether a region really serves is decided by the
+ * governed read (`liveResearchRegions`).
+ */
+export function publishedResearchRegions(
+  env: Record<string, string | undefined> = process.env,
+): ResearchRegion[] {
+  return RESEARCH_REGIONS.filter((r) => resolveResearchAccess(r, null, env).mode === "published");
+}
+
+/** Research appears in navigation only once at least one resource is published. */
+export function researchNavVisible(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  return publishedResearchRegions(env).length > 0;
+}
+
+/**
+ * Regions that are published AND actually served by the API. The flag is the
+ * owner's persistent publication decision; this additionally confirms the resource
+ * can be read, so the hub is never linked to a page that cannot be served. The hub
+ * exists only while this is non-empty.
+ */
+export async function liveResearchRegions(
+  fetchProjection: (region: ResearchRegion) => Promise<ResearchProjection | null> = (r) =>
+    fetchResearchProjection(r, { mode: "published" }),
+  env: Record<string, string | undefined> = process.env,
+): Promise<ResearchRegion[]> {
+  const live: ResearchRegion[] = [];
+  for (const region of publishedResearchRegions(env)) {
+    try {
+      if (await fetchProjection(region)) live.push(region);
+    } catch {
+      // an unreachable API is not a published resource
+    }
+  }
+  return live;
+}
+
 // ---- Sitemap -----------------------------------------------------------------
 
 export interface ResearchSitemapEntry {
@@ -257,9 +309,8 @@ export async function fetchResearchProjection(
 
 /**
  * The gate + the governed read, together. If a region is flagged published but the
- * API declines to serve it publicly (ADR-027 §12: data readiness not met), a
- * reviewer holding the preview token still gets the review-only view; everyone
- * else gets null (404).
+ * API does not serve it publicly, a reviewer holding the preview token still gets
+ * the review-only view; everyone else gets null (404).
  */
 export async function loadResearch(
   region: ResearchRegion,

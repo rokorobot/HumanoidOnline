@@ -67,10 +67,11 @@ export default async function EuropeResearchPage({
         // eslint-disable-next-line react/no-danger -- JSON.stringify output is safe, non-user markup
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <SiteNav />
-      <main id="main" className="wrap">
+      {/* The root layout already provides the single <main> landmark. */}
+      <div className="wrap">
+        <SiteNav active="research" />
         <ResearchResource data={data} preview={preview} canonicalUrl={canonicalUrl} />
-      </main>
+      </div>
     </>
   );
 }

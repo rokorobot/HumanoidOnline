@@ -76,7 +76,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     fetchResearchProjection(region, { mode: "published" }),
   );
 
+  // The Research hub exists only while at least one resource is published, so it
+  // joins the sitemap together with the first one (no lastModified: it is an index).
+  const researchHub: MetadataRoute.Sitemap =
+    researchPages.length > 0
+      ? [{ url: `${origin}/research`, changeFrequency: "weekly", priority: 0.7 }]
+      : [];
+
   // Grouped by entity type. At catalogue scale this is one file; Next's
   // generateSitemaps() is the split-by-type path when the catalogue grows.
-  return [...core, ...robotPages, ...mfrPages, ...useCasePages, ...researchPages];
+  return [...core, ...robotPages, ...mfrPages, ...useCasePages, ...researchHub, ...researchPages];
 }

@@ -2,7 +2,7 @@
 
 > Internal terminology: these are **Regional Research Resources**, not "SEO articles". SEO, GEO/AEO and agent citation are distribution and retrieval objectives of the resource, not its editorial format.
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-10-04
 **Decision Owners:** HumanoidOnline / Humanoid.Company
 **Scope:** Structure, data derivation, evidence rules, SEO/GEO/AI-agent surfaces and publication gates for regional humanoid-market research resources (Europe, North America, Asia). Does not authorize implementation, publication, or any schema change.

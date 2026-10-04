@@ -5,7 +5,7 @@
   "model_code": null,
   "summary": null,
   "announced_year": null,
-  "commercial_status": "UNKNOWN",
+  "commercial_status": "COMMERCIAL",
   "is_published": false,
   "specs": {
     "height_cm": null,
@@ -31,9 +31,32 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Specifications not yet verified.",
+  "specs_note": "Commercial maturity COMMERCIAL recorded 2026-10-04 (owner decision, six-robot review). Basis: mass production, first-batch delivery, orders and named industrial customers stated by UBTECH. Specifications not yet verified.",
   "official_url": "https://www.ubtrobot.com/",
-  "commercial_status_evidence": [],
+  "commercial_status_evidence": [
+    {
+      "source_url": "https://www.prnewswire.com/news-releases/ubtech-humanoid-robot-walker-s2-begins-mass-production-and-delivery-with-orders-exceeding-800-million-yuan-302616924.html",
+      "source_type": "PRESS_RELEASE",
+      "source_title": "UBTECH press release (PR Newswire), 2025-11-17",
+      "excerpt": "UBTECH has begun mass production and delivery of the first batch of several hundred full-size industrial humanoid robots, Walker S2, which will be deployed in phases across frontline industrial applications.",
+      "published_at": "2025-11-17",
+      "observed_at": "2026-10-04",
+      "verified_at": null,
+      "confidence": "MEDIUM",
+      "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude in a session initiated by Robert Konecny, under the owner WorkOrder implementing the six-robot commercial-status review decisions (2026-10-04). Not a MANUAL_BOOTSTRAP reading; not human-verified. UBTECH-issued release: mass production and first-batch delivery. RAAS_DEPLOYMENT, LIMITED_COMMERCIAL and any purchase mechanism are not inferred."
+    },
+    {
+      "source_url": "https://www.prnewswire.com/news-releases/ubtech-humanoid-robot-walker-s2-begins-mass-production-and-delivery-with-orders-exceeding-800-million-yuan-302616924.html",
+      "source_type": "PRESS_RELEASE",
+      "source_title": "UBTECH press release (PR Newswire), 2025-11-17 — orders and customers",
+      "excerpt": "Since early 2025, UBTECH's Walker series humanoid robots have accumulated orders exceeding 800 million yuan (approx. US$112 million)",
+      "published_at": "2025-11-17",
+      "observed_at": "2026-10-04",
+      "verified_at": null,
+      "confidence": "MEDIUM",
+      "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-04 by Claude in a session initiated by Robert Konecny, under the owner WorkOrder implementing the six-robot commercial-status review decisions (2026-10-04). Not a MANUAL_BOOTSTRAP reading; not human-verified. Orders are for the Walker series (not S2 alone). The same release names industrial collaborators including BYD, Dongfeng Liuzhou Motor, Geely Auto, FAW-Volkswagen Qingdao, Audi FAW, BAIC New Energy, Foxconn and SF Express."
+    }
+  ],
   "variants": [],
   "pricing_offers": [],
   "availability_offers": [],

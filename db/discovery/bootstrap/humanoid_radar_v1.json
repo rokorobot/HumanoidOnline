@@ -96,7 +96,7 @@
     "discovery_url": "https://www.galbot.com/",
     "data": { "official_url": "https://www.galbot.com/" } },
 
-  { "external_ref": "agibot/a2", "name": "A2", "manufacturer": "AgiBot",
+  { "external_ref": "agibot/a2", "name": "A2 Ultra", "manufacturer": "AgiBot",
     "discovery_url": "https://www.agibot.com/",
     "data": { "official_url": "https://www.agibot.com/" } },
 

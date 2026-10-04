@@ -1,6 +1,6 @@
 {
-  "slug": "agibot-a2",
-  "name": "A2",
+  "slug": "agibot-a2-lite",
+  "name": "A2 Lite",
   "manufacturer_slug": "agibot",
   "model_code": null,
   "summary": null,
@@ -32,7 +32,7 @@
     "simulation_support": null
   },
   "specs_note": "Specifications not yet verified.",
-  "official_url": "https://www.agibot.com/",
+  "official_url": "https://store.agibot.com/products/a2-lite",
   "commercial_status_evidence": [],
   "variants": [],
   "pricing_offers": [],

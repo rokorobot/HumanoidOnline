@@ -285,7 +285,7 @@ describe("limited-evidence warning", () => {
 
   it("shows the partial-ageing reason in full while the offers stay as projected", () => {
     const reason =
-      "1 published robot has only stale or non-current Europe offer evidence excluded from current figures.";
+      "1 published robot has only aged-out Europe offer evidence (older than 90 days) excluded from current figures.";
     renderPage(projection({ publication_health: { status: "LIMITED_EVIDENCE", reasons: [reason] } }));
     const w = screen.getByTestId("limited-evidence-warning");
     expect(within(w).getByText(reason)).toBeTruthy();

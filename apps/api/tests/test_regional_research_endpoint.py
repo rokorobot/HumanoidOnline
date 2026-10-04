@@ -367,7 +367,7 @@ def test_partial_ageing_is_visible_even_when_5_3_is_still_met(client, journey):
     assert body["publication_health"] == {
         "status": "LIMITED_EVIDENCE",
         "reasons": [
-            "1 published robot has only stale or non-current Europe offer evidence "
+            "1 published robot has only aged-out Europe offer evidence (older than 90 days) "
             "excluded from current figures."
         ],
     }
@@ -382,10 +382,10 @@ def test_health_stale_reason_is_pluralized_and_ordered_after_threshold_reasons()
     two = _projection(
         *[fx.robot(f"c{i}", maker=f"m{i % 3}", offers=[fx.offer()]) for i in range(6)],
         fx.robot("a1", offers=[fx.offer(evidence=[fx.ev(120)])]),
-        fx.robot("a2", offers=[fx.offer(current=False)]),
+        fx.robot("a2", offers=[fx.offer(current=False, evidence=[fx.ev(200)])]),
     )
     assert two["publication_health"]["reasons"] == [
-        "2 published robots have only stale or non-current Europe offer evidence "
+        "2 published robots have only aged-out Europe offer evidence (older than 90 days) "
         "excluded from current figures."
     ]
     both = _projection(fx.robot("c", offers=[fx.offer()]),
@@ -393,7 +393,7 @@ def test_health_stale_reason_is_pluralized_and_ordered_after_threshold_reasons()
     assert both["publication_health"]["reasons"] == [
         "1 qualifying robot; minimum 5",
         "1 manufacturer; minimum 3",
-        "1 published robot has only stale or non-current Europe offer evidence "
+        "1 published robot has only aged-out Europe offer evidence (older than 90 days) "
         "excluded from current figures.",
     ]
 
@@ -415,6 +415,95 @@ def test_confirmed_not_obtainable_or_missing_offers_are_not_staleness():
     robots += [fx.robot("na", offers=[fx.offer(status="NOT_AVAILABLE")]),
                fx.robot("none"), fx.robot("glob", offers=[fx.offer("GLOBAL")])]
     assert _projection(*robots)["publication_health"] == {"status": "CURRENT", "reasons": []}
+
+
+# Aged out vs explicitly withdrawn (ADR-027 section 12) ---------------------------
+
+def _base_ready():
+    """Six current robots from three manufacturers: 5/3 clearly met."""
+    return [fx.robot(f"c{i}", maker=f"m{i % 3}", offers=[fx.offer("DE" if i % 2 else "EU")])
+            for i in range(6)]
+
+
+def test_fresh_withdrawn_offer_is_excluded_but_health_stays_current():
+    """The rehearsal case: a reichelt offer withdrawn on fresh evidence (U5)."""
+    withdrawn = fx.robot(
+        "u5", maker="m1", offers=[fx.offer("DE", current=False, evidence=[fx.ev(8)])])
+    p = _projection(*_base_ready(), withdrawn)
+    assert p["publication_health"] == {"status": "CURRENT", "reasons": []}
+    assert "u5" not in [o["robot_slug"] for o in p["offers"]]  # excluded from current offers
+    assert p["key_figures"]["robots_with_confirmed_offer"] == 6  # and from counts
+    assert [g["robots"][0]["slug"] for g in p["no_confirmed_offer"]
+            if g["reason"] == "STALE_OR_NON_CURRENT"] == ["u5"]  # the public grouping stays
+
+
+def test_offer_older_than_90_days_degrades_health_even_when_5_3_is_met():
+    aged = fx.robot("aged", maker="m1", offers=[fx.offer("DE", evidence=[fx.ev(91)])])
+    p = _projection(*_base_ready(), aged)
+    assert p["publication_health"] == {"status": "LIMITED_EVIDENCE", "reasons": [
+        "1 published robot has only aged-out Europe offer evidence (older than 90 days) "
+        "excluded from current figures."]}
+    assert p["key_figures"]["robots_with_confirmed_offer"] == 6
+    assert "aged" not in [o["robot_slug"] for o in p["offers"]]
+
+
+def test_threshold_shortfall_degrades_health():
+    five_robots_two_makers = [
+        fx.robot(f"r{i}", maker=f"m{i % 2}", offers=[fx.offer()]) for i in range(5)]
+    assert _projection(*five_robots_two_makers)["publication_health"] == {
+        "status": "LIMITED_EVIDENCE", "reasons": ["2 manufacturers; minimum 3"]}
+    four_robots = [fx.robot(f"r{i}", maker=f"m{i % 3}", offers=[fx.offer()]) for i in range(4)]
+    assert _projection(*four_robots)["publication_health"] == {
+        "status": "LIMITED_EVIDENCE", "reasons": ["4 qualifying robots; minimum 5"]}
+
+
+def test_a_withdrawal_whose_own_evidence_is_old_counts_as_aged_out():
+    """Only FRESH evidence of withdrawal is resolved knowledge; an old withdrawal may
+    no longer hold, so it is lost freshness like any other aged evidence."""
+    old_withdrawal = fx.robot(
+        "w", maker="m1", offers=[fx.offer("DE", current=False, evidence=[fx.ev(200)])])
+    p = _projection(*_base_ready(), old_withdrawal)
+    assert p["publication_health"]["status"] == "LIMITED_EVIDENCE"
+    no_evidence_withdrawal = fx.robot(
+        "w2", maker="m1", offers=[fx.offer("DE", current=False, evidence=[])])
+    status = _projection(*_base_ready(), no_evidence_withdrawal)["publication_health"]["status"]
+    assert status == "LIMITED_EVIDENCE"
+
+
+def test_alternate_current_offer_plus_old_or_withdrawn_offer_never_warns():
+    both = fx.robot("both", maker="m0", offers=[
+        fx.offer("DE"),                                              # current, qualifies
+        fx.offer("EU", evidence=[fx.ev(200)]),                       # aged alternate
+        fx.offer("BG", current=False, evidence=[fx.ev(5)]),          # freshly withdrawn alternate
+    ])
+    p = _projection(*_base_ready(), both)
+    assert p["publication_health"] == {"status": "CURRENT", "reasons": []}
+    assert p["key_figures"]["robots_with_confirmed_offer"] == 7
+
+
+def test_fresh_withdrawal_plus_an_aged_offer_on_the_same_robot_still_counts_as_aged():
+    mixed = fx.robot("mixed", maker="m1", offers=[
+        fx.offer("DE", current=False, evidence=[fx.ev(5)]),
+        fx.offer("EU", evidence=[fx.ev(200)]),
+    ])
+    assert _projection(*_base_ready(), mixed)["publication_health"]["status"] == "LIMITED_EVIDENCE"
+
+
+def test_aged_out_and_withdrawn_robots_are_counted_separately_and_each_once():
+    aged = [
+        fx.robot(f"a{i}", maker="m1", offers=[fx.offer(evidence=[fx.ev(150)])])
+        for i in range(2)
+    ]
+    withdrawn = [
+        fx.robot(f"w{i}", maker="m1", offers=[fx.offer(current=False, evidence=[fx.ev(3)])])
+        for i in range(3)
+    ]
+    p = _projection(*_base_ready(), *aged, *withdrawn)
+    assert p["publication_health"]["reasons"] == [
+        "2 published robots have only aged-out Europe offer evidence (older than 90 days) "
+        "excluded from current figures."]
+    stale_group = next(g for g in p["no_confirmed_offer"] if g["reason"] == "STALE_OR_NON_CURRENT")
+    assert len(stale_group["robots"]) == 5  # the public grouping still lists all five
 
 
 # publication_health (pure) --------------------------------------------------------

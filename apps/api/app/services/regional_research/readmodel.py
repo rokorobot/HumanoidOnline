@@ -176,6 +176,9 @@ class RegionalAvailability:
     qualifying_offers: tuple[QualifyingOffer, ...]
     deployments: tuple[RegionalDeployment, ...]
     groups: tuple[GroupSummary, ...]
+    # Robots in STALE_OR_NON_CURRENT whose regional evidence has AGED OUT. A subset of
+    # that group: robots only freshly, explicitly withdrawn are not listed here.
+    aged_out: tuple[RobotRef, ...]
     reconciles: bool
     gate: GateResult
     direct_answer: str
@@ -276,13 +279,26 @@ def _prices_for_offer(
 # --------------------------------------------------------------------------- #
 def _classify(
     robot: RobotRow, members: frozenset[str], snapshot: date, freshness_days: int
-) -> tuple[str, tuple[QualifyingOffer, ...]]:
+) -> tuple[str, tuple[QualifyingOffer, ...], bool]:
+    """(group, qualifying offers, aged_out).
+
+    `aged_out` separates two things the combined STALE_OR_NON_CURRENT group holds:
+
+    * AGED OUT: evidence older than the freshness window (a current offer nobody has
+      re-observed) or a non-current offer whose withdrawal is itself not freshly
+      evidenced. That is lost freshness and degrades publication health.
+    * EXPLICITLY NON-CURRENT: fresh evidence marking the offer withdrawn. That is
+      resolved current knowledge: the offer is excluded from current offers and
+      counts, but does not by itself downgrade health.
+    """
     qualifying: list[QualifyingOffer] = []
-    confirmed_not_obtainable = stale = no_evidence = False
+    confirmed_not_obtainable = stale = no_evidence = aged_out = False
 
     for o in (o for o in robot.offers if o.region_code in members):
         if not o.is_current:
             stale = True
+            if not _fresh_evidence(o.evidence, snapshot, freshness_days):
+                aged_out = True  # withdrawal not freshly evidenced: knowledge has aged
             continue
         if not o.evidence:
             no_evidence = True
@@ -290,6 +306,7 @@ def _classify(
         fresh = _fresh_evidence(o.evidence, snapshot, freshness_days)
         if not fresh:
             stale = True
+            aged_out = True
             continue
         if o.availability_status in NOT_OBTAINABLE:
             confirmed_not_obtainable = True
@@ -316,24 +333,24 @@ def _classify(
             )
         )
     if qualifying:
-        return QUALIFYING, tuple(qualifying)
+        return QUALIFYING, tuple(qualifying), False
     if confirmed_not_obtainable:
-        return CONFIRMED_NOT_OBTAINABLE, ()
+        return CONFIRMED_NOT_OBTAINABLE, (), False
     if stale:
-        return STALE_OR_NON_CURRENT, ()
+        return STALE_OR_NON_CURRENT, (), aged_out
     if no_evidence:
-        return OFFER_WITHOUT_EVIDENCE, ()
+        return OFFER_WITHOUT_EVIDENCE, (), False
 
     rows = list(robot.offers) + list(robot.prices)
     if any(r.region_code is None for r in rows):
-        return UNRESOLVED_REGION, ()
+        return UNRESOLVED_REGION, (), False
     if any(p.region_code in members for p in robot.prices):
-        return PRICE_ONLY, ()
+        return PRICE_ONLY, (), False
     if any(r.region_code == GLOBAL_CODE for r in rows):
-        return GLOBAL_ONLY, ()
+        return GLOBAL_ONLY, (), False
     if rows:
-        return OTHER_REGION_ONLY, ()
-    return NO_OFFERS, ()
+        return OTHER_REGION_ONLY, (), False
+    return NO_OFFERS, (), False
 
 
 # --------------------------------------------------------------------------- #
@@ -500,9 +517,12 @@ def build_regional_availability(
     )
     grouped: dict[str, list[RobotRow]] = {g: [] for g in GROUP_ORDER}
     offers_by_robot: dict[str, tuple[QualifyingOffer, ...]] = {}
+    aged_out: list[RobotRow] = []
     for robot in published:
-        reason, q = _classify(robot, members, snapshot.snapshot_date, freshness_days)
+        reason, q, aged = _classify(robot, members, snapshot.snapshot_date, freshness_days)
         grouped[reason].append(robot)
+        if aged:
+            aged_out.append(robot)
         if q:
             offers_by_robot[robot.slug] = q
 
@@ -591,6 +611,9 @@ def build_regional_availability(
         qualifying_offers=qualifying_offers,
         deployments=deployments,
         groups=groups,
+        aged_out=tuple(
+            RobotRef(r.slug, r.name, r.manufacturer_slug, r.manufacturer_name) for r in aged_out
+        ),
         reconciles=reconciles,
         gate=gate,
         direct_answer=_direct_answer(region_name, snapshot.snapshot_date, kf, qualifying_offers),

@@ -1,3 +1,4 @@
+import { HUB_REGIONS, RESEARCH_HUB_PATH, liveResearchRegions, researchPath } from "@/lib/research";
 import { siteUrl } from "@/lib/site";
 import { listAllManufacturers, listAllRobots, listAllUseCases } from "@/lib/seo";
 
@@ -18,6 +19,11 @@ import { listAllManufacturers, listAllRobots, listAllUseCases } from "@/lib/seo"
 // hits (this path is specifically the kind AI-agent crawlers seek out) within
 // the TTL reuse the cached catalogue data instead of re-querying Neon, without
 // changing this route's build-time behaviour at all.
+//
+// Research (ADR-027): a "Research resources" section is added ONLY for regions that
+// are actually public and served (`liveResearchRegions`, the governed check — not the
+// nav's env-only shortcut). With none live the section is omitted entirely, and
+// nothing is announced as upcoming: machine discovery enumerates public resources.
 export const dynamic = "force-dynamic";
 
 export async function GET(): Promise<Response> {
@@ -26,24 +32,41 @@ export async function GET(): Promise<Response> {
 
   // WS8.5 / R23 — enumerate the ENTIRE published canonical set of every public
   // entity type, paginated via the governed reads (no 100-entity ceiling).
-  const [robots, manufacturers, useCases] = await Promise.all([
+  const [robots, manufacturers, useCases, liveRegions] = await Promise.all([
     listAllRobots(),
     listAllManufacturers(),
     listAllUseCases(),
+    liveResearchRegions(),
   ]);
+
+  const regionName = (slug: string) => HUB_REGIONS.find((r) => r.slug === slug)?.name ?? slug;
+  const researchSection: string[] =
+    liveRegions.length === 0
+      ? []
+      : [
+          "## Research resources",
+          `- Research hub: ${origin}${RESEARCH_HUB_PATH}`,
+          ...liveRegions.flatMap((region) => [
+            `- Humanoid availability in ${regionName(region)}: ${origin}${researchPath(region)}`,
+            `- ${regionName(region)} methodology: ${origin}${researchPath(region)}#method`,
+            `- ${regionName(region)} JSON: ${origin}${researchPath(region)}.json`,
+          ]),
+          "",
+        ];
 
   const lines: string[] = [
     "# HumanoidOnline",
     "",
-    "> Verified humanoid-robot market intelligence. Every catalogue fact is",
-    "> canonical and evidence-backed; this surface exposes only published,",
-    "> verified data — never unverified discovery candidates.",
+    "> Evidence-aware humanoid-robot market intelligence. This surface exposes only",
+    "> published canonical entities. Commercial facts retain their recorded evidence,",
+    "> confidence and verification state; missing values remain unknown.",
     "",
     "## Semantics (read before citing)",
     '- UNKNOWN is not 0, false, or "unavailable" — a missing value is omitted, never guessed.',
     "- Commercial maturity (commercial_status) is distinct from obtainability (availability).",
     "- Evidence status (confidence / verified_at) is distinct from commercial status.",
     "- Provenance is exposed where canonical evidence exists; it is never fabricated.",
+    "- Publication is not verification: a published fact is not necessarily human-verified. Read its recorded confidence and verified_at.",
     "",
     "## Canonical entry points",
     `- Catalogue: ${origin}/robots`,
@@ -52,6 +75,7 @@ export async function GET(): Promise<Response> {
     `- About HumanoidOnline (entity, methodology, FAQ): ${origin}/about`,
     `- Sitemap: ${origin}/sitemap.xml`,
     "",
+    ...researchSection,
     "## Robots (published, canonical)",
     ...robots.map(
       (r) => `- ${r.name} (${r.manufacturer.name}): ${origin}/robots/${r.slug}`,

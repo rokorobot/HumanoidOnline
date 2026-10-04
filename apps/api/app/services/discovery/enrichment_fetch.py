@@ -1,12 +1,15 @@
 """G5-2 — Lane B (catalogue enrichment) controlled fetching, document discovery and reporting.
 
-Runs after Lane A (the radar `observe` cycle) in the same scheduled invocation. It connects the
-G5-1 planner's DUE targets to the EXISTING governed fetch / ingest path; it adds no network code
-of its own:
+Runs after Lane A (the radar `observe` cycle) in the same scheduled invocation. It executes the
+G5-3 PLAN (`enrichment_plan.SourcePlan`) through the EXISTING governed fetch / ingest path; it adds
+no network code and NO target-selection policy of its own:
 
-    planner queue -> due eligible URLs -> run_acquisition (robots, redirect boundary, bounded GET,
-    size limits, conditional GET, immutable observations, content hashes) -> registered extractor
-    -> G2 proposals (digest / slot dedup) -> human review          (and stops)
+    G4 gaps + freshness + source eligibility + cadence + priority + bound   (enrichment_plan)
+      -> planned Targets (the planner -> executor contract)
+      -> execution-time re-check of each target (planning approval is not authorization)
+      -> run_acquisition (robots, redirect boundary, bounded GET, size limits, conditional GET,
+         immutable observations, content hashes) -> registered extractor
+      -> G2 proposals (digest / slot dedup) -> human review          (and stops)
 
 What it never does (pinned by tests/test_discovery_enrichment_fetch.py): accept a proposal, write
 a decision, claim, audit or catalogue row, change publication or maturity, convert UNKNOWN or a
@@ -15,12 +18,14 @@ recursively, or fetch a document that no reviewed extractor reads.
 
 Scope decisions, each deliberate:
 
-- Only sources WITHOUT a radar cadence are fetched by Lane B (today: document hosts such as
-  `neura-documents-official`). A cadence source's own pages are Lane A's: a Lane B run there
-  would move its `last_crawled_at` and become its "latest run", disturbing Lane A's cadence and
-  halt/resume rules. Its due targets are reported as `deferred_radar_source`, not fetched.
-- Per-source target cap and the fetcher's own limits bound every run; the band intervals
-  (7/21/60 days) decide which URL is due, never publication.
+- Only sources WITHOUT a reviewed radar adapter are fetched by Lane B (today: document hosts such as
+  `neura-documents-official`, whose own attributed cadence, 7d, decides when it is due). A radar
+  source's own pages are Lane A's: a Lane B run there would move its `last_crawled_at` and become
+  its "latest run", disturbing Lane A's cadence and halt/resume rules. Its planned targets are
+  reported as `deferred_radar_source`, not fetched; Lane A already observes and extracts them.
+- The per-source bound (8) and the fetcher's own limits bound every run; the band intervals
+  (7/21/60 days) decide which URL is due, never publication. Targets beyond the bound are
+  DEFERRED_BY_BOUND and re-planned on the next due cycle.
 - Document DISCOVERY is one level and read-only: links in already-retained product-page bodies.
   A link is not an authorization: it becomes a target only when an approved source admits the
   URL AND a registered extractor reads exactly that document.
@@ -30,7 +35,7 @@ Scope decisions, each deliberate:
 from __future__ import annotations
 
 import uuid
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Collection, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
 from html.parser import HTMLParser
@@ -43,7 +48,9 @@ from sqlalchemy.orm import Session
 from app.models.acquisition import CrawlRun, FetchedPage
 from app.models.claim_proposal import DiscoveryClaimProposal, DiscoveryProposalObservation
 from app.models.discovery import DiscoverySource
+from app.models.robot import Robot
 from app.services.discovery import cache as body_cache
+from app.services.discovery import enrichment_plan as ep
 from app.services.discovery import g2_ingest
 from app.services.discovery.acquisition import (
     CHANGED,
@@ -56,11 +63,10 @@ from app.services.discovery.acquisition import (
     classify,
     run_acquisition,
 )
-from app.services.discovery.eligibility import source_ineligibility
+from app.services.discovery.eligibility import source_ineligibility, url_ineligibility
 from app.services.discovery.enrichment import (
     APPROVED,
     BAND_INTERVAL,
-    QueueRow,
     classify_urls,
     source_status,
 )
@@ -69,7 +75,7 @@ from app.services.discovery.proposal_review import latest_content_page_for
 from app.services.discovery.urlref import UnsupportedUrl, normalize_url
 
 LANE_B_ADAPTER = ("g5-lane-b", "1")
-MAX_TARGETS_PER_SOURCE = 20
+MAX_TARGETS_PER_SOURCE = ep.DEFAULT_BOUND     # the approved first-production bound (8)
 DOCUMENT_SUFFIXES = (".pdf",)
 
 #: Proposal kinds that state a commercial fact (price, fee, availability, terms).
@@ -128,6 +134,14 @@ class LaneBResult:
     robots_with_due: int = 0
     robots_checked: int = 0
     robots_deferred_cadence: int = 0
+    robots_considered: int = 0
+    targets_planned: int = 0
+    targets_fetched: int = 0
+    source_review_required: int = 0
+    source_review_items: list[str] = field(default_factory=list)
+    deferred_by_bound: list[str] = field(default_factory=list)
+    refused_targets: list[dict] = field(default_factory=list)
+    maturity_proposals: int = 0
     pages: dict = field(default_factory=lambda: {
         "changed": 0, "first_observation": 0, "unchanged": 0, "errors": 0})
     proposals_created: int = 0
@@ -145,7 +159,7 @@ class LaneBResult:
     @property
     def attention(self) -> bool:
         """A human must look: a run needing one, a G2 attention (new proposals / failures)."""
-        return self.failed or any(
+        return self.failed or bool(self.refused_targets) or any(
             r.status in (NEEDS_HUMAN, HALTED, REFUSED)
             or (r.g2 or {}).get("attention") for r in self.runs)
 
@@ -158,6 +172,13 @@ class LaneBResult:
             "not_restated": self.not_restated,
             "deferred_radar_source": self.deferred_radar, "deferred_cap": self.deferred_cap,
             "robots_with_due_targets": self.robots_with_due,
+            "robots_considered": self.robots_considered, "targets_planned": self.targets_planned,
+            "targets_fetched": self.targets_fetched,
+            "source_review_required": self.source_review_required,
+            "source_review_items": self.source_review_items,
+            "deferred_by_bound": self.deferred_by_bound,
+            "refused_targets": self.refused_targets,
+            "maturity_proposals_created": self.maturity_proposals,
             "robots_checked": self.robots_checked,
             "robots_deferred_by_cadence": self.robots_deferred_cadence,
             "robots_with_no_changes": self.robots_no_change, "pages": self.pages,
@@ -175,20 +196,26 @@ class LaneBResult:
         for r in self.runs:
             out.append(f"  - {r.key:<28} {r.status:<22} {len(r.urls)} URL(s) {r.detail}".rstrip())
         out.extend([
+            f"  robots considered={self.robots_considered}  "
+            f"targets planned={self.targets_planned}  fetched={self.targets_fetched}",
+            f"  deferred by bound={len(self.deferred_by_bound)}  "
+            f"source review required={self.source_review_required}",
             f"  robots checked={self.robots_checked}  with no changes={self.robots_no_change}  "
             f"deferred by cadence={self.robots_deferred_cadence}",
             f"  pages {mode}: changed={self.pages['changed']}  "
             f"first observation={self.pages['first_observation']}  "
             f"unchanged={self.pages['unchanged']}  errors={self.pages['errors']}",
-            f"  new facts proposed={self.proposals_created}  "
-            f"commercial changes proposed={self.commercial_proposals}",
+            f"  technical proposals created={self.proposals_created}  "
+            f"commercial changes proposed={self.commercial_proposals}  "
+            f"maturity proposals created={self.maturity_proposals}",
             f"  datasheets/docs discovered={len(self.discovered)}  "
             f"changed-no-extractor={len(self.changed_no_extractor)}  "
             f"not-restated={len(self.not_restated)}",
         ])
         if self.deferred_radar:
-            out.append(f"  deferred (radar-cadence source; Lane A owns it)="
-                        f"{len(self.deferred_radar)}")
+            out.append(f"  deferred (radar source; Lane A owns it)={len(self.deferred_radar)}")
+        for r in self.refused_targets:
+            out.append(f"  REFUSED TARGET {r['url']} ({r['source']}): {'; '.join(r['problems'])}")
         return out
 
 
@@ -287,18 +314,20 @@ def _latest_run(session: Session, source: DiscoverySource) -> CrawlRun | None:
         .order_by(CrawlRun.started_at.desc(), CrawlRun.created_at.desc()).limit(1)).first()
 
 
-def _discover_documents(session: Session, rows: Sequence[QueueRow],
+def _discover_documents(session: Session, plans: Mapping[str, ep.SourcePlan],
                         manufacturer_sources: Mapping[str, Sequence[DiscoverySource]],
                         by_key: Mapping[str, DiscoverySource], registry, cache_dir: Path,
-                        now: datetime, result: LaneBResult) -> dict[str, dict[str, set[str]]]:
-    """Document links in already-retained pages of each robot's own approved URLs. Returns the
-    new fetch targets: source key -> {url -> robot slugs}. One level; nothing is fetched here."""
-    new: dict[str, dict[str, set[str]]] = {}
+                        now: datetime, result: LaneBResult) -> dict[str, list[ep.Target]]:
+    """Document links in already-retained pages of each robot's own approved URLs (the planner's
+    `eligible` targets). One level; nothing is fetched here. Each link that an approved source
+    admits AND a registered extractor reads becomes a planner-contract Target of the governing
+    document source (never of the main-site source); it is fetched only if that source is due."""
+    new: dict[str, list[ep.Target]] = {}
     seen: set[tuple[str, str]] = set()
-    for row in rows:
-        known = set(row.eligible_urls) | {v.url for v in row.excluded_urls}
-        for t in row.targets:
-            src = by_key.get(t.source_key)
+    for plan in (plans[k] for k in sorted(plans)):
+        mfr_of = {p.robot_slug: p.manufacturer_slug for p in plan.profiles}
+        for t in plan.eligible:
+            src = by_key.get(t.source or "")
             if src is None:
                 continue
             page = latest_content_page_for(session, src.id, t.url)
@@ -307,37 +336,58 @@ def _discover_documents(session: Session, rows: Sequence[QueueRow],
             body = body_cache.read_observed_body(cache_dir, str(page.id))
             if body is None:
                 continue
+            known = plan.known_urls.get(t.robot, frozenset())
             for link in document_links(body, page.final_url or page.url):
-                if link in known or (row.robot_slug, link) in seen:
+                if link in known or (t.robot, link) in seen:
                     continue
-                seen.add((row.robot_slug, link))
+                seen.add((t.robot, link))
                 verdict = classify_urls({link: ("discovered",)},
-                                        manufacturer_sources.get(row.manufacturer_slug or ""))[0]
+                                        manufacturer_sources.get(mfr_of.get(t.robot) or ""))[0]
                 if verdict.reason is not None:
-                    result.discovered.append(Discovered(row.robot_slug, link, t.url,
-                                                        verdict.reason))
+                    result.discovered.append(Discovered(t.robot, link, t.url, verdict.reason))
                     continue
                 reader = _registered_source(registry, link)
-                if reader is None or reader != verdict.source_key:
+                if reader is None or reader != verdict.source_key or reader not in plans:
                     result.discovered.append(Discovered(
-                        row.robot_slug, link, t.url, "ELIGIBLE_NO_EXTRACTOR", verdict.source_key))
+                        t.robot, link, t.url, "ELIGIBLE_NO_EXTRACTOR", verdict.source_key))
                     continue
                 prior = latest_content_page_for(session, by_key[reader].id, link)
                 if prior is not None:
-                    # Already observed: no longer a discovery. It follows the band cadence
-                    # like any known URL (never re-fetched every cycle).
-                    if prior.retrieved_at + BAND_INTERVAL[row.priority] <= now:
-                        new.setdefault(reader, {}).setdefault(link, set()).add(row.robot_slug)
-                    continue
-                result.discovered.append(Discovered(row.robot_slug, link, t.url, "TARGET",
-                                                    verdict.source_key))
-                new.setdefault(reader, {}).setdefault(link, set()).add(row.robot_slug)
+                    # Already observed: no longer a discovery; it follows its band interval.
+                    if prior.retrieved_at + BAND_INTERVAL[t.priority] > now:
+                        continue
+                else:
+                    result.discovered.append(Discovered(t.robot, link, t.url, "TARGET",
+                                                        verdict.source_key))
+                target = ep.discovered_target(plans[reader], reader, t.robot, link, t.url)
+                if target is not None:
+                    new.setdefault(reader, []).append(target)
     return new
+
+
+def _runtime_problems(session: Session, t: ep.Target, source: DiscoverySource) -> list[str]:
+    """Execution-time source-policy check of one planned target. Planning approval is not
+    permanent authorization: source state, host/path boundary and robot identity are re-read here
+    (robots.txt, the redirect boundary and size limits are enforced again by the fetch itself)."""
+    problems = ep.contract_problems(t)
+    if t.source != source.key:
+        problems.append(f"target belongs to source {t.source!r}, not {source.key!r}")
+    why = source_ineligibility(source) or (
+        None if source_status(source) == APPROVED else "source is not approved")
+    if why:
+        problems.append(f"source no longer eligible: {why}")
+    else:
+        verdict = url_ineligibility(source, t.url)
+        if verdict is not None:
+            problems.append(f"URL fails the source boundary now: {verdict}")
+    if session.scalar(select(Robot.id).where(Robot.slug == t.robot)) is None:
+        problems.append(f"{t.robot!r} is not a catalogue robot (Lane B never creates identities)")
+    return problems
 
 
 def run_lane_b(
     session: Session,
-    rows: Sequence[QueueRow],
+    plans: Mapping[str, ep.SourcePlan],
     manufacturer_sources: Mapping[str, Sequence[DiscoverySource]],
     *,
     plan_only: bool = False,
@@ -347,50 +397,74 @@ def run_lane_b(
     fetcher_for: Callable[..., HttpFetcher] = _default_fetcher,
     checkpoint: Callable[[], None] | None = None,
     registry: Mapping[str, g2_ingest.G2Ingest] | None = None,
+    radar_sources: Collection[str] | None = None,
 ) -> LaneBResult:
-    """One Lane B pass. With `plan_only`: no request, no write (cached bodies are only read)."""
+    """One Lane B pass over the planner's output. With `plan_only`: no request, no write (cached
+    bodies are only read). `radar_sources` = sources with a reviewed radar adapter (default:
+    every adapter); Lane A observes those, so Lane B only reports their planned targets."""
+    from app.services.discovery.sources import ADAPTERS
+
     reg = g2_ingest.G2_INGESTS if registry is None else registry
+    radar = frozenset(ADAPTERS if radar_sources is None else radar_sources)
     commit = checkpoint or session.flush
     result = LaneBResult(plan_only=plan_only)
     by_key = {s.key: s for srcs in manufacturer_sources.values() for s in srcs}
+    clock = now()
 
-    due: dict[str, dict[str, set[str]]] = {}
-    due_slugs: set[str] = set()
-    for row in rows:
-        if not row.targets:
-            continue
-        if any(t.due for t in row.targets):
-            due_slugs.add(row.robot_slug)
-        else:
-            result.robots_deferred_cadence += 1
-        for t in row.targets:
-            if t.due:
-                due.setdefault(t.source_key, {}).setdefault(t.url, set()).add(row.robot_slug)
-    for key, urls in _discover_documents(session, rows, manufacturer_sources, by_key, reg,
-                                         cache_dir, now(), result).items():
-        for url, slugs in urls.items():
-            due.setdefault(key, {}).setdefault(url, set()).update(slugs)
-            due_slugs.update(slugs)
-    result.robots_with_due = len(due_slugs)
+    result.robots_considered = len({p.robot_slug for pl in plans.values() for p in pl.profiles})
+    result.source_review_items = sorted({
+        f"{t.robot}|{t.url}" for pl in plans.values() for t in pl.skipped
+        if t.decision == ep.SOURCE_REVIEW_REQUIRED})
+    result.source_review_required = len(result.source_review_items)
+    result.robots_deferred_cadence = len({
+        t.robot for pl in plans.values() for t in pl.skipped
+        if t.decision in (ep.NOT_DUE, ep.UNCHANGED_RECENTLY)})
+    targets: dict[str, list[ep.Target]] = {k: list(pl.planned) for k, pl in plans.items()
+                                           if pl.planned}
+    for key, extra in _discover_documents(session, plans, manufacturer_sources, by_key, reg,
+                                          cache_dir, clock, result).items():
+        have = {t.url for t in targets.get(key, [])}
+        if plans[key].source_due:
+            targets.setdefault(key, []).extend(t for t in extra if t.url not in have)
+    for plan in plans.values():
+        result.deferred_by_bound.extend(
+            t.url for t in plan.skipped if t.decision == ep.DEFERRED_BY_BOUND)
+    for key in sorted(targets):                       # the bound also covers discovered targets
+        ordered = sorted(targets[key], key=ep.rank_key)
+        bound = plans[key].bound
+        targets[key] = ordered[:bound]
+        result.deferred_by_bound.extend(t.url for t in ordered[bound:])
+    result.targets_planned = sum(len(v) for v in targets.values())
+    result.robots_with_due = len({t.robot for v in targets.values() for t in v})
 
     checked: set[str] = set()
-    for key in sorted(due):
+    for key in sorted(targets):
         source = by_key[key]
-        urls = sorted(due[key])
-        if source.observation_interval_hours is not None:
+        urls = sorted({t.url for t in targets[key]})
+        if key in radar:
             result.deferred_radar.extend(urls)
             result.runs.append(SourceRun(key, DEFERRED_RADAR, urls,
-                                         "radar-cadence source: Lane A observes its pages"))
+                                         "radar source: Lane A observes and extracts its pages"))
             continue
-        if len(urls) > MAX_TARGETS_PER_SOURCE:
-            result.deferred_cap.extend(urls[MAX_TARGETS_PER_SOURCE:])
-            urls = urls[:MAX_TARGETS_PER_SOURCE]
-        run = _run_source(session, source, urls, reg, plan_only, cache_dir, now,
+        ok: list[ep.Target] = []
+        for t in targets[key]:
+            problems = _runtime_problems(session, t, source)
+            if problems:
+                result.refused_targets.append(
+                    {"source": key, "robot": t.robot, "url": t.url, "problems": problems})
+            else:
+                ok.append(t)
+        if not ok:
+            result.runs.append(SourceRun(key, REFUSED, urls, "every target failed the "
+                                         "execution-time source-policy check"))
+            continue
+        fetch_urls = sorted({t.url for t in ok})
+        run = _run_source(session, source, fetch_urls, reg, plan_only, cache_dir, now,
                           kill_switch_for(key), fetcher_for, commit, result)
         result.runs.append(run)
         if run.status in (FETCHED, WOULD_FETCH):
-            for u in urls:
-                checked.update(due[key][u])
+            result.targets_fetched += len(fetch_urls)
+            checked.update(t.robot for t in ok)
     result.robots_checked = len(checked)
 
     for key, cfg in sorted(reg.items()):
@@ -461,6 +535,7 @@ def _run_source(session, source, urls, registry, plan_only, cache_dir, now, kill
     if g2 is not None:
         out.g2 = g2.as_dict()
         result.proposals_created += g2.proposals_created
+        result.maturity_proposals += g2.maturity_created
         result.commercial_proposals += session.scalar(
             select(func.count()).select_from(DiscoveryClaimProposal).where(
                 DiscoveryClaimProposal.origin_crawl_run_id == run.id,

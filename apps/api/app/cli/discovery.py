@@ -523,6 +523,14 @@ def _cmd_observe(args: argparse.Namespace) -> int:
             checkpoint=None if args.plan else session.commit)
         result.enrichment, result.lane_b = _enrichment_cycle(
             session, plan_only=args.plan, cache_dir=Path(args.cache_dir))
+        from app.services.discovery import human_review
+
+        if result.lane_b is None:     # the planner failed: source review is unknown, not zero
+            result.human_review = human_review.incomplete("lane B plan unavailable")
+        else:
+            result.human_review = human_review.compute(
+                session, result.started_at, result.lane_b.source_review_items,
+                result.lane_summary()["NEW_MODEL"]["identity_review_items"])
         if args.plan:
             session.rollback()
     print("\n".join(result.lines()))
@@ -574,18 +582,20 @@ def _enrichment_cycle(session, *, plan_only: bool, cache_dir: Path):
     effort (the observer role may lack SELECT on some tables). Lane B only fetches after the
     planner succeeded, through the governed acquisition path, and one failure never stops the
     cycle: it is reported (exit 1) with the observation work preserved."""
-    from app.services.discovery import enrichment, enrichment_fetch
+    from app.services.discovery import enrichment, enrichment_fetch, enrichment_plan
     from app.services.discovery.sources import ADAPTERS
 
     try:
         with session.begin_nested():
-            rows, sources = enrichment.plan_catalogue_with_sources(session, ADAPTERS)
+            rows = enrichment.plan_catalogue(session, ADAPTERS)      # informational summary only
+            plans, sources = enrichment_plan.plan_sources(session, ADAPTERS)
         summary = enrichment.summarize(rows)
     except Exception:  # noqa: BLE001 - informational only
         return None, None
     try:
+        # ONE selection policy: the G5-3 planner's output is what Lane B executes.
         lane_b = enrichment_fetch.run_lane_b(
-            session, rows, sources, plan_only=plan_only, cache_dir=cache_dir,
+            session, plans, sources, plan_only=plan_only, cache_dir=cache_dir,
             kill_switch_for=kill_switch_for, checkpoint=None if plan_only else session.commit)
     except Exception as exc:  # noqa: BLE001 - reported, never raised into the cycle
         session.rollback()

@@ -53,6 +53,7 @@ from app.services.discovery.acquisition import (
     _utcnow,
 )
 from app.services.discovery.adapter_run import adapter_problems, resume_adapter, run_adapter
+from app.services.discovery.enrichment import DOCUMENT_SOURCES
 from app.services.discovery.fetcher import FetchLimits, HttpFetcher
 from app.services.discovery.live_adapter import SourceAdapterConfig
 from app.services.discovery.review import review_queue
@@ -64,6 +65,8 @@ COMPLETED, RESUMED, HALTED, FAILED, CANCELLED = (
 # Outcomes that ran nothing.
 DISABLED, NOT_SCHEDULED, NOT_DUE, NO_ADAPTER, INELIGIBLE = (
     "DISABLED", "NOT_SCHEDULED", "NOT_DUE", "NO_ADAPTER", "INELIGIBLE")
+#: A document-host source (G5): scheduled by its own cadence, observed by Lane B (no radar adapter).
+LANE_B_OWNED = "LANE_B_OWNED"
 RUN_IN_PROGRESS, NEEDS_HUMAN, KILL_SWITCH, REFUSED = (
     "RUN_IN_PROGRESS", "NEEDS_HUMAN", "KILL_SWITCH", "REFUSED")
 # Plan mode (no network, no writes): what a cycle would do now.
@@ -110,6 +113,8 @@ class CycleResult:
     enrichment: dict | None = None
     #: G5-2: the Lane B (catalogue enrichment) fetch/report result (enrichment_fetch.LaneBResult).
     lane_b: object | None = None
+    #: G5-4: the HUMAN REVIEW summary (human_review.compute); informational, never an exit code.
+    human_review: dict | None = None
 
     @property
     def needs_attention(self) -> bool:
@@ -126,7 +131,10 @@ class CycleResult:
     def lines(self) -> list[str]:
         mode = "PLAN (no request, no write)" if self.plan_only else "OBSERVATION CYCLE"
         head = f"{mode} started={self.started_at.isoformat()}  sources={len(self.sources)}"
+        from app.services.discovery import human_review as hr
+
         return [head, *(s.line() for s in self.sources), *self.lane_lines(),
+                *hr.lines(self.human_review),
                 f"attention={'yes' if self.needs_attention else 'no'}  "
                 f"exit={self.exit_code}  canonical_rows_written=0"]
 
@@ -172,7 +180,7 @@ class CycleResult:
     def as_dict(self) -> dict:
         return {"started_at": self.started_at.isoformat(), "plan_only": self.plan_only,
                 "exit_code": self.exit_code, "canonical_rows_written": 0,
-                "lanes": self.lane_summary(),
+                "lanes": self.lane_summary(), "human_review": self.human_review,
                 "sources": [s.as_dict() for s in self.sources]}
 
 
@@ -207,6 +215,8 @@ def assess(session: Session, source: DiscoverySource, config: SourceAdapterConfi
         return DISABLED, "", None
     if source.observation_interval_hours is None:
         return NOT_SCHEDULED, "no cadence set (source cadence <key> --every ...)", None
+    if config is None and source.key in DOCUMENT_SOURCES:
+        return LANE_B_OWNED, "document source: its cadence is read by Lane B, not the radar", None
     if config is None:
         return NO_ADAPTER, "enabled and scheduled, but no reviewed adapter module", None
     problems = adapter_problems(config, source)

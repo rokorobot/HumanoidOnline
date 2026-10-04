@@ -25,6 +25,7 @@ from app.models.discovery import DiscoverySource
 from app.services.discovery import cache as body_cache
 from app.services.discovery import enrichment as en
 from app.services.discovery import enrichment_fetch as ef
+from app.services.discovery import enrichment_plan as ep
 from app.services.discovery import g2_ingest
 from app.services.discovery.fetcher import FetchLimits, HttpFetcher
 from app.services.discovery.observe import CycleResult
@@ -221,7 +222,9 @@ class Lane:
             setattr(main, k, v)
         self.docs = DiscoverySource(
             key=f"docs-{tag}", name="docs (test)", source_class="OFFICIAL_DOCUMENT",
-            homepage_url=PX + "/", allowed_path_prefixes=["/plk/"], **reviewed)
+            homepage_url=PX + "/", allowed_path_prefixes=["/plk/"],
+            observation_interval_hours=168, observation_cadence_set_by="Robert Konecny",
+            observation_cadence_set_at=datetime(2026, 10, 4, tzinfo=UTC), **reviewed)
         session.add(self.docs)
         session.flush()
         self.registry = {self.docs.key: g2_ingest.G2Ingest(
@@ -236,15 +239,22 @@ class Lane:
         self.clock += timedelta(days=days)
         self.net.t += days * 86400
 
-    def rows(self, extra_urls=(), commercial="UNKNOWN") -> list[en.QueueRow]:
+    def inputs(self, extra_urls=(), commercial="UNKNOWN", datasheet_known=True):
         rec = RobotRecord(
             slug=self.w.slug, name="4NE1 Mini", manufacturer_slug="maker", is_published=True,
             summary="x" * 40, commercial_status=commercial,
             official_url=MAIN + "/product/4ne1-mini")
-        urls = [("specification", DATASHEET), *extra_urls]
-        last = {u: p.retrieved_at for u, p in self._last().items()}
-        return en.build_queue([en.RobotInput(rec, tuple(urls), announced_year=2026)],
-                              {"maker": [self.w.source, self.docs]}, last, self.clock)
+        urls = [*([("specification", DATASHEET)] if datasheet_known else []), *extra_urls]
+        return [ep.PlanInput(en.RobotInput(rec, tuple(urls), announced_year=2026))]
+
+    def states(self) -> dict[str, ep.UrlState]:
+        return {u: ep.UrlState(p.retrieved_at, p.content_hash, None, str(p.id))
+                for u, p in self._last().items()}
+
+    def plans(self, extra_urls=(), commercial="UNKNOWN", datasheet_known=True, bound=8):
+        return ep.plan_all_from_inputs(
+            self.inputs(extra_urls, commercial, datasheet_known),
+            {"maker": [self.w.source, self.docs]}, self.states(), self.clock, bound=bound)
 
     def _last(self) -> dict[str, FetchedPage]:
         out: dict[str, FetchedPage] = {}
@@ -253,12 +263,12 @@ class Lane:
             out[p.url] = p
         return out
 
-    def run(self, *, plan_only=False, rows=None, **kw) -> ef.LaneBResult:
+    def run(self, *, plan_only=False, plans=None, **kw) -> ef.LaneBResult:
         return ef.run_lane_b(
-            self.session, rows if rows is not None else self.rows(),
+            self.session, plans if plans is not None else self.plans(),
             {"maker": [self.w.source, self.docs]}, plan_only=plan_only, cache_dir=self.cache,
             now=self.now, fetcher_for=self.net.fetcher_for,
-            checkpoint=None, registry=self.registry, **kw)
+            checkpoint=None, registry=self.registry, radar_sources={self.w.source.key}, **kw)
 
     def proposals(self) -> list[DiscoveryClaimProposal]:
         return list(self.session.scalars(select(DiscoveryClaimProposal).where(
@@ -288,9 +298,10 @@ def state(session) -> dict:
 
 def test_datasheet_flows_from_planner_target_to_proposals_for_review(lane):
     before = state(lane.session)
-    [row] = lane.rows()
-    assert DATASHEET in row.eligible_urls
-    assert {t.url: t.source_key for t in row.targets}[DATASHEET] == lane.docs.key
+    plan = lane.plans()[lane.docs.key]
+    assert [t.url for t in plan.planned] == [DATASHEET]
+    assert plan.planned[0].source == lane.docs.key and plan.planned[0].origin == (
+        "CATALOGUE_ENRICHMENT")
     res = lane.run()
     docs_run = next(r for r in res.runs if r.key == lane.docs.key)
     assert docs_run.status == ef.FETCHED and docs_run.urls == [DATASHEET]
@@ -384,11 +395,10 @@ def test_not_restated_is_judged_per_page_of_a_multi_page_source(lane):
 def test_changed_document_without_a_registered_extractor_is_reported_only(lane):
     other = PX + "/plk/Jj/other-datasheet.pdf"
     lane.net.put(other, make_pdf([["v1"]]), "application/pdf")
-    rows = lane.rows(extra_urls=[("specification", other)])
-    lane.run(rows=rows)
+    lane.run(plans=lane.plans(extra_urls=[("specification", other)]))
     lane.advance(8)
     lane.net.put(other, make_pdf([["v2"]]), "application/pdf")
-    res = lane.run(rows=lane.rows(extra_urls=[("specification", other)]))
+    res = lane.run(plans=lane.plans(extra_urls=[("specification", other)]))
     assert other in res.changed_no_extractor
     assert not [p for p in lane.proposals() if p.source_url == other]
 
@@ -398,10 +408,10 @@ def test_nothing_outside_plk_is_fetched_and_a_redirect_out_is_not_followed(lane)
     lane.net.put(outside, b"secret", "application/pdf")
     lane.net.redirects[("neurarobotics.px.media", "/plk/Jj/4NE1Minidatasheet.pdf")] = (
         PX + "/private/secret.pdf")
-    rows = lane.rows(extra_urls=[("specification", outside)])
-    [row] = rows
-    assert outside in {v.url for v in row.excluded_urls}      # NEEDS_SOURCE_APPROVAL
-    res = lane.run(rows=rows)
+    plans = lane.plans(extra_urls=[("specification", outside)])
+    assert outside in {t.url for t in plans[lane.docs.key].skipped
+                       if t.decision == ep.SOURCE_REVIEW_REQUIRED}
+    res = lane.run(plans=plans)
     assert ("neurarobotics.px.media", "/private/secret.pdf") not in lane.net.requests
     assert lane.proposals() == []
     page = lane.session.scalars(select(FetchedPage).where(
@@ -412,15 +422,15 @@ def test_nothing_outside_plk_is_fetched_and_a_redirect_out_is_not_followed(lane)
 
 def test_robots_disallow_halts_disables_and_is_not_retried(lane):
     lane.net.robots = "User-agent: *\nDisallow: /plk/\n"
-    rows_before = lane.rows()
-    res = lane.run(rows=rows_before)
+    plans_before = lane.plans()
+    res = lane.run(plans=plans_before)
     assert next(r for r in res.runs if r.key == lane.docs.key).status == ef.HALTED
     assert lane.docs.is_enabled is False                # robots disallow disables the source
     n = len(lane.net.requests)
     again = lane.run()
     assert len(lane.net.requests) == n                  # a disabled source authorizes nothing
     assert [r for r in again.runs if r.key == lane.docs.key] == []   # not even planned
-    stale_plan = lane.run(rows=rows_before)                          # a stale plan is refused too
+    stale_plan = lane.run(plans=plans_before)                          # a stale plan is refused too
     assert next(r for r in stale_plan.runs if r.key == lane.docs.key).status == ef.REFUSED
     assert len(lane.net.requests) == n
 
@@ -437,6 +447,10 @@ def test_a_halted_run_is_not_retried_automatically(lane):
     lane.docs.is_enabled = True                         # a human re-enables after review
     lane.net.robots = "User-agent: *\nAllow: /\n"
     n = len(lane.net.requests)
+    quiet = lane.run()                                  # not due (7d cadence): quiet
+    assert [r for r in quiet.runs if r.key == lane.docs.key] == []
+    assert len(lane.net.requests) == n
+    lane.advance(8)                                     # due again: still not retried by itself
     res = lane.run()
     assert next(r for r in res.runs if r.key == lane.docs.key).status == ef.NEEDS_HUMAN
     assert len(lane.net.requests) == n
@@ -457,14 +471,8 @@ def retain_product_page(lane, html: str) -> str:
     return url
 
 
-def known_rows(lane, with_datasheet: bool) -> list[en.QueueRow]:
-    rec = RobotRecord(slug=lane.w.slug, name="4NE1 Mini", manufacturer_slug="maker",
-                      is_published=True, summary="x" * 40, commercial_status="UNKNOWN",
-                      official_url=MAIN + "/product/4ne1-mini")
-    urls = [("specification", DATASHEET)] if with_datasheet else []
-    last = {u: p.retrieved_at for u, p in lane._last().items()}
-    return en.build_queue([en.RobotInput(rec, tuple(urls), announced_year=2026)],
-                          {"maker": [lane.w.source, lane.docs]}, last, lane.clock)
+def known_plans(lane, with_datasheet: bool):
+    return lane.plans(datasheet_known=with_datasheet)
 
 
 def test_new_datasheet_link_on_an_approved_page_becomes_a_fetched_target(lane):
@@ -473,8 +481,7 @@ def test_new_datasheet_link_on_an_approved_page_becomes_a_fetched_target(lane):
             f'<a href="{PX}/private/x.pdf">Private</a>'
             '<a href="/product/other">page</a></body></html>')
     retain_product_page(lane, html)
-    rows = known_rows(lane, with_datasheet=False)
-    res = lane.run(rows=rows)
+    res = lane.run(plans=known_plans(lane, with_datasheet=False))
     status = {d.url: d.status for d in res.discovered}
     assert status[DATASHEET] == "TARGET"
     assert status[PX + "/plk/Jj/unreviewed.pdf"] == "ELIGIBLE_NO_EXTRACTOR"
@@ -486,10 +493,10 @@ def test_new_datasheet_link_on_an_approved_page_becomes_a_fetched_target(lane):
 def test_discovered_document_follows_the_band_cadence_afterwards(lane):
     html = f'<html><body><a href="{DATASHEET}">Datasheet</a></body></html>'
     retain_product_page(lane, html)
-    lane.run(rows=known_rows(lane, with_datasheet=False))
+    lane.run(plans=known_plans(lane, with_datasheet=False))
     n = len(lane.net.requests)
     lane.advance(2)
-    res = lane.run(rows=known_rows(lane, with_datasheet=False))
+    res = lane.run(plans=known_plans(lane, with_datasheet=False))
     assert len(lane.net.requests) == n                  # observed once: not re-fetched
     assert res.discovered == []                         # no longer a discovery: quiet
 
@@ -513,12 +520,10 @@ def test_lane_b_has_no_write_surface_beyond_the_governed_acquisition():
 
 def test_unknown_and_stale_fields_alone_create_no_proposals(lane):
     # a robot with UNKNOWN everything and only radar-source URLs: Lane B proposes nothing
-    rec = RobotRecord(slug=lane.w.slug, name="4NE1 Mini", manufacturer_slug="maker",
-                      is_published=False, commercial_status="UNKNOWN",
-                      official_url=MAIN + "/product/4ne1-mini")
-    rows = en.build_queue([en.RobotInput(rec, ())], {"maker": [lane.w.source, lane.docs]}, {},
-                          lane.clock)
-    res = lane.run(rows=rows)
+    plans = lane.plans(datasheet_known=False)
+    plans[lane.docs.key] = ep.plan_manufacturer([], [lane.w.source, lane.docs], {}, lane.clock,
+                                                source_key=lane.docs.key)
+    res = lane.run(plans=plans)
     assert res.proposals_created == 0 and lane.proposals() == [] and lane.runs() == []
 
 

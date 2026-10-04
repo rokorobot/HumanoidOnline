@@ -93,6 +93,7 @@ class UrlState:
     last_observed: datetime | None = None      # newest retrieval that returned content
     last_hash: str | None = None
     previous_hash: str | None = None           # the content before the latest different one
+    last_page_id: str | None = None            # the observation (fetched_page) it refers to
 
     @property
     def changed(self) -> bool:
@@ -245,10 +246,14 @@ class Target:
     next_due: datetime | None
     detail: str | None = None
     origin: str = CATALOGUE_ENRICHMENT
+    previous_observation: str | None = None   # fetched_page id of the last observation
+    source_due: bool | None = None            # the governing source's cadence state
 
     def as_dict(self) -> dict:
         iso = lambda d: d.isoformat() if d else None  # noqa: E731
         return {"source": self.source, "robot": self.robot, "origin": self.origin,
+                "previous_observation": self.previous_observation,
+                "source_due": self.source_due,
                 "priority": self.priority, "reasons": list(self.reason_codes), "target": self.url,
                 "target_type": self.target_type, "eligibility": self.eligibility,
                 "decision": self.decision, "last_observed": iso(self.last_observed),
@@ -265,6 +270,11 @@ class SourcePlan:
     skipped: tuple[Target, ...]
     profiles: tuple[Profile, ...] = field(repr=False, default=())
     bound: int = DEFAULT_BOUND
+    #: every target this source's boundary admits, whatever its decision (document discovery
+    #: reads their already-retained bodies; nothing is fetched from this list)
+    eligible: tuple[Target, ...] = field(repr=False, default=())
+    #: robot slug -> every known URL (eligible or not): the "already known" set
+    known_urls: Mapping[str, frozenset[str]] = field(repr=False, default_factory=dict)
 
     def as_dict(self) -> dict:
         iso = lambda d: d.isoformat() if d else None  # noqa: E731
@@ -305,6 +315,8 @@ def plan_manufacturer(inputs: Sequence[PlanInput], sources: Sequence[DiscoverySo
 
     planned: list[Target] = []
     skipped: list[Target] = []
+    known_by_robot: dict[str, set[str]] = {}
+    eligible: list[Target] = []
     for inp in sorted(inputs, key=lambda i: i.robot.record.slug):
         prof = profile_of[inp.robot.record.slug]
         robot = inp.robot
@@ -329,7 +341,9 @@ def plan_manufacturer(inputs: Sequence[PlanInput], sources: Sequence[DiscoverySo
                 prof.priority)
             base = dict(robot=prof.robot_slug, priority=prof.priority,
                         reason_codes=prof.reason_codes, url=v.url, target_type=kind,
-                        last_observed=st.last_observed, next_due=due_at)
+                        last_observed=st.last_observed, next_due=due_at,
+                        previous_observation=st.last_page_id, source_due=bool(source_due))
+            known_by_robot.setdefault(prof.robot_slug, set()).add(v.url)
             if v.reason is not None:
                 if v.reason == en.NEEDS_SOURCE_APPROVAL:
                     skipped.append(Target(source=None, eligibility=v.reason,
@@ -338,6 +352,8 @@ def plan_manufacturer(inputs: Sequence[PlanInput], sources: Sequence[DiscoverySo
                 continue
             if v.source_key != source_key:
                 continue                      # governed by another source of this manufacturer
+            eligible.append(Target(source=source_key, eligibility="ALLOWED",
+                                   decision=PLANNED, **base))
             if not prof.reason_codes:
                 skipped.append(Target(source=source_key, eligibility="ALLOWED",
                                       decision=NO_MEANINGFUL_GAP, **base))
@@ -354,8 +370,7 @@ def plan_manufacturer(inputs: Sequence[PlanInput], sources: Sequence[DiscoverySo
             else:
                 planned.append(Target(source=source_key, eligibility="ALLOWED",
                                       decision=PLANNED, **base))
-    planned.sort(key=lambda t: (_PRIORITY_ORDER[t.priority], -len(t.reason_codes),
-                                t.robot, _TYPE_ORDER[t.target_type], t.url))
+    planned.sort(key=rank_key)
     kept, deferred = planned[:max(0, bound)], planned[max(0, bound):]
     skipped.extend(_replace_decision(t, DEFERRED_BY_BOUND,
                                      f"beyond this cycle's bound of {bound} targets")
@@ -363,7 +378,8 @@ def plan_manufacturer(inputs: Sequence[PlanInput], sources: Sequence[DiscoverySo
     skipped.sort(key=lambda t: (t.decision, t.robot, t.url))
     return SourcePlan(source_key, bool(source_due), nxt, len(inputs), tuple(kept), tuple(skipped),
                       tuple(sorted(profiles, key=lambda p: (_PRIORITY_ORDER[p.priority],
-                                                            p.robot_slug))), bound)
+                                                            p.robot_slug))), bound,
+                      tuple(eligible), {k: frozenset(v) for k, v in known_by_robot.items()})
 
 
 def plan_unsourced(inputs: Sequence[PlanInput], sourced_manufacturers: set[str],
@@ -385,9 +401,19 @@ def plan_unsourced(inputs: Sequence[PlanInput], sourced_manufacturers: set[str],
     return profiles, targets
 
 
+def rank_key(t: Target) -> tuple:
+    """The one ordering of planned targets: priority, then more reasons, then never-observed
+    first and otherwise longest-unobserved first (so targets deferred by the bound cannot
+    starve), then a stable robot / type / URL tie-break. Tolerates a malformed target."""
+    seen = t.last_observed.timestamp() if t.last_observed else float("-inf")
+    return (_PRIORITY_ORDER.get(t.priority, 99), -len(t.reason_codes), seen, t.robot,
+            _TYPE_ORDER.get(t.target_type, 99), t.url)
+
+
 def _replace_decision(t: Target, decision: str, detail: str) -> Target:
     return Target(t.source, t.robot, t.priority, t.reason_codes, t.url, t.target_type,
-                  t.eligibility, decision, t.last_observed, t.next_due, detail, t.origin)
+                  t.eligibility, decision, t.last_observed, t.next_due, detail, t.origin,
+                  t.previous_observation, t.source_due)
 
 
 # ------------------------------------------------------------------------------ output
@@ -419,11 +445,11 @@ def load_url_states(session: Session) -> dict[str, UrlState]:
     """Normalized URL -> last two distinct content hashes and last retrieval. SELECT only."""
     rows = session.execute(
         select(FetchedPage.url, FetchedPage.final_url, FetchedPage.content_hash,
-               FetchedPage.retrieved_at)
+               FetchedPage.retrieved_at, FetchedPage.id)
         .where(FetchedPage.content_hash.is_not(None))
         .order_by(FetchedPage.retrieved_at)).all()
-    hashes: dict[str, list[tuple[datetime, str]]] = {}
-    for url, final, content_hash, when in rows:
+    hashes: dict[str, list[tuple[datetime, str, str]]] = {}
+    for url, final, content_hash, when, page_id in rows:
         for u in {url, final}:
             if not u:
                 continue
@@ -431,14 +457,14 @@ def load_url_states(session: Session) -> dict[str, UrlState]:
                 key = normalize_url(u)
             except UnsupportedUrl:
                 continue
-            hashes.setdefault(key, []).append((when, content_hash))
+            hashes.setdefault(key, []).append((when, content_hash, str(page_id)))
     states: dict[str, UrlState] = {}
     for key, seq in hashes.items():
         seq.sort(key=lambda x: x[0])
-        last_when, last_hash = seq[-1]
-        previous = next((h for _, h in reversed(seq[:-1]) if h != last_hash), None)
+        last_when, last_hash, last_id = seq[-1]
+        previous = next((h for _, h, _ in reversed(seq[:-1]) if h != last_hash), None)
         states[key] = UrlState(last_when if last_when.tzinfo else last_when.replace(tzinfo=UTC),
-                               last_hash, previous)
+                               last_hash, previous, last_id)
     return states
 
 
@@ -475,3 +501,78 @@ def plan_source(session: Session, adapters: Mapping[str, SourceAdapterConfig], s
     inputs = [i for i in load_plan_inputs(session) if i.robot.record.manufacturer_slug == mfr]
     return plan_manufacturer(inputs, by_mfr[mfr], load_url_states(session), when,
                              source_key=source_key, bound=bound, assume_due=assume_due)
+
+
+# ------------------------------------------------------------------------------ all sources
+
+
+def plan_all_from_inputs(inputs: Sequence[PlanInput],
+                         sources_by_mfr: Mapping[str, Sequence[DiscoverySource]],
+                         states: Mapping[str, UrlState], now: datetime, *,
+                         bound: int = DEFAULT_BOUND) -> dict[str, SourcePlan]:
+    """The plan of EVERY registered source, each over its own manufacturer's robots. This is the
+    single selection policy Lane B executes: G4 gaps + freshness + source eligibility + cadence +
+    priority + bound."""
+    out: dict[str, SourcePlan] = {}
+    for mfr, srcs in sorted(sources_by_mfr.items()):
+        robots = [i for i in inputs if i.robot.record.manufacturer_slug == mfr]
+        for s in sorted(srcs, key=lambda s: s.key):
+            out[s.key] = plan_manufacturer(robots, list(srcs), states, now, source_key=s.key,
+                                           bound=bound)
+    return out
+
+
+def plan_sources(session: Session, adapters: Mapping[str, SourceAdapterConfig],
+                 now: datetime | None = None, bound: int = DEFAULT_BOUND
+                 ) -> tuple[dict[str, SourcePlan], dict[str, list[DiscoverySource]]]:
+    """(plans by source key, sources by manufacturer) from the live database. SELECT only."""
+    when = (now or datetime.now(UTC)).astimezone(UTC)
+    by_mfr = en.sources_by_manufacturer(session.scalars(select(DiscoverySource)).all(), adapters)
+    plans = plan_all_from_inputs(load_plan_inputs(session), by_mfr, load_url_states(session),
+                                 when, bound=bound)
+    return plans, by_mfr
+
+
+# ------------------------------------------------------------------------------ the contract
+
+
+def contract_problems(t: Target) -> list[str]:
+    """Why a target is NOT a well-formed executable Lane B target. The planner produces only
+    well-formed ones; the executor refuses anything else (a fabricated or hand-edited target)."""
+    problems = []
+    if t.origin != CATALOGUE_ENRICHMENT:
+        problems.append(f"origin {t.origin!r} is not {CATALOGUE_ENRICHMENT}")
+    if t.decision != PLANNED:
+        problems.append(f"decision {t.decision!r} is not {PLANNED}")
+    if t.eligibility != "ALLOWED":
+        problems.append(f"eligibility {t.eligibility!r} is not ALLOWED")
+    if not t.source:
+        problems.append("no governing source")
+    if not t.robot:
+        problems.append("no canonical robot slug")
+    if t.priority not in _PRIORITY_ORDER:
+        problems.append(f"unknown priority {t.priority!r}")
+    if t.target_type not in _TYPE_ORDER:
+        problems.append(f"unknown target type {t.target_type!r}")
+    if not t.reason_codes:
+        problems.append("no reason code: nothing says why this target is worth checking")
+    try:
+        if normalize_url(t.url) != t.url:
+            problems.append("URL is not in normalized form")
+    except UnsupportedUrl:
+        problems.append("URL is not an absolute http(s) URL")
+    return problems
+
+
+def discovered_target(plan: SourcePlan, source_key: str, robot: str, url: str,
+                      found_on: str) -> Target | None:
+    """A document link found in an already-retained approved page, as a planner-contract target.
+    None if the robot has no profile in this plan. It still has to pass the executor's
+    execution-time source-policy check like every other target."""
+    prof = next((p for p in plan.profiles if p.robot_slug == robot), None)
+    if prof is None:
+        return None
+    codes = prof.reason_codes if NEW_DOCUMENT_POSSIBLE in prof.reason_codes else tuple(
+        c for c in REASON_CODES if c in {*prof.reason_codes, NEW_DOCUMENT_POSSIBLE})
+    return Target(source_key, robot, prof.priority, codes, url, DOCUMENT, "ALLOWED", PLANNED,
+                  None, None, f"discovered on {found_on}", source_due=plan.source_due)

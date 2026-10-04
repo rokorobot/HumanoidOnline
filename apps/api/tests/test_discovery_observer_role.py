@@ -219,3 +219,34 @@ def test_observe_cli_prints_the_enrichment_section(capsys, tmp_path):
     assert code == 0
     assert "NEW MODEL RADAR" in out and "CATALOGUE ENRICHMENT" in out
     assert "catalogue robots=" in out and "unavailable" not in out
+
+
+# ---------------------------------------------------------------------------------------------
+# G5-4: the planner -> executor path under the SAME role; no privilege was added for it.
+# ---------------------------------------------------------------------------------------------
+
+
+def test_the_g5_plan_and_lane_b_plan_run_as_the_observer_with_select_only_accepted_claims(
+        observer_role, tmp_path):
+    from app.services.discovery import enrichment_fetch, enrichment_plan
+    from app.services.discovery.sources import ADAPTERS
+
+    with Session(observer_role) as session:
+        plans, sources = enrichment_plan.plan_sources(session, ADAPTERS)
+        res = enrichment_fetch.run_lane_b(session, plans, sources, plan_only=True,
+                                          cache_dir=tmp_path / "cache")
+        assert res.plan_only and res.failed is False
+        session.rollback()
+    with observer_role.connect() as conn:
+        for sql in ("INSERT INTO accepted_claim (claim_digest) VALUES ('x')",
+                    "UPDATE accepted_claim SET created_by = created_by",
+                    "DELETE FROM accepted_claim",
+                    "INSERT INTO claim_retraction (claim_id) VALUES (gen_random_uuid())"):
+            with pytest.raises(ProgrammingError, match="permission denied"):
+                conn.execute(text(sql))
+            conn.rollback()
+    grants = GRANTS.read_text(encoding="utf-8")
+    assert "GRANT SELECT ON\n    robot_variant" in grants and "accepted_claim" in grants
+    for forbidden in ("INSERT ON accepted_claim", "UPDATE ON accepted_claim",
+                      "GRANT ALL", "discovery_reviewer"):
+        assert forbidden not in grants

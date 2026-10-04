@@ -139,6 +139,36 @@ def _faq(r: RegionalAvailability) -> list[dict]:
     ]
 
 
+def _plural(n: int, one: str, many: str) -> str:
+    return one if n == 1 else many
+
+
+def _health(r: RegionalAvailability) -> dict:
+    """Public, deterministic evidence health (not the review-only gate object).
+
+    CURRENT when the data meets the normal publication threshold; LIMITED_EVIDENCE
+    when it does not, with factual reasons. Stale offers are already excluded from
+    every count, so this only describes how much current evidence there is.
+    """
+    g = r.gate
+    reasons = []
+    if g.qualifying_robots < g.min_robots:
+        reasons.append(
+            f"{g.qualifying_robots} qualifying {_plural(g.qualifying_robots, 'robot', 'robots')}; "
+            f"minimum {g.min_robots}"
+        )
+    if g.qualifying_manufacturers < g.min_manufacturers:
+        reasons.append(
+            f"{g.qualifying_manufacturers} "
+            f"{_plural(g.qualifying_manufacturers, 'manufacturer', 'manufacturers')}; "
+            f"minimum {g.min_manufacturers}"
+        )
+    return {
+        "status": "LIMITED_EVIDENCE" if reasons else "CURRENT",
+        "reasons": reasons,
+    }
+
+
 def build_projection(
     r: RegionalAvailability, region_slug: str, *, include_readiness: bool = False
 ) -> dict:
@@ -152,6 +182,7 @@ def build_projection(
             max(o.evidence_date for o in offers).isoformat() if offers else None
         ),
         "direct_answer": r.direct_answer,
+        "publication_health": _health(r),
         "key_figures": {
             "published_population": kf.population,
             "robots_with_confirmed_offer": kf.qualifying_robots,

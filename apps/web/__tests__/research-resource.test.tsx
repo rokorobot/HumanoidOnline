@@ -243,6 +243,50 @@ describe("rendering", () => {
   });
 });
 
+// --- publication health (limited evidence) ---------------------------------------
+
+describe("limited-evidence warning", () => {
+  it("is absent when the evidence is current", () => {
+    renderPage(projection());
+    expect(screen.queryByTestId("limited-evidence-warning")).toBeNull();
+  });
+
+  it("is a factual, visible warning with each deterministic reason", () => {
+    renderPage(
+      projection({
+        publication_health: {
+          status: "LIMITED_EVIDENCE",
+          reasons: ["4 qualifying robots; minimum 5", "2 manufacturers; minimum 3"],
+        },
+      }),
+    );
+    const w = screen.getByTestId("limited-evidence-warning");
+    expect(w.textContent).toContain(
+      "Limited current evidence. This resource remains published, but the current evidence on file no longer meets HumanoidOnline’s normal publication threshold. Stale offers are excluded from current availability figures.",
+    );
+    const items = within(w).getAllByRole("listitem").map((li) => li.textContent);
+    expect(items).toEqual(["4 qualifying robots; minimum 5", "2 manufacturers; minimum 3"]);
+    expect(w.getAttribute("role")).toBe("note");
+  });
+
+  it("renders without a reasons list when none are given, and still shows no zeros or removals", () => {
+    renderPage(projection({ publication_health: { status: "LIMITED_EVIDENCE", reasons: [] } }));
+    const w = screen.getByTestId("limited-evidence-warning");
+    expect(within(w).queryByRole("list")).toBeNull();
+    // the offers and figures stay exactly as the projection supplies them
+    expect(screen.getByTestId("offers-available-table")).toBeTruthy();
+  });
+
+  it("appears before the direct answer so it is seen first", () => {
+    const { container } = renderPage(
+      projection({ publication_health: { status: "LIMITED_EVIDENCE", reasons: ["x"] } }),
+    );
+    const warning = container.querySelector('[data-testid="limited-evidence-warning"]')!;
+    const answer = container.querySelector('[data-testid="direct-answer"]')!;
+    expect(warning.compareDocumentPosition(answer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});
+
 // --- editorial fragment ----------------------------------------------------------
 
 describe("editorial fragment", () => {

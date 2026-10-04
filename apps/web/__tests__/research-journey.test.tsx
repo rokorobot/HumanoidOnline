@@ -11,6 +11,7 @@
 import { cleanup, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { ResearchProjection } from "../lib/research";
 import { projection } from "./research-fixture";
 
 vi.mock("@/lib/seo", () => ({
@@ -23,6 +24,7 @@ vi.mock("@/lib/seo", () => ({
 import { GET } from "../app/research/humanoid-availability/europe.json/route";
 import EuropeResearchPage, { generateMetadata } from "../app/research/humanoid-availability/europe/page";
 import sitemap from "../app/sitemap";
+import { SiteNav } from "../components/SiteNav";
 import { EDITORIAL } from "../lib/research-editorial";
 import { buildResearchJsonLd } from "../lib/research-jsonld";
 
@@ -41,12 +43,14 @@ const saved: Record<string, string | undefined> = {};
 // "flagged AND readiness passes"; a valid X-Research-Preview always gets the
 // review-only body.
 let apiPublic = false;
+let apiHealth: ResearchProjection["publication_health"] = { status: "CURRENT", reasons: [] };
 let apiToken: string | null = null;
 const fetchMock = vi.fn();
 
 function apiBody(published: boolean) {
   return projection({
     published,
+    publication_health: apiHealth,
     ...(published
       ? {}
       : {
@@ -69,6 +73,7 @@ beforeEach(() => {
   delete process.env.RESEARCH_PUBLISHED_REGIONS;
   delete process.env.RESEARCH_PREVIEW_TOKEN;
   apiPublic = false;
+  apiHealth = { status: "CURRENT", reasons: [] };
   apiToken = null;
   fetchMock.mockReset();
   fetchMock.mockImplementation(async (_url: string, init?: RequestInit) => {
@@ -204,19 +209,59 @@ describe("published and ready", () => {
   });
 });
 
-describe("published flag but readiness failing (ADR-027 section 12)", () => {
+describe("published but degraded: limited evidence stays public (ADR-027 section 12)", () => {
   beforeEach(() => {
     process.env.RESEARCH_PUBLISHED_REGIONS = "europe";
-    apiPublic = false; // the API declines to serve it publicly
+    apiPublic = true;
+    apiHealth = { status: "LIMITED_EVIDENCE", reasons: ["4 qualifying robots; minimum 5"] };
   });
 
-  it("is not public: 404 page, 404 JSON, absent from the sitemap", async () => {
+  it("renders publicly, indexable, with a visible factual warning and its reasons", async () => {
+    const { container } = render(await EuropeResearchPage(sp()));
+    expect(container.querySelector('[data-testid="preview-banner"]')).toBeNull();
+    const warning = container.querySelector('[data-testid="limited-evidence-warning"]');
+    expect(warning?.textContent).toContain("Limited current evidence.");
+    expect(warning?.textContent).toContain("This resource remains published");
+    expect(warning?.textContent).toContain("Stale offers are excluded from current availability figures.");
+    expect(warning?.textContent).toContain("4 qualifying robots; minimum 5");
+    expect((await generateMetadata(sp())).robots).toBeUndefined();
+  });
+
+  it("the JSON carries the machine-readable health and is public-cacheable", async () => {
+    const res = await GET(jsonRequest());
+    expect(res.status).toBe(200);
+    expect(res.headers.get("x-robots-tag")).toBeNull();
+    expect((await res.json()).publication_health).toEqual(apiHealth);
+  });
+
+  it("keeps the sitemap entries, the hub and the navigation", async () => {
+    const urls = (await sitemap()).map((e) => e.url);
+    expect(urls).toContain(PAGE_URL);
+    expect(urls).toContain(`${ORIGIN}/research`);
+    const { container } = render(<SiteNav />);
+    expect(container.querySelector('a[href="/research"]')).toBeTruthy();
+  });
+
+  it("the JSON-LD still describes only the projected (current) offers", async () => {
+    const { container } = render(await EuropeResearchPage(sp()));
+    const ld = JSON.parse(container.querySelector('script[type="application/ld+json"]')!.textContent!);
+    expect(ld).toEqual(buildResearchJsonLd(apiBody(true), ORIGIN));
+  });
+});
+
+describe("published but structurally invalid: the API fails closed", () => {
+  beforeEach(() => {
+    process.env.RESEARCH_PUBLISHED_REGIONS = "europe";
+    apiPublic = false; // the API answers 404 (e.g. groups do not reconcile)
+  });
+
+  it("is not public: 404 page, 404 JSON, absent from the sitemap and the hub", async () => {
     await expect(EuropeResearchPage(sp())).rejects.toThrow();
     expect((await GET(jsonRequest())).status).toBe(404);
     expect(await researchUrls()).toEqual([]);
   });
 
-  it("a reviewer with the token still sees the review-only view and why it fails", async () => {
+  it("a reviewer with the token still sees the review-only report", async () => {
     process.env.RESEARCH_PREVIEW_TOKEN = TOKEN;
     apiToken = TOKEN;
     const { container } = render(await EuropeResearchPage(sp(TOKEN)));

@@ -156,6 +156,23 @@ export function ResearchResource({
         snapshot to count.
       </p>
 
+      {data.publication_health.status === "LIMITED_EVIDENCE" && (
+        <div role="note" data-testid="limited-evidence-warning">
+          <p>
+            <strong>Limited current evidence.</strong> This resource remains published, but the
+            current evidence on file no longer meets HumanoidOnline’s normal publication threshold.
+            Stale offers are excluded from current availability figures.
+          </p>
+          {data.publication_health.reasons.length > 0 && (
+            <ul>
+              {data.publication_health.reasons.map((reason) => (
+                <li key={reason}>{reason}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
       <section aria-labelledby="answer">
         <h2 id="answer">Direct answer</h2>
         <p data-testid="direct-answer">{data.direct_answer}</p>

@@ -47,6 +47,7 @@ export function projection(overrides: Partial<ResearchProjection> = {}): Researc
     snapshot_date: "2026-10-04",
     freshness_days: 90,
     latest_evidence_date: "2026-09-26",
+    publication_health: { status: "CURRENT", reasons: [] },
     direct_answer:
       "As of 2026-10-04, HumanoidOnline lists 3 published humanoid robots with a confirmed offer in Europe. 2 can be purchased: 1 available and 1 on request.",
     key_figures: {

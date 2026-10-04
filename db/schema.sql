@@ -2080,6 +2080,9 @@ CREATE TABLE discovery_claim_proposal (
     origin_retrieved_at    TIMESTAMPTZ NOT NULL,
     ingested_by            TEXT NOT NULL,
     created_at             TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    -- G5 (0023): operational origin only; never changes proposal semantics.
+    origin                 TEXT NOT NULL DEFAULT 'CATALOGUE_ENRICHMENT',
+    CONSTRAINT ck_claim_proposal_origin CHECK (origin IN ('NEW_MODEL', 'CATALOGUE_ENRICHMENT')),
     CONSTRAINT ck_claim_proposal_digest CHECK (digest ~ '^[0-9a-f]{64}$'),
     CONSTRAINT ck_claim_proposal_slot CHECK (slot_key ~ '^[0-9a-f]{64}$'),
     CONSTRAINT ck_claim_proposal_representability
@@ -2213,7 +2216,8 @@ CREATE TABLE accepted_claim (
     CONSTRAINT ck_accepted_claim_digest CHECK (claim_digest ~ '^[0-9a-f]{64}$'),
     CONSTRAINT ck_accepted_claim_target_kind
         CHECK (target_kind IN ('robot_variant', 'specification', 'pricing_offer',
-                               'availability_offer', 'robot_spec', 'NO_CATALOGUE_HOME')),
+                               'availability_offer', 'robot_spec', 'commercial_status',
+                               'NO_CATALOGUE_HOME')),
     CONSTRAINT ck_accepted_claim_value_type CHECK (value_type IN ('TEXT', 'JSON')),
     CONSTRAINT ck_accepted_claim_scope
         CHECK (edition_scope IS NULL

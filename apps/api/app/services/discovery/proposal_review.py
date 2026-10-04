@@ -40,7 +40,13 @@ from app.models.claim_proposal import (
 from app.models.discovery import DiscoverySource
 from app.models.robot import Robot
 from app.services.discovery import DiscoveryError
-from app.services.discovery.field_policy import MAPPING_KEYS
+from app.services.discovery.field_policy import (
+    COMMERCIAL_MATURITY_KIND,
+    COMMERCIAL_STATUS_TARGET,
+    MAPPING_KEYS,
+    check_maturity_choice,
+)
+from app.services.discovery.sources import maturity_proposals as maturity
 from app.services.discovery.sources import neura_mini_proposals as mini
 from app.services.discovery.sources import xpeng_iron_proposals as xpeng
 from app.services.discovery.urlref import UnsupportedUrl, normalize_url
@@ -53,6 +59,7 @@ CURRENT, SUPERSEDED, STALE = "CURRENT", "SUPERSEDED", "STALE"
 
 #: Extractors whose output is still trusted. Retiring one makes its proposals stale.
 LIVE_EXTRACTORS = frozenset({(mini.EXTRACTOR_KEY, mini.EXTRACTOR_VERSION),
+                             (maturity.EXTRACTOR_KEY, maturity.EXTRACTOR_VERSION),
                              (xpeng.EXTRACTOR_KEY, xpeng.EXTRACTOR_VERSION)})
 #: Identity gate: the catalogue name a live extractor's proposals must attach to.
 EXTRACTOR_ROBOT_NAME = {mini.EXTRACTOR_KEY: mini.ROBOT_NAME,
@@ -257,6 +264,13 @@ def _validate_choices(p: DiscoveryClaimProposal, decision: str,
         raise DiscoveryError(
             "ACCEPT needs an explicit resolved choice for every review question; "
             "unresolved: " + "; ".join(missing))
+    if p.kind == COMMERCIAL_MATURITY_KIND:
+        # Owner ruling 2026-10-04: the reviewer explicitly chooses a frozen status at decision time
+        # (never UNKNOWN, never defaulted, never taken from the wording).
+        if choices.get("target_kind") != COMMERCIAL_STATUS_TARGET:
+            raise DiscoveryError("ACCEPT of a COMMERCIAL_MATURITY proposal must record "
+                                 f"target_kind={COMMERCIAL_STATUS_TARGET} explicitly")
+        check_maturity_choice(choices.get("accepted_value"))
     if choices.get(HOME_KEY, "") not in ("", NO_CATALOGUE_HOME):
         raise DiscoveryError(
             f"{HOME_KEY!r} may only be {NO_CATALOGUE_HOME!r}: G2-2 maps nothing to the "

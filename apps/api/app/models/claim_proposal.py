@@ -54,6 +54,8 @@ class DiscoveryClaimProposal(Base):
         CheckConstraint("btrim(evidence_locator) <> ''", name="ck_claim_proposal_locator"),
         CheckConstraint("btrim(robot_slug) <> ''", name="ck_claim_proposal_robot_slug"),
         CheckConstraint("btrim(ingested_by) <> ''", name="ck_claim_proposal_attributed"),
+        CheckConstraint("origin IN ('NEW_MODEL', 'CATALOGUE_ENRICHMENT')",
+                        name="ck_claim_proposal_origin"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), **_UUID_PK)
@@ -93,6 +95,9 @@ class DiscoveryClaimProposal(Base):
     ingested_by: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("clock_timestamp()"), nullable=False)
+    # G5 (0023): operational origin; never changes proposal semantics.
+    origin: Mapped[str] = mapped_column(
+        Text, nullable=False, server_default=text("'CATALOGUE_ENRICHMENT'"))
 
 
 class DiscoveryProposalObservation(Base):
@@ -153,7 +158,7 @@ class AcceptedClaim(Base):
         CheckConstraint("claim_digest ~ '^[0-9a-f]{64}$'", name="ck_accepted_claim_digest"),
         CheckConstraint(
             "target_kind IN ('robot_variant', 'specification', 'pricing_offer', "
-            "'availability_offer', 'robot_spec', 'NO_CATALOGUE_HOME')",
+            "'availability_offer', 'robot_spec', 'commercial_status', 'NO_CATALOGUE_HOME')",
             name="ck_accepted_claim_target_kind"),
         CheckConstraint("value_type IN ('TEXT', 'JSON')", name="ck_accepted_claim_value_type"),
         CheckConstraint(

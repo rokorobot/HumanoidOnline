@@ -37,6 +37,7 @@ from app.services.discovery.field_policy import (
     PRODUCT_PAGE_CONFIGURATION,
     SPEC_DEFINITION_KEY,
     ClaimPolicy,
+    check_maturity_choice,
     claim_policy_for,
 )
 from app.services.discovery.proposal_review import HOME_KEY
@@ -104,6 +105,15 @@ def _plan(session: Session, p: DiscoveryClaimProposal, policy: ClaimPolicy,
     _need(choices, "target_kind", policy.target_kind)
     verbatim = p.value
     structured = dict(p.structured or {})
+    if policy.target_kind == "commercial_status":
+        # Owner ruling 2026-10-04: the reviewer explicitly chooses the frozen status. Nothing is
+        # inferred from the wording, no default exists, and the proposal suggests none.
+        if p.edition:
+            raise DiscoveryError("commercial maturity is a robot-level property; this proposal "
+                                 "names an edition, so nothing is claimed")
+        value = check_maturity_choice(choices.get("accepted_value"))
+        return {"variant_slug": None, "accepted_value": value, "edition_scope": None,
+                "target_key": policy.target_key}
     if policy.target_kind == "NO_CATALOGUE_HOME":
         # Accepted knowledge with provenance; it authorizes no catalogue write and is never
         # materialized. The human must state both the target kind and the home explicitly.

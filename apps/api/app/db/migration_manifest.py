@@ -89,4 +89,7 @@ MIGRATIONS: dict[str, str] = {
     "0022_robot_spec_claim_target": (
         "808ab1f6d1bee1cef75c28079a5c20d71144fde82e738f4f7de2f7c9e4647124"
     ),
+    "0023_commercial_status_claim_target_and_proposal_origin": (
+        "f0810196d27fdf51ba393dcdd174c1354faa4e98c0b06881f47d384f5fe96f26"
+    ),
 }

@@ -30,37 +30,78 @@ Manifest:  {"expected": [{"table": "pricing_offer", "kind": "ADDED",
 `kind` is ADDED, REMOVED or CHANGED (a keyed row whose columns changed). `match` entries are
 equality tests on the change's resolved fields (foreign keys appear as `robot`, `provider`,
 `region`, `variant`, `subject`...); a key ending in `~` is a substring test. `count` defaults to
-1. Audit / history tables (discovery, claims, crawl, freshness, audit logs) are reported
-separately and never need entries.
+1.
+
+What needs no manifest entry: ONLY genuinely append-only provenance / history (`AUDIT_TABLES`,
+rationale below) and only when rows are ADDED. A REMOVED or altered row in those tables is never
+legitimate and is gated too. Everything that is mutable configuration or effective state is
+gated: the acquisition source registry (`discovery_source`: enabled flag, ToS/robots state,
+cadence ...), freshness targets, crawl runs, discovery candidates, and the lead / requirement
+tables (their rows are redacted — only a content hash is compared — so contact details never
+reach the report). An unexpected change to a source such as `alza-cz`, whose automated
+acquisition must stay disabled, therefore stops the import.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from collections import Counter
 from dataclasses import dataclass, field
 
-#: Append-only provenance / operational history. Reported by count, never gated.
+#: The ONLY tables whose ADDED rows need no manifest entry: append-only provenance / history.
+#: Enforced by the database (append-only triggers) unless noted. A REMOVED or altered row in
+#: any of them is gated (see `Change.gated`): history never shrinks or changes.
 AUDIT_TABLES = frozenset({
-    "accepted_claim", "claim_retraction", "catalogue_write_audit", "discovery_claim_proposal",
-    "discovery_proposal_decision", "discovery_proposal_observation", "crawl_run",
-    "fetched_page", "extraction_result", "promotion_audit", "candidate_identity_decision",
-    "discovery_evidence_excerpt", "candidate_claim", "candidate_commercial_signal",
-    "candidate_image_ref", "discovery_candidate", "freshness_observation", "freshness_target",
-    "event_log", "source_eligibility_review", "discovery_source", "commercial_lead",
-    "commercial_lead_robot", "commercial_lead_provider", "buyer_requirement", "match_result",
+    # DB-enforced append-only (refuse UPDATE/DELETE triggers): immutable decisions and lineage
+    "accepted_claim", "claim_retraction", "catalogue_write_audit",
+    "discovery_claim_proposal", "discovery_proposal_decision",
+    "discovery_proposal_observation", "promotion_audit", "candidate_identity_decision",
+    "source_eligibility_review",
+    # Written once per observation; NO code path updates them (verified: no UPDATE statement and
+    # no attribute assignment in app/ or db/). Not trigger-enforced, hence the removal gate.
+    "fetched_page", "extraction_result", "discovery_evidence_excerpt", "freshness_observation",
+    # Append-only analytics telemetry; production writes it continuously, so gating its adds
+    # would stop every comparison taken from a live system.
+    "event_log",
 })
-#: Natural keys: a removed + added pair with the same key is one CHANGED row.
+#: Mutable configuration / effective state that is NOT audit history, and why it is gated:
+#:   discovery_source          enabled flag, ToS/robots state, path prefixes, cadence: decides
+#:                             whether anything may ever be fetched automatically
+#:   freshness_target          active / interval / manual_override: scheduled-check behaviour
+#:   crawl_run                 status is updated (RUNNING -> COMPLETED/FAILED) and a RUNNING row
+#:                             blocks other runs of its source (one-running guard)
+#:   discovery_candidate,      review-queue state (identity/status/trace) that is edited in place
+#:   candidate_claim,
+#:   candidate_commercial_signal, candidate_image_ref
+#:   commercial_lead (+ _robot/_provider), buyer_requirement, match_result
+#:                             user-submitted business records; lead_status is mutable. Gated but
+#:                             REDACTED (hash only): contact details must not reach reports, and
+#:                             a lead that arrives between the clone and the comparison shows up
+#:                             here as "production moved since the rehearsal"
+REDACTED_TABLES = frozenset({"commercial_lead", "commercial_lead_robot",
+                             "commercial_lead_provider", "buyer_requirement", "match_result"})
+#: Natural keys: a removed + added pair with the same key is one CHANGED row. A tuple is a
+#: composite key over the resolved field names.
 NATURAL_KEY = {"robot": "slug", "provider": "slug", "manufacturer": "slug", "region": "code",
-               "capability": "slug", "use_case": "slug", "spec_definition": "key"}
+               "capability": "slug", "use_case": "slug", "spec_definition": "key",
+               "discovery_source": "key",                       # discovery_source.key (UNIQUE)
+               "freshness_target": ("robot", "url"),            # uq_freshness_target_robot_url
+               "discovery_candidate": ("source", "external_ref")}  # uq_candidate_source_ref
 CATEGORY = {"robot": "robot", "provider": "provider", "pricing_offer": "pricing_offer",
             "availability_offer": "availability_offer", "evidence_source": "evidence_source",
-            "robot_variant": "variant"}
+            "robot_variant": "variant", "discovery_source": "source",
+            "freshness_target": "freshness_config", "crawl_run": "acquisition_run",
+            "discovery_candidate": "discovery_candidate", "candidate_claim": "discovery_candidate",
+            "candidate_commercial_signal": "discovery_candidate",
+            "candidate_image_ref": "discovery_candidate",
+            **{t: "runtime_user_data" for t in REDACTED_TABLES}}
 DROP = {"id", "created_at", "updated_at", "search_vector"}
 LABEL_TABLES = {  # table -> expression naming a row by its natural key
     "robot": "slug", "provider": "slug", "region": "code", "manufacturer": "slug",
     "capability": "slug", "use_case": "slug", "spec_definition": "key",
+    "discovery_source": "key",
 }
 
 
@@ -73,7 +114,12 @@ class Change:
 
     @property
     def audit(self) -> bool:
-        return self.table in AUDIT_TABLES
+        """An ADDED row of an append-only history table: counted, never gated."""
+        return self.table in AUDIT_TABLES and self.kind == "ADDED"
+
+    @property
+    def gated(self) -> bool:
+        return not self.audit
 
     @property
     def category(self) -> str:
@@ -81,9 +127,11 @@ class Change:
             return "publication"
         if self.table == "robot" and self.kind == "ADDED" and self.fields.get("is_published"):
             return "publication"
-        if self.kind == "REMOVED" and not self.audit:
+        if self.table in AUDIT_TABLES:
+            return "audit_removal"           # history lost or altered: never legitimate
+        if self.kind == "REMOVED":
             return "removal"
-        return CATEGORY.get(self.table, "audit" if self.audit else "other_catalogue")
+        return CATEGORY.get(self.table, "other_catalogue")
 
 
 def snapshot(conn) -> dict[str, list[dict]]:
@@ -137,6 +185,9 @@ def snapshot(conn) -> dict[str, list[dict]]:
                     clean[k[:-3]] = labels.get(v, v)    # unresolved FK: keep the raw id
                 else:
                     clean[k] = v
+            if table in REDACTED_TABLES:
+                clean = {"redacted_content_sha": hashlib.sha256(
+                    json.dumps(clean, sort_keys=True, default=str).encode()).hexdigest()[:16]}
             rows.append(clean)
         out[table] = rows
     return out
@@ -151,9 +202,14 @@ def diff(before: dict, after: dict) -> list[Change]:
         added = [json.loads(k) for k, n in (a - b).items() for _ in range(n)]
         key = NATURAL_KEY.get(table)
         if key:    # pair a removed + added row with the same natural key into CHANGED
-            by_key = {r[key]: r for r in removed}
+            keys = (key,) if isinstance(key, str) else key
+
+            def kf(r, keys=keys):
+                return tuple(r.get(k) for k in keys)
+
+            by_key = {kf(r): r for r in removed}
             for row in list(added):
-                old = by_key.pop(row.get(key), None)
+                old = by_key.pop(kf(row), None)
                 if old is not None:
                     added.remove(row)
                     removed.remove(old)
@@ -191,12 +247,12 @@ def classify(changes: list[Change], manifest: dict) -> dict:
         else:
             unexplained.append(change)
     unfulfilled = [{"expected": e, "missing": n} for e, n in budget if n > 0]
-    business = [c for c in changes if not c.audit]
+    business = [c for c in changes if c.gated]
     return {
         "ok": not unexplained and not unfulfilled,
         "business_changes": len(business),
         "by_category": dict(Counter(c.category for c in business)),
-        "audit_history": dict(Counter(c.table for c in changes if c.audit)),
+        "audit_history_added": dict(Counter(c.table for c in changes if c.audit)),
         "unexplained": [{"table": c.table, "kind": c.kind, "category": c.category,
                          "fields": c.fields, "detail": c.detail} for c in unexplained],
         "unfulfilled": unfulfilled,
@@ -205,10 +261,11 @@ def classify(changes: list[Change], manifest: dict) -> dict:
 
 def render(report: dict) -> str:
     lines = [f"business changes: {report['business_changes']}  {report['by_category']}",
-             f"audit/history rows (not gated): {report['audit_history']}"]
+             f"append-only history rows ADDED (not gated): {report['audit_history_added']}"]
     for u in report["unexplained"]:
+        shown = u["fields"] if u["kind"] != "CHANGED" else u["detail"]
         lines.append(f"UNEXPLAINED {u['kind']} {u['table']} [{u['category']}]: "
-                     f"{json.dumps(u['fields'] if u['kind'] != 'CHANGED' else u['detail'], default=str, ensure_ascii=False)[:300]}")
+                     f"{json.dumps(shown, default=str, ensure_ascii=False)[:300]}")
     for m in report["unfulfilled"]:
         lines.append(f"EXPECTED BUT ABSENT x{m['missing']}: {json.dumps(m['expected'])}")
     lines.append("PREFLIGHT " + ("PASS: every business change is accounted for"

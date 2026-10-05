@@ -321,13 +321,19 @@ uv run db/import_preflight.py --before "$PRODUCTION_URL" --after "$REHEARSAL_URL
 
 It is read-only. It compares rows with ids/timestamps removed and every foreign key resolved to
 its natural key (so a swapped row is visible even when the totals are equal), classifies each
-non-audit change (robot, provider, pricing offer, availability offer, evidence, variant,
-publication state, removal, other catalogue rows), and requires **each one** to match an entry
-of the manifest (`table`, `kind` ADDED/REMOVED/CHANGED, `match` fields — a key ending in `~` is
-a substring test — and a `count`). An expected change that did not happen also fails. Audit
-and history tables (claims, proposals, crawl, freshness, audit logs) are reported by count and
-never need entries. `--report-only` prints the classification without gating and is not a
-gate. The manifest is part of the work order: write it from the intended change set, never
+change (robot, provider, pricing offer, availability offer, evidence, variant, publication
+state, removal, source, freshness config, crawl run, discovery candidate, lead/requirement data,
+other catalogue rows), and requires **each one** to match an entry of the manifest (`table`,
+`kind` ADDED/REMOVED/CHANGED, `match` fields — a key ending in `~` is a substring test — and a
+`count`). An expected change that did not happen also fails. Only **append-only history**
+(claims, proposals, decisions, retractions, audit, eligibility reviews, fetched pages,
+extraction results, evidence excerpts, freshness observations, event log) may be *added*
+without an entry — and a removed or altered history row is gated too. Mutable configuration
+is gated: `discovery_source` (enabled flag, ToS/robots state, cadence, path prefixes — paired
+by `key`, so an update is a CHANGED row), `freshness_target`, `crawl_run` (its status is updated
+and gates other runs), discovery candidates, and lead/requirement tables (compared by content
+hash only, never printed). `--report-only` prints the classification without gating and is not
+a gate. The manifest is part of the work order: write it from the intended change set, never
 from the rehearsal output.
 
 CI runs exactly this chain in the `catalogue-validate` job

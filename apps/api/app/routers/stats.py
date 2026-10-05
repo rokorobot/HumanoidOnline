@@ -35,7 +35,7 @@ _SNAPSHOT_SQL = text(
         AS manufacturers_published,
       EXISTS (SELECT 1 FROM availability_offer a
               JOIN robot r ON r.id = a.robot_id
-              WHERE r.is_published AND a.is_current
+              WHERE r.is_published AND a.is_current AND a.condition = 'NEW'
                 AND a.transaction_type IN ('RENTAL', 'SUBSCRIPTION')
                 AND commercially_accessible(a.availability_status)) AS rental_offers_present,
       (SELECT max(observed_at) FROM evidence_source) AS latest_observed_at

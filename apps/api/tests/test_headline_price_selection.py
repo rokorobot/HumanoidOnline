@@ -56,8 +56,10 @@ def offer(
     price_basis: str | None = None,
     order_status_note: str | None = None,
     variant_id: str | None = None,
+    condition: str = "NEW",
 ):
     return SimpleNamespace(
+        condition=condition,
         transaction_type="PURCHASE",
         price_type="PUBLIC",
         price=price,
@@ -392,3 +394,15 @@ def test_ties_are_broken_by_amount_only_within_one_seller_region_and_currency() 
     )
     assert display is not None
     assert display.amount == 21000.0
+
+
+def test_a_non_new_offer_is_never_the_headline_even_when_cheaper():
+    """Offer condition (migration 0024): a used / open-box / refurbished price is its own
+    offer; it neither becomes the robot's headline nor undercuts the new unit's."""
+    used = offer(provider="alza", price=100.0, condition="USED")
+    new = offer(provider="alza", price=900.0, condition="NEW")
+    assert price_display_for(robot_with(used, new)).amount == 900.0
+    assert price_display_for(robot_with(used)) is None
+    for condition in ("OPEN_BOX", "REFURBISHED"):
+        assert price_display_for(
+            robot_with(offer(price=1.0, condition=condition))) is None

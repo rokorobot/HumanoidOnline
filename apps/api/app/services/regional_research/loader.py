@@ -98,6 +98,7 @@ def load_regional_snapshot(session: Session, snapshot_date: date) -> RegionalSna
                 evidence=tuple(offer_ev.get(o.id, ())),
             )
             for o in r.availability_offers
+            if o.condition == "NEW"
         )
         prices = tuple(
             PriceRow(
@@ -115,6 +116,7 @@ def load_regional_snapshot(session: Session, snapshot_date: date) -> RegionalSna
                 evidence=tuple(price_ev.get(p.id, ())),
             )
             for p in r.pricing_offers
+            if p.condition == "NEW"
         )
         deployments = tuple(
             DeploymentRow(

@@ -80,6 +80,8 @@ Recording `QUOTE_ONLY` is a positive claim about the seller's commercial model a
 | `ON_REQUEST` | Contact/quote required (default when engagement is bespoke) |
 | `DISCONTINUED` | Was obtainable in this mode; no longer |
 
+**Offer condition (migration 0024).** `pricing_offer` and `availability_offer` carry `condition` — `NEW` (default), `USED`, `OPEN_BOX` or `REFURBISHED` — and it is part of the availability logical identity (`uq_availability_logical`). A non-NEW offer is its **own** offer: it never replaces the new unit's offer, a used unit's stock never makes the new unit `AVAILABLE` (snapshot, filters, matching, lead routing and regional research count `NEW` only), and a used price never becomes the headline price. The used offer is still published in the robot detail with its `condition`.
+
 **Absence of any `availability_offer` row ≠ `NOT_AVAILABLE`.** Absence means *unknown* → UI renders "No confirmed commercial availability."
 
 **Canonical access predicate.** Whenever a yes/no "commercially accessible?" decision is needed, there is exactly one rule, implemented as the schema function `commercially_accessible(status)`:

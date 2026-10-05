@@ -91,6 +91,7 @@ def _eligible_routes(session: Session, lead: CommercialLead) -> set[tuple[uuid.U
         .where(
             AvailabilityOffer.robot_id.in_(selected_robot_ids),
             AvailabilityOffer.is_current.is_(True),
+            AvailabilityOffer.condition == "NEW",
             # CANONICAL access predicate — never an ad-hoc status list.
             func.commercially_accessible(AvailabilityOffer.availability_status),
             AvailabilityOffer.provider_id.is_not(None),

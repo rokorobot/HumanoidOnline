@@ -216,6 +216,7 @@ export interface PricingOffer {
   // null = not assessed (never shown as confirmed); false = qualified listing.
   edition_confirmed?: boolean | null;
   edition_note?: string | null;
+  condition?: string;
   evidence?: Evidence | null;
 }
 
@@ -232,6 +233,7 @@ export interface AvailabilityOffer {
   // it was given for. Never widen a domestic estimate to a region.
   seller_wording?: string | null;
   delivery_estimate_label?: string | null;
+  condition?: string;
   evidence?: Evidence | null;
 }
 

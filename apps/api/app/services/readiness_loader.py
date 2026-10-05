@@ -98,7 +98,7 @@ def load_records(cur, slugs: Collection[str] | None = None) -> list[RobotRecord]
     for p in _rows(
         cur,
         "SELECT id, robot_id, variant_id, price_type::text AS price_type, price "
-        "FROM pricing_offer WHERE robot_id = ANY(%s) AND is_current",
+        "FROM pricing_offer WHERE robot_id = ANY(%s) AND is_current AND condition = 'NEW'",
         (ids,),
     ):
         pricing[p["robot_id"]].append(
@@ -114,7 +114,7 @@ def load_records(cur, slugs: Collection[str] | None = None) -> list[RobotRecord]
         cur,
         "SELECT id, robot_id, variant_id, availability_status::text AS status, "
         "available_from, delivery_estimate_label, seller_wording FROM "
-        "availability_offer WHERE robot_id = ANY(%s) AND is_current",
+        "availability_offer WHERE robot_id = ANY(%s) AND is_current AND condition = 'NEW'",
         (ids,),
     ):
         availability[a["robot_id"]].append(

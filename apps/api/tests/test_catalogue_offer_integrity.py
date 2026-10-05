@@ -187,3 +187,13 @@ def test_no_robot_is_catalogued_twice():
             code_key = (robot["manufacturer_slug"], _identity(robot["model_code"]))
             assert code_key not in by_code, f"{slug} duplicates {by_code[code_key]} by model code"
             by_code[code_key] = slug
+
+
+def test_offer_condition_is_a_schema_label_when_stated():
+    """`condition` is optional (absent = NEW) but never a label db/schema.sql does not define."""
+    labels = {"NEW", "USED", "OPEN_BOX", "REFURBISHED"}
+    assert "CREATE TYPE offer_condition AS ENUM" in SCHEMA.read_text(encoding="utf-8")
+    for slug, robot in ROBOTS.items():
+        for kind in OFFER_KINDS:
+            for offer in robot.get(kind, []):
+                assert offer.get("condition", "NEW") in labels, f"{slug}: {kind} condition"

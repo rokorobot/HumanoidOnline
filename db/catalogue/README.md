@@ -111,12 +111,14 @@ the catalogue is add-only and does not own data it did not write.
   "order_status_note": "Special item — check delivery time with the supplier.",
   "edition_confirmed": null,               // null = not assessed · false = qualified listing
   "edition_note":      null,
+  "condition":         "NEW",              // NEW (default) | USED | OPEN_BOX | REFURBISHED
   "evidence": [ … ]
 }],
 "availability_offers": [{
   "availability_status": "AVAILABLE",
   "seller_wording": "Limited stock, delivery within 1 - 2 business days",
   "delivery_estimate_label": "Delivery estimate for Germany: 1–2 business days",
+  "condition": "NEW",                      // a used unit's stock is its own offer, never the new unit's
   "evidence": [ … ]
 }]
 ```

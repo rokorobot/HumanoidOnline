@@ -117,6 +117,16 @@ CREATE TYPE availability_status AS ENUM (
     'DISCONTINUED'
 );
 
+-- Condition of the unit an offer is for. A used / open-box / refurbished unit is a
+-- DIFFERENT commercial offer from a new one (its own price and availability); it
+-- must never replace, or promote the availability of, the NEW offer (migration 0024).
+CREATE TYPE offer_condition AS ENUM (
+    'NEW',
+    'USED',
+    'OPEN_BOX',
+    'REFURBISHED'
+);
+
 -- Kind of commercial counterparty. Bridges into Rent/Mart/Lease verticals.
 CREATE TYPE provider_type AS ENUM (
     'OEM',
@@ -666,6 +676,9 @@ CREATE TABLE pricing_offer (
     edition_note      TEXT,
     created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+    -- Condition of the unit this price is for. NEW unless the source states otherwise.
+    -- Last column on purpose: migration 0024 adds it with ADD COLUMN.
+    condition        offer_condition NOT NULL DEFAULT 'NEW',
     -- Frozen price_type semantics (03_DATA_DICTIONARY §3), enforced by the DB
     -- because the DDL wins over application assumptions:
     CONSTRAINT chk_price_type_shape CHECK (
@@ -706,7 +719,10 @@ CREATE TABLE availability_offer (
     delivery_estimate_label TEXT,
     is_current          BOOLEAN NOT NULL DEFAULT TRUE,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+    -- Condition of the unit this availability is for (a used unit's stock is not the new
+    -- unit's). Last column on purpose: migration 0024 adds it with ADD COLUMN.
+    condition           offer_condition NOT NULL DEFAULT 'NEW'
     -- Logical uniqueness (robot × variant × provider × region × transaction) is
     -- enforced by uq_availability_logical below. A plain UNIQUE would not work:
     -- under PG14 semantics NULL <> NULL, so duplicate rows with NULL variant/
@@ -944,6 +960,7 @@ LEFT JOIN LATERAL (
     WHERE po.robot_id = a.robot_id
       AND po.is_current
       AND po.transaction_type = a.transaction_type
+      AND po.condition = a.condition   -- a used price never prices the new offer
       AND (po.variant_id  = a.variant_id  OR po.variant_id  IS NULL)
       AND (po.provider_id = a.provider_id OR po.provider_id IS NULL)
       AND (   po.region_id = a.region_id
@@ -1016,7 +1033,8 @@ CREATE UNIQUE INDEX uq_availability_logical ON availability_offer (
     COALESCE(variant_id,  '00000000-0000-0000-0000-000000000000'::uuid),
     COALESCE(provider_id, '00000000-0000-0000-0000-000000000000'::uuid),
     COALESCE(region_id,   '00000000-0000-0000-0000-000000000000'::uuid),
-    transaction_type
+    transaction_type,
+    condition
 ) WHERE is_current;
 
 CREATE UNIQUE INDEX uq_specification_logical ON specification (
@@ -1121,7 +1139,7 @@ SELECT
     r.name,
     r.commercial_status                             AS maturity,          -- DIMENSION 1
     EXISTS (SELECT 1 FROM availability_offer a
-            WHERE a.robot_id = r.id AND a.is_current
+            WHERE a.robot_id = r.id AND a.is_current AND a.condition = 'NEW'
               AND commercially_accessible(a.availability_status))
                                                     AS is_obtainable,     -- DIMENSION 2
     (SELECT count(*) FROM deployment d WHERE d.robot_id = r.id)
@@ -1129,7 +1147,7 @@ SELECT
     (SELECT sum(d.contract_value) FROM deployment d WHERE d.robot_id = r.id)
                                                     AS contracted_value,
     array(SELECT DISTINCT a.transaction_type::text FROM availability_offer a
-          WHERE a.robot_id = r.id AND a.is_current
+          WHERE a.robot_id = r.id AND a.is_current AND a.condition = 'NEW'
             AND commercially_accessible(a.availability_status))
                                                     AS available_modes
 FROM robot r;

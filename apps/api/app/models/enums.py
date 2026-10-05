@@ -41,6 +41,9 @@ availability_status = _pg_enum(
     "NOT_AVAILABLE", "WAITLIST", "PREORDER", "LIMITED", "AVAILABLE",
     "ON_REQUEST", "DISCONTINUED",
 )
+offer_condition = _pg_enum(
+    "offer_condition", "NEW", "USED", "OPEN_BOX", "REFURBISHED",
+)
 provider_type = _pg_enum(
     "provider_type",
     "OEM", "DISTRIBUTOR", "INTEGRATOR", "RENTAL_PROVIDER", "LEASING_PROVIDER",

@@ -107,7 +107,8 @@ def comparable_amount():
 #: robot's price. `IS NOT FALSE` keeps NULL (never assessed) behaving exactly as
 #: before — absence of an assessment is not a finding either way.
 def _edition_not_excluded():
-    return PricingOffer.edition_confirmed.is_not(False)
+    # Also NEW-only: a used / open-box / refurbished price never sets a robot's comparable price.
+    return PricingOffer.edition_confirmed.is_not(False) & (PricingOffer.condition == "NEW")
 
 
 def _purchase_offers(price_currency: str) -> Select:

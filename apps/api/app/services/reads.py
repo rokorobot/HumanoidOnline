@@ -263,8 +263,9 @@ def price_display_for(
 
     The order of preference, highest first:
 
-    1. **Eligibility.** Removed outright: retired offers (`is_current` false)
-       and edition-excluded ones (`edition_confirmed` FALSE).
+    1. **Eligibility.** Removed outright: retired offers (`is_current` false),
+       edition-excluded ones (`edition_confirmed` FALSE) and any non-NEW offer
+       (used / open-box / refurbished is its own offer, never the robot's price).
     2. **Transaction mode, then price concreteness** — a purchase before a
        developer price, a published figure before an estimate.
     3. **Market applicability**, when `offered_in` is active: offers outside the
@@ -301,7 +302,9 @@ def price_display_for(
     """
     offers = [
         p for p in robot.pricing_offers
-        if p.is_current and p.edition_confirmed is not False
+        # NEW only: a used / open-box / refurbished price is its own offer and never the
+        # robot's headline price (docs/03 offer condition).
+        if p.is_current and p.edition_confirmed is not False and p.condition == "NEW"
     ]
     if market_rank is not None:
         offers = [p for p in offers if _offer_market_rank(p, market_rank) is not None]
@@ -662,6 +665,7 @@ def serialize_detail(
             order_status_note=p.order_status_note,
             edition_confirmed=p.edition_confirmed,
             edition_note=p.edition_note,
+            condition=p.condition,
             evidence=ev.get(("PRICING_OFFER", p.id)),
         )
         for p in current_pricing_offers(robot)
@@ -678,6 +682,7 @@ def serialize_detail(
             lead_time_days=a.lead_time_days,
             seller_wording=a.seller_wording,
             delivery_estimate_label=a.delivery_estimate_label,
+            condition=a.condition,
             evidence=ev.get(("AVAILABILITY_OFFER", a.id)),
         )
         for a in current_availability_offers(robot)

@@ -202,6 +202,9 @@ class PricingOfferRead(BaseModel):
     #: qualified listing and excluded from unqualified price selection.
     edition_confirmed: bool | None = None
     edition_note: str | None = None
+    #: Condition of the unit priced: NEW, USED, OPEN_BOX or REFURBISHED. A non-NEW offer is
+    #: its own offer and never the new unit's price.
+    condition: str = "NEW"
     evidence: EvidenceRead | None = None
 
 
@@ -219,6 +222,8 @@ class AvailabilityOfferRead(BaseModel):
     #: was stated for. A domestic estimate is never widened to a region.
     seller_wording: str | None = None
     delivery_estimate_label: str | None = None
+    #: Condition of the unit this availability is for (a used unit's stock is not the new unit's).
+    condition: str = "NEW"
     evidence: EvidenceRead | None = None
 
 

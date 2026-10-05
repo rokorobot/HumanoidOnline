@@ -18,6 +18,7 @@ from app.db.base import Base
 from app.models.enums import (
     availability_status,
     billing_period,
+    offer_condition,
     price_type,
     transaction_type,
 )
@@ -71,6 +72,11 @@ class PricingOffer(Base):
     #: unqualified price selection.
     edition_confirmed: Mapped[bool | None] = mapped_column(Boolean)
     edition_note: Mapped[str | None] = mapped_column(Text)
+    #: Condition of the unit this row is for. A used / open-box / refurbished offer is a
+    #: different commercial offer from the new one and never replaces or promotes it.
+    condition: Mapped[str] = mapped_column(
+        offer_condition, nullable=False, server_default=text("'NEW'")
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("now()"), nullable=False
     )
@@ -117,6 +123,11 @@ class AvailabilityOffer(Base):
     #: and its delivery estimate WITH the geography it was stated for.
     seller_wording: Mapped[str | None] = mapped_column(Text)
     delivery_estimate_label: Mapped[str | None] = mapped_column(Text)
+    #: Condition of the unit this row is for. A used / open-box / refurbished offer is a
+    #: different commercial offer from the new one and never replaces or promotes it.
+    condition: Mapped[str] = mapped_column(
+        offer_condition, nullable=False, server_default=text("'NEW'")
+    )
     is_current: Mapped[bool] = mapped_column(
         Boolean, nullable=False, server_default=text("true")
     )

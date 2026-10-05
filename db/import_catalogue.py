@@ -79,6 +79,15 @@ PRICING_DETAIL_COLUMNS = [
     "price_basis", "shipping_terms", "package_contents", "warranty_terms",
     "order_status_note", "edition_confirmed", "edition_note",
 ]
+#: Offer condition (migration 0024): NEW unless the catalogue entry says otherwise.
+OFFER_CONDITIONS = ("NEW", "USED", "OPEN_BOX", "REFURBISHED")
+
+
+def _condition(offer: dict) -> str:
+    value = offer.get("condition", "NEW")
+    if value not in OFFER_CONDITIONS:
+        raise ValueError(f"offer condition {value!r} is not one of {OFFER_CONDITIONS}")
+    return value
 AVAILABILITY_DETAIL_COLUMNS = ["seller_wording", "delivery_estimate_label"]
 
 
@@ -578,8 +587,9 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
                 (robot_id, variant_id, provider_id, region_id, transaction_type,
                  price_type, currency, price, price_min, price_max, billing_period,
                  note, is_current, price_basis, shipping_terms, package_contents,
-                 warranty_terms, order_status_note, edition_confirmed, edition_note)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                 warranty_terms, order_status_note, edition_confirmed, edition_note,
+                 condition)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             RETURNING id
             """,
             (
@@ -592,7 +602,7 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
                 # being current. `edition_confirmed` stays tri-state: absent in the
                 # JSON means NOT ASSESSED (NULL), never "confirmed".
                 po.get("is_current", True),
-            ) + tuple(po.get(c) for c in PRICING_DETAIL_COLUMNS),
+            ) + tuple(po.get(c) for c in PRICING_DETAIL_COLUMNS) + (_condition(po),),
         ).fetchone()[0]
         for ev in po.get("evidence", []):
             insert_evidence(cur, "PRICING_OFFER", pid, ev)
@@ -604,8 +614,8 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
             INSERT INTO availability_offer
                 (robot_id, variant_id, provider_id, region_id, transaction_type,
                  availability_status, available_from, lead_time_days, min_order_qty,
-                 note, is_current, seller_wording, delivery_estimate_label)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                 note, is_current, seller_wording, delivery_estimate_label, condition)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             RETURNING id
             """,
             (
@@ -614,7 +624,7 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
                 ao["transaction_type"], ao.get("availability_status", "ON_REQUEST"),
                 ao.get("available_from"), ao.get("lead_time_days"),
                 ao.get("min_order_qty"), ao.get("note"), ao.get("is_current", True),
-            ) + tuple(ao.get(c) for c in AVAILABILITY_DETAIL_COLUMNS),
+            ) + tuple(ao.get(c) for c in AVAILABILITY_DETAIL_COLUMNS) + (_condition(ao),),
         ).fetchone()[0]
         for ev in ao.get("evidence", []):
             insert_evidence(cur, "AVAILABILITY_OFFER", aid, ev)
@@ -800,6 +810,8 @@ def _refresh_lowest_price(cur, robot_id) -> None:
           -- listing: it may be shown, but it never sets this robot's price.
           -- NULL (not assessed) keeps its existing behaviour.
           AND edition_confirmed IS DISTINCT FROM FALSE
+          -- NEW only: a used / open-box / refurbished price never sets the robot's price.
+          AND condition = 'NEW'
           AND transaction_type = 'PURCHASE'
           AND price_type IN ('PUBLIC','FROM') AND price IS NOT NULL
         ORDER BY price ASC LIMIT 1

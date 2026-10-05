@@ -110,12 +110,12 @@ Full detail. Response `200` (abbreviated):
   "use_case_fits": [ { "use_case": "warehouse-logistics", "fit_score": 0.9, "commercial_readiness": "RAAS_DEPLOYMENT", "limitations": null } ],
   "pricing_offers": [
     { "transaction_type": "RAAS", "price_type": "QUOTE_ONLY", "price": null, "currency": "USD",
-      "billing_period": "ANNUAL", "region": "US", "provider": "agility-robotics",
+      "billing_period": "ANNUAL", "region": "US", "provider": "agility-robotics", "condition": "NEW",
       "evidence": { "source_type": "MANUFACTURER_SITE", "verified_at": "2026-07-01", "confidence": "HIGH" } }
   ],
   "availability_offers": [
     { "transaction_type": "RAAS", "availability_status": "AVAILABLE", "region": "US",
-      "provider": "agility-robotics", "available_from": null, "lead_time_days": null }
+      "provider": "agility-robotics", "available_from": null, "lead_time_days": null, "condition": "NEW" }
   ],
   "deployments": [
     { "customer_name": "GXO", "region": "US", "use_case": "warehouse-logistics",

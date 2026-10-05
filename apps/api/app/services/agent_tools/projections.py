@@ -184,6 +184,7 @@ class AgentPricingOffer(BaseModel):
     order_status_note: str | None = None
     edition_confirmed: bool | None = None
     edition_note: str | None = None
+    condition: str = "NEW"
     evidence: AgentEvidence | None = None
 
 
@@ -201,6 +202,7 @@ class AgentAvailabilityOffer(BaseModel):
     #: The seller's own wording and its geographically-scoped delivery estimate.
     seller_wording: str | None = None
     delivery_estimate_label: str | None = None
+    condition: str = "NEW"
     evidence: AgentEvidence | None = None
 
 

@@ -140,6 +140,7 @@ def load_candidates(session: Session, req: RequirementInput) -> list[RobotInput]
                 available_from=o.available_from,
             )
             for o in r.availability_offers
+            if o.condition == "NEW"
         )
         prices = tuple(
             PriceInput(
@@ -157,7 +158,7 @@ def load_candidates(session: Session, req: RequirementInput) -> list[RobotInput]
             # cost: it is a qualified listing, not this robot's price. NULL (never
             # assessed) keeps its existing behaviour.
             for p in r.pricing_offers
-            if p.edition_confirmed is not False
+            if p.edition_confirmed is not False and p.condition == "NEW"
         )
 
         subject_ids = (

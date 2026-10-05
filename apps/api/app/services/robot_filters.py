@@ -443,6 +443,8 @@ def apply_catalogue_filters(
             select(AvailabilityOffer.robot_id)
             .where(AvailabilityOffer.is_current.is_(True))
             .where(func.commercially_accessible(AvailabilityOffer.availability_status))
+            # NEW-only: a used unit's stock never makes the robot obtainable as new.
+            .where(AvailabilityOffer.condition == "NEW")
         )
         if transaction_type:
             avail = avail.where(AvailabilityOffer.transaction_type.in_(transaction_type))

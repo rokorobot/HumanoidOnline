@@ -302,6 +302,14 @@ Forward migrations:
   proposal carries an operational `origin` (`NEW_MODEL` | `CATALOGUE_ENRICHMENT`, default the
   latter) that never changes proposal semantics. One CHECK replaced, one defaulted column added;
   triggers and rows untouched. Additive, backward compatible, idempotent.
+- `0024_offer_condition.sql` — owner-approved offer condition (2026-10-05): new enum
+  `offer_condition` (`NEW`, `USED`, `OPEN_BOX`, `REFURBISHED`) and `condition NOT NULL DEFAULT
+  'NEW'` on `pricing_offer` and `availability_offer`; `condition` joins `uq_availability_logical`
+  (so a used offer coexists with, and never replaces, the new one); the dormant `commercial_offer`
+  family of views and `robot_commercial_snapshot` are recreated (a price only prices the
+  availability offer of the same condition; "obtainable" counts NEW stock only). A guard REFUSES
+  the migration if an existing row's own text says used/open-box/refurbished, so the NEW default
+  can never mislabel one. Additive, backward compatible, idempotent.
 
 ## Checksum integrity (WS8.2 / R9)
 

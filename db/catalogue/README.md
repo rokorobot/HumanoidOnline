@@ -291,6 +291,45 @@ uv run db/validate_catalogue.py   # G2 gate: fails non-zero if any published fac
   attached to a published robot, has a backing `evidence_source` row. It prints a
   summary (robots, offers, deployments, evidence counts) and exits non-zero on any gap.
 
+### Scoped imports (`--only`) are robot-scoped *reconciliation*
+
+`uv run db/import_catalogue.py --only <robot> [--only <robot> ...]` means: **reconcile the
+complete canonical catalogue representation of the selected robots, plus the shared entities
+they reference (manufacturers, providers, regions, ...), with the JSON on `main`.** It does
+**not** mean "apply only the newly materialized claims that motivated this import". The
+selected robots' child rows (offers, evidence, variants, specifications, images, capabilities)
+are deleted and re-inserted from their whole JSON file, so when production lags `main` for a
+selected robot, evidence and facts that are unrelated to the newest change are synchronized
+with it. Robots that are not selected are never touched.
+
+Seen in practice (2026-10-05, Alza reference offers): importing `unitree-h2-edu` and
+`unitree-r1-edu-u4` for their new Alza offers also added three reichelt evidence rows
+(observed 2026-09-26) that were already reviewed on `main` but had never been imported. That is
+correct reconciliation — and exactly the kind of change that must be *listed before* a
+production run, not discovered after it.
+
+### Production import preflight (semantic rehearsal diff)
+
+Before any governed production import, rehearse the exact chain on a clone of production (a
+Neon branch from `production`) and compare it with production using `db/import_preflight.py`:
+
+```bash
+uv run db/import_preflight.py --before "$PRODUCTION_URL" --after "$REHEARSAL_URL" \
+    --manifest expected-changes.json        # exit 0 = every business change is explained;
+                                            # exit 2 = STOP, do not import
+```
+
+It is read-only. It compares rows with ids/timestamps removed and every foreign key resolved to
+its natural key (so a swapped row is visible even when the totals are equal), classifies each
+non-audit change (robot, provider, pricing offer, availability offer, evidence, variant,
+publication state, removal, other catalogue rows), and requires **each one** to match an entry
+of the manifest (`table`, `kind` ADDED/REMOVED/CHANGED, `match` fields — a key ending in `~` is
+a substring test — and a `count`). An expected change that did not happen also fails. Audit
+and history tables (claims, proposals, crawl, freshness, audit logs) are reported by count and
+never need entries. `--report-only` prints the classification without gating and is not a
+gate. The manifest is part of the work order: write it from the intended change set, never
+from the rehearsal output.
+
 CI runs exactly this chain in the `catalogue-validate` job
 (`.github/workflows/ci.yml`), against a Postgres 16 service, **schema only, no seed**.
 

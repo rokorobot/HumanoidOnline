@@ -30,6 +30,13 @@ MANUFACTURER-ONLY MODE (`--manufacturers-only`)
   source attribution are validated before the transaction opens; the write is a
   single transaction. It is the production rollout path for manufacturer data.
 
+SCOPED IMPORT (`--only <robot>`) IS ROBOT-SCOPED RECONCILIATION
+  It reconciles the COMPLETE canonical JSON of the selected robots and what they reference with
+  the database; it is not "apply only the newest materialized claims". Evidence and facts in
+  those robots' files that production lags behind are synchronized too; unselected robots are
+  never touched. Rehearse on a production clone and run `db/import_preflight.py` first
+  (db/catalogue/README.md, "Production import preflight").
+
 NULL / UNKNOWN (AGENTS.md rule 6): every field absent or null in the JSON is
 written as SQL NULL — never coerced to 0, false or a made-up value.
 

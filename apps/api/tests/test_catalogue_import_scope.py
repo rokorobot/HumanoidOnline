@@ -83,7 +83,8 @@ def _batch_deps():
 def test_dependencies_are_only_what_the_selection_references():
     deps, _ = _batch_deps()
     assert deps["manufacturers"] == {"unitree", "booster-robotics"}
-    assert deps["providers"] == {"unitree-store", "reichelt", "quadruped-de"}
+    # alza-cz: governed Alza.cz reference offers on batch robots (owner-accepted 2026-10-05)
+    assert deps["providers"] == {"unitree-store", "reichelt", "quadruped-de", "alza-cz"}
     assert deps["capabilities"] == {"voice-interaction", "dexterous-hands"}
     assert deps["use_cases"] == set()
 

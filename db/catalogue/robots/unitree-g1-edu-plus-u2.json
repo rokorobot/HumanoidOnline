@@ -47,8 +47,57 @@
     }
   ],
   "variants": [],
-  "pricing_offers": [],
-  "availability_offers": [],
+  "pricing_offers": [
+    {
+      "provider_slug": "alza-cz",
+      "region_code": "CZ",
+      "transaction_type": "PURCHASE",
+      "condition": "NEW",
+      "price_type": "PUBLIC",
+      "currency": "CZK",
+      "price": 917990.0,
+      "billing_period": "ONE_TIME",
+      "price_basis": "VAT included: the product page's structured offer states valueAddedTaxIncluded=true; the page also shows 'bez DPH 758 669,-'",
+      "note": "Alza.cz reference price for a NEW unit, as listed on 2026-10-05 (Unitree G1 EDU U2, order code uni_G1_U2). The seller's own offer price in its own currency; not an MSRP, not a manufacturer price, not converted. A snapshot, not a live price.",
+      "evidence": [
+        {
+          "source_url": "https://www.alza.cz/unitree-g1-edu-u2-d13150281.htm",
+          "source_type": "OTHER",
+          "source_title": "Alza.cz — product page (manual capture)",
+          "excerpt": "Unitree G1 EDU U2 | 917 990,- | bez DPH 758 669,- | Skladem 5 ks | SKU uni_G1_U2",
+          "published_at": null,
+          "observed_at": "2026-10-05",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "Governed retail reference offer: proposal e9a22b337670 at offer[13150281]/price, sighted on page content hash 52f6226b15d9; accepted claim 176a34bbcc8d, chosen by Robert Konecny (owner decision, WorkOrder 2026-10-05). Evidence class AGENT_ASSISTED_RESEARCH; capture provenance: AGENT_ASSISTED_RESEARCH: one-time owner-authorised verification of the specific Alza humanoid product pages, 2026-10-05 (WorkOrder 'Proceed with the current Alza work'); plain HTTP GET, declared HumanoidOnlineMarketBot/0.1 user agent, no retries, no circumvention. This is a product-page snapshot, retrieved as stated in the provenance and observed 2026-10-05 (https://www.alza.cz/unitree-g1-edu-u2-d13150281.htm); a dated reference snapshot, not a live value, and not verified by a human beyond that."
+        }
+      ]
+    }
+  ],
+  "availability_offers": [
+    {
+      "provider_slug": "alza-cz",
+      "region_code": "CZ",
+      "transaction_type": "PURCHASE",
+      "condition": "NEW",
+      "availability_status": "AVAILABLE",
+      "seller_wording": "Skladem 5 ks",
+      "note": "Alza.cz availability for a NEW unit as listed on 2026-10-05 (Unitree G1 EDU U2, order code uni_G1_U2). Seller wording at observation: 'Skladem 5 ks' (a volatile observation, not durable inventory). A snapshot, not live stock.",
+      "evidence": [
+        {
+          "source_url": "https://www.alza.cz/unitree-g1-edu-u2-d13150281.htm",
+          "source_type": "OTHER",
+          "source_title": "Alza.cz — product page (manual capture)",
+          "excerpt": "Unitree G1 EDU U2 | 917 990,- | bez DPH 758 669,- | Skladem 5 ks | SKU uni_G1_U2",
+          "published_at": null,
+          "observed_at": "2026-10-05",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "Governed retail reference offer: proposal 96ed5ee4d002 at offer[13150281]/availability, sighted on page content hash 52f6226b15d9; accepted claim 8849adb137f9, chosen by Robert Konecny (owner decision, WorkOrder 2026-10-05). Evidence class AGENT_ASSISTED_RESEARCH; capture provenance: AGENT_ASSISTED_RESEARCH: one-time owner-authorised verification of the specific Alza humanoid product pages, 2026-10-05 (WorkOrder 'Proceed with the current Alza work'); plain HTTP GET, declared HumanoidOnlineMarketBot/0.1 user agent, no retries, no circumvention. This is a product-page snapshot, retrieved as stated in the provenance and observed 2026-10-05 (https://www.alza.cz/unitree-g1-edu-u2-d13150281.htm); a dated reference snapshot, not a live value, and not verified by a human beyond that."
+        }
+      ]
+    }
+  ],
   "deployments": [],
   "capabilities": [
     {

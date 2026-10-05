@@ -179,9 +179,14 @@ def test_api_returns_condition_and_used_never_promotes_new(robot_with_provider, 
     assert slug not in available
 
 
-def _listed(client, slug):
-    page = client.get("/api/robots", params={"q": slug, "page_size": 50}).json()
-    return next(i for i in page["items"] if i["slug"] == slug)
+def _headline(slug):
+    """The headline the listing cards show: the same selector the list endpoint uses, looked up
+    by slug (not by full-text search, which mis-parses an all-digit random suffix)."""
+    from app.models.robot import Robot
+    from app.services.reads import price_display_for
+    with SessionLocal() as s:
+        robot = s.query(Robot).filter_by(slug=slug).one()
+        return price_display_for(robot)
 
 
 def test_used_price_never_becomes_the_headline_price(robot_with_provider, client):
@@ -189,6 +194,6 @@ def test_used_price_never_becomes_the_headline_price(robot_with_provider, client
     _price(rid, pid, "USED", 100)                    # cheaper, but used
     body = client.get(f"/api/robots/{slug}").json()
     assert [p["condition"] for p in body["pricing_offers"]] == ["USED"]
-    assert _listed(client, slug)["price_display"] is None   # no NEW price -> no headline
+    assert _headline(slug) is None                   # no NEW price -> no headline
     _price(rid, pid, "NEW", 900000)
-    assert _listed(client, slug)["price_display"]["amount"] == 900000.0
+    assert _headline(slug).amount == 900000.0

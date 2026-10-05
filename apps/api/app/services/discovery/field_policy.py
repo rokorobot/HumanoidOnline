@@ -54,9 +54,10 @@ MAPPING_KEYS = ("target_kind", "variant_slug", "variant_name", "spec_key", "edit
                 # XPENG IRON (owner decision 2026-10-03): which configuration is current.
                 "configuration",
                 # Retailer reference offers (owner decision 2026-10-05): the reviewer states the
-                # offer's condition; nothing is defaulted. (Displayed stock stays in the seller's
-                # wording and the evidence: no canonical claim or column for it.)
-                "condition",
+                # offer's condition and (when the source states it) tax basis; nothing is
+                # defaulted. Displayed stock stays in the seller's wording and the evidence:
+                # no canonical claim or column for it.
+                "condition", "price_basis",
                 # hand DoF convention (owner decision 2026-10-03): "per hand".
                 "convention")
 
@@ -73,7 +74,7 @@ RETAIL_AVAILABILITY_KIND = "RETAIL_AVAILABILITY"
 RETAIL_PRICE_TARGET = "pricing_offer[retail]"
 RETAIL_AVAILABILITY_TARGET = "availability_offer[retail]"
 RETAIL_TARGET_KEY = "purchase.retail"
-RETAIL_LOCATOR_ROOT = "listing/item["
+RETAIL_LOCATOR_ROOT = "offer["
 OFFER_CONDITIONS = ("NEW", "USED", "OPEN_BOX", "REFURBISHED")
 #: What a seller's availability wording OBSERVATION may be mapped to by the reviewer. The existing
 #: availability vocabulary is reused; no Czech-specific state is invented, and a page's mere

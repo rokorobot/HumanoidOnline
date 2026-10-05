@@ -282,9 +282,14 @@ def _retail_evidence(session: Session, claim: AcceptedClaim, o: dict) -> dict:
     page = session.get(FetchedPage, proposal.origin_fetched_page_id)
     run = session.get(CrawlRun, page.crawl_run_id) if page else None
     provenance = (run.run_manifest or {}).get("provenance") if run else None
+    product_page = (proposal.structured or {}).get("page_kind") == "product-page"
+    kind_label = "product page" if product_page else "category listing"
+    verified = ("a product-page snapshot, retrieved as stated in the provenance and observed"
+                if product_page else
+                "a category-listing snapshot, NOT verified on the product page and observed")
     return {
         "source_url": claim.source_url, "source_type": "OTHER",
-        "source_title": f"{source.name} \u2014 category listing (manual capture)",
+        "source_title": f"{source.name} \u2014 {kind_label} (manual capture)",
         "excerpt": claim.evidence_excerpt, "published_at": None,
         "observed_at": claim.observed_at.date().isoformat(), "verified_at": None,
         "confidence": "MEDIUM",
@@ -293,9 +298,10 @@ def _retail_evidence(session: Session, claim: AcceptedClaim, o: dict) -> dict:
                  f"{claim.observation_content_hash[:12]}; accepted claim "
                  f"{claim.claim_digest[:12]}, chosen by {claim.created_by}. Evidence class "
                  f"AGENT_ASSISTED_RESEARCH; capture provenance: "
-                 f"{provenance or 'none recorded'}. A category-listing snapshot of "
-                 f"{o.get('product_url')} observed {claim.observed_at.date().isoformat()}, not "
-                 "verified on the product page and not a live value.")}
+                 f"{provenance or 'none recorded'}. This is {verified} "
+                 f"{claim.observed_at.date().isoformat()} ({o.get('product_url')}); a dated "
+                 "reference snapshot, not a live value, and not verified by a human beyond "
+                 "that.")}
 
 
 def _retail_entries(session: Session, claims: list[AcceptedClaim]) -> tuple[dict, dict]:
@@ -323,10 +329,12 @@ def _retail_entries(session: Session, claims: list[AcceptedClaim]) -> tuple[dict
             prices[key] = {
                 **base, "price_type": o["price_type"], "currency": o["currency"],
                 "price": float(Decimal(o["price"])), "billing_period": o["billing_period"],
+                **({"price_basis": o["price_basis"]} if o.get("price_basis") else {}),
                 "note": (f"{prov['name']} reference price for a {o['condition']} unit, as listed "
                          f"on {day} ({listing}). The seller's own offer price in its own "
-                         "currency; not an MSRP, not a manufacturer price, not converted, tax "
-                         "basis not stated. A snapshot, not a live price."),
+                         "currency; not an MSRP, not a manufacturer price, not converted"
+                         + ("" if o.get("price_basis") else ", tax basis not stated")
+                         + ". A snapshot, not a live price."),
                 "evidence": [ev]}
         else:
             shown = (f" Seller wording at observation: '{o['seller_wording']}' (a volatile "

@@ -120,9 +120,9 @@ def _plan_retail(p: DiscoveryClaimProposal, policy: ClaimPolicy, choices: dict,
     for key in ("provider", "market", "currency"):
         if not structured.get(key):
             raise DiscoveryError(f"the proposal does not state {key}; nothing is claimed")
-    if structured.get("vat_stated") not in (False, None):
-        raise DiscoveryError("this registry version records no VAT basis; the proposal states "
-                             "one, so it needs its own owner decision")
+    basis = structured.get("price_basis") if structured.get("vat_stated") is True else None
+    if structured.get("vat_stated") is True and not basis:
+        raise DiscoveryError("the proposal claims a stated VAT basis but carries no wording")
     _need(choices, "provider", structured["provider"])
     _need(choices, "region", structured["market"])
     _need(choices, "condition", condition)
@@ -149,8 +149,12 @@ def _plan_retail(p: DiscoveryClaimProposal, policy: ClaimPolicy, choices: dict,
         for key, expected in (("price_type", "PUBLIC"), ("billing_period", "ONE_TIME"),
                               ("currency", structured["currency"]), ("price", amount)):
             _need(choices, key, expected)
+        if basis:
+            _need(choices, "price_basis", basis)        # the stated tax basis, verbatim
         offer = {**common, "price_type": "PUBLIC", "billing_period": "ONE_TIME",
                  "currency": structured["currency"], "price": amount}
+        if basis:
+            offer["price_basis"] = basis
     else:
         signal = structured.get("availability_signal")
         allowed = RETAIL_ALLOWED_STATUS.get(signal)

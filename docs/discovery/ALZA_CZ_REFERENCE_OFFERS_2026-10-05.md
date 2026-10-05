@@ -1,73 +1,75 @@
-# Alza.cz reference offers — proposed, NOT materialized (2026-10-05)
+# Alza.cz reference offers — proposals and one-time reverification (2026-10-05)
 
-Status of everything below: **proposal-grade evidence, requires owner review**. Nothing here is an accepted claim, nothing is in `db/catalogue/robots/*.json`, nothing touched production. Alza.cz is an approved *provider/reference source*; it is **not** approved for automated monitoring, so these are dated evidence snapshots, never live prices or live stock.
+Everything below is a **dated reference snapshot** ("Reference offer verified <timestamp>"), never a live price or live stock. Nothing here is an accepted claim; nothing is in `db/catalogue/robots/*.json`; nothing touched production. Alza.cz is an approved *provider / reference source*, **not** approved for automated monitoring, scheduled fetching or polling.
 
-## Evidence base and its limits
+## Evidence base
 
-- Two category-listing captures retrieved by plain HTTP GET with the declared `HumanoidOnlineMarketBot/0.1` user agent during the 2026-10-05 inspection (robots.txt read the same day: product/manufacturer paths are not disallowed). Under this WorkOrder Alza is **not** contacted again to create fixtures.
-  - `https://www.alza.cz/unitree/v49936.htm?evt=re&exps=humanoidni+robot` — 954,132 bytes, raw sha256 `48a659a67f5316bc273bd189e2255653c7eb64413332873676701a2b51e1d927`
-  - `https://www.alza.cz/ubtech/v6390.htm` — 702,863 bytes, raw sha256 `c850ab3930f72d8e11dbd68805bc13fa9396a3a7dfcbf8a451c2a035d236ced5`
-- Observation **date** is 2026-10-05; the exact retrieval time was not retained, so `retrieved_at` cannot be supplied to `manual_capture` as a true timestamp. The captures are not committed (900 KB, third-party page); the owner decides whether they are to be preserved.
-- The Unitree capture is **page 1 of 3** of the filtered listing (`24 dalších…` pager): the listing is not proven complete, and e.g. *Unitree G1 Basic* did not appear on it.
-- Values come from the **category listing**, not the product-detail pages. Product-detail pages were not fetched. VAT basis is not stated on a listing, so none is recorded.
-- **All rows need manual reverification on the product page before acceptance** (`requires_reverification`).
+**One-time, owner-directed verification** of exactly the 14 authorised product URLs, 2026-10-05 15:06–15:08 UTC: one plain HTTP GET each with the declared `HumanoidOnlineMarketBot/0.1` user agent, 4 s apart, no retries, no circumvention. 11 returned HTTP 200; **3 returned a Cloudflare HTTP 403 block page** and are recorded as *could not reverify* (no retry, no workaround).
 
-## Unitree (existing catalogue robots)
+| Page | HTTP | Retrieved (UTC, end of request) | Bytes | raw sha256 |
+|---|---|---|---|---|
+| /unitree-g1-edu-u2-d13150281.htm | 200 | 2026-10-05T15:06:55Z | 755,486 | `666483944c0e4f3f…` |
+| /unitree-h2-basic-d13215767.htm | 403 | 2026-10-05T15:07:00Z | 65,624 | `0fbf914037437d21…` |
+| /unitree-h2-edu-d13215768.htm | 200 | 2026-10-05T15:07:05Z | 754,239 | `f7fde46d836abe6a…` |
+| /unitree-r1-edu-u2-d13408319.htm | 403 | 2026-10-05T15:07:10Z | 65,627 | `172bc1d36acda2d4…` |
+| /unitree-r1-edu-u4-d13408321.htm | 200 | 2026-10-05T15:07:14Z | 756,299 | `47ffb9af0c575544…` |
+| /unitree-r1-edu-u5-d13408322.htm | 200 | 2026-10-05T15:07:20Z | 756,230 | `352f8f6267464545…` |
+| /unitree-r1-edu-u6-d13408323.htm | 403 | 2026-10-05T15:07:24Z | 65,627 | `2ea96d499888e34e…` |
+| /unitree-g1-edu-u4-d13150282.htm | 200 | 2026-10-05T15:07:29Z | 759,495 | `7b490866e5a1b560…` |
+| /unitree-g1-edu-u5-d13079624.htm | 200 | 2026-10-05T15:07:35Z | 780,037 | `7bd63b18ebe269dc…` |
+| /unitree-g1-edu-u6-d13150284.htm | 200 | 2026-10-05T15:07:40Z | 756,153 | `139640c6621ebaee…` |
+| /unitree-h2-edu-u2-d13501544.htm | 200 | 2026-10-05T15:07:45Z | 757,004 | `74b5976bab4ba52a…` |
+| /unitree-r1-basic-d13408317.htm | 200 | 2026-10-05T15:07:51Z | 757,930 | `1a116954f6db08b4…` |
+| /ubtech-walker-tienkung-embodied-intelligence-d13233810.htm | 200 | 2026-10-05T15:07:56Z | 765,406 | `f9d59f990a913002…` |
+| /ubtech-walker-tienkung-embodied-intelligence-bazar-d13509114.htm | 200 | 2026-10-05T15:08:01Z | 764,812 | `ce8e316ea8410367…` |
 
-| HumanoidOnline robot | Alza product (listing) | Condition | Price (CZK, as shown) | Availability wording → proposed status | Displayed qty | Identity | Proposal status |
-|---|---|---|---|---|---|---|---|
-| `unitree-g1-edu-plus-u2` (G1 EDU Plus (U2)) | [Unitree G1 EDU U2](https://www.alza.cz/unitree-g1-edu-u2-d13150281.htm) `uni_G1_U2` | NEW | 917 990,- | Skladem 5 ks → AVAILABLE | 5 | MEDIUM | not yet ingested; requires reverification |
-| `unitree-h2-edu` (H2 EDU) | [Unitree H2 EDU](https://www.alza.cz/unitree-h2-edu-d13215768.htm) `uni_H2_EDU` | NEW | 1 309 990,- | Skladem 2 ks → AVAILABLE | 2 | HIGH | not yet ingested; requires reverification |
-| `unitree-h2` (H2) | [Unitree H2 Basic](https://www.alza.cz/unitree-h2-basic-d13215767.htm) `uni_H2_basic` | NEW | 863 990,- | Skladem 2 ks → AVAILABLE | 2 | MEDIUM | not yet ingested; requires reverification |
-| `unitree-h2-edu` (H2 EDU) **config U2** | [Unitree H2 EDU U2](https://www.alza.cz/unitree-h2-edu-u2-d13501544.htm) `BUN_H2EDU_U2` | NEW | 1 507 990,- | Skladem 1 ks → AVAILABLE | 1 | MEDIUM | not yet ingested; requires reverification |
-| `unitree-r1-edu-u6` (R1 EDU U6) | [Unitree R1 EDU U6](https://www.alza.cz/unitree-r1-edu-u6-d13408323.htm) `BUN_R1EDU_U6` | NEW | 731 990,- | Skladem 2 ks → AVAILABLE | 2 | HIGH | not yet ingested; requires reverification |
-| `unitree-r1-edu-u5` (R1 EDU U5) | [Unitree R1 EDU U5](https://www.alza.cz/unitree-r1-edu-u5-d13408322.htm) `BUN_R1EDU_U5` | NEW | 622 990,- | Skladem 2 ks → AVAILABLE | 2 | HIGH | not yet ingested; requires reverification |
-| `unitree-r1-edu-u4` (R1 EDU U4) | [Unitree R1 EDU U4](https://www.alza.cz/unitree-r1-edu-u4-d13408321.htm) `BUN_R1EDU_U4` | NEW | 731 990,- | Skladem 1 ks → AVAILABLE | 1 | HIGH | not yet ingested; requires reverification |
-| `unitree-r1-edu-u2` (R1 EDU U2) | [Unitree R1 EDU U2](https://www.alza.cz/unitree-r1-edu-u2-d13408319.htm) `BUN_R1EDU_U2` | NEW | 425 990,- | Skladem 1 ks → AVAILABLE | 1 | HIGH | not yet ingested; requires reverification |
+The 200 pages that map to reviewed items were recorded with `manual_capture` and ingested into a **disposable local database** (7 pages → 14 proposals, all `NOT_VERIFIED`, none decided). The pages themselves are third-party, ~750 KB each and are not committed. VAT: each product page's structured offer states `valueAddedTaxIncluded: true` and also shows a `bez DPH` figure; the proposal carries that wording verbatim as the price basis. The structured availability label (`InStock`, `Discontinued`) is kept as markup only; the visible wording decides.
 
-Identity basis per row:
+Every verified price and availability **equals** the earlier category-listing value: **no price or availability changed**.
 
-- `unitree-g1-edu-plus-u2`: Alza 'G1 EDU U2' states 29 joint motors + Jetson Orin; catalogue 'G1 EDU Plus (U2)' is 29 DoF + Orin NX. The name differs ('Plus'): reviewer must confirm.
-- `unitree-h2-edu`: Alza 'H2 EDU' = catalogue H2 EDU.
-- `unitree-h2`: Alza 'H2 Basic' (31 DoF) vs the catalogue's base edition 'H2'; the 'Basic' wording is Alza's: reviewer must confirm.
-- `unitree-h2-edu`: Alza 'H2 EDU U2' is the official H2 EDU with a retailer bundle (2x BrainCo Revo 2 hands, SKU BUN_H2EDU_U2): canonical H2 EDU, U2 kept as a configuration of the OFFER (owner decision 2026-10-05); reviewer must confirm.
-- `unitree-r1-edu-u6`: Alza U6: 2x BrainCo Revo 2 Touch = catalogue R1 EDU U6.
-- `unitree-r1-edu-u5`: Alza U5: 2x BrainCo Revo 2 Basic = catalogue R1 EDU U5.
-- `unitree-r1-edu-u4`: Alza U4: 2x Dex3-1 with tactile sensors = catalogue R1 EDU U4.
-- `unitree-r1-edu-u2`: Alza U2: 26 DoF, 100 TOPS, no active fingers = catalogue R1 EDU U2 (Smart, no hands).
+Row status key: **VERIFIED PRODUCT PAGE** · **CATEGORY LISTING ONLY** · **COULD NOT REVERIFY** · **IDENTITY REVIEW REQUIRED**.
 
-Owner identity decisions (2026-10-05) applied: the official Unitree structure is G1 / G1 EDU and H2 / H2 EDU, so U2/U4/U5/U6 are retailer/equipment configurations. **No new robot rows**: G1 EDU U4/U5/U6 are not proposed at all; *H2 EDU U2* attaches to canonical `unitree-h2-edu` as a variant-scoped offer (configuration `u2`, SKU kept in the evidence); *H2 Basic* maps to `unitree-h2` (reviewer confirmation); *R1 Basic* stays UNMATCHED. Displayed stock stays in the seller wording/evidence (no column). Follow-up (not in this PR): *Review canonical G1 EDU vs retailer/configuration U2/U4/U5/U6 modelling* (the existing `unitree-g1-edu-plus-u2` predates this decision and is not refactored).
+## A. Ready for owner claim review (verified product page, identity mapped)
 
-### Unitree items seen but NOT proposed
+| Canonical robot | Alza product (SKU) | Identity | Condition | Price CZK | Availability → status | Seller wording | Verified (UTC) | Basis | Proposal state | Remaining review |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `unitree-r1-edu-u4` | [Unitree R1 EDU U4](https://www.alza.cz/unitree-r1-edu-u4-d13408321.htm) (`BUN_R1EDU_U4`) | HIGH | **NEW** | 731 990,- | Skladem 1 ks → AVAILABLE | `Skladem 1 ks` | 2026-10-05T15:07:14Z | VAT included (structured); bez DPH 604 950,- | 2 proposals (price, availability), `NOT_VERIFIED`, undecided (disposable DB only) | owner accept / reject |
+| `unitree-r1-edu-u5` | [Unitree R1 EDU U5](https://www.alza.cz/unitree-r1-edu-u5-d13408322.htm) (`BUN_R1EDU_U5`) | HIGH | **NEW** | 622 990,- | Skladem 2 ks → AVAILABLE | `Skladem 2 ks` | 2026-10-05T15:07:20Z | VAT included (structured); bez DPH 514 868,- | 2 proposals (price, availability), `NOT_VERIFIED`, undecided (disposable DB only) | owner accept / reject |
+| `unitree-g1-edu-plus-u2` | [Unitree G1 EDU U2](https://www.alza.cz/unitree-g1-edu-u2-d13150281.htm) (`uni_G1_U2`) | MEDIUM | **NEW** | 917 990,- | Skladem 5 ks → AVAILABLE | `Skladem 5 ks` | 2026-10-05T15:06:55Z | VAT included (structured); bez DPH 758 669,- | 2 proposals (price, availability), `NOT_VERIFIED`, undecided (disposable DB only) | confirm identity (MEDIUM) |
+| `unitree-h2-edu` | [Unitree H2 EDU](https://www.alza.cz/unitree-h2-edu-d13215768.htm) (`uni_H2_EDU`) | HIGH | **NEW** | 1 309 990,- | Skladem 2 ks → AVAILABLE | `Skladem 2 ks` | 2026-10-05T15:07:05Z | VAT included (structured); bez DPH 1 082 636,- | 2 proposals (price, availability), `NOT_VERIFIED`, undecided (disposable DB only) | owner accept / reject |
+| `unitree-h2-edu` **config U2** | [Unitree H2 EDU U2](https://www.alza.cz/unitree-h2-edu-u2-d13501544.htm) (`BUN_H2EDU_U2`) | MEDIUM | **NEW** | 1 507 990,- | Skladem 1 ks → AVAILABLE | `Skladem 1 ks` | 2026-10-05T15:07:45Z | VAT included (structured); bez DPH 1 246 273,- | 2 proposals (price, availability), `NOT_VERIFIED`, undecided (disposable DB only) | confirm identity + `u2` configuration variant |
+| `ubtech-walker-tienkung-embodied-intelligence` | [Ubtech Walker Tienkung (embodied intelligence)](https://www.alza.cz/ubtech-walker-tienkung-embodied-intelligence-d13233810.htm) (`ubtech2501`) | MEDIUM | **NEW** | 2 491 790,- | Momentálně nedostupné → NOT_AVAILABLE | `Momentálně nedostupné` | 2026-10-05T15:07:56Z | VAT included (structured); bez DPH 2 059 331,- | 2 proposals (price, availability), `NOT_VERIFIED`, undecided (disposable DB only) | confirm identity (MEDIUM) |
+| `ubtech-walker-tienkung-embodied-intelligence` | [Ubtech Walker Tienkung (embodied intelligence)](https://www.alza.cz/ubtech-walker-tienkung-embodied-intelligence-bazar-d13509114.htm) (`ubtech2501_closeout`) | MEDIUM | **USED** | 2 199 990,- | Použité - skladem 1 ks → AVAILABLE | `Použité - skladem 1 ks` | 2026-10-05T15:08:01Z | VAT included (structured); bez DPH 1 818 174,- | 2 proposals (price, availability), `NOT_VERIFIED`, undecided (disposable DB only) | confirm identity (MEDIUM) |
 
-- [Unitree G1 EDU U6](https://www.alza.cz/unitree-g1-edu-u6-d13150284.htm) `uni_G1_U6` — 1 349 990,-, Skladem 2 ks: **G1 EDU U6 (41 DoF, Inspire RH56E2): same decision as G1 EDU U4**.
-- [Unitree G1 EDU U4](https://www.alza.cz/unitree-g1-edu-u4-d13150282.htm) `uni_G1_U4` — 1 242 990,-, Skladem 3 ks: **G1 EDU U4 (43 DoF, Dex3-1): a retailer/equipment configuration of the Unitree G1 EDU family; owner decision 2026-10-05: no new robot row, and the only G1 EDU entity (U2) is a different configuration. Needs configuration-level modelling (follow-up), so nothing is proposed**.
-- [Unitree G1 EDU U5](https://www.alza.cz/unitree-g1-edu-u5-d13079624.htm) `unitreeG1_EDU` — 1 242 990,-, Skladem 2 ks: **G1 EDU U5 (43 DoF, Inspire RH56DFQ): same decision as G1 EDU U4**.
-- [Unitree R1 Basic](https://www.alza.cz/unitree-r1-basic-d13408317.htm) `BUN_R1_B` — 229 990,-, Skladem 3 ks: **R1 Basic (24 DoF, no head): UNMATCHED. Official Unitree distinguishes R1 AIR, R1 and R1 EDU, and this configuration differs from the catalogue 'R1' (26 joints incl. head). Needs product-detail / manufacturer evidence before any mapping (R1 AIR, R1, another configuration, or retailer packaging)**.
-- 12 further listing items are accessories (batteries, remotes, adapters, hands, charging stations), non-humanoids or other brands: out of scope, nothing proposed.
+NEW and USED Walker Tienkung rows are independent offers (`condition` is part of the offer identity): the USED unit's stock does not make the NEW offer available, its price does not replace the NEW price, and only the NEW offer can be the headline price.
 
-## UBTECH — Walker Tienkung · Embodied Intelligence (NEW and USED are separate offers)
+## B. Still unresolved
 
-Canonical robot: `ubtech-walker-tienkung-embodied-intelligence` (new, **unpublished**; model TK2301 in UBTECH's own user manual — see `db/catalogue/robots/`). Not Walker S1/S2.
+| Canonical target | Alza product (SKU) | Condition | Price CZK | Availability wording | Evidence | Why unresolved |
+|---|---|---|---|---|---|---|
+| `unitree-h2` | [Unitree H2 Basic](https://www.alza.cz/unitree-h2-basic-d13215767.htm) (`uni_H2_basic`) | NEW | 863 990,- | `Skladem 2 ks` | COULD NOT REVERIFY (HTTP 403) — CATEGORY LISTING ONLY | Could not reverify (403); listing value only. H2 Basic → `unitree-h2` is MEDIUM identity and needs reviewer confirmation too. |
+| `unitree-r1-edu-u2` | [Unitree R1 EDU U2](https://www.alza.cz/unitree-r1-edu-u2-d13408319.htm) (`BUN_R1EDU_U2`) | NEW | 425 990,- | `Skladem 1 ks` | COULD NOT REVERIFY (HTTP 403) — CATEGORY LISTING ONLY | Could not reverify (403); listing value only. Identity HIGH. |
+| `unitree-r1-edu-u6` | [Unitree R1 EDU U6](https://www.alza.cz/unitree-r1-edu-u6-d13408323.htm) (`BUN_R1EDU_U6`) | NEW | 731 990,- | `Skladem 2 ks` | COULD NOT REVERIFY (HTTP 403) — CATEGORY LISTING ONLY | Could not reverify (403); listing value only. Identity HIGH. |
+| — (no canonical target) | [Unitree G1 EDU U4](https://www.alza.cz/unitree-g1-edu-u4-d13150282.htm) (`uni_G1_U4`) | NEW | 1 242 990,- | `Skladem 3 ks` | VERIFIED PRODUCT PAGE 2026-10-05T15:07:29Z | G1 EDU U4: configuration of the G1 EDU family; **no new robot row** (owner decision). Product page verified, so the data is retained as evidence for a future configuration-level model. |
+| — (no canonical target) | [Unitree G1 EDU U5](https://www.alza.cz/unitree-g1-edu-u5-d13079624.htm) (`unitreeG1_EDU`) | NEW | 1 242 990,- | `Skladem 2 ks` | VERIFIED PRODUCT PAGE 2026-10-05T15:07:35Z | G1 EDU U5: same. |
+| — (no canonical target) | [Unitree G1 EDU U6](https://www.alza.cz/unitree-g1-edu-u6-d13150284.htm) (`uni_G1_U6`) | NEW | 1 349 990,- | `Skladem 2 ks` | VERIFIED PRODUCT PAGE 2026-10-05T15:07:40Z | G1 EDU U6: same. |
+| — (no canonical target) | [Unitree R1 Basic](https://www.alza.cz/unitree-r1-basic-d13408317.htm) (`BUN_R1_B`) | NEW | 229 990,- | `Skladem 3 ks` | VERIFIED PRODUCT PAGE 2026-10-05T15:07:51Z | **R1 Basic — IDENTITY REVIEW REQUIRED, UNMATCHED.** |
 
-| Condition | Alza product | Price (CZK) | Availability wording → proposed status | Qty | Observed | Identity | Proposal status |
-|---|---|---|---|---|---|---|---|
-| **USED** | [Ubtech Walker Tienkung (embodied intelligence)](https://www.alza.cz/ubtech-walker-tienkung-embodied-intelligence-bazar-d13509114.htm) `ubtech2501` | 2 199 990,- (listing shows new-unit price 2 491 790,- beside it; reference only, not an offer) | Použité - skladem 1 ks → AVAILABLE | 1 | 2026-10-05 (date only) | MEDIUM | not yet ingested; requires reverification |
-| **NEW** | [Ubtech Walker Tienkung (embodied intelligence)](https://www.alza.cz/ubtech-walker-tienkung-embodied-intelligence-d13233810.htm) `ubtech2501` | 2 491 790,- | Momentálně nedostupné → NOT_AVAILABLE | — | 2026-10-05 (date only) | MEDIUM | not yet ingested; requires reverification |
+### R1 Basic — what the product page adds
 
-The USED unit being in stock does **not** make the NEW offer available: the NEW offer is `Momentálně nedostupné` → `NOT_AVAILABLE`; the USED offer is its own row (`condition = USED`).
+The verified product page (SKU `BUN_R1_B`, NEW, 229 990,- CZK, `Skladem 3 ks`) states "24 DoF (noha 6, paže 5, pas 2)" — **no head joints**, no R1 AIR / R1 / EDU wording, no manufacturer reference. The canonical `unitree-r1` has 26 joints including the head. There is no manufacturer-grade evidence here, so the identity question stays open (R1 AIR, R1, another configuration, or retailer packaging); no proposal exists and none is made.
 
-## Unresolved identity / evidence questions
+### Walker Tienkung · Embodied Intelligence / TK2301 — current result
 
-- Unitree G1 EDU U6 (`uni_G1_U6`): G1 EDU U6 (41 DoF, Inspire RH56E2): same decision as G1 EDU U4.
-- Unitree G1 EDU U4 (`uni_G1_U4`): G1 EDU U4 (43 DoF, Dex3-1): a retailer/equipment configuration of the Unitree G1 EDU family; owner decision 2026-10-05: no new robot row, and the only G1 EDU entity (U2) is a different configuration. Needs configuration-level modelling (follow-up), so nothing is proposed.
-- Unitree G1 EDU U5 (`unitreeG1_EDU`): G1 EDU U5 (43 DoF, Inspire RH56DFQ): same decision as G1 EDU U4.
-- Unitree R1 Basic (`BUN_R1_B`): R1 Basic (24 DoF, no head): UNMATCHED. Official Unitree distinguishes R1 AIR, R1 and R1 EDU, and this configuration differs from the catalogue 'R1' (26 joints incl. head). Needs product-detail / manufacturer evidence before any mapping (R1 AIR, R1, another configuration, or retailer packaging).
-- `unitree-g1-edu-plus-u2` ↔ Alza *G1 EDU U2* and `unitree-h2` ↔ Alza *H2 Basic* are MEDIUM confidence (name differs); the reviewer must confirm.
-- Product-detail pages must be checked (price, stock, condition, VAT basis) before any claim is accepted; stock quantities change.
+- **NEW** (`ubtech2501`): 2 491 790,- CZK, `Momentálně nedostupné` → `NOT_AVAILABLE` (Alza's structured label says `Discontinued`; the visible wording, "temporarily unavailable", decides, and `DISCONTINUED` is refused as a mapping). Verified 2026-10-05T15:07:56Z.
+- **USED** (`ubtech2501_closeout`): 2 199 990,- CZK, `Použité - skladem 1 ks` → `AVAILABLE`. Verified 2026-10-05T15:08:01Z. Raw wording kept in evidence; no stock column.
 
-## How these would enter the pipeline (owner-authorized steps, none run)
+## Identity decisions applied (owner, 2026-10-05)
 
-1. `discovery source register alza-cz --name Alza.cz --class DISTRIBUTOR --homepage https://www.alza.cz/ --by <owner>` (stays disabled with no cadence; automated-source ToS stays fail-closed; nothing is reviewed or enabled).
-2. Re-retrieve the listing/product pages under an owner work order and record them with `discovery proposals capture alza-cz --url … --body-file … --retrieved-at <true time> --provenance <work order> --by <owner>` (no network; a true retrieval time is mandatory).
-3. `discovery proposals ingest-alza --robot-slug … --fetched-page … --body-file … --by …` per robot → review (`accept` with explicit choices) → `claims create` → `claims materialize` → PR → import → `claims verify`.
+Official Unitree structure is G1 / G1 EDU and H2 / H2 EDU, so U2/U4/U5/U6 are retailer or equipment configurations: **no new robot rows**; G1 EDU U4/U5/U6 get no proposals; *H2 EDU U2* is a variant-scoped offer of `unitree-h2-edu`; *H2 Basic* → `unitree-h2` (confirmation); *R1 Basic* unmatched. The existing `unitree-g1-edu-plus-u2` predates this and is not refactored. Follow-up (not in this PR): *Review canonical G1 EDU vs retailer/configuration U2/U4/U5/U6 modelling*.
+
+## Pipeline (owner-authorised steps; none run against production)
+
+1. `discovery source register alza-cz --name Alza.cz --class DISTRIBUTOR --homepage https://www.alza.cz/ --by <owner>` — stays disabled, no cadence; automated-source ToS stays fail-closed.
+2. `discovery proposals capture alza-cz --url … --body-file … --retrieved-at <true time> --provenance <work order> --by <owner>` — no network.
+3. `discovery proposals ingest-alza --robot-slug … --fetched-page … --body-file … --by …` → review (`accept` with explicit choices) → `claims create` → `claims materialize` → PR → import → `claims verify`.

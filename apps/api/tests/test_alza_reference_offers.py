@@ -692,3 +692,117 @@ def test_h2_edu_and_its_u2_bundle_are_two_offers_of_one_robot_without_a_new_robo
     assert len(audits) == 4
     do_import(dsession, path, robot)
     assert materialize.verify_applied(dsession, slug, change_ref="chg-h2", applied_by=WHO) == []
+
+
+# ------------------------------------------------- product pages (one-time verification) --
+
+
+def product_page(pid, sku, name, price, avail_text, *, markup="InStock", cond="NewCondition",
+                 vat=True, ex_vat="bez DPH 2 059 331,-"):
+    ld = {"@context": "https://schema.org", "@type": "Product",
+          "@id": f"https://www.alza.cz/x-d{pid}.htm#product", "name": name, "sku": sku,
+          "offers": {"@type": "Offer", "itemCondition": f"https://schema.org/{cond}",
+                     "availability": f"https://schema.org/{markup}", "price": price,
+                     "priceCurrency": "CZK",
+                     "priceSpecification": [{"@type": "UnitPriceSpecification", "price": price,
+                                             "priceCurrency": "CZK",
+                                             "valueAddedTaxIncluded": vat}]}}
+    return ("<html><head><script type=\"application/ld+json\">" + json.dumps(ld)
+            + "</script></head><body><h1>" + name + "</h1><span>" + f"{price:,}".replace(",", " ")
+            + ",-</span><span>" + ex_vat + "</span><span>" + avail_text + "</span></body></html>"
+            ).encode("utf-8")
+
+
+WALKER_NEW_URL = f"https://www.alza.cz{alza.PRODUCT_PATHS['13233810']}"
+WALKER_USED_URL = f"https://www.alza.cz{alza.PRODUCT_PATHS['13509114']}"
+WNAME = "Ubtech Walker Tienkung (embodied intelligence)"
+WALKER_NEW_PAGE = product_page("13233810", "ubtech2501", WNAME, 2491790, "Momentálně nedostupné",
+                               markup="Discontinued")
+WALKER_USED_PAGE = product_page("13509114", "ubtech2501_closeout", WNAME, 2199990,
+                                "Použité - skladem 1 ks", cond="UsedCondition",
+                                ex_vat="bez DPH 1 818 174,-")
+
+
+def test_a_product_page_is_read_from_its_structured_offer_and_visible_wording():
+    new = alza.parse_product_page(WALKER_NEW_PAGE, WALKER_NEW_URL)
+    used = alza.parse_product_page(WALKER_USED_PAGE, WALKER_USED_URL)
+    assert not new.problems and not used.problems
+    assert (new.condition, new.price, new.signal, new.vat_included) == (
+        "NEW", "2 491 790,-", alza.UNAVAILABLE, True)
+    assert new.availability_markup == "Discontinued"          # Alza's label, kept as markup only
+    assert (used.condition, used.price, used.signal, used.stock_quantity, used.order_code) == (
+        "USED", "2 199 990,-", alza.IN_STOCK, "1", "ubtech2501_closeout")
+    assert used.ex_vat_wording == "bez DPH 1 818 174,-"
+
+
+@pytest.mark.parametrize("page,why", [
+    (product_page("13233810", "x", WNAME, 2491790, "Skladem 2 ks", markup="Discontinued"),
+     "disagrees"),                                             # markup vs visible wording
+    (product_page("13233810", "x", WNAME, 2491790, "Momentálně nedostupné", markup="InStock"),
+     "disagrees"),
+    (product_page("13233810", "x", WNAME, 2491790, "Skladem 2 ks", cond="UsedCondition"),
+     "condition markers disagree"),
+    (product_page("13233810", "x", WNAME, 2491790, "Momentálně nedostupné", markup="Discontinued",
+                  cond="UsedCondition"), "used condition without"),
+    (product_page("13233810", "x", WNAME, 24917.5, "Skladem 2 ks"), "plain integer"),
+    ("<html><body>Momentálně nedostupné</body></html>".encode(), "no structured Product"),
+])
+def test_a_contradictory_product_page_fails_closed(page, why):
+    item = alza.parse_product_page(page, WALKER_NEW_URL)
+    assert any(why in p for p in item.problems), item.problems
+
+
+def test_only_the_authorised_product_pages_can_be_proposed_from():
+    assert len(alza.PRODUCT_URLS) == 10
+    assert not any("r1-basic" in u or "g1-edu-u4" in u or "g1-edu-u5" in u or "g1-edu-u6" in u
+                   for u in alza.PRODUCT_URLS)
+    with pytest.raises(ValueError, match="not an authorised Alza page"):
+        alza.propose_alza_reference_claims(
+            WALKER_NEW_PAGE, "https://www.alza.cz/some-other-d1.htm", robot_slug=WALKER)
+
+
+def test_product_page_vat_is_recorded_only_as_the_page_states_it(dsession):
+    ensure_robot(dsession, WALKER, WALKER_NAME)
+    alza_source(dsession)
+    for url, body in ((WALKER_NEW_URL, WALKER_NEW_PAGE), (WALKER_USED_URL, WALKER_USED_PAGE)):
+        page = capture(dsession, body, url=url)
+        proposals.ingest_alza_reference_proposals(
+            dsession, source_key=alza.SOURCE_KEY, robot_slug=WALKER, fetched_page_id=page.id,
+            body=body, ingested_by=WHO)
+    rows = props(dsession)
+    price = rows[("RETAIL_PRICE", "NEW")]
+    assert price.structured["page_kind"] == "product-page" and price.structured["vat_stated"]
+    assert "valueAddedTaxIncluded=true" in price.structured["price_basis"]
+    assert "bez DPH 2 059 331,-" in price.structured["price_basis"]
+    # the reviewer must carry the stated basis verbatim; omitting or altering it is refused
+    accept(dsession, price, price_choices(price))
+    with pytest.raises(DiscoveryError, match="price_basis"):
+        claim_for(dsession, price)
+    accept(dsession, price, price_choices(price, price_basis="includes VAT"))
+    with pytest.raises(DiscoveryError):
+        claim_for(dsession, price)
+    accept(dsession, price, price_choices(price, price_basis=price.structured["price_basis"]))
+    o = json.loads(claim_for(dsession, price).accepted_value)
+    assert o["price_basis"] == price.structured["price_basis"] and o["price"] == "2491790"
+    # availability: the status the visible wording supports; the markup label never decides it
+    avail = rows[("RETAIL_AVAILABILITY", "NEW")]
+    assert avail.structured["availability_markup"] == "Discontinued"
+    accept(dsession, avail, avail_choices(avail, "DISCONTINUED"))
+    with pytest.raises(DiscoveryError):
+        claim_for(dsession, avail)
+    accept(dsession, avail, avail_choices(avail, "NOT_AVAILABLE"))
+    assert json.loads(claim_for(dsession, avail).accepted_value)["availability_status"] == (
+        "NOT_AVAILABLE")
+
+
+def test_a_product_page_proposal_supersedes_the_listing_proposal_for_the_same_offer(dsession):
+    ingest(dsession)                                            # category listing first
+    listing_price = props(dsession)[("RETAIL_PRICE", "NEW")]
+    assert listing_price.structured["page_kind"] == "category-listing"
+    page = capture(dsession, WALKER_NEW_PAGE, url=WALKER_NEW_URL,
+                   at=CAPTURED + timedelta(minutes=5))
+    proposals.ingest_alza_reference_proposals(
+        dsession, source_key=alza.SOURCE_KEY, robot_slug=WALKER, fetched_page_id=page.id,
+        body=WALKER_NEW_PAGE, ingested_by=WHO)
+    [state] = pr.derive_states(dsession, [listing_price])
+    assert state.superseded                                     # same slot, newer observation

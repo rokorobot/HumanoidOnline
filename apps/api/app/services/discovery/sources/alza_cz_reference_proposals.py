@@ -32,6 +32,7 @@ import re
 from dataclasses import dataclass
 from decimal import Decimal
 from html.parser import HTMLParser
+from urllib.parse import urlsplit
 
 from app.services.discovery.field_policy import RETAIL_ALLOWED_STATUS
 from app.services.discovery.live_adapter import Evidence, _evidence
@@ -47,11 +48,25 @@ HOST = "www.alza.cz"
 #: The only pages this extractor reads (normalized form): the two category listings.
 UNITREE_LISTING_URL = "https://www.alza.cz/unitree/v49936.htm?evt=re&exps=humanoidni+robot"
 UBTECH_LISTING_URL = "https://www.alza.cz/ubtech/v6390.htm"
-PAGE_URLS = (UNITREE_LISTING_URL, UBTECH_LISTING_URL)
+
+#: The specific product pages authorised for the one-time owner-directed verification
+#: (2026-10-05): exactly the reviewed items, nothing enumerated, nothing crawled.
+PRODUCT_PATHS = {
+    "13408319": "/unitree-r1-edu-u2-d13408319.htm", "13408321": "/unitree-r1-edu-u4-d13408321.htm",
+    "13408322": "/unitree-r1-edu-u5-d13408322.htm", "13408323": "/unitree-r1-edu-u6-d13408323.htm",
+    "13150281": "/unitree-g1-edu-u2-d13150281.htm", "13215767": "/unitree-h2-basic-d13215767.htm",
+    "13215768": "/unitree-h2-edu-d13215768.htm", "13501544": "/unitree-h2-edu-u2-d13501544.htm",
+    "13233810": "/ubtech-walker-tienkung-embodied-intelligence-d13233810.htm",
+    "13509114": "/ubtech-walker-tienkung-embodied-intelligence-bazar-d13509114.htm",
+}
+PRODUCT_URLS = tuple(f"https://{HOST}{p}" for p in PRODUCT_PATHS.values())
+PAGE_URLS = (UNITREE_LISTING_URL, UBTECH_LISTING_URL, *PRODUCT_URLS)
 
 PRICE_KIND, AVAILABILITY_KIND = "RETAIL_PRICE", "RETAIL_AVAILABILITY"
 PRICE_TARGET, AVAILABILITY_TARGET = "pricing_offer[retail]", "availability_offer[retail]"
-LOCATOR_ROOT = "listing/item["
+#: One locator per offer, whichever page kind it was read from, so a product-page proposal
+#: supersedes the category-listing proposal for the same offer (same slot).
+LOCATOR_ROOT = "offer["
 PROPOSED, NO_PROPOSALS = "PROPOSED", "NO_PROPOSALS"
 CLAIM_STATUS = "NOT_VERIFIED"
 
@@ -155,6 +170,12 @@ class ListingItem:
     order_code: str | None
     excerpt: str
     problems: tuple[str, ...]
+    page_kind: str = "category-listing"
+    #: Product pages only: the structured `valueAddedTaxIncluded` flag, the visible ex-VAT
+    #: figure ("bez DPH 758 669,-") and Alza's own structured availability label.
+    vat_included: bool | None = None
+    ex_vat_wording: str | None = None
+    availability_markup: str | None = None
 
 
 class _Items(HTMLParser):
@@ -276,6 +297,117 @@ def parse_listing(body: bytes) -> list[ListingItem]:
     return out
 
 
+# ------------------------------------------------------------------ product pages --
+
+_LD = re.compile(r'<script type="application/ld\+json">(.*?)</script>', re.S)
+_EX_VAT = re.compile(r"bez DPH (\d{1,3}(?: \d{3})*,-)")
+#: Alza's structured availability label -> the visible wording family it must agree with.
+_MARKUP_SIGNAL = {"InStock": IN_STOCK, "Discontinued": UNAVAILABLE, "OutOfStock": UNAVAILABLE,
+                  "PreOrder": PREORDER}
+_MARKUP_CONDITION = {"NewCondition": "NEW", "UsedCondition": "USED"}
+
+
+def _visible_tokens(body: bytes) -> list[str]:
+    class _T(HTMLParser):
+        def __init__(self):
+            super().__init__(convert_charrefs=True)
+            self.out, self.skip = [], 0
+
+        def handle_starttag(self, tag, attrs):
+            if tag in ("script", "style", "noscript"):
+                self.skip += 1
+
+        def handle_endtag(self, tag):
+            if tag in ("script", "style", "noscript") and self.skip:
+                self.skip -= 1
+
+        def handle_data(self, data):
+            if not self.skip and data.strip():
+                self.out.append(re.sub(r"\s+", " ", data.replace("\u00a0", " ")).strip())
+
+    parser = _T()
+    parser.feed(body.decode("utf-8", errors="replace"))
+    parser.close()
+    return parser.out
+
+
+def parse_product_page(body: bytes, url: str) -> ListingItem:
+    """One product-detail page, as an observation. Reads the structured Product offer AND the
+    visible wording and fails closed when they disagree."""
+    problems: list[str] = []
+    match = re.search(r"-d(\d+)\.htm$", url)
+    product_id = match.group(1) if match else ""
+    product = None
+    for block in _LD.findall(body.decode("utf-8", errors="replace")):
+        try:
+            data = json.loads(block)
+        except ValueError:
+            continue
+        if isinstance(data, dict) and data.get("@type") == "Product":
+            product = data
+    if product is None:
+        problems.append("no structured Product data")
+        product = {}
+    if product_id and f"-d{product_id}.htm" not in str(product.get("@id", f"-d{product_id}.htm")):
+        problems.append("structured Product is not this page's product")
+    offer = product.get("offers") or {}
+    if not isinstance(offer, dict):
+        problems.append("structured offer is not a single offer")
+        offer = {}
+    if offer.get("priceCurrency") != CURRENCY:
+        problems.append(f"currency {offer.get('priceCurrency')!r} is not {CURRENCY}")
+    raw_price = offer.get("price")
+    price = None
+    if isinstance(raw_price, int) and not isinstance(raw_price, bool) and raw_price > 0:
+        price = f"{raw_price:,}".replace(",", " ") + ",-"
+    else:
+        problems.append("no plain integer CZK price in the structured offer")
+    specs = offer.get("priceSpecification") or []
+    flags = {s.get("valueAddedTaxIncluded") for s in specs if isinstance(s, dict)}
+    vat_included = True if flags == {True} else (False if flags == {False} else None)
+    tokens = _visible_tokens(body)
+    visible = [t for t in tokens if _signal(t)]
+    kinds = {_signal(t)[0] for t in visible}
+    signal = wording = qty = word_condition = None
+    if not visible:
+        problems.append("no recognised availability wording")
+    elif len(kinds) != 1 or len(set(visible)) != 1:
+        problems.append("conflicting availability wording on the page")
+    else:
+        wording = visible[0]
+        signal, qty, word_condition = _signal(wording)
+    markup = str(offer.get("availability", "")).rsplit("/", 1)[-1]
+    if signal and _MARKUP_SIGNAL.get(markup) != signal:
+        problems.append(f"structured availability {markup!r} disagrees with the visible "
+                        f"wording {wording!r}")
+    cond_markup = _MARKUP_CONDITION.get(str(offer.get("itemCondition", "")).rsplit("/", 1)[-1])
+    condition = None
+    if cond_markup is None:
+        problems.append("condition markers missing")
+    elif word_condition is not None and cond_markup != word_condition:
+        problems.append(f"condition markers disagree (structured {cond_markup}, wording "
+                        f"{word_condition})")
+    elif cond_markup == "USED" and word_condition != "USED":
+        problems.append("used condition without the 'Použité' wording")
+    else:
+        condition = cond_markup
+    ex_vat = None
+    joined = " ".join(tokens)
+    found = _EX_VAT.findall(joined)
+    if found:
+        ex_vat = f"bez DPH {found[0]}"
+    sku = product.get("sku")
+    excerpt = " | ".join(x for x in (product.get("name"), price, ex_vat, wording,
+                                     f"SKU {sku}" if sku else None) if x)
+    return ListingItem(
+        product_id=product_id, code=str(sku or ""), href=urlsplit(url).path,
+        name=str(product.get("name") or ""), price=price, new_reference_price=None,
+        availability_wording=wording, signal=signal, stock_quantity=qty, condition=condition,
+        order_code=str(sku) if sku else None, excerpt=excerpt, problems=tuple(problems),
+        page_kind="product-page", vat_included=vat_included, ex_vat_wording=ex_vat,
+        availability_markup=markup or None)
+
+
 # --------------------------------------------------------------------- proposals --
 
 
@@ -328,8 +460,8 @@ def _review(item: ReferenceItem, what: str) -> tuple[str, ...]:
     return (
         f"Is this listing exactly the catalogue robot '{item.robot_name}'? Identity confidence "
         f"{item.identity_confidence}: {item.identity_basis}.",
-        f"This {what} was read from an Alza category listing, not the product page, and is an "
-        "evidence snapshot (not a live value). Is it acceptable as a reference offer?",
+        f"This {what} is a dated evidence snapshot read from an Alza page (not a live value). "
+        "Is it acceptable as a reference offer?",
     )
 
 
@@ -340,7 +472,13 @@ def propose_alza_reference_claims(body: bytes, url: str, *, robot_slug: str) -> 
     proposals: list[Proposal] = []
     rejected: list[tuple[str, str]] = []
     notes: list[str] = []
-    for li in parse_listing(body):
+    if url in PRODUCT_URLS:
+        items = [parse_product_page(body, url)]
+    elif url in (UNITREE_LISTING_URL, UBTECH_LISTING_URL):
+        items = parse_listing(body)
+    else:
+        raise ValueError(f"{url!r} is not an authorised Alza page")
+    for li in items:
         label = f"{li.product_id} {li.name}".strip()
         ref = REFERENCE_ITEMS.get(li.product_id)
         if ref is None:
@@ -363,11 +501,18 @@ def propose_alza_reference_claims(body: bytes, url: str, *, robot_slug: str) -> 
             "provider": PROVIDER_SLUG, "market": MARKET, "currency": CURRENCY,
             "condition": li.condition, "product_id": li.product_id,
             "order_code": li.order_code, "product_name": li.name, "product_url": product_url,
-            "page_kind": "category-listing", "vat_stated": False,
+            "page_kind": li.page_kind, "vat_stated": li.vat_included is True,
             "identity_confidence": ref.identity_confidence,
             "identity_basis": ref.identity_basis,
             "capture_class": "AGENT_ASSISTED_RESEARCH",
         }
+        if li.vat_included is True:
+            common["price_basis"] = (
+                "VAT included: the product page's structured offer states "
+                "valueAddedTaxIncluded=true"
+                + (f"; the page also shows '{li.ex_vat_wording}'" if li.ex_vat_wording else ""))
+        if li.availability_markup:
+            common["availability_markup"] = li.availability_markup
         if ref.configuration:
             common["configuration_label"] = ref.configuration[0].upper()
             common["configuration_variant_slug"] = ref.configuration[0]

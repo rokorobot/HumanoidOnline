@@ -54,8 +54,9 @@ MAPPING_KEYS = ("target_kind", "variant_slug", "variant_name", "spec_key", "edit
                 # XPENG IRON (owner decision 2026-10-03): which configuration is current.
                 "configuration",
                 # Retailer reference offers (owner decision 2026-10-05): the reviewer states the
-                # offer's condition and (when displayed) the stock quantity; nothing is defaulted.
-                "condition", "stock_quantity",
+                # offer's condition; nothing is defaulted. (Displayed stock stays in the seller's
+                # wording and the evidence: no canonical claim or column for it.)
+                "condition",
                 # hand DoF convention (owner decision 2026-10-03): "per hand".
                 "convention")
 

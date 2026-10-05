@@ -89,7 +89,13 @@ G1_U2 = item("13150281", "uni_G1_U2", "Unitree G1 EDU U2", "917 990,-", "Skladem
 BATTERY = item("13079625", "uni_bat", "Unitree G1 Baterie", "16 990,-", "Skladem > 5 ks")
 GO2_BATTERY = item("13150279", "uni_go2", "Unitree Go2 Baterie", "16 990,-", "Skladem 2 ks")
 G1_U4 = item("13150282", "uni_G1_U4", "Unitree G1 EDU U4", "1 242 990,-", "Skladem 3 ks")
-LISTING = listing(WALKER_NEW, WALKER_USED, R1_U2, G1_U2, BATTERY, GO2_BATTERY, G1_U4)
+G1_U5 = item("13079624", "unitreeG1_EDU", "Unitree G1 EDU U5", "1 242 990,-", "Skladem 2 ks")
+G1_U6 = item("13150284", "uni_G1_U6", "Unitree G1 EDU U6", "1 349 990,-", "Skladem 2 ks")
+H2_EDU = item("13215768", "uni_H2_EDU", "Unitree H2 EDU", "1 309 990,-", "Skladem 2 ks")
+H2_EDU_U2 = item("13501544", "BUN_H2EDU_U2", "Unitree H2 EDU U2", "1 507 990,-", "Skladem 1 ks")
+R1_BASIC = item("13408317", "BUN_R1_B", "Unitree R1 Basic", "229 990,-", "Skladem 3 ks")
+LISTING = listing(WALKER_NEW, WALKER_USED, R1_U2, G1_U2, BATTERY, GO2_BATTERY, G1_U4, G1_U5,
+                  G1_U6, H2_EDU, H2_EDU_U2, R1_BASIC)
 
 
 def ensure_robot(session, slug, name):
@@ -151,8 +157,7 @@ def avail_choices(p, status, **over):
     s = p.structured
     return {**answers(p), "target_kind": "availability_offer", "provider": s["provider"],
             "region": s["market"], "condition": s["condition"], "transaction_type": "PURCHASE",
-            "edition_confirmed": "true", "availability_status": status,
-            "stock_quantity": s["stock_quantity"] or "NONE", **over}
+            "edition_confirmed": "true", "availability_status": status, **over}
 
 
 def accept(session, p, choices):
@@ -276,7 +281,7 @@ def test_only_reviewed_items_are_proposed_and_everything_else_is_reported():
     assert any("OUT_OF_SCOPE" in r and "Baterie" in k for k, r in reasons.items())  # accessory
     assert any(k.startswith("13150279") and "OUT_OF_SCOPE" in r
                for k, r in reasons.items())                    # quadruped accessory
-    assert any(k.startswith("13150282") and "IDENTITY_UNRESOLVED" in r and "no canonical" in r
+    assert any(k.startswith("13150282") and "IDENTITY_UNRESOLVED" in r and "no new robot row" in r
                for k, r in reasons.items())                    # a retailer SKU is not a robot
     # nothing was proposed for any other robot's item
     other = alza.propose_alza_reference_claims(LISTING, alza.UBTECH_LISTING_URL,
@@ -405,15 +410,15 @@ def test_availability_maps_only_to_the_status_the_wording_supports(dsession, con
             claim_for(dsession, p)
 
 
-def test_stock_quantity_and_wording_are_preserved_and_a_wrong_quantity_is_refused(dsession):
+def test_stock_wording_is_preserved_but_quantity_is_not_a_canonical_field(dsession):
     ingest(dsession)
     p = props(dsession)[("RETAIL_AVAILABILITY", "USED")]
-    accept(dsession, p, avail_choices(p, "AVAILABLE", stock_quantity="9"))
-    with pytest.raises(DiscoveryError):
-        claim_for(dsession, p)
+    assert p.structured["stock_quantity"] == "1"               # the extracted observation
+    with pytest.raises(DiscoveryError, match="unknown resolved-choice key"):
+        accept(dsession, p, avail_choices(p, "AVAILABLE", stock_quantity="1"))
     accept(dsession, p, avail_choices(p, "AVAILABLE"))
     o = json.loads(claim_for(dsession, p).accepted_value)
-    assert o["stock_quantity"] == "1" and o["seller_wording"] == "Použité - skladem 1 ks"
+    assert "stock_quantity" not in o and o["seller_wording"] == "Použité - skladem 1 ks"
     assert o["condition"] == "USED" and o["region"] == "CZ" and o["provider"] == "alza-cz"
 
 
@@ -490,8 +495,9 @@ def test_new_and_used_walker_offers_travel_the_whole_chain_as_separate_offers(ds
     avail = {o["condition"]: o for o in doc["availability_offers"]}
     assert avail["NEW"]["availability_status"] == "NOT_AVAILABLE"
     assert avail["USED"]["availability_status"] == "AVAILABLE"
-    assert "Displayed stock quantity: 1" in avail["USED"]["note"]
-    assert "Displayed stock" not in avail["NEW"]["note"]
+    assert "Použité - skladem 1 ks" in avail["USED"]["note"]       # raw wording, not a field
+    assert "durable inventory" in avail["USED"]["note"]
+    assert all("stock_quantity" not in o for o in avail.values())
     for o in (*prices.values(), *avail.values()):
         [ev] = o["evidence"]
         assert ev["source_url"] == alza.UBTECH_LISTING_URL and ev["verified_at"] is None
@@ -598,3 +604,91 @@ def test_the_alza_extractor_is_a_live_extractor_but_has_no_identity_gate_name_co
     assert (alza.EXTRACTOR_KEY, alza.EXTRACTOR_VERSION) in pr.LIVE_EXTRACTORS
     names = {i.robot_name for i in alza.REFERENCE_ITEMS.values()}
     assert re.search(r"Embodied Intelligence", " ".join(names))
+
+
+# ------------------------------------- owner identity decisions (2026-10-05) -------
+
+
+def test_g1_edu_u4_u5_u6_and_r1_basic_get_no_proposals_and_no_robot_rows(dsession):
+    """Retailer configurations are not canonical robots: nothing is proposed or created."""
+    unresolved = {"13150282", "13079624", "13150284", "13408317"}
+    assert unresolved <= set(alza.UNRESOLVED_ITEMS)
+    assert not unresolved & set(alza.REFERENCE_ITEMS)
+    before = dsession.scalar(text("SELECT count(*) FROM robot"))
+    for slug in ("unitree-g1-edu-plus-u2", "unitree-r1", "unitree-h2", "unitree-h2-edu",
+                 "unitree-r1-edu-u2"):
+        result = alza.propose_alza_reference_claims(LISTING, alza.UNITREE_LISTING_URL,
+                                                    robot_slug=slug)
+        ids = {dict(p.structured)["product_id"] for p in result.proposals}
+        assert not ids & unresolved, slug
+        rejected = {k.split()[0]: why for k, why in result.rejected}
+        for pid in unresolved:
+            assert "IDENTITY_UNRESOLVED" in rejected[pid]
+    assert "UNMATCHED" in alza.UNRESOLVED_ITEMS["13408317"]
+    assert "no new robot row" in alza.UNRESOLVED_ITEMS["13150282"]
+    assert dsession.scalar(text("SELECT count(*) FROM robot")) == before
+    for slug in ("unitree-g1-edu-u4", "unitree-g1-edu-u5", "unitree-g1-edu-u6",
+                 "unitree-h2-edu-u2", "unitree-r1-basic"):
+        assert slug not in {i.robot_slug for i in alza.REFERENCE_ITEMS.values()}
+        assert not (REPO / "db" / "catalogue" / "robots" / f"{slug}.json").exists()
+
+
+def test_h2_basic_and_h2_edu_u2_map_to_the_official_h2_family():
+    assert alza.REFERENCE_ITEMS["13215767"].robot_slug == "unitree-h2"
+    assert alza.REFERENCE_ITEMS["13215767"].identity_confidence == "MEDIUM"
+    u2 = alza.REFERENCE_ITEMS["13501544"]
+    assert (u2.robot_slug, u2.configuration[0]) == ("unitree-h2-edu", "u2")
+    result = alza.propose_alza_reference_claims(LISTING, alza.UNITREE_LISTING_URL,
+                                                robot_slug="unitree-h2-edu")
+    by_pid = {}
+    for p in result.proposals:
+        by_pid.setdefault(dict(p.structured)["product_id"], dict(p.structured))
+    assert set(by_pid) == {"13215768", "13501544"}
+    assert "configuration_label" not in by_pid["13215768"]
+    assert by_pid["13501544"]["configuration_label"] == "U2"
+    assert by_pid["13501544"]["order_code"] == "BUN_H2EDU_U2"
+
+
+def test_h2_edu_and_its_u2_bundle_are_two_offers_of_one_robot_without_a_new_robot(
+        dsession, tmp_path):
+    slug, name = "unitree-h2-edu", "H2 EDU"
+    ensure_robot(dsession, slug, name)
+    page = capture(dsession, LISTING, url=alza.UNITREE_LISTING_URL)
+    proposals.ingest_alza_reference_proposals(
+        dsession, source_key=alza.SOURCE_KEY, robot_slug=slug, fetched_page_id=page.id,
+        body=LISTING, ingested_by=WHO)
+    rows = list(dsession.scalars(select(DiscoveryClaimProposal).where(
+        DiscoveryClaimProposal.robot_slug == slug)))
+    assert len(rows) == 4
+    bundle_price = next(p for p in rows if p.kind == "RETAIL_PRICE"
+                        and p.structured.get("configuration_label"))
+    # a bundle offer without the stated configuration is refused
+    accept(dsession, bundle_price, price_choices(bundle_price))
+    with pytest.raises(DiscoveryError):
+        claims.create_claim(dsession, str(bundle_price.id), created_by=WHO)
+    for p in rows:
+        s = p.structured
+        extra = ({"variant_slug": "u2", "variant_name": s["configuration_name"]}
+                 if s.get("configuration_label") else {})
+        if p.kind == "RETAIL_PRICE":
+            accept(dsession, p, price_choices(p, **extra))
+        else:
+            accept(dsession, p, avail_choices(p, "AVAILABLE", **extra))
+        claim_for(dsession, p)
+
+    path = stub_doc(tmp_path, slug, name)
+    materialize.apply_plan(materialize.plan_materialization(dsession, slug, tmp_path))
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    assert [v["slug"] for v in doc["variants"]] == ["u2"]
+    prices = {o.get("variant_slug"): o["price"] for o in doc["pricing_offers"]}
+    assert prices == {None: 1309990.0, "u2": 1507990.0}
+    avail = {o.get("variant_slug"): o["availability_status"] for o in doc["availability_offers"]}
+    assert avail == {None: "AVAILABLE", "u2": "AVAILABLE"}
+    robot = dsession.scalar(select(Robot).where(Robot.slug == slug))
+    before = dsession.scalar(text("SELECT count(*) FROM robot"))
+    do_import(dsession, path, robot)
+    assert dsession.scalar(text("SELECT count(*) FROM robot")) == before   # no new robot
+    audits = materialize.verify_applied(dsession, slug, change_ref="chg-h2", applied_by=WHO)
+    assert len(audits) == 4
+    do_import(dsession, path, robot)
+    assert materialize.verify_applied(dsession, slug, change_ref="chg-h2", applied_by=WHO) == []

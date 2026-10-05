@@ -73,10 +73,14 @@ class ReferenceItem:
     expected_condition: str
     identity_confidence: str          # HIGH | MEDIUM
     identity_basis: str
+    #: A retailer / equipment-package configuration of the canonical robot (owner decision
+    #: 2026-10-05): kept as a variant-scoped OFFER, never a new robot. (slug, display name)
+    configuration: tuple[str, str] | None = None
 
 
-def _item(pid, slug, name, cond, conf, basis) -> tuple[str, ReferenceItem]:
-    return pid, ReferenceItem(pid, slug, name, cond, conf, basis)
+def _item(pid, slug, name, cond, conf, basis, configuration=None
+          ) -> tuple[str, ReferenceItem]:
+    return pid, ReferenceItem(pid, slug, name, cond, conf, basis, configuration)
 
 
 #: Reviewed 2026-10-05 against the retained listing captures and the current catalogue. The
@@ -98,6 +102,11 @@ REFERENCE_ITEMS: dict[str, ReferenceItem] = dict([
           "Alza's: reviewer must confirm"),
     _item("13215768", "unitree-h2-edu", "H2 EDU", "NEW", "HIGH",
           "Alza 'H2 EDU' = catalogue H2 EDU"),
+    _item("13501544", "unitree-h2-edu", "H2 EDU", "NEW", "MEDIUM",
+          "Alza 'H2 EDU U2' is the official H2 EDU with a retailer bundle (2x BrainCo Revo 2 "
+          "hands, SKU BUN_H2EDU_U2): canonical H2 EDU, U2 kept as a configuration of the OFFER "
+          "(owner decision 2026-10-05); reviewer must confirm",
+          ("u2", "U2 configuration (retailer bundle: 2x BrainCo Revo 2 hands)")),
     _item("13233810", "ubtech-walker-tienkung-embodied-intelligence",
           "Walker Tienkung · Embodied Intelligence", "NEW", "MEDIUM",
           "Alza 'Ubtech Walker Tienkung (embodied intelligence)'; the canonical entity rests on "
@@ -109,13 +118,16 @@ REFERENCE_ITEMS: dict[str, ReferenceItem] = dict([
 
 #: Seen on the reviewed captures but deliberately NOT proposed, with the reason.
 UNRESOLVED_ITEMS: dict[str, str] = {
-    "13150282": "G1 EDU U4 (43 DoF, Dex3-1): no canonical robot in the catalogue yet",
-    "13079624": "G1 EDU U5 (43 DoF, Inspire RH56DFQ): no canonical robot in the catalogue yet",
-    "13150284": "G1 EDU U6 (41 DoF, Inspire RH56E2): no canonical robot in the catalogue yet",
-    "13501544": "H2 EDU U2 (BrainCo Revo 2 hands bundle): no canonical robot; may be an H2 EDU "
-                "configuration, owner decision",
-    "13408317": "R1 Basic (24 DoF, no head): the catalogue 'R1' is a 26-joint mid tier; not the "
-                "same configuration without owner review",
+    "13150282": "G1 EDU U4 (43 DoF, Dex3-1): a retailer/equipment configuration of the Unitree "
+                "G1 EDU family; owner decision 2026-10-05: no new robot row, and the only "
+                "G1 EDU entity (U2) is a different configuration. Needs configuration-level "
+                "modelling (follow-up), so nothing is proposed",
+    "13079624": "G1 EDU U5 (43 DoF, Inspire RH56DFQ): same decision as G1 EDU U4",
+    "13150284": "G1 EDU U6 (41 DoF, Inspire RH56E2): same decision as G1 EDU U4",
+    "13408317": "R1 Basic (24 DoF, no head): UNMATCHED. Official Unitree distinguishes R1 AIR, "
+                "R1 and R1 EDU, and this configuration differs from the catalogue 'R1' (26 "
+                "joints incl. head). Needs product-detail / manufacturer evidence before any "
+                "mapping (R1 AIR, R1, another configuration, or retailer packaging)",
 }
 
 # ---------------------------------------------------------------- listing parse --
@@ -356,6 +368,10 @@ def propose_alza_reference_claims(body: bytes, url: str, *, robot_slug: str) -> 
             "identity_basis": ref.identity_basis,
             "capture_class": "AGENT_ASSISTED_RESEARCH",
         }
+        if ref.configuration:
+            common["configuration_label"] = ref.configuration[0].upper()
+            common["configuration_variant_slug"] = ref.configuration[0]
+            common["configuration_name"] = ref.configuration[1]
         price_struct = {**common, "amount": price_amount(li.price),
                         "price_token": li.price}
         if li.condition == "USED" and li.new_reference_price:

@@ -19,6 +19,7 @@ Status of everything below: **proposal-grade evidence, requires owner review**. 
 | `unitree-g1-edu-plus-u2` (G1 EDU Plus (U2)) | [Unitree G1 EDU U2](https://www.alza.cz/unitree-g1-edu-u2-d13150281.htm) `uni_G1_U2` | NEW | 917 990,- | Skladem 5 ks → AVAILABLE | 5 | MEDIUM | not yet ingested; requires reverification |
 | `unitree-h2-edu` (H2 EDU) | [Unitree H2 EDU](https://www.alza.cz/unitree-h2-edu-d13215768.htm) `uni_H2_EDU` | NEW | 1 309 990,- | Skladem 2 ks → AVAILABLE | 2 | HIGH | not yet ingested; requires reverification |
 | `unitree-h2` (H2) | [Unitree H2 Basic](https://www.alza.cz/unitree-h2-basic-d13215767.htm) `uni_H2_basic` | NEW | 863 990,- | Skladem 2 ks → AVAILABLE | 2 | MEDIUM | not yet ingested; requires reverification |
+| `unitree-h2-edu` (H2 EDU) **config U2** | [Unitree H2 EDU U2](https://www.alza.cz/unitree-h2-edu-u2-d13501544.htm) `BUN_H2EDU_U2` | NEW | 1 507 990,- | Skladem 1 ks → AVAILABLE | 1 | MEDIUM | not yet ingested; requires reverification |
 | `unitree-r1-edu-u6` (R1 EDU U6) | [Unitree R1 EDU U6](https://www.alza.cz/unitree-r1-edu-u6-d13408323.htm) `BUN_R1EDU_U6` | NEW | 731 990,- | Skladem 2 ks → AVAILABLE | 2 | HIGH | not yet ingested; requires reverification |
 | `unitree-r1-edu-u5` (R1 EDU U5) | [Unitree R1 EDU U5](https://www.alza.cz/unitree-r1-edu-u5-d13408322.htm) `BUN_R1EDU_U5` | NEW | 622 990,- | Skladem 2 ks → AVAILABLE | 2 | HIGH | not yet ingested; requires reverification |
 | `unitree-r1-edu-u4` (R1 EDU U4) | [Unitree R1 EDU U4](https://www.alza.cz/unitree-r1-edu-u4-d13408321.htm) `BUN_R1EDU_U4` | NEW | 731 990,- | Skladem 1 ks → AVAILABLE | 1 | HIGH | not yet ingested; requires reverification |
@@ -29,18 +30,20 @@ Identity basis per row:
 - `unitree-g1-edu-plus-u2`: Alza 'G1 EDU U2' states 29 joint motors + Jetson Orin; catalogue 'G1 EDU Plus (U2)' is 29 DoF + Orin NX. The name differs ('Plus'): reviewer must confirm.
 - `unitree-h2-edu`: Alza 'H2 EDU' = catalogue H2 EDU.
 - `unitree-h2`: Alza 'H2 Basic' (31 DoF) vs the catalogue's base edition 'H2'; the 'Basic' wording is Alza's: reviewer must confirm.
+- `unitree-h2-edu`: Alza 'H2 EDU U2' is the official H2 EDU with a retailer bundle (2x BrainCo Revo 2 hands, SKU BUN_H2EDU_U2): canonical H2 EDU, U2 kept as a configuration of the OFFER (owner decision 2026-10-05); reviewer must confirm.
 - `unitree-r1-edu-u6`: Alza U6: 2x BrainCo Revo 2 Touch = catalogue R1 EDU U6.
 - `unitree-r1-edu-u5`: Alza U5: 2x BrainCo Revo 2 Basic = catalogue R1 EDU U5.
 - `unitree-r1-edu-u4`: Alza U4: 2x Dex3-1 with tactile sensors = catalogue R1 EDU U4.
 - `unitree-r1-edu-u2`: Alza U2: 26 DoF, 100 TOPS, no active fingers = catalogue R1 EDU U2 (Smart, no hands).
 
+Owner identity decisions (2026-10-05) applied: the official Unitree structure is G1 / G1 EDU and H2 / H2 EDU, so U2/U4/U5/U6 are retailer/equipment configurations. **No new robot rows**: G1 EDU U4/U5/U6 are not proposed at all; *H2 EDU U2* attaches to canonical `unitree-h2-edu` as a variant-scoped offer (configuration `u2`, SKU kept in the evidence); *H2 Basic* maps to `unitree-h2` (reviewer confirmation); *R1 Basic* stays UNMATCHED. Displayed stock stays in the seller wording/evidence (no column). Follow-up (not in this PR): *Review canonical G1 EDU vs retailer/configuration U2/U4/U5/U6 modelling* (the existing `unitree-g1-edu-plus-u2` predates this decision and is not refactored).
+
 ### Unitree items seen but NOT proposed
 
-- [Unitree G1 EDU U6](https://www.alza.cz/unitree-g1-edu-u6-d13150284.htm) `uni_G1_U6` — 1 349 990,-, Skladem 2 ks: **G1 EDU U6 (41 DoF, Inspire RH56E2): no canonical robot in the catalogue yet**.
-- [Unitree G1 EDU U4](https://www.alza.cz/unitree-g1-edu-u4-d13150282.htm) `uni_G1_U4` — 1 242 990,-, Skladem 3 ks: **G1 EDU U4 (43 DoF, Dex3-1): no canonical robot in the catalogue yet**.
-- [Unitree G1 EDU U5](https://www.alza.cz/unitree-g1-edu-u5-d13079624.htm) `unitreeG1_EDU` — 1 242 990,-, Skladem 2 ks: **G1 EDU U5 (43 DoF, Inspire RH56DFQ): no canonical robot in the catalogue yet**.
-- [Unitree H2 EDU U2](https://www.alza.cz/unitree-h2-edu-u2-d13501544.htm) `BUN_H2EDU_U2` — 1 507 990,-, Skladem 1 ks: **H2 EDU U2 (BrainCo Revo 2 hands bundle): no canonical robot; may be an H2 EDU configuration, owner decision**.
-- [Unitree R1 Basic](https://www.alza.cz/unitree-r1-basic-d13408317.htm) `BUN_R1_B` — 229 990,-, Skladem 3 ks: **R1 Basic (24 DoF, no head): the catalogue 'R1' is a 26-joint mid tier; not the same configuration without owner review**.
+- [Unitree G1 EDU U6](https://www.alza.cz/unitree-g1-edu-u6-d13150284.htm) `uni_G1_U6` — 1 349 990,-, Skladem 2 ks: **G1 EDU U6 (41 DoF, Inspire RH56E2): same decision as G1 EDU U4**.
+- [Unitree G1 EDU U4](https://www.alza.cz/unitree-g1-edu-u4-d13150282.htm) `uni_G1_U4` — 1 242 990,-, Skladem 3 ks: **G1 EDU U4 (43 DoF, Dex3-1): a retailer/equipment configuration of the Unitree G1 EDU family; owner decision 2026-10-05: no new robot row, and the only G1 EDU entity (U2) is a different configuration. Needs configuration-level modelling (follow-up), so nothing is proposed**.
+- [Unitree G1 EDU U5](https://www.alza.cz/unitree-g1-edu-u5-d13079624.htm) `unitreeG1_EDU` — 1 242 990,-, Skladem 2 ks: **G1 EDU U5 (43 DoF, Inspire RH56DFQ): same decision as G1 EDU U4**.
+- [Unitree R1 Basic](https://www.alza.cz/unitree-r1-basic-d13408317.htm) `BUN_R1_B` — 229 990,-, Skladem 3 ks: **R1 Basic (24 DoF, no head): UNMATCHED. Official Unitree distinguishes R1 AIR, R1 and R1 EDU, and this configuration differs from the catalogue 'R1' (26 joints incl. head). Needs product-detail / manufacturer evidence before any mapping (R1 AIR, R1, another configuration, or retailer packaging)**.
 - 12 further listing items are accessories (batteries, remotes, adapters, hands, charging stations), non-humanoids or other brands: out of scope, nothing proposed.
 
 ## UBTECH — Walker Tienkung · Embodied Intelligence (NEW and USED are separate offers)
@@ -56,11 +59,10 @@ The USED unit being in stock does **not** make the NEW offer available: the NEW 
 
 ## Unresolved identity / evidence questions
 
-- Unitree G1 EDU U6 (`uni_G1_U6`): G1 EDU U6 (41 DoF, Inspire RH56E2): no canonical robot in the catalogue yet.
-- Unitree G1 EDU U4 (`uni_G1_U4`): G1 EDU U4 (43 DoF, Dex3-1): no canonical robot in the catalogue yet.
-- Unitree G1 EDU U5 (`unitreeG1_EDU`): G1 EDU U5 (43 DoF, Inspire RH56DFQ): no canonical robot in the catalogue yet.
-- Unitree H2 EDU U2 (`BUN_H2EDU_U2`): H2 EDU U2 (BrainCo Revo 2 hands bundle): no canonical robot; may be an H2 EDU configuration, owner decision.
-- Unitree R1 Basic (`BUN_R1_B`): R1 Basic (24 DoF, no head): the catalogue 'R1' is a 26-joint mid tier; not the same configuration without owner review.
+- Unitree G1 EDU U6 (`uni_G1_U6`): G1 EDU U6 (41 DoF, Inspire RH56E2): same decision as G1 EDU U4.
+- Unitree G1 EDU U4 (`uni_G1_U4`): G1 EDU U4 (43 DoF, Dex3-1): a retailer/equipment configuration of the Unitree G1 EDU family; owner decision 2026-10-05: no new robot row, and the only G1 EDU entity (U2) is a different configuration. Needs configuration-level modelling (follow-up), so nothing is proposed.
+- Unitree G1 EDU U5 (`unitreeG1_EDU`): G1 EDU U5 (43 DoF, Inspire RH56DFQ): same decision as G1 EDU U4.
+- Unitree R1 Basic (`BUN_R1_B`): R1 Basic (24 DoF, no head): UNMATCHED. Official Unitree distinguishes R1 AIR, R1 and R1 EDU, and this configuration differs from the catalogue 'R1' (26 joints incl. head). Needs product-detail / manufacturer evidence before any mapping (R1 AIR, R1, another configuration, or retailer packaging).
 - `unitree-g1-edu-plus-u2` ↔ Alza *G1 EDU U2* and `unitree-h2` ↔ Alza *H2 Basic* are MEDIUM confidence (name differs); the reviewer must confirm.
 - Product-detail pages must be checked (price, stock, condition, VAT basis) before any claim is accepted; stock quantities change.
 

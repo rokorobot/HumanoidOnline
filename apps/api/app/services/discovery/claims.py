@@ -134,6 +134,14 @@ def _plan_retail(p: DiscoveryClaimProposal, policy: ClaimPolicy, choices: dict,
               "product_url": structured.get("product_url"),
               "order_code": structured.get("order_code"),
               "product_name": structured.get("product_name")}
+    variant_slug = structured.get("configuration_variant_slug")
+    if variant_slug:
+        # A retailer / equipment-package configuration of the canonical robot (owner decision
+        # 2026-10-05): the offer is variant-scoped, the reviewer states the variant explicitly,
+        # and no new robot exists.
+        _need(choices, "variant_slug", variant_slug)
+        common["variant_slug"] = variant_slug
+        common["variant_name"] = _need(choices, "variant_name", structured["configuration_name"])
     if policy.key == RETAIL_PRICE_POLICY:
         amount = structured.get("amount")
         if not amount or not str(amount).isdigit():
@@ -153,11 +161,10 @@ def _plan_retail(p: DiscoveryClaimProposal, policy: ClaimPolicy, choices: dict,
         if status not in allowed:
             raise DiscoveryError(f"availability_status {status!r} is not an allowed mapping of "
                                  f"the stated {signal} wording ({list(allowed)})")
-        quantity = structured.get("stock_quantity")
-        _need(choices, "stock_quantity", quantity if quantity else "NONE")
-        offer = {**common, "availability_status": status, "seller_wording": verbatim,
-                 "stock_quantity": quantity}
-    return {"variant_slug": None, "accepted_value": _json(offer), "edition_scope": None,
+        # Displayed stock ("Skladem 5 ks") is a volatile observation: it stays in the seller's
+        # own wording and the evidence, never a canonical field (owner decision 2026-10-05).
+        offer = {**common, "availability_status": status, "seller_wording": verbatim}
+    return {"variant_slug": variant_slug, "accepted_value": _json(offer), "edition_scope": None,
             "target_key": policy.target_key}
 
 

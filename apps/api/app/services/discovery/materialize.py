@@ -23,6 +23,7 @@ from pathlib import Path
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
+from app.models.acquisition import CrawlRun, FetchedPage
 from app.models.claim_proposal import (
     AcceptedClaim,
     CatalogueWriteAudit,
@@ -33,7 +34,7 @@ from app.models.discovery import DiscoverySource
 from app.services.discovery import DiscoveryError
 from app.services.discovery import proposal_review as pr
 from app.services.discovery.claims import _active_claim, active_claims
-from app.services.discovery.field_policy import CLAIM_POLICIES
+from app.services.discovery.field_policy import CLAIM_POLICIES, RETAIL_TARGET_KEY
 
 CATALOGUE_ROBOTS = Path(__file__).resolve().parents[5] / "db" / "catalogue" / "robots"
 _SOURCE_KIND = {"MANUFACTURER": "MANUFACTURER"}
@@ -112,7 +113,7 @@ def _materializable(session: Session, robot_slug: str) -> list[AcceptedClaim]:
                                  + "; ".join(state.stale_reasons) + "); materialization refuses")
     seen: dict[tuple, AcceptedClaim] = {}
     for c in claims:
-        key = (c.target_kind, c.target_key, c.variant_slug)
+        key = _conflict_key(c)
         if key in seen and seen[key].accepted_value != c.accepted_value:
             raise DiscoveryError(
                 f"CONFLICT: two active claims disagree on {key} ({seen[key].accepted_value!r} vs "
@@ -219,7 +220,11 @@ def plan_materialization(session: Session, robot_slug: str,
         merged += [entries[k] for k in sorted(entries, key=lambda k: (k[0] or "", k[1]))
                    if k not in placed]
         doc["extended_specs"] = merged
-    offer_claims = [c for c in claims if c.target_kind in ("pricing_offer", "availability_offer")]
+    retail_claims = [c for c in claims if c.target_key == RETAIL_TARGET_KEY]
+    if retail_claims:
+        _apply_retail(session, doc, retail_claims)
+    offer_claims = [c for c in claims if c.target_kind in ("pricing_offer", "availability_offer")
+                    and c.target_key != RETAIL_TARGET_KEY]
     if offer_claims:
         osources = {x.id: x for x in session.scalars(select(DiscoverySource).where(
             DiscoverySource.id.in_({c.source_id for c in offer_claims})))}
@@ -255,6 +260,133 @@ def plan_materialization(session: Session, robot_slug: str,
             doc["availability_offers"] = _merge_offers(
                 doc.get("availability_offers", []), avail, "WAITLIST", "availability_status")
     return MaterializationPlan(robot_slug, path, before, _dump(doc), claims)
+
+
+RETAIL_MARK = "Governed retail reference offer"
+CATALOGUE_DIR = CATALOGUE_ROBOTS.parent
+
+
+def _catalogue_refs() -> tuple[dict, set]:
+    providers = {p["slug"]: p for p in json.loads(
+        (CATALOGUE_DIR / "providers.json").read_text(encoding="utf-8"))["providers"]}
+    regions = {r["code"] for r in json.loads(
+        (CATALOGUE_DIR / "regions.json").read_text(encoding="utf-8"))["regions"]}
+    return providers, regions
+
+
+def _retail_evidence(session: Session, claim: AcceptedClaim, o: dict) -> dict:
+    """The catalogue evidence row of one retail claim, from its own chain only. Labelled for
+    what it is: a manual/agent-assisted capture of a listing, never VERIFIED, never live."""
+    source = session.get(DiscoverySource, claim.source_id)
+    proposal = session.get(DiscoveryClaimProposal, claim.proposal_id)
+    page = session.get(FetchedPage, proposal.origin_fetched_page_id)
+    run = session.get(CrawlRun, page.crawl_run_id) if page else None
+    provenance = (run.run_manifest or {}).get("provenance") if run else None
+    product_page = (proposal.structured or {}).get("page_kind") == "product-page"
+    kind_label = "product page" if product_page else "category listing"
+    verified = ("a product-page snapshot, retrieved as stated in the provenance and observed"
+                if product_page else
+                "a category-listing snapshot, NOT verified on the product page and observed")
+    return {
+        "source_url": claim.source_url, "source_type": "OTHER",
+        "source_title": f"{source.name} \u2014 {kind_label} (manual capture)",
+        "excerpt": claim.evidence_excerpt, "published_at": None,
+        "observed_at": claim.observed_at.date().isoformat(), "verified_at": None,
+        "confidence": "MEDIUM",
+        "note": (f"{RETAIL_MARK}: proposal {claim.proposal_digest[:12]} at "
+                 f"{claim.evidence_locator}, sighted on page content hash "
+                 f"{claim.observation_content_hash[:12]}; accepted claim "
+                 f"{claim.claim_digest[:12]}, chosen by {claim.created_by}. Evidence class "
+                 f"AGENT_ASSISTED_RESEARCH; capture provenance: "
+                 f"{provenance or 'none recorded'}. This is {verified} "
+                 f"{claim.observed_at.date().isoformat()} ({o.get('product_url')}); a dated "
+                 "reference snapshot, not a live value, and not verified by a human beyond "
+                 "that.")}
+
+
+def _retail_entries(session: Session, claims: list[AcceptedClaim]) -> tuple[dict, dict]:
+    providers, regions = _catalogue_refs()
+    prices: dict[tuple, dict] = {}
+    avail: dict[tuple, dict] = {}
+    for c in sorted(claims, key=lambda c: c.claim_seq):
+        o = json.loads(c.accepted_value)
+        prov = providers.get(o["provider"])
+        if prov is None or prov["type"] not in ("DISTRIBUTOR", "OEM"):
+            raise DiscoveryError(f"retail provider {o['provider']!r} is not a catalogue "
+                                 "distributor/seller; add it to providers.json first")
+        if o["region"] not in regions:
+            raise DiscoveryError(f"retail region {o['region']!r} is not in the catalogue")
+        key = (o["provider"], o["region"], o["transaction_type"], o["condition"],
+               o.get("variant_slug"))
+        ev = _retail_evidence(session, c, o)
+        day = c.observed_at.date().isoformat()
+        base = {"provider_slug": o["provider"], "region_code": o["region"],
+                "transaction_type": o["transaction_type"], "condition": o["condition"]}
+        if o.get("variant_slug"):
+            base["variant_slug"] = o["variant_slug"]
+        listing = f"{o.get('product_name')}, order code {o.get('order_code')}"
+        if c.target_kind == "pricing_offer":
+            prices[key] = {
+                **base, "price_type": o["price_type"], "currency": o["currency"],
+                "price": float(Decimal(o["price"])), "billing_period": o["billing_period"],
+                **({"price_basis": o["price_basis"]} if o.get("price_basis") else {}),
+                "note": (f"{prov['name']} reference price for a {o['condition']} unit, as listed "
+                         f"on {day} ({listing}). The seller's own offer price in its own "
+                         "currency; not an MSRP, not a manufacturer price, not converted"
+                         + ("" if o.get("price_basis") else ", tax basis not stated")
+                         + ". A snapshot, not a live price."),
+                "evidence": [ev]}
+        else:
+            shown = (f" Seller wording at observation: '{o['seller_wording']}' (a volatile "
+                     "observation, not durable inventory).")
+            avail[key] = {
+                **base, "availability_status": o["availability_status"],
+                "seller_wording": o["seller_wording"],
+                "note": (f"{prov['name']} availability for a {o['condition']} unit as listed on "
+                         f"{day} ({listing}).{shown} A snapshot, not live stock."),
+                "evidence": [ev]}
+    return prices, avail
+
+
+def _merge_retail(existing: list, new: dict, extra: dict) -> list:
+    """Replace this slice's own derived entries (same provider/region/transaction/condition)
+    in place; keep everything else; refuse to overwrite a hand-authored entry on that identity."""
+    merged, placed = [], set()
+    for entry in existing:
+        key = (entry.get("provider_slug"), entry.get("region_code"),
+               entry.get("transaction_type"), entry.get("condition", "NEW"),
+               entry.get("variant_slug"))
+        if key in new and all(entry.get(k) == v for k, v in extra.items()):
+            if not any(RETAIL_MARK in (e.get("note") or "") for e in entry.get("evidence", [])):
+                raise DiscoveryError(
+                    f"a hand-authored offer already occupies {key}; a governed retail claim "
+                    "never overwrites it (resolve it first)")
+            merged.append(new[key])
+            placed.add(key)
+        else:
+            merged.append(entry)
+    merged += [new[k] for k in sorted(new, key=lambda k: tuple(x or "" for x in k))
+               if k not in placed]
+    return merged
+
+
+def _apply_retail(session: Session, doc: dict, claims: list[AcceptedClaim]) -> None:
+    prices, avail = _retail_entries(session, claims)
+    wanted = {}
+    for c in claims:
+        o = json.loads(c.accepted_value)
+        if o.get("variant_slug"):
+            wanted[o["variant_slug"]] = o["variant_name"]
+    if wanted:      # the configuration travels with its offer; an existing entry is kept as is
+        have = {v.get("slug") for v in doc.get("variants", [])}
+        doc["variants"] = [*doc.get("variants", []),
+                           *({"slug": s, "name": wanted[s], "is_developer": False}
+                             for s in sorted(wanted) if s not in have)]
+    if prices:
+        doc["pricing_offers"] = _merge_retail(doc.get("pricing_offers", []), prices,
+                                              {"price_type": "PUBLIC"})
+    if avail:
+        doc["availability_offers"] = _merge_retail(doc.get("availability_offers", []), avail, {})
 
 
 MATURITY_NOTE_MARK = "Governed maturity claim"
@@ -330,6 +462,17 @@ def maturity_review_required(session: Session, robot_slug: str) -> list[str]:
     return out
 
 
+def _conflict_key(c: AcceptedClaim) -> tuple:
+    """What two claims must not disagree about. A retail offer is one offer per (provider,
+    region, transaction, condition): a NEW and a USED offer of the same robot are different
+    offers and never conflict."""
+    if c.target_key == RETAIL_TARGET_KEY:
+        o = json.loads(c.accepted_value)
+        return (c.target_kind, c.target_key, o["provider"], o["region"], o["transaction_type"],
+                o["condition"], o.get("variant_slug"))
+    return (c.target_kind, c.target_key, c.variant_slug)
+
+
 def _reservation_terms(session: Session, robot_slug: str) -> AcceptedClaim:
     """The accepted RESERVATION_TERMS claim that the WAITLIST status rests on (it must exist
     and its proposal must still be current)."""
@@ -389,6 +532,11 @@ def logical_target(claim: AcceptedClaim) -> str:
         return f"commercial_status:{claim.robot_slug}"
     if claim.target_kind == "specification" and claim.variant_slug is None:
         return f"specification:{claim.robot_slug}:{claim.target_key}"
+    if claim.target_key == RETAIL_TARGET_KEY:
+        o = json.loads(claim.accepted_value)
+        return (f"{claim.target_kind}:{claim.robot_slug}:{o['provider']}:{o['region']}:"
+                f"{o['transaction_type']}:{o['condition']}:{o.get('variant_slug')}:"
+                f"{claim.target_key}")
     if claim.target_kind in ("specification", "pricing_offer", "availability_offer"):
         return (f"{claim.target_kind}:{claim.robot_slug}:{claim.variant_slug}:"
                 f"{claim.target_key}")
@@ -406,6 +554,61 @@ def _offer_evidence(session: Session, subject: str, subject_id, source_url: str)
     ours = [r for r in rows if r.source_url == source_url
             and r.source_type in ("MANUFACTURER_SITE", "MANUFACTURER_STORE") and r.excerpt]
     return [[r.source_url, r.source_type, r.excerpt] for r in rows] if ours else []
+
+
+def _retail_evidence_rows(session: Session, subject: str, subject_id, source_url: str) -> list:
+    rows = session.execute(text(
+        "SELECT source_url, excerpt FROM evidence_source WHERE subject_type = :t AND "
+        "subject_id = :i AND source_url = :u ORDER BY excerpt"),
+        {"t": subject, "i": subject_id, "u": source_url}).all()
+    return [[r.source_url, r.excerpt] for r in rows if r.excerpt]
+
+
+def _verify_retail(session: Session, c: AcceptedClaim, robot_id, robot_slug: str) -> tuple:
+    """The imported retail row (looked up by its logical identity incl. condition) must match
+    the claim exactly, and carry the claim's own evidence."""
+    o = json.loads(c.accepted_value)
+    ident = {"r": robot_id, "p": o["provider"], "g": o["region"], "c": o["condition"],
+             "v": o.get("variant_slug")}
+    scope = ("((CAST(:v AS TEXT) IS NULL AND {t}.variant_id IS NULL) OR {t}.variant_id = "
+             "(SELECT id FROM robot_variant WHERE robot_id = :r AND slug = CAST(:v AS TEXT)))")
+    if c.target_kind == "pricing_offer":
+        r = session.execute(text(
+            "SELECT p.id, p.price, p.currency, p.billing_period, p.price_type, p.is_current, "
+            "p.condition::text AS condition FROM pricing_offer p "
+            "JOIN provider v ON v.id = p.provider_id JOIN region g ON g.id = p.region_id "
+            "WHERE p.robot_id = :r AND v.slug = :p AND g.code = :g "
+            "AND p.condition = CAST(:c AS offer_condition) AND " + scope.format(t="p") +
+            " AND p.transaction_type = 'PURCHASE' AND p.price_type = 'PUBLIC'"),
+            ident).one_or_none()
+        ev = _retail_evidence_rows(session, "PRICING_OFFER", r.id if r else None, c.source_url)
+        if (r is None or r.price != Decimal(o["price"]) or r.currency != o["currency"]
+                or r.billing_period != o["billing_period"] or not r.is_current or not ev):
+            raise DiscoveryError(
+                f"retail price ({o['provider']}/{o['region']}/{o['condition']}) is not in the "
+                "database as accepted (or lacks its evidence); import the merged catalogue first")
+        payload = {"robot_slug": robot_slug, "table": "pricing_offer", "provider": o["provider"],
+                   "region": o["region"], "condition": r.condition, "price": str(r.price),
+                   "currency": r.currency, "price_type": r.price_type, "evidence": ev}
+        return (c, "pricing_offer", r.id, _hash(payload))
+    r = session.execute(text(
+        "SELECT a.id, a.availability_status::text AS status, a.seller_wording, a.is_current, "
+        "a.condition::text AS condition FROM availability_offer a "
+        "JOIN provider v ON v.id = a.provider_id JOIN region g ON g.id = a.region_id "
+        "WHERE a.robot_id = :r AND v.slug = :p AND g.code = :g "
+        "AND a.condition = CAST(:c AS offer_condition) AND " + scope.format(t="a") +
+        " AND a.transaction_type = 'PURCHASE'"), ident).one_or_none()
+    ev = _retail_evidence_rows(session, "AVAILABILITY_OFFER", r.id if r else None, c.source_url)
+    if (r is None or r.status != o["availability_status"]
+            or r.seller_wording != o["seller_wording"] or not r.is_current or not ev):
+        raise DiscoveryError(
+            f"retail availability ({o['provider']}/{o['region']}/{o['condition']}) is not in the "
+            "database as accepted (or lacks its evidence); import the merged catalogue first")
+    payload = {"robot_slug": robot_slug, "table": "availability_offer",
+               "provider": o["provider"], "region": o["region"], "condition": r.condition,
+               "availability_status": r.status, "seller_wording": r.seller_wording,
+               "evidence": ev}
+    return (c, "availability_offer", r.id, _hash(payload))
 
 
 def verify_applied(session: Session, robot_slug: str, *, change_ref: str, applied_by: str,
@@ -434,6 +637,8 @@ def verify_applied(session: Session, robot_slug: str, *, change_ref: str, applie
             payload = {"robot_slug": robot_slug, "table": "robot_variant", "slug": r.slug,
                        "name": r.name}
             rows.append((c, "robot_variant", r.id, _hash(payload)))
+        elif c.target_key == RETAIL_TARGET_KEY:
+            rows.append(_verify_retail(session, c, robot_id, robot_slug))
         elif c.target_kind == "pricing_offer":
             o = json.loads(c.accepted_value)
             r = session.execute(text(

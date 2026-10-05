@@ -42,7 +42,7 @@ def policy_for(target_hint: str) -> FieldPolicy | None:
 # Exactly two registered targets, nothing else. Price, availability, reservation, use
 # cases, interfaces and every other mapping are NOT registered and are refused.
 # --------------------------------------------------------------------------------------
-CLAIM_REGISTRY_VERSION = "0.7.0-commercial-maturity"
+CLAIM_REGISTRY_VERSION = "0.8.0-retail-offers"
 
 # The resolved-choice keys that carry the human's explicit catalogue mapping.
 MAPPING_KEYS = ("target_kind", "variant_slug", "variant_name", "spec_key", "edition_scope",
@@ -53,10 +53,34 @@ MAPPING_KEYS = ("target_kind", "variant_slug", "variant_name", "spec_key", "edit
                 "available_from", "delivery_estimate_label",
                 # XPENG IRON (owner decision 2026-10-03): which configuration is current.
                 "configuration",
+                # Retailer reference offers (owner decision 2026-10-05): the reviewer states the
+                # offer's condition and (when the source states it) tax basis; nothing is
+                # defaulted. Displayed stock stays in the seller's wording and the evidence:
+                # no canonical claim or column for it.
+                "condition", "price_basis",
                 # hand DoF convention (owner decision 2026-10-03): "per hand".
                 "convention")
 
 NO_CATALOGUE_HOME = "NO_CATALOGUE_HOME"
+
+#: Retailer / distributor reference offers (owner decision 2026-10-05). Two governed semantics,
+#: deliberately NOT the manufacturer-estimate price and NOT the WAITLIST availability: a retail
+#: price is the seller's own offer price (price_type PUBLIC, never an MSRP, manufacturer price or
+#: EU price), and retail availability is the seller's stated state for ONE condition (NEW, USED,
+#: ...) in ONE market. Displayed stock quantity is a fact about the listing at observation time,
+#: kept with the offer's own wording, never a product specification.
+RETAIL_PRICE_KIND = "RETAIL_PRICE"
+RETAIL_AVAILABILITY_KIND = "RETAIL_AVAILABILITY"
+RETAIL_PRICE_TARGET = "pricing_offer[retail]"
+RETAIL_AVAILABILITY_TARGET = "availability_offer[retail]"
+RETAIL_TARGET_KEY = "purchase.retail"
+RETAIL_LOCATOR_ROOT = "offer["
+OFFER_CONDITIONS = ("NEW", "USED", "OPEN_BOX", "REFURBISHED")
+#: What a seller's availability wording OBSERVATION may be mapped to by the reviewer. The existing
+#: availability vocabulary is reused; no Czech-specific state is invented, and a page's mere
+#: existence is never availability.
+RETAIL_ALLOWED_STATUS = {"IN_STOCK": ("AVAILABLE",), "UNAVAILABLE": ("NOT_AVAILABLE",),
+                         "PREORDER": ("PREORDER",)}
 
 #: G5 (owner ruling 2026-10-04): commercial maturity is its own governed semantic dimension.
 #: The proposal (kind COMMERCIAL_MATURITY) preserves wording and explicit factual clues only; the
@@ -135,6 +159,13 @@ CLAIM_POLICIES: dict[str, ClaimPolicy] = {
     "commercial_status[current]": ClaimPolicy(
         key="commercial_status[current]", proposal_kind=COMMERCIAL_MATURITY_KIND,
         target_kind="commercial_status", target_key=COMMERCIAL_STATUS_TARGET),
+    # A seller's reference offer for a robot (variant-agnostic: configurations are robots).
+    "pricing_offer[retail]": ClaimPolicy(
+        key="pricing_offer[retail]", proposal_kind=RETAIL_PRICE_KIND,
+        target_kind="pricing_offer", target_key=RETAIL_TARGET_KEY, value_type="JSON"),
+    "availability_offer[retail]": ClaimPolicy(
+        key="availability_offer[retail]", proposal_kind=RETAIL_AVAILABILITY_KIND,
+        target_kind="availability_offer", target_key=RETAIL_TARGET_KEY, value_type="JSON"),
     "robot_variant": ClaimPolicy(
         key="robot_variant", proposal_kind="VARIANT", target_kind="robot_variant",
         target_key="variant"),
@@ -166,6 +197,12 @@ def claim_policy_for(kind: str, target_hint: str, locator: str,
     if (kind == COMMERCIAL_MATURITY_KIND and target_hint == COMMERCIAL_STATUS_TARGET
             and locator.startswith(MATURITY_LOCATOR_PREFIX)):
         return CLAIM_POLICIES["commercial_status[current]"]
+    if (kind == RETAIL_PRICE_KIND and target_hint == RETAIL_PRICE_TARGET
+            and locator.startswith(RETAIL_LOCATOR_ROOT) and locator.endswith("]/price")):
+        return CLAIM_POLICIES["pricing_offer[retail]"]
+    if (kind == RETAIL_AVAILABILITY_KIND and target_hint == RETAIL_AVAILABILITY_TARGET
+            and locator.startswith(RETAIL_LOCATOR_ROOT) and locator.endswith("]/availability")):
+        return CLAIM_POLICIES["availability_offer[retail]"]
     if kind == "VARIANT" and target_hint == "robot_variant":
         return CLAIM_POLICIES["robot_variant"]
     if (kind == "SPECIFICATION" and target_hint == f"specification[{SPEC_DEFINITION_KEY}]"

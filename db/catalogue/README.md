@@ -130,6 +130,18 @@ entirely — a retired offer appears in **no** public surface, so neither its
 auditable in the record, not published. `edition_confirmed` is tri-state —
 **null means nobody checked**, and is never rendered as "confirmed".
 
+### Retailer reference offers and `condition`
+
+A distributor offer names its `provider_slug` (a `DISTRIBUTOR` in `providers.json`, never a
+manufacturer), its `region_code` (the seller's own market only) and its `condition` (`NEW` when
+omitted; a used / open-box / refurbished unit is its own offer). Offers written by the governed
+retail claims (`materialize.py`, registry 0.8.0) carry the marker "Governed retail reference
+offer" in their evidence note, are replaced in place on re-materialization, and refuse to overwrite
+a hand-authored offer on the same (provider, region, transaction, condition). They are dated
+evidence snapshots (`observed_at`, `verified_at` null unless a human verified them), never live
+prices. `alza-cz` is the Czech example (approved for reference offers; not approved for
+automated monitoring).
+
 ### `images[]` — MEDIA-01 verified product imagery (`docs/09_MEDIA_CONTRACT.md`)
 
 Each image of a **specific named robot** must depict that exact robot. There is no

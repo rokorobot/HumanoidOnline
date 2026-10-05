@@ -68,6 +68,16 @@ All six core modes are supported by the schema **now**, even though only Phase 1
 
 Recording `QUOTE_ONLY` is a positive claim about the seller's commercial model and needs evidence like any other commercial fact. Absence of pricing rows claims nothing.
 
+### 3A. Retailer reference offers (owner decision 2026-10-05)
+
+A distributor's offer (`provider.type = DISTRIBUTOR`, e.g. `alza-cz`) is the **seller's own offer price**: `price_type = PUBLIC`, `transaction_type = PURCHASE`, in the seller's currency (CZK for Alza — never converted in the canonical row; display conversion stays in the display layer) and in the seller's market (`region = CZ`; no SK/HU/EU offer is inferred from the seller operating elsewhere). It is **not** an MSRP, a manufacturer price, or `MANUFACTURER_ESTIMATE`, and its availability is **not** `WAITLIST`. Governed claim kinds `RETAIL_PRICE` and `RETAIL_AVAILABILITY` (policies `pricing_offer[retail]` / `availability_offer[retail]`, target key `purchase.retail`, registry 0.8.0) carry them; the reviewer states every catalogue value (provider, market, condition, status, quantity), nothing is defaulted, and the VAT basis is recorded only when the source states it.
+
+- **Condition** (§ offer condition below): NEW and USED are separate offers; a used unit never overwrites or promotes the new offer.
+- **Availability wording** maps only to the existing vocabulary: in stock (`Skladem`, `Skladem N ks`) → `AVAILABLE`; `Momentálně nedostupné` → `NOT_AVAILABLE`; `Předobjednávka` → `PREORDER`. A displayed stock quantity ("Skladem 5 ks") is preserved verbatim in `seller_wording` and the offer note as a fact about the listing at observation time, never a product specification; a listing's existence is not availability.
+- **Reference snapshot, not a live value.** An offer is "917,990 CZK — Alza.cz — observed October 2026". Its `evidence_source.observed_at` ages under the normal evidence-age / publication-health rules (docs/27); it is never labelled live. `verified_at` stays NULL unless a human verified it on the page.
+- **Manual evidence path** (`manual_capture.record_manual_capture`, CLI `proposals capture`): retained bytes become a governed observation (`crawl_run` + `fetched_page`, immutable, hash-linked) **without enabling, reviewing or scheduling the source**, so a provider that is approved for reference offers but not for automated fetching (Alza.cz) can still carry evidence through proposal → review → accepted claim → catalogue file → importer. The evidence class is `AGENT_ASSISTED_RESEARCH` (docs/26), never `MANUAL_BOOTSTRAP`.
+- **Alza.cz policy.** Approved provider and reference source; **not** approved for automated monitoring, scheduled fetching, polling, or automated stock/price checking. It is registered, if at all, as a *disabled* source with no cadence; the extractor is deliberately not in the observation cycle's registry.
+
 ## 4. `availability_status` — DIMENSION 2: can you obtain it, per mode × region
 
 | Value | Meaning |

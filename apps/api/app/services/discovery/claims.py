@@ -34,7 +34,9 @@ from app.services.discovery.field_policy import (
     CLAIM_REGISTRY_VERSION,
     IRON_CURRENT_CONFIGURATION,
     NO_CATALOGUE_HOME,
+    OFFER_CONDITIONS,
     PRODUCT_PAGE_CONFIGURATION,
+    RETAIL_ALLOWED_STATUS,
     SPEC_DEFINITION_KEY,
     ClaimPolicy,
     check_maturity_choice,
@@ -96,6 +98,67 @@ def _variant_prerequisite(session: Session, p: DiscoveryClaimProposal, slug: str
         raise DiscoveryError(
             f"the {p.edition!r} VARIANT claim must be accepted first and its slug must be "
             f"{slug!r} (prerequisite, DR-A5 section 5.3)")
+
+
+RETAIL_PRICE_POLICY = "pricing_offer[retail]"
+RETAIL_AVAILABILITY_POLICY = "availability_offer[retail]"
+
+
+def _plan_retail(p: DiscoveryClaimProposal, policy: ClaimPolicy, choices: dict,
+                 structured: dict, verbatim: str) -> dict:
+    """A seller's reference offer (owner decision 2026-10-05). Every value the catalogue will
+    carry is stated by the reviewer and checked against what the source said; nothing is
+    defaulted, converted, or inferred (no VAT basis, no MSRP, no other market, no other
+    condition). A used / open-box / refurbished offer is its own offer."""
+    if p.edition:
+        raise DiscoveryError("a retail offer is robot-level (configurations are robots); this "
+                             "proposal names an edition, so nothing is claimed")
+    condition = structured.get("condition")
+    if condition not in OFFER_CONDITIONS:
+        raise DiscoveryError("the source does not establish the offer's condition; "
+                             "nothing is claimed")
+    for key in ("provider", "market", "currency"):
+        if not structured.get(key):
+            raise DiscoveryError(f"the proposal does not state {key}; nothing is claimed")
+    if structured.get("vat_stated") not in (False, None):
+        raise DiscoveryError("this registry version records no VAT basis; the proposal states "
+                             "one, so it needs its own owner decision")
+    _need(choices, "provider", structured["provider"])
+    _need(choices, "region", structured["market"])
+    _need(choices, "condition", condition)
+    _need(choices, "transaction_type", "PURCHASE")
+    # The reviewer explicitly confirms the robot identity (never inferred from a SKU label).
+    _need(choices, "edition_confirmed", "true")
+    common = {"provider": structured["provider"], "region": structured["market"],
+              "condition": condition, "transaction_type": "PURCHASE",
+              "product_url": structured.get("product_url"),
+              "order_code": structured.get("order_code"),
+              "product_name": structured.get("product_name")}
+    if policy.key == RETAIL_PRICE_POLICY:
+        amount = structured.get("amount")
+        if not amount or not str(amount).isdigit():
+            raise DiscoveryError("the proposal states no plain price amount; nothing is claimed")
+        for key, expected in (("price_type", "PUBLIC"), ("billing_period", "ONE_TIME"),
+                              ("currency", structured["currency"]), ("price", amount)):
+            _need(choices, key, expected)
+        offer = {**common, "price_type": "PUBLIC", "billing_period": "ONE_TIME",
+                 "currency": structured["currency"], "price": amount}
+    else:
+        signal = structured.get("availability_signal")
+        allowed = RETAIL_ALLOWED_STATUS.get(signal)
+        if allowed is None:
+            raise DiscoveryError("the proposal's availability wording is not a recognised "
+                                 "observation; nothing is claimed")
+        status = _need(choices, "availability_status")
+        if status not in allowed:
+            raise DiscoveryError(f"availability_status {status!r} is not an allowed mapping of "
+                                 f"the stated {signal} wording ({list(allowed)})")
+        quantity = structured.get("stock_quantity")
+        _need(choices, "stock_quantity", quantity if quantity else "NONE")
+        offer = {**common, "availability_status": status, "seller_wording": verbatim,
+                 "stock_quantity": quantity}
+    return {"variant_slug": None, "accepted_value": _json(offer), "edition_scope": None,
+            "target_key": policy.target_key}
 
 
 def _plan(session: Session, p: DiscoveryClaimProposal, policy: ClaimPolicy,
@@ -176,6 +239,8 @@ def _plan(session: Session, p: DiscoveryClaimProposal, policy: ClaimPolicy,
         value = _need(choices, "accepted_value", fragment)
         return {"variant_slug": None, "accepted_value": value,
                 "edition_scope": policy.edition_scope, "target_key": policy.target_key}
+    if policy.key in (RETAIL_PRICE_POLICY, RETAIL_AVAILABILITY_POLICY):
+        return _plan_retail(p, policy, choices, structured, verbatim)
     slug = _need(choices, "variant_slug")
     _variant_prerequisite(session, p, slug)
     if policy.target_kind == "specification":

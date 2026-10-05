@@ -36,6 +36,7 @@ from app.models.discovery import DiscoverySource
 from app.models.robot import Robot
 from app.services.discovery import DiscoveryError
 from app.services.discovery.fingerprint import fingerprint
+from app.services.discovery.sources import alza_cz_reference_proposals as alza
 from app.services.discovery.sources import maturity_proposals as maturity
 from app.services.discovery.sources import neura_mini_datasheet_proposals as mini_ds
 from app.services.discovery.sources import neura_mini_proposals as mini
@@ -117,6 +118,33 @@ def maturity_spec(robot_name: str, page_scope: str = maturity.SHARED_PAGE) -> Ex
         page_urls=None,
         propose=lambda body, url: maturity.propose_maturity_clues(
             body, url, robot_name=robot_name, page_scope=page_scope))
+
+
+def alza_reference_spec(robot_name: str, robot_slug: str) -> ExtractorSpec:
+    """Alza.cz reference-offer extractor bound to ONE catalogue robot (identity gate).
+
+    Manual only: it reads a category listing an operator already captured through
+    `manual_capture`. It is deliberately NOT in `g2_ingest.G2_INGESTS` (the observe cycle's
+    registry) and no scheduler, adapter table or cadence refers to it."""
+    return ExtractorSpec(
+        key=alza.EXTRACTOR_KEY, version=alza.EXTRACTOR_VERSION, robot_name=robot_name,
+        page_urls=tuple(normalize_url(u) for u in alza.PAGE_URLS),
+        propose=lambda body, url: alza.propose_alza_reference_claims(
+            body, url, robot_slug=robot_slug))
+
+
+def ingest_alza_reference_proposals(session: Session, *, robot_slug: str, **kw) -> IngestReport:
+    """Persist the Alza reference-offer proposals for one catalogue robot from a retained
+    capture (`source_key` must be the registered `alza-cz` source)."""
+    names = {i.robot_name for i in alza.REFERENCE_ITEMS.values() if i.robot_slug == robot_slug}
+    if len(names) != 1:
+        raise DiscoveryError(f"{robot_slug!r} has no reviewed Alza reference mapping; an "
+                             "unreviewed robot gets no proposals (identity is reviewed config)")
+    if kw.get("source_key") != alza.SOURCE_KEY:
+        raise DiscoveryError(f"Alza reference proposals are ingested for the "
+                             f"{alza.SOURCE_KEY!r} source only")
+    return ingest_proposals(session, spec=alza_reference_spec(names.pop(), robot_slug),
+                            robot_slug=robot_slug, **kw)
 
 
 def ingest_neura_mini_proposals(session: Session, **kw) -> IngestReport:

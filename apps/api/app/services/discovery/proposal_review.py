@@ -46,6 +46,7 @@ from app.services.discovery.field_policy import (
     MAPPING_KEYS,
     check_maturity_choice,
 )
+from app.services.discovery.sources import alza_cz_reference_proposals as alza
 from app.services.discovery.sources import maturity_proposals as maturity
 from app.services.discovery.sources import neura_mini_datasheet_proposals as mini_ds
 from app.services.discovery.sources import neura_mini_proposals as mini
@@ -62,7 +63,8 @@ CURRENT, SUPERSEDED, STALE = "CURRENT", "SUPERSEDED", "STALE"
 LIVE_EXTRACTORS = frozenset({(mini.EXTRACTOR_KEY, mini.EXTRACTOR_VERSION),
                              (mini_ds.EXTRACTOR_KEY, mini_ds.EXTRACTOR_VERSION),
                              (maturity.EXTRACTOR_KEY, maturity.EXTRACTOR_VERSION),
-                             (xpeng.EXTRACTOR_KEY, xpeng.EXTRACTOR_VERSION)})
+                             (xpeng.EXTRACTOR_KEY, xpeng.EXTRACTOR_VERSION),
+                             (alza.EXTRACTOR_KEY, alza.EXTRACTOR_VERSION)})
 #: Identity gate: the catalogue name a live extractor's proposals must attach to.
 EXTRACTOR_ROBOT_NAME = {mini.EXTRACTOR_KEY: mini.ROBOT_NAME,
                         mini_ds.EXTRACTOR_KEY: mini_ds.ROBOT_NAME,

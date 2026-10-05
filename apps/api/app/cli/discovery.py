@@ -489,6 +489,29 @@ def _cmd_proposals(args: argparse.Namespace) -> int:
     with SessionLocal() as session:
         if args.action in ("list", "show", "accept", "reject", "defer"):
             return _proposal_review(session, args)
+        if args.action == "capture":
+            from datetime import datetime
+
+            from app.services.discovery.manual_capture import record_manual_capture
+            page, created = record_manual_capture(
+                session, source_key=args.source_key, url=args.url,
+                body=Path(args.body_file).read_bytes(), content_type="text/html",
+                retrieved_at=datetime.fromisoformat(args.retrieved_at),
+                captured_by=args.by, provenance=args.provenance,
+                cache_dir=Path(args.cache_dir) if args.cache_dir else None)
+            session.commit()
+            print(json.dumps({"fetched_page_id": str(page.id), "created": created,
+                              "content_hash": page.content_hash, "network": False}, indent=2))
+            return 0
+        if args.action == "ingest-alza":
+            from app.services.discovery.proposals import ingest_alza_reference_proposals
+            report = ingest_alza_reference_proposals(
+                session, source_key="alza-cz", robot_slug=args.robot_slug,
+                fetched_page_id=uuid.UUID(args.fetched_page),
+                body=Path(args.body_file).read_bytes(), ingested_by=args.by)
+            session.commit()
+            print(json.dumps(report.as_dict(), indent=2))
+            return 0
         if args.body_file:
             body = Path(args.body_file).read_bytes()
         else:
@@ -810,6 +833,23 @@ def main(argv: list[str] | None = None) -> int:
     body_src.add_argument("--body-file")
     body_src.add_argument("--cache-dir")
     ingest.add_argument("--by", required=True)
+    capture = proposal_actions.add_parser(
+        "capture", help="record bytes ALREADY retrieved as a manual observation; no network")
+    capture.add_argument("source_key")
+    capture.add_argument("--url", required=True)
+    capture.add_argument("--body-file", required=True)
+    capture.add_argument("--retrieved-at", required=True,
+                         help="true retrieval time, ISO-8601 with timezone (never 'now')")
+    capture.add_argument("--provenance", required=True,
+                         help="work order / occasion under which the bytes were retrieved")
+    capture.add_argument("--cache-dir")
+    capture.add_argument("--by", required=True)
+    ingest_alza = proposal_actions.add_parser(
+        "ingest-alza", help="Alza.cz reference-offer proposals from a manual capture; no network")
+    ingest_alza.add_argument("--robot-slug", required=True)
+    ingest_alza.add_argument("--fetched-page", required=True)
+    ingest_alza.add_argument("--body-file", required=True)
+    ingest_alza.add_argument("--by", required=True)
     plist = proposal_actions.add_parser(
         "list", help="proposals needing a human (G2-2 review); no write")
     plist.add_argument("--robot-slug")

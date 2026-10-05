@@ -594,7 +594,16 @@ def test_walker_tienkung_models_are_separate_unpublished_governed_entities(slug,
     assert robot["manufacturer_slug"] == "ubtech-robotics"
     assert "AGENT_ASSISTED_RESEARCH" in robot["specs_note"]
     assert "docs.ubtrobot.com" in robot["official_url"]
-    assert robot["pricing_offers"] == robot["availability_offers"] == []   # none materialized
+    if slug.endswith("embodied-intelligence"):
+        # the only Walker model with governed Alza reference offers (owner-accepted 2026-10-05):
+        # NEW and USED are separate offers, all by alza-cz in CZ, evidence-backed and dated
+        for kind in ("pricing_offers", "availability_offers"):
+            assert {o["condition"] for o in robot[kind]} == {"NEW", "USED"}
+            assert all((o["provider_slug"], o["region_code"]) == ("alza-cz", "CZ")
+                       for o in robot[kind])
+            assert all(o["evidence"][0]["verified_at"] is None for o in robot[kind])
+    else:
+        assert robot["pricing_offers"] == robot["availability_offers"] == []
     s1, s2 = (catalogue_json(f"robots/ubtech-walker-{x}.json") for x in ("s1", "s2"))
     assert robot["slug"] not in (s1["slug"], s2["slug"])
     assert robot["model_code"] not in (s1.get("model_code"), s2.get("model_code"))

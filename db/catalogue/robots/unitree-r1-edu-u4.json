@@ -95,6 +95,31 @@
       "shipping_terms": "Plus €35.70 special shipping per item (Germany)",
       "package_contents": "Supplier's generic R1 list: 1× robot (Base or EDU, depending on variant), controller, battery, charger, user manual",
       "warranty_terms": "Not stated by this supplier. Unitree states 12 months for the R1 EDU line (edition-level, not a seller term)."
+    },
+    {
+      "provider_slug": "alza-cz",
+      "region_code": "CZ",
+      "transaction_type": "PURCHASE",
+      "condition": "NEW",
+      "price_type": "PUBLIC",
+      "currency": "CZK",
+      "price": 731990.0,
+      "billing_period": "ONE_TIME",
+      "price_basis": "VAT included: the product page's structured offer states valueAddedTaxIncluded=true; the page also shows 'bez DPH 604 950,-'",
+      "note": "Alza.cz reference price for a NEW unit, as listed on 2026-10-05 (Unitree R1 EDU U4, order code BUN_R1EDU_U4). The seller's own offer price in its own currency; not an MSRP, not a manufacturer price, not converted. A snapshot, not a live price.",
+      "evidence": [
+        {
+          "source_url": "https://www.alza.cz/unitree-r1-edu-u4-d13408321.htm",
+          "source_type": "OTHER",
+          "source_title": "Alza.cz — product page (manual capture)",
+          "excerpt": "Unitree R1 EDU U4 | 731 990,- | bez DPH 604 950,- | Skladem 1 ks | SKU BUN_R1EDU_U4",
+          "published_at": null,
+          "observed_at": "2026-10-05",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "Governed retail reference offer: proposal cd218f3f5dd6 at offer[13408321]/price, sighted on page content hash c6d37c26497a; accepted claim 56b748a03a3b, chosen by Robert Konecny (owner decision, WorkOrder 2026-10-05). Evidence class AGENT_ASSISTED_RESEARCH; capture provenance: AGENT_ASSISTED_RESEARCH: one-time owner-authorised verification of the specific Alza humanoid product pages, 2026-10-05 (WorkOrder 'Proceed with the current Alza work'); plain HTTP GET, declared HumanoidOnlineMarketBot/0.1 user agent, no retries, no circumvention. This is a product-page snapshot, retrieved as stated in the provenance and observed 2026-10-05 (https://www.alza.cz/unitree-r1-edu-u4-d13408321.htm); a dated reference snapshot, not a live value, and not verified by a human beyond that."
+        }
+      ]
     }
   ],
   "availability_offers": [
@@ -129,6 +154,28 @@
       ],
       "seller_wording": "Limited stock, delivery within 1 - 2 business days",
       "delivery_estimate_label": "Delivery estimate for Germany: 1–2 business days"
+    },
+    {
+      "provider_slug": "alza-cz",
+      "region_code": "CZ",
+      "transaction_type": "PURCHASE",
+      "condition": "NEW",
+      "availability_status": "AVAILABLE",
+      "seller_wording": "Skladem 1 ks",
+      "note": "Alza.cz availability for a NEW unit as listed on 2026-10-05 (Unitree R1 EDU U4, order code BUN_R1EDU_U4). Seller wording at observation: 'Skladem 1 ks' (a volatile observation, not durable inventory). A snapshot, not live stock.",
+      "evidence": [
+        {
+          "source_url": "https://www.alza.cz/unitree-r1-edu-u4-d13408321.htm",
+          "source_type": "OTHER",
+          "source_title": "Alza.cz — product page (manual capture)",
+          "excerpt": "Unitree R1 EDU U4 | 731 990,- | bez DPH 604 950,- | Skladem 1 ks | SKU BUN_R1EDU_U4",
+          "published_at": null,
+          "observed_at": "2026-10-05",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "Governed retail reference offer: proposal de750052da4d at offer[13408321]/availability, sighted on page content hash c6d37c26497a; accepted claim b9c3cc9fe290, chosen by Robert Konecny (owner decision, WorkOrder 2026-10-05). Evidence class AGENT_ASSISTED_RESEARCH; capture provenance: AGENT_ASSISTED_RESEARCH: one-time owner-authorised verification of the specific Alza humanoid product pages, 2026-10-05 (WorkOrder 'Proceed with the current Alza work'); plain HTTP GET, declared HumanoidOnlineMarketBot/0.1 user agent, no retries, no circumvention. This is a product-page snapshot, retrieved as stated in the provenance and observed 2026-10-05 (https://www.alza.cz/unitree-r1-edu-u4-d13408321.htm); a dated reference snapshot, not a live value, and not verified by a human beyond that."
+        }
+      ]
     }
   ],
   "deployments": [],

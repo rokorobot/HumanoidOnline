@@ -57,7 +57,13 @@
       "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-11 by Claude Opus 5 (curl 8.11.0, default user agent; raw page sha256 3ca42e4b0557b54a…) in a session initiated by Robert Konecny for European Catalogue Gap Batch 01B, under research work order 'OWNER WORK ORDER — BATCH 01B COMMERCIAL RESEARCH' (2026-09-11; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer confirms the H2 EDU edition is sold through sales."
     }
   ],
-  "variants": [],
+  "variants": [
+    {
+      "slug": "u2",
+      "name": "U2 configuration (retailer bundle: 2x BrainCo Revo 2 hands)",
+      "is_developer": false
+    }
+  ],
   "pricing_offers": [
     {
       "provider_slug": "reichelt",
@@ -96,9 +102,106 @@
       "package_contents": "Robot, smart battery (quick-change), charger, handheld remote control, lifting crane (hands optional)",
       "warranty_terms": "12 months (supplier-stated, H2 EDU)",
       "order_status_note": "Special item — check delivery time with the supplier. Delivery date not confirmed."
+    },
+    {
+      "provider_slug": "alza-cz",
+      "region_code": "CZ",
+      "transaction_type": "PURCHASE",
+      "condition": "NEW",
+      "price_type": "PUBLIC",
+      "currency": "CZK",
+      "price": 1309990.0,
+      "billing_period": "ONE_TIME",
+      "price_basis": "VAT included: the product page's structured offer states valueAddedTaxIncluded=true; the page also shows 'bez DPH 1 082 636,-'",
+      "note": "Alza.cz reference price for a NEW unit, as listed on 2026-10-05 (Unitree H2 EDU, order code uni_H2_EDU). The seller's own offer price in its own currency; not an MSRP, not a manufacturer price, not converted. A snapshot, not a live price.",
+      "evidence": [
+        {
+          "source_url": "https://www.alza.cz/unitree-h2-edu-d13215768.htm",
+          "source_type": "OTHER",
+          "source_title": "Alza.cz — product page (manual capture)",
+          "excerpt": "Unitree H2 EDU | 1 309 990,- | bez DPH 1 082 636,- | Skladem 2 ks | SKU uni_H2_EDU",
+          "published_at": null,
+          "observed_at": "2026-10-05",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "Governed retail reference offer: proposal 476978a4bcd5 at offer[13215768]/price, sighted on page content hash f71cb6faaeb1; accepted claim a706ce2524f5, chosen by Robert Konecny (owner decision, WorkOrder 2026-10-05). Evidence class AGENT_ASSISTED_RESEARCH; capture provenance: AGENT_ASSISTED_RESEARCH: one-time owner-authorised verification of the specific Alza humanoid product pages, 2026-10-05 (WorkOrder 'Proceed with the current Alza work'); plain HTTP GET, declared HumanoidOnlineMarketBot/0.1 user agent, no retries, no circumvention. This is a product-page snapshot, retrieved as stated in the provenance and observed 2026-10-05 (https://www.alza.cz/unitree-h2-edu-d13215768.htm); a dated reference snapshot, not a live value, and not verified by a human beyond that."
+        }
+      ]
+    },
+    {
+      "provider_slug": "alza-cz",
+      "region_code": "CZ",
+      "transaction_type": "PURCHASE",
+      "condition": "NEW",
+      "variant_slug": "u2",
+      "price_type": "PUBLIC",
+      "currency": "CZK",
+      "price": 1507990.0,
+      "billing_period": "ONE_TIME",
+      "price_basis": "VAT included: the product page's structured offer states valueAddedTaxIncluded=true; the page also shows 'bez DPH 1 246 273,-'",
+      "note": "Alza.cz reference price for a NEW unit, as listed on 2026-10-05 (Unitree H2 EDU U2, order code BUN_H2EDU_U2). The seller's own offer price in its own currency; not an MSRP, not a manufacturer price, not converted. A snapshot, not a live price.",
+      "evidence": [
+        {
+          "source_url": "https://www.alza.cz/unitree-h2-edu-u2-d13501544.htm",
+          "source_type": "OTHER",
+          "source_title": "Alza.cz — product page (manual capture)",
+          "excerpt": "Unitree H2 EDU U2 | 1 507 990,- | bez DPH 1 246 273,- | Skladem 1 ks | SKU BUN_H2EDU_U2",
+          "published_at": null,
+          "observed_at": "2026-10-05",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "Governed retail reference offer: proposal 64c2a3593480 at offer[13501544]/price, sighted on page content hash 7f37810a0239; accepted claim a646372eef25, chosen by Robert Konecny (owner decision, WorkOrder 2026-10-05). Evidence class AGENT_ASSISTED_RESEARCH; capture provenance: AGENT_ASSISTED_RESEARCH: one-time owner-authorised verification of the specific Alza humanoid product pages, 2026-10-05 (WorkOrder 'Proceed with the current Alza work'); plain HTTP GET, declared HumanoidOnlineMarketBot/0.1 user agent, no retries, no circumvention. This is a product-page snapshot, retrieved as stated in the provenance and observed 2026-10-05 (https://www.alza.cz/unitree-h2-edu-u2-d13501544.htm); a dated reference snapshot, not a live value, and not verified by a human beyond that."
+        }
+      ]
     }
   ],
-  "availability_offers": [],
+  "availability_offers": [
+    {
+      "provider_slug": "alza-cz",
+      "region_code": "CZ",
+      "transaction_type": "PURCHASE",
+      "condition": "NEW",
+      "availability_status": "AVAILABLE",
+      "seller_wording": "Skladem 2 ks",
+      "note": "Alza.cz availability for a NEW unit as listed on 2026-10-05 (Unitree H2 EDU, order code uni_H2_EDU). Seller wording at observation: 'Skladem 2 ks' (a volatile observation, not durable inventory). A snapshot, not live stock.",
+      "evidence": [
+        {
+          "source_url": "https://www.alza.cz/unitree-h2-edu-d13215768.htm",
+          "source_type": "OTHER",
+          "source_title": "Alza.cz — product page (manual capture)",
+          "excerpt": "Unitree H2 EDU | 1 309 990,- | bez DPH 1 082 636,- | Skladem 2 ks | SKU uni_H2_EDU",
+          "published_at": null,
+          "observed_at": "2026-10-05",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "Governed retail reference offer: proposal a20a16614a62 at offer[13215768]/availability, sighted on page content hash f71cb6faaeb1; accepted claim ed6ff4d9eb33, chosen by Robert Konecny (owner decision, WorkOrder 2026-10-05). Evidence class AGENT_ASSISTED_RESEARCH; capture provenance: AGENT_ASSISTED_RESEARCH: one-time owner-authorised verification of the specific Alza humanoid product pages, 2026-10-05 (WorkOrder 'Proceed with the current Alza work'); plain HTTP GET, declared HumanoidOnlineMarketBot/0.1 user agent, no retries, no circumvention. This is a product-page snapshot, retrieved as stated in the provenance and observed 2026-10-05 (https://www.alza.cz/unitree-h2-edu-d13215768.htm); a dated reference snapshot, not a live value, and not verified by a human beyond that."
+        }
+      ]
+    },
+    {
+      "provider_slug": "alza-cz",
+      "region_code": "CZ",
+      "transaction_type": "PURCHASE",
+      "condition": "NEW",
+      "variant_slug": "u2",
+      "availability_status": "AVAILABLE",
+      "seller_wording": "Skladem 1 ks",
+      "note": "Alza.cz availability for a NEW unit as listed on 2026-10-05 (Unitree H2 EDU U2, order code BUN_H2EDU_U2). Seller wording at observation: 'Skladem 1 ks' (a volatile observation, not durable inventory). A snapshot, not live stock.",
+      "evidence": [
+        {
+          "source_url": "https://www.alza.cz/unitree-h2-edu-u2-d13501544.htm",
+          "source_type": "OTHER",
+          "source_title": "Alza.cz — product page (manual capture)",
+          "excerpt": "Unitree H2 EDU U2 | 1 507 990,- | bez DPH 1 246 273,- | Skladem 1 ks | SKU BUN_H2EDU_U2",
+          "published_at": null,
+          "observed_at": "2026-10-05",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "Governed retail reference offer: proposal 4129a7d1204b at offer[13501544]/availability, sighted on page content hash 7f37810a0239; accepted claim 5b759f4cf742, chosen by Robert Konecny (owner decision, WorkOrder 2026-10-05). Evidence class AGENT_ASSISTED_RESEARCH; capture provenance: AGENT_ASSISTED_RESEARCH: one-time owner-authorised verification of the specific Alza humanoid product pages, 2026-10-05 (WorkOrder 'Proceed with the current Alza work'); plain HTTP GET, declared HumanoidOnlineMarketBot/0.1 user agent, no retries, no circumvention. This is a product-page snapshot, retrieved as stated in the provenance and observed 2026-10-05 (https://www.alza.cz/unitree-h2-edu-u2-d13501544.htm); a dated reference snapshot, not a live value, and not verified by a human beyond that."
+        }
+      ]
+    }
+  ],
   "deployments": [],
   "capabilities": [
     {

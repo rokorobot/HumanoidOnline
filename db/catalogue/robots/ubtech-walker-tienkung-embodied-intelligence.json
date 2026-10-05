@@ -35,8 +35,104 @@
   "official_url": "https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/5/",
   "commercial_status_evidence": [],
   "variants": [],
-  "pricing_offers": [],
-  "availability_offers": [],
+  "pricing_offers": [
+    {
+      "provider_slug": "alza-cz",
+      "region_code": "CZ",
+      "transaction_type": "PURCHASE",
+      "condition": "NEW",
+      "price_type": "PUBLIC",
+      "currency": "CZK",
+      "price": 2491790.0,
+      "billing_period": "ONE_TIME",
+      "price_basis": "VAT included: the product page's structured offer states valueAddedTaxIncluded=true; the page also shows 'bez DPH 2 059 331,-'",
+      "note": "Alza.cz reference price for a NEW unit, as listed on 2026-10-05 (Ubtech Walker Tienkung (embodied intelligence), order code ubtech2501). The seller's own offer price in its own currency; not an MSRP, not a manufacturer price, not converted. A snapshot, not a live price.",
+      "evidence": [
+        {
+          "source_url": "https://www.alza.cz/ubtech-walker-tienkung-embodied-intelligence-d13233810.htm",
+          "source_type": "OTHER",
+          "source_title": "Alza.cz — product page (manual capture)",
+          "excerpt": "Ubtech Walker Tienkung (embodied intelligence) | 2 491 790,- | bez DPH 2 059 331,- | Momentálně nedostupné | SKU ubtech2501",
+          "published_at": null,
+          "observed_at": "2026-10-05",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "Governed retail reference offer: proposal 8c33e395b220 at offer[13233810]/price, sighted on page content hash b825e27c1677; accepted claim e56214b788ad, chosen by Robert Konecny (owner decision, WorkOrder 2026-10-05). Evidence class AGENT_ASSISTED_RESEARCH; capture provenance: AGENT_ASSISTED_RESEARCH: one-time owner-authorised verification of the specific Alza humanoid product pages, 2026-10-05 (WorkOrder 'Proceed with the current Alza work'); plain HTTP GET, declared HumanoidOnlineMarketBot/0.1 user agent, no retries, no circumvention. This is a product-page snapshot, retrieved as stated in the provenance and observed 2026-10-05 (https://www.alza.cz/ubtech-walker-tienkung-embodied-intelligence-d13233810.htm); a dated reference snapshot, not a live value, and not verified by a human beyond that."
+        }
+      ]
+    },
+    {
+      "provider_slug": "alza-cz",
+      "region_code": "CZ",
+      "transaction_type": "PURCHASE",
+      "condition": "USED",
+      "price_type": "PUBLIC",
+      "currency": "CZK",
+      "price": 2199990.0,
+      "billing_period": "ONE_TIME",
+      "price_basis": "VAT included: the product page's structured offer states valueAddedTaxIncluded=true; the page also shows 'bez DPH 1 818 174,-'",
+      "note": "Alza.cz reference price for a USED unit, as listed on 2026-10-05 (Ubtech Walker Tienkung (embodied intelligence), order code ubtech2501_closeout). The seller's own offer price in its own currency; not an MSRP, not a manufacturer price, not converted. A snapshot, not a live price.",
+      "evidence": [
+        {
+          "source_url": "https://www.alza.cz/ubtech-walker-tienkung-embodied-intelligence-bazar-d13509114.htm",
+          "source_type": "OTHER",
+          "source_title": "Alza.cz — product page (manual capture)",
+          "excerpt": "Ubtech Walker Tienkung (embodied intelligence) | 2 199 990,- | bez DPH 1 818 174,- | Použité - skladem 1 ks | SKU ubtech2501_closeout",
+          "published_at": null,
+          "observed_at": "2026-10-05",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "Governed retail reference offer: proposal 5daf975acd3b at offer[13509114]/price, sighted on page content hash 5da498959ff2; accepted claim f53cbe6dec92, chosen by Robert Konecny (owner decision, WorkOrder 2026-10-05). Evidence class AGENT_ASSISTED_RESEARCH; capture provenance: AGENT_ASSISTED_RESEARCH: one-time owner-authorised verification of the specific Alza humanoid product pages, 2026-10-05 (WorkOrder 'Proceed with the current Alza work'); plain HTTP GET, declared HumanoidOnlineMarketBot/0.1 user agent, no retries, no circumvention. This is a product-page snapshot, retrieved as stated in the provenance and observed 2026-10-05 (https://www.alza.cz/ubtech-walker-tienkung-embodied-intelligence-bazar-d13509114.htm); a dated reference snapshot, not a live value, and not verified by a human beyond that."
+        }
+      ]
+    }
+  ],
+  "availability_offers": [
+    {
+      "provider_slug": "alza-cz",
+      "region_code": "CZ",
+      "transaction_type": "PURCHASE",
+      "condition": "NEW",
+      "availability_status": "NOT_AVAILABLE",
+      "seller_wording": "Momentálně nedostupné",
+      "note": "Alza.cz availability for a NEW unit as listed on 2026-10-05 (Ubtech Walker Tienkung (embodied intelligence), order code ubtech2501). Seller wording at observation: 'Momentálně nedostupné' (a volatile observation, not durable inventory). A snapshot, not live stock.",
+      "evidence": [
+        {
+          "source_url": "https://www.alza.cz/ubtech-walker-tienkung-embodied-intelligence-d13233810.htm",
+          "source_type": "OTHER",
+          "source_title": "Alza.cz — product page (manual capture)",
+          "excerpt": "Ubtech Walker Tienkung (embodied intelligence) | 2 491 790,- | bez DPH 2 059 331,- | Momentálně nedostupné | SKU ubtech2501",
+          "published_at": null,
+          "observed_at": "2026-10-05",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "Governed retail reference offer: proposal af0a9a7e86be at offer[13233810]/availability, sighted on page content hash b825e27c1677; accepted claim 9ba04aa728c8, chosen by Robert Konecny (owner decision, WorkOrder 2026-10-05). Evidence class AGENT_ASSISTED_RESEARCH; capture provenance: AGENT_ASSISTED_RESEARCH: one-time owner-authorised verification of the specific Alza humanoid product pages, 2026-10-05 (WorkOrder 'Proceed with the current Alza work'); plain HTTP GET, declared HumanoidOnlineMarketBot/0.1 user agent, no retries, no circumvention. This is a product-page snapshot, retrieved as stated in the provenance and observed 2026-10-05 (https://www.alza.cz/ubtech-walker-tienkung-embodied-intelligence-d13233810.htm); a dated reference snapshot, not a live value, and not verified by a human beyond that."
+        }
+      ]
+    },
+    {
+      "provider_slug": "alza-cz",
+      "region_code": "CZ",
+      "transaction_type": "PURCHASE",
+      "condition": "USED",
+      "availability_status": "AVAILABLE",
+      "seller_wording": "Použité - skladem 1 ks",
+      "note": "Alza.cz availability for a USED unit as listed on 2026-10-05 (Ubtech Walker Tienkung (embodied intelligence), order code ubtech2501_closeout). Seller wording at observation: 'Použité - skladem 1 ks' (a volatile observation, not durable inventory). A snapshot, not live stock.",
+      "evidence": [
+        {
+          "source_url": "https://www.alza.cz/ubtech-walker-tienkung-embodied-intelligence-bazar-d13509114.htm",
+          "source_type": "OTHER",
+          "source_title": "Alza.cz — product page (manual capture)",
+          "excerpt": "Ubtech Walker Tienkung (embodied intelligence) | 2 199 990,- | bez DPH 1 818 174,- | Použité - skladem 1 ks | SKU ubtech2501_closeout",
+          "published_at": null,
+          "observed_at": "2026-10-05",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "Governed retail reference offer: proposal 98b2563053e5 at offer[13509114]/availability, sighted on page content hash 5da498959ff2; accepted claim 9c07403c9335, chosen by Robert Konecny (owner decision, WorkOrder 2026-10-05). Evidence class AGENT_ASSISTED_RESEARCH; capture provenance: AGENT_ASSISTED_RESEARCH: one-time owner-authorised verification of the specific Alza humanoid product pages, 2026-10-05 (WorkOrder 'Proceed with the current Alza work'); plain HTTP GET, declared HumanoidOnlineMarketBot/0.1 user agent, no retries, no circumvention. This is a product-page snapshot, retrieved as stated in the provenance and observed 2026-10-05 (https://www.alza.cz/ubtech-walker-tienkung-embodied-intelligence-bazar-d13509114.htm); a dated reference snapshot, not a live value, and not verified by a human beyond that."
+        }
+      ]
+    }
+  ],
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],

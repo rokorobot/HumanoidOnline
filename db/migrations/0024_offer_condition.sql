@@ -18,6 +18,15 @@
 
 SET search_path TO humanoid, public;
 
+-- Guard matching rule (owner decision 2026-10-05, after the production preflight found two
+-- false positives). The guard looks for EXPLICIT condition-bearing wording in the offer's own
+-- text fields: refurb*, open box / open-box, second-hand, pre-owned, bazaar / bazar, renewed,
+-- ex-demo, the phrases "used unit|item|robot|product|offer|condition|stock", "condition: used"
+-- and "(used)". The bare verb "used" is deliberately NOT a signal: "so LIMITED was not used",
+-- "status was used", "label used" or "method used" are editorial prose about a decision, not
+-- evidence that the offered unit is not new. Conservative on purpose (no language parser): a
+-- wording this list does not know would default to NEW, which is why the list stays explicit
+-- and why every existing production offer was also read before authorizing this migration.
 DO $$
 DECLARE
     offending bigint;
@@ -26,10 +35,10 @@ BEGIN
         (SELECT count(*) FROM pricing_offer
           WHERE concat_ws(' ', note, price_basis, package_contents, order_status_note,
                           edition_note, shipping_terms, warranty_terms)
-                ~* '(refurb|open[ -]?box|second[ -]?hand|pre-?owned|bazaar|bazar|renewed|ex-?demo|\mused\M)')
+                ~* '(refurb|open[ -]?box|second[ -]?hand|pre-?owned|bazaar|bazar|renewed|ex-?demo|\mused[ -](unit|item|robot|product|offer|condition|stock)s?\M|\mcondition\M[ :=-]{1,3}used\M|\(used\))')
       + (SELECT count(*) FROM availability_offer
           WHERE concat_ws(' ', note, seller_wording, delivery_estimate_label)
-                ~* '(refurb|open[ -]?box|second[ -]?hand|pre-?owned|bazaar|bazar|renewed|ex-?demo|\mused\M)')
+                ~* '(refurb|open[ -]?box|second[ -]?hand|pre-?owned|bazaar|bazar|renewed|ex-?demo|\mused[ -](unit|item|robot|product|offer|condition|stock)s?\M|\mcondition\M[ :=-]{1,3}used\M|\(used\))')
     INTO offending;
     IF offending > 0 THEN
         RAISE EXCEPTION

@@ -81,7 +81,15 @@ def test_upgrade_converges_defaults_existing_rows_to_new_and_is_idempotent(scrat
 
 @pytest.mark.parametrize("table,sql", [
     ("pricing_offer", "UPDATE pricing_offer SET note = 'Refurbished unit, bazaar'"),
-    ("availability_offer", "UPDATE availability_offer SET seller_wording = 'Used, 1 pc in stock'"),
+    ("pricing_offer", "UPDATE pricing_offer SET order_status_note = 'Open-box unit'"),
+    ("pricing_offer", "UPDATE pricing_offer SET note = 'Bazaar unit'"),
+    ("pricing_offer", "UPDATE pricing_offer SET package_contents = 'Used unit, no box'"),
+    ("pricing_offer", "UPDATE pricing_offer SET note = 'Condition: used'"),
+    ("pricing_offer", "UPDATE pricing_offer SET note = 'Listed as pre-owned (used)'"),
+    ("availability_offer", "UPDATE availability_offer SET seller_wording = 'Used unit, 1 pc'"),
+    ("availability_offer", "UPDATE availability_offer SET note = 'Refurbished unit'"),
+    ("availability_offer", "UPDATE availability_offer SET note = 'Open box unit in stock'"),
+    ("availability_offer", "UPDATE availability_offer SET delivery_estimate_label = 'Second-hand'"),
 ])
 def test_migration_refuses_to_default_a_row_that_says_it_is_used(scratch_db, table, sql):  # noqa: F811
     with psycopg.connect(scratch_db, autocommit=True) as conn:
@@ -91,6 +99,37 @@ def test_migration_refuses_to_default_a_row_that_says_it_is_used(scratch_db, tab
         conn.execute(sql)
         with pytest.raises(psycopg.errors.RaiseException, match="refusing to default"):
             conn.execute(M0024.read_text(encoding="utf-8"))
+
+
+#: The real production false positive (reichelt DE availability offers, 2026-10-05 preflight)
+#: plus the other everyday uses of the verb. All are NEW offers and must migrate to NEW.
+PROSE_THAT_IS_NOT_A_CONDITION = [
+    "reichelt: 'Limited stock, delivery within 1 - 2 business days'. In stock with a stated "
+    "1-2 business-day delivery and an add-to-cart flow (no quote wording) -> AVAILABLE. "
+    "'Limited stock' describes quantity on hand, not a purchase constraint, so LIMITED was not "
+    "used. lead_time_days left NULL (business days, not calendar days).",
+    "LIMITED was not used",
+    "the status was used to mark the row",
+    "label used for display only",
+    "method used: manual reading",
+    "price basis used by the seller is net",
+    "unused stock",
+]
+
+
+@pytest.mark.parametrize("wording", PROSE_THAT_IS_NOT_A_CONDITION)
+@pytest.mark.parametrize("table,column", [
+    ("availability_offer", "note"), ("availability_offer", "seller_wording"),
+    ("pricing_offer", "note"), ("pricing_offer", "order_status_note"),
+])
+def test_prose_with_the_verb_used_does_not_stop_it(scratch_db, wording, table, column):  # noqa: F811
+    with psycopg.connect(scratch_db, autocommit=True) as conn:
+        conn.execute(pre_0024_schema())
+        conn.execute("SET search_path TO humanoid, public")
+        _seed_old(conn)
+        conn.execute(f"UPDATE {table} SET {column} = %s", (wording,))
+        conn.execute(M0024.read_text(encoding="utf-8"))          # does NOT raise
+        assert conn.execute(f"SELECT condition::text FROM {table}").fetchall() == [("NEW",)]
 
 
 # --------------------------------------------------------------------------- DB + API ----

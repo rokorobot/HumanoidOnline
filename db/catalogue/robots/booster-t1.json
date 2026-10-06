@@ -63,5 +63,22 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": []
+  "images": [
+    {
+      "image_url": "/robots/booster-t1.webp",
+      "source_url": "https://www.booster.tech/booster-t1",
+      "source_name": "Booster Robotics",
+      "source_type": "MANUFACTURER",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "UNKNOWN",
+      "usage_basis": "OWNER_APPROVED_DISPLAY",
+      "is_official": true,
+      "is_primary": true,
+      "attribution": "© Booster Robotics",
+      "display_approved_by": "robert@humanoid.company",
+      "display_approved_at": "2026-10-06T00:00:00Z",
+      "last_verified_at": "2026-10-06T00:00:00Z"
+    }
+  ]
 }

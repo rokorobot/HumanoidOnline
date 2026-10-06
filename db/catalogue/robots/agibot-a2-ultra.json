@@ -269,5 +269,22 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": []
+  "images": [
+    {
+      "image_url": "/robots/agibot-a2-ultra.webp",
+      "source_url": "https://www.agibot.com/products/A2_Ultra",
+      "source_name": "AgiBot",
+      "source_type": "MANUFACTURER",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "UNKNOWN",
+      "usage_basis": "OWNER_APPROVED_DISPLAY",
+      "is_official": true,
+      "is_primary": true,
+      "attribution": "© AgiBot",
+      "display_approved_by": "robert@humanoid.company",
+      "display_approved_at": "2026-10-06T00:00:00Z",
+      "last_verified_at": "2026-10-06T00:00:00Z"
+    }
+  ]
 }

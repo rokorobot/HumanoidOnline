@@ -69,6 +69,15 @@
       "notes": "Positioned for logistics alongside manufacturing, with a 15 kg payload recorded.",
       "limitations": "Prototype maturity. Positioning comes from a third-party page, not a manufacturer citation. Not a demonstrated application: no deployment for this use is recorded.",
       "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "security-inspection",
+      "fit_score": 0.5,
+      "is_primary": false,
+      "commercial_readiness": "PROTOTYPE",
+      "notes": "Positioned for hazardous environments alongside manufacturing and logistics.",
+      "limitations": "Prototype maturity. Positioning comes from a third-party page, not a manufacturer citation. No inspection sensor payload or environmental rating is recorded. Not a demonstrated application: no deployment for this use is recorded.",
+      "confidence": "LOW"
     }
   ],
   "images": [

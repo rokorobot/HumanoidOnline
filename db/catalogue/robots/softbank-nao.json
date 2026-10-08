@@ -46,7 +46,16 @@
       "is_primary": true,
       "commercial_readiness": null,
       "notes": "Positioned by its current maker as 'a proven humanoid robot designed to interact naturally with people in education, research, healthcare and elderly environments'.",
-      "limitations": "Specifications, maturity and availability are not yet verified in this catalogue. Healthcare use has no category here.",
+      "limitations": "Specifications, maturity and availability are not yet verified in this catalogue.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "use_case_slug": "healthcare-rehabilitation",
+      "fit_score": 0.6,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "Positioned by its current maker as 'a proven humanoid robot designed to interact naturally with people in education, research, healthcare and elderly environments'.",
+      "limitations": "Positioning by the maker, not a clinically validated or approved medical use. No clinical validation or regulatory approval as a medical device is recorded. Specifications, maturity and availability are not yet verified in this catalogue. Not a demonstrated application: no deployment for this use is recorded.",
       "confidence": "MEDIUM"
     }
   ],

@@ -5,6 +5,21 @@
     { "slug": "manufacturing",       "name": "Manufacturing",         "category": "industry",  "description": "Humanoids on production lines and intralogistics in factories.", "typical_tasks": ["part sequencing", "machine tending", "sheet-metal loading", "kitting"] },
     { "slug": "research-education",  "name": "Research & Education",  "category": "research",  "description": "Humanoid platforms for labs and universities.", "typical_tasks": ["locomotion research", "manipulation research", "teaching"] },
     { "slug": "home",               "name": "Home",                  "category": "consumer",  "description": "Domestic assistance and companionship.", "typical_tasks": ["tidying", "fetching", "companionship"] },
-    { "slug": "events-entertainment","name": "Events & Entertainment","category": "service",   "description": "Humanoids as attractions, presenters and brand activations.", "typical_tasks": ["presenting", "interaction", "photo engagement"] }
+    { "slug": "events-entertainment","name": "Events & Entertainment","category": "service",   "description": "Humanoids as attractions, presenters and brand activations.", "typical_tasks": ["presenting", "interaction", "photo engagement"] },
+    { "slug": "retail-service", "name": "Retail & Service", "category": "service",
+      "description": "Humanoids in shops, branches and other customer-facing service environments: assisting and informing customers, demonstrating products and supporting store operations.",
+      "typical_tasks": ["customer greeting", "information and wayfinding", "product demonstration", "retail assistance", "store operations"],
+      "typical_requirements": "Reliable speech and interaction in noisy public spaces, safe operation among untrained members of the public, long unattended duty hours, and integration with store or service systems.",
+      "key_limitations": "Most humanoids here inform and interact rather than handle goods; unattended operation in a third-party store is rarely documented, and the return on investment is often novelty-driven." },
+    { "slug": "healthcare-rehabilitation", "name": "Healthcare & Rehabilitation", "category": "healthcare",
+      "description": "Humanoids used in rehabilitation research, therapeutic assistance, healthcare education, clinical research and healthcare service environments.",
+      "typical_tasks": ["rehabilitation research", "therapeutic assistance", "healthcare education", "clinical research support", "patient and visitor interaction"],
+      "typical_requirements": "Safe physical and social interaction with patients and older people, supervision by qualified staff, hygiene and data-protection compliance, and for any medical purpose the applicable medical-device approval.",
+      "key_limitations": "Research and experimental use only: no clinical validation or regulatory approval as a medical device is recorded for any robot in this catalogue. A robot listed here is positioned for or studied in healthcare settings; it is not a validated treatment or care device." },
+    { "slug": "security-inspection", "name": "Security & Inspection", "category": "security",
+      "description": "Humanoids for security patrols, facility monitoring and surveillance, remote inspection and inspection of hazardous environments.",
+      "typical_tasks": ["security patrol", "facility monitoring", "remote inspection", "hazardous-environment inspection", "autonomous patrol"],
+      "typical_requirements": "Long autonomous runtime, dependable navigation of the site, remote supervision and teleoperation, suitable sensor payloads, and environmental protection for outdoor or hazardous areas.",
+      "key_limitations": "Quadrupeds and wheeled robots currently dominate this field; documented humanoid deployments are few, and environmental ratings and inspection payloads are rarely published." }
   ]
 }

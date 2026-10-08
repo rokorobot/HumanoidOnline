@@ -144,7 +144,9 @@ def test_a_source_cited_in_a_fit_note_is_recorded_in_that_robots_file():
         text = f"{fit.get('notes') or ''} {fit.get('limitations') or ''}"
         for cited in url.findall(text):
             cited = cited.rstrip(".,;")
-            without_fits = RAW[slug].replace(json.dumps(fit["notes"], ensure_ascii=False), "")
+            without_fits = RAW[slug]
+            for field in ("notes", "limitations"):
+                without_fits = without_fits.replace(json.dumps(fit[field], ensure_ascii=False), "")
             assert cited in without_fits, f"{slug}: {cited} is not a recorded source of this robot"
 
 

@@ -100,6 +100,52 @@ def test_history_that_loses_or_alters_a_row_is_gated():
                                                          "audit_removal")}
 
 
+# ---- catalogue_write_audit.target_row_id: a forensic row id, not an identity (DR-A5 18.3) ----
+
+def audit_row(seq=38, target="unitree-h2-edu|alza-cz|CZ|-|NEW|PURCHASE|PUBLIC", **kw):
+    return {"audit_seq": seq, "claim": "c0ffee00-0000-4000-8000-000000000001",
+            "robot_slug": "unitree-h2-edu", "method": "IMPORTER_M2",
+            "change_ref": "chg-alza-reference-offers-pr149", "target_table": "pricing_offer",
+            "target_row": target, "after_hash": "a" * 64, "applied_by": "tester", **kw}
+
+
+GONE = "7d0f8f0e-3a52-4d0b-9d0c-2f6f2c1f9f11"       # the offer id the importer replaced
+
+
+def test_a_dangling_audit_target_is_reported_distinctly_and_does_not_stop_the_import():
+    """The 2026-10-08 false stop: the audit row is unchanged, only its target's id is gone."""
+    changes = pf.diff(snap(catalogue_write_audit=[audit_row(), audit_row(seq=39)]),
+                      snap(catalogue_write_audit=[audit_row(target=GONE), audit_row(seq=39)]))
+    assert [(c.kind, c.category, c.gated) for c in changes] == [
+        ("CHANGED", "audit_target_dangling", False)]
+    report = pf.classify(changes, {"expected": []})
+    assert report["ok"] and report["business_changes"] == 0 and not report["unexplained"]
+    assert report["audit_history_added"] == {}                  # not "8 removed + 8 added"
+    [d] = report["audit_targets_dangling"]
+    assert (d["audit_seq"], d["target_table"], d["target_row_id"]) == (38, "pricing_offer", GONE)
+    out = pf.render(report)
+    assert "AUDIT TARGET DANGLING" in out and "audit_seq=38" in out and "PASS" in out
+
+
+@pytest.mark.parametrize("after", [
+    audit_row(target=GONE, after_hash="b" * 64),               # content altered as well
+    audit_row(target="unitree-h2-edu|other|CZ|-|NEW|PURCHASE|PUBLIC"),   # points elsewhere
+    audit_row(change_ref="rewritten")])
+def test_any_other_difference_in_an_audit_row_is_still_history_altered(after):
+    report = pf.classify(pf.diff(snap(catalogue_write_audit=[audit_row()]),
+                                 snap(catalogue_write_audit=[after])), {"expected": []})
+    assert not report["ok"] and report["audit_targets_dangling"] == []
+    assert [(u["kind"], u["category"]) for u in report["unexplained"]] == [
+        ("CHANGED", "audit_removal")]
+
+
+def test_a_removed_audit_row_is_still_gated():
+    report = pf.classify(pf.diff(snap(catalogue_write_audit=[audit_row()]),
+                                 snap(catalogue_write_audit=[])), {"expected": []})
+    assert [(u["kind"], u["category"]) for u in report["unexplained"]] == [
+        ("REMOVED", "audit_removal")]
+
+
 # ---- discovery_source: acquisition policy is configuration, not history --------------------
 
 def source(key="alza-cz", **kw):
@@ -334,3 +380,44 @@ def test_the_gate_stops_on_that_synchronization_until_it_is_listed(scoped_world)
     listed = {"expected": [{"table": "evidence_source", "kind": "ADDED",
                             "match": {"subject~": H2, "excerpt~": "Re-observation"}}]}
     assert pf.classify(changes, listed)["ok"]
+
+
+def test_a_reimport_orphans_the_audit_target_row_id_and_the_gate_says_exactly_that(scoped_world):
+    """The mechanism end to end: the importer replaces a robot's offers (new UUIDs), so an
+    untouched `catalogue_write_audit` row stops resolving. Reported as a dangling target, not
+    as a removed + added audit row."""
+    url, _ = scoped_world
+    with psycopg.connect(url, autocommit=True) as conn:
+        conn.execute("SET search_path TO humanoid, public")
+        # Scratch database only: an accepted claim needs the whole proposal/decision chain,
+        # which is irrelevant to how the preflight reads the audit row.
+        conn.execute("ALTER TABLE catalogue_write_audit "
+                     "DROP CONSTRAINT catalogue_write_audit_claim_id_fkey")
+        offer_id = conn.execute(
+            "SELECT p.id FROM pricing_offer p JOIN robot r ON r.id = p.robot_id "
+            "WHERE r.slug = %s ORDER BY p.id LIMIT 1", (H2,)).fetchone()[0]
+        seq, stored = conn.execute(
+            "INSERT INTO catalogue_write_audit (claim_id, robot_slug, method, change_ref, "
+            "target_table, target_row_id, after_hash, applied_by) VALUES (gen_random_uuid(), %s, "
+            "'IMPORTER_M2', 'chg-test', 'pricing_offer', %s, repeat('a', 64), 'tester') "
+            "RETURNING audit_seq, md5(catalogue_write_audit::text)", (H2, offer_id)).fetchone()
+    before = _snap(url)
+    ic.run(url, only={H2})
+    after = _snap(url)
+    with psycopg.connect(url) as conn:
+        conn.execute("SET search_path TO humanoid, public")
+        unchanged = conn.execute("SELECT md5(a::text) FROM catalogue_write_audit a").fetchone()[0]
+        live = conn.execute("SELECT count(*) FROM pricing_offer WHERE id = %s",
+                            (offer_id,)).fetchone()[0]
+    assert unchanged == stored                  # the audit row is byte-identical
+    assert live == 0                            # its target was recreated under a new UUID
+    changes = pf.diff(before, after)
+    assert [c for c in changes if c.gated] == []
+    report = pf.classify(changes, {"expected": []})
+    assert report["ok"] and report["audit_history_added"] == {}
+    [d] = report["audit_targets_dangling"]
+    assert (d["audit_seq"], d["target_row_id"]) == (seq, str(offer_id))
+    assert d["was"].startswith(H2)
+    # already dangling on both sides: nothing left to report on the next import
+    ic.run(url, only={H2})
+    assert pf.classify(pf.diff(after, _snap(url)), {"expected": []})["audit_targets_dangling"] == []

@@ -40,6 +40,13 @@ cadence ...), freshness targets, crawl runs, discovery candidates, and the lead 
 tables (their rows are redacted — only a content hash is compared — so contact details never
 reach the report). An unexpected change to a source such as `alza-cz`, whose automated
 acquisition must stay disabled, therefore stops the import.
+
+One thing in an append-only table is NOT history changing: `catalogue_write_audit.target_row_id`
+is the physical row observed at verification time — forensic metadata, not an identity (DR-A5
+§18.3). The importer recreates a robot's child rows under new UUIDs, so after any later import
+of that robot the stored id stops resolving while the audit row itself is byte-identical. That
+is reported on its own line (`AUDIT TARGET DANGLING`, category `audit_target_dangling`) and is
+not gated; any other difference in an audit row still is.
 """
 from __future__ import annotations
 
@@ -47,6 +54,7 @@ import argparse
 import hashlib
 import json
 import sys
+import uuid
 from collections import Counter
 from dataclasses import dataclass, field
 
@@ -87,6 +95,7 @@ REDACTED_TABLES = frozenset({"commercial_lead", "commercial_lead_robot",
 NATURAL_KEY = {"robot": "slug", "provider": "slug", "manufacturer": "slug", "region": "code",
                "capability": "slug", "use_case": "slug", "spec_definition": "key",
                "discovery_source": "key",                       # discovery_source.key (UNIQUE)
+               "catalogue_write_audit": "audit_seq",            # identity column (UNIQUE)
                "freshness_target": ("robot", "url"),            # uq_freshness_target_robot_url
                "discovery_candidate": ("source", "external_ref")}  # uq_candidate_source_ref
 CATEGORY = {"robot": "robot", "provider": "provider", "pricing_offer": "pricing_offer",
@@ -105,6 +114,14 @@ LABEL_TABLES = {  # table -> expression naming a row by its natural key
 }
 
 
+def _is_uuid(value) -> bool:
+    try:
+        uuid.UUID(str(value))
+    except ValueError:
+        return False
+    return True
+
+
 @dataclass
 class Change:
     table: str
@@ -118,11 +135,24 @@ class Change:
         return self.table in AUDIT_TABLES and self.kind == "ADDED"
 
     @property
+    def dangling_audit_target(self) -> bool:
+        """The same `catalogue_write_audit` row, whose `target_row_id` resolved to a live row
+        before and is a bare UUID after: the importer recreated the target under a new id. The
+        stored audit row did not change (DR-A5 §18.3: the id is forensic, not an identity)."""
+        if (self.table != "catalogue_write_audit" or self.kind != "CHANGED"
+                or set(self.detail) != {"target_row"}):
+            return False
+        was, now = self.detail["target_row"]
+        return _is_uuid(now) and not _is_uuid(was)
+
+    @property
     def gated(self) -> bool:
-        return not self.audit
+        return not self.audit and not self.dangling_audit_target
 
     @property
     def category(self) -> str:
+        if self.dangling_audit_target:
+            return "audit_target_dangling"
         if self.table == "robot" and self.kind == "CHANGED" and "is_published" in self.detail:
             return "publication"
         if self.table == "robot" and self.kind == "ADDED" and self.fields.get("is_published"):
@@ -238,7 +268,7 @@ def classify(changes: list[Change], manifest: dict) -> dict:
     budget = [[e, e.get("count", 1)] for e in manifest.get("expected", [])]
     unexplained: list[Change] = []
     for change in changes:
-        if change.audit:
+        if not change.gated:
             continue
         for slot in budget:
             if slot[1] > 0 and _matches(change, slot[0]):
@@ -253,6 +283,12 @@ def classify(changes: list[Change], manifest: dict) -> dict:
         "business_changes": len(business),
         "by_category": dict(Counter(c.category for c in business)),
         "audit_history_added": dict(Counter(c.table for c in changes if c.audit)),
+        "audit_targets_dangling": [
+            {"audit_seq": c.fields.get("audit_seq"), "change_ref": c.fields.get("change_ref"),
+             "robot_slug": c.fields.get("robot_slug"),
+             "target_table": c.fields.get("target_table"),
+             "was": c.detail["target_row"][0], "target_row_id": c.detail["target_row"][1]}
+            for c in changes if c.dangling_audit_target],
         "unexplained": [{"table": c.table, "kind": c.kind, "category": c.category,
                          "fields": c.fields, "detail": c.detail} for c in unexplained],
         "unfulfilled": unfulfilled,
@@ -262,6 +298,10 @@ def classify(changes: list[Change], manifest: dict) -> dict:
 def render(report: dict) -> str:
     lines = [f"business changes: {report['business_changes']}  {report['by_category']}",
              f"append-only history rows ADDED (not gated): {report['audit_history_added']}"]
+    for d in report["audit_targets_dangling"]:
+        lines.append(f"AUDIT TARGET DANGLING (not gated; audit row unchanged) audit_seq="
+                     f"{d['audit_seq']} {d['change_ref']} {d['robot_slug']} {d['target_table']}: "
+                     f"was {d['was']}, id {d['target_row_id']} no longer exists")
     for u in report["unexplained"]:
         shown = u["fields"] if u["kind"] != "CHANGED" else u["detail"]
         lines.append(f"UNEXPLAINED {u['kind']} {u['table']} [{u['category']}]: "

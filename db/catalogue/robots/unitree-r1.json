@@ -276,8 +276,8 @@
       "fit_score": 0.5,
       "is_primary": true,
       "commercial_readiness": "COMMERCIAL",
-      "notes": "Editorial judgement. A low-cost humanoid with voice and image interaction through an integrated multimodal model, sold ready to use; this edition cannot be programmed, so demonstration and audience interaction are its practical uses.",
-      "limitations": "No secondary development on this edition. About 1 h battery life. Unitree notes some sample functions are still in development. Not a demonstrated application: no deployment for this use is recorded.",
+      "notes": "Editorial judgement. A low-cost humanoid with voice and image interaction through an integrated multimodal model, sold ready to use; this edition cannot be programmed, so demonstrations and audience interaction are its potential uses.",
+      "limitations": "No secondary development on this edition. About 1 h battery life. Unitree notes some sample functions are still in development. Demonstrations or exhibitions are a potential use, not an established event-service capability. Not a demonstrated application: no deployment for this use is recorded.",
       "confidence": "LOW"
     }
   ],

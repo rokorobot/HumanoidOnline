@@ -105,8 +105,8 @@
       "fit_score": 0.5,
       "is_primary": false,
       "commercial_readiness": "COMMERCIAL",
-      "notes": "The distributor listing cites a RoboCup 2025 KidSize championship: a competition and demonstration platform (https://eu.robotshop.com/collections/booster-robotics).",
-      "limitations": "A robot-soccer competition result, not a purpose-built entertainment product. About 30 min runtime.",
+      "notes": "The distributor listing cites a RoboCup 2025 KidSize championship: a competition platform, and a potential demonstration platform (https://eu.robotshop.com/collections/booster-robotics).",
+      "limitations": "A robot-soccer competition result, not a purpose-built entertainment product. Demonstrations or exhibitions are a potential use, not an established event-service capability. About 30 min runtime.",
       "confidence": "LOW"
     }
   ],

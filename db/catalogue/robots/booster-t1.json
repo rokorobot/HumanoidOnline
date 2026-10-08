@@ -77,8 +77,8 @@
       "fit_score": 0.5,
       "is_primary": false,
       "commercial_readiness": "COMMERCIAL",
-      "notes": "Booster's product page ties the T1 to the RoboCup Soccer AdultSize category: a competition and demonstration platform (https://www.booster.tech/booster-t1/).",
-      "limitations": "A robot-soccer competition context, not a purpose-built entertainment product. Specifications are not yet verified.",
+      "notes": "Booster's product page ties the T1 to the RoboCup Soccer AdultSize category: a competition platform, and a potential demonstration platform (https://www.booster.tech/booster-t1/).",
+      "limitations": "A robot-soccer competition context, not a purpose-built entertainment product. Demonstrations or exhibitions are a potential use, not an established event-service capability. Specifications are not yet verified.",
       "confidence": "LOW"
     }
   ],

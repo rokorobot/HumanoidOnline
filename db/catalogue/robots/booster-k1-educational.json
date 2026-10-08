@@ -105,8 +105,8 @@
       "fit_score": 0.5,
       "is_primary": false,
       "commercial_readiness": "COMMERCIAL",
-      "notes": "Editorial judgement. The K1 platform is a robot-soccer competition platform (the distributor cites a RoboCup 2025 KidSize championship for the K1 line), with voice interaction recorded: suited to competitions and live demonstrations.",
-      "limitations": "A development platform used for demonstration, not a purpose-built entertainment product. 95 cm platform, about 80 min runtime.",
+      "notes": "Editorial judgement. The K1 platform is a robot-soccer competition platform (the distributor cites a RoboCup 2025 KidSize championship for the K1 line), with voice interaction recorded: a potential fit for competitions and live demonstrations.",
+      "limitations": "A development platform, not a purpose-built entertainment product. Demonstrations or exhibitions are a potential use, not an established event-service capability. 95 cm platform, about 80 min runtime.",
       "confidence": "LOW"
     }
   ],

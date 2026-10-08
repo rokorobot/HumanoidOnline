@@ -225,8 +225,8 @@
       "fit_score": 0.5,
       "is_primary": false,
       "commercial_readiness": "LIMITED_COMMERCIAL",
-      "notes": "Editorial judgement. A full-size humanoid with a bionic head with facial features and voice-interaction hardware, programmable on this edition: suited to presentation and demonstration, like the base H2.",
-      "limitations": "A development platform used for demonstration, not a purpose-built entertainment product. No language-model capability is claimed. Not a demonstrated application: no deployment for this use is recorded.",
+      "notes": "Editorial judgement. A full-size humanoid with a bionic head with facial features and voice-interaction hardware, programmable on this edition: a potential fit for presentations and demonstrations, like the base H2.",
+      "limitations": "A development platform, not a purpose-built entertainment product. Demonstrations or exhibitions are a potential use, not an established event-service capability. No language-model capability is claimed. Not a demonstrated application: no deployment for this use is recorded.",
       "confidence": "LOW"
     }
   ],

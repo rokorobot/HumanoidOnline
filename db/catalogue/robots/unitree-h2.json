@@ -200,8 +200,8 @@
       "fit_score": 0.5,
       "is_primary": true,
       "commercial_readiness": "LIMITED_COMMERCIAL",
-      "notes": "Editorial judgement. A full-size humanoid with a bionic head with facial features and voice-interaction hardware; this edition cannot be programmed, so presentation and demonstration are its practical uses.",
-      "limitations": "No secondary development and no dexterous hands on this edition. No language-model capability is claimed. Not a demonstrated application: no deployment for this use is recorded.",
+      "notes": "Editorial judgement. A full-size humanoid with a bionic head with facial features and voice-interaction hardware; this edition cannot be programmed, so presentations and demonstrations are its potential uses.",
+      "limitations": "No secondary development and no dexterous hands on this edition. No language-model capability is claimed. Demonstrations or exhibitions are a potential use, not an established event-service capability. Not a demonstrated application: no deployment for this use is recorded.",
       "confidence": "LOW"
     },
     {

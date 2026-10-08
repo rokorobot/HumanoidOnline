@@ -208,8 +208,8 @@
       "fit_score": 0.5,
       "is_primary": false,
       "commercial_readiness": "COMMERCIAL",
-      "notes": "Editorial judgement. The R1 line carries voice and image interaction through an integrated multimodal model, and this edition is programmable: suited to live demonstrations and audience interaction, like the base R1.",
-      "limitations": "A development platform used for demonstration, not a purpose-built entertainment product. About 1 h battery life. Not a demonstrated application: no deployment for this use is recorded.",
+      "notes": "Editorial judgement. The R1 line carries voice and image interaction through an integrated multimodal model, and this edition is programmable: a potential fit for live demonstrations and audience interaction, like the base R1.",
+      "limitations": "A development platform, not a purpose-built entertainment product. Demonstrations or exhibitions are a potential use, not an established event-service capability. About 1 h battery life. Not a demonstrated application: no deployment for this use is recorded.",
       "confidence": "LOW"
     }
   ],

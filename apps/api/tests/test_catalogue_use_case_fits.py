@@ -9,9 +9,13 @@ the robot file it lives in:
 * a fit never claims more maturity than the robot itself records;
 * a fit agrees with the robot's own recorded deployments;
 * any source a fit note cites is a source already recorded in that robot's file;
-* every published, commercially accessible robot has at least one use case, or
-  is listed below as a KNOWN coverage gap. A gap is closed by finding evidence,
-  never by inventing a fit (AGENTS.md rule 6).
+* published, commercially accessible robots with no use case are REPORTED and
+  kept on a reviewed register below. Incomplete coverage never fails the run
+  (owner decision D5, 2026-10-08); only an inaccurate register does. A gap is
+  closed by finding evidence, never by inventing a fit (AGENTS.md rule 6).
+
+A fit on an unpublished robot is allowed when its file supports it; the public
+API filters by publication (tests/test_use_case_fit_safeguards.py).
 
 See docs/audit/USE_CASE_ENRICHMENT_REVIEW_2026-10-08.md.
 """
@@ -19,6 +23,7 @@ from __future__ import annotations
 
 import json
 import re
+import warnings
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -43,9 +48,10 @@ KNOWN_COVERAGE_GAPS = {
     # of the current use cases.
     "agibot-a2-ultra",
     "unitree-r1",
-    # Developer interfaces are sourced, but the file is a governed-promotion record
-    # pinned to "no derived fact" (test_catalogue_stub_adopts_existing_robot.py):
-    # a fit here is an owner decision, not a data edit.
+    # Use cases for this robot are a governed claim kind with NO_CATALOGUE_HOME
+    # (DR-A5 section 18.5; field_policy.NO_HOME_KINDS): accepted with provenance,
+    # never materialized, and its interface rows derive no capability. A fit here
+    # needs a change to that boundary, which is a separate owner decision.
     "4ne1-mini",
 }
 
@@ -150,21 +156,29 @@ def test_a_source_cited_in_a_fit_note_is_recorded_in_that_robots_file():
             assert cited in without_fits, f"{slug}: {cited} is not a recorded source of this robot"
 
 
-def test_unpublished_robots_gain_no_use_case_in_this_catalogue_state():
-    """Fits follow evidence review of published profiles; an unpublished stub with
-    a fit would surface the moment it is published, unreviewed."""
-    for slug, robot in ROBOTS.items():
-        if not robot.get("is_published"):
-            assert not robot.get("use_case_fits"), slug
-
-
-def test_every_commercially_accessible_published_robot_has_a_use_case_or_is_a_known_gap():
+def test_the_reviewed_gap_register_is_accurate():
+    """Integrity of the register itself (blocking): every listed slug is a real,
+    published, commercially accessible robot that still has no use case. A stale
+    entry would hide a robot that has since been covered or withdrawn."""
     gaps = coverage_gaps(ROBOTS)
-    assert gaps == KNOWN_COVERAGE_GAPS, (
-        "use-case coverage drifted. New gap(s): "
-        f"{sorted(gaps - KNOWN_COVERAGE_GAPS)}; closed gap(s) still listed: "
-        f"{sorted(KNOWN_COVERAGE_GAPS - gaps)}"
+    assert KNOWN_COVERAGE_GAPS <= set(ROBOTS), sorted(KNOWN_COVERAGE_GAPS - set(ROBOTS))
+    assert KNOWN_COVERAGE_GAPS <= gaps, (
+        f"listed as a gap but no longer one: {sorted(KNOWN_COVERAGE_GAPS - gaps)}"
     )
+
+
+def test_unreviewed_coverage_gaps_are_reported_not_blocking():
+    """Owner decision D5 (2026-10-08): incomplete use-case coverage is REPORTED,
+    never a blocking condition. An accessible robot with no use case that is not
+    yet on the reviewed register raises a warning in the test output; it does not
+    fail the run. A gap is closed by evidence, never by a deadline."""
+    unreviewed = coverage_gaps(ROBOTS) - KNOWN_COVERAGE_GAPS
+    if unreviewed:
+        warnings.warn(
+            "use-case coverage: commercially accessible robot(s) with no use case and "
+            f"no entry in the reviewed gap register: {sorted(unreviewed)}",
+            stacklevel=1,
+        )
 
 
 # ---- the check itself, on synthetic data ---------------------------------
@@ -204,3 +218,29 @@ def test_coverage_check_uses_the_canonical_accessibility_predicate():
         ),
     }
     assert coverage_gaps(robots) == {"waitlist-counts", "one-live-offer-is-enough"}
+
+
+# ---- owner decisions of 2026-10-08, pinned ---------------------------------
+
+def test_g1_basic_is_associated_but_not_rated_for_research_education():
+    """D1: the base G1 has no secondary development, so its Research & Education
+    association carries no score, and the note no longer claims SDK support."""
+    robot = ROBOTS["unitree-g1"]
+    [fit] = [f for f in robot["use_case_fits"] if f["use_case_slug"] == "research-education"]
+    assert fit["fit_score"] is None
+    assert "SDK/ROS support make" not in fit["notes"]
+    assert "does not offer secondary development" in fit["notes"]
+    assert "No secondary development" in fit["limitations"]
+    assert robot["commercial_status"] == "COMMERCIAL"      # maturity untouched
+    assert robot["specs"]["has_sdk"] is not True            # the record never claimed an SDK
+
+
+def test_4ne1_mini_carries_no_use_case_row_while_its_use_cases_have_no_catalogue_home():
+    """D2 was conditional on compatibility with the claim-governance boundary. It is
+    not compatible: DR-A5 registers this robot's use cases as NO_CATALOGUE_HOME."""
+    policy = (REPO_ROOT / "apps/api/app/services/discovery/field_policy.py").read_text(
+        encoding="utf-8")
+    block = policy[policy.index("NO_HOME_KINDS = {"):]
+    assert '"USE_CASES": "use_cases"' in block[: block.index("}")]
+    assert ROBOTS["4ne1-mini"]["use_case_fits"] == []
+    assert "4ne1-mini" in KNOWN_COVERAGE_GAPS

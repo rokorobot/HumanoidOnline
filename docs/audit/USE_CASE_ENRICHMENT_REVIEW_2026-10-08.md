@@ -1,9 +1,10 @@
-# Use-case enrichment review — proposal record (2026-10-08)
+# Use-case enrichment review — record with owner decisions (2026-10-08)
 
 Owner WorkOrder of 2026-10-08, steps 1 to 3: audit all published robots against the five use cases, propose
-evidence-supported `use_case_fit` rows, and prepare a coverage check. **Everything here is a proposal for owner
-review.** Nothing was imported, published, merged or deployed, and no external research was performed: every
-association rests on text already recorded in the robot's own catalogue file.
+evidence-supported `use_case_fit` rows, and prepare a coverage check. The owner decided D1 to D5 the same day
+(section 5) and this record reflects the branch after those decisions. Nothing was imported, published, merged
+or deployed, and no external research was performed: every association rests on text already recorded in the
+robot's own catalogue file. The PR stays a draft for final owner approval.
 
 | Measure | Before (`origin/main` @ 0e7e690) | After (this branch) |
 |---|---|---|
@@ -15,9 +16,10 @@ association rests on text already recorded in the robot's own catalogue file.
 | Other published robots with a use case | 2 of 26 | 10 of 26 |
 | Rows on unpublished robots | 0 | 0 |
 
-15 rows are added. No existing row is changed. Three commercially accessible robots stay uncovered, each
-for a stated reason (section 5). The target of 16 of 16 is **not** met, because meeting it would have required
-forcing a robot into a category its recorded evidence does not support.
+15 rows are added and one existing row is corrected (G1 Basic, decision D1). Three commercially accessible
+robots stay uncovered, each for a stated reason (sections 5 and 7). The target of 16 of 16 is **not** met,
+because meeting it would have required forcing a robot into a category its recorded evidence or its governance
+does not support.
 
 ## 1. Rules applied
 
@@ -60,8 +62,9 @@ status is UNKNOWN. A fit score states suitability. It does not state deployment 
   confirmed through `robot_commercial_snapshot.is_obtainable` on a fresh import of this branch: 16. No
   discrepancy. `unitree-r1-edu-u5` has one retired offer and qualifies on its other, current offer.
 - **Published-only API.** `/api/use-cases` counts and `/api/use-cases/{slug}` rows are filtered on
-  `robot.is_published`. No test covered this for the use-case endpoints; one is added. No unpublished robot
-  receives a fit in this change, and a test holds that.
+  `robot.is_published`. No test covered this for the use-case endpoints; one is added. A fit on an unpublished
+  robot is permitted when its file supports it; none is added here, and the API filter is what keeps such a
+  row private.
 - **Figure 02.** Its Manufacturing row is accurate history: readiness DISCONTINUED, a recorded BMW deployment.
   Matching already hard-excludes discontinued robots. On the use-case page it ties Apollo at 0.70 and can list
   first. That is a presentation matter for the profile and page work (step 4), not a data defect. Row unchanged.
@@ -100,41 +103,41 @@ The full note and limitation text for each row is in the robot's JSON file.
 | `figure-02` | manufacturing | 0.70 | DISCONTINUED | Accurate history; see section 2. Unchanged. |
 | `unitree-g1-edu-plus-u2` | research-education | 0.85 | COMMERCIAL | Consistent. Unchanged. |
 | `unitree-g1-edu-plus-u2` | events-entertainment | 0.50 | COMMERCIAL | Consistent. Unchanged. |
-| `unitree-g1` | research-education | 0.75 | COMMERCIAL | **Inconsistent with its own record.** See decision D1. Unchanged pending that decision. |
+| `unitree-g1` | research-education | NULL | COMMERCIAL | **Corrected (D1).** Was 0.75 on a note claiming SDK support that the record denies. Now unrated, with the base-edition limitations stated. Readiness and the robot's commercial status are unchanged. |
 | `unitree-h1` | research-education | 0.70 | COMMERCIAL | Consistent (SDK, ROS and simulation recorded). Unchanged. |
 
 Every existing readiness value equals the robot's current commercial status. No stale readiness was found.
+G1 Basic keeps readiness COMMERCIAL on its now-unrated row, because the owner approved a change to the score and
+note only. New unrated rows carry NULL readiness.
 
-## 5. Owner decisions
+## 5. Owner decisions (2026-10-08) and what was done
 
-**D1. Re-rate G1 Basic for Research & Education (0.75 to NULL).** The existing note reads "Low price point and
-SDK/ROS support make G1 a common research/education platform". The same record states that the base G1 "does
-not offer secondary development (SDK) access", which belongs to the EDU tier, and `has_sdk` is not set. ROS and
-simulation support are recorded for the G1 platform. Under the rubric the base edition is unrated, the same
-treatment proposed for the H2 base edition. This reverses an earlier editorial score on a live, accessible robot,
-so it is **not applied** here. Proposed text, if accepted: score NULL, readiness NULL, note stating the missing
-secondary development, limitation pointing to the G1 EDU records.
+| # | Decision | Outcome on this branch |
+|---|---|---|
+| D1 | Approved: G1 Basic Research & Education 0.75 to NULL; replace the inaccurate SDK claim; commercial status untouched | **Applied.** Pinned by tests. |
+| D2 | Conditionally approved: unrated 4NE1 Mini row, only if compatible with the publication and claim-governance boundaries | **Not applied: the condition is not met.** See below. |
+| D3 | A2 Ultra and R1 base stay unassigned; first-party research authorized as a follow-up proposal only | Recorded in section 7 and the gap register. No research done. |
+| D4 | New categories deferred | Candidates recorded below. Nothing implemented. |
+| D5 | Keep coverage reporting; incomplete coverage is not a blocking condition; keep the gap register and integrity safeguards | **Applied.** See section 8. |
+| — | Remove the blanket ban on fits for unpublished robots; keep strict API filtering | **Applied.** The test is removed; the API filter test stays. |
 
-**D2. 4NE1 Mini.** The evidence supports an unrated Research & Education row (section 7). The file is a
-governed-promotion record, and `test_catalogue_stub_adopts_existing_robot.py` pins it to carry no use-case row.
-Adding one means amending that pin. Not applied.
+**D2 in detail.** The stub test pins `use_case_fits == []`, but the test is not the boundary; it mirrors one.
+`docs/decisions/DR-A5` section 18.5 records the owner's ruling for this robot: its use cases are "accepted as
+governed knowledge with provenance, `NO_CATALOGUE_HOME`; never materialized", partly because the schema cannot
+say that Standard and Pro differ, with "no automatic use-case mapping". The same section says of the interface
+rows that "no `has_sdk`, `ros_support`, `has_api` ... or capability is derived". `field_policy.NO_HOME_KINDS`
+implements this. An unrated Research & Education row built from those interface rows would give use cases a
+catalogue home outside the governed path and would derive suitability from rows ruled to derive nothing. Making
+it compatible means changing the claim registry and DR-A5, which D2 excludes. A test now ties the empty row to
+that policy, so the two move together when the owner decides otherwise.
 
-**D3. AgiBot A2 Ultra and Unitree R1.** No recorded source supports any of the five use cases. Closing either
-gap needs new first-party evidence, which is outside this WorkOrder.
-
-**D4. New use-case categories.** Not implemented. Candidates, with the evidence behind each:
+**D4 candidates.**
 
 | Candidate category | Robots | Evidence on file |
 |---|---|---|
 | Retail and service | `galbot-g1`, `xpeng-iron`, `softbank-pepper` | Galbot: sourced, in operation. XPENG: sourced, planned. Pepper: quoted in summary, no evidence row. |
 | Healthcare and rehabilitation | `softbank-nao`, `softbank-pepper`, `fourier-intelligence-gr-2` | Summary text only. |
 | Security and inspection | `1x-eve`, `kepler-k2-forerunner` | Summary text only. |
-
-Only Retail and service has a sourced, operating example today. One robot does not make a useful page.
-
-**D5. Enforcement.** Two checks are prepared (section 8). The database check reports on every run and blocks
-only with a flag that no workflow passes. The file-level test does run in CI once this merges: it fails when a
-published, commercially accessible robot has no use case and is not on the reviewed gap list.
 
 ## 6. Coverage matrix — all 42 published robots
 
@@ -172,7 +175,7 @@ Accessible = satisfies the canonical commercial-accessibility predicate.
 | `ubtech-walker-s1` | UNKNOWN | no | none | gap |
 | `ubtech-walker-s2` | COMMERCIAL | no | manufacturing 0.60 | added |
 | `unitree-g1-edu-plus-u2` | COMMERCIAL | yes | research-education 0.85, events-entertainment 0.50 | existing |
-| `unitree-g1` | COMMERCIAL | yes | research-education 0.75 | existing |
+| `unitree-g1` | COMMERCIAL | yes | research-education NULL | corrected (D1) |
 | `unitree-h1` | COMMERCIAL | yes | research-education 0.70 | existing |
 | `unitree-h2-edu` | LIMITED_COMMERCIAL | yes | research-education 0.75 | added |
 | `unitree-h2` | LIMITED_COMMERCIAL | no | research-education NULL | added |
@@ -185,13 +188,13 @@ Accessible = satisfies the canonical commercial-accessibility predicate.
 | `unitree-r1` | COMMERCIAL | yes | none | gap |
 | `xpeng-iron` | ANNOUNCED | no | none | gap |
 
-## 7. Robots left without a use case
+## 7. Unresolved: robots left without a use case
 
 | Robot | Accessible | Candidate | What the file holds | What would close it |
 |---|---|---|---|---|
-| `agibot-a2-ultra` | yes | — | Recorded sources state deployment scale ("over a thousand units", "over 20 leading enterprises") and a rental and quote path. None names a sector or application. A rental listing is not a use case. | A first-party A2 Ultra page naming its applications. |
-| `unitree-r1` | yes | — | Recorded sources state price, stock and specifications. Unitree's table shows no secondary development for this edition. Nothing positions it for any application. | A first-party statement of intended use for the non-EDU R1. |
-| `4ne1-mini` | yes | research-education (unrated) | NEURA's product page lists a Python SDK and ROS 2 interface for both configurations, and a C++ SDK, digital twin access and Neura Gym training readiness for the Pro. The file is a governed-promotion record pinned by `test_catalogue_stub_adopts_existing_robot.py` to carry no use-case row. | Owner decision D2. |
+| `agibot-a2-ultra` | yes | — | Recorded sources state deployment scale ("over a thousand units", "over 20 leading enterprises") and a rental and quote path. None names a sector or application. A rental listing is not a use case. | A first-party A2 Ultra page naming its applications. Research is authorized only as a follow-up proposal (D3). |
+| `unitree-r1` | yes | — | Recorded sources state price, stock and specifications. Unitree's table shows no secondary development for this edition. Nothing positions it for any application. | A first-party statement of intended use for the non-EDU R1. Research is authorized only as a follow-up proposal (D3). |
+| `4ne1-mini` | yes | research-education (unrated) | NEURA's product page lists a Python SDK and ROS 2 interface for both configurations, and more for the Pro. DR-A5 section 18.5 registers this robot's use cases as a governed claim kind with `NO_CATALOGUE_HOME` (never materialized) and states that its interface rows derive no capability. | A separate owner decision to give governed use-case claims a catalogue home (D2). |
 | `1x-eve` | no | warehouse-logistics; new: security | Summary only: "Wheeled humanoid for security and logistics tasks." No evidence row. | One sourced first-party excerpt. |
 | `boston-dynamics-atlas-electric` | no | manufacturing | Summary only: "All-electric Atlas developed with automotive partners." No evidence row. | One sourced first-party excerpt. |
 | `fourier-intelligence-gr-2` | no | research-education; new: healthcare and rehabilitation | Summary only: "Research/rehabilitation humanoid sold to institutions." The one evidence row is a third-party page with no excerpt. | A Fourier excerpt stating the intended application. |
@@ -209,24 +212,37 @@ Accessible = satisfies the canonical commercial-accessibility predicate.
 | `ubtech-walker-s1` | no | manufacturing | Summary only: "Industrial humanoid piloted in Chinese EV factories." No evidence row. | One sourced first-party excerpt. |
 | `xpeng-iron` | no | new: retail and service | Sourced, first-party: XPENG states "initial commercial-scenario rollouts beginning in XPENG's own stores and campuses". Planned, not delivered; status ANNOUNCED. | Owner decision D4. |
 
-## 8. Checks prepared
+## 8. Checks
 
-- `apps/api/tests/test_catalogue_use_case_fits.py` (no database): fit shape against the schema, readiness never
-  above the robot's status, deployments agree with fits, cited sources are recorded sources, no fit on an
-  unpublished robot, and coverage of accessible robots against the reviewed gap list.
-- `apps/api/tests/test_use_case_fit_safeguards.py` (database): the use-case API excludes an unpublished robot
-  from page and count, and a NULL-score row leaves every matching input identical.
-- `db/validate_catalogue.py`: prints `use-case coverage: commercially_accessible=N without_use_case=M` on every
-  run. `--enforce-use-case-coverage` turns a gap into a failure. No workflow passes the flag.
-- `scripts/use_case_matching_regression.py`: the before and after comparison below, reproducible without a
-  database.
+Blocking, because they are data-integrity conditions:
+
+- `test_catalogue_use_case_fits.py` (no database): fit shape against the schema; readiness never above the
+  robot's status; recorded deployments agree with fits; a cited source is a recorded source of that robot; the
+  gap register lists only real, published, accessible robots that still have no use case; D1 and D2 outcomes.
+- `test_use_case_matching_regression.py` (no database): G1 Basic and 4NE1 Mini are neutral to matching with a
+  warning and no fit reason; every scored fit reaches the engine as the score in its file and moves only the
+  use-case criterion.
+- `test_use_case_fit_safeguards.py` (database): the use-case API excludes an unpublished robot from page and
+  count; a NULL-score row leaves every matching input identical.
+
+Reporting only, per D5:
+
+- `db/validate_catalogue.py` prints `use-case coverage: commercially_accessible=N without_use_case=M (slugs)` on
+  every run and exits 0 whatever it finds. The optional `--enforce-use-case-coverage` flag is passed by no
+  workflow.
+- An accessible robot with no use case that is not on the reviewed register raises a warning in the test
+  output. It does not fail the run.
+
+`scripts/use_case_matching_regression.py` reproduces the comparison below without a database.
 
 ## 9. Matching comparison
 
 Eight representative buyer requirements, top four results each, `origin/main` against this branch. The three
-Research & Education scenarios change, as intended: the newly scored Booster and Unitree EDU editions enter the
-top four. Every other scenario, including the no-use-case control, is unchanged. Scores tie often, and ties
-resolve by slug in this harness; production also uses evidence freshness.
+Research & Education scenarios change: the newly scored Booster and Unitree EDU editions enter the top four,
+and G1 Basic leaves it. Every other scenario, including the no-use-case control, is unchanged. Scores tie often,
+and ties resolve by slug in this harness; production also uses evidence freshness.
+
+G1 Basic on its own, for a Research & Education requirement with nothing else stated: total score 84 before and 73 after. The use-case criterion contributes 34.09 points before and 22.73 after, the neutral value, with the warning "use-case fit for research-education is unverified".
 
 
 ### Research & Education, no country, any transaction
@@ -318,9 +334,6 @@ UNCHANGED
 | 4 | booster-t2-professional (94) | booster-t2-professional (94) |
 
 3 of 8 scenarios changed.
-
-Decision D1 would not alter any of these top-four lists: with the additions in place, G1 Basic is already
-outside the top four of the three Research & Education scenarios.
 
 ## 10. Not done
 

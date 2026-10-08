@@ -178,12 +178,12 @@
   "use_case_fits": [
     {
       "use_case_slug": "research-education",
-      "fit_score": 0.75,
+      "fit_score": null,
       "is_primary": true,
       "commercial_readiness": "COMMERCIAL",
-      "notes": "Low price point and SDK/ROS support make G1 a common research/education platform.",
-      "limitations": "Small arm payload; teleop-first autonomy.",
-      "confidence": "MEDIUM"
+      "notes": "Base configuration of the G1 line. ROS and simulation support are documented for the G1 platform (https://www.unitree.com/g1/), but this record states that the base G1 does not offer secondary development (SDK) access, which belongs to the EDU tier. No source on file positions the base edition for research or education, so no fit score is given.",
+      "limitations": "No secondary development on this edition; fixed hands that cannot grasp; about 2 kg arm payload. For programmable research use see the G1 EDU records.",
+      "confidence": "LOW"
     }
   ],
   "images": [

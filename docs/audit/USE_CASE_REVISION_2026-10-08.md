@@ -29,14 +29,14 @@ is why it defaulted to Research & Education.
 
 | Measure | Production today | Revised |
 |---|---|---|
-| Associations | 24 | 58 |
-| Published robots with a use case | 23 of 42 | 38 of 42 |
+| Associations | 24 | 57 |
+| Published robots with a use case | 23 of 42 | 37 of 42 |
 | Robots with more than one use case | 1 | 20 |
 | Commercially accessible robots covered | 13 of 16 | 15 of 16 |
 | Home | 1 | 1 |
 | Warehouse | 1 | 4 |
 | Manufacturing | 3 | 8 |
-| Events | 2 | 20 |
+| Events | 2 | 19 |
 | Research | 17 | 25 |
 
 Home stays at one robot: NEO is the only published robot positioned for domestic use. Events grows most because
@@ -98,11 +98,12 @@ All 24 are retained. Four are adjusted:
 | `unitree-r1-edu-u5` | yes | Research 0.80 | Research 0.80, Events 0.50 | Editorial judgement, plausible. |
 | `unitree-r1-edu-u6` | no | Research 0.80 | Research 0.80, Events 0.50 | Editorial judgement, plausible. |
 | `unitree-r1` | yes | none | Events 0.50 | Editorial judgement, plausible. |
-| `xpeng-iron` | no | none | Events 0.50 | Planned by the maker, not delivered. |
+| `xpeng-iron` | no | none | none | Held by governance: a governed record pinned as identity and reference only (`test_xpeng_iron.py`). Under the original method it would be Events at 0.50, planned and not delivered. Needs an explicit owner ruling. |
 
 ## Left without a use case
 
 - **`4ne1-mini`**: Held by governance, not by evidence. DR-A5 section 18.5 registers this robot's use cases as a governed claim with no catalogue home. Under the original method it would be Research & Education at about 0.65. Needs an explicit owner decision to change that ruling.
+- **`xpeng-iron`**: Held by governance: a governed record pinned as identity and reference only (`test_xpeng_iron.py`). Under the original method it would be Events at 0.50, planned and not delivered. Needs an explicit owner ruling.
 - **`galbot-g1`**: Recorded operation is in retail kiosks, which fits none of the five categories. Not forced into one.
 - **`honda-asimo`**: Historical platform; the catalogue records no application and no current status.
 - **`rainbow-hubo`**: The catalogue records no specifications, application or status.

@@ -66,6 +66,12 @@ SCENARIOS: list[tuple[str, RequirementInput]] = [
      _req(use_case="events-entertainment", country="BG", preferred_transaction="RENT")),
     ("Home, United States, buy",
      _req(use_case="home", country="US", preferred_transaction="BUY")),
+    ("Retail & Service, no country, any transaction",
+     _req(use_case="retail-service")),
+    ("Healthcare & Rehabilitation, no country, any transaction",
+     _req(use_case="healthcare-rehabilitation")),
+    ("Security & Inspection, no country, any transaction",
+     _req(use_case="security-inspection")),
     ("Control: no use case stated, Germany, buy",
      _req(country="DE", preferred_transaction="BUY")),
 ]

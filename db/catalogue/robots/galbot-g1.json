@@ -62,7 +62,17 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "retail-service",
+      "fit_score": 0.75,
+      "is_primary": true,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "Galbot states that G1 operates in its Galaxy Space Capsule retail units at more than 170 sites in over 40 cities in China.",
+      "limitations": "Stated by the maker; no deployment row is recorded. Recorded for Galbot's own retail units in China only: operation in a third-party store or outside China is not recorded.",
+      "confidence": "MEDIUM"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/galbot-g1.webp",

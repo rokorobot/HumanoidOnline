@@ -41,9 +41,18 @@
   "capabilities": [],
   "use_case_fits": [
     {
+      "use_case_slug": "retail-service",
+      "fit_score": 0.7,
+      "is_primary": true,
+      "commercial_readiness": null,
+      "notes": "Positioned by SoftBank Robotics America as 'a robot designed for people. Built to connect with them, assist them, and share knowledge with them', with retail, banking and hospitality listed among its applications.",
+      "limitations": "Positioning by the maker; no deployment is recorded here. Specifications, maturity and current availability are not yet verified.",
+      "confidence": "MEDIUM"
+    },
+    {
       "use_case_slug": "events-entertainment",
       "fit_score": 0.6,
-      "is_primary": true,
+      "is_primary": false,
       "commercial_readiness": null,
       "notes": "Positioned by SoftBank Robotics America as 'a robot designed for people. Built to connect with them, assist them, and share knowledge with them', for retail, banking and hospitality: greeting, presenting and visitor interaction.",
       "limitations": "Customer-facing reception work is only partly covered by this category. Specifications, maturity and current availability are not yet verified.",
@@ -56,6 +65,15 @@
       "commercial_readiness": null,
       "notes": "SoftBank Robotics America lists education among Pepper's applications.",
       "limitations": "Developer interfaces are not recorded. Specifications, maturity and current availability are not yet verified.",
+      "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "healthcare-rehabilitation",
+      "fit_score": 0.5,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "SoftBank Robotics America lists healthcare among Pepper's applications.",
+      "limitations": "A listed application, not a clinically validated or approved medical use. No clinical validation or regulatory approval as a medical device is recorded. Specifications, maturity and current availability are not yet verified. Not a demonstrated application: no deployment for this use is recorded.",
       "confidence": "LOW"
     }
   ],

@@ -421,14 +421,18 @@ def import_use_cases(cur, data: dict) -> None:
     for u in data["use_cases"]:
         cur.execute(
             """
-            INSERT INTO use_case (slug, name, category, description, typical_tasks)
-            VALUES (%s,%s,%s,%s,%s)
+            INSERT INTO use_case (slug, name, category, description, typical_tasks,
+                                  typical_requirements, key_limitations)
+            VALUES (%s,%s,%s,%s,%s,%s,%s)
             ON CONFLICT (slug) DO UPDATE SET
                 name = EXCLUDED.name, category = EXCLUDED.category,
-                description = EXCLUDED.description, typical_tasks = EXCLUDED.typical_tasks
+                description = EXCLUDED.description, typical_tasks = EXCLUDED.typical_tasks,
+                typical_requirements = EXCLUDED.typical_requirements,
+                key_limitations = EXCLUDED.key_limitations
             """,
             (u["slug"], u["name"], u.get("category"), u.get("description"),
-             u.get("typical_tasks")),
+             u.get("typical_tasks"), u.get("typical_requirements"),
+             u.get("key_limitations")),
         )
 
 

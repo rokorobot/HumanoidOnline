@@ -58,8 +58,17 @@
       "is_primary": true,
       "commercial_readiness": "PROTOTYPE",
       "notes": "Editorial judgement. A research and rehabilitation humanoid sold to institutions, with SDK and ROS support recorded.",
-      "limitations": "Prototype maturity. No availability offer is recorded. Rehabilitation use has no category here.",
+      "limitations": "Prototype maturity. No availability offer is recorded.",
       "confidence": "MEDIUM"
+    },
+    {
+      "use_case_slug": "healthcare-rehabilitation",
+      "fit_score": 0.55,
+      "is_primary": false,
+      "commercial_readiness": "PROTOTYPE",
+      "notes": "Editorial judgement from the catalogue summary: a research and rehabilitation humanoid sold to institutions.",
+      "limitations": "Rehabilitation research positioning only, not a clinically validated or approved medical use. No clinical validation or regulatory approval as a medical device is recorded. Prototype maturity. Not a demonstrated application: no deployment for this use is recorded.",
+      "confidence": "LOW"
     }
   ],
   "images": [

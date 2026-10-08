@@ -151,6 +151,15 @@
       "notes": "Editorial judgement. Expressive face and conversational interaction make Ameca a platform for human-robot interaction studies; the catalogue summary lists research alongside events.",
       "limitations": "Interaction research only: the base configuration does not walk or manipulate. Developer interfaces are not recorded.",
       "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "retail-service",
+      "fit_score": 0.5,
+      "is_primary": false,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "Editorial judgement. Expressive face and conversational interaction suit greeting and information roles in a service environment.",
+      "limitations": "Interaction only: the base configuration does not walk or manipulate, so it cannot handle products. Not a demonstrated application: no deployment for this use is recorded.",
+      "confidence": "LOW"
     }
   ],
   "images": [

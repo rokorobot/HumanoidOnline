@@ -109,6 +109,21 @@ def test_fit_shape_matches_the_schema():
         assert len(primaries) <= 1, f"{slug}: at most one primary use case"
 
 
+def test_healthcare_fits_never_read_as_a_clinical_claim():
+    """Healthcare & Rehabilitation rows are research or positioning. Each one says in
+    its public limitation that no clinical validation or approval is recorded."""
+    rows = [(s, f) for s, _, f in _fits() if f["use_case_slug"] == "healthcare-rehabilitation"]
+    assert rows
+    for slug, fit in rows:
+        assert "No clinical validation or regulatory approval" in fit["limitations"], slug
+        assert not fit.get("is_primary"), slug
+
+
+def test_governed_records_gain_no_fit_from_the_new_categories():
+    for slug in ("4ne1-mini", "xpeng-iron"):
+        assert ROBOTS[slug]["use_case_fits"] == [], slug
+
+
 def test_fit_readiness_never_exceeds_the_robots_own_status():
     """Suitability is not readiness: a fit may leave readiness unknown (NULL), but
     when it states one it is the robot's recorded commercial status, never a

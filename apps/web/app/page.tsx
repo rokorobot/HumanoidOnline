@@ -192,13 +192,9 @@ export default async function HomePage() {
           </div>
           {useCasePage.items.length > 0 ? (
             <div className="apps">
-              {useCasePage.items.slice(0, 7).map((u, i) => (
+              {useCasePage.items.slice(0, 8).map((u, i) => (
                 <UseCaseTile key={u.slug} useCase={u} index={i + 1} />
               ))}
-              <Link className="app" href="/use-cases">
-                <SystemLabel>→</SystemLabel>
-                <span className="name">All use cases</span>
-              </Link>
             </div>
           ) : (
             <p className="empty-state">No use cases on record.</p>

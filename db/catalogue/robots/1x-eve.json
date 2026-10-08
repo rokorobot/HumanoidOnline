@@ -41,9 +41,18 @@
   "capabilities": [],
   "use_case_fits": [
     {
+      "use_case_slug": "security-inspection",
+      "fit_score": 0.55,
+      "is_primary": true,
+      "commercial_readiness": null,
+      "notes": "Editorial judgement from the catalogue summary, which names security first: a wheeled humanoid for security and logistics tasks, with supervised autonomy recorded.",
+      "limitations": "Specifications are not manufacturer-verified. Wheeled base: flat floors only. Commercial maturity and availability are not verified. Not a demonstrated application: no deployment for this use is recorded.",
+      "confidence": "LOW"
+    },
+    {
       "use_case_slug": "warehouse-logistics",
       "fit_score": 0.5,
-      "is_primary": true,
+      "is_primary": false,
       "commercial_readiness": null,
       "notes": "Editorial judgement from the catalogue summary: a wheeled humanoid for security and logistics tasks, with manipulation and supervised autonomy recorded.",
       "limitations": "Specifications are not manufacturer-verified. Wheeled base: flat floors only. Commercial maturity and availability are not verified. Not a demonstrated application: no deployment for this use is recorded.",

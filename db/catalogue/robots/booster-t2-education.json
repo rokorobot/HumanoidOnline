@@ -101,7 +101,17 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "research-education",
+      "fit_score": 0.8,
+      "is_primary": true,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "Education edition of the T2, which Booster presents as an embodied-AI development humanoid; its official open-source page lists an SDK for secondary development, a ROS2 SDK and Isaac Lab-based training (https://www.booster.tech/booster-t2; docs.booster.tech).",
+      "limitations": "End effectors, LiDAR and wrist cameras are optional. About 2 h of walking. No availability offer is recorded for this edition: fit is not obtainability.",
+      "confidence": "MEDIUM"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/booster-t2-education.webp",

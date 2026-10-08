@@ -62,7 +62,17 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "research-education",
+      "fit_score": 0.7,
+      "is_primary": true,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "Booster's product page presents the T1 as 'Made for Developers' (https://www.booster.tech/booster-t1/, observed 2026-10-04).",
+      "limitations": "Specifications, SDK, ROS and simulation support are not yet verified in this catalogue. The page's statement that the T1 is the choice of 50+ robotics teams and research institutes is made in the context of the RoboCup Soccer AdultSize category, not general research adoption. No availability offer is recorded.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/booster-t1.webp",

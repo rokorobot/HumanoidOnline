@@ -62,7 +62,17 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "manufacturing",
+      "fit_score": 0.6,
+      "is_primary": true,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "UBTECH describes Walker S2 as a full-size industrial humanoid and states that mass production and first-batch delivery have begun, with units 'deployed in phases across frontline industrial applications' (UBTECH press release, PR Newswire, 2025-11-17). The same release names automotive and electronics collaborators.",
+      "limitations": "No individual deployment is recorded in this catalogue and specifications are not yet verified. The order figure in the release covers the Walker series, not S2 alone. No availability offer is recorded.",
+      "confidence": "MEDIUM"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/ubtech-walker-s2.webp",

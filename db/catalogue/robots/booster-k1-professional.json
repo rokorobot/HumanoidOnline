@@ -90,7 +90,17 @@
   ],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "research-education",
+      "fit_score": 0.8,
+      "is_primary": true,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "The distributor listing positions this configuration for research teams and advanced development programs, with Jetson AGX Orin compute, ROS2 compatibility and Isaac Sim simulation support (https://eu.robotshop.com/collections/booster-robotics, observed 2026-08-16).",
+      "limitations": "The listing also mentions professional real-world deployment; no deployment is recorded, so none is claimed. ROS 2 / Isaac Sim may require developer integration. Payload and manipulation are not stated. Third-party distributor source.",
+      "confidence": "MEDIUM"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/booster-k1-professional.webp",

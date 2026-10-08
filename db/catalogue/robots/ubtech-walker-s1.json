@@ -39,7 +39,17 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "manufacturing",
+      "fit_score": 0.6,
+      "is_primary": true,
+      "commercial_readiness": null,
+      "notes": "Editorial judgement from the catalogue summary: an industrial humanoid piloted in EV factories, with a 15 kg payload, manipulation and supervised autonomy recorded.",
+      "limitations": "No pilot is recorded as a deployment in this catalogue. Commercial maturity and availability are not verified.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/ubtech-walker-s1.webp",

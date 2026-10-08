@@ -39,7 +39,17 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "research-education",
+      "fit_score": 0.65,
+      "is_primary": true,
+      "commercial_readiness": null,
+      "notes": "Editorial judgement. A full-size biped research platform with SDK and ROS support recorded from PAL Robotics' REEM-C page (https://pal-robotics.com/robot/reem-c/).",
+      "limitations": "1 kg payload. Commercial maturity and availability are not verified.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/pal-reem-c.webp",

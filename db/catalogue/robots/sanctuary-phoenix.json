@@ -51,7 +51,17 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "research-education",
+      "fit_score": 0.5,
+      "is_primary": true,
+      "commercial_readiness": "PROTOTYPE",
+      "notes": "Editorial judgement. A dexterity-focused humanoid trained through teleoperation: of interest for manipulation and teleoperation research.",
+      "limitations": "Prototype maturity; not generally obtainable. Developer interfaces are not recorded.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/sanctuary-phoenix.webp",

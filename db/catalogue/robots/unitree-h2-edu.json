@@ -219,6 +219,15 @@
       "notes": "The research/development edition of the H2: Unitree's parameter table states 'Secondary Development: YES' for H2 EDU only, with a second computer for custom development (https://www.unitree.com/H2). The distributor lists it as a 'Humanoid Research Robot' (reichelt.com).",
       "limitations": "ROS and simulation support are not established by any recorded source. Dexterous hands and the high-power computing module are options, not included. Limited commercial maturity.",
       "confidence": "MEDIUM"
+    },
+    {
+      "use_case_slug": "events-entertainment",
+      "fit_score": 0.5,
+      "is_primary": false,
+      "commercial_readiness": "LIMITED_COMMERCIAL",
+      "notes": "Editorial judgement. A full-size humanoid with a bionic head with facial features and voice-interaction hardware, programmable on this edition: a potential fit for presentations and demonstrations, like the base H2.",
+      "limitations": "A development platform, not a purpose-built entertainment product. Demonstrations or exhibitions are a potential use, not an established event-service capability. No language-model capability is claimed. Not a demonstrated application: no deployment for this use is recorded.",
+      "confidence": "LOW"
     }
   ],
   "images": [

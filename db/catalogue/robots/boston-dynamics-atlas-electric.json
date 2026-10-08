@@ -39,7 +39,17 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "manufacturing",
+      "fit_score": 0.5,
+      "is_primary": true,
+      "commercial_readiness": null,
+      "notes": "Editorial judgement from the catalogue summary: developed with automotive partners, with a 30 kg payload and manipulation recorded.",
+      "limitations": "Commercial maturity and availability are not verified. Not a demonstrated application: no deployment for this use is recorded.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/boston-dynamics-atlas-electric.jpg",

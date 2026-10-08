@@ -177,9 +177,18 @@
   ],
   "use_case_fits": [
     {
+      "use_case_slug": "events-entertainment",
+      "fit_score": 0.5,
+      "is_primary": true,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "Editorial judgement. The same G1 platform is cited for trade shows and technology expos in its EDU listing; the base edition is teleoperated and cannot be programmed, so demonstrations and exhibitions are its potential use.",
+      "limitations": "Requires an operator. Fixed hands that cannot grasp. Not a purpose-built entertainment product. Demonstrations or exhibitions are a potential use, not an established event-service capability.",
+      "confidence": "LOW"
+    },
+    {
       "use_case_slug": "research-education",
       "fit_score": null,
-      "is_primary": true,
+      "is_primary": false,
       "commercial_readiness": "COMMERCIAL",
       "notes": "Base configuration of the G1 line. ROS and simulation support are documented for the G1 platform (https://www.unitree.com/g1/), but this record states that the base G1 does not offer secondary development (SDK) access, which belongs to the EDU tier. No source on file positions the base edition for research or education, so no fit score is given.",
       "limitations": "No secondary development on this edition; fixed hands that cannot grasp; about 2 kg arm payload. For programmable research use see the G1 EDU records.",

@@ -268,7 +268,17 @@
   ],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "events-entertainment",
+      "fit_score": 0.55,
+      "is_primary": true,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "Editorial judgement. A full-size humanoid that AgiBot states is deployed commercially at scale, and that a distributor offers by the week as a rental unit in stock, the engagement model of exhibitions and brand activations.",
+      "limitations": "The recorded sources name no application or sector, and specifications are not yet verified. Not a demonstrated application: no deployment for this use is recorded.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/agibot-a2-ultra.webp",

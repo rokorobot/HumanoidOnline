@@ -44,10 +44,6 @@ USE_CASES = {
 #: Remove a slug when a sourced use case is recorded for it; add one only with an
 #: entry in the review document.
 KNOWN_COVERAGE_GAPS = {
-    # No recorded source names an application or an enabling capability for any
-    # of the current use cases.
-    "agibot-a2-ultra",
-    "unitree-r1",
     # Use cases for this robot are a governed claim kind with NO_CATALOGUE_HOME
     # (DR-A5 section 18.5; field_policy.NO_HOME_KINDS): accepted with provenance,
     # never materialized, and its interface rows derive no capability. A fit here

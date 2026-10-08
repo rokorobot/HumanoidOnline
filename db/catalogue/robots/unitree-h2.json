@@ -196,9 +196,18 @@
   ],
   "use_case_fits": [
     {
+      "use_case_slug": "events-entertainment",
+      "fit_score": 0.5,
+      "is_primary": true,
+      "commercial_readiness": "LIMITED_COMMERCIAL",
+      "notes": "Editorial judgement. A full-size humanoid with a bionic head with facial features and voice-interaction hardware; this edition cannot be programmed, so presentations and demonstrations are its potential uses.",
+      "limitations": "No secondary development and no dexterous hands on this edition. No language-model capability is claimed. Demonstrations or exhibitions are a potential use, not an established event-service capability. Not a demonstrated application: no deployment for this use is recorded.",
+      "confidence": "LOW"
+    },
+    {
       "use_case_slug": "research-education",
       "fit_score": null,
-      "is_primary": true,
+      "is_primary": false,
       "commercial_readiness": null,
       "notes": "The distributor lists this edition as 'H2 Basic - Humanoid Research Robot' (https://www.reichelt.com/de/en/shop/product/h2_basic_-_humanoid_research_robot-418424). Unitree's parameter table shows no secondary development for the base H2; that is stated for H2 EDU only (https://www.unitree.com/H2). No fit score is given.",
       "limitations": "No secondary development and no dexterous hands on this edition. For programmable research use see the H2 EDU record. No availability offer is recorded.",

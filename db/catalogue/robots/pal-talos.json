@@ -39,7 +39,17 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "research-education",
+      "fit_score": 0.75,
+      "is_primary": true,
+      "commercial_readiness": null,
+      "notes": "Editorial judgement. A torque-controlled full-size research humanoid with SDK, ROS support and a developer edition recorded from PAL Robotics' TALOS page (https://pal-robotics.com/robot/talos/).",
+      "limitations": "About 90 min runtime. Commercial maturity and availability are not verified.",
+      "confidence": "MEDIUM"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/pal-talos.webp",

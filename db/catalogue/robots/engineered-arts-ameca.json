@@ -142,6 +142,15 @@
       "notes": "Purpose-built for expressive event/attraction engagement; available to buy or rent.",
       "limitations": "Interaction-focused; base configuration does not perform physical manipulation/locomotion tasks.",
       "confidence": "MEDIUM"
+    },
+    {
+      "use_case_slug": "research-education",
+      "fit_score": 0.5,
+      "is_primary": false,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "Editorial judgement. Expressive face and conversational interaction make Ameca a platform for human-robot interaction studies; the catalogue summary lists research alongside events.",
+      "limitations": "Interaction research only: the base configuration does not walk or manipulate. Developer interfaces are not recorded.",
+      "confidence": "LOW"
     }
   ],
   "images": [

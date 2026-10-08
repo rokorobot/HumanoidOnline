@@ -79,8 +79,8 @@ def test_g1_basic_no_longer_outranks_on_a_research_score_it_did_not_earn():
     assert "use-case fit 0.85 for research-education" in edu.reasons
 
 
-def test_g1_basic_is_unchanged_for_every_other_use_case():
-    for use_case in ("home", "manufacturing", "warehouse-logistics", "events-entertainment"):
+def test_g1_basic_is_unchanged_for_use_cases_it_has_no_row_for():
+    for use_case in ("home", "manufacturing", "warehouse-logistics"):
         req = harness._req(use_case=use_case)
         assert _only(ROBOTS["unitree-g1"], req) == _only(_without_fits(ROBOTS["unitree-g1"]), req)
 

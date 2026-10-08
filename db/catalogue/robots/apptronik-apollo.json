@@ -92,6 +92,15 @@
       "notes": "Targeted at intralogistics and part delivery in manufacturing; in pilot with Mercedes-Benz.",
       "limitations": "Pilot maturity; not offered for open purchase.",
       "confidence": "MEDIUM"
+    },
+    {
+      "use_case_slug": "warehouse-logistics",
+      "fit_score": 0.6,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "The Mercedes-Benz pilot has Apollo delivering assembly kits and moving totes of kitted parts, which is material movement; Apptronik's partners include logistics as well as automotive.",
+      "limitations": "The recorded pilot is inside manufacturing plants; no warehouse or distribution-centre deployment is recorded. Pilot maturity; not offered for open purchase.",
+      "confidence": "LOW"
     }
   ],
   "images": [

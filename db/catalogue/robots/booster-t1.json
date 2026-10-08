@@ -71,6 +71,15 @@
       "notes": "Booster's product page presents the T1 as 'Made for Developers' (https://www.booster.tech/booster-t1/, observed 2026-10-04).",
       "limitations": "Specifications, SDK, ROS and simulation support are not yet verified in this catalogue. The page's statement that the T1 is the choice of 50+ robotics teams and research institutes is made in the context of the RoboCup Soccer AdultSize category, not general research adoption. No availability offer is recorded.",
       "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "events-entertainment",
+      "fit_score": 0.5,
+      "is_primary": false,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "Booster's product page ties the T1 to the RoboCup Soccer AdultSize category: a competition and demonstration platform (https://www.booster.tech/booster-t1/).",
+      "limitations": "A robot-soccer competition context, not a purpose-built entertainment product. Specifications are not yet verified.",
+      "confidence": "LOW"
     }
   ],
   "images": [

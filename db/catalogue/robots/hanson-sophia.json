@@ -39,7 +39,26 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "events-entertainment",
+      "fit_score": 0.7,
+      "is_primary": true,
+      "commercial_readiness": null,
+      "notes": "Editorial judgement. An expressive humanoid built for public appearances and conversation, with camera-based face tracking and natural-language speech recorded.",
+      "limitations": "Mobile base rather than legs; no physical task capability. Commercial maturity and availability are not verified.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "use_case_slug": "research-education",
+      "fit_score": 0.5,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "Editorial judgement. The catalogue summary describes Sophia as a research humanoid; expressive interaction suits human-robot interaction studies.",
+      "limitations": "Developer interfaces are not recorded. Commercial maturity and availability are not verified.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/hanson-sophia.jpg",

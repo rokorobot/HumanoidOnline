@@ -127,6 +127,15 @@
       "notes": "Purpose-built for warehouse tote handling; in live commercial RaaS operation.",
       "limitations": "Available only as a service, not for outright purchase.",
       "confidence": "MEDIUM"
+    },
+    {
+      "use_case_slug": "manufacturing",
+      "fit_score": 0.5,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "Editorial judgement. Autonomous tote handling and material movement carry over to line feeding and intralogistics inside factories.",
+      "limitations": "The recorded deployment is in warehouse logistics; no manufacturing deployment is recorded. Tote handling only, not assembly work. Available as a service, not for purchase.",
+      "confidence": "LOW"
     }
   ],
   "images": [

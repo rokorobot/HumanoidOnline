@@ -116,6 +116,15 @@
       "notes": "Unitree's R1 parameter table states 'Secondary Development: YES' for R1 EDU only (https://www.unitree.com/R1); the EDU editions are the programmable tier of the R1 line, with simulation support recorded for this edition. EDU 'Smart' configuration with more onboard compute per the distributor.",
       "limitations": "No dexterous hands, so manipulation work needs another configuration. About 1 h battery life. ROS support is not established by the recorded sources. Suitability as a development platform, not a statement of deployment readiness.",
       "confidence": "MEDIUM"
+    },
+    {
+      "use_case_slug": "events-entertainment",
+      "fit_score": 0.5,
+      "is_primary": false,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "Editorial judgement. The R1 line carries voice and image interaction through an integrated multimodal model, and this edition is programmable: suited to live demonstrations and audience interaction, like the base R1.",
+      "limitations": "A development platform used for demonstration, not a purpose-built entertainment product. About 1 h battery life. Not a demonstrated application: no deployment for this use is recorded.",
+      "confidence": "LOW"
     }
   ],
   "images": [

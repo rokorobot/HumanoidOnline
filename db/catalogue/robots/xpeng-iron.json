@@ -51,7 +51,17 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "events-entertainment",
+      "fit_score": 0.5,
+      "is_primary": true,
+      "commercial_readiness": "ANNOUNCED",
+      "notes": "XPENG states initial commercial-scenario rollouts will begin in its own stores and campuses (https://www.xpeng.com/news/01a080371029a057bc8e8a02a2c6012b): visitor-facing presentation and interaction.",
+      "limitations": "Planned, not delivered: market launch is stated for 2027. No price or availability is published.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/xpeng-iron.webp",

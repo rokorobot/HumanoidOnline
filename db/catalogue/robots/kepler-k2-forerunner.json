@@ -51,7 +51,26 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "manufacturing",
+      "fit_score": 0.6,
+      "is_primary": true,
+      "commercial_readiness": "PROTOTYPE",
+      "notes": "Positioned as an industrial humanoid for manufacturing, with a 15 kg payload recorded.",
+      "limitations": "Prototype maturity. Positioning comes from a third-party page verified by the product owner, not a manufacturer citation. Not a demonstrated application: no deployment for this use is recorded.",
+      "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "warehouse-logistics",
+      "fit_score": 0.5,
+      "is_primary": false,
+      "commercial_readiness": "PROTOTYPE",
+      "notes": "Positioned for logistics alongside manufacturing, with a 15 kg payload recorded.",
+      "limitations": "Prototype maturity. Positioning comes from a third-party page, not a manufacturer citation. Not a demonstrated application: no deployment for this use is recorded.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/kepler-k2-forerunner.webp",

@@ -39,7 +39,17 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "warehouse-logistics",
+      "fit_score": 0.5,
+      "is_primary": true,
+      "commercial_readiness": null,
+      "notes": "Editorial judgement from the catalogue summary: a wheeled humanoid for security and logistics tasks, with manipulation and supervised autonomy recorded.",
+      "limitations": "Specifications are not manufacturer-verified. Wheeled base: flat floors only. Commercial maturity and availability are not verified. Not a demonstrated application: no deployment for this use is recorded.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/1x-eve.jpg",

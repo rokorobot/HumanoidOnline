@@ -51,7 +51,17 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "research-education",
+      "fit_score": 0.7,
+      "is_primary": true,
+      "commercial_readiness": "PROTOTYPE",
+      "notes": "Editorial judgement. A research and rehabilitation humanoid sold to institutions, with SDK and ROS support recorded.",
+      "limitations": "Prototype maturity. No availability offer is recorded. Rehabilitation use has no category here.",
+      "confidence": "MEDIUM"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/fourier-intelligence-gr-2.jpg",

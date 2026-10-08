@@ -99,6 +99,15 @@
       "notes": "The distributor listing positions this configuration for university programs and STEM curricula, and states ROS2 compatibility and Isaac Sim simulation support (https://eu.robotshop.com/collections/booster-robotics, observed 2026-08-16). SDK and API recorded.",
       "limitations": "The same listing qualifies ROS 2 / Isaac Sim support as possibly requiring developer integration. 95 cm platform, about 80 min runtime; payload and manipulation are not stated. Third-party distributor source, not the manufacturer.",
       "confidence": "MEDIUM"
+    },
+    {
+      "use_case_slug": "events-entertainment",
+      "fit_score": 0.5,
+      "is_primary": false,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "Editorial judgement. The K1 platform is a robot-soccer competition platform (the distributor cites a RoboCup 2025 KidSize championship for the K1 line), with voice interaction recorded: suited to competitions and live demonstrations.",
+      "limitations": "A development platform used for demonstration, not a purpose-built entertainment product. 95 cm platform, about 80 min runtime.",
+      "confidence": "LOW"
     }
   ],
   "images": [

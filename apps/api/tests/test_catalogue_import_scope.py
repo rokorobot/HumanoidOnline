@@ -86,8 +86,8 @@ def test_dependencies_are_only_what_the_selection_references():
     # alza-cz: governed Alza.cz reference offers on batch robots (owner-accepted 2026-10-05)
     assert deps["providers"] == {"unitree-store", "reichelt", "quadruped-de", "alza-cz"}
     assert deps["capabilities"] == {"voice-interaction", "dexterous-hands"}
-    # research-education: the batch's EDU editions carry a use-case fit (review 2026-10-08)
-    assert deps["use_cases"] == {"research-education"}
+    # the batch's robots carry use-case fits (reviews of 2026-10-08)
+    assert deps["use_cases"] == {"research-education", "events-entertainment"}
 
 
 def test_a_referenced_region_brings_its_ancestors():

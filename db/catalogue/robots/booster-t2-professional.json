@@ -134,7 +134,17 @@
   ],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "research-education",
+      "fit_score": 0.8,
+      "is_primary": true,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "Booster presents the T2 as an embodied-AI development humanoid; its official open-source page lists an SDK for secondary development, a ROS2 SDK and Isaac Lab-based training (https://www.booster.tech/booster-t2; docs.booster.tech). Professional edition with Jetson Thor compute.",
+      "limitations": "End effectors (grippers or dexterous hands), LiDAR and wrist cameras are optional. About 2 h of walking. A development platform; no application deployment is recorded.",
+      "confidence": "MEDIUM"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/booster-t2-professional.webp",

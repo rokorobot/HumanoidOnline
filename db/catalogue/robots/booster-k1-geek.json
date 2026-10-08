@@ -90,7 +90,17 @@
   ],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "research-education",
+      "fit_score": null,
+      "is_primary": true,
+      "commercial_readiness": null,
+      "notes": "Entry-level K1 configuration with SDK, ROS2 compatibility and Isaac Sim support stated by the distributor listing, which also cites a RoboCup 2025 KidSize championship (https://eu.robotshop.com/collections/booster-robotics, observed 2026-08-16). The listing does not position this configuration for research or education, so no fit score is given.",
+      "limitations": "About 30 min runtime and a 3-month warranty. ROS 2 / Isaac Sim may require developer integration. Third-party distributor source.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/booster-k1-geek.webp",

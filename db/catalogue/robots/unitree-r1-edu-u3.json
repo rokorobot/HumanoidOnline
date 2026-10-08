@@ -112,7 +112,17 @@
       "detail": "Two Dex3-1 three-finger hands, 7 DoF per hand (Unitree Dex3-1 page). This configuration is listed without tactile sensors by the reseller."
     }
   ],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "research-education",
+      "fit_score": 0.8,
+      "is_primary": true,
+      "commercial_readiness": "COMMERCIAL",
+      "notes": "Unitree's R1 parameter table states 'Secondary Development: YES' for R1 EDU only (https://www.unitree.com/R1); the EDU editions are the programmable tier of the R1 line, with simulation support recorded for this edition. Fitted with two Dex3-1 three-finger hands.",
+      "limitations": "Hands are listed without tactile sensors. About 1 h battery life. ROS support is not established by the recorded sources. Suitability as a development platform, not a statement of deployment readiness.",
+      "confidence": "MEDIUM"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/unitree-r1.png",

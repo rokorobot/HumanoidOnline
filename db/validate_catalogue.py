@@ -114,6 +114,23 @@ GAP_QUERIES.update({
 })
 
 
+# Use-case coverage (docs/audit/USE_CASE_ENRICHMENT_REVIEW_2026-10-08.md). A published
+# robot that is commercially accessible -- the canonical predicate: a current NEW
+# availability offer for which commercially_accessible() holds, exactly as
+# robot_commercial_snapshot.is_obtainable computes it -- should be reachable from at
+# least one use-case page. REPORTED on every run; it fails the run only with
+# --enforce-use-case-coverage, which stays off until the owner has approved and
+# imported the enrichment. A robot with no defensible use case is an evidence gap,
+# never a reason to invent a fit.
+USE_CASE_COVERAGE_FLAG = "--enforce-use-case-coverage"
+USE_CASE_COVERAGE_GAP_SQL = """
+    SELECT r.slug
+    FROM robot r JOIN robot_commercial_snapshot s ON s.id = r.id
+    WHERE r.is_published AND s.is_obtainable
+      AND NOT EXISTS (SELECT 1 FROM use_case_fit f WHERE f.robot_id = r.id)
+"""
+
+
 def normalize_url(url: str) -> str:
     return url.replace("postgresql+psycopg://", "postgresql://", 1)
 
@@ -190,6 +207,19 @@ def main() -> None:
             f"display_eligible={images_eligible}"
         )
 
+        coverage_gaps = sorted(
+            row[0] for row in conn.execute(USE_CASE_COVERAGE_GAP_SQL).fetchall()
+        )
+        accessible = scalar(
+            "SELECT count(*) FROM robot r JOIN robot_commercial_snapshot s ON s.id = r.id "
+            "WHERE r.is_published AND s.is_obtainable"
+        )
+        print(
+            f"use-case coverage: commercially_accessible={accessible} "
+            f"without_use_case={len(coverage_gaps)}"
+            + (f" ({', '.join(coverage_gaps)})" if coverage_gaps else "")
+        )
+
     if gaps:
         print("\nG2 VIOLATION — commercial fact(s) without the evidence they require:")
         for label, slugs in gaps.items():
@@ -199,6 +229,11 @@ def main() -> None:
     if media_offenders:
         print("\nMEDIA-01 VIOLATION — display-eligible image(s) lacking provenance/attribution:")
         print(f"  {', '.join(media_offenders)}")
+        sys.exit(1)
+
+    if coverage_gaps and USE_CASE_COVERAGE_FLAG in sys.argv[1:]:
+        print("\nUSE-CASE COVERAGE VIOLATION — commercially accessible robot(s) with no use case:")
+        print(f"  {', '.join(coverage_gaps)}")
         sys.exit(1)
 
     print("G2 OK: every published commercial fact carries an evidence_source row.")

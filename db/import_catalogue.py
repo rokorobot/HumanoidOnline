@@ -427,8 +427,10 @@ def import_use_cases(cur, data: dict) -> None:
             ON CONFLICT (slug) DO UPDATE SET
                 name = EXCLUDED.name, category = EXCLUDED.category,
                 description = EXCLUDED.description, typical_tasks = EXCLUDED.typical_tasks,
-                typical_requirements = EXCLUDED.typical_requirements,
-                key_limitations = EXCLUDED.key_limitations
+                -- a file that omits these never clears a value already recorded
+                typical_requirements = COALESCE(EXCLUDED.typical_requirements,
+                                                use_case.typical_requirements),
+                key_limitations = COALESCE(EXCLUDED.key_limitations, use_case.key_limitations)
             """,
             (u["slug"], u["name"], u.get("category"), u.get("description"),
              u.get("typical_tasks"), u.get("typical_requirements"),

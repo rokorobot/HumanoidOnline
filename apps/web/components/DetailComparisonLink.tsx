@@ -11,8 +11,7 @@
 //     in it in place; with none it navigates as before.
 //   - a small tray, rendered only when a selection is carried (client-rendered, so it adds
 //     nothing to the delivered document).
-//   - click delegation for server-rendered plain links marked `data-carry` (the breadcrumb
-//     "Robot Catalogue"): they keep their plain href and carry the selection on click.
+//   - click delegation for server-rendered plain links in the breadcrumb (`.idcrumb`, "Robot Catalogue"): they keep their plain href and carry the selection on click.
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -49,7 +48,7 @@ export function DetailComparisonLink({ slug, name, href }: { slug: string; name:
     sync();
     function onClick(e: MouseEvent) {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-      const a = (e.target as Element | null)?.closest?.("a[data-carry]");
+      const a = (e.target as Element | null)?.closest?.(".idcrumb a");
       if (!a) return;
       const target = resolveNavTarget(a.getAttribute("href") ?? "", window.location.pathname, window.location.search);
       if (target) {

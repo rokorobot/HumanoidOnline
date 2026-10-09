@@ -233,7 +233,7 @@ export default async function RobotDetailPage({
               HumanoidOnline
             </Link>
             <span aria-hidden="true">/</span>
-            <Link href="/robots" data-carry>Robot Catalogue</Link>
+            <Link href="/robots">Robot Catalogue</Link>
           </p>
           <div className="topbar">
             <div className="corner">
@@ -541,7 +541,7 @@ export default async function RobotDetailPage({
               <SectionIndex>03 — SPECIFICATIONS</SectionIndex>
               <h2>Physical / intelligence / developer</h2>
             </div>
-            <SystemLabel>Values we cannot confirm are shown as unknown, never as zero or no</SystemLabel>
+            <SystemLabel>Unconfirmed values show as unknown, never zero or no</SystemLabel>
           </div>
           <div className="specgrid">
             <div className="spectbl">

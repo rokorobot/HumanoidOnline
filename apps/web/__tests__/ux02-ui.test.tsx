@@ -361,14 +361,14 @@ describe("DetailComparisonLink (robot detail)", () => {
     expect(screen.queryByRole("region", { name: "Compare selection" })).toBeNull();
   });
 
-  it("carries the selection on click for server-rendered links marked data-carry (breadcrumb)", () => {
+  it("carries the selection on click for the server-rendered breadcrumb link", () => {
     window.history.replaceState(null, "", "/robots/unitree-g1?compare=a,b");
     render(
       <>
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- exercises click delegation on a plain server-rendered anchor */}
-        <a href="/robots" data-carry>
-          Robot Catalogue
-        </a>
+        <p className="idcrumb">
+          <a href="/robots">Robot Catalogue</a>
+        </p>
         <DetailComparisonLink {...props} />
       </>,
     );

@@ -3,6 +3,7 @@
 // same look as UNKNOWN ("No confirmed pricing"). NULL never becomes $0/"free".
 import { shortBasisTag } from "@/lib/commercial-summary";
 import { resolvePriceState, type LabelVariant } from "@/lib/format";
+import { providerLabel, type ProviderNames } from "@/lib/providers";
 import type { PriceDisplay } from "@/lib/types";
 
 const TONE_CLASS: Record<string, string> = {
@@ -24,15 +25,18 @@ const TONE_CLASS: Record<string, string> = {
 // number rather than reading as an ordinary listing.
 export function PriceStateCard({
   price,
+  names,
 }: {
   price: PriceDisplay | null | undefined;
+  names?: ProviderNames | null;
 }) {
   const s = resolvePriceState(price, "short");
   const toneClass = TONE_CLASS[s.tone] ?? "";
   const hatch = s.tone === "unknown" ? "hatchbox" : "";
-  const seller = price?.provider
-    ? [price.provider, price.region].filter(Boolean).join(" · ")
-    : null;
+  // The API gives a seller SLUG only; cards have no authoritative name map, so the
+  // neutral identifier form is used (see lib/providers.ts). Region is unchanged.
+  const label = price?.provider ? providerLabel(price.provider, names, price.provider_name) : null;
+  const seller = label ? [label.text, price?.region].filter(Boolean).join(" · ") : null;
   const tag = shortBasisTag(price?.price_basis);
   return (
     <div className={`price ${toneClass}`.trim()}>
@@ -43,7 +47,11 @@ export function PriceStateCard({
         {s.label}
       </span>
       {s.context && <span className="ctx">{s.context}</span>}
-      {seller && <span className="ctx">{seller}</span>}
+      {seller && (
+        <span className="ctx" data-provider={price?.provider ?? undefined}>
+          {seller}
+        </span>
+      )}
       {/* Only present when the headline came from a variant-scoped offer. Shown
           so the amount is never read as the price of every configuration. */}
       {price?.variant && <span className="ctx">Configuration: {price.variant}</span>}

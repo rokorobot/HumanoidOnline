@@ -3,11 +3,13 @@
 // are forwarded verbatim to the API. No facts are computed here.
 import { notFound, redirect } from "next/navigation";
 
-import { listRobots } from "@/lib/api-client";
+import { listManufacturers, listRobots, listUseCases } from "@/lib/api-client";
+import { partlyUninterpreted, resolveCatalogueQuery } from "@/lib/catalogue-query";
 import {
   asArray,
   asString,
   canonicalizePriceParams,
+  countActiveFilters,
   toQueryString,
   toRobotListParams,
   type RawSearchParams,
@@ -18,6 +20,8 @@ import { FilterPanel } from "@/components/FilterPanel";
 import { RobotCard } from "@/components/RobotCard";
 import Link from "next/link";
 
+import { InterpretationBar } from "@/components/InterpretationBar";
+import { SearchBox } from "@/components/SearchBox";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteNav } from "@/components/SiteNav";
 import { SortSelect } from "@/components/SortSelect";
@@ -57,8 +61,23 @@ export default async function RobotsPage({
     redirect(`/robots${toQueryString(priceUrl.params)}`);
   }
 
-  const apiParams = toRobotListParams(sp);
+  // UX-02A: the free-text `q` is interpreted deterministically on EVERY render (the URL
+  // stays the single source of truth). Vocabulary comes from the existing cached reads and
+  // is only fetched when there is a query.
+  const rawQ = (asString(sp.q) ?? "").trim();
+  const vocab = rawQ
+    ? await Promise.all([listManufacturers({ limit: 100 }), listUseCases({ limit: 100 })]).then(
+        ([m, u]) => ({
+          manufacturers: m.items.map((x) => ({ slug: x.slug, name: x.name })),
+          useCases: u.items.map((x) => ({ slug: x.slug, name: x.name })),
+        }),
+      )
+    : null;
+  const cq = resolveCatalogueQuery(sp, vocab);
+  const apiParams = toRobotListParams(cq.effective);
   const page = await listRobots({ ...apiParams, limit: 100 });
+  const interp = cq.interpretation;
+  const residualUnmatched = page.total === 0 && interp?.residual ? interp.residual.split(" ") : [];
 
   const compareSlugs = (asString(sp.compare) ?? "")
     .split(",")
@@ -77,14 +96,8 @@ export default async function RobotsPage({
     return `/robots${toQueryString(next)}`;
   }
 
-  const activeFilterCount =
-    asArray(sp.commercial_status).length +
-    asArray(sp.transaction_type).length +
-    ["region", "offered_in", "mobility", "autonomy_min", "payload_min", "height_min",
-      "price_max", "has_sdk", "ros_support", "developer_edition", "has_manipulation",
-      "q"].filter(
-      (k) => asString(sp[k]),
-    ).length;
+  // Counted from the same derived state the API call uses, never from the raw URL.
+  const activeFilterCount = countActiveFilters(cq.effective);
 
   return (
     <>
@@ -123,6 +136,22 @@ export default async function RobotsPage({
           </p>
         )}
 
+        <SearchBox q={rawQ} />
+        {interp && (
+          <InterpretationBar
+            text={interp.text}
+            chips={cq.chips}
+            base={toQueryString(Object.fromEntries(Object.entries(sp).filter(([k]) => k !== "q"))).slice(1)}
+            residualUnmatched={residualUnmatched}
+            unsupported={interp.unsupported}
+            conflicts={[
+              ...interp.conflicts,
+              ...[...cq.overridden].map((k) => `The ${k.replace("_", " ")} filter in the URL differs from the search text, so the URL filter was used.`),
+            ]}
+            hasAppliedPrice={cq.chips.some((c) => c.kind === "price" && c.status === "applied")}
+          />
+        )}
+
         <div className="layout">
           <FilterPanel params={sp} resultCount={page.total} activeCount={activeFilterCount} />
 
@@ -151,16 +180,37 @@ export default async function RobotsPage({
                 ))}
               </div>
             ) : (
-              <div className="empty-state">
+              <div className="empty-state" data-testid="no-results">
                 <p>No robots match the current filters.</p>
-                <SystemLabel>Adjust or reset the filter rail.</SystemLabel>
+                {rawQ && (
+                  <p>
+                    You searched for <b>{"“"}{rawQ}{"”"}</b>.
+                    {interp && interp.chips.length > 0 && (
+                      <> It was read as: {cq.chips.map((c) => c.label + (c.status === "applied" ? "" : " (not applied)")).join("; ")}.</>
+                    )}
+                    {residualUnmatched.length > 0 && (
+                      <> Not understood: {residualUnmatched.map((w) => `“${w}”`).join(", ")}.</>
+                    )}
+                  </p>
+                )}
+                {(partlyUninterpreted(cq) || residualUnmatched.length > 0) && (
+                  <p>The query could not be fully interpreted, so some of it was not applied.</p>
+                )}
+                <p>
+                  Zero matches means nothing in the catalogue matched these recorded facts, not that no
+                  such robot exists.
+                </p>
+                <p>
+                  <Link className="btn" href="/robots">
+                    Clear search and filters
+                  </Link>
+                </p>
               </div>
             )}
 
             <p className="note">
-              A price or availability shown on a card comes from one sourced offer and
-              is never inferred: where nothing is published it is shown as unknown,
-              not as zero or unavailable. Open a robot to see its evidence.
+              Each price or availability comes from one sourced offer. Unknown stays unknown, never
+              zero or unavailable.
             </p>
           </section>
         </div>

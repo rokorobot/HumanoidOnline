@@ -5,13 +5,14 @@ import type { RobotListParams } from "./api-client";
 
 export type RawSearchParams = Record<string, string | string[] | undefined>;
 
-// The catalogue price filter is denominated in USD, which the control states
-// visibly ("Max purchase price (USD)"). The API requires `price_max` and
-// `price_currency` as a pair and applies no default currency, so the
-// denomination is sent explicitly rather than assumed server-side.
-// A multi-currency selector is a later UI enhancement; this constant is the one
-// place the current single currency is declared.
+// The API requires `price_max` and `price_currency` as a pair, matches the currency
+// EXACTLY against purchase offers (no conversion, no FX) and applies no default, so the
+// denomination is always sent explicitly. UX-02A: the control now carries a currency
+// selector limited to the currencies the catalogue records purchase prices in.
+// `PRICE_CURRENCY` remains the fallback ONLY for legacy URLs/forms that carry a
+// ceiling and no denomination (it is redirected into explicit form, never silent).
 export const PRICE_CURRENCY = "USD";
+export const PRICE_CURRENCIES = ["USD", "EUR", "GBP", "CZK"] as const;
 
 export function asArray(v: string | string[] | undefined): string[] {
   if (v == null) return [];
@@ -56,11 +57,11 @@ export type PriceUrlAction =
 //                               (this is the no-JS GET form's output)
 //   currency, no price_max   -> redirect, dropping the orphan: the API rejects a
 //                               lone currency, and it constrains nothing
-//   price_max + USD          -> canonical, render as-is
-//   price_max + other        -> reject. This UI is USD-only and says so on the
-//                               control; it cannot honour another currency, and
-//                               it must not quietly reinterpret it as USD nor
-//                               drop the ceiling and widen the result set.
+//   price_max + supported    -> canonical, render as-is (USD, EUR, GBP, CZK)
+//   price_max + other        -> reject. The control offers only the supported
+//                               currencies; another one must not be quietly
+//                               reinterpreted as USD nor have its ceiling dropped
+//                               (which would widen the result set).
 //
 // A non-numeric `price_max` is treated as no ceiling at all, matching
 // `toRobotListParams`, so junk never produces a currency or a redirect loop.
@@ -78,12 +79,12 @@ export function canonicalizePriceParams(sp: RawSearchParams): PriceUrlAction {
   if (!currency) {
     return { action: "redirect", params: { ...sp, price_currency: PRICE_CURRENCY } };
   }
-  if (currency !== PRICE_CURRENCY) {
+  if (!(PRICE_CURRENCIES as readonly string[]).includes(currency)) {
     return { action: "reject", currency };
   }
-  if (raw !== PRICE_CURRENCY) {
+  if (raw !== currency) {
     // Same currency, non-canonical spelling ("usd", padded) — normalise once.
-    return { action: "redirect", params: { ...sp, price_currency: PRICE_CURRENCY } };
+    return { action: "redirect", params: { ...sp, price_currency: currency } };
   }
   return { action: "ok" };
 }
@@ -135,4 +136,25 @@ export function toQueryString(sp: RawSearchParams): string {
   }
   const s = usp.toString();
   return s ? `?${s}` : "";
+}
+
+// Number of constraints applied to the catalogue results. Pass the EFFECTIVE params
+// (`resolveCatalogueQuery(...).effective`), i.e. what is sent to the API: a search
+// phrase interpreted as a use case plus a price ceiling is two constraints, not one,
+// and words left over as a name search (`q`) count as one. An interpreted part that
+// was not applied (no currency, conflict, overridden) is not in the effective params
+// and so is not counted. Region and offer market are separate filters. The price pair
+// counts once (`price_currency` only denominates `price_max`).
+const COUNTED_KEYS = [
+  "manufacturer", "use_case", "region", "offered_in", "mobility", "autonomy_min",
+  "payload_min", "height_min", "height_max", "price_max", "has_sdk", "ros_support",
+  "developer_edition", "has_manipulation", "q",
+];
+export function countActiveFilters(effective: RawSearchParams): number {
+  return (
+    asArray(effective.commercial_status).length +
+    asArray(effective.transaction_type).length +
+    asArray(effective.availability_status).length +
+    COUNTED_KEYS.filter((k) => asString(effective[k])).length
+  );
 }

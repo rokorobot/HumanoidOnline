@@ -7,7 +7,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 
-import { findRobot, listRegions } from "@/lib/api-client";
+import { findManufacturer, findRobot, listRegions } from "@/lib/api-client";
+import { providerLabel, providerNamesFrom, type ProviderNames } from "@/lib/providers";
 import { buildRobotJsonLd } from "@/lib/jsonld";
 import { absoluteUrl } from "@/lib/site";
 import {
@@ -17,6 +18,7 @@ import {
   selectHeadline,
 } from "@/lib/commercial-summary";
 import {
+  enumLabel,
   availabilityLabel,
   autonomyLabel,
   confidenceLabel,
@@ -38,6 +40,7 @@ import type {
   PricingOffer,
   RobotDetail,
 } from "@/lib/types";
+import { DetailComparisonLink } from "@/components/DetailComparisonLink";
 import { AvailabilityMatrix } from "@/components/AvailabilityState";
 import { CitationFacts } from "@/components/CitationFacts";
 import { CommercialTriad } from "@/components/CommercialTriad";
@@ -167,6 +170,14 @@ export default async function RobotDetailPage({
     listRegions({ type: "COUNTRY" }),
   ]);
   if (!robot) notFound();
+
+  // UX-02B: the maker's own providers are the only authoritative seller names the API returns.
+  // A failed read must not break the page: sellers then fall back to their identifier.
+  const providerNames: ProviderNames = providerNamesFrom(
+    await findManufacturer(robot.manufacturer.slug)
+      .then((m) => m?.providers)
+      .catch(() => undefined),
+  );
 
   const code = deriveModelCode(robot.slug, robot.manufacturer.slug);
   const conf = strongestConfidence(robot);
@@ -336,9 +347,7 @@ export default async function RobotDetailPage({
                 <GraphicMarker /> Official product page ↗
               </a>
             )}
-            <Link className="btn" href={`/compare?ids=${robot.slug}`}>
-              <GraphicMarker /> Compare +
-            </Link>
+            <DetailComparisonLink slug={robot.slug} name={robot.name} href={`/compare?ids=${robot.slug}`} />
             <RequestAvailabilityButton
               robotSlug={robot.slug}
               robotName={robot.name}
@@ -399,7 +408,6 @@ export default async function RobotDetailPage({
                   <SystemLabel as="div">Maturity ladder</SystemLabel>
                   <div
                     className="ladder"
-                    title={MATURITY_LADDER.map(statusLabel).join(" → ")}
                     style={{ marginTop: 8 }}
                     role="img"
                     aria-label={`Maturity: ${statusLabel(robot.commercial_status)}`}
@@ -502,7 +510,7 @@ export default async function RobotDetailPage({
             </div>
             {robot.pricing_offers.length > 0 ? (
               robot.pricing_offers.map((p, i) => (
-                <PricingRow key={i} offer={p} />
+                <PricingRow key={i} offer={p} names={providerNames} />
               ))
             ) : (
               <div className="prow">
@@ -533,7 +541,7 @@ export default async function RobotDetailPage({
               <SectionIndex>03 — SPECIFICATIONS</SectionIndex>
               <h2>Physical / intelligence / developer</h2>
             </div>
-            <SystemLabel>Values we cannot confirm are shown as unknown, never as zero or no</SystemLabel>
+            <SystemLabel>Unconfirmed values show as unknown, never zero or no</SystemLabel>
           </div>
           <div className="specgrid">
             <div className="spectbl">
@@ -575,7 +583,7 @@ export default async function RobotDetailPage({
               <div className="specgrid" style={{ marginTop: "var(--ho-sp-6)" }}>
                 {groupExtendedSpecs(robot.extended_specs).map(([category, rows]) => (
                   <div className="spectbl" key={category}>
-                    <h3>{category}</h3>
+                    <h3>{enumLabel("capability_category", category)}</h3>
                     {rows.map((x) => (
                       <ExtendedSpecRow key={`${x.key}:${x.variant_slug ?? ""}`} spec={x} />
                     ))}
@@ -681,7 +689,7 @@ function CommercialTriadInline({
   );
 }
 
-function PricingRow({ offer }: { offer: PricingOffer }) {
+function PricingRow({ offer, names }: { offer: PricingOffer; names: ProviderNames }) {
   const price = {
     type: offer.price_type,
     amount: offer.price,
@@ -705,8 +713,11 @@ function PricingRow({ offer }: { offer: PricingOffer }) {
       <div className={offer.region ? "tt-none" : "val unknown tt-none"}>
         {offer.region ?? "—"}
       </div>
-      <div className={offer.provider ? "tt-none" : "val unknown tt-none"}>
-        {offer.provider ?? "—"}
+      <div
+        className={offer.provider ? "tt-none" : "val unknown tt-none"}
+        {...(offer.provider && (offer.provider_name || names[offer.provider]) ? { "data-provider": offer.provider } : {})}
+      >
+        {offer.provider ? providerLabel(offer.provider, names, offer.provider_name).text : "—"}
       </div>
       <div>
         <PriceStateLong price={price} />

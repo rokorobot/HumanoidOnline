@@ -68,7 +68,10 @@ def offer(
         currency=currency,
         billing_period="ONE_TIME",
         provider=SimpleNamespace(
-            slug=provider, type=provider_type, manufacturer_id=provider_manufacturer
+            slug=provider,
+            name=None,  # UX-02B: the serialiser also reads the provider record's name
+            type=provider_type,
+            manufacturer_id=provider_manufacturer,
         ) if provider else None,
         region=SimpleNamespace(code=region) if region else None,
         price_basis=price_basis,

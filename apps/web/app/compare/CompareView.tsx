@@ -54,6 +54,7 @@ import {
   type SavedView,
 } from "@/lib/saved-views";
 import { ConfidenceIndicator } from "@/components/ConfidenceIndicator";
+import { NavLink } from "@/components/NavLink";
 import { GraphicMarker } from "@/components/GraphicMarker";
 import { deriveModelCode } from "@/lib/model-code";
 import { PriceStateLong } from "@/components/PricingState";
@@ -327,9 +328,9 @@ function RobotSelectRow({
           return (
             <div className={`cell robotpick${isRef ? " is-ref" : ""}`} key={r.slug}>
               <div className="lockup">
-                <Link className="name" href={`/robots/${r.slug}`}>
+                <NavLink className="name" href={`/robots/${r.slug}`}>
                   {r.name}
-                </Link>
+                </NavLink>
                 <span className="code">{deriveModelCode(r.slug, r.manufacturer.slug)}</span>
               </div>
               <div className="mfr">

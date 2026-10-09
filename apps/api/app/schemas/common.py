@@ -60,6 +60,7 @@ class PriceDisplay(BaseModel):
     billing_period: str | None = None
     #: Which offer this is, and on what terms — never a blend of several.
     provider: str | None = None
+    provider_name: str | None = None
     region: str | None = None
     price_basis: str | None = None
     order_status_note: str | None = None

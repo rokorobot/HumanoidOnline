@@ -106,17 +106,29 @@ describe("price filter URL emission", () => {
   });
 });
 
-describe("price control UX is unchanged", () => {
-  it("still shows the denomination in the visible label", () => {
+describe("price control (UX-02A: the denomination is now an explicit, visible selector)", () => {
+  it("states what the number matches and in which currency", () => {
     render(<FilterPanel params={{}} resultCount={0} />);
-    expect(screen.getByLabelText(/max purchase price \(usd\)/i)).toBeDefined();
+    const select = screen.getByRole("combobox", { name: /price currency/i }) as HTMLSelectElement;
+    expect(select.value).toBe("USD");
+    expect(Array.from(select.options).map((o) => o.value)).toEqual(["USD", "EUR", "GBP", "CZK"]);
+    expect(screen.getByText(/\(no conversion\)/i)).toBeDefined();
   });
 
-  it("introduces no visible currency selector", () => {
+  it("emits the chosen currency with the ceiling, and never a lone currency", () => {
     render(<FilterPanel params={{}} resultCount={0} />);
-    const labels = screen.queryAllByLabelText(/currency/i);
-    expect(labels).toHaveLength(0);
-    expect(screen.queryByRole("combobox", { name: /currency/i })).toBeNull();
+    fireEvent.change(screen.getByLabelText(/max purchase price/i), { target: { value: "20000" } });
+    fireEvent.change(screen.getByRole("combobox", { name: /price currency/i }), { target: { value: "EUR" } });
+    apply();
+    let q = pushedQuery();
+    expect(q.get("price_max")).toBe("20000");
+    expect(q.get("price_currency")).toBe("EUR");
+    // clearing the ceiling drops the currency with it
+    fireEvent.change(screen.getByLabelText(/max purchase price/i), { target: { value: "" } });
+    apply();
+    q = pushedQuery();
+    expect(q.has("price_max")).toBe(false);
+    expect(q.has("price_currency")).toBe(false);
   });
 
   it("restores the price field from a URL carrying the pair", () => {

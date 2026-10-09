@@ -1140,9 +1140,34 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-line); padding: var(
 .mmenu--dark .mmenu-btn { color: var(--ho-paper-ink); }
 .csum--hero { color: var(--ho-paper-ink); margin-top: 12px; }
 
-/* UX-01: no page-level horizontal overflow at 320px. Grid/flex items default to
-   min-width:auto (min-content), so the hero rows and search field refused to shrink. */
-.subrow > *, .hero-actions, .readout { min-width: 0; }
-.hero-tools > * { min-width: 0; }
+/* UX-01: no overflow at 320px (grid/flex items default to min-width:auto). */
+.subrow > *, .hero-actions, .readout, .hero-tools > * { min-width: 0; }
 .searchbar input { min-width: 0; width: 100%; }
 @media (max-width: 900px) { .subrow { grid-template-columns: minmax(0, 1fr); } }
+
+.searchbar--page { border-color: var(--ho-ink); background: var(--ho-paper); margin-bottom: var(--ho-sp-4); }
+.searchbar--page input { color: var(--ho-ink); min-height: 48px; font-size: 1rem; }
+.searchbar--page input::placeholder { color: var(--ho-text-muted); }
+.searchbar--page button { min-height: 48px; min-width: 88px; background: var(--ho-ink); color: var(--ho-paper); }
+.chips { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; padding: 0; }
+.chip { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; border: var(--ho-rule-hair) solid var(--ho-ink);
+  background: var(--ho-paper-2); padding: 6px 8px; max-width: 100%; font-size: var(--ho-fs-small); }
+.chip--not_applied, .chip--needs_currency { border-style: dashed; }
+.chip-label, .chip button { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s); }
+.chip-note { color: var(--ho-text-muted); font-size: var(--ho-fs-mono-s); flex-basis: 100%; }
+.chip button { min-height: 44px; min-width: 44px; padding: 0 10px; cursor: pointer; background: none; color: inherit;
+  border: var(--ho-rule-hair) solid var(--ho-ink); text-transform: uppercase; }
+.chip-choices { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+.empty-state .btn { min-height: 44px; }
+.fhelp-btn { display: block; margin-top: 4px; min-height: 44px; padding: 0; cursor: pointer; background: none; border: 0;
+  color: var(--ho-text-muted); text-decoration: underline; font: inherit; font-size: var(--ho-fs-mono-s); text-transform: uppercase; }
+.fhelp-text { margin: 0; color: var(--ho-text-muted); line-height: 1.4; font-size: var(--ho-fs-mono-s); }
+.cmp-tray { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--ho-ink); color: var(--ho-paper-ink);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 12px 20px;
+  border-top: var(--ho-rule-med) solid var(--ho-signal); }
+.cmp-tray .ho-syslabel { color: var(--ho-paper-ink); }
+.cmp-tray .btn { min-height: 44px; }
+.ho-dotsq { --dc: var(--ho-mark); display: inline-block; width: 14px; height: 14px; vertical-align: middle;
+  background: radial-gradient(circle at 2.5px 2.5px, var(--dc) 2.5px, #0000 2.9px) 0 0 / 9px 9px; }
+.ho-dotsq--signal { --dc: var(--ho-signal); }
+body:has(.cmp-tray) { padding-bottom: 84px; }

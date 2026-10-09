@@ -18,7 +18,9 @@ export type EnumKind =
   | "mobility"
   | "transaction"
   | "source_type"
-  | "confidence";
+  | "confidence"
+  | "capability_category"
+  | "provider_type";
 
 const LABELS: Record<EnumKind, Record<string, string>> = {
   commercial_status: {
@@ -87,6 +89,27 @@ const LABELS: Record<EnumKind, Record<string, string>> = {
     CONFERENCE: "Conference",
     INTERVIEW: "Interview",
     OTHER: "Other source",
+  },
+  // Seller / channel kinds (db/schema.sql provider_type).
+  provider_type: {
+    OEM: "Manufacturer (OEM)",
+    DISTRIBUTOR: "Distributor",
+    INTEGRATOR: "Integrator",
+    RENTAL_PROVIDER: "Rental provider",
+    LEASING_PROVIDER: "Leasing provider",
+    RAAS_PROVIDER: "Robot-as-a-service provider",
+    SERVICE_PROVIDER: "Service provider",
+  },
+  // Extended-spec headings (db/schema.sql capability_category).
+  capability_category: {
+    MANIPULATION: "Manipulation",
+    MOBILITY: "Mobility",
+    PERCEPTION: "Perception",
+    AI_AUTONOMY: "AI and autonomy",
+    INTERACTION: "Interaction",
+    SOFTWARE: "Software",
+    SAFETY: "Safety",
+    OTHER: "Other",
   },
   confidence: {
     LOW: "Low",

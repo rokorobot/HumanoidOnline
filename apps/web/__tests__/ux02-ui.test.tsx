@@ -17,6 +17,7 @@ vi.mock("next/navigation", () => ({
 import { CitationFacts, citationFacts } from "@/components/CitationFacts";
 import { DetailComparisonLink } from "@/components/DetailComparisonLink";
 import { InterpretationBar } from "@/components/InterpretationBar";
+import { AvailabilityMatrix } from "@/components/AvailabilityState";
 import { PriceStateCard } from "@/components/PricingState";
 import { SearchBox } from "@/components/SearchBox";
 import { partlyUninterpreted, resolveCatalogueQuery } from "@/lib/catalogue-query";
@@ -29,8 +30,8 @@ import {
 } from "@/lib/nav-selection";
 import { interpretQuery, type InterpreterVocab } from "@/lib/query-interpreter";
 import { providerLabel, providerNamesFrom } from "@/lib/providers";
-import { toRobotListParams } from "@/lib/search-params";
-import type { RobotDetail } from "@/lib/types";
+import { countActiveFilters, toRobotListParams } from "@/lib/search-params";
+import type { AvailabilityOffer, PriceDisplay, PricingOffer, RobotDetail } from "@/lib/types";
 
 const vocab: InterpreterVocab = {
   manufacturers: [
@@ -120,6 +121,50 @@ describe("resolveCatalogueQuery - the URL stays the source of truth", () => {
     expect(partlyUninterpreted(resolveCatalogueQuery({ q: "under 20000" }, vocab))).toBe(true);
     expect(partlyUninterpreted(resolveCatalogueQuery({ q: "unitree" }, vocab))).toBe(false);
     expect(partlyUninterpreted(resolveCatalogueQuery({ q: "over 5000 eur" }, vocab))).toBe(true);
+  });
+});
+
+describe("active filter count - counts the constraints actually applied", () => {
+  const count = (sp: Record<string, string | string[]>) =>
+    countActiveFilters(resolveCatalogueQuery(sp, vocab).effective);
+
+  it("a compound query counts each interpreted filter, not the search box as one", () => {
+    // use case + purchase-price ceiling = 2 (the currency only denominates the ceiling)
+    expect(count({ q: "warehouse robot under €20000" })).toBe(2);
+    // manufacturer + use case + price + obtainability = 4
+    expect(count({ q: "unitree research under $20000 purchase" })).toBe(4);
+    // manufacturer + leftover name words (one name search) + price = 3
+    expect(count({ q: "unitree g1 under 20k eur" })).toBe(3);
+  });
+
+  it("is a function of the applied constraints only, so a zero-result search reports the same count", () => {
+    const cq = resolveCatalogueQuery({ q: "warehouse robot under €20000" }, vocab);
+    expect(cq.chips.filter((c) => c.status === "applied")).toHaveLength(2);
+    expect(countActiveFilters(cq.effective)).toBe(2);
+    // an unrecognised word is still one applied name search, whatever it returns
+    expect(count({ q: "waterproof" })).toBe(1);
+  });
+
+  it("does not count interpreted parts that were not applied", () => {
+    expect(count({ q: "warehouse under 20000" })).toBe(1); // no currency: price not applied
+    // an explicit, different use case wins; the interpreted one is not counted twice
+    expect(count({ q: "warehouse", use_case: "research-education" })).toBe(1);
+  });
+
+  it("counts independently selected filters, alone and alongside a query", () => {
+    expect(count({})).toBe(0);
+    expect(count({ region: "DE" })).toBe(1);
+    expect(count({ region: "DE", offered_in: "EU" })).toBe(2);
+    expect(count({ commercial_status: ["COMMERCIAL", "PILOT"], transaction_type: ["RENTAL"] })).toBe(3);
+    expect(count({ price_max: "30000", price_currency: "USD" })).toBe(1);
+    expect(count({ q: "warehouse", region: "DE", commercial_status: ["COMMERCIAL", "PILOT"] })).toBe(4);
+    // the same filter stated in the URL and in the query is one constraint
+    expect(count({ q: "warehouse", use_case: "warehouse-logistics" })).toBe(1);
+  });
+
+  it("agrees with the number of filters sent to the API", () => {
+    const api = toRobotListParams(resolveCatalogueQuery({ q: "warehouse robot under €20000" }, vocab).effective);
+    expect([api.use_case, api.price_max, api.q, api.manufacturer].filter((v) => v != null)).toHaveLength(2);
   });
 });
 
@@ -252,6 +297,51 @@ describe("provider display names", () => {
       <PriceStateCard price={{ type: "PUBLIC", amount: 1, currency: "CZK", provider: "alza-cz", provider_name: null }} />,
     );
     expect(nulled.container.querySelector("[data-provider]")?.textContent).toBe("Seller ref: alza-cz");
+  });
+
+  // The API field is optional: an API that predates it (or a deploy where the web ships
+  // first) sends offers with NO provider_name key at all.
+  it("price payloads with provider_name absent: neutral identifier, never an invented name", () => {
+    const headline: PriceDisplay = { type: "PUBLIC", amount: 917990, currency: "CZK", provider: "alza-cz", region: "CZ" };
+    expect("provider_name" in headline).toBe(false);
+    const { container } = render(<PriceStateCard price={headline} />);
+    const el = container.querySelector("[data-provider]");
+    expect(el?.textContent).toBe("Seller ref: alza-cz · CZ");
+    expect(container.textContent).toContain("CZK");
+    expect(container.textContent).not.toMatch(/Alza|undefined|null/);
+
+    // the same resolver call the robot-detail pricing row makes, for two sellers on one robot
+    const offers = [
+      { transaction_type: "PURCHASE", price_type: "PUBLIC", provider: "alza-cz", region: "CZ" },
+      { transaction_type: "PURCHASE", price_type: "PUBLIC", provider: "unitree-store", region: "GLOBAL" },
+    ] as unknown as PricingOffer[];
+    expect(offers.map((o) => providerLabel(o.provider!, names, o.provider_name).text)).toEqual([
+      "Seller ref: alza-cz",
+      "Unitree Online Store", // still named from the maker's own list
+    ]);
+    expect(offers.map((o) => providerLabel(o.provider!, undefined, o.provider_name).text)).toEqual([
+      "Seller ref: alza-cz",
+      "Seller ref: unitree-store",
+    ]);
+  });
+
+  it("a price with no provider at all shows no seller line", () => {
+    const { container } = render(<PriceStateCard price={{ type: "PUBLIC", amount: 1, currency: "EUR" }} />);
+    expect(container.querySelector("[data-provider]")).toBeNull();
+    expect(container.textContent).not.toMatch(/Seller ref|undefined|null/);
+  });
+
+  it("availability payloads with provider_name absent render unchanged", () => {
+    const offers = [
+      { transaction_type: "PURCHASE", availability_status: "AVAILABLE", region: "CZ", provider: "alza-cz" },
+      { transaction_type: "RENTAL", availability_status: "ON_REQUEST", region: null, provider: null },
+    ] as unknown as AvailabilityOffer[];
+    expect(offers.every((o) => !("provider_name" in o))).toBe(true);
+    const { container } = render(<AvailabilityMatrix offers={offers} />);
+    const text = container.textContent ?? "";
+    expect(text).toContain("Available");
+    expect(text).toContain("Availability on request");
+    expect(text).not.toMatch(/Alza|undefined|null/);
   });
 
   it("a card keeps the offer's own provider, region, basis and order note together; slug in data-provider", () => {

@@ -95,6 +95,20 @@ test.describe("@responsive UX-02A catalogue search", () => {
     for (const slug of rentalOnly) expect(under.map((x) => x.slug)).not.toContain(slug);
   });
 
+  test("the active-filter count matches the interpreted filters, with and without results", async ({ page }) => {
+    const main = page.locator("main");
+    // two interpreted filters (use case + price ceiling)
+    await page.goto("/robots?q=" + encodeURIComponent("warehouse robot under €20000"), { waitUntil: "networkidle" });
+    await expect(main).toContainText(/2 FILTERS ACTIVE/i);
+    await expect(main).not.toContainText(/1 FILTER ACTIVE/i);
+    // one interpreted filter plus one independently selected filter
+    await page.goto("/robots?q=warehouse&region=DE", { waitUntil: "networkidle" });
+    await expect(main).toContainText(/2 FILTERS ACTIVE/i);
+    // a price with no currency is not applied, so only the use case counts
+    await page.goto("/robots?q=" + encodeURIComponent("warehouse under 20000"), { waitUntil: "networkidle" });
+    await expect(main).toContainText(/1 FILTER ACTIVE/i);
+  });
+
   test("no-result state names the query, the interpretation, what was not understood, and offers a clear action", async ({ page }) => {
     await page.goto("/robots?q=" + encodeURIComponent("unitree waterproof"), { waitUntil: "networkidle" });
     const empty = page.getByTestId("no-results");

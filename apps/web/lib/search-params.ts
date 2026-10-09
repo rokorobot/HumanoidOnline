@@ -138,16 +138,23 @@ export function toQueryString(sp: RawSearchParams): string {
   return s ? `?${s}` : "";
 }
 
-// Number of active filters shown on the catalogue (the search box text counts as one).
-// Region and offer market are separate filters and are counted separately.
+// Number of constraints applied to the catalogue results. Pass the EFFECTIVE params
+// (`resolveCatalogueQuery(...).effective`), i.e. what is sent to the API: a search
+// phrase interpreted as a use case plus a price ceiling is two constraints, not one,
+// and words left over as a name search (`q`) count as one. An interpreted part that
+// was not applied (no currency, conflict, overridden) is not in the effective params
+// and so is not counted. Region and offer market are separate filters. The price pair
+// counts once (`price_currency` only denominates `price_max`).
 const COUNTED_KEYS = [
-  "region", "offered_in", "mobility", "autonomy_min", "payload_min", "height_min",
-  "price_max", "has_sdk", "ros_support", "developer_edition", "has_manipulation", "q",
+  "manufacturer", "use_case", "region", "offered_in", "mobility", "autonomy_min",
+  "payload_min", "height_min", "height_max", "price_max", "has_sdk", "ros_support",
+  "developer_edition", "has_manipulation", "q",
 ];
-export function countActiveFilters(sp: RawSearchParams): number {
+export function countActiveFilters(effective: RawSearchParams): number {
   return (
-    asArray(sp.commercial_status).length +
-    asArray(sp.transaction_type).length +
-    COUNTED_KEYS.filter((k) => asString(sp[k])).length
+    asArray(effective.commercial_status).length +
+    asArray(effective.transaction_type).length +
+    asArray(effective.availability_status).length +
+    COUNTED_KEYS.filter((k) => asString(effective[k])).length
   );
 }

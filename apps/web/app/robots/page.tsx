@@ -96,7 +96,8 @@ export default async function RobotsPage({
     return `/robots${toQueryString(next)}`;
   }
 
-  const activeFilterCount = countActiveFilters(sp);
+  // Counted from the same derived state the API call uses, never from the raw URL.
+  const activeFilterCount = countActiveFilters(cq.effective);
 
   return (
     <>

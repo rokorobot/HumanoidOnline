@@ -124,7 +124,7 @@ export default async function RobotsPage({
         )}
 
         <div className="layout">
-          <FilterPanel params={sp} resultCount={page.total} />
+          <FilterPanel params={sp} resultCount={page.total} activeCount={activeFilterCount} />
 
           <section aria-label="Results">
             <div className="results-head">
@@ -158,16 +158,17 @@ export default async function RobotsPage({
             )}
 
             <p className="note">
-              {"// PRICE STATES: PUBLIC · FROM · RANGE · MANUFACTURER_ESTIMATE · ESTIMATED · QUOTE_ONLY · UNKNOWN."}
-              <br />
-              {'// QUOTE_ONLY ("Price on request") ≠ UNKNOWN ("No confirmed pricing"). Absence of availability rows renders "Availability unknown", never NOT_AVAILABLE.'}
-              <br />
-              {"// Every price/status/availability on a record carries an evidence source — open a robot to drill in."}
+              A price or availability shown on a card comes from one sourced offer and
+              is never inferred: where nothing is published it is shown as unknown,
+              not as zero or unavailable. Open a robot to see its evidence.
             </p>
           </section>
         </div>
       </div>
-      <CompareBar slugs={compareSlugs} />
+      <CompareBar
+        slugs={compareSlugs}
+        names={Object.fromEntries(page.items.map((r) => [r.slug, r.name]))}
+      />
     </>
   );
 }

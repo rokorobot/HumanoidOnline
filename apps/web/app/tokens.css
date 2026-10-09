@@ -496,6 +496,15 @@ button, input, select { font: inherit; color: inherit; }
 .ho-sysheader .mm .f { color: var(--ho-grey-400); }
 .ho-sysheader .mm .f b { color: var(--ho-paper-ink); font-weight: 600; }
 .ho-sysheader .mm .f.ev-high b    { color: var(--ho-signal); }
+/* UX-01 / P0-C: on phones the status strip stays ONE compact row - the title
+   truncates and the secondary counts are dropped (they repeat in the page body). */
+@media (max-width: 560px) {
+  .ho-sysheader { flex-wrap: nowrap; gap: 10px; padding: 7px 12px; }
+  .ho-sysheader .title { min-width: 0; flex: 1; }
+  .ho-sysheader .title .tt { min-width: 0; overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; }
+  .ho-sysheader .mm { display: none; }
+}
 .ho-sysheader .ref { color: var(--ho-grey-500);
   border: var(--ho-rule-hair) solid var(--ho-grey-700); padding: 2px 8px; }
 

@@ -5,6 +5,7 @@
 import Link from "next/link";
 import type { MouseEvent } from "react";
 
+import { humanizeToken } from "@/lib/labels";
 import type { MatchItem } from "@/lib/types";
 
 const CRITERIA: [string, string][] = [
@@ -29,7 +30,7 @@ export function MatchCard({
   return (
     <article className="mr-card" data-slug={match.robot.slug}>
       <div className="mr-top">
-        <div className="mr-cat">{match.category.replace(/_/g, " ")}</div>
+        <div className="mr-cat">{humanizeToken(match.category)}</div>
         <div className="mr-lock">
           <Link className="mr-name" href={`/robots/${match.robot.slug}`}>
             {match.robot.name}

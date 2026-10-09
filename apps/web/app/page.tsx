@@ -50,7 +50,7 @@ export default async function HomePage() {
       {/* HERO (dark) */}
       <div className="hero-shell ho-dark ho-scan">
         <div className="hero-inner">
-          <div className="topbar">
+          <div className="topbar topbar--nav">
             <div className="corner">
               <span className="ho-star">&#9733;</span>
             </div>
@@ -161,7 +161,7 @@ export default async function HomePage() {
               <h2 className="ho-section-title">Obtainable now</h2>
             </div>
             <SystemLabel>
-              <abbr title="Predicate: is_current AND status ∉ {NOT_AVAILABLE, DISCONTINUED}">
+              <abbr title="Current offers that are not marked unavailable or discontinued">
                 CURRENT CONFIRMED OFFERS
               </abbr>
             </SystemLabel>

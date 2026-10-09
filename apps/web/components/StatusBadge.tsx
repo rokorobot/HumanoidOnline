@@ -1,8 +1,12 @@
 // StatusBadge (§6.4) — DIMENSION 1: commercial_status (platform MATURITY) only.
-// Never obtainability. Enum rendered verbatim; a value ramp (ghost -> solid ink)
+// Never obtainability. Rendered as a buyer-facing label (lib/labels.ts) with the
+// raw enum kept in data-enum; a value ramp (ghost -> solid ink)
 // encodes the maturity ladder. RAAS_DEPLOYMENT is a SUCCESS state (solid).
 // DISCONTINUED is ghosted/struck. No colour implies "buyable".
 import { maturityIndex } from "@/lib/format";
+import { statusLabel } from "@/lib/labels";
+
+const STRUCK = { textDecoration: "line-through", color: "var(--ho-text-faint)" };
 
 export function StatusBadge({ status }: { status: string }) {
   const idx = maturityIndex(status);
@@ -16,13 +20,10 @@ export function StatusBadge({ status }: { status: string }) {
   return (
     <span
       className={`ho-badge ${variant} ho-state`}
-      style={
-        discontinued
-          ? { textDecoration: "line-through", color: "var(--ho-text-faint)" }
-          : undefined
-      }
+      data-enum={status}
+      {...(discontinued ? { style: STRUCK } : {})}
     >
-      {status}
+      {statusLabel(status)}
     </span>
   );
 }
@@ -33,13 +34,10 @@ export function StatusBracket({ status }: { status: string }) {
   return (
     <span
       className="ho-bracket ho-state"
-      style={
-        discontinued
-          ? { textDecoration: "line-through", color: "var(--ho-text-faint)" }
-          : undefined
-      }
+      data-enum={status}
+      {...(discontinued ? { style: STRUCK } : {})}
     >
-      {status}
+      {statusLabel(status)}
     </span>
   );
 }

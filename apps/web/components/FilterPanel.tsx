@@ -6,8 +6,10 @@
 // (Apply button), and auto-applies on change when JS is on. It never computes
 // facts — it only forwards filter params to /api/robots.
 import { useRouter } from "next/navigation";
-import { useRef, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 
+import { modeLabel } from "@/lib/format";
+import { autonomyLabel, mobilityLabel, statusLabel } from "@/lib/labels";
 import {
   PRICE_CURRENCY,
   asArray,
@@ -62,12 +64,42 @@ const AUTONOMY = [
 export function FilterPanel({
   params,
   resultCount,
+  activeCount = 0,
 }: {
   params: RawSearchParams;
   resultCount: number;
+  /** Number of active filters (shown on the mobile toggle). */
+  activeCount?: number;
 }) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const panelId = useId();
+  // Mobile (<= 820px) collapses the rail behind a "Filters" button; on desktop
+  // the toggle is hidden by CSS and the rail is always shown, so `open` is inert.
+  const [open, setOpen] = useState(false);
+
+  function openPanel() {
+    setOpen(true);
+    // Move focus into the panel once it is displayed.
+    requestAnimationFrame(() => formRef.current?.focus());
+  }
+  function closePanel() {
+    setOpen(false);
+    toggleRef.current?.focus();
+  }
+  // Escape closes the mobile disclosure and returns focus to its button.
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setOpen(false);
+        toggleRef.current?.focus();
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
 
   function currentStatus() {
     return asArray(params.commercial_status);
@@ -97,6 +129,8 @@ export function FilterPanel({
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     submitForm();
+    // An explicit Apply on mobile dismisses the panel and shows the results.
+    if (open) closePanel();
   }
 
   // Auto-apply on discrete controls (checkbox/select). Free-text number inputs
@@ -114,14 +148,36 @@ export function FilterPanel({
 
   function reset() {
     router.push("/robots", { scroll: false });
+    if (open) closePanel();
   }
 
   const sort = asString(params.sort) ?? "name";
   const q = asString(params.q) ?? "";
 
   return (
+    <div className={`filters-wrap${open ? " is-open" : ""}`}>
+    <button
+      ref={toggleRef}
+      type="button"
+      className="filters-toggle"
+      aria-expanded={open}
+      aria-controls={panelId}
+      onClick={() => (open ? closePanel() : openPanel())}
+    >
+      <span className="ft-label">
+        Filters{activeCount > 0 ? ` · ${activeCount} active` : ""}
+      </span>
+      <span className="ft-count">
+        {resultCount} {resultCount === 1 ? "result" : "results"}
+      </span>
+    </button>
+    <noscript>
+      <style>{".filters-toggle{display:none!important}.filters{display:block!important}"}</style>
+    </noscript>
     <form
+      id={panelId}
       ref={formRef}
+      tabIndex={-1}
       className="filters"
       aria-label="Filters"
       action="/robots"
@@ -156,7 +212,7 @@ export function FilterPanel({
                 value={s}
                 defaultChecked={active}
               />{" "}
-              {s}
+              {statusLabel(s)}
             </label>
           );
         })}
@@ -176,7 +232,7 @@ export function FilterPanel({
                 value={t}
                 defaultChecked={active}
               />{" "}
-              {t}
+              {modeLabel(t)}
             </label>
           );
         })}
@@ -265,7 +321,7 @@ export function FilterPanel({
             <option value="">Any</option>
             {MOBILITY.map((m) => (
               <option key={m} value={m}>
-                {m}
+                {mobilityLabel(m)}
               </option>
             ))}
           </select>
@@ -286,7 +342,7 @@ export function FilterPanel({
             <option value="">Any</option>
             {AUTONOMY.map((a) => (
               <option key={a} value={a}>
-                {a}
+                {autonomyLabel(a)}
               </option>
             ))}
           </select>
@@ -323,5 +379,6 @@ export function FilterPanel({
         </button>
       </div>
     </form>
+    </div>
   );
 }

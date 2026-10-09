@@ -2,6 +2,7 @@
 //   ① maturity (commercial_status)  ② obtainability (available modes/offers)
 //   ③ evidence (deployments / confidence). Never collapsed into one flag.
 import { modeLabel } from "@/lib/format";
+import { availabilityLabel, statusLabel } from "@/lib/labels";
 import type { AvailabilityOffer } from "@/lib/types";
 
 function Pair({
@@ -9,9 +10,12 @@ function Pair({
   value,
   mono,
   tone,
+  rawEnum,
 }: {
   kicker: string;
   value: string;
+  /** Raw enum the visible label stands for (kept in data-enum). */
+  rawEnum?: string;
   mono?: string;
   tone?: "signal" | "verified" | "caution" | "unknown";
 }) {
@@ -19,7 +23,7 @@ function Pair({
   return (
     <div className={`ho-pair${toneClass}`}>
       <span className="k">{kicker}</span>
-      <span className="s">
+      <span className="s" {...(rawEnum ? { "data-enum": rawEnum } : {})}>
         {value}
         {mono && <span className="mono">· {mono}</span>}
       </span>
@@ -38,7 +42,7 @@ export function CommercialTriad({
   deploymentCount: number;
   strongestConfidence?: string | null;
 }) {
-  // ② obtainability summary from the offer rows (verbatim), absence = unknown.
+  // ② obtainability summary from the offer rows, absence = unknown.
   const accessible = availabilityOffers.filter(
     (o) =>
       o.availability_status !== "NOT_AVAILABLE" &&
@@ -46,7 +50,15 @@ export function CommercialTriad({
   );
   const obtainValue =
     availabilityOffers.length === 0
-      ? "AVAILABILITY UNKNOWN"
+      ? "Availability unknown"
+      : availabilityLabel(
+          accessible.length > 0
+            ? accessible[0].availability_status
+            : availabilityOffers[0].availability_status,
+        );
+  const obtainEnum =
+    availabilityOffers.length === 0
+      ? undefined
       : accessible.length > 0
         ? accessible[0].availability_status
         : availabilityOffers[0].availability_status;
@@ -61,15 +73,16 @@ export function CommercialTriad({
 
   const evValue =
     deploymentCount > 0
-      ? `${deploymentCount} DEPLOYMENT${deploymentCount === 1 ? "" : "S"}`
-      : "NO DEPLOYMENTS ON RECORD";
+      ? `${deploymentCount} deployment${deploymentCount === 1 ? "" : "s"}`
+      : "No deployments on record";
 
   return (
     <div className="triad" role="group" aria-label="Three commercial dimensions">
       <div className="t">
         <Pair
           kicker="① Commercial maturity"
-          value={status}
+          value={statusLabel(status)}
+          rawEnum={status}
           tone={status === "DISCONTINUED" ? "unknown" : "signal"}
         />
       </div>
@@ -77,6 +90,7 @@ export function CommercialTriad({
         <Pair
           kicker="② Obtainability"
           value={obtainValue}
+          rawEnum={obtainEnum}
           mono={obtainMono}
           tone={availabilityOffers.length === 0 ? "unknown" : undefined}
         />

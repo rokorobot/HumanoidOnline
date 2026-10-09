@@ -48,7 +48,9 @@ async function measure(page: Page, path: string) {
 const STATIC: Budget[] = [
   { path: "/", docKB: 62, jsRawKB: 404 },
   { path: "/robots/unitree-g1", docKB: 89, jsRawKB: 412 },
-  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 32, jsRawKB: 431 },
+  // UX-01: 32 -> 33 (measured 32.06). The compare price cell now carries its configuration,
+  // basis tag, order note and the shared summary line, plus data-enum traceability.
+  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 33, jsRawKB: 431 },
   { path: "/find-a-humanoid", docKB: 46, jsRawKB: 424 },
 ];
 
@@ -86,7 +88,10 @@ for (const b of STATIC) {
  * stays correct as the catalogue changes.
  */
 const ROBOTS_FIXED_KB = 22; // measured 20.1
-const ROBOTS_PER_CARD_KB = 4.0; // measured 3.68
+// UX-01: 4.0 -> 4.35 (measured 4.32/card; main 3.96). Per card: the one-line commercial summary,
+// buyer-facing labels with data-enum, and the "Price terms" disclosure - each counted twice
+// because the RSC payload repeats the server-rendered tree.
+const ROBOTS_PER_CARD_KB = 4.35;
 const ROBOTS_JS_RAW_KB = 411; // unchanged from the flat budget
 
 test("@perf built-route budget: /robots (scales with rendered cards)", async ({

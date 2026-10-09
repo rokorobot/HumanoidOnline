@@ -7,16 +7,22 @@ export function Metric({
   label,
   value,
   unit,
+  rawEnum,
 }: {
   label: string;
   value: number | string | boolean | null | undefined;
   unit?: string | null;
+  /** Raw enum the visible label stands for (kept in data-enum). */
+  rawEnum?: string | null;
 }) {
   const resolved = specValue(value, unit);
   return (
     <div className="metric">
       <SystemLabel className="k">{label}</SystemLabel>
-      <span className={resolved.unknown ? "v unk" : "v"}>{resolved.label}</span>
+      <span
+      className={resolved.unknown ? "v unk" : "v"}
+      {...(rawEnum && !resolved.unknown ? { "data-enum": rawEnum } : {})}
+    >{resolved.label}</span>
     </div>
   );
 }

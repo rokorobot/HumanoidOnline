@@ -32,6 +32,14 @@ Corollaries, binding:
 4. **Enum labels are rendered verbatim** from `docs/03_DATA_DICTIONARY.md`. The visual
    system styles them; it never renames, merges, or invents them.
 
+   > **Amendment (UX-01, 2026-10-09 - ratified by owner 2026-10-09 (PR #156)):**
+   > for *buyer-facing human UI* the enum is shown as a mapped label (`lib/labels.ts`,
+   > e.g. `RAAS_DEPLOYMENT` -> "Robot-as-a-service", `QUOTE_ONLY` -> "Price on request")
+   > and the raw enum is kept on the element as `data-enum="RAW"`. Mappings are total
+   > and fall back to a readable form; no enum is renamed in the data, merged, or invented.
+   > *Machine surfaces stay verbatim:* `llms.txt`, JSON-LD, the research JSON, citation
+   > facts, API payloads, URL parameters and form values.
+
 ## 0.1 FROZEN UI LAWS
 
 These are frozen for WS3. They override any local styling temptation.

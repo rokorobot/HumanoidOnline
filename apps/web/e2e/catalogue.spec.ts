@@ -74,15 +74,15 @@ test("catalogue: G1 shows $13,500 PUBLIC, never the illustrative $16,000", async
 test("robot detail unitree-g1: $13,500 PUBLIC", async ({ page }) => {
   await page.goto("/robots/unitree-g1");
   await expect(page.getByText("$13,500").first()).toBeVisible();
-  // PUBLIC price_type surfaced verbatim in the pricing table context.
-  await expect(page.locator("body")).toContainText("PUBLIC");
+  // PUBLIC price_type is shown as a human label; the raw enum rides along in data-enum.
+  await expect(page.locator('[data-enum="PUBLIC"]').first()).toBeVisible();
   await expect(page.locator("body")).not.toContainText("$16,000");
 });
 
 test("unitree-h1: PRICE ON REQUEST / QUOTE_ONLY, and never $90,000", async ({ page }) => {
   await page.goto("/robots/unitree-h1");
   await expect(page.getByText(/Price on request/i).first()).toBeVisible();
-  await expect(page.locator("body")).toContainText("QUOTE_ONLY");
+  await expect(page.locator('[data-enum="QUOTE_ONLY"]').first()).toBeVisible();
   const body = await page.locator("body").innerText();
   expect(body).not.toContain("$90,000");
   expect(body).not.toContain("90,000");
@@ -90,7 +90,7 @@ test("unitree-h1: PRICE ON REQUEST / QUOTE_ONLY, and never $90,000", async ({ pa
 
 test("figure-02 is DISCONTINUED", async ({ page }) => {
   await page.goto("/robots/figure-02");
-  await expect(page.getByText("DISCONTINUED").first()).toBeVisible();
+  await expect(page.locator('[data-enum="DISCONTINUED"]').first()).toBeVisible();
 });
 
 test("unknown-price robot (agility-digit) shows explicit unknown, never $0/0/unavailable", async ({
@@ -114,8 +114,8 @@ test("QUOTE_ONLY and UNKNOWN render as visibly different states on the catalogue
 }) => {
   await page.goto("/robots");
   // Distinct labels...
-  await expect(page.getByText("PRICE ON REQUEST").first()).toBeVisible();
-  await expect(page.getByText("NO PRICE DATA").first()).toBeVisible();
+  await expect(page.getByText("Price on request").first()).toBeVisible();
+  await expect(page.getByText("No published price").first()).toBeVisible();
   // ...backed by distinct state classes (caution vs unknown/grey).
   await expect(page.locator(".price.quote").first()).toBeVisible();
   await expect(page.locator(".price.unknown").first()).toBeVisible();
@@ -222,7 +222,7 @@ test("manufacturer detail: unknown listing status renders UNKNOWN, never NO", as
   await expect(factValue(page, "Public company")).toHaveText("UNKNOWN");
   await expect(factValue(page, "Headquarters")).toContainText("San Jose");
   // Humanoid deployment, with its meaning and basis spelled out.
-  await expect(factValue(page, "Humanoid deployment")).toHaveText("COMMERCIAL");
+  await expect(factValue(page, "Humanoid deployment")).toHaveText("Commercial");
   await expect(page.locator(".mfr-deployment")).toContainText("Commercially available");
   await expect(page.locator(".mfr-deployment")).toContainText("BMW");
   // Header counts are labelled as published vs tracked models.

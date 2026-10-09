@@ -5,7 +5,7 @@ import type { ResolvedFact } from "@/lib/types";
 export function ResolvedFactCell({ fact }: { fact: ResolvedFact }) {
   const d = describeResolved(fact);
   return (
-    <span style={{ display: "block" }} data-resolved-state={fact.state} data-resolved-property={fact.property}>
+    <span className="d-blk" data-resolved-state={fact.state} data-resolved-property={fact.property}>
       <span className="v">{d.headline}</span>
       {d.lines.map((l) => (
         <span

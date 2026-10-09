@@ -54,7 +54,7 @@ describe("resolvePriceState — the six frozen price states", () => {
     const long = resolvePriceState(pd, "long");
     expect(short.label).toBe("€19,999");
     expect(short.label).not.toContain("~"); // "~" is HumanoidOnline's own ESTIMATED marker
-    expect(short.context).toBe("MANUFACTURER ESTIMATE");
+    expect(short.context).toBe("Manufacturer estimate");
     expect(long.context).toBe("Manufacturer estimate");
     expect(short.tone).toBe("estimated");
     // ESTIMATED is unchanged
@@ -65,7 +65,7 @@ describe("resolvePriceState — the six frozen price states", () => {
 
   it("QUOTE_ONLY is 'Price on request' — never a number, distinct from unknown", () => {
     const pd: PriceDisplay = { type: "QUOTE_ONLY", amount: null, currency: "USD" };
-    expect(resolvePriceState(pd, "short").label).toBe("PRICE ON REQUEST");
+    expect(resolvePriceState(pd, "short").label).toBe("Price on request");
     expect(resolvePriceState(pd, "long").label).toBe("Price on request");
     expect(resolvePriceState(pd, "short").tone).toBe("quote");
   });
@@ -73,7 +73,8 @@ describe("resolvePriceState — the six frozen price states", () => {
   it("UNKNOWN (null) is 'No confirmed pricing' — never $0/free, distinct from quote", () => {
     const short = resolvePriceState(null, "short");
     const long = resolvePriceState(undefined, "long");
-    expect(short.label).toBe("NO PRICE DATA");
+    expect(short.label).toBe("No published price");
+    expect(short.context).toBe("Price unknown");
     expect(long.label).toBe("No confirmed pricing");
     expect(short.tone).toBe("unknown");
   });
@@ -89,13 +90,15 @@ describe("resolvePriceState — the six frozen price states", () => {
 describe("resolveAvailabilitySummary", () => {
   it("empty modes -> explicit UNKNOWN (not NOT_AVAILABLE)", () => {
     const s = resolveAvailabilitySummary([], "short");
-    expect(s.label).toBe("AVAILABILITY UNKNOWN");
+    expect(s.label).toBe("Availability unknown");
     expect(s.isUnknown).toBe(true);
   });
   it("modes present -> accessible with the modes listed", () => {
     const s = resolveAvailabilitySummary(["PURCHASE", "DEVELOPER"], "short");
     expect(s.isUnknown).toBe(false);
     expect(s.modes).toContain("Purchase");
+    // the badge says WHAT is available, not a bare "AVAILABLE"
+    expect(s.label).toBe("Offered · Purchase, Developer");
   });
 });
 

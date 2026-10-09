@@ -9,6 +9,7 @@ export function SpecRow({
   unit,
   notApplicable = false,
   note,
+  rawEnum,
 }: {
   label: string;
   value?: number | string | boolean | null;
@@ -17,14 +18,16 @@ export function SpecRow({
   // Why this value is UNKNOWN, or which sources disagree. Rendered as visible
   // text rather than a tooltip: an explanation nobody can see does not explain.
   note?: string | null;
+  /** Raw enum the visible label stands for (kept in data-enum). */
+  rawEnum?: string | null;
 }) {
   return (
     <div className="srow">
       <span className="k">{label}</span>
-      <span style={{ display: "block" }}>
+      <span className="d-blk" {...(rawEnum ? { "data-enum": rawEnum } : {})}>
         <SpecValue value={value} unit={unit} notApplicable={notApplicable} />
         {note && (
-          <span className="ho-syslabel" style={{ display: "block" }}>
+          <span className="ho-syslabel d-blk">
             {note}
           </span>
         )}

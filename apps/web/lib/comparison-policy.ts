@@ -19,6 +19,8 @@
 //   - No value is ever inferred or fabricated to fill a gap.
 // ============================================================================
 
+import { selectHeadline } from "./commercial-summary";
+
 export type LeaderDirection = "HIGHER" | "LOWER" | "NONE";
 
 /** How a metric may be compared across robots. */
@@ -184,15 +186,6 @@ export const COMPARABLE_PRICE_TYPES = new Set([
   "MANUFACTURER_ESTIMATE",
 ]);
 
-const PRICE_TYPE_RANK: Record<string, number> = {
-  PUBLIC: 0,
-  FROM: 1,
-  MANUFACTURER_ESTIMATE: 2,
-  ESTIMATED: 3,
-  RANGE: 4,
-  QUOTE_ONLY: 5,
-};
-
 export interface NormalizedOffer {
   transaction_type: string;
   price_type: string;
@@ -200,6 +193,10 @@ export interface NormalizedOffer {
   amount: number | null;
   currency: string | null;
   billing_period: string | null;
+  /** Configuration the headline price is scoped to (null = the whole robot). */
+  variant?: string | null;
+  /** > 1 when several configurations were priced and this is the lowest ("From ..."). */
+  configurations_priced?: number;
 }
 
 export interface OfferLike {
@@ -210,23 +207,23 @@ export interface OfferLike {
   price_max?: number | null;
   currency: string | null;
   billing_period: string | null;
+  variant?: string | null;
+  edition_confirmed?: boolean | null;
+  condition?: string;
 }
 
 /**
- * The headline offer for a robot: PURCHASE first, then by price_type quality.
- * Mirrors the API/base-compare headline selection so display stays consistent.
+ * The headline offer for a robot: PURCHASE first, then by price_type quality, then
+ * a robot-level offer before a configuration-scoped one (see
+ * `selectHeadline` in commercial-summary.ts, the single selector shared with the
+ * compare price cell so the leader and the displayed price are the same row).
  * `amount` is a single number only for single-value price types; RANGE and
  * QUOTE_ONLY resolve to null (no single comparable number).
  */
 export function headlineOffer(offers: OfferLike[]): NormalizedOffer | null {
-  if (offers.length === 0) return null;
-  const sorted = [...offers].sort((a, b) => {
-    const at = a.transaction_type === "PURCHASE" ? 0 : 1;
-    const bt = b.transaction_type === "PURCHASE" ? 0 : 1;
-    if (at !== bt) return at - bt;
-    return (PRICE_TYPE_RANK[a.price_type] ?? 9) - (PRICE_TYPE_RANK[b.price_type] ?? 9);
-  });
-  const o = sorted[0];
+  const h = selectHeadline(offers);
+  if (!h) return null;
+  const o = h.offer;
   const amount = COMPARABLE_PRICE_TYPES.has(o.price_type) ? (o.price ?? null) : null;
   return {
     transaction_type: o.transaction_type,
@@ -234,6 +231,8 @@ export function headlineOffer(offers: OfferLike[]): NormalizedOffer | null {
     amount,
     currency: o.currency,
     billing_period: o.billing_period,
+    variant: o.variant ?? null,
+    configurations_priced: h.configurationsPriced,
   };
 }
 

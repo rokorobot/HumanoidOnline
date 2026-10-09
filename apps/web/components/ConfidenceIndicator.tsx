@@ -1,6 +1,8 @@
 // ConfidenceIndicator (§6.8) — expose confidence_level as a four-segment value
-// ramp (NOT a hue rainbow) + the literal enum label. Only VERIFIED renders the
+// ramp (NOT a hue rainbow) + a buyer-facing label (raw enum in data-level). Only VERIFIED renders the
 // "Verified" indicator, and only when verified_at is present.
+import { confidenceLabel } from "@/lib/labels";
+
 const LEVELS = ["LOW", "MEDIUM", "HIGH", "VERIFIED"] as const;
 
 export function ConfidenceIndicator({
@@ -23,7 +25,7 @@ export function ConfidenceIndicator({
         <i />
         <i />
       </span>
-      <span>{known ? effective : level}</span>
+      <span>{confidenceLabel(known ? effective : level)}</span>
     </span>
   );
 }

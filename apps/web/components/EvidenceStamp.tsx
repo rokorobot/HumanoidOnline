@@ -1,8 +1,10 @@
 // EvidenceStamp (§6.7) — DIMENSION 3: provenance for a commercial fact.
-// "No commercial fact without evidence." Renders source_type + dates
+// "No commercial fact without evidence." Renders source_type (buyer-facing label,
+// raw enum in data-enum) + dates
 // (observed/published/verified) + a source link affordance. A ® rides along
 // only when verified_at is present.
 import { formatDate } from "@/lib/format";
+import { sourceTypeLabel } from "@/lib/labels";
 import type { Evidence } from "@/lib/types";
 
 export function EvidenceStamp({ evidence }: { evidence?: Evidence | null }) {
@@ -13,7 +15,7 @@ export function EvidenceStamp({ evidence }: { evidence?: Evidence | null }) {
   const published = formatDate(evidence.published_at);
   return (
     <div className="src">
-      SOURCE: {evidence.source_type}
+      SOURCE: <span data-enum={evidence.source_type}>{sourceTypeLabel(evidence.source_type)}</span>
       <br />
       {published && <>PUBLISHED {published} </>}
       {verified && (

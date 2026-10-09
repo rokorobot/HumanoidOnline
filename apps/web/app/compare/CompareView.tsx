@@ -17,8 +17,23 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import {
+  accessibleModes,
+  commercialSummary,
+  priceDisplayFromHeadline,
+  selectHeadline,
+} from "@/lib/commercial-summary";
 import { formatObservedDate, modeLabel } from "@/lib/format";
-import type { CompareResponse, CompareRow, PricingOffer, RobotDetail } from "@/lib/types";
+import {
+  autonomyLabel,
+  availabilityLabel,
+  confidenceLabel,
+  mobilityLabel,
+  priceTypeLabel,
+  sourceTypeLabel,
+  statusLabel,
+} from "@/lib/labels";
+import type { CompareResponse, CompareRow, RobotDetail } from "@/lib/types";
 import {
   bestInRow,
   computePriceLeader,
@@ -40,7 +55,7 @@ import {
 } from "@/lib/saved-views";
 import { ConfidenceIndicator } from "@/components/ConfidenceIndicator";
 import { GraphicMarker } from "@/components/GraphicMarker";
-import { deriveModelCode } from "@/components/RobotCard";
+import { deriveModelCode } from "@/lib/model-code";
 import { PriceStateLong } from "@/components/PricingState";
 
 // Best-in-row framing — FROZEN copy. Mirrors the comment in comparison-policy.ts.
@@ -401,7 +416,7 @@ function CompareMatrix({
               const d = priceDelta(refOffer, headlines.get(r.slug) ?? null, r.slug === refSlug);
               return (
                 <td className={`cell${win ? " best" : ""}`} key={r.slug}>
-                  <PriceStateLong price={headlinePriceDisplay(r.pricing_offers)} variant="long" />
+                  <ComparePriceCell robot={r} />
                   {refSlug && <PriceDeltaTag d={d} />}
                 </td>
               );
@@ -414,6 +429,8 @@ function CompareMatrix({
                 <span className="ho-syslabel">
                   <GraphicMarker signal /> LOWEST COMPARABLE PRICE — like-for-like offers only
                   (same transaction type, currency &amp; billing basis)
+                  {Array.from(headlines.values()).some((h) => h?.variant) &&
+                    "; each price is for the configuration shown in its column"}
                 </span>
               </td>
             </tr>
@@ -428,8 +445,8 @@ function CompareMatrix({
                 {robots.map((r) => {
                   const status = availabilityFor(r, mode);
                   return status ? (
-                    <td className="cell" key={r.slug}>
-                      {status}
+                    <td className="cell" key={r.slug} data-enum={status}>
+                      {availabilityLabel(status)}
                     </td>
                   ) : (
                     <td className="cell na" key={r.slug}>
@@ -475,7 +492,9 @@ function CompareMatrix({
               return (
                 <td className="cell" key={r.slug}>
                   {conf ? (
-                    <span className={conf === "VERIFIED" ? "v" : ""}>{conf}</span>
+                    <span className={conf === "VERIFIED" ? "v" : ""} data-enum={conf}>
+                      {confidenceLabel(conf)}
+                    </span>
                   ) : (
                     <span className="hatch">UNKNOWN</span>
                   )}
@@ -541,6 +560,7 @@ function ApiRow({
         }
         const isBest = winners != null && winners.has(slug);
         let body: React.ReactNode;
+        let rawEnum: string | null = null;
         let canonical: string | null = null;
         if (typeof v === "boolean") {
           body = v ? "YES" : "NO";
@@ -549,12 +569,16 @@ function ApiRow({
           body = dv.primary;
           canonical = dv.canonical;
         } else {
-          body = v; // enum / free text — verbatim
+          // Enum rows get their buyer-facing label (raw enum kept in data-enum);
+          // anything else is free text and stays verbatim.
+          const label = ENUM_ROW_LABEL[row.key];
+          if (label) rawEnum = String(v);
+          body = label ? label(v) : v;
         }
         const delta =
           refSlug && numeric ? metricDelta(row.key, refVal, v, slug === refSlug) : null;
         return (
-          <td className={`cell${isBest ? " best" : ""}`} key={slug}>
+          <td className={`cell${isBest ? " best" : ""}`} key={slug} {...(rawEnum ? { "data-enum": rawEnum } : {})}>
             {body}
             {canonical && <span className="cmp-canon">{canonical}</span>}
             {delta && <DeltaTag d={delta} />}
@@ -603,17 +627,19 @@ function EvidenceCompare({ robots, refSlug }: { robots: RobotDetail[]; refSlug: 
   return (
     <div className="cmp-evidence">
       <p className="note cmp-ev-intro">
-        {'// FACT-LEVEL PROVENANCE, SIDE BY SIDE. Value · source · confidence · dates · link — straight from the catalogue. No synthetic evidence score. UNKNOWN facts read "NO CONFIRMED FACT".'}
+        Fact-level provenance, side by side: value, source, confidence, dates and link, straight from the catalogue. No synthetic evidence score. Facts we cannot confirm read &quot;NO CONFIRMED FACT&quot;.
       </p>
 
       <EvidenceBlock title="Pricing — headline offer">
         {robots.map((r) => {
           const o = headlineOffer(r.pricing_offers);
-          const headline = r.pricing_offers.find(Boolean);
+          // The evidence belongs to the SAME offer row the price cell displays.
+          const headline = selectHeadline(r.pricing_offers)?.offer;
+          const cfg = o?.variant ? ` · ${o.variant} configuration` : "";
           const value = o
             ? o.amount != null
-              ? `${o.currency ?? ""} ${o.amount.toLocaleString("en-US")} · ${o.price_type} · ${modeLabel(o.transaction_type)}`
-              : `${o.price_type} · ${modeLabel(o.transaction_type)}`
+              ? `${o.currency ?? ""} ${o.amount.toLocaleString("en-US")} · ${priceTypeLabel(o.price_type)} · ${modeLabel(o.transaction_type)}${cfg}`
+              : `${priceTypeLabel(o.price_type)} · ${modeLabel(o.transaction_type)}${cfg}`
             : null;
           return (
             <FactRow
@@ -632,7 +658,7 @@ function EvidenceCompare({ robots, refSlug }: { robots: RobotDetail[]; refSlug: 
           const a = r.availability_offers.find(
             (x) => x.availability_status !== "NOT_AVAILABLE" && x.availability_status !== "DISCONTINUED",
           ) ?? r.availability_offers[0];
-          const value = a ? `${a.availability_status} · ${modeLabel(a.transaction_type)}` : null;
+          const value = a ? `${availabilityLabel(a.availability_status)} · ${modeLabel(a.transaction_type)}` : null;
           return (
             <FactRow key={r.slug} robot={r} isRef={r.slug === refSlug} value={value} evidence={a?.evidence} />
           );
@@ -711,7 +737,9 @@ function EvidenceDates({ evidence }: { evidence?: import("@/lib/types").Evidence
   const verified = formatObservedDate(evidence.verified_at);
   return (
     <div className="src cmp-ev-dates">
-      <div>SOURCE: {evidence.source_type}</div>
+      <div>
+        SOURCE: <span data-enum={evidence.source_type}>{sourceTypeLabel(evidence.source_type)}</span>
+      </div>
       {published && (
         <div>
           <span className="cmp-dlabel">PUBLISHED</span> {published}
@@ -753,48 +781,51 @@ function Legend() {
         </span>
         <span>
           <span className="ho-badge ho-badge--caution" style={{ padding: "1px 6px" }}>
-            QUOTE
+            Quote
           </span>{" "}
           = price on request ≠ unknown
         </span>
       </div>
       <p className="note cmp-framing">
-        {"// "}
         {BEST_IN_ROW_FRAMING} Reference deltas are factual differences in
-        canonical units, not verdicts. Matching / fit scoring is out of scope
-        (WS6).
+        canonical units, not verdicts. Fit scoring is not part of this view.
       </p>
     </>
   );
 }
 
 // ── shared helpers (kept identical in spirit to the WS3 base) ─────────────────
-const PRICE_TYPE_RANK: Record<string, number> = {
-  PUBLIC: 0,
-  FROM: 1,
-  MANUFACTURER_ESTIMATE: 2,
-  ESTIMATED: 3,
-  RANGE: 4,
-  QUOTE_ONLY: 5,
+// Labels for the enum-valued API rows (visible text only; data-enum keeps the raw value).
+const ENUM_ROW_LABEL: Partial<Record<string, (v: string) => string>> = {
+  commercial_status: statusLabel,
+  mobility: mobilityLabel,
+  autonomy: autonomyLabel,
 };
 
-function headlinePriceDisplay(offers: PricingOffer[]) {
-  if (offers.length === 0) return null;
-  const sorted = [...offers].sort((a, b) => {
-    const at = a.transaction_type === "PURCHASE" ? 0 : 1;
-    const bt = b.transaction_type === "PURCHASE" ? 0 : 1;
-    if (at !== bt) return at - bt;
-    return (PRICE_TYPE_RANK[a.price_type] ?? 9) - (PRICE_TYPE_RANK[b.price_type] ?? 9);
-  });
-  const p = sorted[0];
-  return {
-    type: p.price_type,
-    amount: p.price,
-    amount_min: p.price_min,
-    amount_max: p.price_max,
-    currency: p.currency,
-    billing_period: p.billing_period,
-  };
+/**
+ * The compare price cell. Everything shown - amount, configuration, "From ... /
+ * N configurations priced", basis, order note - is read from the SAME offer row,
+ * so a configuration-scoped amount never appears without its configuration. The
+ * one-line commercial summary is the same helper the catalogue card uses.
+ */
+export function ComparePriceCell({ robot }: { robot: RobotDetail }) {
+  const h = selectHeadline(robot.pricing_offers);
+  const price = priceDisplayFromHeadline(h);
+  const summary = commercialSummary(price, accessibleModes(robot.availability_offers));
+  return (
+    <>
+      <PriceStateLong
+        price={price}
+        variant="long"
+        detailed
+        fromLowest={(h?.configurationsPriced ?? 0) > 1}
+        configurationsPriced={h?.configurationsPriced ?? 0}
+      />
+      <span className={summary.unknown ? "ho-syslabel d-blk csum--unk" : "ho-syslabel d-blk"}>
+        {summary.line}
+      </span>
+    </>
+  );
 }
 
 function availabilityFor(robot: RobotDetail, mode: string): string | null {

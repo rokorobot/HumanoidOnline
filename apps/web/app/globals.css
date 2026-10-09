@@ -219,7 +219,12 @@ section.block { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid
    rather than forcing it wider than the viewport. */
 .rcard .ho-state { white-space: normal; }
 .csum { font-size: var(--ho-fs-small); color: var(--ho-text-muted); line-height: 1.35; }
-.csum[data-summary="none"], .csum[data-summary="modes_only"] { color: var(--ho-unknown); }
+.csum--unk { color: var(--ho-unknown); }
+.d-blk { display: block; }
+.caution, .price .ctx.caution, .ho-syslabel.caution { color: var(--ho-caution); }
+.faint, .stamp.faint { color: var(--ho-text-faint); }
+.tt-none, .val.tt-none { text-transform: none; }
+.unk-c, .ho-syslabel.unk-c { color: var(--ho-unknown); }
 .price-terms { margin-top: 6px; font-size: var(--ho-fs-mono-s); }
 .price-terms summary { cursor: pointer; text-transform: uppercase;
   letter-spacing: var(--ho-tracking-label); color: var(--ho-text-muted);

@@ -320,23 +320,41 @@ test("@responsive UX-01 homepage menu opens and navigates at phone width", async
 // UX-01 / P0-D - the compare selection survives the header hop (desktop width;
 // the URL is the only store).
 // ---------------------------------------------------------------------------
-test("@compare-persistence header Compare / Robots carry the selection", async ({ page, browser }) => {
-  await page.setViewportSize({ width: 1280, height: 900 });
+test("@responsive @compare-persistence header Compare / Robots carry the selection", async ({
+  page,
+  browser,
+}) => {
+  // Runs on BOTH projects: inline Primary nav at desktop width, Menu -> link on phones.
+  const narrow = (page.viewportSize()?.width ?? 1280) <= 720;
+  async function header(name: "Compare" | "Robots") {
+    if (narrow) {
+      await page.getByRole("button", { name: "Menu" }).click();
+      await page
+        .getByRole("navigation", { name: "Menu" })
+        .getByRole("link", { name, exact: true })
+        .click();
+    } else {
+      await page
+        .getByRole("navigation", { name: "Primary" })
+        .getByRole("link", { name, exact: true })
+        .click();
+    }
+  }
   await page.goto("/robots?compare=unitree-g1,agility-digit", { waitUntil: "networkidle" });
-  const primary = page.getByRole("navigation", { name: "Primary" });
-  // HTML stays a plain /compare href (crawl containment).
-  await expect(primary.getByRole("link", { name: "Compare", exact: true })).toHaveAttribute(
-    "href",
-    "/compare",
-  );
-  await primary.getByRole("link", { name: "Compare", exact: true }).click();
+  if (!narrow) {
+    // HTML stays a plain /compare href (crawl containment).
+    await expect(
+      page.getByRole("navigation", { name: "Primary" }).getByRole("link", { name: "Compare", exact: true }),
+    ).toHaveAttribute("href", "/compare");
+  }
+  await header("Compare");
   await expect(page).toHaveURL(/\/compare\?ids=unitree-g1,agility-digit$/);
-  // Both selected robots are in the comparison (by id, in the header cells).
+  // Both selected robots are in the comparison.
   await expect(page.locator("#main-content")).toContainText("G1");
   await expect(page.locator("#main-content")).toContainText("Digit");
 
   // Back to the catalogue: the selection is still there.
-  await primary.getByRole("link", { name: "Robots", exact: true }).click();
+  await header("Robots");
   await expect(page).toHaveURL(/\/robots\?compare=unitree-g1,agility-digit$/);
   await expect(page.getByText(/Compare selection: 2 \/ 4/)).toBeVisible();
   // The tray names robots, not slugs.
@@ -347,7 +365,7 @@ test("@compare-persistence header Compare / Robots carry the selection", async (
   const neo = page.locator("article.rcard", { hasText: "NEO" }).first();
   await neo.locator("button.cmp").click();
   await expect(page).toHaveURL(/compare=[^&]*1x-neo/);
-  await primary.getByRole("link", { name: "Compare", exact: true }).click();
+  await header("Compare");
   await expect(page).toHaveURL(/\/compare\?ids=[^&]*1x-neo/);
   await expect(page.locator("#main-content")).toContainText("NEO");
 

@@ -23,7 +23,7 @@ function Pair({
   return (
     <div className={`ho-pair${toneClass}`}>
       <span className="k">{kicker}</span>
-      <span className="s" data-enum={rawEnum}>
+      <span className="s" {...(rawEnum ? { "data-enum": rawEnum } : {})}>
         {value}
         {mono && <span className="mono">· {mono}</span>}
       </span>

@@ -6,6 +6,8 @@
 import { maturityIndex } from "@/lib/format";
 import { statusLabel } from "@/lib/labels";
 
+const STRUCK = { textDecoration: "line-through", color: "var(--ho-text-faint)" };
+
 export function StatusBadge({ status }: { status: string }) {
   const idx = maturityIndex(status);
   const discontinued = status === "DISCONTINUED";
@@ -19,11 +21,7 @@ export function StatusBadge({ status }: { status: string }) {
     <span
       className={`ho-badge ${variant} ho-state`}
       data-enum={status}
-      style={
-        discontinued
-          ? { textDecoration: "line-through", color: "var(--ho-text-faint)" }
-          : undefined
-      }
+      {...(discontinued ? { style: STRUCK } : {})}
     >
       {statusLabel(status)}
     </span>
@@ -37,11 +35,7 @@ export function StatusBracket({ status }: { status: string }) {
     <span
       className="ho-bracket ho-state"
       data-enum={status}
-      style={
-        discontinued
-          ? { textDecoration: "line-through", color: "var(--ho-text-faint)" }
-          : undefined
-      }
+      {...(discontinued ? { style: STRUCK } : {})}
     >
       {statusLabel(status)}
     </span>

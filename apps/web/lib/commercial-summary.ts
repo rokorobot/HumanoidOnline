@@ -22,6 +22,8 @@ export type CommercialSummaryKind =
 
 export interface CommercialSummary {
   kind: CommercialSummaryKind;
+  /** True when the summary states an absence (render in the unknown tone). */
+  unknown: boolean;
   line: string;
   /** Human labels of the accessible modes ([] when unknown). */
   modes: string[];
@@ -45,22 +47,22 @@ export function commercialSummary(
   const joined = modes.join(", ");
 
   if (priced && !hasModes) {
-    return { kind: "price_only", line: "Price published; ordering not confirmed", modes };
+    return { kind: "price_only", unknown: false, line: "Price published; ordering not confirmed", modes };
   }
   if (priced && hasModes) {
-    return { kind: "modes_and_price", line: `Offered via ${joined}`, modes };
+    return { kind: "modes_and_price", unknown: false, line: `Offered via ${joined}`, modes };
   }
   // Price on request is a known commercial model, not an absence of price.
   if (quote && hasModes) {
-    return { kind: "quote_with_modes", line: `Offered via ${joined}; price on request`, modes };
+    return { kind: "quote_with_modes", unknown: false, line: `Offered via ${joined}; price on request`, modes };
   }
   if (quote) {
-    return { kind: "quote_only", line: "Price on request; ordering not confirmed", modes };
+    return { kind: "quote_only", unknown: false, line: "Price on request; ordering not confirmed", modes };
   }
   if (hasModes) {
-    return { kind: "modes_only", line: `Offered via ${joined}; no published price`, modes };
+    return { kind: "modes_only", unknown: true, line: `Offered via ${joined}; no published price`, modes };
   }
-  return { kind: "none", line: "No confirmed availability or price", modes };
+  return { kind: "none", unknown: true, line: "No confirmed availability or price", modes };
 }
 
 /**

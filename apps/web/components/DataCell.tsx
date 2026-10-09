@@ -24,10 +24,10 @@ export function SpecRow({
   return (
     <div className="srow">
       <span className="k">{label}</span>
-      <span style={{ display: "block" }} data-enum={rawEnum ?? undefined}>
+      <span className="d-blk" {...(rawEnum ? { "data-enum": rawEnum } : {})}>
         <SpecValue value={value} unit={unit} notApplicable={notApplicable} />
         {note && (
-          <span className="ho-syslabel" style={{ display: "block" }}>
+          <span className="ho-syslabel d-blk">
             {note}
           </span>
         )}

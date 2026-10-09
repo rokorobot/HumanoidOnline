@@ -9,22 +9,18 @@ import { useEffect, useId, useRef, useState } from "react";
 
 import { GraphicMarker } from "./GraphicMarker";
 import { NavLink } from "./NavLink";
-
-export interface MenuLink {
-  key: string;
-  href: string;
-  label: string;
-  current?: boolean;
-  cta?: boolean;
-}
+import { menuLinksFor, type NavSection } from "./nav-model";
 
 export function MobileMenu({
-  links,
+  active = null,
+  research = false,
   register,
 }: {
-  links: MenuLink[];
+  active?: NavSection;
+  research?: boolean;
   register: "light" | "dark";
 }) {
+  const links = menuLinksFor(active, research);
   const [open, setOpen] = useState(false);
   const panelId = useId();
   const buttonRef = useRef<HTMLButtonElement>(null);

@@ -19,7 +19,10 @@ export function Metric({
   return (
     <div className="metric">
       <SystemLabel className="k">{label}</SystemLabel>
-      <span className={resolved.unknown ? "v unk" : "v"} data-enum={resolved.unknown ? undefined : (rawEnum ?? undefined)}>{resolved.label}</span>
+      <span
+      className={resolved.unknown ? "v unk" : "v"}
+      {...(rawEnum && !resolved.unknown ? { "data-enum": rawEnum } : {})}
+    >{resolved.label}</span>
     </div>
   );
 }

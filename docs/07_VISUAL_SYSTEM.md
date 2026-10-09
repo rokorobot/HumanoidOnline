@@ -32,7 +32,7 @@ Corollaries, binding:
 4. **Enum labels are rendered verbatim** from `docs/03_DATA_DICTIONARY.md`. The visual
    system styles them; it never renames, merges, or invents them.
 
-   > **Amendment (UX-01, 2026-10-09 - pending owner ratification via the UX-01 PR):**
+   > **Amendment (UX-01, 2026-10-09 - ratified by owner 2026-10-09 (PR #156)):**
    > for *buyer-facing human UI* the enum is shown as a mapped label (`lib/labels.ts`,
    > e.g. `RAAS_DEPLOYMENT` -> "Robot-as-a-service", `QUOTE_ONLY` -> "Price on request")
    > and the raw enum is kept on the element as `data-enum="RAW"`. Mappings are total

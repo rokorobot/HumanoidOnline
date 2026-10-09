@@ -117,10 +117,10 @@ describe("PriceStateCard - compact disclosure of long price terms", () => {
         }}
       />,
     );
-    expect(container.querySelector("[data-basis-tag]")?.textContent).toBe("Incl. VAT");
+    expect(container.querySelector("details.price-terms summary")?.textContent).toBe("Incl. VAT · Price terms");
     const details = container.querySelector("details.price-terms");
     expect(details).toBeTruthy();
-    expect(details?.querySelector("summary")?.textContent).toBe("Price terms");
+    expect(details?.querySelector("summary")?.textContent).toContain("Price terms");
     expect(details?.querySelector("p")?.textContent).toBe(
       basis.replace("including 19% German VAT", "with VAT included"),
     );
@@ -137,7 +137,7 @@ describe("PriceStateCard - compact disclosure of long price terms", () => {
         price={{ type: "PUBLIC", amount: 1, currency: "USD", price_basis: "VAT included; net of VAT for exports" }}
       />,
     );
-    expect(container.querySelector("[data-basis-tag]")).toBeNull();
+    expect(container.querySelector("details summary")?.textContent).toBe("Price terms");
     expect(container.querySelector("details p")?.textContent).toContain("net of VAT");
   });
   it("no basis -> no disclosure", () => {

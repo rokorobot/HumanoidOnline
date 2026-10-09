@@ -36,7 +36,10 @@ export function PriceStateCard({
   const tag = shortBasisTag(price?.price_basis);
   return (
     <div className={`price ${toneClass}`.trim()}>
-      <span className={`amt ${hatch} ho-state`.trim()} data-enum={price?.type}>
+      <span
+        className={`amt ${hatch} ho-state`.trim()}
+        {...(price ? { "data-enum": price.type } : {})}
+      >
         {s.label}
       </span>
       {s.context && <span className="ctx">{s.context}</span>}
@@ -44,26 +47,22 @@ export function PriceStateCard({
       {/* Only present when the headline came from a variant-scoped offer. Shown
           so the amount is never read as the price of every configuration. */}
       {price?.variant && <span className="ctx">Configuration: {price.variant}</span>}
-      {tag && (
-        <span className="ctx" data-basis-tag>
-          {tag}
-        </span>
-      )}
       {price?.order_status_note && (
-        <span className="ctx" style={{ color: "var(--ho-caution)" }}>
+        <span className="ctx caution">
           {price.order_status_note}
         </span>
       )}
-      {price?.price_basis && <PriceTerms basis={price.price_basis} />}
+      {price?.price_basis && <PriceTerms basis={price.price_basis} tag={tag} />}
     </div>
   );
 }
 
 /** The full, unmodified price_basis text behind a native, keyboard-accessible disclosure. */
-export function PriceTerms({ basis }: { basis: string }) {
+export function PriceTerms({ basis, tag }: { basis: string; tag?: string | null }) {
+  // The short VAT/tax tag (when unambiguous) rides in the summary line.
   return (
     <details className="price-terms">
-      <summary>Price terms</summary>
+      <summary>{tag ? `${tag} · Price terms` : "Price terms"}</summary>
       <p>{basis}</p>
     </details>
   );
@@ -92,46 +91,34 @@ export function PriceStateLong({
   const toneClass = TONE_CLASS[s.tone] ?? "";
   const tag = detailed ? shortBasisTag(price?.price_basis) : null;
   return (
-    <span className={`val ${toneClass}`.trim()} data-enum={price?.type}>
+    <span className={`val ${toneClass}`.trim()} {...(price ? { "data-enum": price.type } : {})}>
       {fromLowest && price && price.type !== "FROM" ? "From " : ""}
       {s.label}
       {s.context && (
         <span
-          className="ho-syslabel"
-          style={{
-            display: "block",
-            color:
-              s.tone === "quote" || s.tone === "estimated"
-                ? "var(--ho-caution)"
-                : s.tone === "unknown"
-                  ? "var(--ho-unknown)"
-                  : undefined,
-          }}
+          className={`ho-syslabel d-blk${
+            s.tone === "quote" || s.tone === "estimated" ? " caution" : s.tone === "unknown" ? " unk-c" : ""
+          }`}
         >
           {s.context}
         </span>
       )}
       {detailed && price?.variant && (
-        <span className="ho-syslabel" style={{ display: "block" }} data-config>
+        <span className="ho-syslabel d-blk">
           {price.variant} configuration
         </span>
       )}
       {detailed && configurationsPriced > 1 && (
-        <span className="ho-syslabel" style={{ display: "block" }} data-config-count>
+        <span className="ho-syslabel d-blk">
           {configurationsPriced} configurations priced
         </span>
       )}
-      {tag && (
-        <span className="ho-syslabel" style={{ display: "block" }} data-basis-tag>
-          {tag}
-        </span>
-      )}
       {detailed && price?.order_status_note && (
-        <span className="ho-syslabel" style={{ display: "block", color: "var(--ho-caution)" }}>
+        <span className="ho-syslabel d-blk caution">
           {price.order_status_note}
         </span>
       )}
-      {detailed && price?.price_basis && <PriceTerms basis={price.price_basis} />}
+      {detailed && price?.price_basis && <PriceTerms basis={price.price_basis} tag={tag} />}
     </span>
   );
 }

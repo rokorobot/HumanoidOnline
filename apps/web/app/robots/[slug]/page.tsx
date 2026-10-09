@@ -233,7 +233,7 @@ export default async function RobotDetailPage({
             </div>
             <div className="seg">{robot.summary ? "HUMANOID PLATFORM" : "HUMANOID"}</div>
             <div className="seg">
-              STATUS — <b data-enum={robot.commercial_status}>{statusLabel(robot.commercial_status)}</b>
+              STATUS — <b>{statusLabel(robot.commercial_status)}</b>
             </div>
             <div className="seg">
               {robot.manufacturer.name}
@@ -309,7 +309,7 @@ export default async function RobotDetailPage({
             <div className="dims-strip">
               <CommercialTriadInline robot={robot} conf={conf} />
               {/* Same one-line summary as the catalogue card and compare matrix. */}
-              <p className="csum csum--hero" data-summary={heroSummary.kind}>
+              <p className="csum csum--hero">
                 {heroSummary.line}
               </p>
             </div>
@@ -418,7 +418,7 @@ export default async function RobotDetailPage({
                     as="div"
                     className=""
                   >
-                    <span style={{ color: "var(--ho-text-faint)" }}>
+                    <span className="faint">
                       Announced ▸ Robot-as-a-service ▸ Discontinued
                     </span>
                   </SystemLabel>
@@ -465,9 +465,7 @@ export default async function RobotDetailPage({
                   <span className="s">
                     {robot.deployments.length}
                     {conf && (
-                      <span className="mono" data-enum={conf}>
-                        · {confidenceLabel(conf)}
-                      </span>
+                      <span className="mono">· {confidenceLabel(conf)}</span>
                     )}
                   </span>
                 </div>
@@ -509,19 +507,19 @@ export default async function RobotDetailPage({
               ))
             ) : (
               <div className="prow">
-                <div className="val unknown" style={{ textTransform: "none" }}>
+                <div className="val unknown tt-none">
                   —
                 </div>
-                <div className="val unknown" style={{ textTransform: "none" }}>
+                <div className="val unknown tt-none">
                   —
                 </div>
-                <div className="val unknown" style={{ textTransform: "none" }}>
+                <div className="val unknown tt-none">
                   —
                 </div>
                 <div>
                   <PriceStateLong price={null} />
                 </div>
-                <div className="stamp" style={{ color: "var(--ho-text-faint)" }}>
+                <div className="stamp faint">
                   — absence claims nothing —
                 </div>
               </div>
@@ -700,15 +698,15 @@ function PricingRow({ offer }: { offer: PricingOffer }) {
         {/* A variant-scoped price names its configuration, so Standard and Pro are never
             read as two prices for one thing. */}
         {offer.variant && (
-          <span className="ho-syslabel" style={{ display: "block" }}>
+          <span className="ho-syslabel d-blk">
             {offer.variant} configuration
           </span>
         )}
       </div>
-      <div className={offer.region ? "" : "val unknown"} style={{ textTransform: "none" }}>
+      <div className={offer.region ? "tt-none" : "val unknown tt-none"}>
         {offer.region ?? "—"}
       </div>
-      <div className={offer.provider ? "" : "val unknown"} style={{ textTransform: "none" }}>
+      <div className={offer.provider ? "tt-none" : "val unknown tt-none"}>
         {offer.provider ?? "—"}
       </div>
       <div>
@@ -717,34 +715,34 @@ function PricingRow({ offer }: { offer: PricingOffer }) {
             are rendered with it, so one seller's number is never read under
             another seller's terms. */}
         {offer.price_basis && (
-          <span className="ho-syslabel" style={{ display: "block" }}>
+          <span className="ho-syslabel d-blk">
             {offer.price_basis}
           </span>
         )}
         {offer.shipping_terms && (
-          <span className="ho-syslabel" style={{ display: "block" }}>
+          <span className="ho-syslabel d-blk">
             {offer.shipping_terms}
           </span>
         )}
         {offer.package_contents && (
-          <span className="ho-syslabel" style={{ display: "block" }}>
+          <span className="ho-syslabel d-blk">
             Includes: {offer.package_contents}
           </span>
         )}
         {offer.warranty_terms && (
-          <span className="ho-syslabel" style={{ display: "block" }}>
+          <span className="ho-syslabel d-blk">
             Warranty (this seller): {offer.warranty_terms}
           </span>
         )}
         {offer.order_status_note && (
-          <span className="ho-syslabel" style={{ display: "block" }}>
+          <span className="ho-syslabel d-blk">
             {offer.order_status_note}
           </span>
         )}
         {/* Only an explicit FALSE is a warning. null means the edition match was
             never assessed, and silence is the honest rendering of that. */}
         {offer.edition_confirmed === false && (
-          <span className="ho-syslabel" style={{ display: "block" }}>
+          <span className="ho-syslabel d-blk">
             ⚠ {offer.edition_note ?? "This listing is not confirmed to be this edition."}
           </span>
         )}
@@ -765,7 +763,7 @@ function PricingRow({ offer }: { offer: PricingOffer }) {
             </span>
           </>
         ) : (
-          <span style={{ color: "var(--ho-text-faint)" }}>— no evidence —</span>
+          <span className="faint">— no evidence —</span>
         )}
       </div>
     </div>
@@ -804,10 +802,10 @@ function ResolvedRow({
   return (
     <div className="srow">
       <span className="k">{label}</span>
-      <span style={{ display: "block" }}>
+      <span className="d-blk">
         <ResolvedFactCell fact={fact} />
         {note && (
-          <span className="ho-syslabel" style={{ display: "block" }}>
+          <span className="ho-syslabel d-blk">
             {note}
           </span>
         )}
@@ -838,15 +836,15 @@ function ExtendedSpecRow({ spec }: { spec: ExtendedSpec }) {
       <span className="k">
         {spec.label}
         {spec.variant && (
-          <span className="ho-syslabel" style={{ display: "block" }}>
+          <span className="ho-syslabel d-blk">
             {spec.variant} configuration
           </span>
         )}
       </span>
-      <span style={{ display: "block" }}>
+      <span className="d-blk">
         <SpecValue value={spec.value} unit={spec.unit} />
         {attribution && (
-          <span className="ho-syslabel" style={{ display: "block" }}>
+          <span className="ho-syslabel d-blk">
             {spec.source_url ? (
               <a href={spec.source_url} target="_blank" rel="noopener noreferrer">
                 {attribution} ↗

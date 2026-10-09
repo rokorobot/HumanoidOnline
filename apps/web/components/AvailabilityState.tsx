@@ -55,7 +55,7 @@ export function AvailabilityMatrix({
           <span>
             {modeLabel(o.transaction_type)}
             {o.variant && (
-              <span className="ho-syslabel" style={{ display: "block" }}>
+              <span className="ho-syslabel d-blk">
                 {o.variant} configuration
               </span>
             )}
@@ -67,12 +67,12 @@ export function AvailabilityMatrix({
                 geography their estimate was given for are shown beneath it, so a
                 domestic estimate is never read as wider coverage. */}
             {o.seller_wording && (
-              <span className="ho-syslabel" style={{ display: "block" }}>
+              <span className="ho-syslabel d-blk">
                 “{o.seller_wording}”
               </span>
             )}
             {o.delivery_estimate_label && (
-              <span className="ho-syslabel" style={{ display: "block" }}>
+              <span className="ho-syslabel d-blk">
                 {o.delivery_estimate_label}
               </span>
             )}

@@ -93,12 +93,8 @@ describe("server HTML stays crawl-safe", () => {
 });
 
 describe("MobileMenu", () => {
-  const links = [
-    { key: "robots", href: "/robots", label: "Robots" },
-    { key: "compare", href: "/compare", label: "Compare" },
-  ];
   it("is a labelled disclosure button; opens a nav; Escape closes and refocuses", () => {
-    render(<MobileMenu links={links} register="light" />);
+    render(<MobileMenu register="light" />);
     const btn = screen.getByRole("button", { name: "Menu" });
     expect(btn.getAttribute("aria-expanded")).toBe("false");
     expect(screen.queryByRole("navigation", { name: "Menu" })).toBeNull();
@@ -106,14 +102,14 @@ describe("MobileMenu", () => {
     expect(btn.getAttribute("aria-expanded")).toBe("true");
     const nav = screen.getByRole("navigation", { name: "Menu" });
     expect(nav.id).toBe(btn.getAttribute("aria-controls"));
-    expect(nav.querySelectorAll("a").length).toBe(2);
+    expect(nav.querySelectorAll("a").length).toBe(6); // 5 primary links + Find a Humanoid
     fireEvent.keyDown(document, { key: "Escape" });
     expect(btn.getAttribute("aria-expanded")).toBe("false");
     expect(document.activeElement).toBe(btn);
   });
   it("its Compare link also carries the selection and closes the menu", () => {
     at("/robots?compare=a,b");
-    render(<MobileMenu links={links} register="dark" />);
+    render(<MobileMenu register="dark" />);
     const btn = screen.getByRole("button", { name: "Menu" });
     fireEvent.click(btn);
     fireEvent.click(screen.getByRole("link", { name: "Compare" }));

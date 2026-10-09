@@ -6,30 +6,15 @@
 import Link from "next/link";
 
 import { GraphicMarker } from "./GraphicMarker";
-import { MobileMenu, type MenuLink } from "./MobileMenu";
+import { researchNavVisible } from "@/lib/research";
+
+import { MobileMenu } from "./MobileMenu";
 import { NavLink } from "./NavLink";
 
 import { primaryLinks, type NavSection } from "./nav-links";
+import { menuLinksFor } from "./nav-model";
 
 export type { NavSection };
-
-function menuLinks(active: NavSection): MenuLink[] {
-  return [
-    ...primaryLinks().map((l) => ({
-      key: l.key,
-      href: l.href,
-      label: l.label,
-      current: active === l.key,
-    })),
-    {
-      key: "find",
-      href: "/find-a-humanoid",
-      label: "Find a Humanoid",
-      current: active === "find",
-      cta: true,
-    },
-  ];
-}
 
 export function SiteNav({ active = null }: { active?: NavSection }) {
   return (
@@ -53,7 +38,7 @@ export function SiteNav({ active = null }: { active?: NavSection }) {
           <GraphicMarker /> Find a Humanoid
         </Link>
       </nav>
-      <MobileMenu links={menuLinks(active)} register="light" />
+      <MobileMenu active={active} research={researchNavVisible()} register="light" />
     </header>
   );
 }
@@ -63,13 +48,13 @@ export function DarkNav({ active = null }: { active?: NavSection }) {
   return (
     <>
       <nav className="darknav" aria-label="Primary">
-        {menuLinks(active).map((l) => (
+        {menuLinksFor(active, researchNavVisible()).map((l) => (
           <NavLink key={l.key} href={l.href} current={l.current}>
             {l.label}
           </NavLink>
         ))}
       </nav>
-      <MobileMenu links={menuLinks(active)} register="dark" />
+      <MobileMenu active={active} research={researchNavVisible()} register="dark" />
     </>
   );
 }

@@ -68,7 +68,7 @@ export function RobotCard({
         </div>
         <StatusBracket status={robot.commercial_status} />
         {/* One buyer-facing line, shared with compare and the detail hero. */}
-        <p className="csum" data-summary={summary.kind}>
+        <p className={summary.unknown ? "csum csum--unk" : "csum"}>
           {summary.line}
         </p>
         <div className="metrics">

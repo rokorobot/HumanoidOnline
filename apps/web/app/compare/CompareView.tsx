@@ -560,6 +560,7 @@ function ApiRow({
         }
         const isBest = winners != null && winners.has(slug);
         let body: React.ReactNode;
+        let rawEnum: string | null = null;
         let canonical: string | null = null;
         if (typeof v === "boolean") {
           body = v ? "YES" : "NO";
@@ -571,12 +572,13 @@ function ApiRow({
           // Enum rows get their buyer-facing label (raw enum kept in data-enum);
           // anything else is free text and stays verbatim.
           const label = ENUM_ROW_LABEL[row.key];
-          body = label ? <span data-enum={v}>{label(v)}</span> : v;
+          if (label) rawEnum = String(v);
+          body = label ? label(v) : v;
         }
         const delta =
           refSlug && numeric ? metricDelta(row.key, refVal, v, slug === refSlug) : null;
         return (
-          <td className={`cell${isBest ? " best" : ""}`} key={slug}>
+          <td className={`cell${isBest ? " best" : ""}`} key={slug} {...(rawEnum ? { "data-enum": rawEnum } : {})}>
             {body}
             {canonical && <span className="cmp-canon">{canonical}</span>}
             {delta && <DeltaTag d={delta} />}
@@ -781,7 +783,7 @@ function Legend() {
           <span className="ho-badge ho-badge--caution" style={{ padding: "1px 6px" }}>
             Quote
           </span>{" "}
-          = price on request, which is not the same as unknown
+          = price on request ≠ unknown
         </span>
       </div>
       <p className="note cmp-framing">
@@ -794,7 +796,7 @@ function Legend() {
 
 // ── shared helpers (kept identical in spirit to the WS3 base) ─────────────────
 // Labels for the enum-valued API rows (visible text only; data-enum keeps the raw value).
-const ENUM_ROW_LABEL: Record<string, (v: string) => string> = {
+const ENUM_ROW_LABEL: Partial<Record<string, (v: string) => string>> = {
   commercial_status: statusLabel,
   mobility: mobilityLabel,
   autonomy: autonomyLabel,
@@ -819,7 +821,7 @@ export function ComparePriceCell({ robot }: { robot: RobotDetail }) {
         fromLowest={(h?.configurationsPriced ?? 0) > 1}
         configurationsPriced={h?.configurationsPriced ?? 0}
       />
-      <span className="ho-syslabel csum-line" style={{ display: "block" }} data-summary={summary.kind}>
+      <span className={summary.unknown ? "ho-syslabel d-blk csum--unk" : "ho-syslabel d-blk"}>
         {summary.line}
       </span>
     </>

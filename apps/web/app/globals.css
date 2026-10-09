@@ -33,6 +33,7 @@
   display: flex; align-items: center; justify-content: space-between;
   gap: var(--ho-sp-5); padding: var(--ho-sp-4) 0;
   border-bottom: var(--ho-rule-med) solid var(--ho-ink); flex-wrap: wrap;
+  position: relative;
 }
 .site-head .logo b { font-family: var(--ho-font-display-grotesk); font-weight: 800;
   font-stretch: 75%; font-size: 1.15rem; letter-spacing: -0.02em; }
@@ -55,6 +56,39 @@
   color: var(--ho-text-muted); }
 .darknav a[aria-current="page"] { color: var(--ho-signal); }
 .darknav a:hover { color: var(--ho-signal); }
+
+/* ---- MOBILE MENU (both header registers) --------------------------------- */
+.mmenu { display: none; }
+.mmenu-btn { display: inline-flex; align-items: center; gap: 10px; min-height: 44px;
+  min-width: 44px; padding: 0 12px; cursor: pointer; background: transparent;
+  color: inherit; border: var(--ho-rule-hair) solid currentColor;
+  font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-label); text-transform: uppercase; }
+.mmenu-icon { display: inline-flex; flex-direction: column; gap: 3px; }
+.mmenu-icon i { display: block; width: 16px; height: 2px; background: currentColor; }
+.mmenu-panel { position: absolute; left: 0; right: 0; top: 100%; z-index: 40;
+  display: flex; flex-direction: column;
+  border-bottom: var(--ho-rule-med) solid var(--ho-ink); }
+.mmenu-panel[hidden] { display: none; }
+.mmenu--light .mmenu-panel { background: var(--ho-paper); }
+.mmenu--dark .mmenu-panel { background: var(--ho-ink);
+  border-bottom-color: var(--ho-paper-ink); }
+.mmenu-link { display: flex; align-items: center; gap: 8px; min-height: 48px;
+  padding: 0 16px; font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-label); text-transform: uppercase;
+  border-top: var(--ho-rule-hair) solid var(--ho-line-soft); }
+.mmenu--light .mmenu-link { color: var(--ho-text-muted); }
+.mmenu--dark .mmenu-link { color: var(--ho-paper-ink); }
+.mmenu-link[aria-current="page"] { color: var(--ho-signal-ink); }
+.mmenu--dark .mmenu-link[aria-current="page"] { color: var(--ho-signal); }
+.mmenu-link.cta { background: var(--ho-signal); color: var(--ho-ink); }
+.topbar--nav { position: relative; }
+@media (max-width: 720px) {
+  .site-head { flex-wrap: nowrap; }
+  .site-head .nav { display: none; }
+  .site-head .nav.nav--static { display: flex; }
+  .site-head .mmenu { display: block; }
+}
 
 /* Robot-detail return path (breadcrumb) inside the dark identity header. NOT the
    primary nav — a minimal home/catalogue escape. Links use --ho-paper-ink
@@ -164,9 +198,11 @@ section.block { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid
 .metric .v { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono);
   font-variant-numeric: tabular-nums; }
 .metric .v.unk { color: var(--ho-unknown); }
+/* UX-01 / P0-E: the price block stacks ABOVE the actions row so a long price
+   qualifier can never squeeze the Compare button into a vertical letter stack. */
 .rcard-foot { margin-top: auto; padding: 10px 12px;
   border-top: var(--ho-rule-hair) solid var(--ho-line-soft);
-  display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+  display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
 .price { font-family: var(--ho-font-machine); font-variant-numeric: tabular-nums; }
 .price .amt { font-size: 1rem; font-weight: 600; }
 .price .ctx { display: block; font-size: var(--ho-fs-mono-s); text-transform: uppercase;
@@ -177,11 +213,24 @@ section.block { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid
 .price.unknown .amt { color: var(--ho-unknown); font-size: var(--ho-fs-body);
   padding: 2px 6px; }
 .price.unknown .amt.hatchbox { border: var(--ho-rule-hair) dashed var(--ho-grey-400); }
-.foot-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+.foot-actions { display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px;
+  align-items: center; justify-content: space-between; }
+/* Long state labels ("Limited commercial availability") wrap inside a card
+   rather than forcing it wider than the viewport. */
+.rcard .ho-state { white-space: normal; }
+.csum { font-size: var(--ho-fs-small); color: var(--ho-text-muted); line-height: 1.35; }
+.csum[data-summary="none"], .csum[data-summary="modes_only"] { color: var(--ho-unknown); }
+.price-terms { margin-top: 6px; font-size: var(--ho-fs-mono-s); }
+.price-terms summary { cursor: pointer; text-transform: uppercase;
+  letter-spacing: var(--ho-tracking-label); color: var(--ho-text-muted);
+  min-height: 24px; display: list-item; }
+.price-terms p { margin: 4px 0 0; font-family: var(--ho-font-body, inherit);
+  text-transform: none; letter-spacing: 0; color: var(--ho-text-muted); line-height: 1.4; }
 .cmp { font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
   letter-spacing: var(--ho-tracking-label); text-transform: uppercase;
   border: var(--ho-rule-hair) solid var(--ho-ink); padding: 6px 9px;
-  background: transparent; color: inherit; cursor: pointer; }
+  background: transparent; color: inherit; cursor: pointer;
+  white-space: nowrap; flex-shrink: 0; }
 .cmp:hover { background: var(--ho-ink); color: var(--ho-paper); }
 /* Emergency Compare Crawl Containment (v0.2) — the compare toggle is now a
    <button class="cmp"> (CompareLink), not an <a>; browsers default a button to
@@ -189,6 +238,17 @@ section.block { padding: var(--ho-sp-7) 0; border-top: var(--ho-rule-hair) solid
    visual box the anchor had. Scoped to the element, not the shared .cmp rule,
    so the untouched a.cmp ("Detail →") is unaffected. */
 button.cmp { display: inline-flex; align-items: center; }
+
+.filters-toggle { display: none; width: 100%; min-height: 48px; align-items: center;
+  justify-content: space-between; gap: 12px; padding: 10px 14px; cursor: pointer;
+  background: var(--ho-ink); color: var(--ho-paper-ink);
+  border: var(--ho-rule-hair) solid var(--ho-ink);
+  font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  letter-spacing: var(--ho-tracking-label); text-transform: uppercase; }
+.filters-toggle[aria-expanded="true"] { border-bottom-color: var(--ho-signal); }
+.filters-toggle .ft-count { color: var(--ho-grey-400); }
+.filters:focus { outline: none; }
+.filters:focus-visible { outline: var(--ho-rule-med) solid var(--ho-signal); outline-offset: 2px; }
 
 /* ---- CATALOGUE LAYOUT + FILTER RAIL -------------------------------------- */
 /* WS8.4 / R19: minmax(0, 1fr) instead of 1fr so the results column can shrink
@@ -632,6 +692,11 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-line); padding: var(
   .hero-tools, .card-row, .apps, .mfr-row, .snap-grid { grid-template-columns: 1fr 1fr; }
   .subrow { grid-template-columns: 1fr; }
   .darknav { display: none; }
+  /* Narrow dark header: logo + Menu only, so the logo is never clipped. */
+  .topbar--nav { grid-template-columns: minmax(0, 1fr) auto; }
+  .topbar--nav .corner, .topbar--nav .seg.mid { display: none; }
+  .topbar--nav .seg { padding: 6px 12px; }
+  .topbar--nav .mmenu { display: block; }
   .hero-body { padding-inline: var(--ho-sp-6); }
   .id-grid, .dims, .specgrid, .pstates, .triad, .two-col { grid-template-columns: 1fr; }
   .dims-strip { grid-template-columns: 1fr; }
@@ -641,6 +706,11 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-line); padding: var(
 @media (max-width: 820px) {
   .layout { grid-template-columns: 1fr; }
   .filters { position: static; }
+  /* UX-01 / P0-C: the filter rail collapses behind a prominent toggle so the
+     first result is reachable without scrolling past every control. */
+  .filters-toggle { display: flex; }
+  .filters-wrap .filters { display: none; }
+  .filters-wrap.is-open .filters { display: block; }
 }
 @media (max-width: 560px) {
   .card-row, .apps, .mfr-row, .snap-grid, .hero-tools, .grid { grid-template-columns: 1fr; }
@@ -862,6 +932,7 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-line); padding: var(
    .readout; sections reuse .block/.block-head, the .apps tile grid and the
    .snapshot band. Only the pieces below are About-specific. */
 .about-hero h1 { font-size: clamp(2.75rem, 8.5vw, 7rem); }
+@media (max-width: 420px) { .about-hero h1 { font-size: 2.1rem; overflow-wrap: break-word; } }
 .about-hero .subrow .cell.about-lede { color: var(--ho-paper-ink); }
 .about-tools { align-items: stretch; }
 .about-principle-label { color: var(--ho-grey-400); }
@@ -1061,3 +1132,12 @@ footer.foot { border-top: var(--ho-rule-med) solid var(--ho-line); padding: var(
 .research-regions div.app { color: var(--ho-text-muted); }
 .research-resource [role="note"] ul { columns: 1; margin: 4px 0 0; }
 .research-resource [role="note"] p { margin: 0; }
+.mmenu--dark .mmenu-btn { color: var(--ho-paper-ink); }
+.csum--hero { color: var(--ho-paper-ink); margin-top: 12px; }
+
+/* UX-01: no page-level horizontal overflow at 320px. Grid/flex items default to
+   min-width:auto (min-content), so the hero rows and search field refused to shrink. */
+.subrow > *, .hero-actions, .readout { min-width: 0; }
+.hero-tools > * { min-width: 0; }
+.searchbar input { min-width: 0; width: 100%; }
+@media (max-width: 900px) { .subrow { grid-template-columns: minmax(0, 1fr); } }

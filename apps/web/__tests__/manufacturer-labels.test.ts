@@ -29,8 +29,9 @@ describe("formatPublishedModelStatus — scoped to published catalogue models", 
     expect(formatPublishedModelStatus(null, 2)).toEqual({ label: "UNKNOWN", unknown: true });
   });
 
-  it("an active status passes through verbatim", () => {
-    expect(formatPublishedModelStatus("PILOT", 3)).toEqual({ label: "PILOT", unknown: false });
+  it("an active status renders its buyer-facing label (UX-01)", () => {
+    expect(formatPublishedModelStatus("PILOT", 3)).toEqual({ label: "Pilot", unknown: false });
+    expect(formatPublishedModelStatus("RAAS_DEPLOYMENT", 1).label).toBe("Robot-as-a-service");
   });
 });
 

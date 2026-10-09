@@ -5,8 +5,10 @@
 //   - QUOTE_ONLY ("Price on request") is NEVER collapsed into UNKNOWN
 //     ("No confirmed pricing"). Different data, different display, both variants.
 //   - UNKNOWN (null) never becomes $0 / "free" / "N/A".
-//   - Enum labels are rendered verbatim.
+//   - Visible human labels come from lib/labels.ts (UX-01); the raw enum stays on
+//     the element as data-enum. Machine surfaces keep enums verbatim.
 //   - Card = SHORT single-line labels; detail/compare = LONG sentences.
+import { priceTypeLabel, statusLabel } from "./labels";
 import type { PriceDisplay } from "./types";
 
 export type StateTone = "default" | "public" | "estimated" | "quote" | "unknown";
@@ -93,8 +95,8 @@ export function resolvePriceState(
   if (!pd) {
     // No pricing rows at all -> UNKNOWN. Claims nothing.
     return {
-      label: variant === "short" ? "NO PRICE DATA" : "No confirmed pricing",
-      context: variant === "short" ? "UNKNOWN · no offer rows" : "UNKNOWN",
+      label: variant === "short" ? "No published price" : "No confirmed pricing",
+      context: variant === "short" ? "Price unknown" : "Unknown",
       tone: "unknown",
     };
   }
@@ -106,14 +108,14 @@ export function resolvePriceState(
     case "PUBLIC":
       return {
         label: pd.amount != null ? formatMoney(pd.amount, cur, false) : "—",
-        context: joinCtx("PUBLIC", billing),
+        context: joinCtx("Published", billing),
         tone: "public",
       };
     case "FROM":
       return {
         label:
           pd.amount != null ? `From ${formatMoney(pd.amount, cur, false)}` : "—",
-        context: joinCtx("FROM", billing),
+        context: joinCtx("From price", billing),
         tone: "default",
       };
     case "RANGE": {
@@ -124,16 +126,16 @@ export function resolvePriceState(
           variant === "short"
             ? `${formatMoney(lo, cur, true)}–${formatMoney(hi, cur, true)}`
             : `${formatMoney(lo, cur, false)} – ${formatMoney(hi, cur, false)}`;
-        return { label, context: joinCtx("RANGE", billing), tone: "default" };
+        return { label, context: joinCtx("Price range", billing), tone: "default" };
       }
-      return { label: "—", context: "RANGE", tone: "default" };
+      return { label: "—", context: "Price range", tone: "default" };
     }
     case "ESTIMATED":
       return {
         label:
           pd.amount != null ? `~${formatMoney(pd.amount, cur, false)}` : "~—",
         // The LONG variant must carry the explicit ESTIMATED flag.
-        context: variant === "short" ? joinCtx("ESTIMATED", billing) : "ESTIMATED",
+        context: variant === "short" ? joinCtx("Estimated", billing) : "Estimated",
         tone: "estimated",
       };
     case "MANUFACTURER_ESTIMATE":
@@ -143,20 +145,20 @@ export function resolvePriceState(
         label: pd.amount != null ? formatMoney(pd.amount, cur, false) : "—",
         context:
           variant === "short"
-            ? joinCtx("MANUFACTURER ESTIMATE", billing)
+            ? joinCtx("Manufacturer estimate", billing)
             : "Manufacturer estimate",
         tone: "estimated",
       };
     case "QUOTE_ONLY":
       // A KNOWN commercial model — not unknown. Never a number.
       return {
-        label: variant === "short" ? "PRICE ON REQUEST" : "Price on request",
-        context: joinCtx("QUOTE_ONLY", billing),
+        label: "Price on request",
+        context: joinCtx("Quote required", billing),
         tone: "quote",
       };
     default:
-      // Unrecognised price_type: render the enum verbatim, never a fake number.
-      return { label: pd.type, context: pd.type, tone: "default" };
+      // Unrecognised price_type: readable fallback, never a fake number.
+      return { label: priceTypeLabel(pd.type), context: priceTypeLabel(pd.type), tone: "default" };
   }
 }
 
@@ -198,14 +200,19 @@ export function resolveAvailabilitySummary(
     return {
       label:
         variant === "short"
-          ? "AVAILABILITY UNKNOWN"
+          ? "Availability unknown"
           : "No confirmed commercial availability",
       tone: "unknown",
       modes: [],
       isUnknown: true,
     };
   }
-  return { label: "AVAILABLE", tone: "default", modes: list, isUnknown: false };
+  return {
+    label: `Available · ${list.join(", ")}`,
+    tone: "default",
+    modes: list,
+    isUnknown: false,
+  };
 }
 
 // Maturity ladder ordering for the StatusBadge value ramp (§6.4).
@@ -282,7 +289,7 @@ export function formatPublishedModelStatus(
   if (publishedCount === 0) return { label: "NONE PUBLISHED", unknown: true };
   if (status === "DISCONTINUED") return { label: "ALL DISCONTINUED", unknown: false };
   if (!status || status === "UNKNOWN") return { label: "UNKNOWN", unknown: true };
-  return { label: status, unknown: false };
+  return { label: statusLabel(status), unknown: false };
 }
 
 /** Plain meaning of a humanoid deployment status (commercial_status vocabulary). */

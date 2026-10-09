@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { SectionIndex } from "@/components/SectionIndex";
-import { SiteNav } from "@/components/SiteNav";
+import { StaticNav } from "@/components/StaticNav";
 import { SystemHeader } from "@/components/SystemHeader";
 
 export const metadata = {
@@ -13,7 +13,7 @@ export default function NotFound() {
     <>
       <SystemHeader title="RECORD NOT FOUND / 404" />
       <div className="wrap">
-        <SiteNav active={null} />
+        <StaticNav />
         <div className="pagebar">
           <div>
             <SectionIndex>404 — NO SUCH RECORD</SectionIndex>

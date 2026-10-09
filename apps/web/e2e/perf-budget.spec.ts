@@ -46,9 +46,12 @@ async function measure(page: Page, path: string) {
 
 // `/robots` is deliberately NOT in this table — see the scale-aware test below.
 const STATIC: Budget[] = [
-  { path: "/", docKB: 62, jsRawKB: 404 },
-  { path: "/robots/unitree-g1", docKB: 89, jsRawKB: 412 },
-  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 32, jsRawKB: 431 },
+  // UX-01 (2026-10-09): document budgets raised ~3-4% for the shared mobile menu,
+  // human enum labels with data-enum, the one-line commercial summary and the
+  // collapsible "Price terms" disclosure (all server-rendered; RSC payload doubles them).
+  { path: "/", docKB: 64, jsRawKB: 404 },
+  { path: "/robots/unitree-g1", docKB: 94, jsRawKB: 412 },
+  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 35, jsRawKB: 431 },
   { path: "/find-a-humanoid", docKB: 46, jsRawKB: 424 },
 ];
 
@@ -86,7 +89,7 @@ for (const b of STATIC) {
  * stays correct as the catalogue changes.
  */
 const ROBOTS_FIXED_KB = 22; // measured 20.1
-const ROBOTS_PER_CARD_KB = 4.0; // measured 3.68
+const ROBOTS_PER_CARD_KB = 4.6; // measured 3.68; 4.5 after UX-01 (summary line, labels, price-terms)
 const ROBOTS_JS_RAW_KB = 411; // unchanged from the flat budget
 
 test("@perf built-route budget: /robots (scales with rendered cards)", async ({

@@ -29,18 +29,18 @@ test.describe("R20 empty / error states", () => {
     await expect(page.locator(".cmp-scroll")).toHaveCount(0);
   });
 
-  test("price trichotomy: PUBLIC, PRICE ON REQUEST and NO PRICE DATA are visibly distinct", async ({
+  test("price trichotomy: PUBLIC, Price on request and No published price are visibly distinct", async ({
     page,
   }) => {
     await page.goto("/robots", { waitUntil: "networkidle" });
     const body = page.locator("#main-content");
     // A known public price (G1) — a real amount, never $0.
     await expect(body).toContainText("$");
-    // QUOTE_ONLY renders "PRICE ON REQUEST" (a known commercial model)...
-    await expect(page.getByText("PRICE ON REQUEST").first()).toBeVisible();
-    // ...and it is NOT the same string as UNKNOWN ("NO PRICE DATA").
+    // QUOTE_ONLY renders "Price on request" (a known commercial model)...
+    await expect(page.getByText("Price on request").first()).toBeVisible();
+    // ...and it is NOT the same string as UNKNOWN ("No published price").
     // At least one of the two unknown-ish states exists in the verified set.
-    const noData = page.getByText(/NO PRICE DATA/i);
+    const noData = page.getByText(/No published price/i);
     if (await noData.count()) {
       await expect(noData.first()).toBeVisible();
     }

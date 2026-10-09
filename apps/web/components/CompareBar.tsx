@@ -1,8 +1,18 @@
 // CompareBar — sticky tray showing the current compare selection built from the
 // catalogue `compare` URL param. Navigates to /compare?ids=... (2–4 required).
+import { nameFromSlug } from "@/lib/labels";
 import { CompareLink } from "./CompareLink";
 
-export function CompareBar({ slugs }: { slugs: string[] }) {
+// `names` maps slug -> display name for robots on the current page. A selected robot
+// that is not on the (filtered) page falls back to a de-slugged Title Case name -
+// the raw slug is never shown.
+export function CompareBar({
+  slugs,
+  names = {},
+}: {
+  slugs: string[];
+  names?: Record<string, string>;
+}) {
   if (slugs.length === 0) return null;
   const ready = slugs.length >= 2 && slugs.length <= 4;
   return (
@@ -23,7 +33,7 @@ export function CompareBar({ slugs }: { slugs: string[] }) {
       }}
     >
       <span className="ho-syslabel" style={{ color: "var(--ho-paper-ink)" }}>
-        COMPARE SELECTION: {slugs.length} / 4 — {slugs.join(" · ")}
+        Compare selection: {slugs.length} / 4 — {slugs.map((s) => names[s] ?? nameFromSlug(s)).join(" · ")}
       </span>
       {ready ? (
         // Emergency Compare Crawl Containment (v0.2) — a real <a href> here
@@ -36,7 +46,7 @@ export function CompareBar({ slugs }: { slugs: string[] }) {
         </CompareLink>
       ) : (
         <span className="ho-syslabel" style={{ color: "var(--ho-grey-400)" }}>
-          SELECT AT LEAST 2 TO COMPARE
+          Select at least 2 to compare
         </span>
       )}
     </div>

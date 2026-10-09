@@ -328,7 +328,7 @@ export function LeadDialog({
                   {draft.contact_email}
                 </p>
                 <p className="note">
-                  {"// This is the identity from your Find a Humanoid submission and can't be changed here."}
+                  {"This is the identity from your Find a Humanoid submission and can't be changed here."}
                 </p>
               </div>
             ) : (
@@ -470,7 +470,7 @@ export function LeadDialog({
               </button>
             </div>
             <p className="note">
-              {"// No checkout, no payment. This captures a qualified commercial inquiry only."}
+              {"No checkout, no payment. This captures a qualified commercial inquiry only."}
             </p>
           </form>
         )}

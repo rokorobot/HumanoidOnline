@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 
 import { findManufacturer } from "@/lib/api-client";
+import { confidenceLabel, sourceTypeLabel, statusLabel } from "@/lib/labels";
 import { boolLabel, deploymentMeaning, formatDate, regionLabel } from "@/lib/format";
 import { manufacturerProfileView } from "@/lib/manufacturer-profile";
 import type { ManufacturerSource } from "@/lib/types";
@@ -87,7 +88,7 @@ function SourceRow({ source: s }: { source: ManufacturerSource }) {
         <span className="stamp">{supports ? `Supports: ${supports}` : "No field claim recorded"}</span>
       </div>
       <div className="src">
-        SOURCE: {s.source_type}
+        SOURCE: <span data-enum={s.source_type}>{sourceTypeLabel(s.source_type)}</span>
         <br />
         {published && <>PUBLISHED {published} · </>}
         {observed && <>OBSERVED {observed}</>}
@@ -100,7 +101,9 @@ function SourceRow({ source: s }: { source: ManufacturerSource }) {
           <>Unverified claim</>
         )}
       </div>
-      <div className="conf-cell stamp">{s.confidence}</div>
+      <div className="conf-cell stamp" data-enum={s.confidence}>
+        {confidenceLabel(s.confidence)}
+      </div>
     </div>
   );
 }
@@ -203,7 +206,11 @@ export default async function ManufacturerDetailPage({
                   unknown={m.founded_year == null}
                 />
                 <Fact k="Business model" v={m.commercial_model ?? "UNKNOWN"} unknown={!m.commercial_model} />
-                <Fact k="Humanoid deployment" v={deployment ?? "UNKNOWN"} unknown={!deployment} />
+                <Fact
+                  k="Humanoid deployment"
+                  v={deployment ? statusLabel(deployment) : "UNKNOWN"}
+                  unknown={!deployment}
+                />
                 <Fact
                   k="Public company"
                   v={view.isPublicCompany && m.ticker ? `${publicCo.label} · ${m.ticker}` : publicCo.label}
@@ -218,7 +225,7 @@ export default async function ManufacturerDetailPage({
               </dl>
               {(meaning || view.deploymentNote) && (
                 <p className="stamp mfr-deployment" style={{ marginTop: 12 }}>
-                  {meaning && <>Humanoid deployment {deployment}: {meaning}. </>}
+                  {meaning && <>Humanoid deployment {statusLabel(deployment)}: {meaning}. </>}
                   {view.deploymentNote && <>Basis: {view.deploymentNote}</>}
                 </p>
               )}

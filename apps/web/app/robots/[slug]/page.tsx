@@ -11,6 +11,21 @@ import { findRobot, listRegions } from "@/lib/api-client";
 import { buildRobotJsonLd } from "@/lib/jsonld";
 import { absoluteUrl } from "@/lib/site";
 import {
+  accessibleModes,
+  commercialSummary,
+  priceDisplayFromHeadline,
+  selectHeadline,
+} from "@/lib/commercial-summary";
+import {
+  availabilityLabel,
+  autonomyLabel,
+  confidenceLabel,
+  mobilityLabel,
+  priceTypeLabel,
+  sourceTypeLabel,
+  statusLabel,
+} from "@/lib/labels";
+import {
   formatDate,
   maturityIndex,
   MATURITY_LADDER,
@@ -27,7 +42,7 @@ import { AvailabilityMatrix } from "@/components/AvailabilityState";
 import { CitationFacts } from "@/components/CitationFacts";
 import { CommercialTriad } from "@/components/CommercialTriad";
 import { ConfidenceIndicator } from "@/components/ConfidenceIndicator";
-import { deriveModelCode } from "@/components/RobotCard";
+import { deriveModelCode } from "@/lib/model-code";
 import { EvidenceStamp } from "@/components/EvidenceStamp";
 import { GraphicMarker } from "@/components/GraphicMarker";
 import { RequestAvailabilityButton } from "@/components/RequestAvailabilityButton";
@@ -85,16 +100,16 @@ function collectEvidence(robot: RobotDetail): EvidenceRow[] {
   for (const p of robot.pricing_offers) {
     if (p.evidence)
       rows.push({
-        subject: `Price — ${modeLabel(p.transaction_type)}${p.variant ? ` · ${p.variant}` : ""}${p.region ? ` · ${p.region}` : ""} · ${p.price_type}`,
-        subjectCode: "SUBJECT: PRICING_OFFER",
+        subject: `Price — ${modeLabel(p.transaction_type)}${p.variant ? ` · ${p.variant}` : ""}${p.region ? ` · ${p.region}` : ""} · ${priceTypeLabel(p.price_type)}`,
+        subjectCode: "Subject: pricing offer",
         evidence: p.evidence,
       });
   }
   for (const a of robot.availability_offers) {
     if (a.evidence)
       rows.push({
-        subject: `Availability — ${modeLabel(a.transaction_type)}${a.variant ? ` · ${a.variant}` : ""}${a.region ? ` · ${a.region}` : ""} · ${a.availability_status}`,
-        subjectCode: "SUBJECT: AVAILABILITY_OFFER",
+        subject: `Availability — ${modeLabel(a.transaction_type)}${a.variant ? ` · ${a.variant}` : ""}${a.region ? ` · ${a.region}` : ""} · ${availabilityLabel(a.availability_status)}`,
+        subjectCode: "Subject: availability offer",
         evidence: a.evidence,
       });
   }
@@ -102,7 +117,7 @@ function collectEvidence(robot: RobotDetail): EvidenceRow[] {
     if (d.evidence)
       rows.push({
         subject: `Deployment — ${d.customer_name ?? "Undisclosed customer"}`,
-        subjectCode: "SUBJECT: DEPLOYMENT",
+        subjectCode: "Subject: deployment",
         evidence: d.evidence,
       });
   }
@@ -160,6 +175,10 @@ export default async function RobotDetailPage({
   const ladderIdx = maturityIndex(robot.commercial_status);
   const discontinued = robot.commercial_status === "DISCONTINUED";
   const s = robot.specs;
+  const heroSummary = commercialSummary(
+    priceDisplayFromHeadline(selectHeadline(robot.pricing_offers)),
+    accessibleModes(robot.availability_offers),
+  );
 
   // A caveat EXPLAINS a spec — most often why it is UNKNOWN, or that sources
   // disagree. It never supplies a value: the row still renders whatever the
@@ -214,7 +233,7 @@ export default async function RobotDetailPage({
             </div>
             <div className="seg">{robot.summary ? "HUMANOID PLATFORM" : "HUMANOID"}</div>
             <div className="seg">
-              STATUS — <b>{robot.commercial_status}</b>
+              STATUS — <b data-enum={robot.commercial_status}>{statusLabel(robot.commercial_status)}</b>
             </div>
             <div className="seg">
               {robot.manufacturer.name}
@@ -289,6 +308,10 @@ export default async function RobotDetailPage({
 
             <div className="dims-strip">
               <CommercialTriadInline robot={robot} conf={conf} />
+              {/* Same one-line summary as the catalogue card and compare matrix. */}
+              <p className="csum csum--hero" data-summary={heroSummary.kind}>
+                {heroSummary.line}
+              </p>
             </div>
           </div>
         </div>
@@ -368,17 +391,19 @@ export default async function RobotDetailPage({
               </div>
               <div className="dbody">
                 <div className={`ho-pair ${discontinued ? "is-unknown" : "is-signal"}`}>
-                  <span className="k">commercial_status</span>
-                  <span className="s">{robot.commercial_status}</span>
+                  <span className="k">Commercial status</span>
+                  <span className="s" data-enum={robot.commercial_status}>
+                    {statusLabel(robot.commercial_status)}
+                  </span>
                 </div>
                 <div>
                   <SystemLabel as="div">Maturity ladder</SystemLabel>
                   <div
                     className="ladder"
-                    title={MATURITY_LADDER.join(" → ")}
+                    title={MATURITY_LADDER.map(statusLabel).join(" → ")}
                     style={{ marginTop: 8 }}
                     role="img"
-                    aria-label={`Maturity: ${robot.commercial_status}`}
+                    aria-label={`Maturity: ${statusLabel(robot.commercial_status)}`}
                   >
                     {MATURITY_LADDER.map((_, i) => (
                       <i
@@ -394,7 +419,7 @@ export default async function RobotDetailPage({
                     className=""
                   >
                     <span style={{ color: "var(--ho-text-faint)" }}>
-                      ANNOUNCED ▸ RAAS_DEPLOYMENT ▸ DISCONTINUED
+                      Announced ▸ Robot-as-a-service ▸ Discontinued
                     </span>
                   </SystemLabel>
                 </div>
@@ -418,9 +443,8 @@ export default async function RobotDetailPage({
               <div className="dbody">
                 <AvailabilityMatrix offers={robot.availability_offers} />
                 <p className="stamp">
-                  Predicate <code>commercially_accessible</code> = is_current AND
-                  status ∉ {"{"}NOT_AVAILABLE, DISCONTINUED{"}"}. Absence of a row =
-                  unknown, not NOT_AVAILABLE.
+                  Shows where this robot can currently be obtained. No offer on
+                  record means availability is unknown, which is not the same as ruled out.
                 </p>
               </div>
             </article>
@@ -437,10 +461,14 @@ export default async function RobotDetailPage({
               </div>
               <div className="dbody">
                 <div className={`ho-pair ${conf === "VERIFIED" ? "is-verified" : ""}`}>
-                  <span className="k">deployments</span>
+                  <span className="k">Deployments</span>
                   <span className="s">
                     {robot.deployments.length}
-                    {conf && <span className="mono">· {conf}</span>}
+                    {conf && (
+                      <span className="mono" data-enum={conf}>
+                        · {confidenceLabel(conf)}
+                      </span>
+                    )}
                   </span>
                 </div>
                 {robot.deployments.length > 0 ? (
@@ -461,7 +489,7 @@ export default async function RobotDetailPage({
               <h2>Price is never one column</h2>
             </div>
             <SystemLabel>
-              transaction_type × price_type × billing × region × provider
+              Mode, price type, billing, region and seller
             </SystemLabel>
           </div>
 
@@ -508,7 +536,7 @@ export default async function RobotDetailPage({
               <SectionIndex>03 — SPECIFICATIONS</SectionIndex>
               <h2>Physical / intelligence / developer</h2>
             </div>
-            <SystemLabel>NULL = UNKNOWN, NEVER 0 OR FALSE</SystemLabel>
+            <SystemLabel>Values we cannot confirm are shown as unknown, never as zero or no</SystemLabel>
           </div>
           <div className="specgrid">
             <div className="spectbl">
@@ -521,12 +549,12 @@ export default async function RobotDetailPage({
               <SpecRow label="Walk speed" value={s.walk_speed_ms} unit="m/s" note={caveats.get("walk_speed_ms")} />
               <SpecRow label="Runtime" value={s.runtime_minutes} unit="min" note={caveats.get("runtime_minutes")} />
               <SpecRow label="Battery" value={s.battery_wh} unit="Wh" note={caveats.get("battery_wh")} />
-              <SpecRow label="Mobility" value={s.mobility} note={caveats.get("mobility")} />
+              <SpecRow label="Mobility" value={s.mobility ? mobilityLabel(s.mobility) : s.mobility} rawEnum={s.mobility} note={caveats.get("mobility")} />
               <SpecRow label="DOF" value={s.degrees_of_freedom} note={caveats.get("degrees_of_freedom")} />
             </div>
             <div className="spectbl">
               <h3>Intelligence</h3>
-              <SpecRow label="Autonomy" value={s.autonomy} note={caveats.get("autonomy")} />
+              <SpecRow label="Autonomy" value={s.autonomy ? autonomyLabel(s.autonomy) : s.autonomy} rawEnum={s.autonomy} note={caveats.get("autonomy")} />
               <ResolvedRow label="Manipulation" value={s.has_manipulation} fact={resolved.has_manipulation} note={caveats.get("has_manipulation")} />
               <ResolvedRow label="Teleoperation" value={s.has_teleoperation} fact={resolved.has_teleoperation} note={caveats.get("has_teleoperation")} />
               <SpecRow label="Vision" value={s.has_vision} note={caveats.get("has_vision")} />
@@ -589,7 +617,7 @@ export default async function RobotDetailPage({
               <SectionIndex>04 — EVIDENCE &amp; PROVENANCE</SectionIndex>
               <h2>No commercial fact without evidence</h2>
             </div>
-            <SystemLabel>EvidenceStamp + ConfidenceIndicator</SystemLabel>
+            <SystemLabel>Source, dates and confidence for every commercial fact</SystemLabel>
           </div>
           {evidenceRows.length > 0 ? (
             <div className="ev">
@@ -624,9 +652,8 @@ export default async function RobotDetailPage({
           <div>
             <SectionIndex>COMMERCIAL ACTION</SectionIndex>
             <p className="note">
-              Availability requests are captured as demand intelligence. No
-              checkout, no payment — commercial transaction workflows are later
-              phases, driven by availability_offer rows without redesign.
+              Availability requests are recorded as interest. There is no checkout
+              or payment on HumanoidOnline.
             </p>
           </div>
           <RequestAvailabilityButton
@@ -725,12 +752,17 @@ function PricingRow({ offer }: { offer: PricingOffer }) {
       <div className="stamp">
         {offer.evidence ? (
           <>
-            {offer.evidence.confidence}
+            <span data-enum={offer.evidence.confidence}>
+              {confidenceLabel(offer.evidence.confidence)}
+            </span>
             {offer.evidence.verified_at
               ? ` · ${formatDate(offer.evidence.verified_at)}`
               : ""}
             <br />
-            SOURCE: {offer.evidence.source_type}
+            SOURCE:{" "}
+            <span data-enum={offer.evidence.source_type}>
+              {sourceTypeLabel(offer.evidence.source_type)}
+            </span>
           </>
         ) : (
           <span style={{ color: "var(--ho-text-faint)" }}>— no evidence —</span>
@@ -842,13 +874,14 @@ function DeploymentMatrix({ deployments }: { deployments: Deployment[] }) {
           <span>{d.customer_name ?? "Undisclosed"}</span>
           <span className={d.use_case ? "" : "na"}>{d.use_case ?? "—"}</span>
           <span
+            data-enum={d.evidence?.confidence}
             style={
               d.evidence?.confidence === "VERIFIED"
                 ? { color: "var(--ho-verified)" }
                 : undefined
             }
           >
-            {d.evidence?.confidence ?? "—"}
+            {d.evidence ? confidenceLabel(d.evidence.confidence) : "—"}
           </span>
         </div>
       ))}

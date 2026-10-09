@@ -59,14 +59,28 @@ test("@responsive about: hero, key facts and grids fit, no overflow", async ({ p
 });
 
 test("@responsive primary nav with About: fits and stays operable", async ({ page }) => {
-  // SiteNav (light register) wraps rather than overflowing at phone width.
+  // SiteNav (light register): the inline nav at desktop widths, the accessible
+  // "Menu" disclosure (UX-01) at phone widths - either way About is reachable.
   await page.goto("/robots", { waitUntil: "networkidle" });
-  const about = page
-    .getByRole("navigation", { name: "Primary" })
-    .getByRole("link", { name: "About", exact: true });
+  const width = page.viewportSize()?.width ?? 1280;
+  let about;
+  if (width <= 720) {
+    const menu = page.getByRole("button", { name: "Menu" });
+    await expect(menu).toBeVisible();
+    await expect(menu).toHaveAttribute("aria-expanded", "false");
+    await menu.click();
+    await expect(menu).toHaveAttribute("aria-expanded", "true");
+    about = page
+      .getByRole("navigation", { name: "Menu" })
+      .getByRole("link", { name: "About", exact: true });
+  } else {
+    about = page
+      .getByRole("navigation", { name: "Primary" })
+      .getByRole("link", { name: "About", exact: true });
+    await expectWithinViewport(page, "nav.nav a[href='/about']", "catalogue nav About");
+    await expectWithinViewport(page, "nav.nav a.cta", "catalogue nav CTA");
+  }
   await expect(about).toBeVisible();
-  await expectWithinViewport(page, "nav.nav a[href='/about']", "catalogue nav About");
-  await expectWithinViewport(page, "nav.nav a.cta", "catalogue nav CTA");
   await expectNoHorizontalOverflow(page, "catalogue nav");
   await about.click();
   await expect(page).toHaveURL(/\/about$/);
@@ -224,4 +238,128 @@ test("@responsive target size: lead dialog controls ≥24×24", async ({ page })
   await expect(page.getByRole("dialog")).toBeVisible();
   await expectControlsMeetTargetSize(page, "lead dialog");
   await expectAxeTargetSizeClean(page, "lead dialog");
+});
+
+// ---------------------------------------------------------------------------
+// UX-01 - buyer trust & mobile accessibility. Width matrix: 320 / 375 / 390 / 768
+// / 1280. The first result must be reachable without an expanded filter panel,
+// nothing may overflow the page, and the header must offer working navigation.
+// ---------------------------------------------------------------------------
+for (const width of [320, 375, 390, 768, 1280]) {
+  test(`@responsive UX-01 catalogue at ${width}px: first card reachable, filters collapsed, no overflow`, async ({
+    page,
+  }) => {
+    const height = 800;
+    await page.setViewportSize({ width, height });
+    await page.goto("/robots", { waitUntil: "networkidle" });
+    await expectNoHorizontalOverflow(page, `catalogue ${width}`);
+    const card = page.locator("article.rcard").first();
+    await expect(card).toBeVisible();
+    const top = await card.evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
+    const toggle = page.getByRole("button", { name: /^Filters/ });
+    if (width <= 820) {
+      // Collapsed behind a real disclosure button: first card within 1.5 viewports.
+      expect(top, `first card top at ${width}px`).toBeLessThan(height * 1.5);
+      await expect(toggle).toBeVisible();
+      await expect(toggle).toHaveAttribute("aria-expanded", "false");
+      await expect(page.locator("form.filters")).toBeHidden();
+      await toggle.click();
+      await expect(toggle).toHaveAttribute("aria-expanded", "true");
+      await expect(page.locator("form.filters")).toBeVisible();
+      await expectNoHorizontalOverflow(page, `catalogue ${width} filters open`);
+      await page.keyboard.press("Escape");
+      await expect(toggle).toHaveAttribute("aria-expanded", "false");
+      await expect(toggle).toBeFocused();
+    } else {
+      // Desktop sidebar unchanged: toggle hidden, rail visible.
+      await expect(toggle).toBeHidden();
+      await expect(page.locator("form.filters")).toBeVisible();
+    }
+    // The Compare button never wraps into a vertical letter stack.
+    const cmp = card.locator(".cmp").first();
+    const box = await cmp.boundingBox();
+    expect(box && box.height, `compare button height at ${width}px`).toBeLessThan(50);
+  });
+}
+
+for (const width of [320, 375, 390, 768]) {
+  test(`@responsive UX-01 headers at ${width}px: logo not clipped, no overflow`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    for (const path of ["/", "/robots"]) {
+      await page.goto(path, { waitUntil: "networkidle" });
+      await expectNoHorizontalOverflow(page, `${path} ${width}`);
+      // Logo fully visible (not clipped to "Hl").
+      const clipped = await page.evaluate(() => {
+        const b = document.querySelector(".logo b") as HTMLElement | null;
+        if (!b) return null;
+        const r = b.getBoundingClientRect();
+        const box = (b.closest(".seg, .site-head") as HTMLElement).getBoundingClientRect();
+        return r.right - box.right;
+      });
+      expect(clipped, `${path} logo clipped by ${clipped}px at ${width}px`).toBeLessThanOrEqual(1);
+    }
+  });
+}
+
+test("@responsive UX-01 homepage menu opens and navigates at phone width", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.goto("/", { waitUntil: "networkidle" });
+  const menu = page.getByRole("button", { name: "Menu" });
+  await expect(menu).toBeVisible();
+  const mb = await menu.boundingBox();
+  expect(mb && mb.height).toBeGreaterThanOrEqual(44);
+  await menu.click();
+  await expect(menu).toHaveAttribute("aria-expanded", "true");
+  const nav = page.getByRole("navigation", { name: "Menu" });
+  await expect(nav.getByRole("link", { name: "Robots", exact: true })).toBeVisible();
+  await nav.getByRole("link", { name: "Robots", exact: true }).click();
+  await expect(page).toHaveURL(/\/robots/);
+});
+
+// ---------------------------------------------------------------------------
+// UX-01 / P0-D - the compare selection survives the header hop (desktop width;
+// the URL is the only store).
+// ---------------------------------------------------------------------------
+test("@compare-persistence header Compare / Robots carry the selection", async ({ page, browser }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/robots?compare=unitree-g1,agility-digit", { waitUntil: "networkidle" });
+  const primary = page.getByRole("navigation", { name: "Primary" });
+  // HTML stays a plain /compare href (crawl containment).
+  await expect(primary.getByRole("link", { name: "Compare", exact: true })).toHaveAttribute(
+    "href",
+    "/compare",
+  );
+  await primary.getByRole("link", { name: "Compare", exact: true }).click();
+  await expect(page).toHaveURL(/\/compare\?ids=unitree-g1,agility-digit$/);
+  // Both selected robots are in the comparison (by id, in the header cells).
+  await expect(page.locator("#main-content")).toContainText("G1");
+  await expect(page.locator("#main-content")).toContainText("Digit");
+
+  // Back to the catalogue: the selection is still there.
+  await primary.getByRole("link", { name: "Robots", exact: true }).click();
+  await expect(page).toHaveURL(/\/robots\?compare=unitree-g1,agility-digit$/);
+  await expect(page.getByText(/Compare selection: 2 \/ 4/)).toBeVisible();
+  // The tray names robots, not slugs.
+  const tray = await page.getByText(/Compare selection/).innerText();
+  expect(tray).not.toContain("unitree-g1");
+
+  // Change the selection, then Compare reflects it.
+  const neo = page.locator("article.rcard", { hasText: "NEO" }).first();
+  await neo.locator("button.cmp").click();
+  await expect(page).toHaveURL(/compare=[^&]*1x-neo/);
+  await primary.getByRole("link", { name: "Compare", exact: true }).click();
+  await expect(page).toHaveURL(/\/compare\?ids=[^&]*1x-neo/);
+  await expect(page.locator("#main-content")).toContainText("NEO");
+
+  // A shared /compare?ids= URL still works in a fresh context.
+  const ctx = await browser.newContext();
+  const fresh = await ctx.newPage();
+  await fresh.goto(new URL("/compare?ids=unitree-g1,agility-digit", page.url()).toString(), {
+    waitUntil: "networkidle",
+  });
+  await expect(fresh.locator("#main-content")).toContainText("Digit");
+  // Direct /compare with no selection stays an intentional empty state.
+  await fresh.goto(new URL("/compare", page.url()).toString(), { waitUntil: "networkidle" });
+  await expect(fresh.locator(".cmp-scroll")).toHaveCount(0);
+  await ctx.close();
 });

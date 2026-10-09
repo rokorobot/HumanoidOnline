@@ -8,22 +8,15 @@ import type { RobotListItem } from "@/lib/types";
 import { AvailabilityBadge } from "./AvailabilityState";
 import { CompareLink } from "./CompareLink";
 import { DotMatrix } from "./GraphicMarker";
+import { commercialSummary } from "@/lib/commercial-summary";
+import { deriveModelCode } from "@/lib/model-code";
+import { mobilityLabel } from "@/lib/labels";
 import { MachineCode } from "./MachineCode";
 import { Metric } from "./Metric";
 import { PriceStateCard } from "./PricingState";
 import { StatusBracket } from "./StatusBadge";
 
-// Derive a short machine model token from the canonical slug (presentational —
-// derived from a real identifier, not a fabricated fact).
-export function deriveModelCode(slug: string, mfrSlug: string): string {
-  let token = slug;
-  if (mfrSlug && slug.startsWith(`${mfrSlug}-`)) {
-    token = slug.slice(mfrSlug.length + 1);
-  } else if (slug.includes("-")) {
-    token = slug.split("-").slice(1).join("-");
-  }
-  return token.replace(/-/g, " ").toUpperCase();
-}
+export { deriveModelCode };
 
 export function RobotCard({
   robot,
@@ -38,6 +31,7 @@ export function RobotCard({
   const code = deriveModelCode(robot.slug, robot.manufacturer.slug);
   // Live/active RaaS deployments earn the signal dot; nothing else does.
   const live = robot.commercial_status === "RAAS_DEPLOYMENT";
+  const summary = commercialSummary(robot.price_display, robot.available_modes);
   return (
     <article className="rcard">
       <div className="rcard-top">
@@ -73,10 +67,18 @@ export function RobotCard({
           <div className="mfr">{robot.manufacturer.name}</div>
         </div>
         <StatusBracket status={robot.commercial_status} />
+        {/* One buyer-facing line, shared with compare and the detail hero. */}
+        <p className="csum" data-summary={summary.kind}>
+          {summary.line}
+        </p>
         <div className="metrics">
           <Metric label="Payload" value={robot.payload_kg} unit="kg" />
           <Metric label="Height" value={robot.height_cm} unit="cm" />
-          <Metric label="Mobility" value={robot.mobility} />
+          <Metric
+            label="Mobility"
+            value={robot.mobility ? mobilityLabel(robot.mobility) : null}
+            rawEnum={robot.mobility}
+          />
         </div>
         {(robot.scope_notes ?? []).map((n) => (
           <div key={n.property} className="ho-syslabel" data-scope-note={n.property}>

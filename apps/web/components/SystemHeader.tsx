@@ -21,7 +21,7 @@ export function SystemHeader({
   return (
     <div className="ho-sysheader">
       <span className="title">
-        <span className="ho-marker" aria-hidden="true" /> {title}
+        <span className="ho-marker" aria-hidden="true" /> <span className="tt">{title}</span>
       </span>
       <span className="mm">
         {fields.map((f, i) => (

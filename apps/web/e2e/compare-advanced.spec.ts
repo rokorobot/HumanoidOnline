@@ -48,8 +48,8 @@ test("WS4: best-in-row marks a numeric leader ONLY — never categorical/leaderl
   // runtime_minutes leader = 1X NEO (240 > 120): its cell is best-in-row.
   await expect(page.locator("td.cell.best", { hasText: "240" })).toBeVisible();
   // commercial_status is categorical → never best-in-row.
-  await expect(page.locator("td.cell.best", { hasText: "EARLY_ACCESS" })).toHaveCount(0);
-  await expect(page.locator("td.cell.best", { hasText: "COMMERCIAL" })).toHaveCount(0);
+  await expect(page.locator("td.cell.best", { hasText: "Early access" })).toHaveCount(0);
+  await expect(page.locator("td.cell.best", { hasText: "Commercial" })).toHaveCount(0);
   // height_cm is numeric but leaderless → never best-in-row (NEO 167.6 cm not marked).
   await expect(page.locator("td.cell.best", { hasText: "167" })).toHaveCount(0);
 });
@@ -83,7 +83,7 @@ test("WS4: evidence view is inspectable; UNKNOWN facts read NO CONFIRMED FACT", 
   await page.goto("/compare?ids=unitree-g1,unitree-h1&view=evidence");
   await expect(page.getByText(/Pricing — headline offer/i)).toBeVisible();
   // G1's price fact carries store provenance.
-  await expect(page.getByText(/MANUFACTURER_STORE/i).first()).toBeVisible();
+  await expect(page.getByText(/Manufacturer store/i).first()).toBeVisible();
   // The three provenance dates are kept SEPARATE; OBSERVED is always present.
   await expect(page.getByText("OBSERVED").first()).toBeVisible();
   await expect(page.getByText(/OBSERVED\s+\d{2}\s+[A-Z]{3}\s+\d{4}/).first()).toBeVisible();

@@ -314,7 +314,7 @@ export default async function AboutPage() {
       {/* HERO (dark) — same control-room register as the home hero */}
       <div className="hero-shell ho-dark ho-scan">
         <div className="hero-inner">
-          <div className="topbar">
+          <div className="topbar topbar--nav">
             <div className="corner">
               <span className="ho-star">&#9733;</span>
             </div>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-import { SiteFooter } from "@/components/SiteNav";
+import { SiteFooter } from "@/components/SiteFooter";
 
 import "./tokens.css";
 import "./globals.css";

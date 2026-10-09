@@ -20,7 +20,9 @@ describe("variant-scoped availability", () => {
     render(<AvailabilityMatrix offers={[offer("Standard"), offer("Pro")]} />);
     expect(screen.getByText("Standard configuration")).toBeTruthy();
     expect(screen.getByText("Pro configuration")).toBeTruthy();
-    expect(screen.getAllByText("WAITLIST").length).toBe(2);
+    expect(screen.getAllByText("Waitlist").length).toBe(2);
+    // the raw enum rides along for traceability
+    expect(document.querySelectorAll('[data-enum="WAITLIST"]').length).toBe(2);
     expect(screen.getAllByText("Expected in 2026").length).toBe(2);
     expect(document.body.textContent).not.toMatch(/2026-\d\d/); // no invented date
   });

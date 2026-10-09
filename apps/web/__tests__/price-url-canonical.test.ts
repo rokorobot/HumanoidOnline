@@ -119,28 +119,26 @@ describe("C. canonical URL is stable", () => {
   });
 });
 
-describe("D. a currency this UI cannot represent", () => {
-  it("is rejected, never reinterpreted as USD", () => {
-    const result = canonicalizePriceParams({
-      price_max: "30000",
-      price_currency: "EUR",
-    });
-    expect(result).toEqual({ action: "reject", currency: "EUR" });
+describe("D. currencies (UX-02A: EUR / GBP / CZK are now honoured; others still rejected)", () => {
+  // The API matches `price_currency` exactly against purchase offers (no FX), so an explicit
+  // supported currency is passed through untouched. It is never reinterpreted as USD.
+  it("renders an explicit supported currency as-is", () => {
+    for (const currency of ["USD", "EUR", "GBP", "CZK"]) {
+      expect(canonicalizePriceParams({ price_max: "30000", price_currency: currency })).toEqual({
+        action: "ok",
+      });
+    }
   });
 
-  it("is rejected rather than silently dropping the ceiling", () => {
-    // Dropping it would return the UNFILTERED catalogue for a query that asked
-    // for a ceiling — a silent widening, the exact failure the price contract
-    // exists to prevent.
-    const result = canonicalizePriceParams({
-      price_max: "30000",
-      price_currency: "GBP",
-    });
-    expect(result.action).toBe("reject");
+  it("normalises the spelling of a supported currency once", () => {
+    const r = canonicalizePriceParams({ price_max: "30000", price_currency: " eur " });
+    expect(r).toEqual({ action: "redirect", params: { price_max: "30000", price_currency: "EUR" } });
   });
 
-  it("rejects regardless of spelling", () => {
-    for (const currency of ["eur", "Eur", " EUR ", "JPY"]) {
+  it("still rejects a currency the catalogue records no purchase prices in", () => {
+    // Dropping the ceiling would return the UNFILTERED catalogue for a query that asked for
+    // one - the silent widening the price contract exists to prevent.
+    for (const currency of ["JPY", "cny", " CHF "]) {
       expect(
         canonicalizePriceParams({ price_max: "1", price_currency: currency }).action,
       ).toBe("reject");

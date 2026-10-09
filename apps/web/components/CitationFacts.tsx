@@ -23,11 +23,18 @@
 //   CIT-K  Commercial status is shown as maturity ONLY, never merged with
 //     availability, transaction mode or price state.
 import { specValue } from "@/lib/format";
+import { enumLabel, type EnumKind } from "@/lib/labels";
 import type { RobotDetail } from "@/lib/types";
 
 interface Fact {
   label: string;
   value: string;
+  /**
+   * Presentation only (UX-02E): the enum family `value` belongs to. `value` itself stays the raw,
+   * verbatim enum - the machine-truth projection never changes; only the VISIBLE text of the
+   * rendered block is mapped to a label (raw value kept in `data-enum` on the same element).
+   */
+  enumKind?: EnumKind;
 }
 
 /**
@@ -63,13 +70,14 @@ export function citationFacts(robot: RobotDetail): Fact[] {
 
   // Maturity only. NOT obtainability, NOT "for sale" (CIT-K).
   if (isCitableValue(robot.commercial_status)) {
-    facts.push({ label: "Commercial status", value: robot.commercial_status });
+    facts.push({ label: "Commercial status", value: robot.commercial_status, enumKind: "commercial_status" });
   }
 
   const specFields: Array<{
     label: string;
     value: number | string | boolean | null | undefined;
     unit?: string;
+    kind?: EnumKind;
   }> = [
     { label: "Height", value: s.height_cm, unit: "cm" },
     { label: "Weight", value: s.weight_kg, unit: "kg" },
@@ -79,11 +87,11 @@ export function citationFacts(robot: RobotDetail): Fact[] {
     { label: "Walk speed", value: s.walk_speed_ms, unit: "m/s" },
     { label: "Runtime", value: s.runtime_minutes, unit: "min" },
     { label: "Degrees of freedom", value: s.degrees_of_freedom },
-    { label: "Mobility", value: s.mobility },
-    { label: "Autonomy", value: s.autonomy },
+    { label: "Mobility", value: s.mobility, kind: "mobility" },
+    { label: "Autonomy", value: s.autonomy, kind: "autonomy" },
   ];
 
-  for (const { label, value, unit } of specFields) {
+  for (const { label, value, unit, kind } of specFields) {
     // UNKNOWN is omitted from the citation block rather than printed as an
     // "UNKNOWN" row: this block exists to be quoted, and a retrieval system
     // lifting "Payload: UNKNOWN" out of context reads as a claim about the
@@ -93,7 +101,7 @@ export function citationFacts(robot: RobotDetail): Fact[] {
     if (!isCitableValue(value)) continue;
     const resolved = specValue(value, unit);
     if (resolved.unknown) continue; // defensive; isCitableValue already excluded it
-    facts.push({ label, value: resolved.label });
+    facts.push({ label, value: resolved.label, ...(kind ? { enumKind: kind } : {}) });
   }
 
   if (isCitableValue(robot.announced_year)) {
@@ -115,7 +123,9 @@ export function CitationFacts({ robot }: { robot: RobotDetail }) {
       {facts.map((f) => (
         <div className="cf-row" key={f.label}>
           <dt>{f.label}</dt>
-          <dd>{f.value}</dd>
+          <dd {...(f.enumKind ? { "data-enum": f.value } : {})}>
+            {f.enumKind ? enumLabel(f.enumKind, f.value) : f.value}
+          </dd>
         </div>
       ))}
     </dl>

@@ -11,6 +11,7 @@ import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { modeLabel } from "@/lib/format";
 import { autonomyLabel, mobilityLabel, statusLabel } from "@/lib/labels";
 import {
+  PRICE_CURRENCIES,
   PRICE_CURRENCY,
   asArray,
   asString,
@@ -60,6 +61,43 @@ const AUTONOMY = [
   "TASK_AUTONOMOUS",
   "HIGHLY_AUTONOMOUS",
 ];
+
+// UX-02D - wording derived from the real predicates (apps/api/app/services/robot_filters.py,
+// regions.py). `region` = a CURRENT, NEW, commercially-accessible AVAILABILITY offer whose
+// region is the chosen region, an ancestor of it, GLOBAL, or unspecified (NULL). `offered_in`
+// = a CURRENT pricing OR availability record (any status) whose region is the market, an
+// ancestor, a descendant (member country), GLOBAL, or unspecified. Neither asserts delivery.
+export const REGION_HELP =
+  "Shows robots with a current, accessible availability offer that applies to this region: " +
+  "an offer for the region itself, for a wider area that includes it (for example the EU for " +
+  "Germany), a worldwide offer, or an offer with no region recorded. An offer being recorded " +
+  "for a region is not proof that the robot can be bought there, and it does not establish " +
+  "shipping, customs or delivery eligibility. Missing regional information is unknown, not " +
+  "unavailable.";
+export const MARKET_HELP =
+  "Shows robots with a recorded price or availability entry tied to this market, including " +
+  "entries for member countries of an economic zone (for example a German supplier for the EU), " +
+  "worldwide entries and entries with no region recorded, whatever the entry's status. It says " +
+  "only that such an entry exists: not that the robot can be ordered, shipped or cleared " +
+  "through customs there. Missing market information is unknown, not unavailable.";
+
+// A disclosure button (works on touch and keyboard, no hover). The text is rendered only
+// while open, so it adds nothing to the delivered document until a buyer asks for it.
+function Help({ id, label, text }: { id: string; label: string; text: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button type="button" className="fhelp-btn" aria-expanded={open} aria-controls={id} onClick={() => setOpen((o) => !o)}>
+        {label}
+      </button>
+      {open && (
+        <p id={id} className="fhelp-text">
+          {text}
+        </p>
+      )}
+    </>
+  );
+}
 
 export function FilterPanel({
   params,
@@ -122,7 +160,11 @@ export function FilterPanel({
     // hidden field keeps them inseparable — a hidden input is never "empty", so
     // it would survive the filter above and emit a lone `price_currency` the
     // moment the price box is cleared. Clearing the price therefore drops both.
-    if (usp.has("price_max")) usp.set("price_currency", PRICE_CURRENCY);
+    if (usp.has("price_max")) {
+      if (!usp.get("price_currency")) usp.set("price_currency", PRICE_CURRENCY);
+    } else {
+      usp.delete("price_currency");
+    }
     router.push(`/robots?${usp.toString()}`, { scroll: false });
   }
 
@@ -249,6 +291,7 @@ export function FilterPanel({
               </option>
             ))}
           </select>
+          <Help id="f-region-help" label="Region help" text={REGION_HELP} />
         </div>
         <div className="field">
           <label htmlFor="f-offered-in">Offer market</label>
@@ -269,17 +312,33 @@ export function FilterPanel({
             Where the offer is sold from, including suppliers in member countries.
             Not a delivery guarantee, and not a claim about the robot&apos;s edition.
           </span>
+          <Help id="f-market-help" label="Offer market help" text={MARKET_HELP} />
         </div>
         <div className="field">
-          <label htmlFor="f-price">Max purchase price (USD)</label>
-          <input
-            id="f-price"
-            type="number"
-            name="price_max"
-            min={0}
-            placeholder="e.g. 50000"
-            defaultValue={asString(params.price_max) ?? ""}
-          />
+          <label htmlFor="f-price">Max purchase price (no conversion)</label>
+          <div className="range">
+            <input
+              id="f-price"
+              type="number"
+              name="price_max"
+              min={0}
+              placeholder="e.g. 50000"
+              defaultValue={asString(params.price_max) ?? ""}
+            />
+            <select
+              id="f-currency"
+              name="price_currency"
+              aria-label="Price currency"
+              defaultValue={(asString(params.price_currency) ?? PRICE_CURRENCY).toUpperCase()}
+            >
+              {PRICE_CURRENCIES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+
         </div>
       </div>
 

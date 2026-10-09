@@ -1,7 +1,7 @@
 "use client";
 
-// Header nav link that keeps the compare selection alive across the Robots <->
-// Compare hop (UX-01 / P0-D). The server HTML is an ordinary
+// Link that keeps the compare selection alive across Robots <-> Compare <-> robot detail
+// (UX-01 / P0-D, UX-02C). The server HTML is an ordinary
 // `<a href="/compare">` / `<a href="/robots">` - never a selection-carrying URL,
 // so the crawl-containment rule (components/CompareLink.tsx) is untouched. Only
 // on an explicit click do we read the CURRENT URL (window.location, no
@@ -17,11 +17,13 @@ export function NavLink({
   href,
   className,
   current,
+  ariaLabel,
   onNavigate,
   children,
 }: {
   href: string;
   className?: string;
+  ariaLabel?: string;
   current?: boolean;
   onNavigate?: () => void;
   children: ReactNode;
@@ -32,6 +34,7 @@ export function NavLink({
       href={href}
       className={className}
       aria-current={current ? "page" : undefined}
+      {...(ariaLabel ? { "aria-label": ariaLabel } : {})}
       onClick={(e) => {
         onNavigate?.();
         if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {

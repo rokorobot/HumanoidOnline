@@ -93,7 +93,7 @@ export default async function UseCaseDetailPage({
               <SectionIndex>01 — SUITABLE ROBOTS</SectionIndex>
               <h2>Ranked by fit</h2>
             </div>
-            <SystemLabel>ORDERED BY FIT_SCORE — DESC</SystemLabel>
+            <SystemLabel>Ordered by fit score, highest first</SystemLabel>
           </div>
           {u.suitable_robots.length > 0 ? (
             <div className="fit-list">

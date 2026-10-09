@@ -79,3 +79,75 @@ describe("offer market control", () => {
     expect(text).toMatch(/edition/i);
   });
 });
+
+// UX-02D - help next to the two geography controls. The wording is derived from the real
+// predicates (apps/api/app/services/robot_filters.py: `region` = a current accessible
+// availability offer applying to the region; `offered_in` = a current pricing OR availability
+// record tied to the market) and must never imply delivery or turn missing data into "unavailable".
+import { MARKET_HELP, REGION_HELP } from "@/components/FilterPanel";
+import { countActiveFilters } from "@/lib/search-params";
+
+describe("region / offer market help (UX-02D)", () => {
+  it("is a button disclosure: closed by default, aria-expanded + aria-controls, toggles open and shut", () => {
+    render(<FilterPanel params={{}} resultCount={0} />);
+    const region = screen.getByRole("button", { name: "Region help" });
+    const market = screen.getByRole("button", { name: "Offer market help" });
+    expect(region.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByText(REGION_HELP)).toBeNull();
+    fireEvent.click(region);
+    expect(region.getAttribute("aria-expanded")).toBe("true");
+    const panel = screen.getByText(REGION_HELP);
+    expect(panel.id).toBe(region.getAttribute("aria-controls"));
+    // the other control's help is independent
+    expect(market.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(market);
+    expect(screen.getByText(MARKET_HELP)).toBeTruthy();
+    fireEvent.click(region);
+    expect(screen.queryByText(REGION_HELP)).toBeNull();
+  });
+
+  it("states the limits: not proof of purchase, no delivery/customs claim, missing data is unknown", () => {
+    for (const text of [REGION_HELP, MARKET_HELP]) {
+      expect(text).toMatch(/shipping, customs or delivery|ordered, shipped or cleared through customs/);
+      expect(text).toMatch(/unknown, not unavailable/);
+      expect(text).not.toMatch(/guarantee|will be delivered|ships to/i);
+    }
+    expect(REGION_HELP).toMatch(/not proof that the robot can be bought there/);
+    // the real predicates: region = accessible AVAILABILITY offer incl. wider area + worldwide + unspecified
+    expect(REGION_HELP).toMatch(/wider area/);
+    expect(REGION_HELP).toMatch(/worldwide/);
+    expect(REGION_HELP).toMatch(/no region recorded/);
+    // offer market = price OR availability entry, incl. member countries, whatever its status
+    expect(MARKET_HELP).toMatch(/price or availability entry/);
+    expect(MARKET_HELP).toMatch(/member countries/);
+    expect(MARKET_HELP).toMatch(/whatever the entry's status/);
+  });
+
+  it("changes no filtering: region only / market only / both map to the same params as before", () => {
+    render(<FilterPanel params={{}} resultCount={0} />);
+    fireEvent.change(screen.getByLabelText(/^region$/i), { target: { value: "DE" } });
+    let q = pushedQuery();
+    expect(q.get("region")).toBe("DE");
+    expect(q.has("offered_in")).toBe(false);
+    fireEvent.change(screen.getByLabelText(/offer market/i), { target: { value: "EU" } });
+    q = pushedQuery();
+    expect(q.get("region")).toBe("DE");
+    expect(q.get("offered_in")).toBe("EU");
+    fireEvent.change(screen.getByLabelText(/^region$/i), { target: { value: "" } });
+    q = pushedQuery();
+    expect(q.has("region")).toBe(false);
+    expect(q.get("offered_in")).toBe("EU");
+  });
+
+  it("counts region and offer market as two separate active filters", () => {
+    expect(countActiveFilters({ region: "DE" })).toBe(1);
+    expect(countActiveFilters({ offered_in: "EU" })).toBe(1);
+    expect(countActiveFilters({ region: "DE", offered_in: "EU" })).toBe(2);
+    expect(countActiveFilters({})).toBe(0);
+  });
+
+  it("shows the active count on the mobile toggle", () => {
+    render(<FilterPanel params={{ region: "DE", offered_in: "EU" }} resultCount={3} activeCount={2} />);
+    expect(screen.getByRole("button", { name: /^Filters/ }).textContent).toContain("Filters · 2 active");
+  });
+});

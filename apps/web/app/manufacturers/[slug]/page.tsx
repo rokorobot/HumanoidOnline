@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 
 import { findManufacturer } from "@/lib/api-client";
-import { confidenceLabel, sourceTypeLabel, statusLabel } from "@/lib/labels";
+import { confidenceLabel, enumLabel, sourceTypeLabel, statusLabel } from "@/lib/labels";
 import { boolLabel, deploymentMeaning, formatDate, regionLabel } from "@/lib/format";
 import { manufacturerProfileView } from "@/lib/manufacturer-profile";
 import type { ManufacturerSource } from "@/lib/types";
@@ -280,8 +280,8 @@ export default async function ManufacturerDetailPage({
             </div>
             <div className="taglist">
               {providers.map((p) => (
-                <span className="ho-chip" key={p.slug}>
-                  {p.name} · {p.type}
+                <span className="ho-chip" key={p.slug} data-provider={p.slug}>
+                  {p.name} · <span data-enum={p.type}>{enumLabel("provider_type", p.type)}</span>
                 </span>
               ))}
             </div>

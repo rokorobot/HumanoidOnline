@@ -28,6 +28,12 @@ const SCHEMA: Record<EnumKind, string[]> = {
     "FINANCIAL_FILING", "DIRECT_QUOTE", "CONFERENCE", "INTERVIEW", "OTHER",
   ],
   confidence: ["LOW", "MEDIUM", "HIGH", "VERIFIED"],
+  provider_type: [
+    "OEM", "DISTRIBUTOR", "INTEGRATOR", "RENTAL_PROVIDER", "LEASING_PROVIDER", "RAAS_PROVIDER", "SERVICE_PROVIDER",
+  ],
+  capability_category: [
+    "MANIPULATION", "MOBILITY", "PERCEPTION", "AI_AUTONOMY", "INTERACTION", "SOFTWARE", "SAFETY", "OTHER",
+  ],
 };
 
 describe("enum labels are total over the schema enums", () => {

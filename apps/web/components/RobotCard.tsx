@@ -7,7 +7,7 @@ import Link from "next/link";
 import type { RobotListItem } from "@/lib/types";
 import { AvailabilityBadge } from "./AvailabilityState";
 import { CompareLink } from "./CompareLink";
-import { DotMatrix } from "./GraphicMarker";
+import { NavLink } from "./NavLink";
 import { commercialSummary } from "@/lib/commercial-summary";
 import { deriveModelCode } from "@/lib/model-code";
 import { mobilityLabel } from "@/lib/labels";
@@ -36,12 +36,14 @@ export function RobotCard({
     <article className="rcard">
       <div className="rcard-top">
         <MachineCode>{robot.manufacturer.name.toUpperCase()}</MachineCode>
-        <DotMatrix signal={live} />
+        {/* Same 2x2 dot mark as DotMatrix, drawn in CSS: one empty element instead of four <i> in
+            every card (HTML and RSC), which keeps the catalogue document within its budget. */}
+        <span className={live ? "ho-dotsq ho-dotsq--signal" : "ho-dotsq"} aria-hidden="true" />
       </div>
       {/* MEDIA-01: verified real image (same image truth as Robot Detail) in the
           smaller catalogue format, or an explicit unavailable tile — never an
           invented/placeholder robot picture. */}
-      <Link className="rcard-media" href={detailHref} aria-label={`${robot.name} image`}>
+      <NavLink className="rcard-media" href={detailHref} ariaLabel={`${robot.name} image`}>
         {robot.primary_image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -53,13 +55,13 @@ export function RobotCard({
         ) : (
           <span className="rcard-media__unavailable">IMAGE UNAVAILABLE</span>
         )}
-      </Link>
+      </NavLink>
       <div className="rcard-body">
         <div>
           <div className="lockup">
-            <Link className="name" href={detailHref}>
+            <NavLink className="name" href={detailHref}>
               {robot.name}
-            </Link>
+            </NavLink>
             {code && code !== robot.name.toUpperCase() && (
               <span className="code">{code}</span>
             )}

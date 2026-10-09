@@ -365,8 +365,8 @@ describe("DetailComparisonLink (robot detail)", () => {
     window.history.replaceState(null, "", "/robots/unitree-g1?compare=a,b");
     render(
       <>
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- exercises click delegation on a plain server-rendered anchor */}
         <p className="idcrumb">
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- exercises click delegation on a plain server-rendered anchor */}
           <a href="/robots">Robot Catalogue</a>
         </p>
         <DetailComparisonLink {...props} />

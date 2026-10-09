@@ -308,11 +308,10 @@ export default async function RobotDetailPage({
 
             <div className="dims-strip">
               <CommercialTriadInline robot={robot} conf={conf} />
-              {/* Same one-line summary as the catalogue card and compare matrix. */}
-              <p className="csum csum--hero">
-                {heroSummary.line}
-              </p>
             </div>
+            {/* Same one-line summary as the catalogue card and compare matrix,
+                on its own full-width row beneath the three status boxes. */}
+            <p className="csum csum--hero">{heroSummary.line}</p>
           </div>
         </div>
       </div>

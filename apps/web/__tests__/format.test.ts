@@ -98,7 +98,7 @@ describe("resolveAvailabilitySummary", () => {
     expect(s.isUnknown).toBe(false);
     expect(s.modes).toContain("Purchase");
     // the badge says WHAT is available, not a bare "AVAILABLE"
-    expect(s.label).toBe("Available · Purchase, Developer");
+    expect(s.label).toBe("Offered · Purchase, Developer");
   });
 });
 

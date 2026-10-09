@@ -208,7 +208,7 @@ export function resolveAvailabilitySummary(
     };
   }
   return {
-    label: `Available · ${list.join(", ")}`,
+    label: `Offered · ${list.join(", ")}`,
     tone: "default",
     modes: list,
     isUnknown: false,

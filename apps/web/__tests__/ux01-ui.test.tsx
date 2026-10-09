@@ -50,7 +50,7 @@ describe("catalogue card - price and availability integrity", () => {
   it("Digit-like: modes but no price reads 'Offered via ...; no published price'", () => {
     const { container } = render(<RobotCard robot={robot({ available_modes: ["RAAS"] })} />);
     const text = container.textContent ?? "";
-    expect(text).toContain("Available · RaaS");
+    expect(text).toContain("Offered · RaaS");
     expect(text).toContain("Offered via RaaS; no published price");
     expect(text).toContain("No published price");
     // no developer wording survives
@@ -83,7 +83,7 @@ describe("catalogue card - price and availability integrity", () => {
     expect(text).toContain("Not available to order from this seller at present.");
     expect(text).toContain("Price published; ordering not confirmed");
     expect(text).toContain("Availability unknown");
-    expect(text).not.toMatch(/Available ·/);
+    expect(text).not.toMatch(/Offered ·/);
   });
 
   it("nothing known: unknown tone, never 'not available'", () => {

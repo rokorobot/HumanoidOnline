@@ -23,7 +23,13 @@ export interface ProviderLabel {
   named: boolean;
 }
 
-export function providerLabel(slug: string, names?: ProviderNames | null): ProviderLabel {
-  const name = names?.[slug];
+export function providerLabel(
+  slug: string,
+  names?: ProviderNames | null,
+  apiName?: string | null,
+): ProviderLabel {
+  // Precedence: the name the API sent with the offer -> the maker's own providers list ->
+  // a neutral identifier. A slug is never turned into a name.
+  const name = apiName?.trim() || names?.[slug];
   return name ? { text: name, named: true } : { text: `Seller ref: ${slug}`, named: false };
 }

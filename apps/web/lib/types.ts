@@ -31,6 +31,8 @@ export interface PriceDisplay {
   // can be ordered. Rendering the number without them would show one supplier's
   // price under another supplier's terms.
   provider?: string | null;
+  // The provider record's own display name (API addition, optional: absent on older APIs).
+  provider_name?: string | null;
   region?: string | null;
   price_basis?: string | null;
   order_status_note?: string | null;
@@ -205,6 +207,8 @@ export interface PricingOffer {
   billing_period: string;
   region?: string | null;
   provider?: string | null;
+  // The provider record's own display name (API addition, optional: absent on older APIs).
+  provider_name?: string | null;
   // One fact per field, so none of them has to be parsed out of prose.
   price_basis?: string | null;
   shipping_terms?: string | null;
@@ -227,6 +231,8 @@ export interface AvailabilityOffer {
   availability_status: string;
   region?: string | null;
   provider?: string | null;
+  // The provider record's own display name (API addition, optional: absent on older APIs).
+  provider_name?: string | null;
   available_from?: string | null;
   lead_time_days?: number | null;
   // The seller's own sentence, and a delivery estimate that states the country

@@ -189,6 +189,7 @@ class PricingOfferRead(BaseModel):
     billing_period: str
     region: str | None = None
     provider: str | None = None
+    provider_name: str | None = None
     #: Public offer detail, one fact per field: what the amount includes, what
     #: shipping costs, what is in the box, what THIS seller warrants, and whether
     #: it can be ordered right now.
@@ -216,6 +217,7 @@ class AvailabilityOfferRead(BaseModel):
     availability_status: str
     region: str | None = None
     provider: str | None = None
+    provider_name: str | None = None
     available_from: date | None = None
     lead_time_days: int | None = None
     #: The seller's own sentence, and its delivery estimate with the geography it

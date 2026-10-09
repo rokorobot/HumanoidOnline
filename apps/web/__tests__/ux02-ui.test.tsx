@@ -222,6 +222,38 @@ describe("provider display names", () => {
     ]);
   });
 
+  it("payload provider_name wins over the maker's map, which wins over the identifier", () => {
+    expect(providerLabel("alza-cz", names, "Alza.cz")).toEqual({ text: "Alza.cz", named: true });
+    expect(providerLabel("unitree-store", names, "Unitree Store (API)").text).toBe("Unitree Store (API)");
+    expect(providerLabel("unitree-store", names, null).text).toBe("Unitree Online Store");
+    expect(providerLabel("unitree-store", names, "  ").text).toBe("Unitree Online Store");
+    expect(providerLabel("alza-cz", names, undefined).text).toBe("Seller ref: alza-cz");
+    expect(providerLabel("alza-cz", undefined, null).text).toBe("Seller ref: alza-cz");
+  });
+
+  it("a card shows the API's provider_name with the slug kept in data-provider", () => {
+    const { container } = render(
+      <PriceStateCard
+        price={{ type: "PUBLIC", amount: 1, currency: "CZK", provider: "alza-cz", provider_name: "Alza.cz", region: "CZ" }}
+      />,
+    );
+    const el = container.querySelector("[data-provider]");
+    expect(el?.getAttribute("data-provider")).toBe("alza-cz");
+    expect(el?.textContent).toBe("Alza.cz · CZ");
+  });
+
+  it("an older API payload without provider_name still renders (identifier fallback)", () => {
+    const { container } = render(
+      <PriceStateCard price={{ type: "PUBLIC", amount: 1, currency: "CZK", provider: "alza-cz", region: "CZ" }} />,
+    );
+    expect(container.querySelector("[data-provider]")?.textContent).toBe("Seller ref: alza-cz · CZ");
+    cleanup();
+    const nulled = render(
+      <PriceStateCard price={{ type: "PUBLIC", amount: 1, currency: "CZK", provider: "alza-cz", provider_name: null }} />,
+    );
+    expect(nulled.container.querySelector("[data-provider]")?.textContent).toBe("Seller ref: alza-cz");
+  });
+
   it("a card keeps the offer's own provider, region, basis and order note together; slug in data-provider", () => {
     const { container } = render(
       <PriceStateCard

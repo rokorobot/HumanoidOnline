@@ -35,7 +35,7 @@ export function PriceStateCard({
   const hatch = s.tone === "unknown" ? "hatchbox" : "";
   // The API gives a seller SLUG only; cards have no authoritative name map, so the
   // neutral identifier form is used (see lib/providers.ts). Region is unchanged.
-  const label = price?.provider ? providerLabel(price.provider, names) : null;
+  const label = price?.provider ? providerLabel(price.provider, names, price.provider_name) : null;
   const seller = label ? [label.text, price?.region].filter(Boolean).join(" · ") : null;
   const tag = shortBasisTag(price?.price_basis);
   return (

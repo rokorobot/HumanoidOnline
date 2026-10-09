@@ -715,9 +715,9 @@ function PricingRow({ offer, names }: { offer: PricingOffer; names: ProviderName
       </div>
       <div
         className={offer.provider ? "tt-none" : "val unknown tt-none"}
-        {...(offer.provider && names[offer.provider] ? { "data-provider": offer.provider } : {})}
+        {...(offer.provider && (offer.provider_name || names[offer.provider]) ? { "data-provider": offer.provider } : {})}
       >
-        {offer.provider ? providerLabel(offer.provider, names).text : "—"}
+        {offer.provider ? providerLabel(offer.provider, names, offer.provider_name).text : "—"}
       </div>
       <div>
         <PriceStateLong price={price} />

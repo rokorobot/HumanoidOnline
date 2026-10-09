@@ -287,13 +287,28 @@ test.describe("UX-02E no developer tokens in visible text", () => {
     expect(status?.[1]).toBe("Robot-as-a-service");
   });
 
+  test("provider names from the API: a reseller shows its real name on a card and in a detail row", async ({ page }) => {
+    await page.goto("/robots", { waitUntil: "networkidle" });
+    await expect(page.locator('article.rcard [data-provider="alza-cz"]').first()).toContainText("Alza.cz");
+    await expect(page.locator('article.rcard [data-provider="reichelt"]').first()).toContainText("reichelt elektronik");
+    await page.goto("/robots/unitree-h2", { waitUntil: "networkidle" });
+    await expect(page.locator('[data-provider="reichelt"]').first()).toHaveText("reichelt elektronik");
+    // no page shows a bare provider slug (visible text is the name, even though CSS upper-cases it)
+    for (const path of ["/robots", "/robots/unitree-h2", "/robots/unitree-g1", "/compare?ids=unitree-g1,unitree-h2"]) {
+      await page.goto(path, { waitUntil: "networkidle" });
+      const text = (await page.evaluate(() => document.body.innerText)).toLowerCase();
+      for (const slug of ["alza-cz", "robotshop-eu", "robotshop-us", "quadruped-de", "unitree-store", "seller ref"]) {
+        expect(text, `${slug} on ${path}`).not.toContain(slug);
+      }
+    }
+  });
+
   test("provider names: the maker's own store is named, a reseller is a labelled identifier", async ({ page }) => {
     await page.goto("/robots/unitree-g1", { waitUntil: "networkidle" });
     const named = page.locator('[data-provider="unitree-store"]').first();
     await expect(named).toHaveText("Unitree Online Store");
-    // A reseller is not in the maker's provider list: shown as an identifier, never a made-up name.
-    await expect(page.getByText("Seller ref: robotshop-us", { exact: true }).first()).toBeVisible();
-    await expect(page.getByText(/^Robotshop/i)).toHaveCount(0);
+    // A reseller now carries the provider record's own name from the API.
+    await expect(page.locator('[data-provider="robotshop-us"]').first()).toHaveText("RobotShop US");
   });
 });
 

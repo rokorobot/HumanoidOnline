@@ -68,6 +68,7 @@ import { CompareEvidenceSheet } from "@/components/CompareEvidenceSheet";
 import { EvidenceDates } from "@/components/EvidenceDates";
 import {
   contextCounts,
+  eligibleForRegion,
   inScope,
   MARKET_HELP,
   NO_BUYER_CONTEXT,
@@ -1127,7 +1128,7 @@ function AvailabilityCell({
     <td className={`cell${cls}`} data-enum={row.availability_status}>
       {availabilityLabel(row.availability_status)}
       {observed && <span className="cmp-obs">observed {observed}</span>}
-      <RegionNote offers={modeRows.filter(isAccessible)} context={context} />
+      <RegionNote offers={modeRows.filter(eligibleForRegion)} context={context} />
       <MarketNote offers={modeRows} context={context} />
     </td>
   );

@@ -28,6 +28,7 @@ import { SectionIndex } from "@/components/SectionIndex";
 import { SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 import { CompareView } from "./CompareView";
+import "./compare.css";
 
 export const dynamic = "force-dynamic";
 

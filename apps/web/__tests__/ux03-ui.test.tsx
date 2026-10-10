@@ -212,6 +212,16 @@ describe("buyer context - Region and Offer market stay two questions", () => {
     expect(contextCounts(robots, NO_BUYER_CONTEXT)).toEqual({ region: null, market: null });
   });
 
+  it("a used or refurbished listing never makes an offer 'apply' to a region", () => {
+    const refurbished = robot("rf", "Refurb", [], [avail({ region: "DE", condition: "REFURBISHED" })]);
+    const ctx: BuyerContext = { region: "DE", market: null, applicable: DE_SCOPE.applicable, marketCodes: null };
+    expect(contextCounts([refurbished, published], ctx).region).toBe(1);
+    const { container } = view([refurbished, published], { context: ctx });
+    const cells = rowOf(container, "Purchase").querySelectorAll("td");
+    expect(cells[0].textContent).not.toContain("Applies to DE");
+    expect(cells[1].textContent).toContain("Applies to DE");
+  });
+
   it("round-trips through the URL with the catalogue's parameter names", () => {
     const base = { ref: null, units: "metric" as const, view: "matrix" as const };
     expect(buildCompareUrl(["a", "b"], base)).toBe("/compare?ids=a%2Cb");

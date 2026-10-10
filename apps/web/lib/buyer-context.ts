@@ -88,7 +88,13 @@ export function scopedRegions(offers: Offer[], scope: string[]): string[] {
   return out;
 }
 
-function accessible(a: AvailabilityOffer): boolean {
+/**
+ * The availability rows the `region` question is asked of: NEW condition and a
+ * commercially accessible status, as the catalogue's region filter defines it
+ * (see REGION_HELP). A used or refurbished listing never makes a robot "apply".
+ */
+export function eligibleForRegion(a: AvailabilityOffer): boolean {
+  if (a.condition && a.condition !== "NEW") return false;
   return a.availability_status !== "NOT_AVAILABLE" && a.availability_status !== "DISCONTINUED";
 }
 
@@ -104,7 +110,7 @@ export function contextCounts(
 ): { region: number | null; market: number | null } {
   const region = ctx.applicable
     ? robots.filter((r) =>
-        r.availability_offers.some((a) => accessible(a) && inScope(a.region, ctx.applicable!)),
+        r.availability_offers.some((a) => eligibleForRegion(a) && inScope(a.region, ctx.applicable!)),
       ).length
     : null;
   const market = ctx.marketCodes

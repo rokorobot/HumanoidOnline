@@ -3,6 +3,8 @@
 //   &ref=<slug>     reference robot for factual numeric deltas
 //   &units=imperial Metric/Imperial presentation toggle (presentation only)
 //   &view=evidence  deep fact-level evidence comparison
+//   &region=<code> / &offered_in=<code>  optional Buyer context (UX-03): annotates
+//                   recorded offers with the catalogue filters' own two questions
 // The URL is the single source of truth — every bit of view state round-trips
 // through reload / back / forward / share, and device-local Saved Views simply
 // reconstruct one of these URLs (localStorage only; no persistence/API/schema).
@@ -13,7 +15,13 @@
 // lib/comparison-policy.ts (tested); this page only fetches + delegates.
 import Link from "next/link";
 
-import { compareRobots } from "@/lib/api-client";
+import { compareRobots, getRegionScope } from "@/lib/api-client";
+import {
+  OFFER_MARKETS,
+  parseContextCode,
+  REGIONS,
+  type BuyerContext,
+} from "@/lib/buyer-context";
 import { isUnitSystem, type UnitSystem } from "@/lib/units";
 import type { CompareResponse, ResolvedFact } from "@/lib/types";
 import { SectionIndex } from "@/components/SectionIndex";
@@ -59,6 +67,8 @@ export default async function ComparePage({
     ref?: string | string[];
     units?: string | string[];
     view?: string | string[];
+    region?: string | string[];
+    offered_in?: string | string[];
   }>;
 }) {
   const sp = await searchParams;
@@ -75,6 +85,24 @@ export default async function ComparePage({
   const viewParam = first(sp.view);
   const view = viewParam === "evidence" ? "evidence" : "matrix";
   const ref = first(sp.ref) ?? null;
+
+  // Buyer context. A value outside the offered lists is ignored (unset), and the
+  // scope itself comes from the API's canonical region resolvers — this page
+  // derives no geography. No scope (unknown code) leaves that question unasked.
+  const region = parseContextCode(first(sp.region), REGIONS);
+  const market = parseContextCode(first(sp.offered_in), OFFER_MARKETS);
+  const [regionScope, marketScope] = data
+    ? await Promise.all([
+        region ? getRegionScope(region) : null,
+        market ? getRegionScope(market) : null,
+      ])
+    : [null, null];
+  const context: BuyerContext = {
+    region: regionScope ? region : null,
+    market: marketScope ? market : null,
+    applicable: regionScope?.applicable ?? null,
+    marketCodes: marketScope?.market ?? null,
+  };
 
   return (
     <>
@@ -113,7 +141,8 @@ export default async function ComparePage({
             // would only grow the delivered document (perf budget).
             data={slimForClient(data)}
             ids={data.robots.map((r) => r.slug)}
-            state={{ ref, units, view }}
+            state={{ ref, units, view, region: context.region, market: context.market }}
+            context={context}
           />
         )}
       </div>

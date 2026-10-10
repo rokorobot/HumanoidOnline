@@ -30,6 +30,25 @@
 - **C3.** Given fewer than 2 valid ids, then the page prompts for selection instead of erroring.
 - **C4.** Given a comparison URL, when shared and reopened, then the same comparison renders (state lives in the URL).
 
+### C-M. Comparison on a phone (UX-03)
+
+One comparison: the phone layout is the same matrix and the same comparison policy as the desktop table, never a second implementation.
+
+- **C5.** Given 2, 3 or 4 published robots, when `/compare` renders at 320, 390 or 430 px wide, then the page has no horizontal overflow (also with a wide fallback font), each metric is a full-width label over the robot columns, and the robot header columns are the same columns as the metric cells (equal left edge and width).
+- **C6.** Given the rows are scrolled, then the robot header stays pinned at the top of the viewport.
+- **C7.** Given a set too wide for the screen (four robots below 600 px, three below 360 px), then exactly two aligned columns are shown with a previous/next control; no column is squeezed below a readable width. Given a reference robot, it is one of the two columns on every page.
+- **C8.** Given a phone-width price cell, then it shows the amount with its price type, its configuration when configuration-specific ("From …", "N configurations priced"), its region and its seller, and nothing else. `QUOTE_ONLY`, `RANGE`, `ESTIMATED`, `MANUFACTURER_ESTIMATE` and no-price each render as their own state; a leader ("LOWEST COMPARABLE PRICE") is named only among like-for-like offers.
+- **C9.** Given "Offers & evidence" is opened for a robot, then a modal dialog lists every pricing and availability entry for that robot — each with its own region, seller, terms, source, PUBLISHED / OBSERVED / VERIFIED dates and source link. Focus moves into the dialog and cannot reach the page behind it, Escape closes it, focus returns to the control that opened it, and the entries scroll inside the dialog.
+- **C10.** Given a robot with no availability entry, then its availability cells read "Availability not recorded" (missing catalogue evidence, not unavailability); "—" is reserved for "no offer in this mode". Given an availability status, then the date it was observed is shown beside it.
+- **C11.** Given the optional Buyer context (`region=`, `offered_in=`), then recorded offers are annotated and none is hidden, filtered or changed; every offer keeps the region it was recorded for. An offer recorded for a member country is in the zone's market and does not apply to the zone as a region. Scope comes from the API's canonical region resolvers (`GET /api/regions/{code}/scope`); the client derives no geography.
+- **C12.** Given a robot with several availability entries for one transaction mode recorded for different regions, then "Applies to {region}" is said only when the entry whose status is displayed is itself in scope; when a different entry is in scope the note says so and names both regions.
+- **C13.** Given a viewport wider than 720 px, then the comparison renders as the desktop table (row label left of its cells, all robots shown, no paging control, no phone-only controls).
+
+**Release validation (manual, not covered by CI).** Automated accessibility checks run in Chromium only and do not prove the following; each is checked by a person before UX-03 is closed:
+
+- **C-M.R1.** Real iPhone / Safari: layout at phone width, pinned header, paging, sheet open / scroll / close, native select menus in Buyer context.
+- **C-M.R2.** Screen reader (VoiceOver on iOS Safari; one desktop reader): the matrix is still announced as a table with row headers at phone width — the rows use `display: grid`, which older Safari versions are known to strip of table semantics — and the dialog announces its title and traps reading focus.
+
 ## D. Buyer intent
 
 - **D1.** Given a requirement for logistics use in Germany, when the wizard is submitted, then a `buyer_requirement` record is persisted with `country_region` resolved to `DE` and `raw_input` containing the full answers.

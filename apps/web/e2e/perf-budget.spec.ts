@@ -50,7 +50,13 @@ const STATIC: Budget[] = [
   { path: "/robots/unitree-g1", docKB: 89, jsRawKB: 412 },
   // UX-01: 32 -> 33 (measured 32.06). The compare price cell now carries its configuration,
   // basis tag, order note and the shared summary line, plus data-enum traceability.
-  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 33, jsRawKB: 431 },
+  // UX-03: 33 -> 35 (measured 33.6). Mobile compare adds, per robot, the seller/region line
+  // and the "Offers & evidence" control, the observed date beside each availability status,
+  // the collapsed Buyer context toggle and one legend entry. The sheet's contents and the
+  // Buyer context controls are rendered only when opened, and the paging control only for
+  // three or more robots, so none of those reach this document. 35 rather than 34 because
+  // documents on this suite vary by a few hundred bytes between runs.
+  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 35, jsRawKB: 431 },
   { path: "/find-a-humanoid", docKB: 46, jsRawKB: 424 },
 ];
 

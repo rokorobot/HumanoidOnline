@@ -256,6 +256,53 @@ describe("buyer context - Region and Offer market stay two questions", () => {
   });
 });
 
+describe("several availability entries for one mode, recorded for different regions", () => {
+  // The cell shows the FIRST accessible entry's status. The region note must
+  // never credit that entry with another entry's applicability.
+  const mixed = robot("mx", "Mixed", [], [
+    avail({ region: "US", availability_status: "ON_REQUEST" }),
+    avail({ region: "DE", availability_status: "AVAILABLE" }),
+  ]);
+  const cellFor = (region: string, applicable: string[]) => {
+    const { container } = view([mixed, published], {
+      context: { region, market: null, applicable, marketCodes: null },
+    });
+    return rowOf(container, "Purchase").querySelectorAll("td")[0].textContent ?? "";
+  };
+
+  it("says another entry applies, and where the shown one is recorded", () => {
+    const text = cellFor("DE", DE_SCOPE.applicable);
+    // The shown status is still the US entry's, unchanged.
+    expect(text).toContain("Availability on request");
+    expect(text).toContain("Another entry (DE) applies to DE; this one is recorded for US");
+    expect(text).not.toMatch(/^.*request.*Applies to DE/);
+    expect(text).not.toContain("does not apply");
+  });
+
+  it("says 'Applies' only when the shown entry itself is in scope", () => {
+    expect(cellFor("US", ["US", "GLOBAL"])).toContain("Applies to US");
+  });
+
+  it("names every recorded region when none applies", () => {
+    expect(cellFor("EU", EU_SCOPE.applicable)).toContain("Recorded for US, DE; does not apply to EU");
+  });
+
+  it("the sheet lists both entries with their own regions", () => {
+    view([mixed, published], {
+      context: { region: "DE", market: null, applicable: DE_SCOPE.applicable, marketCodes: null },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Offers and evidence: Mixed" }));
+    const entries = screen
+      .getByRole("dialog", { hidden: true })
+      .querySelectorAll("article.cmp-entry");
+    expect(entries).toHaveLength(2);
+    expect(entries[0].textContent).toContain("RegionUS");
+    expect(entries[0].textContent).toContain("Region DEDoes not apply");
+    expect(entries[1].textContent).toContain("RegionDE");
+    expect(entries[1].textContent).toContain("Region DEApplies");
+  });
+});
+
 describe("availability - missing evidence is not unavailability", () => {
   it("a robot with no availability entry reads 'Availability not recorded'", () => {
     const { container } = view([published, twoRegions]);

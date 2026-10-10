@@ -213,6 +213,38 @@ test("@responsive compare buyer context: Region and Offer market annotate, never
   );
 });
 
+test("@responsive compare: a configuration-specific manufacturer estimate keeps its configuration on a phone", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/compare?ids=4ne1-mini,unitree-g1", { waitUntil: "networkidle" });
+  // 4NE1 Mini: NEURA's own estimates, EUR 19,999 (Standard) and EUR 29,999 (Pro).
+  const cell = page.locator("table.cmatrix tr", { has: page.locator("th.rowlab", { hasText: /^Price$/ }) })
+    .locator("td.cell")
+    .first();
+  // The concise cell never shows the amount without what it is and whose it is.
+  await expect(cell).toContainText("From €19,999");
+  await expect(cell).toContainText("Manufacturer estimate");
+  await expect(cell).toContainText("Standard configuration");
+  await expect(cell).toContainText("2 configurations priced");
+  await expect(cell).not.toContainText("29,999");
+  // An estimate is not a like-for-like published price: no leader is named.
+  await expect(page.getByText(/LOWEST COMPARABLE PRICE/i)).toHaveCount(0);
+  expect(await pageOverflow(page)).toBeLessThanOrEqual(1);
+
+  // The sheet holds BOTH configurations' entries, each with its own configuration.
+  await cell.getByRole("button", { name: /^Offers and evidence/ }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toContainText("Price entries · 2");
+  await expect(dialog).toContainText("€19,999");
+  await expect(dialog).toContainText("€29,999");
+  await expect(dialog.locator("article.cmp-entry", { hasText: "€29,999" })).toContainText("Pro");
+  await expect(dialog.locator("article.cmp-entry", { hasText: "€19,999" })).toContainText("Standard");
+  await expect(dialog).toContainText("Manufacturer estimate");
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+});
+
 test("@responsive @a11y compare at 390px: four robots, axe clean", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`/compare?ids=${SETS[4]}`, { waitUntil: "networkidle" });

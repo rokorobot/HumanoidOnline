@@ -327,16 +327,43 @@ function ContextHelp({ id, label, text }: { id: string; label: string; text: str
   );
 }
 
-/** What the Buyer context says about a set of recorded offers. Annotation only. */
-function RegionNote({ offers, context }: { offers: AvailabilityOffer[]; context: BuyerContext }) {
+/**
+ * What the Buyer context's region says about one mode's availability entries.
+ * Annotation only, and precise about WHICH entry it speaks of: a cell shows one
+ * entry's status (`shown`) while a robot may hold several entries for the mode,
+ * recorded for different regions. "Applies" is said of the shown entry only when
+ * that entry itself is in scope; when a different entry is the one in scope, the
+ * note says so and names the region it is recorded for.
+ */
+function RegionNote({
+  shown,
+  offers,
+  context,
+}: {
+  shown: AvailabilityOffer;
+  offers: AvailabilityOffer[];
+  context: BuyerContext;
+}) {
   if (!context.region || !context.applicable || offers.length === 0) return null;
-  const applies = offers.some((a) => inScope(a.region, context.applicable!));
-  const recorded = [...new Set(offers.map((a) => a.region ?? "no region"))].join(", ");
+  const scope = context.applicable;
+  const where = (a: AvailabilityOffer) => a.region ?? "no region";
+  if (offers.includes(shown) && inScope(shown.region, scope)) {
+    return <span className="cmp-ctx">Applies to {context.region}</span>;
+  }
+  const other = offers.filter((a) => a !== shown && inScope(a.region, scope));
+  if (other.length > 0) {
+    const regions = [...new Set(other.map(where))].join(", ");
+    return (
+      <span className="cmp-ctx">
+        Another entry ({regions}) applies to {context.region}; this one is recorded for{" "}
+        {where(shown)}
+      </span>
+    );
+  }
+  const recorded = [...new Set(offers.map(where))].join(", ");
   return (
-    <span className={`cmp-ctx${applies ? "" : " no"}`}>
-      {applies
-        ? `Applies to ${context.region}`
-        : `Recorded for ${recorded}; does not apply to ${context.region}`}
+    <span className="cmp-ctx no">
+      Recorded for {recorded}; does not apply to {context.region}
     </span>
   );
 }
@@ -1128,7 +1155,7 @@ function AvailabilityCell({
     <td className={`cell${cls}`} data-enum={row.availability_status}>
       {availabilityLabel(row.availability_status)}
       {observed && <span className="cmp-obs">observed {observed}</span>}
-      <RegionNote offers={modeRows.filter(eligibleForRegion)} context={context} />
+      <RegionNote shown={row} offers={modeRows.filter(eligibleForRegion)} context={context} />
       <MarketNote offers={modeRows} context={context} />
     </td>
   );

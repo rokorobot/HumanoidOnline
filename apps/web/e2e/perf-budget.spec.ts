@@ -46,11 +46,20 @@ async function measure(page: Page, path: string) {
 
 // `/robots` is deliberately NOT in this table — see the scale-aware test below.
 const STATIC: Budget[] = [
-  { path: "/", docKB: 62, jsRawKB: 404 },
-  { path: "/robots/unitree-g1", docKB: 89, jsRawKB: 412 },
+  // SOCIAL-01: the three caps below were raised for the social sharing cards.
+  // Every document now carries 18 Open Graph / Twitter tags (the route's own
+  // title and description for each, plus the card image), and Next repeats
+  // them in the streamed payload: +3.2 to +4.9 kB per document, measured
+  // against production. Owner-approved; no other limit changed.
+  // SOCIAL-01: 62 -> 65 (measured 63.8).
+  { path: "/", docKB: 65, jsRawKB: 404 },
+  // SOCIAL-01: 89 -> 95 (measured 93.6). The largest increase: this route has
+  // the longest description, and it is the one repeated per card.
+  { path: "/robots/unitree-g1", docKB: 95, jsRawKB: 412 },
   // UX-01: 32 -> 33 (measured 32.06). The compare price cell now carries its configuration,
   // basis tag, order note and the shared summary line, plus data-enum traceability.
-  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 33, jsRawKB: 431 },
+  // SOCIAL-01: 33 -> 37 (measured 35.4).
+  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 37, jsRawKB: 431 },
   { path: "/find-a-humanoid", docKB: 46, jsRawKB: 424 },
 ];
 

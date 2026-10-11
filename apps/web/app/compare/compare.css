@@ -1,0 +1,140 @@
+/* ---- COMPARE — UX-03 mobile compare -------------------------------------- */
+/* Route-scoped: imported by app/compare/page.tsx only, so no other page pays for
+   it (in bytes or in an extra stylesheet request). It builds on the compare rules
+   in globals.css; selectors here are prefixed with .cmp-root where they override
+   one, so the result does not depend on stylesheet order. */
+/* ONE DOM. Above 720px the matrix is the same table as before. At and below it
+   the table's rows become a label band over aligned robot columns, the robot
+   header is pinned, and a too-wide set is paged two columns at a time. Tracks
+   are minmax(0, 1fr) and cells min-width: 0, so wide fallback fonts cannot push
+   the page sideways. */
+.cmp-root { --cmp-cols: var(--cmp-n, 2); }
+.cmp-root .selrow { grid-template-columns: 190px repeat(var(--cmp-n, 2), 1fr); }
+.cmp-m, .cmp-pager { display: none; }
+
+/* Facts beside an availability status / price: when it was observed, and what
+   the optional Buyer context says about the recorded offers. */
+.cmp-obs, .cmp-ctx { display: block; font-family: var(--ho-font-machine);
+  font-size: var(--ho-fs-mono-s); letter-spacing: var(--ho-tracking-code); margin-top: 3px; }
+.cmp-obs { color: var(--ho-text-muted); }
+.cmp-ctx { color: var(--ho-verified); }
+.cmp-ctx.no { color: var(--ho-text); }
+
+/* Buyer context — collapsed by default. */
+.cmp-bctx { border: var(--ho-rule-hair) solid var(--ho-ink); background: var(--ho-paper-2);
+  margin-bottom: var(--ho-sp-4); }
+.cmp-bctx-toggle { width: 100%; min-height: 44px; display: flex; flex-wrap: wrap; align-items: center;
+  justify-content: space-between; gap: 6px 12px; padding: 8px 12px; background: none; border: 0;
+  cursor: pointer; text-align: left; font-family: var(--ho-font-machine);
+  font-size: var(--ho-fs-mono-s); letter-spacing: var(--ho-tracking-code); color: var(--ho-text); }
+.cmp-bctx-sum { flex: 1 1 12ch; min-width: 0; }
+.cmp-bctx-act { letter-spacing: var(--ho-tracking-label); font-weight: 600; }
+.cmp-bctx-body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 var(--ho-sp-5);
+  padding: 4px 12px 12px; border-top: var(--ho-rule-hair) solid var(--ho-line-soft); }
+.cmp-bctx-body > .note { grid-column: 1 / -1; margin: 8px 0; }
+.cmp-bctx-body .field { min-width: 0; }
+.cmp-bctx-body .field select { min-height: 44px; width: 100%; }
+.cmp-bctx-count { display: block; text-transform: none; letter-spacing: var(--ho-tracking-code);
+  color: var(--ho-text); line-height: 1.5; }
+
+/* Paging control (only displayed where paging applies, below). */
+.cmp-pager { align-items: center; justify-content: space-between; gap: 8px; padding: 6px 8px;
+  border: var(--ho-rule-med) solid var(--ho-ink); border-bottom: 0;
+  border-top: var(--ho-rule-hair) solid var(--ho-line-soft); background: var(--ho-paper); }
+.cmp-pager .btn { min-height: 44px; padding: 0 10px; }
+.cmp-pager .ho-syslabel { min-width: 0; text-align: center; overflow-wrap: anywhere; }
+
+.cmp-detail { margin-top: 8px; width: 100%; min-height: 44px; padding: 4px 8px; align-items: center;
+  background: var(--ho-ink); color: var(--ho-paper); border: 0; cursor: pointer; text-align: left;
+  font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s); letter-spacing: 0.04em; }
+
+/* "Offers & evidence" sheet — a native modal dialog. */
+dialog.cmp-sheet { padding: 0; width: min(640px, 100%); max-width: 100%; max-height: min(88vh, 880px);
+  background: var(--ho-paper); color: var(--ho-text); border: var(--ho-rule-med) solid var(--ho-ink);
+  border-top: 3px solid var(--ho-signal); }
+dialog.cmp-sheet[open] { display: flex; flex-direction: column; }
+dialog.cmp-sheet::backdrop { background: rgba(19, 18, 16, 0.6); }
+.cmp-sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  padding: 14px 16px; border-bottom: var(--ho-rule-med) solid var(--ho-ink); }
+.cmp-sheet-head h2 { font-size: var(--ho-fs-h2); margin: 2px 0; overflow-wrap: anywhere; }
+.cmp-sheet-close { min-width: 44px; min-height: 44px; padding: 0; justify-content: center; }
+.cmp-sheet-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch; padding: 4px 16px 20px; }
+.cmp-entry { border: var(--ho-rule-hair) solid var(--ho-ink); background: var(--ho-paper-2);
+  padding: 12px; margin-bottom: 12px; }
+.cmp-entry--absent { border-style: dashed; border-color: var(--ho-grey-400); }
+.cmp-entry--absent .hatch { display: inline-block; padding: 1px 7px; color: var(--ho-unknown);
+  border: var(--ho-rule-hair) dashed var(--ho-grey-400); font-family: var(--ho-font-machine);
+  font-size: var(--ho-fs-mono); }
+.cmp-entry .note { margin-top: 8px; }
+.cmp-entry-main { font-weight: 700; font-size: var(--ho-fs-h2); line-height: 1.2; margin-bottom: 4px;
+  overflow-wrap: anywhere; }
+.cmp-entry .mfr-facts { margin-top: 8px; }
+.cmp-entry-ev { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
+  gap: 8px 12px; margin-top: 10px; font-family: var(--ho-font-machine); font-size: var(--ho-fs-mono-s);
+  color: var(--ho-text-muted); }
+.cmp-entry-ev a { text-decoration: underline; color: var(--ho-signal-ink); display: inline-block;
+  padding: 6px 0; }
+
+@media (max-width: 720px) {
+  .cmp-m { display: block; }
+  button.cmp-detail.cmp-m { display: inline-flex; }
+
+  /* Pinned robot header, aligned to the matrix columns. */
+  .cmp-root .selrow-wrap { overflow: visible; position: sticky; top: 0; z-index: 4; background: var(--ho-paper); }
+  .cmp-root .selrow { min-width: 0; grid-template-columns: repeat(var(--cmp-cols), minmax(0, 1fr));
+    border-bottom: var(--ho-rule-med) solid var(--ho-ink); }
+  .cmp-root .selrow .rowlab { display: none; }
+  .cmp-root .selrow .cell { padding: 8px; min-width: 0; overflow-wrap: anywhere; }
+  .cmp-root .selrow .lockup .name { font-size: 1rem; }
+  .cmp-root .cmp-ref-btn { width: 100%; min-height: 44px; margin-top: 6px; padding: 4px 6px;
+    letter-spacing: 0.04em; text-align: left; }
+
+  /* The table, restyled: each row is a full-width label over the robot columns. */
+  .cmp-root .cmp-scroll { overflow-x: visible; }
+  .cmp-root table.cmatrix { display: block; width: 100%; min-width: 0; border-top: 0; }
+  .cmp-root table.cmatrix colgroup { display: none; }
+  .cmp-root table.cmatrix tbody { display: block; }
+  .cmp-root table.cmatrix tr { display: grid; grid-template-columns: repeat(var(--cmp-cols), minmax(0, 1fr)); }
+  .cmp-root table.cmatrix th.rowlab, .cmp-root .grouprow th, .cmp-root .cmp-annot td { grid-column: 1 / -1; }
+  .cmp-root table.cmatrix th.rowlab { position: static; background: var(--ho-grey-100); color: var(--ho-text);
+    font-weight: 600; padding: 6px 10px; border-right: 0; }
+  .cmp-root .cmp-annot th.rowlab { display: none; }
+  .cmp-root table.cmatrix tbody td { padding: 8px; min-width: 0; overflow-wrap: anywhere; }
+  /* Concise cells: amount, type, configuration and seller stay; the full price terms
+     and the one-line commercial summary (restated by the availability rows right
+     below) are in the sheet. Small labels drop the wide tracking so a word such as
+     "configuration" fits a narrow column instead of breaking mid-word. */
+  .cmp-root table.cmatrix .price-terms, .cmp-root table.cmatrix .cmp-csum { display: none; }
+  .cmp-root table.cmatrix td .ho-syslabel { letter-spacing: var(--ho-tracking-code); text-transform: none; }
+
+  /* The toolbar stays above the matrix but stops costing half a screen: units and
+     view share a row, and the three actions share the next one. */
+  .cmp-root .cmp-toolbar { padding: var(--ho-sp-3); gap: var(--ho-sp-3); }
+  .cmp-root .cmp-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ho-sp-3); width: 100%; }
+  .cmp-root .cmp-seg-btns { display: flex; }
+  .cmp-root .cmp-seg-btn { flex: 1; min-width: 0; min-height: 44px; padding-left: 4px; padding-right: 4px;
+    letter-spacing: 0.06em; }
+  .cmp-root .cmp-actions { gap: var(--ho-sp-2); width: 100%; }
+  .cmp-root .cmp-actions > .btn { flex: 1 1 auto; min-height: 44px; padding: 6px 10px; justify-content: center; }
+
+  .cmp-root .evrow { grid-template-columns: minmax(0, 1fr); }
+  .cmp-bctx-body { grid-template-columns: minmax(0, 1fr); }
+
+  dialog.cmp-sheet { width: 100%; max-height: 88vh; margin: auto 0 0; border-left: 0; border-right: 0;
+    border-bottom: 0; }
+}
+
+/* A deliberate narrow mode instead of shrinking: four robots on a phone, or three
+   on a very small one, show two aligned columns at a time with a pager. */
+@media (max-width: 599px) {
+  .cmp-root[data-n="4"] { --cmp-cols: 2; }
+  .cmp-root[data-n="4"] .c-off { display: none; }
+  .cmp-root[data-n="4"] .cmp-pager { display: flex; }
+}
+@media (max-width: 359px) {
+  .cmp-root[data-n="3"] { --cmp-cols: 2; }
+  .cmp-root[data-n="3"] .c-off { display: none; }
+  .cmp-root[data-n="3"] .cmp-pager { display: flex; }
+}

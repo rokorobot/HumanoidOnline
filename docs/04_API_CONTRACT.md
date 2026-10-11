@@ -152,6 +152,13 @@ Canonical geography for pickers — added in WS5 to drive the buyer-intent **Cou
 ```
 `code` is exactly what `POST /api/buyer-requirements` resolves for `country` (COUNTRY rows only). Read-only; product-owner-authorized additive endpoint.
 
+### `GET /api/regions/{code}/scope`
+The region codes an offer may carry to be in scope for `code`, under the two governed questions (`docs/20` §12 / §12.1). Added for the compare view's optional Buyer context (UX-03), which annotates recorded offers and must not re-derive geography. Both lists are the output of the canonical resolvers in `services/regions.py`:
+```json
+{ "code": "EU", "applicable": ["EU", "GLOBAL"], "market": ["DE", "EU", "GLOBAL", "IE"] }
+```
+`applicable` = the region, its ancestors and `GLOBAL` (the `region` filter's eligibility rule). `market` = the same plus descendants such as member countries (the `offered_in` discovery rule). An offer with no region recorded is in scope under both and appears in neither list. Scope only: nothing here asserts delivery or relabels an offer. Unknown code → `404`. Read-only; product-owner-authorized additive endpoint.
+
 ## 4. Buyer intent & matching
 
 `POST /api/buyer-requirements` runs **no matching** and creates **no** `match_result`/`commercial_lead`. `raw_input` is **required and versioned** (`wizard_version` + per-answer `state` ∈ `ANSWERED|UNKNOWN|SKIPPED`), and `country` resolves **only** to a canonical `COUNTRY` region (an economic zone like `EU` or `GLOBAL` is rejected `422`). `contact_name`/`organization`/`contact_email` are **required** (the Find a Humanoid questionnaire ends with a contact step before submission); `contact_phone` is optional. This is an API-layer requirement only — the underlying DB columns stay nullable so historical rows captured before this change remain valid. Identity is persisted but never affects matching/scoring, which reads only the structured requirement fields.

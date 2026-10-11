@@ -5,6 +5,7 @@
 // searchParams and re-queries the API. Works as a plain GET form without JS
 // (Apply button), and auto-applies on change when JS is on. It never computes
 // facts — it only forwards filter params to /api/robots.
+import { MARKET_HELP, OFFER_MARKETS, REGION_HELP, REGIONS } from "@/lib/buyer-context";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 
@@ -44,15 +45,6 @@ const TRANSACTION_TYPES = [
   "PILOT",
   "DEVELOPER",
 ];
-const REGIONS = ["US", "EU", "CN", "DE", "UK", "NO", "CA"];
-// Offer market is NOT a second region filter. `region` asks where a robot is
-// offered as the record states it; this asks which market's storefronts to
-// search, and an economic zone admits its member countries' suppliers — an EU
-// buyer should find what a German distributor lists. Only zones with member
-// regions on record appear: for a plain country the two questions collapse into
-// one, and a second control would imply a distinction that isn't there.
-// Unset by default — no listing is hidden until the buyer narrows.
-const OFFER_MARKETS = ["EU"];
 const MOBILITY = ["BIPEDAL", "WHEELED", "HYBRID", "QUADRUPED", "STATIONARY", "OTHER"];
 const AUTONOMY = [
   "TELEOPERATED",
@@ -62,24 +54,9 @@ const AUTONOMY = [
   "HIGHLY_AUTONOMOUS",
 ];
 
-// UX-02D - wording derived from the real predicates (apps/api/app/services/robot_filters.py,
-// regions.py). `region` = a CURRENT, NEW, commercially-accessible AVAILABILITY offer whose
-// region is the chosen region, an ancestor of it, GLOBAL, or unspecified (NULL). `offered_in`
-// = a CURRENT pricing OR availability record (any status) whose region is the market, an
-// ancestor, a descendant (member country), GLOBAL, or unspecified. Neither asserts delivery.
-export const REGION_HELP =
-  "Shows robots with a current, accessible availability offer that applies to this region: " +
-  "an offer for the region itself, for a wider area that includes it (for example the EU for " +
-  "Germany), a worldwide offer, or an offer with no region recorded. An offer being recorded " +
-  "for a region is not proof that the robot can be bought there, and it does not establish " +
-  "shipping, customs or delivery eligibility. Missing regional information is unknown, not " +
-  "unavailable.";
-export const MARKET_HELP =
-  "Shows robots with a recorded price or availability entry tied to this market, including " +
-  "entries for member countries of an economic zone (for example a German supplier for the EU), " +
-  "worldwide entries and entries with no region recorded, whatever the entry's status. It says " +
-  "only that such an entry exists: not that the robot can be ordered, shipped or cleared " +
-  "through customs there. Missing market information is unknown, not unavailable.";
+// Region / Offer market lists and help texts live in lib/buyer-context.ts (shared with
+// the compare view). Re-exported so existing imports keep working.
+export { MARKET_HELP, REGION_HELP };
 
 // A disclosure button (works on touch and keyboard, no hover). The text is rendered only
 // while open, so it adds nothing to the delivered document until a buyer asks for it.

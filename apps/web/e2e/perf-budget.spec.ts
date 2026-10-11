@@ -59,7 +59,15 @@ const STATIC: Budget[] = [
   // UX-01: 32 -> 33 (measured 32.06). The compare price cell now carries its configuration,
   // basis tag, order note and the shared summary line, plus data-enum traceability.
   // SOCIAL-01: 33 -> 37 (measured 35.4).
-  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 37, jsRawKB: 431 },
+  // UX-03: 37 -> 38 (measured 36.8 with SOCIAL-01's tags on the same build). Mobile compare
+  // adds about 1.6 kB of its own: per robot, the seller/region line and the "Offers & evidence"
+  // control; the observed date beside each availability status; the collapsed Buyer context
+  // toggle; one legend entry; and the link to the compare-only stylesheet. The sheet's contents
+  // and the Buyer context controls are rendered only when opened, and the paging control only
+  // for three or more robots, so none of those reach this document.
+  // 38 is the measured size plus about 1.2 kB of headroom, NOT the sum of the two increases
+  // (33 + 4 + 2 = 39): SOCIAL-01's cap already carried 1.6 kB of headroom, which this reuses.
+  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 38, jsRawKB: 431 },
   { path: "/find-a-humanoid", docKB: 46, jsRawKB: 424 },
 ];
 

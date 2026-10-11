@@ -434,6 +434,15 @@ export interface RegionListItem {
   iso_country?: string | null;
 }
 
+// GET /api/regions/{code}/scope — the canonical resolvers' answer, as codes.
+export interface RegionScope {
+  code: string;
+  // The region, its ancestors and GLOBAL (the `region` eligibility rule).
+  applicable: string[];
+  // The same plus descendants, e.g. member countries (the `offered_in` rule).
+  market: string[];
+}
+
 export interface MatchRobotRef {
   slug: string;
   name: string;

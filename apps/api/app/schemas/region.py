@@ -33,3 +33,19 @@ class RegionListItem(BaseModel):
     name: str
     type: str
     iso_country: str | None = None
+
+
+class RegionScope(BaseModel):
+    """Region codes in scope for one requested region, by the two governed questions.
+
+    `applicable` answers `region` (eligibility): the region itself, its ancestors
+    and GLOBAL. `market` answers `offered_in` (discovery): the same plus the
+    region's descendants, e.g. member countries of an economic zone. Both are the
+    output of the canonical resolvers in `services/regions.py`, exposed so a
+    client can annotate offers without re-deriving geography. An offer with no
+    region recorded applies under both questions and is not a member of either list.
+    """
+
+    code: str
+    applicable: list[str]
+    market: list[str]

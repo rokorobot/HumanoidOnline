@@ -25,6 +25,7 @@ import type {
   MatchResponse,
   Page,
   RegionListItem,
+  RegionScope,
   RequirementRead,
   RobotDetail,
   RobotListItem,
@@ -265,6 +266,15 @@ export function listRegions(
     `/api/regions${buildQuery(params as Record<string, QueryValue>)}`,
     { revalidate: CATALOGUE_REVALIDATE_S },
   );
+}
+
+// Scope of one region under the two governed questions (eligibility / market),
+// resolved by the API's canonical region resolvers. Drives the compare view's
+// optional Buyer context; an unknown code is null (the context is then unset).
+export function getRegionScope(code: string): Promise<RegionScope | null> {
+  return getJSONOrNull<RegionScope>(`/api/regions/${encodeURIComponent(code)}/scope`, {
+    revalidate: CATALOGUE_REVALIDATE_S,
+  });
 }
 
 // ---- Buyer intent & matching (WS6) -----------------------------------------

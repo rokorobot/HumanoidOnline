@@ -9,6 +9,13 @@
 //   • Matrix / Evidence view switch (view=)                — deep evidence
 //   • Share link + device-local Saved Views (localStorage) — no persistence/API
 //
+// UX-03 — the SAME matrix, made usable on a phone. Below 721px the table's rows
+// are laid out as a label band over aligned robot columns (CSS only: one DOM, so
+// the desktop table is untouched and nothing is rendered twice), the robot header
+// is pinned, and each robot gains an "Offers & evidence" sheet holding every
+// recorded offer row in full. Optional Buyer context (region= / offered_in=)
+// ANNOTATES recorded offers; it never hides, filters or rewrites one.
+//
 // All comparison SEMANTICS live in lib/comparison-policy.ts (tested). This file
 // only renders the answers. UNKNOWN stays UNKNOWN; QUOTE_ONLY ≠ UNKNOWN.
 // ============================================================================
@@ -30,7 +37,6 @@ import {
   confidenceLabel,
   mobilityLabel,
   priceTypeLabel,
-  sourceTypeLabel,
   statusLabel,
 } from "@/lib/labels";
 import type { CompareResponse, CompareRow, RobotDetail } from "@/lib/types";
@@ -58,6 +64,22 @@ import { NavLink } from "@/components/NavLink";
 import { GraphicMarker } from "@/components/GraphicMarker";
 import { deriveModelCode } from "@/lib/model-code";
 import { PriceStateLong } from "@/components/PricingState";
+import { CompareEvidenceSheet } from "@/components/CompareEvidenceSheet";
+import { EvidenceDates } from "@/components/EvidenceDates";
+import {
+  contextCounts,
+  eligibleForRegion,
+  inScope,
+  MARKET_HELP,
+  NO_BUYER_CONTEXT,
+  OFFER_MARKETS,
+  REGION_HELP,
+  REGIONS,
+  scopedRegions,
+  type BuyerContext,
+} from "@/lib/buyer-context";
+import { providerLabel } from "@/lib/providers";
+import type { AvailabilityOffer } from "@/lib/types";
 
 // Best-in-row framing — FROZEN copy. Mirrors the comment in comparison-policy.ts.
 const BEST_IN_ROW_FRAMING =
@@ -72,6 +94,9 @@ interface ViewState {
   ref: string | null;
   units: UnitSystem;
   view: ViewMode;
+  // UX-03 Buyer context — optional, URL-canonical like the rest of the view state.
+  region?: string | null;
+  market?: string | null;
 }
 
 // ── URL is canonical ─────────────────────────────────────────────────────────
@@ -83,43 +108,283 @@ export function buildCompareUrl(ids: string[], s: ViewState): string {
   if (s.ref) usp.set("ref", s.ref);
   if (s.units !== "metric") usp.set("units", s.units);
   if (s.view !== "matrix") usp.set("view", s.view);
+  // Same parameter names as the catalogue filters, so the two surfaces agree.
+  if (s.region) usp.set("region", s.region);
+  if (s.market) usp.set("offered_in", s.market);
   return `/compare?${usp.toString()}`;
 }
+
+/**
+ * Narrow-viewport paging. When the compared set is too wide for the screen (four
+ * robots on a phone, three on a very small one) two columns are shown at a time
+ * rather than squeezing every column unreadably thin. A reference robot stays
+ * pinned so its deltas are always read against a visible column. CSS decides
+ * WHEN paging applies; this only decides WHICH two columns a page shows.
+ */
+export function visiblePair(slugs: string[], refSlug: string | null, page: number): string[] {
+  if (slugs.length <= 2) return slugs;
+  if (refSlug) {
+    const others = slugs.filter((s) => s !== refSlug);
+    return [refSlug, others[page % others.length]];
+  }
+  const i = page % (slugs.length - 1);
+  return [slugs[i], slugs[i + 1]];
+}
+
+/** Column class for one robot: " c-off" when paged out on a narrow viewport. */
+type ColCls = (slug: string) => string;
 
 export function CompareView({
   data,
   ids,
   state,
+  context = NO_BUYER_CONTEXT,
 }: {
   data: CompareResponse;
   ids: string[];
   state: ViewState;
+  context?: BuyerContext;
 }) {
   const router = useRouter();
   const robots = data.robots;
   const slugs = robots.map((r) => r.slug);
   // A stale ref (slug no longer in the set) is ignored — fail safe.
   const refSlug = state.ref && slugs.includes(state.ref) ? state.ref : null;
+  const [page, setPage] = useState(0);
+  const [sheetSlug, setSheetSlug] = useState<string | null>(null);
 
   function go(next: Partial<ViewState>) {
     const merged: ViewState = { ...state, ref: refSlug, ...next };
     router.push(buildCompareUrl(ids, merged), { scroll: false });
   }
 
+  const pages = Math.max(1, slugs.length - 1);
+  const shown = visiblePair(slugs, refSlug, page % pages);
+  const col: ColCls = (slug) => (shown.includes(slug) ? "" : " c-off");
+  const sheetRobot = sheetSlug ? robots.find((r) => r.slug === sheetSlug) ?? null : null;
+
   return (
-    <>
+    <div
+      className="cmp-root"
+      data-n={robots.length}
+      style={{ "--cmp-n": robots.length } as React.CSSProperties}
+    >
       <CompareToolbar ids={ids} state={{ ...state, ref: refSlug }} onGo={go} />
 
-      <RobotSelectRow robots={robots} refSlug={refSlug} onGo={go} />
+      <BuyerContextPanel robots={robots} context={context} onGo={go} />
+
+      <RobotSelectRow
+        robots={robots}
+        refSlug={refSlug}
+        onGo={go}
+        col={col}
+        pager={{
+          label: robots
+            .filter((r) => shown.includes(r.slug))
+            .map((r) => r.name)
+            .join(" · "),
+          page: page % pages,
+          pages,
+          onStep: (d) => setPage((p) => (((p + d) % pages) + pages) % pages),
+        }}
+      />
 
       {state.view === "matrix" ? (
-        <CompareMatrix data={data} slugs={slugs} units={state.units} refSlug={refSlug} />
+        <CompareMatrix
+          data={data}
+          slugs={slugs}
+          units={state.units}
+          refSlug={refSlug}
+          col={col}
+          context={context}
+          onOpenSheet={setSheetSlug}
+        />
       ) : (
         <EvidenceCompare robots={robots} refSlug={refSlug} />
       )}
 
       <Legend />
+
+      {sheetRobot && (
+        <CompareEvidenceSheet
+          key={sheetRobot.slug}
+          robot={sheetRobot}
+          context={context}
+          onClose={() => setSheetSlug(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Buyer context: Region / Offer market (optional, collapsed) ───────────────
+// Two different questions, kept as two controls with the catalogue's own help
+// text. Collapsed by default and rendered only when opened, so it costs the
+// matrix no space and the document no weight until a buyer asks for it.
+function BuyerContextPanel({
+  robots,
+  context,
+  onGo,
+}: {
+  robots: RobotDetail[];
+  context: BuyerContext;
+  onGo: (n: Partial<ViewState>) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const counts = contextCounts(robots, context);
+  const n = robots.length;
+  return (
+    <div className="cmp-bctx">
+      <button
+        type="button"
+        className="cmp-bctx-toggle"
+        aria-expanded={open}
+        aria-controls="cmp-bctx-body"
+        onClick={() => setOpen((o) => !o)}
+      >
+        <span className="ho-syslabel">Buyer context</span>
+        <span className="cmp-bctx-sum">
+          Region: {context.region ?? "any"} · Offer market: {context.market ?? "any"}
+        </span>
+        <span className="cmp-bctx-act">{open ? "CLOSE" : "CHANGE"}</span>
+      </button>
+      {open && (
+        <div id="cmp-bctx-body" className="cmp-bctx-body">
+          <p className="note">
+            Optional. These add notes to the recorded offers below; they never hide, filter or
+            change one.
+          </p>
+          <div className="field">
+            <label htmlFor="cmp-region">Region — where an availability offer applies</label>
+            <select
+              id="cmp-region"
+              value={context.region ?? ""}
+              onChange={(e) => onGo({ region: e.target.value || null })}
+            >
+              <option value="">Any region</option>
+              {REGIONS.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+            {counts.region != null && (
+              <span className="ho-syslabel cmp-bctx-count">
+                {counts.region} of {n} robots: an availability offer applies to {context.region}.
+                An offer recorded for a narrower area does not apply to a wider region.
+              </span>
+            )}
+            <ContextHelp id="cmp-region-help" label="Region help" text={REGION_HELP} />
+          </div>
+          <div className="field">
+            <label htmlFor="cmp-market">Offer market — where a seller&apos;s offer originates</label>
+            <select
+              id="cmp-market"
+              value={context.market ?? ""}
+              onChange={(e) => onGo({ market: e.target.value || null })}
+            >
+              <option value="">Any market</option>
+              {OFFER_MARKETS.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+            {counts.market != null && (
+              <span className="ho-syslabel cmp-bctx-count">
+                {counts.market} of {n} robots: a price or availability entry is tied to the{" "}
+                {context.market} market, including member-country suppliers. Not a delivery
+                guarantee.
+              </span>
+            )}
+            <ContextHelp id="cmp-market-help" label="Offer market help" text={MARKET_HELP} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ContextHelp({ id, label, text }: { id: string; label: string; text: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        className="fhelp-btn"
+        aria-expanded={open}
+        aria-controls={id}
+        onClick={() => setOpen((o) => !o)}
+      >
+        {label}
+      </button>
+      {open && (
+        <p id={id} className="fhelp-text">
+          {text}
+        </p>
+      )}
     </>
+  );
+}
+
+/**
+ * What the Buyer context's region says about one mode's availability entries.
+ * Annotation only, and precise about WHICH entry it speaks of: a cell shows one
+ * entry's status (`shown`) while a robot may hold several entries for the mode,
+ * recorded for different regions. "Applies" is said of the shown entry only when
+ * that entry itself is in scope; when a different entry is the one in scope, the
+ * note says so and names the region it is recorded for.
+ */
+function RegionNote({
+  shown,
+  offers,
+  context,
+}: {
+  shown: AvailabilityOffer;
+  offers: AvailabilityOffer[];
+  context: BuyerContext;
+}) {
+  if (!context.region || !context.applicable || offers.length === 0) return null;
+  const scope = context.applicable;
+  const where = (a: AvailabilityOffer) => a.region ?? "no region";
+  if (offers.includes(shown) && inScope(shown.region, scope)) {
+    return <span className="cmp-ctx">Applies to {context.region}</span>;
+  }
+  const other = offers.filter((a) => a !== shown && inScope(a.region, scope));
+  if (other.length > 0) {
+    const regions = [...new Set(other.map(where))].join(", ");
+    return (
+      <span className="cmp-ctx">
+        Another entry ({regions}) applies to {context.region}; this one is recorded for{" "}
+        {where(shown)}
+      </span>
+    );
+  }
+  const recorded = [...new Set(offers.map(where))].join(", ");
+  return (
+    <span className="cmp-ctx no">
+      Recorded for {recorded}; does not apply to {context.region}
+    </span>
+  );
+}
+
+function MarketNote({
+  offers,
+  context,
+}: {
+  offers: { region?: string | null }[];
+  context: BuyerContext;
+}) {
+  if (!context.market || !context.marketCodes || offers.length === 0) return null;
+  const inMarket = offers.filter((o) => inScope(o.region, context.marketCodes!));
+  if (inMarket.length === 0) {
+    return <span className="cmp-ctx no">No {context.market} market entry</span>;
+  }
+  const codes = scopedRegions(inMarket, context.marketCodes);
+  return (
+    <span className="cmp-ctx">
+      In {context.market} market{codes.length ? ` (${codes.join(", ")})` : ""}
+    </span>
   );
 }
 
@@ -311,22 +576,25 @@ function RobotSelectRow({
   robots,
   refSlug,
   onGo,
+  col,
+  pager,
 }: {
   robots: RobotDetail[];
   refSlug: string | null;
   onGo: (n: Partial<ViewState>) => void;
+  col: ColCls;
+  pager: { label: string; page: number; pages: number; onStep: (d: number) => void };
 }) {
-  const cols = `190px repeat(${robots.length}, 1fr)`;
   return (
     <div className="selrow-wrap">
-      <div className="selrow" style={{ gridTemplateColumns: cols }}>
+      <div className="selrow">
         <div className="cell rowlab">
           <span className="ho-syslabel">Robots ×{robots.length}</span>
         </div>
         {robots.map((r) => {
           const isRef = r.slug === refSlug;
           return (
-            <div className={`cell robotpick${isRef ? " is-ref" : ""}`} key={r.slug}>
+            <div className={`cell robotpick${isRef ? " is-ref" : ""}${col(r.slug)}`} key={r.slug}>
               <div className="lockup">
                 <NavLink className="name" href={`/robots/${r.slug}`}>
                   {r.name}
@@ -358,6 +626,21 @@ function RobotSelectRow({
           );
         })}
       </div>
+      {/* Paging can only apply to three or more robots; CSS decides where it shows
+          (see .cmp-pager in globals.css). Two robots never carry the markup. */}
+      {robots.length > 2 && (
+      <div className="cmp-pager">
+        <button type="button" className="btn" onClick={() => pager.onStep(-1)} aria-label="Show previous robot">
+          ‹ PREV
+        </button>
+        <span className="ho-syslabel" aria-live="polite">
+          {pager.label} · {pager.page + 1}/{pager.pages}
+        </span>
+        <button type="button" className="btn" onClick={() => pager.onStep(1)} aria-label="Show next robot">
+          NEXT ›
+        </button>
+      </div>
+      )}
     </div>
   );
 }
@@ -368,13 +651,22 @@ function CompareMatrix({
   slugs,
   units,
   refSlug,
+  col,
+  context,
+  onOpenSheet,
 }: {
   data: CompareResponse;
   slugs: string[];
   units: UnitSystem;
   refSlug: string | null;
+  col: ColCls;
+  context: BuyerContext;
+  onOpenSheet: (slug: string) => void;
 }) {
   const robots = data.robots;
+  const availModes = AVAIL_MODES.filter((mode) =>
+    robots.some((r) => r.availability_offers.some((a) => a.transaction_type === mode)),
+  );
   const rowsByGroup = new Map<string, CompareRow[]>();
   for (const row of data.rows) {
     const list = rowsByGroup.get(row.group) ?? [];
@@ -396,7 +688,7 @@ function CompareMatrix({
   // viewports, so the scroll container is keyboard-focusable (WCAG 2.1.1).
   return (
     <div className="cmp-scroll" tabIndex={0} role="group" aria-label="Comparison matrix">
-      <table className="cmatrix" style={{ minWidth: 640 }}>
+      <table className="cmatrix">
         <colgroup>
           <col className="lab" />
           {robots.map((r) => (
@@ -406,7 +698,7 @@ function CompareMatrix({
         <tbody>
           <GroupHeader span={robots.length + 1}>① Commercial — maturity · obtainability</GroupHeader>
           {(rowsByGroup.get("commercial") ?? []).map((row) => (
-            <ApiRow key={row.key} row={row} slugs={slugs} units={units} refSlug={refSlug} />
+            <ApiRow key={row.key} row={row} slugs={slugs} units={units} refSlug={refSlug} col={col} />
           ))}
 
           {/* Price — leader only when truly like-for-like ("LOWEST COMPARABLE PRICE"). */}
@@ -416,9 +708,10 @@ function CompareMatrix({
               const win = priceWinners.has(r.slug);
               const d = priceDelta(refOffer, headlines.get(r.slug) ?? null, r.slug === refSlug);
               return (
-                <td className={`cell${win ? " best" : ""}`} key={r.slug}>
+                <td className={`cell${win ? " best" : ""}${col(r.slug)}`} key={r.slug}>
                   <ComparePriceCell robot={r} />
                   {refSlug && <PriceDeltaTag d={d} />}
+                  <PriceCellExtras robot={r} context={context} onOpen={() => onOpenSheet(r.slug)} />
                 </td>
               );
             })}
@@ -437,31 +730,21 @@ function CompareMatrix({
             </tr>
           )}
 
-          {AVAIL_MODES.map((mode) => {
-            const any = robots.some((r) => availabilityFor(r, mode) !== null);
-            if (!any) return null;
-            return (
-              <tr key={mode}>
-                <th className="rowlab">{modeLabel(mode)}</th>
-                {robots.map((r) => {
-                  const status = availabilityFor(r, mode);
-                  return status ? (
-                    <td className="cell" key={r.slug} data-enum={status}>
-                      {availabilityLabel(status)}
-                    </td>
-                  ) : (
-                    <td className="cell na" key={r.slug}>
-                      —
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
+          {/* One row per transaction mode on record. A robot with no availability
+              entry at all reads "Availability not recorded" (missing evidence, not
+              unavailability); "—" stays "no offer in this mode". */}
+          {(availModes.length > 0 ? availModes : [null]).map((mode) => (
+            <tr key={mode ?? "none"}>
+              <th className="rowlab">{mode ? modeLabel(mode) : "Availability"}</th>
+              {robots.map((r) => (
+                <AvailabilityCell key={r.slug} robot={r} mode={mode} context={context} cls={col(r.slug)} />
+              ))}
+            </tr>
+          ))}
 
           <GroupHeader span={robots.length + 1}>② Physical</GroupHeader>
           {(rowsByGroup.get("physical") ?? []).map((row) => (
-            <ApiRow key={row.key} row={row} slugs={slugs} units={units} refSlug={refSlug} />
+            <ApiRow key={row.key} row={row} slugs={slugs} units={units} refSlug={refSlug} col={col} />
           ))}
 
           <GroupHeader span={robots.length + 1}>③ Manipulation · intelligence · developer</GroupHeader>
@@ -470,7 +753,7 @@ function CompareMatrix({
             ...(rowsByGroup.get("intelligence") ?? []),
             ...(rowsByGroup.get("developer") ?? []),
           ].map((row) => (
-            <ApiRow key={row.key} row={row} slugs={slugs} units={units} refSlug={refSlug} />
+            <ApiRow key={row.key} row={row} slugs={slugs} units={units} refSlug={refSlug} col={col} />
           ))}
 
           <GroupHeader span={robots.length + 1}>④ Deployment — evidence</GroupHeader>
@@ -480,7 +763,7 @@ function CompareMatrix({
               const n = r.deployments.length;
               const best = bestDeployments(robots, r);
               return (
-                <td className={`cell${best ? " best" : ""}${n === 0 ? " unk" : ""}`} key={r.slug}>
+                <td className={`cell${best ? " best" : ""}${n === 0 ? " unk" : ""}${col(r.slug)}`} key={r.slug}>
                   {n > 0 ? n : <span className="hatch">UNKNOWN</span>}
                 </td>
               );
@@ -491,7 +774,7 @@ function CompareMatrix({
             {robots.map((r) => {
               const conf = strongestConf(r);
               return (
-                <td className="cell" key={r.slug}>
+                <td className={`cell${col(r.slug)}`} key={r.slug}>
                   {conf ? (
                     <span className={conf === "VERIFIED" ? "v" : ""} data-enum={conf}>
                       {confidenceLabel(conf)}
@@ -523,11 +806,13 @@ function ApiRow({
   slugs,
   units,
   refSlug,
+  col,
 }: {
   row: CompareRow;
   slugs: string[];
   units: UnitSystem;
   refSlug: string | null;
+  col: ColCls;
 }) {
   const winners = isBestInRowEligible(row.key)
     ? new Set(bestInRow(row.key, row.values))
@@ -544,14 +829,14 @@ function ApiRow({
         const rf = row.resolved?.[slug];
         if (rf && rf.state !== "PRODUCT_VALUE" && rf.state !== "UNKNOWN") {
           return (
-            <td className="cell" key={slug}>
+            <td className={`cell${col(slug)}`} key={slug}>
               <ResolvedFactCell fact={rf} />
             </td>
           );
         }
         if (v == null) {
           return (
-            <td className="cell unk" key={slug}>
+            <td className={`cell unk${col(slug)}`} key={slug}>
               <span className="hatch">UNKNOWN</span>
               {refSlug && slug !== refSlug && numeric && (
                 <span className="cmp-delta unk">Δ UNKNOWN</span>
@@ -579,7 +864,7 @@ function ApiRow({
         const delta =
           refSlug && numeric ? metricDelta(row.key, refVal, v, slug === refSlug) : null;
         return (
-          <td className={`cell${isBest ? " best" : ""}`} key={slug} {...(rawEnum ? { "data-enum": rawEnum } : {})}>
+          <td className={`cell${isBest ? " best" : ""}${col(slug)}`} key={slug} {...(rawEnum ? { "data-enum": rawEnum } : {})}>
             {body}
             {canonical && <span className="cmp-canon">{canonical}</span>}
             {delta && <DeltaTag d={delta} />}
@@ -723,50 +1008,6 @@ function FactRow({
   );
 }
 
-/**
- * Provenance dates for a compared fact, kept STRICTLY SEPARATE — PUBLISHED,
- * OBSERVED, VERIFIED — never collapsed into one synthetic "freshness" value.
- * observed_at is always present (TIMESTAMPTZ NOT NULL); the other two rows are
- * omitted when genuinely absent. A ® rides along only when verified_at exists.
- */
-function EvidenceDates({ evidence }: { evidence?: import("@/lib/types").Evidence | null }) {
-  if (!evidence) {
-    return <span className="stamp" style={{ color: "var(--ho-text-faint)" }}>— no evidence on record —</span>;
-  }
-  const published = formatObservedDate(evidence.published_at);
-  const observed = formatObservedDate(evidence.observed_at);
-  const verified = formatObservedDate(evidence.verified_at);
-  return (
-    <div className="src cmp-ev-dates">
-      <div>
-        SOURCE: <span data-enum={evidence.source_type}>{sourceTypeLabel(evidence.source_type)}</span>
-      </div>
-      {published && (
-        <div>
-          <span className="cmp-dlabel">PUBLISHED</span> {published}
-        </div>
-      )}
-      {observed && (
-        <div>
-          <span className="cmp-dlabel">OBSERVED</span> {observed}
-        </div>
-      )}
-      {verified && (
-        <div>
-          <span className="cmp-dlabel">VERIFIED</span> {verified} &reg;
-        </div>
-      )}
-      {evidence.source_url && (
-        <div>
-          <a href={evidence.source_url} target="_blank" rel="noopener noreferrer">
-            View source ↗
-          </a>
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ── Legend ───────────────────────────────────────────────────────────────────
 function Legend() {
   return (
@@ -776,6 +1017,12 @@ function Legend() {
           <GraphicMarker signal /> best-in-row (numeric metrics with a leader only)
         </span>
         <span>— = not applicable / no offer in this mode</span>
+        <span>
+          <span style={{ border: "1px dashed var(--ho-grey-400)", padding: "0 5px" }}>
+            Availability not recorded
+          </span>{" "}
+          = no availability entry in the catalogue (not a statement that it is unavailable)
+        </span>
         <span>
           <span style={{ border: "1px dashed var(--ho-grey-400)", padding: "0 5px" }}>UNKNOWN</span>{" "}
           = no data (never 0/false)
@@ -822,20 +1069,96 @@ export function ComparePriceCell({ robot }: { robot: RobotDetail }) {
         fromLowest={(h?.configurationsPriced ?? 0) > 1}
         configurationsPriced={h?.configurationsPriced ?? 0}
       />
-      <span className={summary.unknown ? "ho-syslabel d-blk csum--unk" : "ho-syslabel d-blk"}>
+      <span className={summary.unknown ? "ho-syslabel d-blk cmp-csum csum--unk" : "ho-syslabel d-blk cmp-csum"}>
         {summary.line}
       </span>
     </>
   );
 }
 
-function availabilityFor(robot: RobotDetail, mode: string): string | null {
+/**
+ * Everything the matrix adds beside the headline price on a narrow viewport: who
+ * sells it and where (from the SAME offer row as the amount), what the Buyer
+ * context says about this robot's price entries, and the way into the full
+ * record. The full terms stay in the "Offers & evidence" sheet.
+ */
+function PriceCellExtras({
+  robot,
+  context,
+  onOpen,
+}: {
+  robot: RobotDetail;
+  context: BuyerContext;
+  onOpen: () => void;
+}) {
+  const offer = selectHeadline(robot.pricing_offers)?.offer;
+  const seller = offer?.provider ? providerLabel(offer.provider, null, offer.provider_name).text : null;
+  const where = [offer?.region, seller].filter(Boolean).join(" · ");
+  return (
+    <>
+      {where && (
+        <span className="ho-syslabel d-blk cmp-m" data-provider={offer?.provider ?? undefined}>
+          {where}
+        </span>
+      )}
+      <MarketNote offers={robot.pricing_offers} context={context} />
+      <button
+        type="button"
+        className="cmp-detail cmp-m"
+        onClick={onOpen}
+        aria-label={`Offers and evidence: ${robot.name}`}
+      >
+        OFFERS &amp; EVIDENCE
+      </button>
+    </>
+  );
+}
+
+function isAccessible(a: AvailabilityOffer): boolean {
+  return a.availability_status !== "NOT_AVAILABLE" && a.availability_status !== "DISCONTINUED";
+}
+
+/** The availability row a mode's cell displays: the first accessible one, else the first. */
+function availabilityRowFor(robot: RobotDetail, mode: string): AvailabilityOffer | null {
   const rows = robot.availability_offers.filter((a) => a.transaction_type === mode);
   if (rows.length === 0) return null;
-  const accessible = rows.find(
-    (a) => a.availability_status !== "NOT_AVAILABLE" && a.availability_status !== "DISCONTINUED",
+  return rows.find(isAccessible) ?? rows[0];
+}
+
+/**
+ * One availability cell. The status is the catalogue's record as of the date it
+ * was observed (shown beside it) — never presented as a live stock check.
+ */
+function AvailabilityCell({
+  robot,
+  mode,
+  context,
+  cls,
+}: {
+  robot: RobotDetail;
+  mode: string | null;
+  context: BuyerContext;
+  cls: string;
+}) {
+  if (robot.availability_offers.length === 0) {
+    return (
+      <td className={`cell unk${cls}`}>
+        <span className="hatch">Availability not recorded</span>
+      </td>
+    );
+  }
+  const row = mode ? availabilityRowFor(robot, mode) : null;
+  if (!row) return <td className={`cell na${cls}`}>—</td>;
+  const observed = formatObservedDate(row.evidence?.observed_at);
+  const modeRows = robot.availability_offers.filter((a) => a.transaction_type === mode);
+  return (
+    <td className={`cell${cls}`} data-enum={row.availability_status}>
+      {availabilityLabel(row.availability_status)}
+      {observed && <span className="cmp-obs">observed {observed}</span>}
+      <RegionNote shown={row} offers={modeRows.filter(eligibleForRegion)} context={context} />
+      <MarketNote offers={modeRows} context={context} />
+    </td>
   );
-  return (accessible ?? rows[0]).availability_status;
 }
 
 function strongestConf(robot: RobotDetail): string | null {

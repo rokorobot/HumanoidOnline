@@ -46,17 +46,28 @@ async function measure(page: Page, path: string) {
 
 // `/robots` is deliberately NOT in this table — see the scale-aware test below.
 const STATIC: Budget[] = [
-  { path: "/", docKB: 62, jsRawKB: 404 },
-  { path: "/robots/unitree-g1", docKB: 89, jsRawKB: 412 },
+  // SOCIAL-01: the three caps below were raised for the social sharing cards.
+  // Every document now carries 18 Open Graph / Twitter tags (the route's own
+  // title and description for each, plus the card image), and Next repeats
+  // them in the streamed payload: +3.2 to +4.9 kB per document, measured
+  // against production. Owner-approved; no other limit changed.
+  // SOCIAL-01: 62 -> 65 (measured 63.8).
+  { path: "/", docKB: 65, jsRawKB: 404 },
+  // SOCIAL-01: 89 -> 95 (measured 93.6). The largest increase: this route has
+  // the longest description, and it is the one repeated per card.
+  { path: "/robots/unitree-g1", docKB: 95, jsRawKB: 412 },
   // UX-01: 32 -> 33 (measured 32.06). The compare price cell now carries its configuration,
   // basis tag, order note and the shared summary line, plus data-enum traceability.
-  // UX-03: 33 -> 35 (measured 33.6). Mobile compare adds, per robot, the seller/region line
-  // and the "Offers & evidence" control, the observed date beside each availability status,
-  // the collapsed Buyer context toggle and one legend entry. The sheet's contents and the
-  // Buyer context controls are rendered only when opened, and the paging control only for
-  // three or more robots, so none of those reach this document. 35 rather than 34 because
-  // documents on this suite vary by a few hundred bytes between runs.
-  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 35, jsRawKB: 431 },
+  // SOCIAL-01: 33 -> 37 (measured 35.4).
+  // UX-03: 37 -> 38 (measured 36.8 with SOCIAL-01's tags on the same build). Mobile compare
+  // adds about 1.6 kB of its own: per robot, the seller/region line and the "Offers & evidence"
+  // control; the observed date beside each availability status; the collapsed Buyer context
+  // toggle; one legend entry; and the link to the compare-only stylesheet. The sheet's contents
+  // and the Buyer context controls are rendered only when opened, and the paging control only
+  // for three or more robots, so none of those reach this document.
+  // 38 is the measured size plus about 1.2 kB of headroom, NOT the sum of the two increases
+  // (33 + 4 + 2 = 39): SOCIAL-01's cap already carried 1.6 kB of headroom, which this reuses.
+  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 38, jsRawKB: 431 },
   { path: "/find-a-humanoid", docKB: 46, jsRawKB: 424 },
 ];
 

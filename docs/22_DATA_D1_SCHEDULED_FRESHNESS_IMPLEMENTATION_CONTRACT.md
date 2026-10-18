@@ -27,7 +27,7 @@
 | Area | Finding |
 |---|---|
 | Migrations | `db/migrations/NNNN_description.sql`, sequential, each wrapped in idempotent `DO $$ ... IF NOT EXISTS ... END $$;` guards against `pg_type`/`pg_attribute`, with a header comment naming the ratifying doc and stating exactly what the slice does and does not add (0003, 0004 are the direct precedent for a discovery-adjacent, structurally-isolated layer). Current head: `0009_add_buyer_requirement_contact_phone.sql`. |
-| `DiscoverySource` | `apps/api/app/models/discovery.py:82-93` — `radar_eligible` property is DATA-D1.9's base gate. **Verified by direct inspection: it does NOT check `tos_expires_at` or `last_robots_checked_at` recency at all** — it checks only `is_enabled`, `tos_status == ALLOWED`, `robots_status`, and reviewer attribution. A source whose review expired months ago still reads `radar_eligible = True` today if nothing else touched its row. `adapters.ingest()` has the identical gap (same single check, `apps/api/app/services/discovery/adapters.py:104`). Neither gap has ever been exercised — `FixtureAdapter` never performs a real fetch, so no code path has ever needed the currentness check to actually fire. **`radar_eligible` alone is reused unmodified; freshness composes an ADDITIONAL currentness check on top of it — see Phase 3.** |
+| `DiscoverySource` | `apps/api/app/models/discovery.py:82-93` — `radar_eligible` property is DATA-D1.9's base gate. *(Line numbers and the condition list in this row are historical; see the docs/28 note in §3.1.)* **Verified by direct inspection: it does NOT check `tos_expires_at` or `last_robots_checked_at` recency at all** — it checks only `is_enabled`, `tos_status == ALLOWED`, `robots_status`, and reviewer attribution. A source whose review expired months ago still reads `radar_eligible = True` today if nothing else touched its row. `adapters.ingest()` has the identical gap (same single check, `apps/api/app/services/discovery/adapters.py:104`). Neither gap has ever been exercised — `FixtureAdapter` never performs a real fetch, so no code path has ever needed the currentness check to actually fire. **`radar_eligible` alone is reused unmodified; freshness composes an ADDITIONAL currentness check on top of it — see Phase 3.** |
 | `DiscoveryCandidate` | Own state machine (`pipeline.py`), `UniqueConstraint("source_id", "external_ref")` for dedup, `promoted_robot_id`/`possible_robot_id` point *to* canonical (Gate K: never the reverse). **Not backfilled per Decision B — reused only at the moment a change is detected**, via its existing dedup constraint. |
 | `crawl_trigger` / `crawl_run` | DATA-D1.LIVE's live-acquisition run record (migration 0004). `crawl_trigger` has exactly one value, `'MANUAL'`, by design (LIVE.4, restated in a schema comment). `crawl_run` is wired to `fetched_page`/`candidate_claim.crawl_run_id`/`candidate_image_ref.crawl_run_id` — i.e. to the **radar/discovery** ingest path specifically. |
 | `pipeline.flag_recheck()` | Fully implemented, tested, terminal-safe (H5), sets `status = RECHECK_REQUIRED` and merges a reason into `candidate_data`. Safe to call again on an already-`RECHECK_REQUIRED` candidate (idempotent in effect — restated in Phase 6). **Reused unmodified.** |
@@ -192,6 +192,17 @@ accident.
 > 24 h robots ceiling; ToS expiry never blocks `AUTO_CHECK`. The text below is
 > kept as the historical record. The same applies to test E's expired-ToS case
 > (§ tests) and the "Eligibility runtime" summary.
+
+> **Amended by `docs/28` (Amendment A4, migration 0025):** the five-condition
+> description below is historical. `radar_eligible` now composes
+> `access_authorized` (an access basis: `SOURCE_PERMISSION` = `tos_status ==
+> ALLOWED`, or `OWNER_AUTHORIZED` = a complete, attributed owner decision while
+> `tos_status` is not `RESTRICTED`/`PROHIBITED`) with `is_enabled`, a
+> non-disallow `robots_status` and reviewer attribution. For scheduled freshness,
+> `freshness_auto_check_eligible` additionally requires `access_basis ==
+> SOURCE_PERMISSION` (A4 is not extended to freshness) and the 24 h robots
+> ceiling. ToS expiry is still never read (DR-A4). Production held zero
+> `freshness_target` rows on 2026-10-18.
 
 Direct inspection of `apps/api/app/models/discovery.py:82-93` (Phase 1) shows
 `radar_eligible` checks exactly five conditions — `is_enabled`, `tos_status ==

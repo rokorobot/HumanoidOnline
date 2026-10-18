@@ -570,7 +570,11 @@ def test_alza_is_a_czech_distributor_provider_not_a_manufacturer():
     assert provider["type"] == "DISTRIBUTOR" and provider["manufacturer_slug"] is None
     assert provider["country_region_code"] == "CZ"
     assert provider["website_url"] == "https://www.alza.cz"
-    assert "NOT approved for automated monitoring" in provider["description"]
+    # 2026-10-18 (docs/28): owner approval for monitoring is NOT operational activation.
+    assert "Owner-approved for recurring discovery monitoring" in provider["description"]
+    assert "monitoring is NOT yet active" in provider["description"]
+    assert "dated evidence snapshot, never a live price or live stock" in provider["description"]
+    assert "New and used (bazaar) units are separate offers" in provider["description"]
     assert "no Slovak, Hungarian or EU-wide offer" in provider["description"]
     manufacturers = {m["slug"] for m in catalogue_json("manufacturers.json")["manufacturers"]}
     assert "alza-cz" not in manufacturers and "alza" not in manufacturers

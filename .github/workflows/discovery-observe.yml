@@ -16,6 +16,10 @@ name: Discovery observation (Stage F)
 #              later, requests nothing). A source without a reviewed adapter is reported
 #              NO_ADAPTER and never contacted. A slot in which a source is not due
 #              requests nothing.
+#              This schedule is the UPPER BOUND on observation frequency: a source
+#              cadence shorter than the gap between slots (e.g. 24 h) is still observed
+#              at most twice a week. Observing more often needs an owner-approved change
+#              to this cron, not just a shorter source cadence (docs/28 §5A).
 #
 # Production database access comes only from the `discovery-production`
 # environment's secret DISCOVERY_DATABASE_URL: the least-privilege

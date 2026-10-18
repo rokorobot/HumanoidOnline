@@ -110,6 +110,11 @@ freshness re-checks) is therefore satisfied only by `SOURCE_PERMISSION`.
 `mode_reason` says so. Extending owner authorization to scheduled freshness is
 a separate owner decision.
 
+Production impact today is nil either way: on 2026-10-18 production holds **zero**
+`freshness_target` rows and zero `freshness_observation` rows (read-only check),
+so no scheduled freshness re-check exists for any source. A4 stays excluded from
+scheduled freshness in this change regardless.
+
 ## 5. Source registry as version-controlled identity
 
 `db/discovery/source_registry.json` lists the identity (key, name, class, https
@@ -120,6 +125,19 @@ overwriting it, and reports `UNMANAGED` rows without deleting them. It never
 reviews, authorizes, enables, schedules or fetches. Adapter readiness is
 reported from code (`sources.ADAPTERS`), never from the file. Re-applying it is
 a no-op.
+
+## 5A. Observation frequency is bounded by the workflow schedule
+
+A source's cadence (`source cadence`, 6 h to 90 d) says when the source is *due*;
+it does not trigger anything by itself. Observation runs only when the
+`Discovery observation (Stage F)` workflow runs: its `schedule:` (Monday and
+Thursday 06:37 UTC) plus manual dispatch. The cron is therefore the **upper
+bound** on observation frequency. A source with a 24 h cadence is still
+observed at most twice a week (gaps of 3 and 4 days), and a 48 h or 72 h cadence
+behaves the same way. Observing more often needs a separate, owner-approved
+change to the workflow schedule. Changing a source's cadence alone does not do
+it. The cadences suggested for the six sources (24 h / 48 h / 72 h) should be
+read with this bound in mind.
 
 ## 6. Schema (migration `0025_owner_authorized_source_access.sql`)
 
@@ -135,17 +153,24 @@ nothing: it cannot write the basis or the event table.
 ## 7. Activation order (each step a separate, owner-approved act)
 
 1. Review and approve the PR head.
-2. **Apply `0025` to production before merging.** The API refuses to serve a
-   database whose migration state differs from the build
-   (`app/db/migration_state.py`), so merge-then-migrate would take the API down.
-   Take a Neon safety branch first (`pre-0025-YYYYMMDD`), apply, verify the
+2. **Apply `0025` to production before merging.** In a strict environment,
+   `app/db/migration_state.py` treats a migration the build expects but the
+   database lacks as **fatal**, and checksum drift as fatal too. A database that is
+   **ahead** of the build (a migration applied that the running code does not
+   know) is reported as a **warning only** (WS8-L7). Migrating first therefore
+   leaves the currently deployed pre-A4 API serving, with a warning, on an
+   additive schema it ignores. Merging first would deploy a build that expects
+   0025 against a database without it, and that build would refuse to start.
+   Take a Neon safety branch first (`pre-0025-YYYYMMDD`), apply, then verify the
    ledger and that all 9 rows are unchanged.
 3. Merge. Verify CI, deployment and health.
 4. `source sync` (plan) against production must report 9 `UNCHANGED`, 0 drift.
 5. Per source, under its own work order: §3 steps 1–5. A source is reported
    **actively monitored** only after an observation cycle has completed for it.
 
-Rollback: before step 3, delete nothing and restore from the safety branch if
-needed. After it, a forward fix. The migration is additive, so the pre-A4 code
-ignores the new columns, but the strict migration check pins code and schema
-together. Revoking a single source is `source revoke-owner`.
+Rollback: the migration is additive, and pre-A4 code ignores the new columns.
+Between steps 2 and 3, if the migration must be undone, restore from the safety
+branch. Leaving it in place is also safe, because a database ahead of the build is
+only a warning. After step 3, a code revert to the pre-A4 build keeps serving with
+the same "database ahead" warning, so no database restore is needed for it. A
+schema problem is fixed forward. Revoking a single source is `source revoke-owner`.

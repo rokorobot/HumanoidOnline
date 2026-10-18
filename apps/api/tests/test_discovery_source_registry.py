@@ -321,3 +321,44 @@ def test_cli_owner_authorization_path(shared_session, capsys):
     assert cli.main(["source", "enable", key, "--by", "robert"]) == 0
     assert cli.main(["source", "revoke-owner", key, "--by", "robert", "--reason", "stop"]) == 0
     assert "enabled=False" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("owner, reviewed, effective", [
+    (["/products"], ["/products/g1"], ("/products/g1",)),          # narrower review wins
+    (["/products/g1"], ["/products"], ("/products/g1",)),          # narrower owner wins
+    (["/products"], ["/products/g1", "/products/h2"], ("/products/g1", "/products/h2")),
+    (["/products", "/news"], ["/news/2026", "/about"], ("/news/2026",)),
+    (["/products"], ["/news"], ()),                                 # disjoint: fail closed
+    (["/products"], ["/productsX"], ()),                            # not a path prefix
+])
+def test_effective_owner_scope_is_the_intersection_with_the_review(owner, reviewed, effective):
+    from app.models.discovery import DiscoverySource
+    from app.services.discovery.eligibility import approved_prefixes
+    source = DiscoverySource(
+        key="k", name="n", source_class="MANUFACTURER", homepage_url="https://maker.example/",
+        access_basis="OWNER_AUTHORIZED", owner_authorized_by="robert",
+        owner_authorization_reason="r", owner_authorized_path_prefixes=owner,
+        allowed_path_prefixes=reviewed)
+    assert approved_prefixes(source) == effective
+
+
+def test_a_narrower_later_review_keeps_the_overlap_and_a_disjoint_one_stops_fetching(
+        shared_session):
+    from app.services.discovery.eligibility import (
+        NO_APPROVED_PATHS,
+        URL_OUTSIDE_APPROVED_PATHS,
+        source_ineligibility,
+        url_ineligibility,
+    )
+    key = _key()
+    source = _register(shared_session, key)
+    _review(shared_session, key, tos="UNKNOWN", paths=("/products",))
+    _owner(shared_session, key, paths=("/products",))
+    registry.enable_source(shared_session, key, by="robert")
+    _review(shared_session, key, tos="UNKNOWN", paths=("/products/g1",))
+    assert url_ineligibility(source, "https://maker.example/products/g1/spec") is None
+    outside = url_ineligibility(source, "https://maker.example/products/h2")
+    assert outside == URL_OUTSIDE_APPROVED_PATHS
+    _review(shared_session, key, tos="UNKNOWN", paths=("/news",))
+    assert source_ineligibility(source) == NO_APPROVED_PATHS
+

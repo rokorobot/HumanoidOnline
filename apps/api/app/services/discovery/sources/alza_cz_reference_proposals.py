@@ -1,8 +1,9 @@
 """Alza.cz reference-offer proposals — manual / evidence-backed, NEVER automated.
 
 Owner decision (2026-10-05): Alza.cz is an approved Czech commercial provider and a *reference*
-source for evidence-backed offers. It is NOT approved for automated monitoring, scheduled
-fetching, recurring discovery, polling, or automated stock/price checking. So this module:
+source for evidence-backed offers. On 2026-10-18 the owner also approved it for recurring
+discovery monitoring (docs/28, OWNER_AUTHORIZED), but monitoring is NOT active: that needs a
+separate, structurally reviewed live adapter. This module stays the manual path, so it:
 
 - is a pure function over bytes an operator ALREADY retained
   (`manual_capture.record_manual_capture`); it does no I/O, holds no HTTP client and is

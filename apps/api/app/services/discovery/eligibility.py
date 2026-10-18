@@ -60,13 +60,20 @@ def approved_prefixes(source: DiscoverySource) -> tuple[str, ...]:
     reviewed = tuple(p for p in (source.allowed_path_prefixes or ()) if p and p.startswith("/"))
     if source.access_basis != OWNER_AUTHORIZED:
         return reviewed
-    # docs/28: the owner's scope is a CEILING inside the current review, never a
-    # widening. An owner prefix approves nothing unless a reviewed prefix covers
-    # it, so a later, narrower review narrows an owner-authorized source too.
-    return tuple(
-        p for p in (source.owner_authorized_path_prefixes or ())
-        if p and p.startswith("/") and any(_path_within(p, r) for r in reviewed)
-    )
+    # docs/28: the effective scope is the INTERSECTION of the owner's scope and the
+    # current review, never a widening. Per (owner, reviewed) pair the narrower
+    # prefix wins when one lies inside the other; disjoint pairs approve nothing.
+    # So a later, narrower review (/products -> /products/g1) narrows the source to
+    # /products/g1 instead of emptying it, and fails closed when nothing overlaps.
+    owner = [p for p in (source.owner_authorized_path_prefixes or ())
+             if p and p.startswith("/")]
+    effective: list[str] = []
+    for o in owner:
+        for r in reviewed:
+            narrower = o if _path_within(o, r) else r if _path_within(r, o) else None
+            if narrower is not None and narrower not in effective:
+                effective.append(narrower)
+    return tuple(effective)
 
 
 def source_ineligibility(source: DiscoverySource | None) -> str | None:

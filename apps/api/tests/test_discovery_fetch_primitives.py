@@ -124,6 +124,26 @@ def test_robots_empty_disallow_and_no_group_allow_everything():
     assert parse("").allows("https://m.example/a")
 
 
+def test_robots_utf8_bom_does_not_hide_the_first_group():
+    # A BOM-prefixed file (as www.unitree.com serves) once glued "﻿" onto "User-agent",
+    # so the group was unrecognized and its Disallow silently dropped: a fail-open parse.
+    bom = "﻿"
+    for text in (f"{bom}User-agent: *\nDisallow: /private\n",
+                 f"{bom}User-agent:*\nDisallow: /private\n",
+                 f"{bom}User-agent: HumanoidOnlineMarketBot\nDisallow: /private\n"
+                 "\nUser-agent: *\nAllow: /\n"):
+        rules = parse(text)
+        assert not rules.allows("https://m.example/private/x"), text
+        assert rules.allows("https://m.example/public")
+    # Same result through the acquisition decode path (raw bytes, plain "utf-8").
+    raw = "﻿User-agent: *\nDisallow: /private\nCrawl-delay: 5\n".encode()
+    rules = parse(raw.decode("utf-8", errors="replace"))
+    assert not rules.allows("https://m.example/private") and rules.crawl_delay == 5
+    # With or without the BOM, the parsed rules are identical.
+    assert parse("User-agent: *\nDisallow: /private\n") == parse(
+        "﻿User-agent: *\nDisallow: /private\n")
+
+
 def test_robots_disallow_all_model_and_robots_file_itself():
     rules = RobotsRules(disallow_all=True)
     assert not rules.allows("https://m.example/products/x")

@@ -231,7 +231,9 @@ def test_excerpt_over_limit_is_rejected_not_truncated() -> None:
 def test_neura_module_is_registered_but_blocked() -> None:
     assert adapter_for("neura-robotics-official") is NEURA
     assert set(ADAPTERS) == {"neura-robotics-official", "xpeng-official",   # + XPENG, 2026-10-03
-                            "unitree-robotics-official"}               # + Unitree, A4 2026-10-18
+                            "unitree-robotics-official", "booster-robotics-official",
+                            "agibot-official", "agility-robotics-official",
+                            "figure-ai-official"}                      # + A4, 2026-10-18/19
     assert NEURA.manufacturer == "Neura Robotics"          # canonical catalogue name
     assert NEURA.host == "neura-robotics.com"
     assert NEURA.structural_review is not None and NEURA.blocked_reason is None

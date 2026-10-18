@@ -66,7 +66,10 @@ def test_manifest_adapters_match_code_and_only_reviewed_a4_adapters_exist():
         assert key in entries
         assert entries[key]["homepage_url"] == f"https://{config.host}/"
         assert entries[key]["source_class"] == config.source_class
-    assert A4_SOURCES & set(ADAPTERS) == {"unitree-robotics-official"}
+    assert A4_SOURCES & set(ADAPTERS) == {
+        "unitree-robotics-official", "booster-robotics-official", "agibot-official",
+        "agility-robotics-official", "figure-ai-official"}
+    assert "alza-cz" not in ADAPTERS          # blocked by the source (403 on robots.txt)
 
 
 @pytest.mark.parametrize("bad", [
@@ -216,7 +219,7 @@ def test_cli_sync_reports_adapter_readiness(shared_session, capsys):
     code = cli.main(["source", "sync"])
     out = capsys.readouterr().out
     assert "PLAN (no write)" in out
-    line = next(x for x in out.splitlines() if "booster-robotics-official" in x)
+    line = next(x for x in out.splitlines() if "alza-cz" in x)
     assert "WOULD_REGISTER" in line and "adapter=NONE" in line
     line = next(x for x in out.splitlines() if "unitree-robotics-official" in x)
     assert "WOULD_REGISTER" in line and "adapter=unitree-robotics-official@0.1.0" in line

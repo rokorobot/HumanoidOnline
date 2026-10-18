@@ -125,4 +125,6 @@ def test_a4_sources_without_a_reviewed_adapter_are_not_runnable(h):  # noqa: F81
     result = h.cycle()[0]
     status = {s.key: s.status for s in result.sources}
     assert {status[k] for k in keys} == {"NO_ADAPTER"}
-    assert set(keys) & set(ADAPTERS) == {"unitree-robotics-official"}
+    assert set(keys) & set(ADAPTERS) == {
+        "unitree-robotics-official", "booster-robotics-official", "agibot-official",
+        "agility-robotics-official", "figure-ai-official"}

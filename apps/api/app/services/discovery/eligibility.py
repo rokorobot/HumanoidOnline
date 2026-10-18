@@ -50,7 +50,10 @@ def approved_host(source: DiscoverySource) -> str | None:
 
 def approved_prefixes(source: DiscoverySource) -> tuple[str, ...]:
     """Well-formed approved path prefixes. A malformed entry approves nothing."""
-    return tuple(p for p in (source.allowed_path_prefixes or ()) if p and p.startswith("/"))
+    paths = (source.owner_authorized_path_prefixes
+             if source.access_basis == "OWNER_AUTHORIZED"
+             else source.allowed_path_prefixes)
+    return tuple(p for p in (paths or ()) if p and p.startswith("/"))
 
 
 def source_ineligibility(source: DiscoverySource | None) -> str | None:

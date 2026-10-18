@@ -67,6 +67,13 @@ class DiscoverySource(Base):
     robots_status: Mapped[str] = mapped_column(
         robots_status, nullable=False, server_default=text("'UNKNOWN'")
     )
+    # A4 owner authorization: internal business authorization, not a statement
+    # that the publisher permits automated acquisition.
+    access_basis: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'SOURCE_PERMISSION'"))
+    owner_authorized_by: Mapped[str | None] = mapped_column(Text)
+    owner_authorized_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    owner_authorization_reason: Mapped[str | None] = mapped_column(Text)
+    owner_authorized_path_prefixes: Mapped[list[str] | None] = mapped_column(ARRAY(Text))
     eligibility_reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     eligibility_reviewed_by: Mapped[str | None] = mapped_column(Text)
     is_enabled: Mapped[bool] = mapped_column(
@@ -98,16 +105,48 @@ class DiscoverySource(Base):
 
     @property
     def radar_eligible(self) -> bool:
-        """DATA-D1.9 in one place: a source may be crawled only when the ToS
-        affirmatively permits automation, robots is not a disallow, an attributed
-        review exists, and it is explicitly enabled. Reviewing != being allowed."""
+        """A4: two distinct INTERNAL authorization paths; neither overrides robots.
+
+        The owner path never represents publisher consent, and cannot be used
+        where an express RESTRICTED/PROHIBITED status has been recorded.
+        """
+        basis = self.access_basis or "SOURCE_PERMISSION"
+        source_permission = (
+            basis == "SOURCE_PERMISSION" and self.tos_status == "ALLOWED"
+        )
+        owner_permission = (
+            basis == "OWNER_AUTHORIZED"
+            and self.tos_status not in ("PROHIBITED", "RESTRICTED")
+            and bool(self.owner_authorized_by)
+            and self.owner_authorized_at is not None
+            and bool(self.owner_authorization_reason and self.owner_authorization_reason.strip())
+            and bool(self.owner_authorized_path_prefixes)
+        )
         return (
             self.is_enabled
-            and self.tos_status == "ALLOWED"
+            and (source_permission or owner_permission)
             and self.robots_status in ("ALLOWED", "NOT_APPLICABLE")
             and self.eligibility_reviewed_at is not None
             and bool(self.eligibility_reviewed_by)
         )
+
+
+class DiscoverySourceOwnerAuthorizationEvent(Base):
+    __tablename__ = "discovery_source_owner_authorization_event"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    source_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("discovery_source.id", ondelete="RESTRICT"), nullable=False
+    )
+    action: Mapped[str] = mapped_column(Text, nullable=False)
+    decided_by: Mapped[str] = mapped_column(Text, nullable=False)
+    reason: Mapped[str] = mapped_column(Text, nullable=False)
+    approved_path_prefixes: Mapped[list[str]] = mapped_column(ARRAY(Text), nullable=False)
+    decided_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
 
 
 class DiscoveryCandidate(Base):

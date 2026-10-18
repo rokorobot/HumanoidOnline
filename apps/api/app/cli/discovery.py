@@ -250,6 +250,12 @@ def _cmd_source(args: argparse.Namespace) -> int:
                 path_prefixes=args.path_prefix or [], tos_url=args.tos_url,
                 robots_url=args.robots_url, notes=args.notes)
             source = registry.get_source(session, args.key)
+        elif args.action == "authorize-owner":
+            source = registry.authorize_owner(
+                session, args.key, by=args.by, reason=args.reason,
+                path_prefixes=args.path_prefix or [])
+        elif args.action == "revoke-owner":
+            source = registry.revoke_owner(session, args.key, by=args.by, reason=args.reason)
         elif args.action == "enable":
             source = registry.enable_source(session, args.key, by=args.by)
         elif args.action == "disable":
@@ -721,7 +727,16 @@ def main(argv: list[str] | None = None) -> int:
     review.add_argument("--tos-url")
     review.add_argument("--robots-url")
     review.add_argument("--notes")
-    enable = actions.add_parser("enable", help="enable a reviewed, ToS-ALLOWED source")
+    auth = actions.add_parser("authorize-owner", help="record internal owner approval; never enables")
+    auth.add_argument("key")
+    auth.add_argument("--by", required=True)
+    auth.add_argument("--reason", required=True)
+    auth.add_argument("--path-prefix", action="append", required=True)
+    revoke = actions.add_parser("revoke-owner", help="stop source and revoke owner approval")
+    revoke.add_argument("key")
+    revoke.add_argument("--by", required=True)
+    revoke.add_argument("--reason", required=True)
+    enable = actions.add_parser("enable", help="enable a reviewed, authorized source")
     enable.add_argument("key")
     enable.add_argument("--by", required=True)
     disable = actions.add_parser("disable", help="disable a source")

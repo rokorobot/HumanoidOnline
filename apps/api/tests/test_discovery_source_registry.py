@@ -155,3 +155,58 @@ def test_cli_adapter_plan_refuses_neura_until_registered(shared_session, capsys)
 def test_cli_adapter_run_requires_an_operator():
     with pytest.raises(SystemExit):
         cli.main(["adapter", "run", "neura-robotics-official", "--operator", "  "])
+
+
+def test_owner_authorization_is_not_publisher_permission(shared_session):
+    from app.models.discovery import DiscoverySourceOwnerAuthorizationEvent
+    key = _key()
+    source = _register(shared_session, key)
+    _review(shared_session, key, tos="UNKNOWN", robots="ALLOWED", paths=("/products",))
+    registry.authorize_owner(shared_session, key, by="robert", reason="A4 business decision",
+                             path_prefixes=["/products"])
+    assert source.tos_status == "UNKNOWN"
+    assert source.access_basis == "OWNER_AUTHORIZED"
+    assert source.is_enabled is False
+    registry.enable_source(shared_session, key, by="robert")
+    assert source.radar_eligible is True
+    assert shared_session.scalar(select(func.count()).select_from(
+        DiscoverySourceOwnerAuthorizationEvent).where(
+        DiscoverySourceOwnerAuthorizationEvent.source_id == source.id)) == 1
+    registry.revoke_owner(shared_session, key, by="robert", reason="cancelled")
+    assert source.is_enabled is False
+    assert source.radar_eligible is False
+    assert source.access_basis == "SOURCE_PERMISSION"
+    assert shared_session.scalar(select(func.count()).select_from(
+        DiscoverySourceOwnerAuthorizationEvent).where(
+        DiscoverySourceOwnerAuthorizationEvent.source_id == source.id)) == 2
+
+
+def test_owner_authorization_cannot_override_source_prohibition(shared_session):
+    key = _key()
+    _register(shared_session, key)
+    _review(shared_session, key, tos="PROHIBITED", robots="ALLOWED", paths=("/products",))
+    with pytest.raises(DiscoveryError, match="restriction"):
+        registry.authorize_owner(shared_session, key, by="robert", reason="test",
+                                 path_prefixes=["/products"])
+
+
+def test_owner_authorization_caps_allowed_url_scope(shared_session):
+    from app.services.discovery.eligibility import url_ineligibility, URL_OUTSIDE_APPROVED_PATHS
+    key = _key()
+    source = _register(shared_session, key)
+    _review(shared_session, key, tos="UNKNOWN", robots="ALLOWED",
+            paths=("/products", "/news"))
+    registry.authorize_owner(shared_session, key, by="robert", reason="A4",
+                             path_prefixes=["/products"])
+    registry.enable_source(shared_session, key, by="robert")
+    assert url_ineligibility(source, "https://maker.example/products/a") is None
+    assert url_ineligibility(source, "https://maker.example/news/b") == URL_OUTSIDE_APPROVED_PATHS
+
+
+def test_owner_authorization_cannot_expand_approved_paths(shared_session):
+    key = _key()
+    _register(shared_session, key)
+    _review(shared_session, key, tos="UNKNOWN", robots="ALLOWED", paths=("/products",))
+    with pytest.raises(DiscoveryError, match="scope"):
+        registry.authorize_owner(shared_session, key, by="robert", reason="test",
+                                 path_prefixes=["/"])

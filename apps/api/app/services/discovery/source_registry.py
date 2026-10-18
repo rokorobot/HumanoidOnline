@@ -26,7 +26,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.acquisition import SourceEligibilityReview
-from app.models.discovery import DiscoverySource
+from app.models.discovery import DiscoverySource, DiscoverySourceOwnerAuthorizationEvent
 from app.services.discovery import DiscoveryError
 
 SOURCE_CLASSES = (
@@ -120,13 +120,80 @@ def review_source(
     return review
 
 
+def authorize_owner(
+    session: Session, key: str, *, by: str, reason: str,
+    path_prefixes: list[str], now: datetime | None = None,
+) -> DiscoverySource:
+    """Record OWNER_AUTHORIZED without asserting the publisher's ToS is ALLOWED.
+
+    Owner authorization does not fetch, enable, set a cadence or bypass robots.
+    The already reviewed robots status and scoped paths remain independent gates.
+    """
+    who = _required(by, "--by")
+    why = _required(reason, "--reason")
+    source = get_source(session, key)
+    if source.tos_status in ("PROHIBITED", "RESTRICTED"):
+        raise DiscoveryError("recorded source restriction cannot be overridden")
+    paths = list(dict.fromkeys(path_prefixes))
+    if not paths or any(not p.startswith("/") for p in paths):
+        raise DiscoveryError("at least one absolute --path-prefix is required")
+    # Never let an owner event expand beyond the separately approved path scope.
+    approved = list(source.allowed_path_prefixes or [])
+    def inside(path: str, prefix: str) -> bool:
+        return path == prefix.rstrip("/") or path.startswith(prefix.rstrip("/") + "/")
+    if not approved or any(not any(inside(p, a) for a in approved) for p in paths):
+        raise DiscoveryError("owner scope must fit the recorded eligibility-review paths")
+    when = now or _now()
+    source.access_basis = "OWNER_AUTHORIZED"
+    source.owner_authorized_by = who
+    source.owner_authorized_at = when
+    source.owner_authorization_reason = why
+    source.owner_authorized_path_prefixes = paths
+    session.add(DiscoverySourceOwnerAuthorizationEvent(
+        source_id=source.id, action="AUTHORIZE", decided_by=who,
+        reason=why, approved_path_prefixes=paths, decided_at=when))
+    _note(source, f"{when.isoformat()} owner-authorized by {who}: {why}; paths={paths}")
+    session.flush()
+    return source
+
+
+def revoke_owner(
+    session: Session, key: str, *, by: str, reason: str,
+    now: datetime | None = None,
+) -> DiscoverySource:
+    who, why = _required(by, "--by"), _required(reason, "--reason")
+    source = get_source(session, key)
+    when = now or _now()
+    previous = list(source.owner_authorized_path_prefixes or [])
+    source.is_enabled = False  # revocation stops future observations
+    source.access_basis = "SOURCE_PERMISSION"
+    source.owner_authorized_by = None
+    source.owner_authorized_at = None
+    source.owner_authorization_reason = None
+    source.owner_authorized_path_prefixes = None
+    session.add(DiscoverySourceOwnerAuthorizationEvent(
+        source_id=source.id, action="REVOKE", decided_by=who,
+        reason=why, approved_path_prefixes=previous, decided_at=when))
+    _note(source, f"{when.isoformat()} owner authorization revoked by {who}: {why}")
+    session.flush()
+    return source
+
+
 def enable_source(session: Session, key: str, *, by: str,
                   now: datetime | None = None) -> DiscoverySource:
     who = _required(by, "--by")
     source = get_source(session, key)
     reasons = []
-    if source.tos_status != "ALLOWED":
-        reasons.append(f"tos_status={source.tos_status} (needs the owner's ALLOWED)")
+    if (source.access_basis or "SOURCE_PERMISSION") == "SOURCE_PERMISSION" and source.tos_status != "ALLOWED":
+        reasons.append(f"tos_status={source.tos_status} (requires publisher permission or owner authorization)")
+    elif source.access_basis == "OWNER_AUTHORIZED" and not (
+        source.tos_status not in ("PROHIBITED", "RESTRICTED")
+        and source.owner_authorized_by
+        and source.owner_authorized_at
+        and source.owner_authorization_reason
+        and source.owner_authorized_path_prefixes
+    ):
+        reasons.append("owner authorization missing, revoked, or blocked by recorded restrictions")
     if source.robots_status not in ("ALLOWED", "NOT_APPLICABLE"):
         reasons.append(f"robots_status={source.robots_status}")
     if source.eligibility_reviewed_at is None or not source.eligibility_reviewed_by:
@@ -219,6 +286,7 @@ def describe(source: DiscoverySource) -> list[str]:
     return [
         f"SOURCE {source.key}   class={source.source_class}   host={source.homepage_url}",
         f"  enabled={source.is_enabled}   radar_eligible={source.radar_eligible}",
+        f"  access_basis={source.access_basis}   owner_authorized_by={source.owner_authorized_by or '-'}",
         f"  tos_status={source.tos_status}   robots_status={source.robots_status}",
         f"  reviewed_by={source.eligibility_reviewed_by or '-'}   "
         f"reviewed_at={_iso(source.eligibility_reviewed_at)}",

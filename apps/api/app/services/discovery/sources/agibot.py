@@ -10,13 +10,14 @@ Scope: a FIXED set of two product pages, `/products/A2` and `/products/X2`, both
 The wheeled G2, the C5/D1 quadrupeds, hands and other products are not seeds. The malformed
 sitemap is never read, and `store.agibot.com` is another host.
 
-IDENTITY-ONLY, source-specific extractor (`extract_agibot_product`). The pages have no `<h1>` and
+Source-specific extractor (identity first) (`extract_agibot_product`). The pages have no `<h1>` and
 no JSON-LD. Their `<title>` is often the generic company title, and **every product page's
 canonical points to the homepage**, so canonical is deliberately NOT read. Identity needs the URL
 slug (`A2`, `X2`) to equal the model in a visible `AGIBOT <model>` / `AGIBOT <model> series`
 heading block. The candidate is the model token as the page writes it (`A2`, `X2`); catalogue
-editions (`A2 Lite`, `A2 Ultra`) are a human identity decision. No claim, signal or image is
-emitted.
+editions (`A2 Lite`, `A2 Ultra`) are a human identity decision. v0.2.0 also records a page's
+`Item | <edition> ...` specification table (X2: X2 / X2 Ultra) as verbatim per-edition claims
+`agibot.spec[<edition>]/<label>`. The A2 page has no such table. No signal or price is emitted.
 """
 from __future__ import annotations
 
@@ -25,6 +26,7 @@ from urllib.parse import urlsplit
 
 from app.services.discovery.live_adapter import ProductExtraction, SourceAdapterConfig
 from app.services.discovery.sources import xpeng_iron_proposals as html
+from app.services.discovery.sources.spec_claims import SpecClaims, children, find
 from app.services.discovery.urlref import UnsupportedUrl, normalize_url
 
 STRUCTURAL_FINDINGS = {
@@ -58,6 +60,18 @@ def _without_navigation(node):
     return copy
 
 
+def _cell(node) -> str:
+    """A table cell's text, its paragraphs joined by spaces (verbatim words, never merged)."""
+    return " ".join(html._blocks(node))
+
+
+def _span(node) -> int:
+    try:
+        return int(node.attrs.get("colspan") or 1)
+    except ValueError:
+        return 0                # an unreadable span is never attributed
+
+
 def extract_agibot_product(config: SourceAdapterConfig, body: bytes,
                            url: str | None) -> ProductExtraction:
     """Identity only: URL slug == visible `AGIBOT <model>` heading. Pure and deterministic."""
@@ -78,15 +92,38 @@ def extract_agibot_product(config: SourceAdapterConfig, body: bytes,
     if models != {slug}:
         return ProductExtraction("AMBIGUOUS", notes=(
             f"headings name {sorted(models)}, the URL slug is {slug!r}",))
+    specs = SpecClaims("agibot")
+    for table in find(tree.root, "table"):
+        rows = [[c for c in children(r) if c.tag in ("td", "th")] for r in find(table, "tr")]
+        header = [_cell(c) for c in rows[0]] if rows else []
+        if not header or header[0] != "Item" or slug not in header[1:]:
+            continue        # not this page's specification table
+        editions, category = header[1:], None
+        for cells in rows[1:]:
+            values = [_cell(c) for c in cells]
+            if len(cells) == 1 and _span(cells[0]) == len(header):
+                category = values[0]        # a full-width section row ("Perception System")
+                continue
+            if len(cells) != len(header) or any(_span(c) != 1 for c in cells):
+                specs.rejected.append(f"spec-table/row[{values[0] if values else ''}]: "
+                                      f"{len(cells) - 1} cells for {len(editions)} editions or a "
+                                      "merged cell (row rejected, never partially attributed)")
+                continue
+            label = f"{category}/{values[0]}" if category else values[0]
+            for edition, value in zip(editions, values[1:], strict=True):
+                specs.add(edition, label, value, f"spec-table/row[{label}]/col[{edition}]")
     return ProductExtraction(
-        "EXTRACTED", name=slug, name_method="SELECTOR",
+        "EXTRACTED", name=slug, name_method="SELECTOR", claims=specs.claims,
+        rejected=tuple(specs.rejected),
         notes=("agreeing locators: ['url_slug', 'heading_block']; canonical ignored "
-               "(it points to the homepage)", "identity only: no specification or price read"))
+               "(it points to the homepage)",
+               "specifications: the page's 'Item | <edition> ...' table, verbatim per edition "
+               "(editions are not resolved to catalogue robots); no price read"))
 
 
 CONFIG = SourceAdapterConfig(
     key="agibot-official",
-    version="0.1.0",
+    version="0.2.0",
     source_key="agibot-official",
     source_class="MANUFACTURER",
     host="www.agibot.com",

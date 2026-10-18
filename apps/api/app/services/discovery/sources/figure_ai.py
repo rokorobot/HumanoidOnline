@@ -8,12 +8,14 @@ Structural review: docs/discovery/FIGURE_STRUCTURAL_REVIEW_2026-10-18.md (6 requ
 
 Scope: ONE fixed product page, `/figure`. `/news` articles are not seeds in v0.1.
 
-IDENTITY-ONLY, source-specific extractor (`extract_figure_product`). There is no canonical and
+Source-specific extractor (identity first) (`extract_figure_product`). There is no canonical and
 no JSON-LD, and the URL names no model. Identity needs `<title>` `<name> | Figure` to equal the
 first `<h1>` (case-insensitively: `Figure 03` / `FIGURE 03`). The candidate takes the title's
 spelling. When the page moves to a new generation the name changes with it, and Stage E reports
 that as an identity change for a human. Generation naming (Figure 03 / F.03) and aliases stay
-human decisions. No claim, signal or image is emitted.
+human decisions. v0.2.0 also records the page's stat block (`dt`/`dd`: Height, Payload,
+Weight, Runtime, Speed) as verbatim claims `figure.spec[<model>]/<label>`. No signal or
+price is emitted.
 """
 from __future__ import annotations
 
@@ -22,6 +24,7 @@ from urllib.parse import urlsplit
 
 from app.services.discovery.live_adapter import ProductExtraction, SourceAdapterConfig
 from app.services.discovery.sources import xpeng_iron_proposals as html
+from app.services.discovery.sources.spec_claims import SpecClaims, find, text
 from app.services.discovery.urlref import UnsupportedUrl, normalize_url
 
 STRUCTURAL_FINDINGS = {
@@ -61,14 +64,25 @@ def extract_figure_product(config: SourceAdapterConfig, body: bytes,
     if name.casefold() != h1.casefold():
         return ProductExtraction("AMBIGUOUS", notes=(
             f"<title> name {name!r} and first <h1> {h1!r} disagree",))
+    specs = SpecClaims("figure")
+    for item in find(tree.root, cls="human-form-item"):
+        terms, values = find(item, "dt"), find(item, "dd")
+        if len(terms) == 1 and len(values) == 1:
+            label = text(terms[0])
+            specs.add(name, label, text(values[0]), f"human-form/item[{label}]")
+        else:
+            specs.rejected.append("human-form/item: not exactly one <dt> and one <dd>")
     return ProductExtraction(
-        "EXTRACTED", name=name, name_method="SELECTOR",
-        notes=("agreeing locators: ['title', 'h1']", "identity only: no specification read"))
+        "EXTRACTED", name=name, name_method="SELECTOR", claims=specs.claims,
+        rejected=tuple(specs.rejected),
+        notes=("agreeing locators: ['title', 'h1']",
+               "specifications: the page's own stat labels and values, verbatim; no unit "
+               "conversion, no price, no availability"))
 
 
 CONFIG = SourceAdapterConfig(
     key="figure-ai-official",
-    version="0.1.0",
+    version="0.2.0",
     source_key="figure-ai-official",
     source_class="MANUFACTURER",
     host="www.figure.ai",

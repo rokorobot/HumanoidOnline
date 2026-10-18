@@ -50,6 +50,9 @@ SOURCES = {
 }
 PAGES = [(key, url, fx, name) for key, (pages, _, _) in SOURCES.items()
          for url, (fx, name) in pages.items()]
+#: v0.2.0: verbatim specification claims per reviewed page (2026-10-18 fixtures).
+CLAIMS = {"booster/t2.html": 64, "booster/k1.html": 81, "agibot/a2.html": 0,
+          "agibot/x2.html": 70, "agility/digit-5.html": 4, "figure/figure.html": 6}
 
 
 def raw(fixture: str) -> bytes:
@@ -61,16 +64,82 @@ def raw(fixture: str) -> bytes:
 
 @pytest.mark.parametrize("key, url, fixture, name", PAGES)
 def test_each_reviewed_page_names_its_model_and_states_nothing_commercial(key, url, fixture, name):
+    from app.services.discovery.promotion import _APPROVED_FIELDS
     result = extract_product(ADAPTERS[key], raw(fixture), url)
     assert (result.status, result.name) == ("EXTRACTED", name)
-    assert result.signals == () and result.claims == ()     # identity-first: no price, no claim
+    assert result.signals == ()                             # no price, availability or maturity
+    assert len(result.claims) == CLAIMS[fixture] and result.rejected == ()
+    prefix = key.split("-")[0] + ".spec["
+    assert all(c.field_key.startswith(prefix) and c.unit is None for c in result.claims)
+    assert not {c.field_key for c in result.claims} & set(_APPROVED_FIELDS)   # never promotable
+    assert all(len(c.evidence.excerpt) <= 1000 and c.evidence.locator for c in result.claims)
     assert extract_product(ADAPTERS[key], raw(fixture), url) == result   # deterministic
+
+
+def _claims(key, fixture, url, body=None):
+    result = extract_product(ADAPTERS[key], body if body is not None else raw(fixture), url)
+    return {c.field_key: c.claimed_value for c in result.claims}, result
+
+
+def test_specification_values_are_verbatim_and_edition_keyed():
+    t2, _ = _claims("booster-robotics-official", "booster/t2.html",
+                    "https://www.booster.tech/booster-t2?target=en")
+    assert t2["booster.spec[T2 Education]/Actuators/Max Peak Torque"] == "140 N·m"
+    k1, _ = _claims("booster-robotics-official", "booster/k1.html",
+                    "https://www.booster.tech/booster-k1?target=en")
+    assert [k1[f"booster.spec[K1 {e}]/Computing & Sensors/GPU"]
+            for e in ("Geek Edition", "Education", "Professional")] == [
+        "48 TOPS (dense) AI computing power", "117 TOPS AI computing power",
+        "200 TOPS AI computing power"]
+    x2, _ = _claims("agibot-official", "agibot/x2.html", "https://www.agibot.com/products/X2")
+    assert (x2["agibot.spec[X2]/Weight"], x2["agibot.spec[X2 Ultra]/Weight"]) == (
+        "Approx.35kg", "Approx.39kg")
+    assert x2["agibot.spec[X2]/Arm Reach"] == "558mm excluding end effector"   # words kept apart
+    assert x2["agibot.spec[X2 Ultra]/Perception System/3D LiDAR"] == "Equipped"
+    digit, _ = _claims("agility-robotics-official", "agility/digit-5.html",
+                       "https://www.agilityrobotics.com/solutions/digit-5")
+    assert digit == {"agility.spec[Digit 5]/Payload*": "23kg/50lbs",
+                     "agility.spec[Digit 5]/Reach*": "2.2m/7.2ft",
+                     "agility.spec[Digit 5]/Run to charge ratio*": "10:1",
+                     "agility.spec[Digit 5]/Work/Shift*": "20HRS/24HRS"}
+    fig, _ = _claims("figure-ai-official", "figure/figure.html", "https://www.figure.ai/figure")
+    assert fig["figure.spec[Figure 03]/Height"] == "5'8\"" and \
+        fig["figure.spec[Figure 03]/Weight"] == "61KG"
+
+
+def test_booster_an_unreviewed_edition_label_is_never_attributed():
+    body = raw("booster/t2.html").replace(b">Professional<", b">Ultra<")
+    claims, result = _claims("booster-robotics-official", "booster/t2.html",
+                             "https://www.booster.tech/booster-t2?target=en", body)
+    assert result.status == "EXTRACTED"
+    assert not any("Ultra" in k or "T2 Professional" in k for k in claims)
+    # The lines under the unknown label are attributed to NO edition (not to the previous one):
+    # Education keeps exactly its own reviewed lines.
+    assert len(claims) == CLAIMS["booster/t2.html"] // 2
+
+
+def test_booster_a_repeated_block_with_a_different_value_is_dropped():
+    body = raw("booster/t2.html").replace(b"Max Peak Torque: 140 N", b"Max Peak Torque: 150 N", 1)
+    claims, result = _claims("booster-robotics-official", "booster/t2.html",
+                             "https://www.booster.tech/booster-t2?target=en", body)
+    assert "booster.spec[T2 Education]/Actuators/Max Peak Torque" not in claims
+    assert any("different values" in r for r in result.rejected)
+
+
+def test_agibot_a_merged_cell_rejects_its_row_whole():
+    body = raw("agibot/x2.html").replace(
+        b'<td valign="top" width="598">25</td>',
+        b'<td valign="top" colspan="2" width="598">25</td>', 1)
+    claims, result = _claims("agibot-official", "agibot/x2.html",
+                             "https://www.agibot.com/products/X2", body)
+    assert not any("Total Degrees of Freedom" in k for k in claims)
+    assert any("merged cell" in r for r in result.rejected)
 
 
 @pytest.mark.parametrize("key", sorted(SOURCES))
 def test_each_adapter_is_a_fixed_reviewed_seed_set_on_one_host(key):
     config, (pages, _, home) = ADAPTERS[key], SOURCES[key]
-    assert config.source_key == key and config.version == "0.1.0"
+    assert config.source_key == key and config.version == "0.2.0"
     assert set(config.seed_urls) == set(pages) and config.target_cap == 1
     assert config.structural_review and config.blocked_reason is None
     assert f"https://{config.host}/" == home
@@ -238,7 +307,8 @@ def test_a_run_names_every_seed_model_and_writes_nothing_canonical(dsession, tmp
         DiscoveryCandidate.source_id == source.id)))
     assert names == {name for _, (_, name) in SOURCES[key][0].items()}
     assert dsession.scalar(select(func.count()).select_from(CandidateClaim).join(
-        DiscoveryCandidate).where(DiscoveryCandidate.source_id == source.id)) == 0
+        DiscoveryCandidate).where(DiscoveryCandidate.source_id == source.id)) == sum(
+        CLAIMS[fx] for fx, _ in SOURCES[key][0].values())
     assert _canonical(dsession) == before
     second = _run(dsession, source, key, site, clock, tmp_path)        # unchanged pages
     assert second.status == "COMPLETED"

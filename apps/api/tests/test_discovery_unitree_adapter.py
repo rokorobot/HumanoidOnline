@@ -114,6 +114,12 @@ def test_contact_sales_on_the_model_row_is_quote_only():
     assert (signal.price_type, signal.price_amount) == ("QUOTE_ONLY", None)
 
 
+def test_multi_paragraph_cells_keep_their_statements_apart():
+    g1 = claims(extract("g1"))
+    ranges = g1["unitree.spec[G1]/Mechanical Dimensions/Extra Large Joint Movement Space"]
+    assert "Z±155° Knee joint" in ranges and "°Knee" not in ranges
+
+
 def test_specifications_are_verbatim_text_per_edition_and_never_promotable():
     r1 = claims(extract("r1"))
     key = "unitree.spec[{}]/Mechanical Dimensions/Degree of Freedom(Total Joints)"
@@ -371,6 +377,6 @@ def test_a_robots_disallow_behind_the_bom_is_honoured(dsession, tmp_path):
 def test_the_run_record_names_the_adapter_and_its_review(dsession, tmp_path):
     source = _source(dsession)
     run = _run(dsession, source, Site(), Clock(), tmp_path)
-    assert (run.adapter_key, run.adapter_version) == ("unitree-robotics-official", "0.1.0")
+    assert (run.adapter_key, run.adapter_version) == ("unitree-robotics-official", "0.1.1")
     assert "UNITREE_STRUCTURAL_REVIEW" in run.run_manifest["adapter_structural_review"]
     assert isinstance(dsession.get(CrawlRun, run.id), CrawlRun)

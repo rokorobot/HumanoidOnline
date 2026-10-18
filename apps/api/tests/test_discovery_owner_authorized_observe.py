@@ -102,9 +102,11 @@ def test_revocation_stops_the_next_cycle_and_other_sources_keep_running(h):  # n
     assert second[other.key].status == "COMPLETED"           # isolation between sources
 
 
-def test_the_six_a4_sources_are_not_runnable_in_this_build(h):  # noqa: F811
-    """Registered (as in production) and even if wrongly enabled and scheduled, none
-    of the six has a reviewed adapter, so no cycle can contact them."""
+def test_a4_sources_without_a_reviewed_adapter_are_not_runnable(h):  # noqa: F811
+    """Registered (as in production) and even if wrongly enabled and scheduled, a source
+    without a reviewed adapter is never contacted. Unitree has one since 2026-10-18; the
+    other five do not. (The harness only runs adapters it is given, so all six report
+    NO_ADAPTER here and no real host is contacted.)"""
     from app.services.discovery.source_manifest import sync_sources
     from app.services.discovery.sources import ADAPTERS
 
@@ -123,4 +125,4 @@ def test_the_six_a4_sources_are_not_runnable_in_this_build(h):  # noqa: F811
     result = h.cycle()[0]
     status = {s.key: s.status for s in result.sources}
     assert {status[k] for k in keys} == {"NO_ADAPTER"}
-    assert not set(keys) & set(ADAPTERS)
+    assert set(keys) & set(ADAPTERS) == {"unitree-robotics-official"}

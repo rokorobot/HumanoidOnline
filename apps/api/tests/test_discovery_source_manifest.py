@@ -57,15 +57,19 @@ def test_manifest_hosts_are_single_origins_and_claim_no_store_host():
     assert entries["alza-cz"]["source_class"] == "DISTRIBUTOR"   # a retailer, not a maker
 
 
-def test_manifest_adapters_match_code_and_the_a4_sources_have_none_yet():
+def test_manifest_adapters_match_code_and_only_reviewed_a4_adapters_exist():
     """Adapter readiness is code, not data. When an A4 adapter lands (after its
-    structural review), this test is updated in that same reviewed PR."""
+    structural review), this test is updated in that same reviewed PR: Unitree (2026-10-18,
+    UNITREE_STRUCTURAL_REVIEW_2026-10-18) is the first."""
     entries = {e["key"]: e for e in load_manifest()}
     for key, config in ADAPTERS.items():
         assert key in entries
         assert entries[key]["homepage_url"] == f"https://{config.host}/"
         assert entries[key]["source_class"] == config.source_class
-    assert A4_SOURCES.isdisjoint(ADAPTERS)
+    assert A4_SOURCES & set(ADAPTERS) == {
+        "unitree-robotics-official", "booster-robotics-official", "agibot-official",
+        "agility-robotics-official", "figure-ai-official"}
+    assert "alza-cz" not in ADAPTERS          # blocked by the source (403 on robots.txt)
 
 
 @pytest.mark.parametrize("bad", [
@@ -215,8 +219,10 @@ def test_cli_sync_reports_adapter_readiness(shared_session, capsys):
     code = cli.main(["source", "sync"])
     out = capsys.readouterr().out
     assert "PLAN (no write)" in out
-    line = next(x for x in out.splitlines() if "unitree-robotics-official" in x)
+    line = next(x for x in out.splitlines() if "alza-cz" in x)
     assert "WOULD_REGISTER" in line and "adapter=NONE" in line
+    line = next(x for x in out.splitlines() if "unitree-robotics-official" in x)
+    assert "WOULD_REGISTER" in line and "adapter=unitree-robotics-official@0.1.0" in line
     line = next(x for x in out.splitlines() if "neura-documents-official" in x)
     assert "adapter=LANE_B_DOCUMENT" in line
     line = next(x for x in out.splitlines() if " xpeng-official" in x)

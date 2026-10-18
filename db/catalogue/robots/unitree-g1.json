@@ -253,8 +253,8 @@
     },
     {
       "key": "limb_lengths_mm",
-      "value": "Calf + thigh 0.6M",
-      "source_label": "Unitree G1 — parameter table (G1 column); discovery claim 171dcd90 (verbatim: '0.6M')",
+      "value": "Calf + thigh 600 mm",
+      "source_label": "Unitree G1 — parameter table (G1 column); discovery claim 171dcd90; manufacturer statement 'Calf + Thigh Length: 0.6M' normalized to millimetres",
       "source_url": "https://www.unitree.com/g1",
       "source_kind": "MANUFACTURER",
       "edition_scope": "THIS_EDITION",

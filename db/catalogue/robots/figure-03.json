@@ -8,7 +8,7 @@
   "commercial_status": "PILOT",
   "is_published": false,
   "specs": {
-    "height_cm": 172.7,
+    "height_cm": 173.0,
     "weight_kg": 61.0,
     "arm_span_cm": null,
     "reach_cm": null,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Commercial maturity PILOT recorded 2026-10-04 (owner decision, six-robot review). Basis: Figure 03 placed at an external customer site and a customer deployment agreement; no purchase or general availability is stated. Specifications not yet verified. RETRIEVAL: AUTOMATED discovery observation 2026-10-18 by the owner-authorized (docs/28 A4) source figure-ai-official, adapter 0.2.0; values verbatim from https://www.figure.ai/figure as stored in production candidate_claim rows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Core specs added 2026-10-19 from the /figure stat block (claims: weight bd4d27ae).",
+  "specs_note": "Commercial maturity PILOT recorded 2026-10-04 (owner decision, six-robot review). Basis: Figure 03 placed at an external customer site and a customer deployment agreement; no purchase or general availability is stated. Figure 03 is a separate, unpublished successor-generation robot to Figure 02 (figure-02); it is not merged with it. SPECIFICATIONS (owner-approved promotion batch 1, 2026-10-19): height, weight, payload, runtime and speed come from the stat block of Figure's official product page https://www.figure.ai/figure, captured on 2026-10-18 by HumanoidOnline's automated discovery observation of the owner-authorized source figure-ai-official (docs/28 A4; adapter 0.2.0) and stored as discovery claims (height 48923025, weight bd4d27ae, payload b4da6ae2, runtime c3258260, speed 6e17a216). Weight, payload, runtime and speed are recorded as stated (61KG, 20KG, 5HR, 1.2M/S); height is stated as 5'8\" and recorded as approximately 173 cm. Automated capture, not a MANUAL_BOOTSTRAP reading; not independently verified.",
   "official_url": "https://www.figure.ai/",
   "commercial_status_evidence": [
     {
@@ -67,7 +67,7 @@
   "spec_caveats": [
     {
       "field": "height_cm",
-      "text": "Figure states 5'8\" (claim 48923025); 172.7 cm is the exact conversion (68 in × 2.54)."
+      "text": "Figure states 5'8\" (claim 48923025); recorded as approximately 173 cm (5'8\" = 172.7 cm, rounded)."
     },
     {
       "field": "payload_kg",

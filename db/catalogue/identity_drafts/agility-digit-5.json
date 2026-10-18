@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "IDENTITY DRAFT (owner decision pending; not imported). RETRIEVAL: AUTOMATED discovery observation 2026-10-18 by an owner-authorized (docs/28 A4) source; values verbatim from https://www.agilityrobotics.com/solutions/digit-5 as stored in production candidate_claim rows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. A new generation, not merged into the existing 'Digit' record (agility-digit). Run to charge ratio '10:1' is kept as discovery evidence only.",
+  "specs_note": "IDENTITY DRAFT (owner decision pending; not imported). RETRIEVAL: AUTOMATED discovery observation 2026-10-18 by an owner-authorized (docs/28 A4) source; values verbatim from https://www.agilityrobotics.com/solutions/digit-5 as stored in production candidate_claim rows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. A new generation, not merged into the existing 'Digit' record (agility-digit). Agility's 'Work/Shift* 20HRS/24HRS' and 'Run to charge ratio* 10:1' are duty-cycle statements, not a generic operating time: kept as discovery evidence only, not recorded in this record.",
   "official_url": "https://www.agilityrobotics.com/solutions/digit-5",
   "commercial_status_evidence": [],
   "variants": [],
@@ -41,17 +41,7 @@
   "capabilities": [],
   "use_case_fits": [],
   "images": [],
-  "extended_specs": [
-    {
-      "key": "operating_time",
-      "value": "20HRS/24HRS",
-      "source_label": "Agility — Explore Digit stats; discovery claim 76deefad (verbatim: '20HRS/24HRS')",
-      "source_url": "https://www.agilityrobotics.com/solutions/digit-5",
-      "source_kind": "MANUFACTURER",
-      "edition_scope": "THIS_EDITION",
-      "observed_at": "2026-10-18"
-    }
-  ],
+  "extended_specs": [],
   "spec_caveats": [
     {
       "field": "payload_kg",

@@ -1,14 +1,78 @@
 {
-  "_comment": "A4 catalogue promotion batch 1 (2026-10-19): expected business changes for `import_catalogue.py --only unitree-g1 --only figure-03 --only booster-t2-education --only booster-t2-professional`. Gate with db/import_preflight.py on a production rehearsal.",
+  "_comment": "A4 catalogue promotion batch 1 (2026-10-19): expected business changes for `import_catalogue.py --only unitree-g1 --only figure-03 --only booster-t2-education --only booster-t2-professional`. Gate with db/import_preflight.py on a production rehearsal. Amended 2026-10-19 per owner decision: G1 limb length normalized to 600 mm; Figure 03 height approx. 173 cm and provenance wording corrected (same 9 business changes).",
   "expected": [
-    {"table": "robot", "kind": "CHANGED", "match": {"slug": "figure-03"}, "count": 1},
-    {"table": "specification", "kind": "ADDED", "match": {"robot": "unitree-g1", "definition": "standing_dimensions_mm"}},
-    {"table": "specification", "kind": "ADDED", "match": {"robot": "unitree-g1", "definition": "limb_lengths_mm"}},
-    {"table": "specification", "kind": "ADDED", "match": {"robot": "unitree-g1", "definition": "battery_pack"}},
-    {"table": "specification", "kind": "ADDED", "match": {"robot": "unitree-g1", "definition": "cameras"}},
-    {"table": "specification", "kind": "ADDED", "match": {"robot": "unitree-g1", "definition": "lidar"}},
-    {"table": "specification", "kind": "ADDED", "match": {"robot": "unitree-g1", "definition": "manufacturer_warranty_months"}},
-    {"table": "specification", "kind": "ADDED", "match": {"robot": "booster-t2-education", "definition": "manufacturer_warranty_months"}},
-    {"table": "specification", "kind": "ADDED", "match": {"robot": "booster-t2-professional", "definition": "manufacturer_warranty_months"}}
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "figure-03",
+        "height_cm~": "173"
+      },
+      "count": 1
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "unitree-g1",
+        "definition": "standing_dimensions_mm"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "unitree-g1",
+        "definition": "limb_lengths_mm"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "unitree-g1",
+        "definition": "battery_pack"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "unitree-g1",
+        "definition": "cameras"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "unitree-g1",
+        "definition": "lidar"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "unitree-g1",
+        "definition": "manufacturer_warranty_months"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-t2-education",
+        "definition": "manufacturer_warranty_months"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-t2-professional",
+        "definition": "manufacturer_warranty_months"
+      }
+    }
   ]
 }

@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "IDENTITY DRAFT (owner decision pending; not imported). RETRIEVAL: AUTOMATED discovery observation 2026-10-18 by an owner-authorized (docs/28 A4) source; values verbatim from https://www.agibot.com/products/X2 as stored in production candidate_claim rows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. AgiBot's X2 page lists two editions, X2 and X2 Ultra; this draft is the X2 edition.",
+  "specs_note": "IDENTITY DRAFT (owner decision pending; not imported). RETRIEVAL: AUTOMATED discovery observation 2026-10-18 by an owner-authorized (docs/28 A4) source; values verbatim from https://www.agibot.com/products/X2 as stored in production candidate_claim rows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Identity candidate: the ORIGINAL AGIBOT X2 generation, edition 'X2', exactly as presented on agibot.com/products/X2 on 2026-10-18 (that page lists two editions of this generation, 'X2' and 'X2 Ultra'). Any later or revised X2 generation is a separate identity and is not covered by this record. Not merged with AGIBOT A2 Lite / A2 Ultra.",
   "official_url": "https://www.agibot.com/products/X2",
   "commercial_status_evidence": [],
   "variants": [],

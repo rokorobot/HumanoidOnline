@@ -190,3 +190,29 @@ def test_mode_reason_identifies_the_specific_failing_currentness_check() -> None
 
     missing = mode_reason(_target(), None, "ELIGIBILITY_REVIEW_REQUIRED")
     assert "no DiscoverySource" in missing
+
+
+# ---- docs/28 (A4): OWNER_AUTHORIZED does not extend to scheduled freshness ----
+
+
+def _owner_authorized_source(**overrides) -> DiscoverySource:
+    return _eligible_source(
+        tos_status="UNKNOWN", access_basis="OWNER_AUTHORIZED",
+        owner_authorized_by="Robert Konecny", owner_authorized_at=NOW,
+        owner_authorization_reason="A4 owner instruction",
+        owner_authorized_path_prefixes=["/products"], **overrides)
+
+
+def test_A4_owner_authorized_source_is_radar_eligible_but_never_auto_check() -> None:
+    src = _owner_authorized_source()
+    assert src.radar_eligible is True                       # discovery monitoring: yes
+    assert freshness_auto_check_eligible(src, NOW) is False  # scheduled freshness: no
+    mode = compute_execution_mode(_target(), src, NOW)
+    assert mode == "ELIGIBILITY_REVIEW_REQUIRED"
+    assert "access_basis=OWNER_AUTHORIZED" in mode_reason(_target(), src, mode)
+
+
+def test_A4_unsaved_source_defaults_to_source_permission() -> None:
+    src = _eligible_source()                                 # access_basis not yet flushed
+    assert freshness_auto_check_eligible(src, NOW) is True
+

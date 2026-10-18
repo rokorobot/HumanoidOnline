@@ -1,5 +1,12 @@
 """Acquisition eligibility — the one place automated acquisition asks "may we?".
 
+Amended by docs/28 (A4): the access basis is either the owner-recorded ToS
+decision (SOURCE_PERMISSION, below) or an attributed OWNER_AUTHORIZED decision,
+which is an internal business decision and never publisher consent. Under
+OWNER_AUTHORIZED the approved paths are the owner's scope intersected with the
+reviewed `allowed_path_prefixes`. robots.txt, LIVE.3 and every URL check below
+apply unchanged to both.
+
 Owner decision DR-A4 (docs/decisions/DR-A4_TOS_NOT_TIME_GATED.md): the owner
 reads each source's terms personally and records the result in `tos_status`.
 That recorded decision is enforced through `radar_eligible` and the
@@ -10,8 +17,8 @@ mandatory: `radar_eligible` holds the stored decision, and the runner re-evaluat
 robots per run and per URL (docs/16 LIVE.2), which this module does not replace.
 
 Source-level policy (all must hold, fails closed):
-  - `radar_eligible`: enabled, owner-recorded ToS ALLOWED, robots not a
-    disallow, attributed approval;
+  - `radar_eligible`: enabled, an access basis (owner-recorded ToS ALLOWED, or
+    OWNER_AUTHORIZED per docs/28), robots not a disallow, attributed approval;
   - an approved host: `homepage_url` is an absolute http(s) URL with a host;
   - approved paths: at least one `allowed_path_prefixes` entry, each an
     absolute path ("/products/").
@@ -26,7 +33,7 @@ from __future__ import annotations
 
 from urllib.parse import urlsplit
 
-from app.models.discovery import DiscoverySource
+from app.models.discovery import OWNER_AUTHORIZED, DiscoverySource
 
 SOURCE_DISABLED = "SOURCE_DISABLED"
 NOT_RADAR_ELIGIBLE = "NOT_RADAR_ELIGIBLE"
@@ -50,10 +57,16 @@ def approved_host(source: DiscoverySource) -> str | None:
 
 def approved_prefixes(source: DiscoverySource) -> tuple[str, ...]:
     """Well-formed approved path prefixes. A malformed entry approves nothing."""
-    paths = (source.owner_authorized_path_prefixes
-             if source.access_basis == "OWNER_AUTHORIZED"
-             else source.allowed_path_prefixes)
-    return tuple(p for p in (paths or ()) if p and p.startswith("/"))
+    reviewed = tuple(p for p in (source.allowed_path_prefixes or ()) if p and p.startswith("/"))
+    if source.access_basis != OWNER_AUTHORIZED:
+        return reviewed
+    # docs/28: the owner's scope is a CEILING inside the current review, never a
+    # widening. An owner prefix approves nothing unless a reviewed prefix covers
+    # it, so a later, narrower review narrows an owner-authorized source too.
+    return tuple(
+        p for p in (source.owner_authorized_path_prefixes or ())
+        if p and p.startswith("/") and any(_path_within(p, r) for r in reviewed)
+    )
 
 
 def source_ineligibility(source: DiscoverySource | None) -> str | None:

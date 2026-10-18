@@ -1,7 +1,10 @@
 """Alza.cz reference offers (owner decision 2026-10-05): provider + governed retail claims.
 
 Alza is an approved Czech commercial provider and a REFERENCE source for evidence-backed offers.
-It is NOT approved for automated monitoring. These tests pin that split and the semantics:
+The 2026-10-05 decision kept it out of automated monitoring; the owner's 2026-10-18 A4
+instruction (docs/28) authorizes recurring monitoring under the OWNER_AUTHORIZED basis, but no
+reviewed Alza adapter exists yet, so in this build Alza is still manual-only. These tests pin
+that current state and the semantics:
 
 - manual capture records retained bytes as a governed observation without enabling the source;
   nothing schedules, polls or fetches Alza (no network at all: the suite's guard is active);
@@ -172,7 +175,10 @@ def claim_for(session, p):
 # ----------------------------------------------------- source governance ---------
 
 
-def test_alza_is_a_manual_provider_never_a_scheduled_source(dsession):
+def test_alza_is_manual_only_until_a_reviewed_adapter_exists(dsession):
+    # docs/28: owner-authorized for monitoring (2026-10-18), but activation needs its own
+    # structural review, reviewed adapter, eligibility review and enablement. Update this
+    # test in that adapter's PR, not before.
     source = alza_source(dsession)
     assert source.is_enabled is False and source.tos_status != "ALLOWED"
     assert source.observation_interval_hours is None          # no cadence: never scheduled

@@ -35,7 +35,9 @@ GRANT INSERT, UPDATE ON
 TO discovery_observer;
 
 -- Run bookkeeping only: robots hash/check time, last crawl, and the robots-
--- disallow auto-disable (docs/16 Gate B). Never approval, ToS, paths or cadence.
+-- disallow auto-disable (docs/16 Gate B). Never approval, ToS, paths or cadence,
+-- and never the docs/28 access basis (access_basis, owner_authorized_*): the
+-- observer gets NO privilege on discovery_source_owner_authorization_event.
 GRANT UPDATE (last_robots_hash, last_robots_checked_at, last_crawled_at, is_enabled)
     ON discovery_source TO discovery_observer;
 

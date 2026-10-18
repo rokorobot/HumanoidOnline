@@ -4,9 +4,13 @@
     python -m app.cli.discovery source review   <key> --reviewed-by WHO --tos-decision D
                                                 --robots-decision D --path-prefix /p/ ...
                                                 [--tos-url U] [--robots-url U] [--notes T]
+    python -m app.cli.discovery source authorize-owner <key> --by WHO --reason WHY
+                                                --path-prefix /p/ ...
+    python -m app.cli.discovery source revoke-owner    <key> --by WHO --reason WHY
     python -m app.cli.discovery source enable   <key> --by WHO
     python -m app.cli.discovery source disable  <key> --by WHO --reason WHY
     python -m app.cli.discovery source show     <key>
+    python -m app.cli.discovery source sync     [--apply --by WHO]   (source_registry.json)
     python -m app.cli.discovery source cadence  <key> (--every 24h|7d | --off) --by WHO
     python -m app.cli.discovery observe [--plan] [--only KEY [--run-now]] [--report-json PATH]
     python -m app.cli.discovery cache prune [--apply] [--cache-dir DIR]
@@ -237,6 +241,18 @@ def _cmd_crawl(args: argparse.Namespace) -> int:
 def _cmd_source(args: argparse.Namespace) -> int:
     from app.db.session import SessionLocal
     from app.services.discovery import source_registry as registry
+
+    if args.action == "sync":
+        from app.services.discovery.source_manifest import sync_sources
+
+        with SessionLocal() as session:
+            result = sync_sources(session, apply=args.apply, by=args.by)
+            if args.apply:
+                session.commit()
+            else:
+                session.rollback()
+        print("\n".join(result.text()))
+        return 4 if result.needs_attention else 0
 
     with SessionLocal() as session:
         if args.action == "register":
@@ -727,12 +743,17 @@ def main(argv: list[str] | None = None) -> int:
     review.add_argument("--tos-url")
     review.add_argument("--robots-url")
     review.add_argument("--notes")
-    auth = actions.add_parser("authorize-owner", help="record internal owner approval; never enables")
+    auth = actions.add_parser(
+        "authorize-owner",
+        help="docs/28: record the owner's OWNER_AUTHORIZED access basis (an internal "
+             "decision, not publisher consent; never changes tos_status; never enables)")
     auth.add_argument("key")
     auth.add_argument("--by", required=True)
     auth.add_argument("--reason", required=True)
-    auth.add_argument("--path-prefix", action="append", required=True)
-    revoke = actions.add_parser("revoke-owner", help="stop source and revoke owner approval")
+    auth.add_argument("--path-prefix", action="append", required=True,
+                      help="authorized path prefix inside the reviewed prefixes (repeat)")
+    revoke = actions.add_parser("revoke-owner",
+                                help="docs/28: revoke OWNER_AUTHORIZED and disable the source")
     revoke.add_argument("key")
     revoke.add_argument("--by", required=True)
     revoke.add_argument("--reason", required=True)
@@ -745,6 +766,12 @@ def main(argv: list[str] | None = None) -> int:
     disable.add_argument("--reason", required=True)
     show = actions.add_parser("show", help="print a source's recorded state")
     show.add_argument("key")
+    sync = actions.add_parser(
+        "sync", help="docs/28: reconcile db/discovery/source_registry.json (register missing "
+                     "sources DISABLED; report drift; never edits, enables or fetches)")
+    sync.add_argument("--apply", action="store_true",
+                      help="register missing sources (default: plan, no write)")
+    sync.add_argument("--by", help="who applies the sync (required with --apply)")
     cadence = actions.add_parser("cadence", help="set the Stage F observation cadence")
     cadence.add_argument("key")
     every = cadence.add_mutually_exclusive_group(required=True)

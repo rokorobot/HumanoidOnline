@@ -53,6 +53,9 @@ DISCOVERY_TABLES = {
     "discovery_proposal_decision",
     # G2-3 (migration 0019): accepted claims, retractions, catalogue write audit.
     "accepted_claim", "claim_retraction", "catalogue_write_audit",
+    # docs/28 A4 (migration 0025): the append-only owner access-basis history. Its one
+    # FK points INTO discovery_source, so Gate K is unchanged.
+    "discovery_source_owner_authorization_event",
 }
 
 

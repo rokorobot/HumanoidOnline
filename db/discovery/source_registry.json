@@ -1,0 +1,68 @@
+{
+  "_comment": "Version-controlled IDENTITY of every registered discovery source (docs/28 A4). `discovery source sync` registers a missing entry DISABLED with ToS and robots UNKNOWN, and reports drift on an existing one; it never edits an existing row, never reviews, authorizes, enables or schedules, and never fetches. Approval, access basis, enablement and cadence live only in the database and are set by their own attributed commands. `decision` is a human-readable reference to the owner decision behind the registration, not an authorization.",
+  "sources": [
+    {
+      "key": "agibot-official",
+      "name": "AgiBot",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://www.agibot.com/",
+      "decision": "2026-10-18 owner instruction (A4): recurring discovery monitoring authorized as a business decision; OWNER_AUTHORIZED basis; not publisher consent"
+    },
+    {
+      "key": "agility-robotics-official",
+      "name": "Agility Robotics",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://www.agilityrobotics.com/",
+      "decision": "2026-10-18 owner instruction (A4): recurring discovery monitoring authorized as a business decision; OWNER_AUTHORIZED basis; not publisher consent"
+    },
+    {
+      "key": "alza-cz",
+      "name": "Alza.cz",
+      "source_class": "DISTRIBUTOR",
+      "homepage_url": "https://www.alza.cz/",
+      "decision": "2026-10-05 approved Czech distributor reference source (manual capture); 2026-10-18 owner instruction (A4) supersedes the manual-only limit: recurring monitoring authorized as a business decision; OWNER_AUTHORIZED basis; not publisher consent"
+    },
+    {
+      "key": "booster-robotics-official",
+      "name": "Booster Robotics",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://www.booster.tech/",
+      "decision": "2026-10-18 owner instruction (A4): recurring discovery monitoring authorized as a business decision; OWNER_AUTHORIZED basis; not publisher consent"
+    },
+    {
+      "key": "figure-ai-official",
+      "name": "Figure AI",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://www.figure.ai/",
+      "decision": "2026-10-18 owner instruction (A4): recurring discovery monitoring authorized as a business decision; OWNER_AUTHORIZED basis; not publisher consent"
+    },
+    {
+      "key": "neura-documents-official",
+      "name": "NEURA Robotics documents (px.media)",
+      "source_class": "OFFICIAL_DOCUMENT",
+      "homepage_url": "https://neurarobotics.px.media/",
+      "decision": "2026-10-04 owner source decision: ToS ALLOWED, bounded to /plk/ (SOURCE_PERMISSION)"
+    },
+    {
+      "key": "neura-robotics-official",
+      "name": "NEURA Robotics",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://neura-robotics.com/",
+      "decision": "2026-09-26 owner ToS reading: ALLOWED (DR-A4; SOURCE_PERMISSION)"
+    },
+    {
+      "key": "unitree-robotics-official",
+      "name": "Unitree Robotics",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://www.unitree.com/",
+      "decision": "2026-10-18 owner instruction (A4): recurring discovery monitoring authorized as a business decision; OWNER_AUTHORIZED basis; not publisher consent"
+    },
+    {
+      "key": "xpeng-official",
+      "name": "XPENG",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://www.xpeng.com/",
+      "decision": "2026-10-03 owner source decision: ToS ALLOWED for governed research of IRON (SOURCE_PERMISSION)"
+    }
+  ]
+}

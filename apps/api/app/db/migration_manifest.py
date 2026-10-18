@@ -95,4 +95,7 @@ MIGRATIONS: dict[str, str] = {
     "0024_offer_condition": (
         "448ed6b45de57aea3e07d2bba42b628eb6134ea18a9d4629a6e468306cab232e"
     ),
+    "0025_owner_authorized_source_access": (
+        "4bda22d1b2bdac28fa2f866db6957805cd4c67de3af6b2bc8c55dd6c0c7cbd62"
+    ),
 }

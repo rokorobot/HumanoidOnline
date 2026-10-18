@@ -281,6 +281,15 @@
       "source_kind": "MANUFACTURER_DOC",
       "edition_scope": "THIS_EDITION",
       "observed_at": "2026-09-11"
+    },
+    {
+      "key": "manufacturer_warranty_months",
+      "value": 12,
+      "source_label": "Booster T2 — Specifications (Education); discovery claim 1b74fb91 (verbatim: '1 year; extended warranty available')",
+      "source_url": "https://www.booster.tech/booster-t2?target=en",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
     }
   ]
 }

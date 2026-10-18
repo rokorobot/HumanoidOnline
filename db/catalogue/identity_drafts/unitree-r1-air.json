@@ -1,0 +1,114 @@
+{
+  "slug": "unitree-r1-air",
+  "name": "R1 AIR",
+  "manufacturer_slug": "unitree",
+  "model_code": null,
+  "summary": null,
+  "announced_year": null,
+  "commercial_status": "UNKNOWN",
+  "is_published": false,
+  "specs": {
+    "height_cm": 123.0,
+    "weight_kg": 27.0,
+    "arm_span_cm": null,
+    "reach_cm": null,
+    "payload_kg": null,
+    "walk_speed_ms": null,
+    "runtime_minutes": 60,
+    "battery_wh": null,
+    "mobility": "BIPEDAL",
+    "degrees_of_freedom": 20,
+    "hand_type": null,
+    "hand_dof": null,
+    "autonomy": null,
+    "has_manipulation": null,
+    "has_teleoperation": null,
+    "has_vision": null,
+    "has_language_ui": null,
+    "has_sdk": null,
+    "has_api": null,
+    "ros_support": null,
+    "developer_edition": null,
+    "simulation_support": null
+  },
+  "specs_note": "IDENTITY DRAFT (owner decision pending; not imported). RETRIEVAL: AUTOMATED discovery observation 2026-10-18 by an owner-authorized (docs/28 A4) source; values verbatim from https://www.unitree.com/R1 as stored in production candidate_claim rows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Unitree lists R1 AIR as a separate edition beside R1 and R1 EDU (price 'R1 AIR $4,900', tax and shipping excluded: NOT recorded here; price semantics are an owner decision). Source anomaly kept out: its row 'Maximum Torque of Arm Joint' states a mass ('About 2kg').",
+  "official_url": "https://www.unitree.com/R1",
+  "commercial_status_evidence": [],
+  "variants": [],
+  "pricing_offers": [],
+  "availability_offers": [],
+  "deployments": [],
+  "capabilities": [],
+  "use_case_fits": [],
+  "images": [],
+  "extended_specs": [
+    {
+      "key": "standing_dimensions_mm",
+      "value": "1230x357x190mm",
+      "source_label": "Unitree R1 — parameter table (R1 AIR column); discovery claim e6cd2f28 (verbatim: '1230x357x190mm')",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "joint_breakdown",
+      "value": "6 per leg, 4 per arm — 20 body joints",
+      "source_label": "Unitree R1 — parameter table (R1 AIR column); discovery claim f0bdb560 (verbatim: '20')",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "compute_base",
+      "value": "8-Core High-Performance Processor",
+      "source_label": "Unitree R1 — parameter table (R1 AIR column); discovery claim 5a7ae0cf (verbatim: '8-Core High-Performance Processor')",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "cameras",
+      "value": "Monocular camera",
+      "source_label": "Unitree R1 — parameter table (R1 AIR column); discovery claim ab0f841a (verbatim: 'Monocular camera')",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "audio",
+      "value": "4-Mic Array",
+      "source_label": "Unitree R1 — parameter table (R1 AIR column); discovery claim df068792 (verbatim: '4-Mic Array')",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "manufacturer_warranty_months",
+      "value": 6,
+      "source_label": "Unitree R1 — parameter table (R1 AIR column); discovery claim 5f060ab3 (verbatim: '6 Months')",
+      "source_url": "https://www.unitree.com/R1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    }
+  ],
+  "spec_caveats": [
+    {
+      "field": "weight_kg",
+      "text": "Unitree states 'About 27kg' (with battery)."
+    },
+    {
+      "field": "runtime_minutes",
+      "text": "Unitree states 'About 1h'."
+    },
+    {
+      "field": "height_cm",
+      "text": "From the stated standing dimensions (height × width × thickness)."
+    }
+  ]
+}

@@ -8,13 +8,13 @@
   "commercial_status": "PILOT",
   "is_published": false,
   "specs": {
-    "height_cm": null,
-    "weight_kg": null,
+    "height_cm": 172.7,
+    "weight_kg": 61.0,
     "arm_span_cm": null,
     "reach_cm": null,
-    "payload_kg": null,
-    "walk_speed_ms": null,
-    "runtime_minutes": null,
+    "payload_kg": 20.0,
+    "walk_speed_ms": 1.2,
+    "runtime_minutes": 300,
     "battery_wh": null,
     "mobility": null,
     "degrees_of_freedom": null,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Commercial maturity PILOT recorded 2026-10-04 (owner decision, six-robot review). Basis: Figure 03 placed at an external customer site and a customer deployment agreement; no purchase or general availability is stated. Specifications not yet verified.",
+  "specs_note": "Commercial maturity PILOT recorded 2026-10-04 (owner decision, six-robot review). Basis: Figure 03 placed at an external customer site and a customer deployment agreement; no purchase or general availability is stated. Specifications not yet verified. RETRIEVAL: AUTOMATED discovery observation 2026-10-18 by the owner-authorized (docs/28 A4) source figure-ai-official, adapter 0.2.0; values verbatim from https://www.figure.ai/figure as stored in production candidate_claim rows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Core specs added 2026-10-19 from the /figure stat block (claims: weight bd4d27ae).",
   "official_url": "https://www.figure.ai/",
   "commercial_status_evidence": [
     {
@@ -63,5 +63,23 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": []
+  "images": [],
+  "spec_caveats": [
+    {
+      "field": "height_cm",
+      "text": "Figure states 5'8\" (claim 48923025); 172.7 cm is the exact conversion (68 in × 2.54)."
+    },
+    {
+      "field": "payload_kg",
+      "text": "Figure's stat block states 'Payload 20KG' (claim b4da6ae2); the kind of payload (rated, peak, per arm) is not stated."
+    },
+    {
+      "field": "runtime_minutes",
+      "text": "Figure states 'Runtime 5HR' (claim c3258260); the duty cycle is not stated."
+    },
+    {
+      "field": "walk_speed_ms",
+      "text": "Figure states 'Speed 1.2M/S' (claim 6e17a216); stated as the robot's speed, conditions not given."
+    }
+  ]
 }

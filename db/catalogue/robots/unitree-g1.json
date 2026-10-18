@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": true
   },
-  "specs_note": "height (1320 mm), weight (~35 kg with battery), 23 base joints, ~2 h runtime and EDU dexterous-hand option from the official spec page https://www.unitree.com/g1/ (observed 2026-07-24). Walking speed and battery Wh not stated there -> left NULL. SDK/ROS/simulation are documented developer features of the G1 platform.\n\nPhysical specs enriched 2026-08-17 from the G1 Basic retail listing text (Manufacturer # G1-Basic, SKU RB-Unt-51) supplied by the product owner; the listing states 'Values shown are from the manufacturer's reference'. The exact RobotShop US product URL was subsequently supplied and attested by the product owner and is now recorded on the RobotShop US pricing, availability and image rows; that capture was not independently re-checked at source by HumanoidOnline, which is why those rows carry confidence MEDIUM and a NULL verified_at. The existing OEM-store pricing, availability and evidence rows are untouched and remain the VERIFIED manufacturer-store observation. Judgement calls, each deliberate:\n* payload_kg 2.0 is the ARM maximum load ('About 2 kg arm payload'), not a whole-body rating.\n* reach_cm 45, arm_span_cm still NULL. The source labels 'Arm Span: about 0.45 m', but this schema defines arm_span_cm as fingertip-to-fingertip and reach_cm as one arm from its shoulder. A 132 cm-tall humanoid cannot have a 45 cm fingertip-to-fingertip span, so the figure is a single-arm measure and is recorded as REACH. Actual fingertip-to-fingertip span is not stated anywhere in the source and stays UNKNOWN -- and must not be derived from reach.\n* hand_dof 0 is a stated fact, not a gap: 'The fingers do not move or actuate.' This describes the G1 Basic end effector.\n* SCOPE RESOLVED 2026-08-17: this canonical record is now normalized to the commercial G1 Basic SKU (Manufacturer # G1-Basic), not the wider G1 platform. name, model_code, hand_type, has_manipulation, has_sdk, developer_edition and the dexterous-hands capability are aligned to Basic, and the embedded g1-edu variant was removed -- EDU-tier configurations are represented by their own catalogue records. The slug stays `unitree-g1` because it is a published canonical URL. ros_support and simulation_support are deliberately UNCHANGED: the captured Basic listing is silent on both (it denies SDK access while still linking unitree_sdk2, unitree_rl_gym and xr_teleoperate), so no safe contrary value is established and flipping them would assert something the evidence does not say.\n* battery_wh stays UNKNOWN. The source gives 9000 mAh and a 13-string lithium pack but no authoritative nominal pack voltage. Converting would require assuming a voltage, which would present a derived number as a measured one.\n* has_language_ui TRUE from the stated 4-microphone array and 5 W speaker with two-way listen-and-respond interaction.\n* Not modelled by any current schema field, so recorded here rather than lost: 8-core high-performance CPU with NO dedicated AI compute module, Livox MID-360 3D LiDAR (360 degree horizontal, 59 degree vertical), Intel RealSense D435i RGB-D camera, 4-microphone array, 5 W speaker, WiFi 6 + Bluetooth 5.2.\n\nG4-4 correction 2026-10-04 (owner WorkOrder, DR-G4 4.3): has_manipulation, has_sdk and developer_edition were previously stored as false. No first-party statement of a negative was found (the SDK point rested on a paraphrase of a retail listing and developer_edition on the SKU being 'Basic'), and no negative projection is ratified, so all three are now UNKNOWN. The hand wording ('The fingers do not move or actuate') and hand_dof 0 are unchanged: a stated fact, kept.",
+  "specs_note": "height (1320 mm), weight (~35 kg with battery), 23 base joints, ~2 h runtime and EDU dexterous-hand option from the official spec page https://www.unitree.com/g1/ (observed 2026-07-24). Walking speed and battery Wh not stated there -> left NULL. SDK/ROS/simulation are documented developer features of the G1 platform.\n\nPhysical specs enriched 2026-08-17 from the G1 Basic retail listing text (Manufacturer # G1-Basic, SKU RB-Unt-51) supplied by the product owner; the listing states 'Values shown are from the manufacturer's reference'. The exact RobotShop US product URL was subsequently supplied and attested by the product owner and is now recorded on the RobotShop US pricing, availability and image rows; that capture was not independently re-checked at source by HumanoidOnline, which is why those rows carry confidence MEDIUM and a NULL verified_at. The existing OEM-store pricing, availability and evidence rows are untouched and remain the VERIFIED manufacturer-store observation. Judgement calls, each deliberate:\n* payload_kg 2.0 is the ARM maximum load ('About 2 kg arm payload'), not a whole-body rating.\n* reach_cm 45, arm_span_cm still NULL. The source labels 'Arm Span: about 0.45 m', but this schema defines arm_span_cm as fingertip-to-fingertip and reach_cm as one arm from its shoulder. A 132 cm-tall humanoid cannot have a 45 cm fingertip-to-fingertip span, so the figure is a single-arm measure and is recorded as REACH. Actual fingertip-to-fingertip span is not stated anywhere in the source and stays UNKNOWN -- and must not be derived from reach.\n* hand_dof 0 is a stated fact, not a gap: 'The fingers do not move or actuate.' This describes the G1 Basic end effector.\n* SCOPE RESOLVED 2026-08-17: this canonical record is now normalized to the commercial G1 Basic SKU (Manufacturer # G1-Basic), not the wider G1 platform. name, model_code, hand_type, has_manipulation, has_sdk, developer_edition and the dexterous-hands capability are aligned to Basic, and the embedded g1-edu variant was removed -- EDU-tier configurations are represented by their own catalogue records. The slug stays `unitree-g1` because it is a published canonical URL. ros_support and simulation_support are deliberately UNCHANGED: the captured Basic listing is silent on both (it denies SDK access while still linking unitree_sdk2, unitree_rl_gym and xr_teleoperate), so no safe contrary value is established and flipping them would assert something the evidence does not say.\n* battery_wh stays UNKNOWN. The source gives 9000 mAh and a 13-string lithium pack but no authoritative nominal pack voltage. Converting would require assuming a voltage, which would present a derived number as a measured one.\n* has_language_ui TRUE from the stated 4-microphone array and 5 W speaker with two-way listen-and-respond interaction.\n* Not modelled by any current schema field, so recorded here rather than lost: 8-core high-performance CPU with NO dedicated AI compute module, Livox MID-360 3D LiDAR (360 degree horizontal, 59 degree vertical), Intel RealSense D435i RGB-D camera, 4-microphone array, 5 W speaker, WiFi 6 + Bluetooth 5.2.\n\nG4-4 correction 2026-10-04 (owner WorkOrder, DR-G4 4.3): has_manipulation, has_sdk and developer_edition were previously stored as false. No first-party statement of a negative was found (the SDK point rested on a paraphrase of a retail listing and developer_edition on the SKU being 'Basic'), and no negative projection is ratified, so all three are now UNKNOWN. The hand wording ('The fingers do not move or actuate') and hand_dof 0 are unchanged: a stated fact, kept. RETRIEVAL: AUTOMATED discovery observation 2026-10-18 by the owner-authorized (docs/28 A4) source unitree-robotics-official, adapter 0.1.1; values verbatim from https://www.unitree.com/g1 as stored in production candidate_claim rows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Extended specs added 2026-10-19 from the page's G1 column (base edition).",
   "commercial_status_evidence": [
     {
       "source_url": "https://shop.unitree.com/products/unitree-g1",
@@ -239,6 +239,62 @@
       "attribution": "© Unitree Robotics",
       "last_verified_at": "2026-08-17T00:00:00Z",
       "identity_confirmed_by": "robert@humanoid.company"
+    }
+  ],
+  "extended_specs": [
+    {
+      "key": "standing_dimensions_mm",
+      "value": "1320x450x200mm",
+      "source_label": "Unitree G1 — parameter table (G1 column); discovery claim 23bac6c6 (verbatim: '1320x450x200mm')",
+      "source_url": "https://www.unitree.com/g1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "limb_lengths_mm",
+      "value": "Calf + thigh 0.6M",
+      "source_label": "Unitree G1 — parameter table (G1 column); discovery claim 171dcd90 (verbatim: '0.6M')",
+      "source_url": "https://www.unitree.com/g1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "battery_pack",
+      "value": "13 string lithium battery",
+      "source_label": "Unitree G1 — parameter table (G1 column); discovery claim 1436deb3 (verbatim: '13 string lithium battery')",
+      "source_url": "https://www.unitree.com/g1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "cameras",
+      "value": "Depth camera",
+      "source_label": "Unitree G1 — parameter table (G1 column); discovery claim 6219f138 (verbatim: 'Depth Camera+3D LiDAR')",
+      "source_url": "https://www.unitree.com/g1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "lidar",
+      "value": "3D LiDAR",
+      "source_label": "Unitree G1 — parameter table (G1 column); discovery claim 6219f138 (verbatim: 'Depth Camera+3D LiDAR')",
+      "source_url": "https://www.unitree.com/g1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "manufacturer_warranty_months",
+      "value": 8,
+      "source_label": "Unitree G1 — parameter table (G1 column); discovery claim 6654f6b8 (verbatim: '8 months')",
+      "source_url": "https://www.unitree.com/g1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
     }
   ]
 }

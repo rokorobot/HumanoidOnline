@@ -126,5 +126,52 @@
       "last_verified_at": "2026-08-16T22:31:00+00:00",
       "identity_confirmed_by": "robert@humanoid.company"
     }
+  ],
+  "extended_specs": [
+    {
+      "key": "compute_ai",
+      "value": "48 TOPS (dense) AI computing power",
+      "source_label": "Booster K1 — Specifications (Geek Edition); discovery claim 72ddb0f3 (verbatim: '48 TOPS (dense) AI computing power')",
+      "source_url": "https://www.booster.tech/booster-k1?target=en",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "peak_joint_torque_nm",
+      "value": 60,
+      "source_label": "Booster K1 — Specifications (Geek Edition); discovery claim 7b27eb4c (verbatim: '60 N·m')",
+      "source_url": "https://www.booster.tech/booster-k1?target=en",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "manufacturer_warranty_months",
+      "value": 3,
+      "source_label": "Booster K1 — Specifications (Geek Edition); discovery claim 4b9741f9 (verbatim: '3 months (extended warranty available)')",
+      "source_url": "https://www.booster.tech/booster-k1?target=en",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "cameras",
+      "value": "Binocular camera",
+      "source_label": "Booster K1 — Specifications (Geek Edition); discovery claim 5006adec (verbatim: 'Binocular camera')",
+      "source_url": "https://www.booster.tech/booster-k1?target=en",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "audio",
+      "value": "Microphone array + speaker",
+      "source_label": "Booster K1 — Specifications (Geek Edition); discovery claim 0ab950e7 (verbatim: 'Microphone array + speaker')",
+      "source_url": "https://www.booster.tech/booster-k1?target=en",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    }
   ]
 }

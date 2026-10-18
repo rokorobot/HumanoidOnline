@@ -92,7 +92,10 @@ def parse(text: str, product_token: str = PRODUCT_TOKEN) -> RobotsRules:
     rules: list[_Rule] = []
     delays: list[float] = []
     last_was_agent = False
-    for raw_line in text.splitlines():
+    # A leading UTF-8 byte-order mark (www.unitree.com serves one) would otherwise glue onto
+    # the first field name, so 'User-agent' went unrecognized and that group's Disallow
+    # lines were silently dropped: a fail-OPEN parse. RFC 9309 robots.txt is UTF-8.
+    for raw_line in text.removeprefix("\ufeff").splitlines():
         line = raw_line.split("#", 1)[0].strip()
         if ":" not in line:
             continue

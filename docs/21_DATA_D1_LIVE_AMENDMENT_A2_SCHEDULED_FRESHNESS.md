@@ -97,6 +97,12 @@ given run, or the run for that target does not happen:
 | **9** | A **detected change** creates or reuses governed DATA-D1 work — `RECHECK_REQUIRED` (§12) on the linked discovery-layer record — and nothing more. It does not assert a new value, does not touch the canonical row, and does not skip TRACE/VERIFY. |
 | **10** | **P1–P8 remain fully authoritative for promotion.** Nothing about this amendment shortens, bypasses, or auto-satisfies any promotion gate. |
 
+> **Clarified by `docs/28` (Amendment A4), §4:** requirement 3 is satisfied only
+> by the `SOURCE_PERMISSION` basis. An `OWNER_AUTHORIZED` source (an owner
+> business decision for the discovery monitoring programme, not publisher
+> consent) does not reach `AUTO_CHECK`; extending it to scheduled freshness is a
+> separate owner decision.
+
 > **Requirement 3 amended by DR-A4 (`docs/decisions/DR-A4_TOS_NOT_TIME_GATED.md`,
 > 2026-09-26):** "unexpired" no longer applies to the terms decision. The
 > owner-recorded `tos_status = ALLOWED` does not expire; ToS expiry and page-hash

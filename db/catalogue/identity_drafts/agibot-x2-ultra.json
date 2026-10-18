@@ -1,0 +1,136 @@
+{
+  "slug": "agibot-x2-ultra",
+  "name": "X2 Ultra",
+  "manufacturer_slug": "agibot",
+  "model_code": null,
+  "summary": null,
+  "announced_year": null,
+  "commercial_status": "UNKNOWN",
+  "is_published": false,
+  "specs": {
+    "height_cm": 131.0,
+    "weight_kg": 39.0,
+    "arm_span_cm": null,
+    "reach_cm": null,
+    "payload_kg": null,
+    "walk_speed_ms": null,
+    "runtime_minutes": null,
+    "battery_wh": 500.0,
+    "mobility": "BIPEDAL",
+    "degrees_of_freedom": 30,
+    "hand_type": null,
+    "hand_dof": null,
+    "autonomy": null,
+    "has_manipulation": null,
+    "has_teleoperation": null,
+    "has_vision": null,
+    "has_language_ui": null,
+    "has_sdk": null,
+    "has_api": null,
+    "ros_support": null,
+    "developer_edition": null,
+    "simulation_support": null
+  },
+  "specs_note": "IDENTITY DRAFT (owner decision pending; not imported). RETRIEVAL: AUTOMATED discovery observation 2026-10-18 by an owner-authorized (docs/28 A4) source; values verbatim from https://www.agibot.com/products/X2 as stored in production candidate_claim rows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Identity candidate: the ORIGINAL AGIBOT X2 generation, edition 'X2 Ultra', exactly as presented on agibot.com/products/X2 on 2026-10-18 (that page lists two editions of this generation, 'X2' and 'X2 Ultra'). Any later or revised X2 generation is a separate identity and is not covered by this record. Not merged with AGIBOT A2 Lite / A2 Ultra.",
+  "official_url": "https://www.agibot.com/products/X2",
+  "commercial_status_evidence": [],
+  "variants": [],
+  "pricing_offers": [],
+  "availability_offers": [],
+  "deployments": [],
+  "capabilities": [],
+  "use_case_fits": [],
+  "images": [],
+  "extended_specs": [
+    {
+      "key": "standing_dimensions_mm",
+      "value": "1310mm（H）× 460mm（W）× 210mm（L）",
+      "source_label": "AgiBot X2 — specification table (X2 Ultra column); discovery claim 8f3f0eb8 (verbatim: '1310mm（H）× 460mm（W）× 210mm（L）')",
+      "source_url": "https://www.agibot.com/products/X2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "peak_joint_torque_nm",
+      "value": 120,
+      "source_label": "AgiBot X2 — specification table (X2 Ultra column); discovery claim 81763516 (verbatim: '120N·m')",
+      "source_url": "https://www.agibot.com/products/X2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "max_speed",
+      "value": "Up to : 1.8 m/s typical ≤0.8 m/s Laboratory Environment: ≤2m/s",
+      "source_label": "AgiBot X2 — specification table (X2 Ultra column); discovery claim 36dffe70 (verbatim: 'Up to : 1.8 m/s typical ≤0.8 m/s Laboratory Environment: ≤2m/s')",
+      "source_url": "https://www.agibot.com/products/X2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "operating_time",
+      "value": "At 0.5 m/s walking Approx. 2 hours",
+      "source_label": "AgiBot X2 — specification table (X2 Ultra column); discovery claim b562a224 (verbatim: 'At 0.5 m/s walking Approx. 2 hours')",
+      "source_url": "https://www.agibot.com/products/X2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "lidar",
+      "value": "Equipped",
+      "source_label": "AgiBot X2 — specification table (X2 Ultra column); discovery claim 34d1e2e1 (verbatim: 'Equipped')",
+      "source_url": "https://www.agibot.com/products/X2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "cameras",
+      "value": "Interactive RGB + Front dual RGB + Rear RGB",
+      "source_label": "AgiBot X2 — specification table (X2 Ultra column); discovery claim e3efb48e (verbatim: 'Interactive RGB + Front dual RGB + Rear RGB')",
+      "source_url": "https://www.agibot.com/products/X2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "compute_base",
+      "value": "RK3588 ×2",
+      "source_label": "AgiBot X2 — specification table (X2 Ultra column); discovery claim 5e5d0740 (verbatim: 'RK3588 ×2')",
+      "source_url": "https://www.agibot.com/products/X2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "connectivity",
+      "value": "Wi-Fi, Bluetooth 4G/5G module",
+      "source_label": "AgiBot X2 — specification table (X2 Ultra column); discovery claim 68443c1f (verbatim: 'Wi-Fi, Bluetooth 4G/5G module')",
+      "source_url": "https://www.agibot.com/products/X2",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    }
+  ],
+  "spec_caveats": [
+    {
+      "field": "height_cm",
+      "text": "AgiBot states 'Approx.1.31 m'."
+    },
+    {
+      "field": "weight_kg",
+      "text": "AgiBot states 'Approx.39kg'."
+    },
+    {
+      "field": "battery_wh",
+      "text": "AgiBot states 'Approx.500Wh'."
+    },
+    {
+      "field": "payload_kg",
+      "text": "Left UNKNOWN: AgiBot states 'Max (in specific postures): 3kg Excluding end effector Across full range: ≤1kg Excluding end effector' (posture-dependent)."
+    }
+  ]
+}

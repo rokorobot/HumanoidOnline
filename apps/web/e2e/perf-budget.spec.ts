@@ -55,7 +55,10 @@ const STATIC: Budget[] = [
   { path: "/", docKB: 65, jsRawKB: 404 },
   // SOCIAL-01: 89 -> 95 (measured 93.6). The largest increase: this route has
   // the longest description, and it is the one repeated per card.
-  { path: "/robots/unitree-g1", docKB: 95, jsRawKB: 412 },
+  // A4 promotion batch 1: 95 -> 102 (measured 101.1 in CI). Content, not code: the record gains
+  // six manufacturer-sourced extended specs, each rendered with its source label (carrying the
+  // discovery claim id and verbatim value) and repeated in the streamed payload.
+  { path: "/robots/unitree-g1", docKB: 102, jsRawKB: 412 },
   // UX-01: 32 -> 33 (measured 32.06). The compare price cell now carries its configuration,
   // basis tag, order note and the shared summary line, plus data-enum traceability.
   // SOCIAL-01: 33 -> 37 (measured 35.4).
@@ -67,7 +70,9 @@ const STATIC: Budget[] = [
   // for three or more robots, so none of those reach this document.
   // 38 is the measured size plus about 1.2 kB of headroom, NOT the sum of the two increases
   // (33 + 4 + 2 = 39): SOCIAL-01's cap already carried 1.6 kB of headroom, which this reuses.
-  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 38, jsRawKB: 431 },
+  // A4 promotion batch 1: 38 -> 40 (measured 39.4 in CI): unitree-g1's six new extended specs
+  // appear in its compare column. Measured size plus ~0.6 kB headroom.
+  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 40, jsRawKB: 431 },
   { path: "/find-a-humanoid", docKB: 46, jsRawKB: 424 },
 ];
 

@@ -1,0 +1,55 @@
+{
+  "slug": "agility-digit-5",
+  "name": "Digit 5",
+  "manufacturer_slug": "agility-robotics",
+  "model_code": null,
+  "summary": null,
+  "announced_year": null,
+  "commercial_status": "UNKNOWN",
+  "is_published": false,
+  "specs": {
+    "height_cm": null,
+    "weight_kg": null,
+    "arm_span_cm": null,
+    "reach_cm": null,
+    "payload_kg": 23.0,
+    "walk_speed_ms": null,
+    "runtime_minutes": null,
+    "battery_wh": null,
+    "mobility": "BIPEDAL",
+    "degrees_of_freedom": null,
+    "hand_type": null,
+    "hand_dof": null,
+    "autonomy": null,
+    "has_manipulation": null,
+    "has_teleoperation": null,
+    "has_vision": null,
+    "has_language_ui": null,
+    "has_sdk": null,
+    "has_api": null,
+    "ros_support": null,
+    "developer_edition": null,
+    "simulation_support": null
+  },
+  "specs_note": "IDENTITY DRAFT (owner decision pending; not imported). RETRIEVAL: AUTOMATED discovery observation 2026-10-18 by an owner-authorized (docs/28 A4) source; values verbatim from https://www.agilityrobotics.com/solutions/digit-5 as stored in production candidate_claim rows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. A new generation, not merged into the existing 'Digit' record (agility-digit). Agility's 'Work/Shift* 20HRS/24HRS' and 'Run to charge ratio* 10:1' are duty-cycle statements, not a generic operating time: kept as discovery evidence only, not recorded in this record.",
+  "official_url": "https://www.agilityrobotics.com/solutions/digit-5",
+  "commercial_status_evidence": [],
+  "variants": [],
+  "pricing_offers": [],
+  "availability_offers": [],
+  "deployments": [],
+  "capabilities": [],
+  "use_case_fits": [],
+  "images": [],
+  "extended_specs": [],
+  "spec_caveats": [
+    {
+      "field": "payload_kg",
+      "text": "Agility states 'Payload* 23kg/50lbs' with a footnote marker; the footnote text is not on the page."
+    },
+    {
+      "field": "reach_cm",
+      "text": "Left UNKNOWN: Agility states 'Reach* 2.2m/7.2ft', which is not the schema's single-arm reach."
+    }
+  ]
+}

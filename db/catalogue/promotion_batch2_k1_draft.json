@@ -1,0 +1,169 @@
+{
+  "_comment": "DRAFT for a subsequent scoped batch (NOT imported, not a manifest). Independently supported, edition-specific K1 facts from booster.tech/booster-k1 (#specifications, observed 2026-10-18). The conflicting walk-speed and runtime values stay BLOCKED pending owner review.",
+  "source_url": "https://www.booster.tech/booster-k1?target=en",
+  "edition_mapping": {
+    "K1 Geek Edition": "booster-k1-geek",
+    "K1 Education": "booster-k1-educational",
+    "K1 Professional": "booster-k1-professional"
+  },
+  "proposed": [
+    {
+      "robot": "booster-k1-geek",
+      "page_edition": "K1 Geek Edition",
+      "key": "compute_ai",
+      "value": "48 TOPS (dense) AI computing power",
+      "verbatim": "48 TOPS (dense) AI computing power",
+      "claim": "72ddb0f3"
+    },
+    {
+      "robot": "booster-k1-geek",
+      "page_edition": "K1 Geek Edition",
+      "key": "peak_joint_torque_nm",
+      "value": 60,
+      "verbatim": "60 N·m",
+      "claim": "7b27eb4c"
+    },
+    {
+      "robot": "booster-k1-geek",
+      "page_edition": "K1 Geek Edition",
+      "key": "manufacturer_warranty_months",
+      "value": 3,
+      "verbatim": "3 months (extended warranty available)",
+      "claim": "4b9741f9"
+    },
+    {
+      "robot": "booster-k1-geek",
+      "page_edition": "K1 Geek Edition",
+      "key": "cameras",
+      "value": "Binocular camera",
+      "verbatim": "Binocular camera",
+      "claim": "5006adec"
+    },
+    {
+      "robot": "booster-k1-geek",
+      "page_edition": "K1 Geek Edition",
+      "key": "audio",
+      "value": "Microphone array + speaker",
+      "verbatim": "Microphone array + speaker",
+      "claim": "0ab950e7"
+    },
+    {
+      "robot": "booster-k1-educational",
+      "page_edition": "K1 Education",
+      "key": "compute_ai",
+      "value": "117 TOPS AI computing power",
+      "verbatim": "117 TOPS AI computing power",
+      "claim": "17628e19"
+    },
+    {
+      "robot": "booster-k1-educational",
+      "page_edition": "K1 Education",
+      "key": "peak_joint_torque_nm",
+      "value": 60,
+      "verbatim": "60 N·m",
+      "claim": "af6fdd75"
+    },
+    {
+      "robot": "booster-k1-educational",
+      "page_edition": "K1 Education",
+      "key": "manufacturer_warranty_months",
+      "value": 12,
+      "verbatim": "1 year (extended warranty available)",
+      "claim": "942966bc"
+    },
+    {
+      "robot": "booster-k1-educational",
+      "page_edition": "K1 Education",
+      "key": "cameras",
+      "value": "Binocular camera",
+      "verbatim": "Binocular camera",
+      "claim": "ff622db8"
+    },
+    {
+      "robot": "booster-k1-educational",
+      "page_edition": "K1 Education",
+      "key": "audio",
+      "value": "Microphone array + speaker",
+      "verbatim": "Microphone array + speaker",
+      "claim": "9e68eb64"
+    },
+    {
+      "robot": "booster-k1-professional",
+      "page_edition": "K1 Professional",
+      "key": "compute_ai",
+      "value": "200 TOPS AI computing power",
+      "verbatim": "200 TOPS AI computing power",
+      "claim": "96b2a532"
+    },
+    {
+      "robot": "booster-k1-professional",
+      "page_edition": "K1 Professional",
+      "key": "peak_joint_torque_nm",
+      "value": 60,
+      "verbatim": "60 N·m",
+      "claim": "585b5b17"
+    },
+    {
+      "robot": "booster-k1-professional",
+      "page_edition": "K1 Professional",
+      "key": "manufacturer_warranty_months",
+      "value": 12,
+      "verbatim": "1 year (extended warranty available)",
+      "claim": "4486f74a"
+    },
+    {
+      "robot": "booster-k1-professional",
+      "page_edition": "K1 Professional",
+      "key": "cameras",
+      "value": "Binocular camera",
+      "verbatim": "Binocular camera",
+      "claim": "7dbef0bf"
+    },
+    {
+      "robot": "booster-k1-professional",
+      "page_edition": "K1 Professional",
+      "key": "audio",
+      "value": "Microphone array + speaker",
+      "verbatim": "Microphone array + speaker",
+      "claim": "da7c7184"
+    }
+  ],
+  "blocked_conflicts": [
+    {
+      "page_edition": "K1 Geek Edition",
+      "label": "Actuators/Walking Speed",
+      "verbatim": "2 m/s",
+      "claim": "fc370db3"
+    },
+    {
+      "page_edition": "K1 Geek Edition",
+      "label": "Body Interaction & Expansion/Battery life",
+      "verbatim": "20 min (walking at 1.1 m/s)",
+      "claim": "c6f067a5"
+    },
+    {
+      "page_edition": "K1 Education",
+      "label": "Actuators/Walking Speed",
+      "verbatim": "2 m/s",
+      "claim": "89e5d72c"
+    },
+    {
+      "page_edition": "K1 Education",
+      "label": "Body Interaction & Expansion/Battery life",
+      "verbatim": "1 h 10 min (walking at 1.1 m/s)",
+      "claim": "a55b65de"
+    },
+    {
+      "page_edition": "K1 Professional",
+      "label": "Actuators/Walking Speed",
+      "verbatim": "2 m/s",
+      "claim": "f79a4674"
+    },
+    {
+      "page_edition": "K1 Professional",
+      "label": "Body Interaction & Expansion/Battery life",
+      "verbatim": "1 h 10 min (walking at 1.1 m/s)",
+      "claim": "57368c23"
+    }
+  ]
+}

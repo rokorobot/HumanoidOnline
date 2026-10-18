@@ -7,11 +7,19 @@ name: Discovery observation (Stage F)
 #              Setting it to anything else disables recurring observation.
 #   RECURRING  the twice-weekly `schedule:` below (Monday and Thursday; owner
 #              decision 2026-10-02, replacing the hourly check). Each
-#              invocation only CHECKS the registered, enabled sources (NEURA, XPENG): it
-#              observes (never plan, never run-now), and each source's own attributed
+#              invocation considers every registered source and observes only one that
+#              is enabled and eligible (ToS ALLOWED, or the docs/28 OWNER_AUTHORIZED
+#              basis; robots not a disallow), has a reviewed adapter in code and an
+#              attributed cadence (it never plans, never runs-now). Each source's own
 #              cadence decides whether anything is fetched (NEURA 48 h; XPENG 120 h, so a
 #              Monday slot is due again the next Monday while the Thursday slot, 72 h
-#              later, requests nothing). A slot in which a source is not due requests nothing.
+#              later, requests nothing). A source without a reviewed adapter is reported
+#              NO_ADAPTER and never contacted. A slot in which a source is not due
+#              requests nothing.
+#              This schedule is the UPPER BOUND on observation frequency: a source
+#              cadence shorter than the gap between slots (e.g. 24 h) is still observed
+#              at most twice a week. Observing more often needs an owner-approved change
+#              to this cron, not just a shorter source cadence (docs/28 §5A).
 #
 # Production database access comes only from the `discovery-production`
 # environment's secret DISCOVERY_DATABASE_URL: the least-privilege
@@ -61,7 +69,7 @@ jobs:
       DATABASE_URL: ${{ secrets.DISCOVERY_DATABASE_URL }}
       APP_ENV: production
       # A scheduled event has no inputs: it observes EVERY registered source that is enabled
-      # AND has an attributed cadence (NEURA and, since 2026-10-03, XPENG), and never skips
+      # AND eligible AND has a reviewed adapter and an attributed cadence, and never skips
       # the cadence wait. A source that is not due requests nothing.
       MODE: ${{ github.event_name == 'schedule' && 'observe' || inputs.mode }}
       ONLY: ${{ github.event_name == 'schedule' && '' || inputs.source }}

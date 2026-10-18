@@ -4,9 +4,13 @@
     python -m app.cli.discovery source review   <key> --reviewed-by WHO --tos-decision D
                                                 --robots-decision D --path-prefix /p/ ...
                                                 [--tos-url U] [--robots-url U] [--notes T]
+    python -m app.cli.discovery source authorize-owner <key> --by WHO --reason WHY
+                                                --path-prefix /p/ ...
+    python -m app.cli.discovery source revoke-owner    <key> --by WHO --reason WHY
     python -m app.cli.discovery source enable   <key> --by WHO
     python -m app.cli.discovery source disable  <key> --by WHO --reason WHY
     python -m app.cli.discovery source show     <key>
+    python -m app.cli.discovery source sync     [--apply --by WHO]   (source_registry.json)
     python -m app.cli.discovery source cadence  <key> (--every 24h|7d | --off) --by WHO
     python -m app.cli.discovery observe [--plan] [--only KEY [--run-now]] [--report-json PATH]
     python -m app.cli.discovery cache prune [--apply] [--cache-dir DIR]
@@ -238,6 +242,18 @@ def _cmd_source(args: argparse.Namespace) -> int:
     from app.db.session import SessionLocal
     from app.services.discovery import source_registry as registry
 
+    if args.action == "sync":
+        from app.services.discovery.source_manifest import sync_sources
+
+        with SessionLocal() as session:
+            result = sync_sources(session, apply=args.apply, by=args.by)
+            if args.apply:
+                session.commit()
+            else:
+                session.rollback()
+        print("\n".join(result.text()))
+        return 4 if result.needs_attention else 0
+
     with SessionLocal() as session:
         if args.action == "register":
             source = registry.register_source(
@@ -250,6 +266,12 @@ def _cmd_source(args: argparse.Namespace) -> int:
                 path_prefixes=args.path_prefix or [], tos_url=args.tos_url,
                 robots_url=args.robots_url, notes=args.notes)
             source = registry.get_source(session, args.key)
+        elif args.action == "authorize-owner":
+            source = registry.authorize_owner(
+                session, args.key, by=args.by, reason=args.reason,
+                path_prefixes=args.path_prefix or [])
+        elif args.action == "revoke-owner":
+            source = registry.revoke_owner(session, args.key, by=args.by, reason=args.reason)
         elif args.action == "enable":
             source = registry.enable_source(session, args.key, by=args.by)
         elif args.action == "disable":
@@ -721,7 +743,21 @@ def main(argv: list[str] | None = None) -> int:
     review.add_argument("--tos-url")
     review.add_argument("--robots-url")
     review.add_argument("--notes")
-    enable = actions.add_parser("enable", help="enable a reviewed, ToS-ALLOWED source")
+    auth = actions.add_parser(
+        "authorize-owner",
+        help="docs/28: record the owner's OWNER_AUTHORIZED access basis (an internal "
+             "decision, not publisher consent; never changes tos_status; never enables)")
+    auth.add_argument("key")
+    auth.add_argument("--by", required=True)
+    auth.add_argument("--reason", required=True)
+    auth.add_argument("--path-prefix", action="append", required=True,
+                      help="authorized path prefix inside the reviewed prefixes (repeat)")
+    revoke = actions.add_parser("revoke-owner",
+                                help="docs/28: revoke OWNER_AUTHORIZED and disable the source")
+    revoke.add_argument("key")
+    revoke.add_argument("--by", required=True)
+    revoke.add_argument("--reason", required=True)
+    enable = actions.add_parser("enable", help="enable a reviewed, authorized source")
     enable.add_argument("key")
     enable.add_argument("--by", required=True)
     disable = actions.add_parser("disable", help="disable a source")
@@ -730,6 +766,12 @@ def main(argv: list[str] | None = None) -> int:
     disable.add_argument("--reason", required=True)
     show = actions.add_parser("show", help="print a source's recorded state")
     show.add_argument("key")
+    sync = actions.add_parser(
+        "sync", help="docs/28: reconcile db/discovery/source_registry.json (register missing "
+                     "sources DISABLED; report drift; never edits, enables or fetches)")
+    sync.add_argument("--apply", action="store_true",
+                      help="register missing sources (default: plan, no write)")
+    sync.add_argument("--by", help="who applies the sync (required with --apply)")
     cadence = actions.add_parser("cadence", help="set the Stage F observation cadence")
     cadence.add_argument("key")
     every = cadence.add_mutually_exclusive_group(required=True)

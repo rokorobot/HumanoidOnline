@@ -46,11 +46,17 @@ from app.models.enums import (
     trace_state,
 )
 
+#: docs/28 (A4) access bases. Owner authorization is never publisher consent.
+SOURCE_PERMISSION = "SOURCE_PERMISSION"
+OWNER_AUTHORIZED = "OWNER_AUTHORIZED"
+
 
 class DiscoverySource(Base):
-    """A radar source. DATA-D1.9: crawler-eligible only when the ToS AFFIRMATIVELY
-    permits automation, the robots policy is not a disallow, and the review is
-    attributed + timestamped. The DB CHECK enforces the same on is_enabled."""
+    """A radar source. DATA-D1.9 as amended by docs/28 (A4): crawler-eligible only
+    with an access basis (the ToS AFFIRMATIVELY permits automation, or an attributed
+    OWNER_AUTHORIZED decision that is not publisher consent), a robots policy that
+    is not a disallow, and an attributed + timestamped review. The DB CHECKs
+    enforce the same on is_enabled."""
 
     __tablename__ = "discovery_source"
 
@@ -67,6 +73,20 @@ class DiscoverySource(Base):
     robots_status: Mapped[str] = mapped_column(
         robots_status, nullable=False, server_default=text("'UNKNOWN'")
     )
+    # docs/28 (A4, migration 0025): the internal basis for automated access.
+    # OWNER_AUTHORIZED is the owner's business decision, NOT a statement that the
+    # publisher permits automated acquisition; tos_status stays the truthful
+    # terms reading. owner_* is the projection of the latest
+    # DiscoverySourceOwnerAuthorizationEvent, all set exactly when the basis is
+    # OWNER_AUTHORIZED (ck_discovery_owner_authorization).
+    access_basis: Mapped[str] = mapped_column(
+        Text, nullable=False, default=SOURCE_PERMISSION,
+        server_default=text("'SOURCE_PERMISSION'"),
+    )
+    owner_authorized_by: Mapped[str | None] = mapped_column(Text)
+    owner_authorized_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    owner_authorization_reason: Mapped[str | None] = mapped_column(Text)
+    owner_authorized_path_prefixes: Mapped[list[str] | None] = mapped_column(ARRAY(Text))
     eligibility_reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     eligibility_reviewed_by: Mapped[str | None] = mapped_column(Text)
     is_enabled: Mapped[bool] = mapped_column(
@@ -97,17 +117,58 @@ class DiscoverySource(Base):
     )
 
     @property
+    def access_authorized(self) -> bool:
+        """The access-basis half of DATA-D1.9 (docs/28): SOURCE_PERMISSION needs the
+        owner-recorded ToS ALLOWED; OWNER_AUTHORIZED needs a complete attributed
+        owner decision and never applies over a recorded RESTRICTED/PROHIBITED."""
+        if (self.access_basis or SOURCE_PERMISSION) == SOURCE_PERMISSION:
+            return self.tos_status == "ALLOWED"
+        return (
+            self.access_basis == OWNER_AUTHORIZED
+            and self.tos_status not in ("PROHIBITED", "RESTRICTED")
+            and bool(self.owner_authorized_by and self.owner_authorized_by.strip())
+            and self.owner_authorized_at is not None
+            and bool(self.owner_authorization_reason
+                     and self.owner_authorization_reason.strip())
+            and bool(self.owner_authorized_path_prefixes)
+        )
+
+    @property
     def radar_eligible(self) -> bool:
-        """DATA-D1.9 in one place: a source may be crawled only when the ToS
-        affirmatively permits automation, robots is not a disallow, an attributed
-        review exists, and it is explicitly enabled. Reviewing != being allowed."""
+        """DATA-D1.9 in one place: a source may be crawled only with an access basis
+        (`access_authorized`), a robots decision that is not a disallow, an
+        attributed review, and explicit enablement. Reviewing != being allowed, and
+        neither basis overrides robots.txt, which is still re-read every run."""
         return (
             self.is_enabled
-            and self.tos_status == "ALLOWED"
+            and self.access_authorized
             and self.robots_status in ("ALLOWED", "NOT_APPLICABLE")
             and self.eligibility_reviewed_at is not None
             and bool(self.eligibility_reviewed_by)
         )
+
+
+class DiscoverySourceOwnerAuthorizationEvent(Base):
+    """docs/28: one owner AUTHORIZE / REVOKE decision. Append-only (DB triggers
+    refuse UPDATE, DELETE and TRUNCATE). Never publisher consent."""
+
+    __tablename__ = "discovery_source_owner_authorization_event"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    source_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("discovery_source.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    action: Mapped[str] = mapped_column(Text, nullable=False)
+    decided_by: Mapped[str] = mapped_column(Text, nullable=False)
+    reason: Mapped[str] = mapped_column(Text, nullable=False)
+    approved_path_prefixes: Mapped[list[str]] = mapped_column(
+        ARRAY(Text), nullable=False, server_default=text("'{}'"))
+    decided_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
 
 
 class DiscoveryCandidate(Base):

@@ -343,3 +343,8 @@ to a small, generated, checked-in manifest
 verification still runs instead of being skipped. The manifest is never an
 independent source of truth: `test_migration_manifest.py` recomputes the
 canonical set from these files on every CI run and fails on any drift.
+
+- `0025_owner_authorized_source_access.sql` — adds explicit, attributed
+  `OWNER_AUTHORIZED` source-access basis separately from any publisher ToS
+  verdict, an append-only event table, and revised (still fail-closed)
+  enablement constraint. The migration never enables a source or starts a crawl.

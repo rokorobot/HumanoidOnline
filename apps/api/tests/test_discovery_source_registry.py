@@ -9,13 +9,15 @@ import uuid
 from contextlib import contextmanager
 
 import pytest
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
+from sqlalchemy.exc import DBAPIError, IntegrityError
 from sqlalchemy.orm import Session
 
 from app.cli import discovery as cli
 from app.db import session as db_session
 from app.db.session import engine
 from app.models.acquisition import EligibilityReviewImmutableError, SourceEligibilityReview
+from app.models.discovery import DiscoverySourceOwnerAuthorizationEvent
 from app.services.discovery import DiscoveryError
 from app.services.discovery import source_registry as registry
 
@@ -155,3 +157,208 @@ def test_cli_adapter_plan_refuses_neura_until_registered(shared_session, capsys)
 def test_cli_adapter_run_requires_an_operator():
     with pytest.raises(SystemExit):
         cli.main(["adapter", "run", "neura-robotics-official", "--operator", "  "])
+
+
+# ------------------------------------------------- docs/28 (A4) OWNER_AUTHORIZED --
+
+
+def _events(session, source):
+    return list(session.scalars(
+        select(DiscoverySourceOwnerAuthorizationEvent)
+        .where(DiscoverySourceOwnerAuthorizationEvent.source_id == source.id)
+        .order_by(DiscoverySourceOwnerAuthorizationEvent.decided_at)))
+
+
+def _owner(session, key, paths=("/products",), reason="A4 owner instruction 2026-10-18"):
+    return registry.authorize_owner(session, key, by="robert", reason=reason,
+                                    path_prefixes=list(paths))
+
+
+def test_owner_authorization_is_not_publisher_permission(shared_session):
+    key = _key()
+    source = _register(shared_session, key)
+    _review(shared_session, key, tos="UNKNOWN", robots="ALLOWED", paths=("/products",))
+    with pytest.raises(DiscoveryError, match="tos_status=UNKNOWN.*authorize-owner"):
+        registry.enable_source(shared_session, key, by="robert")
+    _owner(shared_session, key)
+    assert source.tos_status == "UNKNOWN"                    # never rewritten to ALLOWED
+    assert source.access_basis == "OWNER_AUTHORIZED"
+    assert source.is_enabled is False                         # authorizing never enables
+    assert source.observation_interval_hours is None          # ... nor schedules
+    registry.enable_source(shared_session, key, by="robert")
+    assert source.radar_eligible is True
+    [event] = _events(shared_session, source)
+    assert (event.action, event.decided_by, event.approved_path_prefixes) == (
+        "AUTHORIZE", "robert", ["/products"])
+    text_out = "\n".join(registry.describe(source))
+    assert "access_basis=OWNER_AUTHORIZED" in text_out and "NOT publisher consent" in text_out
+    assert "tos_status=UNKNOWN" in text_out
+
+
+def test_revocation_disables_and_is_appended_to_the_history(shared_session):
+    key = _key()
+    source = _register(shared_session, key)
+    _review(shared_session, key, tos="UNKNOWN")
+    _owner(shared_session, key)
+    registry.enable_source(shared_session, key, by="robert")
+    registry.revoke_owner(shared_session, key, by="robert", reason="cancelled")
+    assert source.is_enabled is False and source.radar_eligible is False
+    assert source.access_basis == "SOURCE_PERMISSION" and source.owner_authorized_by is None
+    assert [e.action for e in _events(shared_session, source)] == ["AUTHORIZE", "REVOKE"]
+    assert _events(shared_session, source)[1].approved_path_prefixes == ["/products"]
+    with pytest.raises(DiscoveryError, match="cannot enable"):
+        registry.enable_source(shared_session, key, by="robert")
+    with pytest.raises(DiscoveryError, match="nothing to revoke"):
+        registry.revoke_owner(shared_session, key, by="robert", reason="again")
+
+
+@pytest.mark.parametrize("tos", ["PROHIBITED", "RESTRICTED"])
+def test_owner_authorization_cannot_override_a_recorded_restriction(shared_session, tos):
+    key = _key()
+    source = _register(shared_session, key)
+    _review(shared_session, key, tos=tos, robots="ALLOWED", paths=("/products",))
+    with pytest.raises(DiscoveryError, match="cannot be overridden"):
+        _owner(shared_session, key)
+    assert source.access_basis == "SOURCE_PERMISSION" and _events(shared_session, source) == []
+
+
+def test_a_later_restriction_or_robots_disallow_stops_an_owner_authorized_source(shared_session):
+    key = _key()
+    source = _register(shared_session, key)
+    _review(shared_session, key, tos="UNKNOWN")
+    _owner(shared_session, key)
+    registry.enable_source(shared_session, key, by="robert")
+    _review(shared_session, key, tos="PROHIBITED")
+    assert source.is_enabled is False and source.tos_status == "PROHIBITED"
+    with pytest.raises(DiscoveryError, match="owner authorization does not apply"):
+        registry.enable_source(shared_session, key, by="robert")
+    _review(shared_session, key, tos="UNKNOWN", robots="DISALLOWED")
+    with pytest.raises(DiscoveryError, match="robots_status=DISALLOWED"):
+        registry.enable_source(shared_session, key, by="robert")
+
+
+def test_owner_authorization_needs_an_attributed_review_and_fitting_paths(shared_session):
+    key = _key()
+    _register(shared_session, key)
+    with pytest.raises(DiscoveryError, match="no attributed review"):
+        _owner(shared_session, key)
+    _review(shared_session, key, tos="UNKNOWN", robots="ALLOWED", paths=("/products",))
+    with pytest.raises(DiscoveryError, match="scope"):
+        _owner(shared_session, key, paths=("/",))                 # wider than the review
+    with pytest.raises(DiscoveryError, match="scope"):
+        _owner(shared_session, key, paths=("/productsX",))        # not inside /products
+    with pytest.raises(DiscoveryError, match="absolute"):
+        _owner(shared_session, key, paths=("products",))
+    with pytest.raises(DiscoveryError, match="--reason"):
+        _owner(shared_session, key, reason="  ")
+
+
+def test_owner_scope_caps_url_eligibility_and_a_narrower_review_narrows_it(shared_session):
+    from app.services.discovery.eligibility import URL_OUTSIDE_APPROVED_PATHS, url_ineligibility
+    key = _key()
+    source = _register(shared_session, key)
+    _review(shared_session, key, tos="UNKNOWN", robots="ALLOWED", paths=("/products", "/news"))
+    _owner(shared_session, key, paths=("/products",))
+    registry.enable_source(shared_session, key, by="robert")
+    assert url_ineligibility(source, "https://maker.example/products/a") is None
+    assert url_ineligibility(source, "https://maker.example/news/b") == URL_OUTSIDE_APPROVED_PATHS
+    assert url_ineligibility(source, "https://shop.maker.example/products/a") is not None
+    _review(shared_session, key, tos="UNKNOWN", robots="ALLOWED", paths=("/news",))
+    assert url_ineligibility(source, "https://maker.example/products/a") is not None
+
+
+def test_database_refuses_an_incomplete_owner_authorization(shared_session):
+    key = _key()
+    source = _register(shared_session, key)
+    _review(shared_session, key, tos="UNKNOWN")
+    shared_session.flush()
+    complete = {"by": "robert", "why": "r", "paths": ["/products"]}
+    # A NULL or empty scope, or a blank reason, never satisfies the CHECK (no NULL bypass).
+    for broken in ({"paths": None}, {"paths": []}, {"why": " "}, {"by": None}):
+        with pytest.raises(IntegrityError), shared_session.begin_nested():
+            shared_session.execute(text(
+                "UPDATE discovery_source SET access_basis = 'OWNER_AUTHORIZED', "
+                "owner_authorized_by = :by, owner_authorized_at = now(), "
+                "owner_authorization_reason = :why, owner_authorized_path_prefixes = :paths "
+                "WHERE id = :id"), {**complete, **broken, "id": source.id})
+    # Owner fields without the OWNER_AUTHORIZED basis are refused too.
+    with pytest.raises(IntegrityError), shared_session.begin_nested():
+        shared_session.execute(text("UPDATE discovery_source SET owner_authorized_by = 'robert' "
+                                    "WHERE id = :id"), {"id": source.id})
+    with pytest.raises(IntegrityError), shared_session.begin_nested():   # UNKNOWN, no owner
+        shared_session.execute(text("UPDATE discovery_source SET is_enabled = true "
+                                    "WHERE id = :id"), {"id": source.id})
+
+
+def test_owner_authorization_history_is_append_only(shared_session):
+    key = _key()
+    source = _register(shared_session, key)
+    _review(shared_session, key, tos="UNKNOWN")
+    _owner(shared_session, key)
+    shared_session.flush()
+    for statement in ("UPDATE discovery_source_owner_authorization_event SET reason = 'x' "
+                      "WHERE source_id = :id",
+                      "DELETE FROM discovery_source_owner_authorization_event "
+                      "WHERE source_id = :id",
+                      "TRUNCATE discovery_source_owner_authorization_event"):
+        with pytest.raises(DBAPIError, match="append-only"), shared_session.begin_nested():
+            shared_session.execute(text(statement), {"id": source.id})
+    assert len(_events(shared_session, source)) == 1
+
+
+def test_cli_owner_authorization_path(shared_session, capsys):
+    key = _key()
+    assert cli.main(["source", "register", key, "--name", "Fixture maker", "--class",
+                     "MANUFACTURER", "--homepage", "https://maker.example/", "--by", "robert"]) == 0
+    assert cli.main(["source", "review", key, "--reviewed-by", "robert", "--tos-decision",
+                     "UNKNOWN", "--robots-decision", "ALLOWED", "--path-prefix", "/products"]) == 0
+    assert cli.main(["source", "enable", key, "--by", "robert"]) == 1
+    assert cli.main(["source", "authorize-owner", key, "--by", "robert", "--reason",
+                     "A4 owner instruction", "--path-prefix", "/products"]) == 0
+    out = capsys.readouterr().out
+    assert "access_basis=OWNER_AUTHORIZED" in out and "enabled=False" in out
+    assert "tos_status=UNKNOWN" in out
+    assert cli.main(["source", "enable", key, "--by", "robert"]) == 0
+    assert cli.main(["source", "revoke-owner", key, "--by", "robert", "--reason", "stop"]) == 0
+    assert "enabled=False" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("owner, reviewed, effective", [
+    (["/products"], ["/products/g1"], ("/products/g1",)),          # narrower review wins
+    (["/products/g1"], ["/products"], ("/products/g1",)),          # narrower owner wins
+    (["/products"], ["/products/g1", "/products/h2"], ("/products/g1", "/products/h2")),
+    (["/products", "/news"], ["/news/2026", "/about"], ("/news/2026",)),
+    (["/products"], ["/news"], ()),                                 # disjoint: fail closed
+    (["/products"], ["/productsX"], ()),                            # not a path prefix
+])
+def test_effective_owner_scope_is_the_intersection_with_the_review(owner, reviewed, effective):
+    from app.models.discovery import DiscoverySource
+    from app.services.discovery.eligibility import approved_prefixes
+    source = DiscoverySource(
+        key="k", name="n", source_class="MANUFACTURER", homepage_url="https://maker.example/",
+        access_basis="OWNER_AUTHORIZED", owner_authorized_by="robert",
+        owner_authorization_reason="r", owner_authorized_path_prefixes=owner,
+        allowed_path_prefixes=reviewed)
+    assert approved_prefixes(source) == effective
+
+
+def test_a_narrower_later_review_keeps_the_overlap_and_a_disjoint_one_stops_fetching(
+        shared_session):
+    from app.services.discovery.eligibility import (
+        NO_APPROVED_PATHS,
+        URL_OUTSIDE_APPROVED_PATHS,
+        source_ineligibility,
+        url_ineligibility,
+    )
+    key = _key()
+    source = _register(shared_session, key)
+    _review(shared_session, key, tos="UNKNOWN", paths=("/products",))
+    _owner(shared_session, key, paths=("/products",))
+    registry.enable_source(shared_session, key, by="robert")
+    _review(shared_session, key, tos="UNKNOWN", paths=("/products/g1",))
+    assert url_ineligibility(source, "https://maker.example/products/g1/spec") is None
+    outside = url_ineligibility(source, "https://maker.example/products/h2")
+    assert outside == URL_OUTSIDE_APPROVED_PATHS
+    _review(shared_session, key, tos="UNKNOWN", paths=("/news",))
+    assert source_ineligibility(source) == NO_APPROVED_PATHS
+

@@ -1252,9 +1252,12 @@ CREATE TYPE extraction_status AS ENUM (
 CREATE TYPE evidence_subject_type AS ENUM (
     'CLAIM', 'COMMERCIAL_SIGNAL', 'IMAGE_REF');
 
--- Radar registry. DATA-D1.9: is_enabled requires an AFFIRMATIVE ToS-permits-
--- automation decision, a robots decision that is not a disallow, and recorded
--- review attribution + time. Reviewing a source is NOT the same as being allowed.
+-- Radar registry. DATA-D1.9 as amended by docs/28 (A4): is_enabled requires an
+-- access basis — SOURCE_PERMISSION (an affirmative ToS-permits-automation
+-- decision) or OWNER_AUTHORIZED (an attributed internal owner decision, never
+-- publisher consent, never over a recorded RESTRICTED/PROHIBITED) — plus a
+-- robots decision that is not a disallow and recorded review attribution +
+-- time. Reviewing a source is NOT the same as being allowed.
 CREATE TABLE discovery_source (
     id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     key                     TEXT NOT NULL UNIQUE,
@@ -1263,6 +1266,17 @@ CREATE TABLE discovery_source (
     homepage_url            TEXT,
     tos_status              tos_status NOT NULL DEFAULT 'UNKNOWN',
     robots_status           robots_status NOT NULL DEFAULT 'UNKNOWN',
+    -- docs/28 (A4, migration 0025): which internal basis authorizes automated
+    -- access. OWNER_AUTHORIZED is the owner's business decision, NOT a ToS
+    -- verdict: tos_status keeps the truthful publisher-terms reading. The owner_*
+    -- columns are the effective projection of the latest
+    -- discovery_source_owner_authorization_event; they are all set exactly when
+    -- the basis is OWNER_AUTHORIZED (ck_discovery_owner_authorization).
+    access_basis            TEXT NOT NULL DEFAULT 'SOURCE_PERMISSION',
+    owner_authorized_by     TEXT,
+    owner_authorized_at     TIMESTAMPTZ,
+    owner_authorization_reason TEXT,
+    owner_authorized_path_prefixes TEXT[],  -- a ceiling inside allowed_path_prefixes
     eligibility_reviewed_at TIMESTAMPTZ,
     eligibility_reviewed_by TEXT,
     is_enabled              BOOLEAN NOT NULL DEFAULT FALSE,
@@ -1294,18 +1308,75 @@ CREATE TABLE discovery_source (
             AND observation_cadence_set_at IS NOT NULL
         )
     ),
+    CONSTRAINT ck_discovery_access_basis CHECK (
+        access_basis IN ('SOURCE_PERMISSION', 'OWNER_AUTHORIZED')
+    ),
+    CONSTRAINT ck_discovery_owner_authorization CHECK (
+        (access_basis = 'SOURCE_PERMISSION'
+         AND owner_authorized_by IS NULL AND owner_authorized_at IS NULL
+         AND owner_authorization_reason IS NULL AND owner_authorized_path_prefixes IS NULL)
+        OR (access_basis = 'OWNER_AUTHORIZED'
+            AND coalesce(btrim(owner_authorized_by), '') <> ''
+            AND owner_authorized_at IS NOT NULL
+            AND coalesce(btrim(owner_authorization_reason), '') <> ''
+            AND coalesce(cardinality(owner_authorized_path_prefixes), 0) > 0)
+    ),
     CONSTRAINT ck_discovery_source_eligible CHECK (
         NOT is_enabled OR (
-            tos_status = 'ALLOWED'
-            AND robots_status IN ('ALLOWED', 'NOT_APPLICABLE')
+            robots_status IN ('ALLOWED', 'NOT_APPLICABLE')
             AND eligibility_reviewed_at IS NOT NULL
             AND eligibility_reviewed_by IS NOT NULL
+            AND (
+                (access_basis = 'SOURCE_PERMISSION' AND tos_status = 'ALLOWED')
+                -- The owner's fields are guaranteed by ck_discovery_owner_authorization.
+                OR (access_basis = 'OWNER_AUTHORIZED'
+                    AND tos_status NOT IN ('PROHIBITED', 'RESTRICTED'))
+            )
         )
     )
 );
 COMMENT ON TABLE discovery_source IS
-    'DATA-D1 radar registry. is_enabled requires an affirmative ToS-permits-automation '
-    'decision + non-disallow robots decision + recorded review attribution (DATA-D1.9).';
+    'DATA-D1 radar registry. is_enabled requires an access basis (affirmative ToS '
+    'decision, or an attributed internal OWNER_AUTHORIZED decision that is not publisher '
+    'consent; docs/28) + non-disallow robots decision + recorded review attribution (DATA-D1.9).';
+
+-- docs/28 (A4) — APPEND-ONLY history of owner access-basis decisions. Each row
+-- is the owner's internal business decision to authorize (or stop) automated
+-- access to one registered source; it is NOT publisher consent and never edits
+-- tos_status. discovery_source.owner_* is the effective projection of the
+-- latest row. Append-only for the same reason as source_eligibility_review:
+-- an authorization that could be edited could be backdated.
+CREATE TABLE discovery_source_owner_authorization_event (
+    id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    source_id               UUID NOT NULL REFERENCES discovery_source(id) ON DELETE RESTRICT,
+    action                  TEXT NOT NULL,
+    decided_by              TEXT NOT NULL,
+    reason                  TEXT NOT NULL,
+    -- AUTHORIZE: the authorized scope. REVOKE: the scope that was revoked.
+    approved_path_prefixes  TEXT[] NOT NULL DEFAULT '{}',
+    decided_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT ck_owner_authorization_event_action CHECK (action IN ('AUTHORIZE', 'REVOKE')),
+    CONSTRAINT ck_owner_authorization_event_attributed CHECK (
+        btrim(decided_by) <> '' AND btrim(reason) <> ''
+    ),
+    CONSTRAINT ck_owner_authorization_event_scope CHECK (
+        action <> 'AUTHORIZE' OR cardinality(approved_path_prefixes) > 0
+    )
+);
+CREATE INDEX idx_owner_authorization_event_source
+    ON discovery_source_owner_authorization_event (source_id, decided_at DESC);
+
+CREATE OR REPLACE FUNCTION refuse_source_owner_authorization_mutation() RETURNS trigger
+LANGUAGE plpgsql AS $$
+BEGIN
+    RAISE EXCEPTION 'discovery_source_owner_authorization_event is append-only (docs/28)';
+END $$;
+CREATE TRIGGER trg_source_owner_authorization_append_only
+    BEFORE UPDATE OR DELETE ON discovery_source_owner_authorization_event
+    FOR EACH ROW EXECUTE FUNCTION refuse_source_owner_authorization_mutation();
+CREATE TRIGGER trg_source_owner_authorization_no_truncate
+    BEFORE TRUNCATE ON discovery_source_owner_authorization_event
+    FOR EACH STATEMENT EXECUTE FUNCTION refuse_source_owner_authorization_mutation();
 
 -- DATA-D1.LIVE §5 — APPEND-ONLY eligibility review record.
 --

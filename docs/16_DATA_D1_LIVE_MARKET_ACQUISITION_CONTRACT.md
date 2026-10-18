@@ -308,6 +308,13 @@ review is **not** eligibility, and neither is a stale one.
 > URL or hash change, and no terms page is re-fetched to check it. The robots
 > row is unchanged and fully in force.
 
+> **Amended by `docs/28` (Amendment A4) — owner direction 2026-10-18;
+> repository-effective upon merge:** the affirmative terms reading is one of two
+> access bases. The other, `OWNER_AUTHORIZED`, is an attributed, path-scoped
+> owner business decision that is **not** publisher consent, never rewrites
+> `tos_status`, and never applies over a recorded `RESTRICTED`/`PROHIBITED`.
+> The robots row, LIVE.3 and every other gate apply unchanged to both.
+
 **Amended by `docs/26` (Amendment A3), Revision 5 — ratified by owner
 2026-09-11; repository-effective upon merge:** LIVE.2 governs standing automated processes — adapters, the
 discovery radar and scheduled freshness. It no longer gates agent retrieval of
@@ -550,6 +557,11 @@ not permission (DATA-D1.9).
 > decision. An affirmative owner-recorded `tos_status = ALLOWED`, robots
 > `ALLOWED`/`NOT_APPLICABLE`, an attributed review and an explicit enable remain
 > required.
+
+> **Amended by `docs/28` (A4):** "an affirmative `ALLOWED` terms decision" above
+> reads "an access basis": `SOURCE_PERMISSION` (terms `ALLOWED`) or
+> `OWNER_AUTHORIZED` (`docs/28` §2). Silence is still not permission: an
+> `UNKNOWN` terms decision without an owner authorization is not fetched.
 
 **Applies identically to every source class.** An aggregator, a marketplace or
 an editorial outlet is reviewed by the exact same procedure as a manufacturer —

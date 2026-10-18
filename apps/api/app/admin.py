@@ -173,13 +173,17 @@ class DiscoverySourceAdmin(ModelView, model=DiscoverySource):
     # an enabled source without affirmative review cannot be stored at all.
     column_list = [
         DiscoverySource.key, DiscoverySource.name, DiscoverySource.source_class,
-        DiscoverySource.tos_status, DiscoverySource.robots_status,
+        DiscoverySource.tos_status, DiscoverySource.access_basis,
+        DiscoverySource.robots_status,
         DiscoverySource.eligibility_reviewed_by, DiscoverySource.is_enabled,
     ]
     column_searchable_list = [DiscoverySource.key, DiscoverySource.name]
     # Deleting a source cascades into its candidates — i.e. it destroys research
     # history. Retire a source with `is_enabled = False` instead.
     can_delete = False
+    # docs/28: the OWNER_AUTHORIZED basis is displayed, never editable here. It is
+    # granted and revoked only through `discovery source authorize-owner/revoke-owner`,
+    # which append the audit event this form could not write.
     # Explicit allowlist: only registry + eligibility-review fields. Surrogate IDs
     # and system timestamps are deliberately NOT editable, and neither are the
     # `candidates` relationship (editing a parent must never rewrite its children).

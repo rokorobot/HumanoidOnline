@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 
-from app.models.discovery import DiscoverySource
+from app.models.discovery import SOURCE_PERMISSION, DiscoverySource
 from app.models.freshness import FreshnessTarget
 
 #: docs/16 LIVE.2 — robots policy is re-read at the start of every run and
@@ -32,8 +32,15 @@ def freshness_auto_check_eligible(source: DiscoverySource | None, now: datetime)
     ceiling, which `radar_eligible` does not itself check. Fails closed — a
     missing source or a missing robots-check timestamp is treated as NOT
     current. ToS expiry/hash are deliberately not consulted (DR-A4).
+
+    docs/28 (A4): only the SOURCE_PERMISSION basis counts here. The owner's
+    OWNER_AUTHORIZED decision (2026-10-18) covers the discovery monitoring
+    programme, not docs/21 scheduled freshness; extending it is a separate
+    owner decision, so an owner-authorized source stays MANUAL here.
     """
     if source is None:
+        return False
+    if (source.access_basis or SOURCE_PERMISSION) != SOURCE_PERMISSION:
         return False
     if not source.radar_eligible:
         return False
@@ -84,6 +91,9 @@ def mode_reason(target: FreshnessTarget, source: DiscoverySource | None, mode: s
         return "no DiscoverySource is registered for this target's source"
     if not source.is_enabled:
         return "source is not enabled"
+    if (source.access_basis or SOURCE_PERMISSION) != SOURCE_PERMISSION:
+        return (f"access_basis={source.access_basis}: owner authorization (docs/28) does not "
+                "extend to scheduled freshness")
     if source.tos_status != "ALLOWED":
         return f"tos_status={source.tos_status} (owner-recorded terms decision must be ALLOWED)"
     if source.robots_status not in ("ALLOWED", "NOT_APPLICABLE"):

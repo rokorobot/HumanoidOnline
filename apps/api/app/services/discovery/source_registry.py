@@ -7,8 +7,15 @@ The separation this module preserves, one step per command:
                  robots reading; approved path prefixes), appended to the
                  append-only `source_eligibility_review` history and mirrored as
                  the source's effective state. Reviewing never enables.
+    authorize-owner / revoke-owner
+              -> docs/28 (A4): the owner's OWNER_AUTHORIZED access basis, an
+                 internal business decision that is NOT publisher consent and
+                 never rewrites tos_status; appended to the append-only
+                 `discovery_source_owner_authorization_event`. Never enables;
+                 revocation disables.
     enable    -> a separate, attributed act; refused unless the recorded review
-                 makes the source radar-eligible (the DB CHECK agrees)
+                 and access basis make the source radar-eligible (the DB CHECK
+                 agrees)
     disable   -> always allowed, attributed, with a reason
     cadence   -> Stage F (docs/16 §17.2): how often an enabled, approved source
                  is observed by the scheduler; attributed; off by default
@@ -26,8 +33,14 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.acquisition import SourceEligibilityReview
-from app.models.discovery import DiscoverySource
+from app.models.discovery import (
+    OWNER_AUTHORIZED,
+    SOURCE_PERMISSION,
+    DiscoverySource,
+    DiscoverySourceOwnerAuthorizationEvent,
+)
 from app.services.discovery import DiscoveryError
+from app.services.discovery.eligibility import _path_within, approved_prefixes
 
 SOURCE_CLASSES = (
     "MANUFACTURER", "AUTHORIZED_DISTRIBUTOR", "OFFICIAL_STORE", "AGGREGATOR",
@@ -120,23 +133,103 @@ def review_source(
     return review
 
 
+def authorize_owner(
+    session: Session, key: str, *, by: str, reason: str,
+    path_prefixes: list[str], now: datetime | None = None,
+) -> DiscoverySource:
+    """docs/28: record the owner's OWNER_AUTHORIZED decision for one source.
+
+    An internal business decision, NOT publisher consent: tos_status is never
+    touched, and a recorded RESTRICTED/PROHIBITED cannot be overridden. The
+    scope must fit inside the attributed review's path prefixes (a ceiling,
+    never a widening). Authorizing never enables, never sets a cadence and
+    never fetches; robots.txt is still re-read on every run.
+    """
+    who = _required(by, "--by")
+    why = _required(reason, "--reason")
+    source = get_source(session, key)
+    if source.tos_status in ("PROHIBITED", "RESTRICTED"):
+        raise DiscoveryError(
+            f"tos_status={source.tos_status}: a recorded source restriction cannot be "
+            "overridden by owner authorization")
+    if source.eligibility_reviewed_at is None or not source.eligibility_reviewed_by:
+        raise DiscoveryError("no attributed review: record `source review` (robots decision "
+                             "and path prefixes) before owner authorization")
+    paths = list(dict.fromkeys(p.strip() for p in path_prefixes if p and p.strip()))
+    if not paths or any(not p.startswith("/") for p in paths):
+        raise DiscoveryError("at least one absolute --path-prefix is required")
+    reviewed = list(source.allowed_path_prefixes or [])
+    outside = [p for p in paths if not any(_path_within(p, r) for r in reviewed)]
+    if outside:
+        raise DiscoveryError(f"owner scope must fit the reviewed path prefixes {reviewed}: "
+                             f"{outside} do not")
+    when = now or _now()
+    source.access_basis = OWNER_AUTHORIZED
+    source.owner_authorized_by = who
+    source.owner_authorized_at = when
+    source.owner_authorization_reason = why
+    source.owner_authorized_path_prefixes = paths
+    session.add(DiscoverySourceOwnerAuthorizationEvent(
+        source_id=source.id, action="AUTHORIZE", decided_by=who,
+        reason=why, approved_path_prefixes=paths, decided_at=when))
+    _note(source, f"{when.isoformat()} OWNER_AUTHORIZED by {who} (internal decision, not "
+                  f"publisher consent; tos_status={source.tos_status} unchanged): {why}; "
+                  f"paths={paths} (not enabled)")
+    session.flush()
+    return source
+
+
+def revoke_owner(
+    session: Session, key: str, *, by: str, reason: str,
+    now: datetime | None = None,
+) -> DiscoverySource:
+    """docs/28: withdraw an owner authorization. The source is disabled in the same
+    act, so the next observation cycle skips it even if it was running on a cadence."""
+    who, why = _required(by, "--by"), _required(reason, "--reason")
+    source = get_source(session, key)
+    if source.access_basis != OWNER_AUTHORIZED:
+        raise DiscoveryError(f"source {key!r} is not OWNER_AUTHORIZED; nothing to revoke")
+    when = now or _now()
+    previous = list(source.owner_authorized_path_prefixes or [])
+    was_enabled = source.is_enabled
+    source.is_enabled = False
+    source.access_basis = SOURCE_PERMISSION
+    source.owner_authorized_by = None
+    source.owner_authorized_at = None
+    source.owner_authorization_reason = None
+    source.owner_authorized_path_prefixes = None
+    session.add(DiscoverySourceOwnerAuthorizationEvent(
+        source_id=source.id, action="REVOKE", decided_by=who,
+        reason=why, approved_path_prefixes=previous, decided_at=when))
+    _note(source, f"{when.isoformat()} owner authorization REVOKED by {who}: {why}"
+                  f"{' (disabled)' if was_enabled else ''}")
+    session.flush()
+    return source
+
+
 def enable_source(session: Session, key: str, *, by: str,
                   now: datetime | None = None) -> DiscoverySource:
     who = _required(by, "--by")
     source = get_source(session, key)
     reasons = []
-    if source.tos_status != "ALLOWED":
-        reasons.append(f"tos_status={source.tos_status} (needs the owner's ALLOWED)")
+    if not source.access_authorized:
+        if source.access_basis == OWNER_AUTHORIZED:
+            reasons.append(f"owner authorization does not apply (tos_status="
+                           f"{source.tos_status}, or the owner decision is incomplete)")
+        else:
+            reasons.append(f"tos_status={source.tos_status} (needs the owner's ALLOWED, or "
+                           "an OWNER_AUTHORIZED decision: source authorize-owner)")
     if source.robots_status not in ("ALLOWED", "NOT_APPLICABLE"):
         reasons.append(f"robots_status={source.robots_status}")
     if source.eligibility_reviewed_at is None or not source.eligibility_reviewed_by:
         reasons.append("no attributed review")
-    if not source.allowed_path_prefixes:
+    if not approved_prefixes(source):
         reasons.append("no approved path prefixes")
     if reasons:
         raise DiscoveryError("cannot enable: " + "; ".join(reasons))
     source.is_enabled = True
-    _note(source, f"{(now or _now()).isoformat()} enabled by {who}")
+    _note(source, f"{(now or _now()).isoformat()} enabled by {who} "
+                  f"(access_basis={source.access_basis})")
     session.flush()
     return source
 
@@ -219,6 +312,14 @@ def describe(source: DiscoverySource) -> list[str]:
     return [
         f"SOURCE {source.key}   class={source.source_class}   host={source.homepage_url}",
         f"  enabled={source.is_enabled}   radar_eligible={source.radar_eligible}",
+        f"  access_basis={source.access_basis}"
+        + ("   (internal owner decision, NOT publisher consent)"
+           if source.access_basis == OWNER_AUTHORIZED else ""),
+        *([f"  owner_authorized_by={source.owner_authorized_by}   "
+           f"owner_authorized_at={_iso(source.owner_authorized_at)}",
+           f"  owner_authorized_path_prefixes={list(source.owner_authorized_path_prefixes or [])}",
+           f"  owner_authorization_reason={source.owner_authorization_reason}"]
+          if source.access_basis == OWNER_AUTHORIZED else []),
         f"  tos_status={source.tos_status}   robots_status={source.robots_status}",
         f"  reviewed_by={source.eligibility_reviewed_by or '-'}   "
         f"reviewed_at={_iso(source.eligibility_reviewed_at)}",

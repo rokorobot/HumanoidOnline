@@ -222,7 +222,7 @@ def test_cli_sync_reports_adapter_readiness(shared_session, capsys):
     line = next(x for x in out.splitlines() if "alza-cz" in x)
     assert "WOULD_REGISTER" in line and "adapter=NONE" in line
     line = next(x for x in out.splitlines() if "unitree-robotics-official" in x)
-    assert "WOULD_REGISTER" in line and "adapter=unitree-robotics-official@0.1.0" in line
+    assert "WOULD_REGISTER" in line and "adapter=unitree-robotics-official@0.1.1" in line
     line = next(x for x in out.splitlines() if "neura-documents-official" in x)
     assert "adapter=LANE_B_DOCUMENT" in line
     line = next(x for x in out.splitlines() if " xpeng-official" in x)

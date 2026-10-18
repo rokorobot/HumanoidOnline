@@ -29,9 +29,10 @@ Source-specific product extractor (`extract_unitree_product`), pure and determin
 - SPECIFICATIONS: every `div.params` grid row whose cell count is exactly 1 + editions becomes one
   verbatim TEXT claim per edition: `unitree.spec[<edition>]/<category>/<label>`, `unit=None`.
   Ranges (`26-40`), footnote markers (`【4】`) and "About" wording are kept as written. A
-  misaligned row is rejected whole, never partially attributed. These keys are deliberately
-  outside promotion's approved fields: nothing here can become a catalogue fact without the
-  separately governed trace / review / claim chain.
+  misaligned row is rejected whole, never partially attributed. A cell's paragraphs and line
+  breaks are joined by a space (0.1.1), so separate statements never run together. These keys
+  are deliberately outside promotion's approved fields: nothing here can become a catalogue
+  fact without the separately governed trace / review / claim chain.
 - PRICES are recorded verbatim per edition (`unitree.price[<edition>]`) with the table's own
   terms header (`unitree.price_terms`, e.g. `Price（Tax and Shipping cost excluded）`). PRICE
   SIGNALS are emitted ONLY for the page model's own row and for the hero `Price from …` line,
@@ -141,6 +142,8 @@ class _Page(HTMLParser):
         if tag in self._SKIP:
             self._skip += 1
             return
+        if tag in ("br", "p") and self._gcell is not None:
+            self._gcell.append(" ")     # a cell's paragraphs and line breaks stay separate words
         if tag in self._VOID:
             return
         classes = frozenset((dict(attrs).get("class") or "").split())
@@ -364,7 +367,7 @@ def extract_unitree_product(config: SourceAdapterConfig, body: bytes,
 
 CONFIG = SourceAdapterConfig(
     key="unitree-robotics-official",
-    version="0.1.0",
+    version="0.1.1",
     source_key="unitree-robotics-official",
     source_class="MANUFACTURER",
     host="www.unitree.com",

@@ -1,0 +1,13 @@
+{
+  "_comment": "Figure 03 summary (owner-approved text, 2026-10-19): expected business changes for `import_catalogue.py --only figure-03`. Only the robot row CHANGES (summary). No image, deployment, offer, evidence or publication change; is_published stays false.",
+  "expected": [
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "figure-03"
+      },
+      "count": 1
+    }
+  ]
+}

@@ -273,8 +273,9 @@ class Pending(NamedTuple):
 class Reconciliation:
     """Counters, refusals and authorized removals for one import run."""
 
-    def __init__(self, authorize=None) -> None:
+    def __init__(self, authorize=None, *, probe_unchanged: bool = False) -> None:
         self.authorize = as_authorization(authorize)
+        self.probe_unchanged = probe_unchanged   # the _upsert opt-in; fixed for the run
         self.counts: dict[str, Counter] = {}
         self.refusals: list[tuple[str, dict | None]] = []
         self.pending: list[Pending] = []
@@ -605,11 +606,9 @@ def reconcile_evidence(cur, recon: Reconciliation, robot: str, subject_type: str
                    parent={"subject_type": subject_type, **parent}, immutable=True)
 
 
-_PROBE_UNCHANGED = False    # set only for the duration of run(probe_unchanged=True)
-
-
 def _upsert(cur, table: str, conflict: str, cols: list[str], vals: list, *,
-            skip=(), set_exprs=None, only_if: str | None = None, only_if_params=()):
+            skip=(), set_exprs=None, only_if: str | None = None, only_if_params=(),
+            probe_unchanged: bool = False):
     """INSERT ... ON CONFLICT DO UPDATE that rewrites a row only if a column differs.
 
     Returns (id, inserted), or None when the row exists and nothing would change
@@ -619,12 +618,13 @@ def _upsert(cur, table: str, conflict: str, cols: list[str], vals: list, *,
     new = {c: set_exprs.get(c, f"EXCLUDED.{c}") for c in changing}
     guard = (f"({', '.join(f'{table}.{c}' for c in changing)}) "
              f"IS DISTINCT FROM ({', '.join(new.values())})")
-    # OPT-IN (run(probe_unchanged=True), used only by the promotion executor): detect an
+    # OPT-IN (`probe_unchanged`, passed down from run(probe_unchanged=True) through the run's
+    # Reconciliation; used only by the promotion executor): detect an
     # unchanged row with a plain SELECT first. INSERT ... ON CONFLICT DO UPDATE needs the UPDATE
     # privilege even when it would change nothing, so an INSERT-only role could not otherwise
     # import a robot whose shared rows are already current. The SELECT uses the same guard, so
     # the outcome is identical. By default (every other caller) no extra statement is issued.
-    if _PROBE_UNCHANGED:
+    if probe_unchanged:
         params: list = []
 
         def _bind(match):
@@ -690,7 +690,8 @@ def _upsert_entity(cur, recon: Reconciliation, table: str, conflict: str, cols: 
     row = None
     if not _refuse_blanking(cur, recon, table, conflict, cols, vals,
                             skip=kw.get("skip", ()), set_exprs=kw.get("set_exprs")):
-        row = _upsert(cur, table, conflict, cols, vals, **kw)
+        row = _upsert(cur, table, conflict, cols, vals, probe_unchanged=recon.probe_unchanged,
+                      **kw)
     if row is None:
         recon.count(table, "unchanged")
         return cur.execute(
@@ -1013,6 +1014,7 @@ def import_spec_definitions(cur, data: dict, collisions: list[str],
             row = _upsert(
                 cur, "spec_definition", "key", cols, vals, skip=("managed_by",),
                 only_if="spec_definition.managed_by = %s", only_if_params=(MANAGED_BY,),
+                probe_unchanged=recon.probe_unchanged,
             )
         if row is not None:
             recon.count("spec_definition", "inserted" if row[1] else "updated")
@@ -1250,7 +1252,8 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
     preserved = () if apply_publication_state else EDITORIAL_COLUMNS
     row = None
     if not _refuse_blanking(cur, recon, "robot", "slug", cols, vals, skip=preserved):
-        row = _upsert(cur, "robot", "slug", cols, vals, skip=preserved)
+        row = _upsert(cur, "robot", "slug", cols, vals, skip=preserved,
+                      probe_unchanged=recon.probe_unchanged)
     if row is None:
         robot_id = cur.execute("SELECT id FROM robot WHERE slug = %s", (slug,)).fetchone()[0]
         robot_outcome = "unchanged"
@@ -1597,19 +1600,9 @@ def run(url: str, *, apply_publication_state: bool = False,
     transaction is open and before the first write; it may raise (e.g. ReconcileRefused) to
     abort with nothing written; it is responsible for any locking it needs. Both `before_write`
     and `probe_unchanged` (see _upsert) are OPT-IN for the promotion executor: with the defaults
-    the statements issued are exactly those of the pre-promotion importer."""
-    global _PROBE_UNCHANGED
-    _PROBE_UNCHANGED = probe_unchanged
-    try:
-        return _run(url, apply_publication_state=apply_publication_state, only=only,
-                    authorize=authorize, before_write=before_write)
-    finally:
-        _PROBE_UNCHANGED = False
-
-
-def _run(url: str, *, apply_publication_state: bool, only, authorize,
-         before_write) -> Reconciliation:
-    recon = Reconciliation(authorize)
+    the statements issued are exactly those of the pre-promotion importer. The probe setting
+    travels on this run's Reconciliation only: there is no module state (issue #180)."""
+    recon = Reconciliation(authorize, probe_unchanged=probe_unchanged)
     regions = _load(CATALOGUE_DIR / "regions.json")
     providers = _load(CATALOGUE_DIR / "providers.json")
     capabilities = _load(CATALOGUE_DIR / "capabilities.json")

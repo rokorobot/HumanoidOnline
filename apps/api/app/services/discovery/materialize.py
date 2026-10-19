@@ -9,7 +9,7 @@ conflicting or missing its prerequisite. Re-running it once the patch is applied
 no diff. It never writes the database: the change travels through a normal PR and the
 importer loads it. `verify_applied` later compares the imported rows with the claims and
 appends `catalogue_write_audit` rows; only that command writes, and only to the audit
-table.
+table, under the `catalogue-write` lock it shares with the promotion executor.
 """
 from __future__ import annotations
 
@@ -33,6 +33,7 @@ from app.models.claim_proposal import (
 from app.models.discovery import DiscoverySource
 from app.services.discovery import DiscoveryError
 from app.services.discovery import proposal_review as pr
+from app.services.discovery.catalogue_lock import CATALOGUE_WRITE_LOCK_SQL
 from app.services.discovery.claims import _active_claim, active_claims
 from app.services.discovery.field_policy import CLAIM_POLICIES, RETAIL_TARGET_KEY
 
@@ -620,6 +621,10 @@ def verify_applied(session: Session, robot_slug: str, *, change_ref: str, applie
     physical row observed at verification time (forensic only, not an identity)."""
     if not change_ref.strip() or not applied_by.strip():
         raise DiscoveryError("verification needs a change reference and a named human")
+    # The catalogue-write lock (shared with the promotion executor) is held until the caller's
+    # COMMIT/ROLLBACK: the rows compared below and the audit appended for them cannot
+    # interleave with a promotion apply.
+    session.execute(text(CATALOGUE_WRITE_LOCK_SQL))
     claims = _materializable(session, robot_slug)
     robot_id = session.execute(text("SELECT id FROM robot WHERE slug = :s"),
                                {"s": robot_slug}).scalar()

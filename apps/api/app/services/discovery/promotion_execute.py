@@ -43,6 +43,7 @@ from typing import Any, Protocol
 import psycopg
 
 from app.services.discovery import promotion_manifest as pm
+from app.services.discovery.catalogue_lock import CATALOGUE_WRITE_LOCK_SQL
 
 LOCK_SQL = "SELECT pg_try_advisory_lock(hashtext('catalogue-promotion'))"
 UNLOCK_SQL = "SELECT pg_advisory_unlock(hashtext('catalogue-promotion'))"
@@ -953,7 +954,7 @@ def execute(manifest: dict, *, commit: str, production: Production, branches: Br
             """Runs inside the importer's transaction before its first write: takes the
             `catalogue-write` advisory lock (serializing against other promotions), then rechecks
             the fingerprints in the same snapshot, so nothing can slip in between."""
-            cur.execute("SELECT pg_advisory_xact_lock(hashtext('catalogue-write'))")
+            cur.execute(CATALOGUE_WRITE_LOCK_SQL)
             now = pm.fingerprints_from_connection(cur.connection, robots, excluded)
             for slug in robots:
                 if want_fp.get(slug) != now.get(slug):

@@ -58,7 +58,9 @@ const STATIC: Budget[] = [
   // A4 promotion batch 1: 95 -> 102 (measured 101.1 in CI). Content, not code: the record gains
   // six manufacturer-sourced extended specs, each rendered with its source label (carrying the
   // discovery claim id and verbatim value) and repeated in the streamed payload.
-  { path: "/robots/unitree-g1", docKB: 102, jsRawKB: 412 },
+  // First governed promotion (#178, compute_base): 102 -> 104 (measured 102.6 in CI). Content,
+  // not code: one more manufacturer-sourced extended spec with its source label.
+  { path: "/robots/unitree-g1", docKB: 104, jsRawKB: 412 },
   // UX-01: 32 -> 33 (measured 32.06). The compare price cell now carries its configuration,
   // basis tag, order note and the shared summary line, plus data-enum traceability.
   // SOCIAL-01: 33 -> 37 (measured 35.4).

@@ -11,6 +11,7 @@ transaction integrity) is exercised in BOTH modes by test_importer_stable_ids.py
 from __future__ import annotations
 
 import contextlib
+import threading
 
 import psycopg
 import pytest
@@ -126,3 +127,67 @@ def test_a_refusing_before_write_hook_leaves_nothing_written(world):  # noqa: F8
     with pytest.raises(ic.ReconcileRefused, match="production changed"):
         ic.run(url, only=ROBOTS, before_write=refuse, probe_unchanged=True)
     assert _state(url) == before and _scalar_summary(url) == summary
+
+
+@contextlib.contextmanager
+def _twin(url):
+    """A second scratch database, an exact copy of `url`'s (CREATE DATABASE ... TEMPLATE)."""
+    admin = psycopg.conninfo.make_conninfo(url, dbname="postgres")
+    source = psycopg.conninfo.conninfo_to_dict(url)["dbname"]
+    name = f"{source}_twin"
+    with psycopg.connect(admin, autocommit=True) as conn:
+        conn.execute(f'CREATE DATABASE "{name}" TEMPLATE "{source}"')
+    try:
+        yield psycopg.conninfo.make_conninfo(url, dbname=name)
+    finally:
+        with psycopg.connect(admin, autocommit=True) as conn:
+            conn.execute("SELECT pg_terminate_backend(pid) FROM pg_stat_activity"
+                         " WHERE datname = %s AND pid <> pg_backend_pid()", (name,))
+            conn.execute(f'DROP DATABASE IF EXISTS "{name}"')
+
+
+def test_interleaved_runs_do_not_leak_the_probe_setting_to_each_other(
+        world, monkeypatch):  # noqa: F811
+    """Issue #180: the probe setting is per run (on its Reconciliation), not module state. Two
+    runs in threads against separate databases - one with the probe, one without - are held
+    together inside their transactions until both have started, then write concurrently; each
+    issues exactly the statements it issues when run alone."""
+    url, _cat = world
+    assert not hasattr(ic, "_PROBE_UNCHANGED")
+    with _twin(url) as twin:
+        with _recording(monkeypatch) as solo_probe:
+            ic.run(url, only=ROBOTS, probe_unchanged=True)
+        with _recording(monkeypatch) as solo_default:
+            ic.run(twin, only=ROBOTS)
+
+        logs: dict[str, list[str]] = {"probe": [], "default": []}
+        errors: list[BaseException] = []
+        both_open = threading.Barrier(2, timeout=60)
+
+        class Cursor(psycopg.Cursor):
+            def execute(self, query, params=None, **kw):
+                if isinstance(query, str) and threading.current_thread().name in logs:
+                    logs[threading.current_thread().name].append(query)
+                return super().execute(query, params, **kw)
+
+        real = psycopg.connect
+        monkeypatch.setattr(ic.psycopg, "connect",
+                            lambda *a, **kw: real(*a, cursor_factory=Cursor, **kw))
+
+        def go(target, probe):
+            try:
+                ic.run(target, only=ROBOTS, before_write=lambda cur: both_open.wait(),
+                       probe_unchanged=probe)
+            except BaseException as exc:       # surfaced below, in the test thread
+                errors.append(exc)
+
+        threads = [threading.Thread(target=go, args=(url, True), name="probe"),
+                   threading.Thread(target=go, args=(twin, False), name="default")]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join(300)
+    assert not errors, errors
+    assert any(_is_probe(q) for q in logs["probe"])
+    assert not any(_is_probe(q) for q in logs["default"])
+    assert logs["probe"] == solo_probe and logs["default"] == solo_default

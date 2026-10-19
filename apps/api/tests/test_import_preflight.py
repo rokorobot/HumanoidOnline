@@ -382,27 +382,48 @@ def test_the_gate_stops_on_that_synchronization_until_it_is_listed(scoped_world)
     assert pf.classify(changes, listed)["ok"]
 
 
-def test_a_reimport_orphans_the_audit_target_row_id_and_the_gate_says_exactly_that(scoped_world):
-    """The mechanism end to end: the importer replaces a robot's offers (new UUIDs), so an
-    untouched `catalogue_write_audit` row stops resolving. Reported as a dangling target, not
-    as a removed + added audit row."""
-    url, _ = scoped_world
+def test_an_authorized_removal_orphans_the_audit_target_and_the_gate_says_exactly_that(
+        scoped_world):
+    """The mechanism end to end. A re-import no longer recreates offers under new UUIDs, so an
+    audit row only dangles when its target is removed, which needs an explicit authorization.
+    Then the untouched `catalogue_write_audit` row is reported as a dangling target, not as a
+    removed + added audit row."""
+    url, cat = scoped_world
     with psycopg.connect(url, autocommit=True) as conn:
         conn.execute("SET search_path TO humanoid, public")
         # Scratch database only: an accepted claim needs the whole proposal/decision chain,
         # which is irrelevant to how the preflight reads the audit row.
         conn.execute("ALTER TABLE catalogue_write_audit "
                      "DROP CONSTRAINT catalogue_write_audit_claim_id_fkey")
-        offer_id = conn.execute(
-            "SELECT p.id FROM pricing_offer p JOIN robot r ON r.id = p.robot_id "
-            "WHERE r.slug = %s ORDER BY p.id LIMIT 1", (H2,)).fetchone()[0]
+        offer_id, variant, provider, region, txn, condition = conn.execute(
+            "SELECT p.id, v.slug, (SELECT slug FROM provider WHERE id = p.provider_id), "
+            "(SELECT code FROM region WHERE id = p.region_id), p.transaction_type::text, "
+            "p.condition::text FROM pricing_offer p JOIN robot r ON r.id = p.robot_id "
+            "LEFT JOIN robot_variant v ON v.id = p.variant_id "
+            "WHERE r.slug = %s ORDER BY p.id LIMIT 1", (H2,)).fetchone()
         seq, stored = conn.execute(
             "INSERT INTO catalogue_write_audit (claim_id, robot_slug, method, change_ref, "
             "target_table, target_row_id, after_hash, applied_by) VALUES (gen_random_uuid(), %s, "
             "'IMPORTER_M2', 'chg-test', 'pricing_offer', %s, repeat('a', 64), 'tester') "
             "RETURNING audit_seq, md5(catalogue_write_audit::text)", (H2, offer_id)).fetchone()
+    path = cat / "robots" / f"{H2}.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc["pricing_offers"] = [o for o in doc["pricing_offers"] if (
+        o.get("variant_slug"), o.get("provider_slug"), o.get("region_code"),
+        o["transaction_type"], o.get("condition", "NEW")) != (variant, provider, region, txn,
+                                                              condition)]
+    path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n",
+                    encoding="utf-8")
     before = _snap(url)
-    ic.run(url, only={H2})
+    ic.run(url, only={H2})                      # unauthorized: the offer is preserved (D1)
+    with psycopg.connect(url) as conn:
+        conn.execute("SET search_path TO humanoid, public")
+        assert conn.execute("SELECT count(*) FROM pricing_offer WHERE id = %s",
+                            (offer_id,)).fetchone()[0] == 1
+    ic.run(url, only={H2}, authorize={"version": 1, "entries": [{
+        "action": "remove", "table": "pricing_offer", "robot": H2,
+        "key": {"variant_slug": variant, "provider_slug": provider, "region_code": region,
+                "transaction_type": txn, "condition": condition}}]})
     after = _snap(url)
     with psycopg.connect(url) as conn:
         conn.execute("SET search_path TO humanoid, public")
@@ -410,10 +431,19 @@ def test_a_reimport_orphans_the_audit_target_row_id_and_the_gate_says_exactly_th
         live = conn.execute("SELECT count(*) FROM pricing_offer WHERE id = %s",
                             (offer_id,)).fetchone()[0]
     assert unchanged == stored                  # the audit row is byte-identical
-    assert live == 0                            # its target was recreated under a new UUID
+    assert live == 0                            # its target was removed, by authorization
     changes = pf.diff(before, after)
-    assert [c for c in changes if c.gated] == []
-    report = pf.classify(changes, {"expected": []})
+    counted = {}
+    for c in changes:
+        if c.gated:
+            counted[(c.table, c.kind)] = counted.get((c.table, c.kind), 0) + 1
+    gated = set(counted)
+    # the offer and its own evidence; the robot's cached lowest price moves only if the
+    # removed offer happened to be the cheapest one. Nothing else.
+    assert gated - {("robot", "CHANGED")} == {("pricing_offer", "REMOVED"),
+                                              ("evidence_source", "REMOVED")}
+    report = pf.classify(changes, {"expected": [
+        {"table": t, "kind": k, "count": n} for (t, k), n in sorted(counted.items())]})
     assert report["ok"] and report["audit_history_added"] == {}
     [d] = report["audit_targets_dangling"]
     assert (d["audit_seq"], d["target_row_id"]) == (seq, str(offer_id))

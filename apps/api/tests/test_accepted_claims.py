@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import importlib.util
 import json
-import uuid
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -430,6 +429,20 @@ def test_materializing_and_claiming_never_touch_the_catalogue_tables(dsession, t
 # ------------------------------------------------- importer + verify + audit --
 
 
+AUDIT_TARGET_TABLES = ("robot_variant", "specification", "pricing_offer", "availability_offer")
+
+
+def dangling_audit_targets(session):
+    """(audit_seq, target_table) of every audit row whose target no longer exists (plain SQL)."""
+    out = []
+    for table in AUDIT_TARGET_TABLES:
+        out += [tuple(r) for r in session.execute(text(
+            "SELECT a.audit_seq, a.target_table FROM catalogue_write_audit a "
+            f"WHERE a.target_table = '{table}' AND NOT EXISTS "
+            f"(SELECT 1 FROM {table} t WHERE t.id = a.target_row_id)"))]
+    return out
+
+
 def _raw_cursor(session):
     return session.connection().connection.driver_connection.cursor()
 
@@ -581,13 +594,15 @@ def test_importer_variant_scoped_sql_uses_the_resolved_variant_id():
              "is_published": False, "specs": {}, "variants": [{"slug": "pro", "name": "Pro"}],
              "extended_specs": [{"key": "k", "variant_slug": "pro", "value": "v",
                                  "edition_scope": "THIS_EDITION"}]}
-    cur = _RecordingCursor(rows=[(1,), ("variant-uuid",), None])
+    # robot upsert -> (id, inserted); the variant insert -> its new id
+    cur = _RecordingCursor(rows=[(1, True), ("variant-uuid",)])
     ic.import_robot(cur, robot, region_id=lambda c: 1, manufacturer_id=lambda s: 1,
                     capability_id=lambda s: 1, use_case_id=lambda s: 1,
                     spec_definition=lambda k: (7, "TEXT"), collisions=[])
-    probe = [s for s in cur.statements if "IS NOT DISTINCT FROM" in s]
-    assert probe and uuid  # the logical-key probe is variant-aware
-    assert any(s.startswith("INSERT INTO specification") for s in cur.statements)
+    [(sql, params)] = [(s, p) for s, p in zip(cur.statements, cur.params, strict=True)
+                       if s.startswith("INSERT INTO specification")]
+    columns = [c.strip() for c in sql.split("(", 1)[1].split(")", 1)[0].split(",")]
+    assert dict(zip(columns, params, strict=True))["variant_id"] == "variant-uuid"
 
 
 def test_every_catalogue_file_variant_slug_reference_resolves():
@@ -603,9 +618,10 @@ def test_every_catalogue_file_variant_slug_reference_resolves():
     assert not bad, bad
 
 
-def test_audit_identity_survives_importer_uuid_churn(dsession, tmp_path):
+def test_audit_identity_survives_importer_reimport(dsession, tmp_path):
     """Part A hardening: the durable identity is claim + logical target + content hash +
-    change_ref, never the physical row UUID the importer recreates on every run."""
+    change_ref. Since stable-ID reconciliation the importer also keeps the physical row UUIDs,
+    so every audit target keeps resolving across a re-import."""
     w = seeded(dsession)
     made = slice_claims(dsession, w)
     path = stub(w, tmp_path)
@@ -624,19 +640,21 @@ def test_audit_identity_survives_importer_uuid_churn(dsession, tmp_path):
         "SELECT v.id FROM robot_variant v JOIN robot r ON r.id = v.robot_id "
         "WHERE r.slug = :s UNION SELECT s.id FROM specification s JOIN robot r "
         "ON r.id = s.robot_id WHERE r.slug = :s"), {"s": w.slug})}
-    _import(dsession, w, path)                                     # 3. importer churns UUIDs
+    assert dangling_audit_targets(dsession) == []
+    _import(dsession, w, path)                                     # 3. re-import
     live_after = {r[0] for r in dsession.execute(text(
         "SELECT v.id FROM robot_variant v JOIN robot r ON r.id = v.robot_id "
         "WHERE r.slug = :s UNION SELECT s.id FROM specification s JOIN robot r "
         "ON r.id = s.robot_id WHERE r.slug = :s"), {"s": w.slug})}
-    assert live_before and live_after and not (live_before & live_after)
+    assert live_before and live_before == live_after               # same rows, same UUIDs
+    assert dangling_audit_targets(dsession) == []
     assert materialize.verify_applied(dsession, w.slug, change_ref="chg-1",
                                       applied_by=WHO) == []        # 4. still zero new rows
     assert dsession.scalar(select(func.count()).select_from(CatalogueWriteAudit)) == 4
     for a in dsession.scalars(select(CatalogueWriteAudit)):        # 5. history untouched
         assert (a.target_row_id, a.after_hash, a.claim_id, a.change_ref) == original[a.id]
     assert row_ids() == {o[0] for o in original.values()}
-    assert not (row_ids() & live_after)                            # forensic, not live
+    assert row_ids() <= live_after                                 # and every target is live
     targets = {materialize.logical_target(c) for c in made.values()}   # 6. from the claim
     assert targets == {
         f"robot_variant:{w.slug}:standard", f"robot_variant:{w.slug}:pro",
@@ -652,6 +670,7 @@ def test_audit_identity_survives_importer_uuid_churn(dsession, tmp_path):
     _import(dsession, w, path)                                     # restores the content
     again = materialize.verify_applied(dsession, w.slug, change_ref="chg-2", applied_by=WHO)
     assert len(again) == 4
+    assert dangling_audit_targets(dsession) == []                  # drift repaired in place
     assert dsession.scalar(select(func.count()).select_from(CatalogueWriteAudit)) == 8
     # 8. append-only protections remain
     with refused(dsession, op="UPDATE"):

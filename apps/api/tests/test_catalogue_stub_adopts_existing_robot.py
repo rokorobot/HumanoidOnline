@@ -168,7 +168,13 @@ class _Recording:
         return self
 
     def fetchone(self):
+        if "IS NOT NULL)" in self.statements[-1]:
+            return None         # the blanking guard: no stored value exists
         return (1, "EUR")
+
+    def fetchall(self):
+        # No existing child rows: the reconciliation inserts everything.
+        return []
 
 
 def test_the_importer_matches_by_slug_and_never_rewrites_publication():

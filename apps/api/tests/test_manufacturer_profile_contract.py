@@ -140,7 +140,12 @@ class _RecordingCursor:
         return self
 
     def fetchone(self):
-        return (1,)
+        if "IS NOT NULL)" in self.calls[-1][0]:
+            return None         # the blanking guard: no stored value exists
+        return (1, True)        # an upsert's RETURNING id, (xmax = 0)
+
+    def fetchall(self):
+        return []               # no existing evidence rows to reconcile against
 
     def insert(self, table: str) -> tuple[list[str], tuple]:
         for sql, params in self.calls:

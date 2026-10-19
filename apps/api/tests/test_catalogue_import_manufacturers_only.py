@@ -73,9 +73,11 @@ class _Cursor:
         return self
 
     def fetchone(self):
+        if "IS NOT NULL)" in self._last:
+            return None         # the blanking guard: no stored value exists
         if self._last.startswith("SELECT count(*)"):
             return (0,)
-        return (1,)
+        return (1, True)        # an upsert's RETURNING id, (xmax = 0)
 
     def fetchall(self):
         if self._last.startswith("SELECT code, id FROM region"):
@@ -195,22 +197,19 @@ def test_manufacturers_only_reads_no_robot_file_and_writes_only_company_rows(
     assert connection.committed
 
 
-def test_company_evidence_refresh_deletes_only_catalogue_managed_rows(connection) -> None:
+def test_company_evidence_reconciliation_reads_only_catalogue_managed_rows(connection) -> None:
     ic.run_manufacturers_only("postgresql://unused")
-    deletes = [
-        (sql, p) for _, sql, p in connection.writes()
-        if sql.startswith("DELETE FROM evidence_source")
-    ]
-    assert deletes, "no evidence refresh happened"
-    for sql, params in deletes:
-        # Only the importer's own marked rows — never an unmarked row, whatever
-        # its content.
-        assert "subject_type='MANUFACTURER'" in sql
-        assert "managed_by = %s" in sql and params[-1] == ic.MANAGED_BY, sql
-        assert "managed_by IS NULL" not in sql, sql
-    assert not any(
-        sql.startswith("UPDATE evidence_source") for _, sql, _ in connection.writes()
-    )
+    reads = [sql for sql, _ in connection.calls
+             if sql.startswith("SELECT") and "FROM evidence_source t" in sql]
+    assert reads, "no evidence reconciliation happened"
+    for sql in reads:
+        # Only the importer's own marked rows are in scope - never an unmarked row.
+        assert "t.subject_type = %s AND t.subject_id = %s AND t.managed_by = %s" in sql, sql
+    params = [p for sql, p in connection.calls if sql in reads]
+    assert all(p[0] == "MANUFACTURER" and p[-1] == ic.MANAGED_BY for p in params)
+    # the importer reconciles by key now: it never deletes or rewrites a row on its own
+    assert not any(sql.startswith(("DELETE FROM evidence_source", "UPDATE evidence_source"))
+                   for _, sql, _ in connection.writes())
     inserts = [
         p for _, sql, p in connection.writes()
         if sql.startswith("INSERT INTO evidence_source")
@@ -230,15 +229,21 @@ def test_full_import_manufacturer_step_uses_the_same_owned_row_refresh() -> None
             return self
 
         def fetchone(self):
-            return (1,)
+            if "IS NOT NULL)" in self.sql[-1]:
+                return None
+            return (1, True)
+
+        def fetchall(self):
+            return []
 
     cur = Recording()
     ic.import_manufacturers(cur, MANUFACTURERS, lambda code: None)
-    blanket = [
+    unscoped = [
         s for s in cur.sql
-        if s.startswith("DELETE FROM evidence_source") and "managed_by" not in s
+        if "FROM evidence_source t" in s and "managed_by = %s" not in s
     ]
-    assert not blanket, blanket
+    assert not unscoped, unscoped
+    assert not [s for s in cur.sql if s.startswith("DELETE FROM evidence_source")]
 
 
 # --- validation before writing -----------------------------------------------------

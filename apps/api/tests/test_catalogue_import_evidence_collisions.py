@@ -145,19 +145,69 @@ def test_edited_unmarked_row_sharing_url_type_and_date_survives_repeated_imports
     _assert_preserved_and_reported(cur, slug, mid, manual_id, runs=3)
 
 
-def test_repeated_imports_replace_only_catalogue_managed_rows(cur) -> None:
-    """No unmarked row present: the managed copy is replaced on each run, never
-    duplicated, and nothing is reported."""
+def test_repeated_imports_keep_one_catalogue_managed_row_with_a_stable_id(cur) -> None:
+    """No unmarked row present: the managed copy is inserted once, then left alone (same
+    id, no write, never duplicated), and nothing is reported."""
     slug, mid = _manufacturer(cur)
     ids = []
     for run in range(3):
         result = _import(cur, slug, [CATALOGUE_SOURCE])
         assert result["collisions"] == []
-        assert result["removed"] == (0 if run == 0 else 1)
+        assert result["removed"] == 0
+        assert result["inserted"] == (1 if run == 0 else 0)
+        assert result["unchanged"] == (0 if run == 0 else 1)
         managed = _managed_rows(cur, mid)
         assert len(managed) == 1
         ids.append(managed[0][0])
-    assert len(set(ids)) == 3  # re-inserted each run, one row at a time
+    assert len(set(ids)) == 1  # the same row, every time
+
+
+def _authorization(slug, action, source, **extra):
+    return {"version": 1, "entries": [{
+        "action": action, "table": "evidence_source", "robot": slug,
+        "key": {"subject_type": "MANUFACTURER", "source_url": source["source_url"],
+                "source_type": source["source_type"], "excerpt": source["excerpt"],
+                "observed_at": source["observed_at"]}, **extra}]}
+
+
+def test_a_managed_source_that_left_the_json_is_preserved_and_removed_only_when_authorized(
+        cur) -> None:
+    slug, mid = _manufacturer(cur)
+    _import(cur, slug, [CATALOGUE_SOURCE])
+    (kept_id,) = [r[0] for r in _managed_rows(cur, mid)]
+    other = {**CATALOGUE_SOURCE, "source_url": "https://example.test/collision/other"}
+
+    _import(cur, slug, [other])                     # D1: CATALOGUE_SOURCE left the file ...
+    assert kept_id in [r[0] for r in _managed_rows(cur, mid)]   # ... and is left untouched
+    assert len(_managed_rows(cur, mid)) == 2
+
+    recon = ic.Reconciliation(_authorization(slug, "remove", CATALOGUE_SOURCE))
+    data = {"manufacturers": [{"slug": slug, "name": "Collision Robotics", "evidence": [other]}]}
+    result = ic.import_manufacturers(cur, data, lambda code: None, recon)
+    recon.finish()
+    assert (result["removed"], result["inserted"], result["unchanged"]) == (1, 0, 1)
+    assert kept_id not in [r[0] for r in _managed_rows(cur, mid)]
+
+
+def test_managed_evidence_whose_content_changed_needs_update_evidence(cur) -> None:
+    slug, mid = _manufacturer(cur)
+    _import(cur, slug, [CATALOGUE_SOURCE])
+    (kept_id,) = [r[0] for r in _managed_rows(cur, mid)]
+    edited = {**CATALOGUE_SOURCE, "note": "A corrected note."}
+
+    cur.execute("SAVEPOINT before_refusal")
+    with pytest.raises(ic.ReconcileRefused, match="immutable to the importer"):
+        _import(cur, slug, [edited])
+    cur.execute("ROLLBACK TO SAVEPOINT before_refusal")
+    assert _row(cur, kept_id)[ROW_COLUMNS.split(", ").index("note")] == UNMARKED_SOURCE["note"]
+
+    recon = ic.Reconciliation(_authorization(slug, "update_evidence", CATALOGUE_SOURCE))
+    data = {"manufacturers": [{"slug": slug, "name": "Collision Robotics", "evidence": [edited]}]}
+    result = ic.import_manufacturers(cur, data, lambda code: None, recon)
+    recon.finish()
+    assert result["updated"] == 1
+    assert [r[0] for r in _managed_rows(cur, mid)] == [kept_id]      # same id, edited in place
+    assert _row(cur, kept_id)[ROW_COLUMNS.split(", ").index("note")] == "A corrected note."
 
 
 def test_unrelated_manual_row_is_preserved_without_a_collision(cur) -> None:

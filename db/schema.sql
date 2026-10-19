@@ -2395,8 +2395,8 @@ CREATE TRIGGER trg_catalogue_write_audit_no_delete
 -- =============================================================================
 -- CATALOGUE FRESHNESS (0026): when did canonical catalogue content last change?
 -- =============================================================================
--- One row, maintained only by record_catalogue_change() inside the writing transaction
--- (rollback-safe, no-op UPDATEs ignored, every write path covered). Definition, coverage
+-- One row, maintained only by record_catalogue_change() at commit of the writing
+-- transaction (rollback-safe, commit-time clock, no-op UPDATEs ignored, every write path covered). Definition, coverage
 -- and exclusions: db/migrations/0026_catalogue_freshness.sql. A fresh database starts at
 -- NULL (UNKNOWN) and is set by its first catalogue write.
 
@@ -2407,7 +2407,7 @@ CREATE TABLE catalogue_freshness (
     CONSTRAINT ck_catalogue_freshness_single_row CHECK (id = 1)
 );
 COMMENT ON TABLE catalogue_freshness IS
-    'Single row. Maintained ONLY by record_catalogue_change() inside the writing transaction: '
+    'Single row. Maintained ONLY by record_catalogue_change() at commit of the writing transaction: '
     'latest_public_update_at = last committed change to public catalogue content, '
     'latest_update_at = last committed change to any canonical content (drafts included).';
 
@@ -2418,7 +2418,13 @@ DECLARE
     new_row   JSONB;
     ids       UUID[];
     is_public BOOLEAN;
+    stamp     TIMESTAMPTZ;
 BEGIN
+    -- Transaction-local flags (set_config(..., true)): once the public date is recorded for
+    -- this transaction, every later row event of it has nothing left to do.
+    IF current_setting('humanoid.catalogue_public_recorded', true) = 'yes' THEN
+        RETURN NULL;
+    END IF;
     IF TG_OP <> 'INSERT' THEN
         old_row := to_jsonb(OLD) - 'updated_at' - 'search_vector';
     END IF;
@@ -2461,17 +2467,22 @@ BEGIN
         is_public := EXISTS (SELECT 1 FROM robot r WHERE r.is_published AND r.id = ANY(ids));
     END IF;
 
-    -- At most one real write per transaction (now() is fixed for the transaction), and never
-    -- backwards: a long transaction that commits after a newer one cannot move the date back.
-    UPDATE catalogue_freshness
-       SET latest_update_at = GREATEST(latest_update_at, now()),
-           latest_public_update_at = CASE WHEN is_public
-                                          THEN GREATEST(latest_public_update_at, now())
-                                          ELSE latest_public_update_at END
-     WHERE id = 1
-       AND (latest_update_at IS NULL OR latest_update_at < now()
-            OR (is_public AND (latest_public_update_at IS NULL
-                               OR latest_public_update_at < now())));
+    -- Commit-time clock, never backwards: a transaction that commits after a newer one cannot
+    -- move the date back.
+    stamp := clock_timestamp();
+    IF is_public THEN
+        UPDATE catalogue_freshness
+           SET latest_update_at = GREATEST(latest_update_at, stamp),
+               latest_public_update_at = GREATEST(latest_public_update_at, stamp)
+         WHERE id = 1;
+        PERFORM set_config('humanoid.catalogue_public_recorded', 'yes', true);
+        PERFORM set_config('humanoid.catalogue_change_recorded', 'yes', true);
+    ELSIF current_setting('humanoid.catalogue_change_recorded', true) IS DISTINCT FROM 'yes' THEN
+        UPDATE catalogue_freshness
+           SET latest_update_at = GREATEST(latest_update_at, stamp)
+         WHERE id = 1;
+        PERFORM set_config('humanoid.catalogue_change_recorded', 'yes', true);
+    END IF;
     RETURN NULL;
 END;
 $$;
@@ -2509,8 +2520,9 @@ BEGIN
     LOOP
         EXECUTE format('DROP TRIGGER IF EXISTS trg_%1$s_catalogue_freshness ON %1$s', t);
         EXECUTE format(
-            'CREATE TRIGGER trg_%1$s_catalogue_freshness
+            'CREATE CONSTRAINT TRIGGER trg_%1$s_catalogue_freshness
              AFTER INSERT OR UPDATE OR DELETE ON %1$s
+             DEFERRABLE INITIALLY DEFERRED
              FOR EACH ROW EXECUTE FUNCTION record_catalogue_change();', t);
     END LOOP;
 END$$;

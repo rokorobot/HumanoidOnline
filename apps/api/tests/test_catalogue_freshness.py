@@ -7,6 +7,8 @@ transaction that writes the catalogue. What is pinned here:
   governed promotion (the executor's importer opt-ins), any other SQL client (the admin);
 * nothing else does: a no-op re-import, a discovery observation, a new evidence observation,
   a refused / rolled-back import, an explicit ROLLBACK, an UPDATE that rewrites equal values;
+* the date is the COMMIT time (not the transaction start), never moves backwards, and
+  concurrent writers queue only at commit (no lock held for the whole transaction);
 * an unpublished-only change is recorded as `latest_update_at` but never moves the public date;
 * the row cannot be written, deleted or truncated directly;
 * migration 0026 converges onto db/schema.sql, is idempotent, and seeds from stored data;
@@ -21,6 +23,9 @@ import json
 import pathlib
 import shutil
 import sys
+import threading
+import time
+from datetime import timedelta
 
 import psycopg
 import pytest
@@ -87,6 +92,12 @@ def _exec(url, sql, params=None):
     with psycopg.connect(url, autocommit=True) as conn:
         conn.execute("SET search_path TO humanoid, public")
         conn.execute(sql, params or ())
+
+
+def _scalar(url, sql, params=None):
+    with psycopg.connect(url) as conn:
+        conn.execute("SET search_path TO humanoid, public")
+        return conn.execute(sql, params or ()).fetchone()[0]
 
 
 def _edit(cat, slug, change):
@@ -247,11 +258,111 @@ def test_a_rolled_back_transaction_does_not_advance_the_date(world):
     with psycopg.connect(url) as conn:
         conn.execute("SET search_path TO humanoid, public")
         conn.execute("UPDATE robot SET summary = 'rolled back' WHERE slug = %s", (PUBLISHED,))
+        assert conn.execute("SELECT latest_public_update_at, latest_update_at "
+                            "FROM catalogue_freshness").fetchone() == before   # deferred
+        conn.execute("SET CONSTRAINTS ALL IMMEDIATE")      # force the write mid-transaction
         assert _advanced(before, conn.execute(
             "SELECT latest_public_update_at, latest_update_at FROM catalogue_freshness"
         ).fetchone()) == (True, True)       # visible inside the transaction only
         conn.rollback()
     assert _fresh(url) == before
+
+
+# ---------------------------------------------------------- commit-time semantics --
+
+def test_the_date_is_the_commit_time_not_the_transaction_start(world):
+    """now() is the transaction START: an import begun at 23:59 UTC and committed at 00:01
+    would show the previous day. The recorded time is taken while the transaction commits."""
+    url, _ = world
+    with psycopg.connect(url) as conn:
+        conn.execute("SET search_path TO humanoid, public")
+        started = conn.execute("SELECT now()").fetchone()[0]
+        conn.execute("UPDATE robot SET summary = 'slow import' WHERE slug = %s", (PUBLISHED,))
+        conn.execute("SELECT pg_sleep(1.5)")                # the long tail of a big import
+        conn.commit()
+    public, everything = _fresh(url)
+    assert public - started >= timedelta(seconds=1.5)
+    assert everything == public
+
+
+# ------------------------------------------------------------------- concurrency --
+
+def _conn(url):
+    conn = psycopg.connect(url)
+    conn.execute("SET search_path TO humanoid, public")
+    conn.execute("SET lock_timeout = '10s'")    # a regression fails the test, never hangs it
+    return conn
+
+
+def test_a_transaction_that_commits_last_sets_the_date_even_if_it_started_first(world):
+    url, _ = world
+    a, b = _conn(url), _conn(url)
+    try:
+        a.execute("UPDATE robot SET summary = 'A' WHERE slug = %s", (PUBLISHED,))
+        b.execute("UPDATE robot SET summary = 'B' WHERE slug = 'agility-digit'")
+        b.commit()                                  # B started later, commits first
+        after_b = _fresh(url)[0]
+        a.execute("SELECT pg_sleep(0.2)")
+        a.commit()
+        after_a = _fresh(url)[0]
+    finally:
+        a.close(), b.close()
+    assert after_a > after_b                        # A's commit is the newest change
+    assert _scalar(url, "SELECT summary FROM robot WHERE slug = %s", (PUBLISHED,)) == "A"
+    assert _scalar(url, "SELECT summary FROM robot WHERE slug = 'agility-digit'") == "B"
+
+
+def test_concurrent_writers_queue_at_commit_and_both_land(world):
+    """A holds the freshness row (forced mid-transaction); B, on another robot, waits only for
+    the freshness row at its commit, then lands after A with a later date."""
+    url, _ = world
+    a = _conn(url)
+    result = {}
+
+    def writer_b():
+        with _conn(url) as b:
+            b.execute("UPDATE robot SET summary = 'B' WHERE slug = 'agility-digit'")
+            b.commit()
+            result["done_at"] = time.monotonic()
+
+    try:
+        a.execute("UPDATE robot SET summary = 'A' WHERE slug = %s", (PUBLISHED,))
+        a.execute("SET CONSTRAINTS ALL IMMEDIATE")          # A now holds the freshness row
+        held = a.execute("SELECT latest_public_update_at FROM catalogue_freshness").fetchone()[0]
+        thread = threading.Thread(target=writer_b)
+        thread.start()
+        time.sleep(1.0)
+        assert thread.is_alive()                            # B is queued behind A ...
+        assert _scalar(url, "SELECT count(*) FROM pg_stat_activity WHERE wait_event_type = "
+                            "'Lock' AND query LIKE 'COMMIT%%'") == 1   # ... at its COMMIT
+        a.commit()
+        committed_a = time.monotonic()
+        thread.join(10)
+    finally:
+        a.close()
+    assert not thread.is_alive() and result["done_at"] >= committed_a
+    assert _fresh(url)[0] > held                            # B's later commit, never backwards
+    assert _scalar(url, "SELECT summary FROM robot WHERE slug = %s", (PUBLISHED,)) == "A"
+    assert _scalar(url, "SELECT summary FROM robot WHERE slug = 'agility-digit'") == "B"
+
+
+def test_crossing_writers_do_not_deadlock_on_the_freshness_row(world):
+    """A writes X; B writes Y and commits; A then writes Y. With an immediate trigger, A would
+    hold the freshness row from its first write, B would wait for it at commit while holding Y,
+    and A's write to Y would deadlock. Deferred to commit, B passes and A follows."""
+    url, _ = world
+    before = _fresh(url)
+    a, b = _conn(url), _conn(url)
+    try:
+        a.execute("UPDATE robot SET summary = 'A1' WHERE slug = %s", (PUBLISHED,))
+        b.execute("UPDATE robot SET summary = 'B' WHERE slug = 'agility-digit'")
+        b.commit()                                          # not blocked by A
+        a.execute("UPDATE robot SET summary = 'A2' WHERE slug = 'agility-digit'")
+        a.commit()
+    finally:
+        a.close(), b.close()
+    assert _advanced(before, _fresh(url)) == (True, True)
+    assert _scalar(url, "SELECT summary FROM robot WHERE slug = 'agility-digit'") == "A2"
 
 
 @pytest.mark.parametrize("statement", [

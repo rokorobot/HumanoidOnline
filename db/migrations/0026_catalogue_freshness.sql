@@ -12,12 +12,21 @@
 --                                case / spec definition that a published robot uses;
 --       latest_update_at         last committed change to ANY canonical content row, unpublished
 --                                drafts included (recorded, never shown on the homepage).
---  2. record_catalogue_change(): a row-level AFTER INSERT/UPDATE/DELETE trigger on every
---     canonical content table. It runs inside the writing transaction, so a rolled-back or
---     failed write never advances the date, and every write path (importer, promotion executor,
---     internal admin, hand-written SQL) is covered without code in any of them. An UPDATE that
---     changes nothing but `updated_at` / `search_vector` is ignored (no-op). The timestamp is
---     now() - the writing transaction's own database UTC time - and only ever moves forward.
+--  2. record_catalogue_change(): a row-level constraint trigger on INSERT/UPDATE/DELETE of
+--     every canonical content table, DEFERRABLE INITIALLY DEFERRED: it runs at COMMIT, still
+--     inside the writing transaction, so a rolled-back or failed write never advances the date,
+--     and every write path (importer, promotion executor, internal admin, hand-written SQL) is
+--     covered without code in any of them. An UPDATE that changes nothing but `updated_at` /
+--     `search_vector` is ignored (no-op).
+--     The timestamp is clock_timestamp() taken while the transaction commits - NOT now(), which
+--     is the transaction's START: a long import begun before midnight UTC and committed after it
+--     records the commit day. It only ever moves forward (GREATEST), and the row is written at
+--     most twice per transaction (once for any change, once for the first public one): the
+--     per-row trigger calls after that only read two transaction-local settings.
+--     Because the row is written at commit, its row lock is held only for the commit itself:
+--     concurrent catalogue writers queue briefly at commit instead of for their whole
+--     transaction. (A session that runs SET CONSTRAINTS ALL IMMEDIATE gets the write at that
+--     point instead - the date is then that moment, still inside its transaction.)
 --  3. guard_catalogue_freshness(): the row may be changed only by that trigger (refused at
 --     trigger depth 1, i.e. from any direct statement); DELETE and TRUNCATE are refused.
 --
@@ -44,7 +53,7 @@ CREATE TABLE IF NOT EXISTS catalogue_freshness (
     CONSTRAINT ck_catalogue_freshness_single_row CHECK (id = 1)
 );
 COMMENT ON TABLE catalogue_freshness IS
-    'Single row. Maintained ONLY by record_catalogue_change() inside the writing transaction: '
+    'Single row. Maintained ONLY by record_catalogue_change() at commit of the writing transaction: '
     'latest_public_update_at = last committed change to public catalogue content, '
     'latest_update_at = last committed change to any canonical content (drafts included).';
 
@@ -55,7 +64,13 @@ DECLARE
     new_row   JSONB;
     ids       UUID[];
     is_public BOOLEAN;
+    stamp     TIMESTAMPTZ;
 BEGIN
+    -- Transaction-local flags (set_config(..., true)): once the public date is recorded for
+    -- this transaction, every later row event of it has nothing left to do.
+    IF current_setting('humanoid.catalogue_public_recorded', true) = 'yes' THEN
+        RETURN NULL;
+    END IF;
     IF TG_OP <> 'INSERT' THEN
         old_row := to_jsonb(OLD) - 'updated_at' - 'search_vector';
     END IF;
@@ -98,17 +113,22 @@ BEGIN
         is_public := EXISTS (SELECT 1 FROM robot r WHERE r.is_published AND r.id = ANY(ids));
     END IF;
 
-    -- At most one real write per transaction (now() is fixed for the transaction), and never
-    -- backwards: a long transaction that commits after a newer one cannot move the date back.
-    UPDATE catalogue_freshness
-       SET latest_update_at = GREATEST(latest_update_at, now()),
-           latest_public_update_at = CASE WHEN is_public
-                                          THEN GREATEST(latest_public_update_at, now())
-                                          ELSE latest_public_update_at END
-     WHERE id = 1
-       AND (latest_update_at IS NULL OR latest_update_at < now()
-            OR (is_public AND (latest_public_update_at IS NULL
-                               OR latest_public_update_at < now())));
+    -- Commit-time clock, never backwards: a transaction that commits after a newer one cannot
+    -- move the date back.
+    stamp := clock_timestamp();
+    IF is_public THEN
+        UPDATE catalogue_freshness
+           SET latest_update_at = GREATEST(latest_update_at, stamp),
+               latest_public_update_at = GREATEST(latest_public_update_at, stamp)
+         WHERE id = 1;
+        PERFORM set_config('humanoid.catalogue_public_recorded', 'yes', true);
+        PERFORM set_config('humanoid.catalogue_change_recorded', 'yes', true);
+    ELSIF current_setting('humanoid.catalogue_change_recorded', true) IS DISTINCT FROM 'yes' THEN
+        UPDATE catalogue_freshness
+           SET latest_update_at = GREATEST(latest_update_at, stamp)
+         WHERE id = 1;
+        PERFORM set_config('humanoid.catalogue_change_recorded', 'yes', true);
+    END IF;
     RETURN NULL;
 END;
 $$;
@@ -146,8 +166,9 @@ BEGIN
     LOOP
         EXECUTE format('DROP TRIGGER IF EXISTS trg_%1$s_catalogue_freshness ON %1$s', t);
         EXECUTE format(
-            'CREATE TRIGGER trg_%1$s_catalogue_freshness
+            'CREATE CONSTRAINT TRIGGER trg_%1$s_catalogue_freshness
              AFTER INSERT OR UPDATE OR DELETE ON %1$s
+             DEFERRABLE INITIALLY DEFERRED
              FOR EACH ROW EXECUTE FUNCTION record_catalogue_change();', t);
     END LOOP;
 END$$;

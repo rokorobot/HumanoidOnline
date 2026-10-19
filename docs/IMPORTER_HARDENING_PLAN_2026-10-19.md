@@ -46,10 +46,22 @@ audit rows. Each audit row still carries `claim_id`, `robot_slug`, `target_table
 
 ## 2. Plan
 
-**Phase 0: measure (read-only, no schema change). Started: `db/audit_integrity.py`.** Add a `db/audit_integrity.py` report:
-dangling audit targets, the evidence subjects missing their row, and the variant-scoped rows not
-owned by the importer. Run it in CI against the seed and in the import preflight, as a report
-(not a gate) at first.
+**Phase 0: measure (read-only, no schema change). Implemented:**
+`apps/api/app/services/discovery/audit_integrity.py`, run as `python -m app.cli.audit_integrity`
+(READ ONLY transaction, rolled back). It lives beside the materializer because it reuses its
+verification and `_hash`; nothing is duplicated into `db/`. It reports:
+- every `catalogue_write_audit` row, classified by whether its `after_hash` is reproducible from
+  the rows in the database now (the claim's logical target yields at most one row, so a match is
+  unique and exact): CURRENT (same row, same hash), RELINKABLE (same hash, recreated row),
+  SUPERSEDED (a later audit of the claim holds the current hash), RETRACTED, UNRESOLVED
+  (anything else, with the reason); plus which targets dangle;
+- `evidence_source` rows whose subject row is missing;
+- variant-scoped `specification` rows the importer does not own (cascade-loss risk).
+
+It runs in CI on the seed as a non-gating step. Production copy, 2026-10-19 07:22 UTC: 45 audit
+rows, 20 CURRENT, **25 RELINKABLE (all 25 dangling targets reproduced exactly by one current
+row)**, 0 SUPERSEDED / RETRACTED / UNRESOLVED; 0 evidence orphans; 0 unowned variant specs.
+The hash function is therefore reproducible, which Phase 3 requires.
 
 **Phase 1: stable IDs via diff-based reconcile (importer code, no migration if natural keys
 exist).** Replace delete-all/insert-all with upsert-by-natural-key and delete-only-missing:

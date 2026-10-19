@@ -611,6 +611,138 @@ def _verify_retail(session: Session, c: AcceptedClaim, robot_id, robot_slug: str
     return (c, "availability_offer", r.id, _hash(payload))
 
 
+def _verify_claim(session: Session, c: AcceptedClaim, robot_id, robot_slug: str) -> tuple:
+    """(claim, target_table, current row id, after_hash) for one materializable claim, computed
+    from the rows in the database now. Read-only; raises DiscoveryError if the database does
+    not hold the claim as accepted."""
+    if c.target_kind == "robot_variant":
+        r = session.execute(text(
+            "SELECT id, slug, name FROM robot_variant WHERE robot_id = :r AND slug = :v"),
+            {"r": robot_id, "v": c.variant_slug}).one_or_none()
+        if r is None or r.name != c.accepted_value:
+            raise DiscoveryError(f"variant {c.variant_slug!r} is not in the database as "
+                                 "accepted; import the merged catalogue first")
+        payload = {"robot_slug": robot_slug, "table": "robot_variant", "slug": r.slug,
+                   "name": r.name}
+        return (c, "robot_variant", r.id, _hash(payload))
+    elif c.target_key == RETAIL_TARGET_KEY:
+        return _verify_retail(session, c, robot_id, robot_slug)
+    elif c.target_kind == "pricing_offer":
+        o = json.loads(c.accepted_value)
+        r = session.execute(text(
+            "SELECT p.id, p.price, p.currency, p.billing_period, p.price_type, "
+            "p.transaction_type, p.edition_confirmed, p.price_basis, p.provider_id, "
+            "p.region_id, p.is_current FROM pricing_offer p JOIN robot_variant v "
+            "ON v.id = p.variant_id WHERE p.robot_id = :r AND v.slug = :v "
+            "AND p.price_type = 'MANUFACTURER_ESTIMATE' AND p.transaction_type = 'PURCHASE'"),
+            {"r": robot_id, "v": c.variant_slug}).one_or_none()
+        ev = _offer_evidence(session, "PRICING_OFFER", r.id if r else None, c.source_url)
+        if (r is None or r.price != Decimal(o["price"]) or r.currency != o["currency"]
+                or r.billing_period != o["billing_period"] or r.edition_confirmed is not True
+                or r.provider_id is not None or r.region_id is not None
+                or not r.is_current or not ev
+                or not (r.price_basis or "").startswith(o["price_basis"])):
+            raise DiscoveryError(
+                f"pricing offer for variant {c.variant_slug!r} is not in the database as "
+                "accepted (or lacks its manufacturer evidence); import the merged "
+                "catalogue first")
+        payload = {"robot_slug": robot_slug, "table": "pricing_offer",
+                   "variant_slug": c.variant_slug, "price_type": r.price_type,
+                   "transaction_type": r.transaction_type, "price": str(r.price),
+                   "currency": r.currency, "billing_period": r.billing_period,
+                   "price_basis": r.price_basis, "evidence": ev}
+        return (c, "pricing_offer", r.id, _hash(payload))
+    elif c.target_kind == "availability_offer":
+        o = json.loads(c.accepted_value)
+        r = session.execute(text(
+            "SELECT a.id, a.availability_status, a.available_from, a.region_id, "
+            "a.provider_id, a.delivery_estimate_label, a.seller_wording, a.is_current, "
+            "a.transaction_type FROM availability_offer a JOIN robot_variant v "
+            "ON v.id = a.variant_id WHERE a.robot_id = :r AND v.slug = :v "
+            "AND a.transaction_type = 'PURCHASE'"),
+            {"r": robot_id, "v": c.variant_slug}).one_or_none()
+        ev = _offer_evidence(session, "AVAILABILITY_OFFER", r.id if r else None, c.source_url)
+        if (r is None or r.availability_status != o["availability_status"]
+                or r.available_from is not None or r.provider_id is not None
+                or r.region_id is not None or not r.is_current
+                or r.delivery_estimate_label != o["delivery_estimate_label"]
+                or r.seller_wording != o["seller_wording"] or not ev):
+            raise DiscoveryError(
+                f"availability offer for variant {c.variant_slug!r} is not in the database "
+                "as accepted (or lacks its manufacturer evidence); import the merged "
+                "catalogue first")
+        payload = {"robot_slug": robot_slug, "table": "availability_offer",
+                   "variant_slug": c.variant_slug, "transaction_type": r.transaction_type,
+                   "availability_status": r.availability_status,
+                   "available_from": None,
+                   "delivery_estimate_label": r.delivery_estimate_label,
+                   "seller_wording": r.seller_wording, "evidence": ev}
+        return (c, "availability_offer", r.id, _hash(payload))
+    elif c.target_kind == "commercial_status":
+        val = session.execute(text("SELECT commercial_status::text FROM robot WHERE id = :r"),
+                              {"r": robot_id}).scalar()
+        ev = session.execute(text(
+            "SELECT source_type::text AS st, excerpt FROM evidence_source WHERE "
+            "subject_type = 'COMMERCIAL_STATUS' AND subject_id = :r AND source_url = :u "
+            "AND excerpt = :e"),
+            {"r": robot_id, "u": c.source_url, "e": c.evidence_excerpt}).all()
+        if val != c.accepted_value or not ev:
+            raise DiscoveryError(
+                "robot.commercial_status is not in the database as accepted (or lacks its "
+                "evidence row); import the merged catalogue first")
+        return (c, "robot", robot_id, _hash({
+            "robot_slug": robot_slug, "table": "robot", "column": "commercial_status",
+            "value": val, "evidence": sorted([e.st, e.excerpt] for e in ev)}))
+    elif c.target_kind == "robot_spec":
+        col = c.target_key
+        if col not in ("degrees_of_freedom", "hand_dof"):          # only registered columns
+            raise DiscoveryError(f"{col!r} is not a registered robot column")
+        val = session.execute(text(f"SELECT {col} FROM robot WHERE id = :r"),
+                              {"r": robot_id}).scalar()
+        if val is None or int(val) != int(c.accepted_value):
+            raise DiscoveryError(
+                f"robot.{col} is not in the database as accepted; import the merged "
+                "catalogue first")
+        return (c, "robot", robot_id, _hash({
+            "robot_slug": robot_slug, "table": "robot", "column": col, "value": int(val)}))
+    else:
+        r = session.execute(text(
+            "SELECT s.id, s.value_text, s.value_number, s.value_bool, s.edition_scope, "
+            "s.source_url, s.source_label, s.source_kind, s.observed_at, d.key "
+            "FROM specification s JOIN spec_definition d ON d.id = s.definition_id "
+            "LEFT JOIN robot_variant v ON v.id = s.variant_id "
+            "WHERE s.robot_id = :r AND d.key = :k AND "
+            "((CAST(:v AS TEXT) IS NULL AND s.variant_id IS NULL) "
+            "OR v.slug = CAST(:v AS TEXT))"),
+            {"r": robot_id, "v": c.variant_slug, "k": c.target_key}).one_or_none()
+        if (r is None or r.value_text != c.accepted_value or r.value_number is not None
+                or r.value_bool is not None or r.edition_scope != c.edition_scope
+                or r.source_url != c.source_url
+                or (r.observed_at and r.observed_at.isoformat()
+                    != c.observed_at.date().isoformat())):
+            raise DiscoveryError(
+                f"specification {c.target_key!r} for variant {c.variant_slug!r} is not in "
+                "the database as accepted; import the merged catalogue first")
+        payload = {"robot_slug": robot_slug, "table": "specification",
+                   "variant_slug": c.variant_slug, "key": r.key, "value_text": r.value_text,
+                   "edition_scope": r.edition_scope, "source_url": r.source_url,
+                   "source_label": r.source_label, "source_kind": r.source_kind,
+                   "observed_at": r.observed_at.isoformat() if r.observed_at else None}
+        return (c, "specification", r.id, _hash(payload))
+
+
+def verified_rows(session: Session, robot_slug: str) -> list[tuple]:
+    """Read-only: `_verify_claim` for every materializable claim of a robot. Raises on the
+    first mismatch. `verify_applied` audits exactly these rows; the audit-integrity report
+    recomputes them to check existing audit rows."""
+    claims = _materializable(session, robot_slug)
+    robot_id = session.execute(text("SELECT id FROM robot WHERE slug = :s"),
+                               {"s": robot_slug}).scalar()
+    if robot_id is None:
+        raise DiscoveryError(f"robot {robot_slug!r} is not in the database")
+    return [_verify_claim(session, c, robot_id, robot_slug) for c in claims]
+
+
 def verify_applied(session: Session, robot_slug: str, *, change_ref: str, applied_by: str,
                    importer_run_ref: str | None = None) -> list[CatalogueWriteAudit]:
     """Compare the imported rows with the active claims and append one audit row per
@@ -620,127 +752,7 @@ def verify_applied(session: Session, robot_slug: str, *, change_ref: str, applie
     physical row observed at verification time (forensic only, not an identity)."""
     if not change_ref.strip() or not applied_by.strip():
         raise DiscoveryError("verification needs a change reference and a named human")
-    claims = _materializable(session, robot_slug)
-    robot_id = session.execute(text("SELECT id FROM robot WHERE slug = :s"),
-                               {"s": robot_slug}).scalar()
-    if robot_id is None:
-        raise DiscoveryError(f"robot {robot_slug!r} is not in the database")
-    rows = []
-    for c in claims:
-        if c.target_kind == "robot_variant":
-            r = session.execute(text(
-                "SELECT id, slug, name FROM robot_variant WHERE robot_id = :r AND slug = :v"),
-                {"r": robot_id, "v": c.variant_slug}).one_or_none()
-            if r is None or r.name != c.accepted_value:
-                raise DiscoveryError(f"variant {c.variant_slug!r} is not in the database as "
-                                     "accepted; import the merged catalogue first")
-            payload = {"robot_slug": robot_slug, "table": "robot_variant", "slug": r.slug,
-                       "name": r.name}
-            rows.append((c, "robot_variant", r.id, _hash(payload)))
-        elif c.target_key == RETAIL_TARGET_KEY:
-            rows.append(_verify_retail(session, c, robot_id, robot_slug))
-        elif c.target_kind == "pricing_offer":
-            o = json.loads(c.accepted_value)
-            r = session.execute(text(
-                "SELECT p.id, p.price, p.currency, p.billing_period, p.price_type, "
-                "p.transaction_type, p.edition_confirmed, p.price_basis, p.provider_id, "
-                "p.region_id, p.is_current FROM pricing_offer p JOIN robot_variant v "
-                "ON v.id = p.variant_id WHERE p.robot_id = :r AND v.slug = :v "
-                "AND p.price_type = 'MANUFACTURER_ESTIMATE' AND p.transaction_type = 'PURCHASE'"),
-                {"r": robot_id, "v": c.variant_slug}).one_or_none()
-            ev = _offer_evidence(session, "PRICING_OFFER", r.id if r else None, c.source_url)
-            if (r is None or r.price != Decimal(o["price"]) or r.currency != o["currency"]
-                    or r.billing_period != o["billing_period"] or r.edition_confirmed is not True
-                    or r.provider_id is not None or r.region_id is not None
-                    or not r.is_current or not ev
-                    or not (r.price_basis or "").startswith(o["price_basis"])):
-                raise DiscoveryError(
-                    f"pricing offer for variant {c.variant_slug!r} is not in the database as "
-                    "accepted (or lacks its manufacturer evidence); import the merged "
-                    "catalogue first")
-            payload = {"robot_slug": robot_slug, "table": "pricing_offer",
-                       "variant_slug": c.variant_slug, "price_type": r.price_type,
-                       "transaction_type": r.transaction_type, "price": str(r.price),
-                       "currency": r.currency, "billing_period": r.billing_period,
-                       "price_basis": r.price_basis, "evidence": ev}
-            rows.append((c, "pricing_offer", r.id, _hash(payload)))
-        elif c.target_kind == "availability_offer":
-            o = json.loads(c.accepted_value)
-            r = session.execute(text(
-                "SELECT a.id, a.availability_status, a.available_from, a.region_id, "
-                "a.provider_id, a.delivery_estimate_label, a.seller_wording, a.is_current, "
-                "a.transaction_type FROM availability_offer a JOIN robot_variant v "
-                "ON v.id = a.variant_id WHERE a.robot_id = :r AND v.slug = :v "
-                "AND a.transaction_type = 'PURCHASE'"),
-                {"r": robot_id, "v": c.variant_slug}).one_or_none()
-            ev = _offer_evidence(session, "AVAILABILITY_OFFER", r.id if r else None, c.source_url)
-            if (r is None or r.availability_status != o["availability_status"]
-                    or r.available_from is not None or r.provider_id is not None
-                    or r.region_id is not None or not r.is_current
-                    or r.delivery_estimate_label != o["delivery_estimate_label"]
-                    or r.seller_wording != o["seller_wording"] or not ev):
-                raise DiscoveryError(
-                    f"availability offer for variant {c.variant_slug!r} is not in the database "
-                    "as accepted (or lacks its manufacturer evidence); import the merged "
-                    "catalogue first")
-            payload = {"robot_slug": robot_slug, "table": "availability_offer",
-                       "variant_slug": c.variant_slug, "transaction_type": r.transaction_type,
-                       "availability_status": r.availability_status,
-                       "available_from": None,
-                       "delivery_estimate_label": r.delivery_estimate_label,
-                       "seller_wording": r.seller_wording, "evidence": ev}
-            rows.append((c, "availability_offer", r.id, _hash(payload)))
-        elif c.target_kind == "commercial_status":
-            val = session.execute(text("SELECT commercial_status::text FROM robot WHERE id = :r"),
-                                  {"r": robot_id}).scalar()
-            ev = session.execute(text(
-                "SELECT source_type::text AS st, excerpt FROM evidence_source WHERE "
-                "subject_type = 'COMMERCIAL_STATUS' AND subject_id = :r AND source_url = :u "
-                "AND excerpt = :e"),
-                {"r": robot_id, "u": c.source_url, "e": c.evidence_excerpt}).all()
-            if val != c.accepted_value or not ev:
-                raise DiscoveryError(
-                    "robot.commercial_status is not in the database as accepted (or lacks its "
-                    "evidence row); import the merged catalogue first")
-            rows.append((c, "robot", robot_id, _hash({
-                "robot_slug": robot_slug, "table": "robot", "column": "commercial_status",
-                "value": val, "evidence": sorted([e.st, e.excerpt] for e in ev)})))
-        elif c.target_kind == "robot_spec":
-            col = c.target_key
-            if col not in ("degrees_of_freedom", "hand_dof"):          # only registered columns
-                raise DiscoveryError(f"{col!r} is not a registered robot column")
-            val = session.execute(text(f"SELECT {col} FROM robot WHERE id = :r"),
-                                  {"r": robot_id}).scalar()
-            if val is None or int(val) != int(c.accepted_value):
-                raise DiscoveryError(
-                    f"robot.{col} is not in the database as accepted; import the merged "
-                    "catalogue first")
-            rows.append((c, "robot", robot_id, _hash({
-                "robot_slug": robot_slug, "table": "robot", "column": col, "value": int(val)})))
-        else:
-            r = session.execute(text(
-                "SELECT s.id, s.value_text, s.value_number, s.value_bool, s.edition_scope, "
-                "s.source_url, s.source_label, s.source_kind, s.observed_at, d.key "
-                "FROM specification s JOIN spec_definition d ON d.id = s.definition_id "
-                "LEFT JOIN robot_variant v ON v.id = s.variant_id "
-                "WHERE s.robot_id = :r AND d.key = :k AND "
-                "((CAST(:v AS TEXT) IS NULL AND s.variant_id IS NULL) "
-                "OR v.slug = CAST(:v AS TEXT))"),
-                {"r": robot_id, "v": c.variant_slug, "k": c.target_key}).one_or_none()
-            if (r is None or r.value_text != c.accepted_value or r.value_number is not None
-                    or r.value_bool is not None or r.edition_scope != c.edition_scope
-                    or r.source_url != c.source_url
-                    or (r.observed_at and r.observed_at.isoformat()
-                        != c.observed_at.date().isoformat())):
-                raise DiscoveryError(
-                    f"specification {c.target_key!r} for variant {c.variant_slug!r} is not in "
-                    "the database as accepted; import the merged catalogue first")
-            payload = {"robot_slug": robot_slug, "table": "specification",
-                       "variant_slug": c.variant_slug, "key": r.key, "value_text": r.value_text,
-                       "edition_scope": r.edition_scope, "source_url": r.source_url,
-                       "source_label": r.source_label, "source_kind": r.source_kind,
-                       "observed_at": r.observed_at.isoformat() if r.observed_at else None}
-            rows.append((c, "specification", r.id, _hash(payload)))
+    rows = verified_rows(session, robot_slug)
     written = []
     for c, table, row_id, after in rows:
         # The materialization identity is (claim, logical target, content hash, change_ref).

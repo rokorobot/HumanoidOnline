@@ -171,8 +171,9 @@ class World:
         with psycopg.connect(self.admin, autocommit=True) as conn:
             rows = conn.execute("SELECT datname FROM pg_database WHERE datname LIKE 'promo%' "
                                 "OR datname LIKE 'rehearse%'").fetchall()
-        return sorted(r[0] for r in rows if r[0] != self.name and not r[0].startswith(
-            "promo_tpl_") and not r[0].startswith("promo_w_"))
+        # Only this test's synthetic promotions: other branch databases on the same server
+        # (e.g. a retained local pilot safety point) are not ours to count.
+        return sorted(r[0] for r in rows if r[0] != self.name and "synthetic" in r[0])
 
     # -- proposals ---------------------------------------------------------------------
     def item(self, **over) -> dict:

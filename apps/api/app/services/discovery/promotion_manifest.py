@@ -479,6 +479,17 @@ def record_decision(catalogue_dir: Path, manifest: dict, decision: str, reason: 
 # --------------------------------------------------------------------------------------- #
 # propose
 # --------------------------------------------------------------------------------------- #
+def _compare_peer(session, robot_slug: str, definition: str) -> str | None:
+    """A published robot to compare against (a one-robot compare renders no comparison).
+    Prefers one that has the same field, so the row appears; deterministic (first by slug)."""
+    row = session.execute(text(
+        "SELECT r.slug FROM robot r WHERE r.is_published AND r.slug <> :s ORDER BY "
+        "EXISTS (SELECT 1 FROM specification x JOIN spec_definition d ON d.id = x.definition_id "
+        "WHERE x.robot_id = r.id AND d.key = :k) DESC, r.slug LIMIT 1"),
+        {"s": robot_slug, "k": definition}).first()
+    return row[0] if row else None
+
+
 def propose(session, robot_slug: str, items: list[dict], *, catalogue_dir: Path,
             base_commit: str, promotion_id: str, today: date,
             edition_map: dict | None = None, reconsider: bool = False,
@@ -581,6 +592,7 @@ def propose(session, robot_slug: str, items: list[dict], *, catalogue_dir: Path,
             "expected_change": expected,
             "display": raw.get("display")
             or f"Robot detail spec table: '{label}: {value}', with source",
+            "compare_peer": _compare_peer(session, robot_slug, key),
         })
 
     if unknown:

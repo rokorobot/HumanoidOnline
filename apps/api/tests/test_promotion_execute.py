@@ -420,3 +420,28 @@ def test_ci_gates_pull_requests_on_promotion_manifest_verification():
     assert "continue-on-error" not in step                               # gating
     assert "app.cli.promotion verify" in step["run"] and "merge-base" in step["run"]
     assert names.index("Verify catalogue promotion manifests") < names.index("Test")
+
+
+def test_compare_is_checked_against_a_peer_never_as_a_one_robot_compare(world):  # noqa: F811
+    """Pilot finding 2026-10-19: `/compare?ids=<one robot>` renders no comparison, so the
+    value can never appear there. The check compares with the manifest's published peer, and
+    without a peer it is recorded as SKIPPED, not silently passed."""
+    import copy
+
+    seen = []
+
+    class Web:
+        def get(self, url):
+            seen.append(url)
+            return 200, f"<p>{VALUE}</p>"
+
+    manifest = copy.deepcopy(world.manifest)
+    manifest["items"][0]["compare_peer"] = "peer-robot"
+    results = px.check_public(manifest, Web(), "http://a", "http://w")
+    compare = [r for r in results if r["surface"] == "compare"][0]
+    assert compare["url"].endswith(f"/compare?ids={ROBOT},peer-robot") and compare["ok"]
+    assert not any(u.endswith(f"/compare?ids={ROBOT}") for u in seen)
+    manifest["items"][0]["compare_peer"] = None
+    compare = [r for r in px.check_public(manifest, Web(), "http://a", "http://w")
+               if r["surface"] == "compare"][0]
+    assert compare["skipped"] and compare["url"] is None and "SKIPPED" in compare["note"]

@@ -249,7 +249,10 @@ def check_public(manifest: dict, web: Web, api_base: str, web_base: str) -> list
         shown = str(want)
         api_url = f"{api_base.rstrip('/')}/api/robots/{urllib.parse.quote(slug)}"
         page_url = f"{web_base.rstrip('/')}/robots/{urllib.parse.quote(slug)}"
-        compare_url = f"{web_base.rstrip('/')}/compare?ids={urllib.parse.quote(slug)}"
+        # A one-robot compare renders no comparison: compare against the manifest's peer.
+        peer = item.get("compare_peer")
+        compare_url = (f"{web_base.rstrip('/')}/compare?ids={urllib.parse.quote(slug)},"
+                       f"{urllib.parse.quote(peer)}" if peer else None)
         ok, note = False, ""
         try:
             status, body = web.get(api_url)
@@ -267,6 +270,11 @@ def check_public(manifest: dict, web: Web, api_base: str, web_base: str) -> list
         results.append({"claim_id": item["claim_id"], "surface": "api", "url": api_url,
                         "ok": ok, "note": note})
         for surface, url in (("page", page_url), ("compare", compare_url)):
+            if url is None:   # no published peer: recorded, never silently passed
+                results.append({"claim_id": item["claim_id"], "surface": surface, "url": None,
+                                "ok": True, "skipped": True,
+                                "note": "SKIPPED: no published peer robot to compare with"})
+                continue
             ok, note, label_seen = False, "", None
             try:
                 status, body = web.get(url)
@@ -578,6 +586,10 @@ class LocalBranches:
     def create(self, name: str) -> str:
         db = self._db(name)
         with psycopg.connect(self.admin_url, autocommit=True) as conn:
+            # A template copy needs the source to have no other sessions. Local only: a locally
+            # running API's idle pool connections to the source are ended (it reconnects).
+            conn.execute("SELECT pg_terminate_backend(pid) FROM pg_stat_activity "
+                         "WHERE datname = %s AND pid <> pg_backend_pid()", (self.source_db,))
             conn.execute(f'CREATE DATABASE "{db}" TEMPLATE "{self.source_db}"')
         return self._url(db)
 

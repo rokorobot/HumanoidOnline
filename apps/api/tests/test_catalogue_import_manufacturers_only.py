@@ -73,6 +73,8 @@ class _Cursor:
         return self
 
     def fetchone(self):
+        if "IS NOT NULL)" in self._last:
+            return None         # the blanking guard: no stored value exists
         if self._last.startswith("SELECT count(*)"):
             return (0,)
         return (1, True)        # an upsert's RETURNING id, (xmax = 0)
@@ -227,6 +229,8 @@ def test_full_import_manufacturer_step_uses_the_same_owned_row_refresh() -> None
             return self
 
         def fetchone(self):
+            if "IS NOT NULL)" in self.sql[-1]:
+                return None
             return (1, True)
 
         def fetchall(self):

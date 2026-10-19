@@ -135,6 +135,9 @@ class _RecordingCursor:
         return self
 
     def fetchone(self):
+        # The blanking guard asks whether a stored value exists: there is none.
+        if "IS NOT NULL)" in self.statements[-1]:
+            return None
         return self._rows.pop(0) if self._rows else (1, "EUR")
 
     def fetchall(self):

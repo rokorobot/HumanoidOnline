@@ -53,11 +53,14 @@ class _RecordingCursor:
         return self
 
     def fetchone(self):
+        # The blanking guard asks whether a stored value exists: there is none.
+        if "IS NOT NULL)" in self._last:
+            return None
         return self._rows.pop(0) if self._rows else (1, "EUR")
 
     def fetchall(self):
         for table, rows in self._existing.items():
-            if f"FROM {table} t" in self._last:
+            if f"FROM {table} t" in self._last or f"FROM {table} WHERE" in self._last:
                 return list(rows)
         return []
 
@@ -65,12 +68,13 @@ class _RecordingCursor:
         return [s for s in self.statements if s.startswith(prefix)]
 
 
-def _import(cur, robot, authorize=None):
+def _import(cur, robot, authorize=None, recon=None):
     return ic.import_robot(
         cur, robot,
         region_id=lambda code: 1, manufacturer_id=lambda slug: 1,
         capability_id=lambda slug: 1, use_case_id=lambda slug: 1,
         spec_definition=lambda key: (7, "TEXT"), collisions=[], authorize=authorize,
+        recon=recon,
     )
 
 
@@ -78,22 +82,24 @@ ROBOT = {"slug": "test-robot", "manufacturer_slug": "test-maker", "name": "Test 
          "commercial_status": "ANNOUNCED", "is_published": False, "specs": {}}
 
 #: The shape of an existing row as the reconciliation reads it: id, natural key, peeks.
-FOREIGN_SPEC = ("spec-1", None, "swappable_battery", "seed/hand-authored", False, False, False)
-OWN_SPEC = ("spec-2", None, "retired_key", ic.MANAGED_BY, False, False, False)
+FOREIGN_SPEC = ("spec-1", None, "swappable_battery", "seed/hand-authored")
+OWN_SPEC = ("spec-2", None, "retired_key", ic.MANAGED_BY)
 
 
 # --- specification reconciliation is scoped to the importer's own rows -------
 
-def test_only_importer_managed_specifications_can_ever_be_removed():
-    """A routine refresh must never reach seed and hand-authored specifications: a row
-    that is not ours is not even a candidate for removal, while one of ours that left
-    the JSON is refused (never silently deleted) and named exactly."""
+def test_an_omitted_managed_specification_is_preserved_and_a_foreign_one_is_ignored():
+    """D1: a row that is not in the JSON is left untouched and reported, never deleted. A
+    row that is not ours is not even reported: it is outside the importer's scope."""
     cur = _RecordingCursor(existing={"specification": [FOREIGN_SPEC, OWN_SPEC]})
-    with pytest.raises(ic.ReconcileRefused) as refused:
-        _import(cur, ROBOT)
-    message = str(refused.value)
-    assert "retired_key" in message and "swappable_battery" not in message
-    assert not [s for s in cur.statements if s.startswith("DELETE")], cur.statements
+    recon = ic.Reconciliation()
+    _import(cur, ROBOT, recon=recon)
+    recon.finish()
+    assert recon.preserved == [("specification", "test-robot",
+                                {"variant_slug": None, "key": "retired_key"})]
+    assert recon.counts["specification"]["preserved"] == 1
+    assert "swappable_battery" not in recon.summary()
+    assert not [s for s in cur.statements if s.startswith(("DELETE", "UPDATE specification"))]
 
 
 def test_authorized_removal_deletes_only_the_named_managed_specification():
@@ -111,21 +117,21 @@ _OFFER_KEY = {"variant_slug": None, "provider_slug": "shop", "region_code": "DE"
 TABLE_ROWS = {
     "pricing_offer": (("offer-1", None, "shop", "DE", "PURCHASE", "NEW"), _OFFER_KEY),
     "availability_offer": (("offer-1", None, "shop", "DE", "PURCHASE", "NEW"), _OFFER_KEY),
-    "deployment": (("dep-1", "Acme", "DE", "2026-01-01"),
-                   {"customer_name": "Acme", "region_code": "DE", "started_on": "2026-01-01"}),
 }
 
 
 @pytest.mark.parametrize("table", sorted(TABLE_ROWS))
 def test_wholly_owned_child_tables_are_removed_only_when_authorized(table):
-    """The importer owns these tables outright, so a row that left the JSON is neither
-    silently kept (rows would accumulate) nor silently deleted: it is refused, and removed
-    without any managed_by filter once the operator names it."""
+    """The importer owns these tables outright, but a row that left the JSON is neither
+    deleted nor refused: it is preserved and reported. It is removed, without any managed_by
+    filter, once the operator names it."""
     row, key = TABLE_ROWS[table]
-    refused = _RecordingCursor(existing={table: [row]})
-    with pytest.raises(ic.ReconcileRefused):
-        _import(refused, ROBOT)
-    assert not [s for s in refused.statements if s.startswith("DELETE")]
+    kept = _RecordingCursor(existing={table: [row]})
+    recon = ic.Reconciliation()
+    _import(kept, ROBOT, recon=recon)
+    recon.finish()
+    assert recon.counts[table]["preserved"] == 1
+    assert not [s for s in kept.statements if s.startswith("DELETE")]
 
     cur = _RecordingCursor(existing={table: [row]})
     _import(cur, ROBOT, authorize={"version": 1, "entries": [{
@@ -133,6 +139,16 @@ def test_wholly_owned_child_tables_are_removed_only_when_authorized(table):
     deletes = cur.matching(f"DELETE FROM {table}")
     assert deletes, f"{table} is importer-owned and an authorized removal must delete the row"
     assert "managed_by" not in deletes[0]
+
+
+def test_a_stored_deployment_that_left_the_json_is_refused_by_decision_d2():
+    """Deployments have no inferred identity: an omitted one cannot be matched, preserved as
+    'the same row' or removed, so the import stops until an explicit deployment_key exists."""
+    cur = _RecordingCursor(existing={"deployment": [("dep-1",)]})
+    with pytest.raises(ic.ReconcileRefused, match="Owner decision D2"):
+        _import(cur, ROBOT)
+    assert not [s for s in cur.statements
+                if s.startswith(("DELETE", "UPDATE", "INSERT INTO deployment"))]
 
 
 def test_the_managed_marker_is_a_named_constant():

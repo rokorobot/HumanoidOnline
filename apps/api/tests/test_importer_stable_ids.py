@@ -9,9 +9,12 @@ change, and never delete or blank anything unless the operator authorized exactl
   `updated_at` and issues no write (the whole row state, not just ids, is compared);
 * one edit changes one row: the edited row keeps its id, everything else is byte-identical;
 * additions are inserted exactly once;
-* fail closed: ambiguity (duplicate keys in the JSON or in the database) aborts, a row that
-  left the JSON is only removed under an explicit `--authorize` entry, evidence is immutable
-  unless authorized, protected provenance is never blanked silently;
+* non-destructive (owner decision D1): a row that is not in the JSON is preserved and reported,
+  removed only under an explicit `--authorize` entry; no stored value is ever turned into NULL
+  without a `clear` entry;
+* fail closed: ambiguity (duplicate keys in the JSON or in the database) aborts, evidence is
+  immutable unless authorized, deployments have no inferred identity (D2), a changed excerpt is
+  a new evidence version (D3);
 * `is_published` stays editorial.
 
 Real catalogue files on a scratch database.
@@ -394,21 +397,23 @@ def test_two_database_rows_on_one_key_abort_and_nothing_is_picked(world):
     assert _state(url) == before
 
 
-def test_a_removed_offer_aborts_with_a_pasteable_diagnostic_unless_authorized(world, tmp_path):
+def test_an_omitted_offer_is_preserved_and_reported_and_removed_only_when_authorized(
+        world, tmp_path, capsys):
     url, cat = world
     before = _state(url)
     _edit(cat, "unitree-h2-edu", lambda d: d["pricing_offers"].pop(0))
-    with pytest.raises(ic.ReconcileRefused) as refused:
-        ic.run(url, only=ROBOTS)
-    assert "no longer in the JSON" in str(refused.value)
-    document = _authorization_in(refused.value)
-    assert document["entries"] == [{
+    recon = ic.run(url, only=ROBOTS)                  # D1: nothing is deleted or refused
+    assert recon.counts["pricing_offer"]["preserved"] == 1
+    assert recon.counts["evidence_source"]["preserved"] == 0
+    out = capsys.readouterr().out
+    assert "PRESERVED (not in JSON, left untouched)" in out
+    assert "pricing_offer of unitree-h2-edu" in out and "reichelt" in out
+    assert _state(url) == before                      # not one row or byte changed
+
+    path = _authorize_file(tmp_path, [{
         "action": "remove", "table": "pricing_offer", "robot": "unitree-h2-edu",
         "key": {"variant_slug": None, "provider_slug": "reichelt", "region_code": "DE",
-                "transaction_type": "PURCHASE", "condition": "NEW"}}]
-    assert _state(url) == before               # the refused run rolled back completely
-
-    path = _authorize_file(tmp_path, document["entries"])     # paste it, as an operator would
+                "transaction_type": "PURCHASE", "condition": "NEW"}}])
     recon = ic.run(url, only=ROBOTS, authorize=path)
     assert recon.counts["pricing_offer"]["removed"] == 1
     assert recon.counts["evidence_source"]["removed"] == 2    # the offer's own evidence goes
@@ -425,8 +430,8 @@ def test_the_cli_takes_an_authorize_file(world, tmp_path, capsys):
     url, cat = world
     _edit(cat, "unitree-h2-edu", lambda d: d["pricing_offers"].pop(0))
     argv = ["--database-url", url, "--only", ",".join(sorted(ROBOTS))]
-    with pytest.raises(ic.ReconcileRefused):
-        ic.main(argv)
+    ic.main(argv)                                     # preserved, reported, nothing removed
+    assert "PRESERVED (not in JSON, left untouched)" in capsys.readouterr().out
     entry = {"action": "remove", "table": "pricing_offer", "robot": "unitree-h2-edu",
              "key": {"variant_slug": None, "provider_slug": "reichelt", "region_code": "DE",
                      "transaction_type": "PURCHASE", "condition": "NEW"}}
@@ -458,27 +463,30 @@ def test_removing_a_variant_with_a_dependent_that_is_not_removed_aborts(world, t
             " 'hand written' FROM robot_variant v JOIN robot r ON r.id = v.robot_id "
             "WHERE r.slug='agility-digit' AND v.slug='digit-v5'")
         conn.commit()
-    _edit(cat, "agility-digit", lambda d: d.update(variants=[], availability_offers=[]))
-    with pytest.raises(ic.ReconcileRefused) as refused:
-        ic.run(url, only=ROBOTS)
-    entries = _authorization_in(refused.value)["entries"]
-    assert {e["table"] for e in entries} == {"robot_variant", "availability_offer"}
+    _edit(cat, "agility-digit", lambda d: d.update(variants=[]))
+    entry = {"action": "remove", "table": "robot_variant", "robot": "agility-digit",
+             "key": {"slug": "digit-v5"}}
     with pytest.raises(ic.ReconcileRefused, match="still depends on it"):
-        ic.run(url, only=ROBOTS, authorize=_authorize_file(tmp_path, entries))
+        ic.run(url, only=ROBOTS, authorize=_authorize_file(tmp_path, [entry]))
     unchanged = {t: v for t, v in _state(url).items() if t != "specification"}
     assert unchanged == {t: v for t, v in before.items() if t != "specification"}
 
 
 def test_an_authorized_variant_removal_removes_its_dependents_too(world, tmp_path):
     url, cat = world
+    doc = json.loads((cat / "robots" / "unitree-h2-edu.json").read_text(encoding="utf-8"))
+    on_u2 = [x for x in doc["extended_specs"] if x.get("variant_slug") == "u2"]
+    offer_key = {"variant_slug": "u2", "provider_slug": "alza-cz", "region_code": "CZ",
+                 "transaction_type": "PURCHASE", "condition": "NEW"}
+    entries = [{"action": "remove", "table": t, "robot": "unitree-h2-edu", "key": k}
+               for t, k in [("robot_variant", {"slug": "u2"}),
+                            ("pricing_offer", offer_key), ("availability_offer", offer_key)]
+               + [("specification", {"variant_slug": "u2", "key": x["key"]}) for x in on_u2]]
     _edit(cat, "unitree-h2-edu",
           lambda d: d.update(variants=[], availability_offers=d["availability_offers"][:1],
                              pricing_offers=d["pricing_offers"][:2],
                              extended_specs=[x for x in d["extended_specs"]
                                              if x.get("variant_slug") is None]))
-    with pytest.raises(ic.ReconcileRefused) as refused:
-        ic.run(url, only=ROBOTS)
-    entries = _authorization_in(refused.value)["entries"]
     recon = ic.run(url, only=ROBOTS, authorize=_authorize_file(tmp_path, entries))
     assert recon.counts["robot_variant"]["removed"] == 1
     assert _scalar(url, "SELECT count(*) FROM robot_variant v JOIN robot r ON r.id = v.robot_id "
@@ -524,12 +532,12 @@ PROTECTED = [
 
 @pytest.mark.parametrize(("slug", "table", "column", "change"), PROTECTED,
                          ids=[f"{t}.{c}" for _, t, c, _ in PROTECTED])
-def test_blanking_protected_provenance_needs_a_clear_entry(
+def test_blanking_provenance_needs_a_clear_entry(
         world, tmp_path, slug, table, column, change):
     url, cat = world
     before = _state(url)
     _edit(cat, slug, change)
-    with pytest.raises(ic.ReconcileRefused, match=f"protected column {column}") as refused:
+    with pytest.raises(ic.ReconcileRefused, match=f"erase the stored value of {column}") as refused:
         ic.run(url, only=ROBOTS)
     entries = _authorization_in(refused.value)["entries"]
     assert len(entries) == 1 and entries[0]["action"] == "clear"
@@ -541,3 +549,112 @@ def test_blanking_protected_provenance_needs_a_clear_entry(
     ((_, key),) = _changed(before, after)
     assert before[table][key][0] == after[table][key][0]
     assert json.loads(after[table][key][1])[column] is None
+
+
+# --------------------------------------------- D1: no value is erased implicitly (any column) --
+
+BLANKING = [
+    ("robot", "summary", lambda d: d.pop("summary"),
+     {"table": "robot", "robot": "unitree-h2-edu", "key": {}}),
+    ("pricing_offer", "price_basis", lambda d: d["pricing_offers"][0].pop("price_basis"),
+     {"table": "pricing_offer", "robot": "unitree-h2-edu",
+      "key": {"variant_slug": None, "provider_slug": "reichelt", "region_code": "DE",
+              "transaction_type": "PURCHASE", "condition": "NEW"}}),
+    ("specification", "source_label",
+     lambda d: d["extended_specs"][0].pop("source_label"),
+     {"table": "specification", "robot": "unitree-h2-edu",
+      "key": {"variant_slug": None, "key": "standing_dimensions_mm"}}),
+]
+
+
+@pytest.mark.parametrize(("change", "entry"), [b[2:] for b in BLANKING],
+                         ids=[b[0] for b in BLANKING])
+def test_an_absent_field_over_a_stored_value_needs_a_clear_entry(world, tmp_path, change,
+                                                                 entry):
+    url, cat = world
+    before = _state(url)
+    _edit(cat, "unitree-h2-edu", change)
+    with pytest.raises(ic.ReconcileRefused, match="erase the stored value") as refused:
+        ic.run(url, only=ROBOTS)
+    (needed,) = _authorization_in(refused.value)["entries"]
+    assert needed["action"] == "clear" and needed["table"] == entry["table"]
+    assert needed["robot"] == "unitree-h2-edu" and needed["key"] == entry["key"]
+    assert _state(url) == before                       # refused: nothing changed
+
+    ic.run(url, only=ROBOTS, authorize=_authorize_file(tmp_path, [needed]))
+    after = _state(url)
+    assert _changed(before, after)                     # the cleared value, same row id
+    for table in before:
+        assert {k: v[0] for k, v in before[table].items()} == \
+            {k: v[0] for k, v in after[table].items()}
+
+
+def test_an_explicit_null_is_the_same_as_an_absent_field(world):
+    url, cat = world
+    _edit(cat, "unitree-h2-edu", lambda d: d.update(summary=None))
+    with pytest.raises(ic.ReconcileRefused, match="erase the stored value of summary"):
+        ic.run(url, only=ROBOTS)
+
+
+def test_a_changed_non_null_value_is_a_normal_update(world):
+    url, cat = world
+    _edit(cat, "unitree-h2-edu", lambda d: d.update(summary="A reworded summary."))
+    recon = ic.run(url, only=ROBOTS)
+    assert recon.counts["robot"]["updated"] == 1
+
+
+# ---------------------------------------------------------------- D2: deployments frozen --
+
+def _digit_deployments(url):
+    return _exec(url, "SELECT id, status FROM deployment d JOIN robot r ON r.id = d.robot_id "
+                      "WHERE r.slug = 'agility-digit'").fetchall()
+
+
+def test_unchanged_deployments_are_not_written_and_keep_their_ids(world):
+    url, _ = world
+    before = _state(url)["deployment"]
+    assert before
+    recon = ic.run(url, only=ROBOTS)
+    assert recon.counts["deployment"]["unchanged"] == len(before)
+    assert recon.counts["deployment"]["inserted"] == 0
+    assert _state(url)["deployment"] == before
+
+
+@pytest.mark.parametrize("change", [
+    lambda d: d["deployments"][0].update(status="an edited status"),
+    lambda d: d["deployments"].append(dict(d["deployments"][0], customer_name="Another")),
+    lambda d: d.update(deployments=[]),
+], ids=["edited", "added", "removed"])
+def test_any_other_deployment_situation_is_refused_by_decision_d2(world, change):
+    url, cat = world
+    before = _state(url)
+    _edit(cat, "agility-digit", change)
+    with pytest.raises(ic.ReconcileRefused, match="Owner decision D2"):
+        ic.run(url, only=ROBOTS)
+    assert _state(url) == before
+
+
+def test_a_remove_authorization_for_a_deployment_is_refused_for_now(world, tmp_path):
+    url, _ = world
+    entry = {"action": "remove", "table": "deployment", "robot": "agility-digit", "key": {}}
+    with pytest.raises(ic.ReconcileRefused, match="not supported"):
+        ic.run(url, only=ROBOTS, authorize=_authorize_file(tmp_path, [entry]))
+
+
+# ------------------------------------------------------------ D3: evidence is versioned --
+
+def test_a_changed_excerpt_is_a_new_evidence_row_and_the_old_one_is_preserved(world, capsys):
+    url, cat = world
+    before = _state(url)["evidence_source"]
+
+    def reword(doc):
+        doc["availability_offers"][0]["evidence"][0]["excerpt"] = "A materially new excerpt."
+
+    _edit(cat, "unitree-h2-edu", reword)
+    recon = ic.run(url, only=ROBOTS)
+    after = _state(url)["evidence_source"]
+    assert recon.counts["evidence_source"]["inserted"] == 1
+    assert recon.counts["evidence_source"]["preserved"] == 1
+    assert before.items() <= after.items()             # the old row: same id, same content
+    assert len(after) == len(before) + 1
+    assert "PRESERVED (not in JSON, left untouched)" in capsys.readouterr().out

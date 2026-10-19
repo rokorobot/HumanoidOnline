@@ -10,7 +10,7 @@ idempotently loads it into the `humanoid` schema created by db/schema.sql
 (via db/bootstrap.py). Safe to run repeatedly — re-running produces no
 duplicate rows, no new row ids and no writes.
 
-IDEMPOTENCY MODEL (stable-ID reconciliation)
+IDEMPOTENCY MODEL (stable-ID, non-destructive reconciliation)
   - regions, manufacturers, providers, capabilities, use_cases, spec_definitions
     and robots are UPSERTed by their natural key (code / slug). The upsert only
     writes when a column actually differs, so an unchanged row is not rewritten
@@ -21,33 +21,42 @@ IDEMPOTENCY MODEL (stable-ID reconciliation)
         specification       (robot, variant, spec key)            importer-owned rows
         pricing_offer       (robot, variant, provider, region, transaction_type, condition)
         availability_offer  (same key as pricing_offer)
-        deployment          (robot, customer_name, region, started_on)
         robot_image         (robot, image_url)
         robot_capability    (robot, capability)
         use_case_fit        (robot, use case)
         evidence_source     (subject, source_url, source_type, excerpt, observed date)
     Matching is NULL-safe. `is_current`, `price_type` and prices are NOT key
     columns, so a corrected price or a retired offer is an UPDATE in place.
+    DEPLOYMENTS have no inferred identity (owner decision D2): an unchanged set
+    is left alone with its ids; any new, edited or missing deployment is refused
+    until an explicit `deployment_key` exists (a schema change not yet approved).
   - Per row: key found and every other column equal -> no statement at all; key
     found and different -> UPDATE that row (same id); key not found -> INSERT.
+  - OMITTED RECORDS ARE LEFT UNTOUCHED (owner decision D1). A database row in
+    scope whose key is absent from the JSON is preserved, counted in the summary
+    `preserved` column and listed under "PRESERVED (not in JSON, left untouched)".
+    It is removed only by an explicit `remove` authorization.
+  - NO VALUE IS ERASED IMPLICITLY. For every updatable non-key column of every
+    reconciled table, the robot row and the shared-entity upserts, a change from
+    a stored value to NULL (absent or explicit null in the JSON) is refused unless
+    a `clear` authorization names the table, robot/slug, key and column. A change
+    to a different non-NULL value is a normal in-place update.
   - Evidence rows are immutable to the importer: a matched row whose other
     columns differ is refused unless an `update_evidence` authorization names it.
+    A materially changed excerpt is a new key, hence a new evidence row (owner
+    decision D3); the old row is preserved under the rule above.
   - FAIL CLOSED. A duplicate natural key in the JSON aborts before anything is
     written. Two database rows on one key abort (the importer never picks one).
-    A database row in scope for a selected robot whose key is no longer in the
-    JSON is NOT deleted: the run aborts and prints the exact authorization
-    entries (table, robot, key) that would permit it. Likewise a protected
-    provenance column (image approvals/verification/capture/source/attribution,
-    specification source/label/observed date) that the JSON would blank is
-    refused unless a `clear` entry names it.
   - Authorization is explicit: `--authorize PATH` takes a JSON file
         {"version": 1, "entries": [{"action": "remove" | "update_evidence" | "clear",
          "table": ..., "robot": <robot slug, or manufacturer slug for company
-         evidence>, "key": {...natural key...}, "column": <clear only>}]}
+         evidence; the slug/code for entity-level tables, with key {}>,
+         "key": {...natural key...}, "column": <clear only>}]}
     Nothing is authorized by default, and an entry that matches nothing aborts
     the run (it signals drift). Authorized removals run last, after every
     insert/update; removing a variant that still has a dependent specification,
     pricing_offer or availability_offer not itself being removed is refused.
+    A `remove` for a deployment is refused (D2).
   - Robots are never deleted. Offer retirement is `is_current` true -> false.
   - Scope of the evidence reconciled: PRICING_OFFER / AVAILABILITY_OFFER /
     DEPLOYMENT evidence under the reconciled rows, COMMERCIAL_STATUS evidence of
@@ -55,7 +64,8 @@ IDEMPOTENCY MODEL (stable-ID reconciliation)
     (migration 0013). Every other evidence row (hand-written ROBOT rows, unmarked
     MANUFACTURER rows) is never touched. Robot-child evidence is still inserted
     unmarked, exactly as before.
-  - Every run prints a per-table summary: unchanged / updated / inserted / removed.
+  - Every run prints a per-table summary: unchanged / updated / inserted /
+    removed / preserved.
 
 MANUFACTURER-ONLY MODE (`--manufacturers-only`)
   Imports manufacturer profiles and their company-level evidence and nothing
@@ -175,12 +185,11 @@ SUMMARY_TABLES = (
     "robot", "robot_variant", "specification", "pricing_offer", "availability_offer",
     "deployment", "robot_image", "robot_capability", "use_case_fit", "evidence_source",
 )
-OUTCOMES = ("unchanged", "updated", "inserted", "removed")
+OUTCOMES = ("unchanged", "updated", "inserted", "removed", "preserved")
 #: Evidence subject type of the tables whose rows carry evidence of their own.
 EVIDENCE_SUBJECTS = {
     "pricing_offer": "PRICING_OFFER",
     "availability_offer": "AVAILABILITY_OFFER",
-    "deployment": "DEPLOYMENT",
 }
 
 
@@ -268,6 +277,7 @@ class Reconciliation:
         self.counts: dict[str, Counter] = {}
         self.refusals: list[tuple[str, dict | None]] = []
         self.pending: list[Pending] = []
+        self.preserved: list[tuple[str, str, dict]] = []
 
     def count(self, table: str, outcome: str, n: int = 1) -> None:
         self.counts.setdefault(table, Counter())[outcome] += n
@@ -294,10 +304,15 @@ class Reconciliation:
         raise ReconcileRefused("\n".join(lines))
 
     def summary(self) -> str:
-        lines = ["Reconciliation summary (unchanged / updated / inserted / removed):"]
+        lines = ["Reconciliation summary "
+                 "(unchanged / updated / inserted / removed / preserved):"]
         for table in SUMMARY_TABLES:
             c = self.counts.get(table, Counter())
             lines.append(f"  {table:<19} " + " / ".join(f"{c[o]:>4}" for o in OUTCOMES))
+        if self.preserved:
+            lines.append("PRESERVED (not in JSON, left untouched):")
+            lines += [f"  {table} of {robot} {json.dumps(key)}"
+                      for table, robot, key in self.preserved]
         return "\n".join(lines)
 
 
@@ -308,21 +323,17 @@ class Table:
     and the joins). Matching on slugs, not ids, keeps the NULL-safe comparison
     trivial and lets a refusal quote the key exactly as the JSON writes it.
     `fixed` are the insert columns an UPDATE never rewrites (the key and the owner).
-    `protected` columns may only be blanked with a `clear` authorization.
+    `peek` are extra per-row facts read with the existing rows.
     """
 
-    def __init__(self, name, key, fixed, *, joins="", id_cols=("id",), peek=None,
-                 protected=()) -> None:
+    def __init__(self, name, key, fixed, *, joins="", id_cols=("id",), peek=None) -> None:
         self.name = name
         self.key = key
         self.names = [n for n, _ in key]
         self.fixed = set(fixed)
         self.joins = joins
         self.id_cols = id_cols
-        self.protected = protected
         self.peek = dict(peek or {})
-        for col in protected:
-            self.peek[col] = f"t.{col} IS NOT NULL"
 
 
 class Existing(NamedTuple):
@@ -351,21 +362,14 @@ T_SPEC = Table(
     ("robot_id", "variant_id", "definition_id"),
     joins=_V + " JOIN spec_definition d ON d.id = t.definition_id",
     peek={"managed_by": "coalesce(t.managed_by, 'seed/hand-authored')"},
-    protected=("source_url", "source_label", "observed_at"),
 )
 T_PRICING = Table("pricing_offer", _OFFER_KEY, _OFFER_FIXED, joins=_V)
 T_AVAILABILITY = Table("availability_offer", _OFFER_KEY, _OFFER_FIXED, joins=_V)
-T_DEPLOYMENT = Table(
-    "deployment",
-    [("customer_name", "t.customer_name"), ("region_code", _REGION),
-     ("started_on", "t.started_on::text")],
-    ("robot_id", "customer_name", "region_id", "started_on"),
-)
+#: Only used to INSERT a robot's first deployments (D2 gives them no key to match on).
+T_DEPLOYMENT = Table("deployment", [], ("robot_id",))
 T_IMAGE = Table(
     "robot_image", [("image_url", "t.image_url")], ("robot_id", "image_url"),
     peek={"is_primary": "t.is_primary"},
-    protected=("display_approved_by", "display_approved_at", "last_verified_at",
-               "captured_at", "source_url", "attribution"),
 )
 T_CAPABILITY = Table(
     "robot_capability",
@@ -428,16 +432,23 @@ def _insert(cur, table: Table, values: dict):
     return row[0] if len(table.id_cols) == 1 else tuple(row)
 
 
-def _differs(cur, table: Table, row_id, values: dict) -> bool:
-    """Let Postgres compare, so numerics, dates, timestamps and arrays use the column types."""
+def _compare(cur, table: Table, row_id, values: dict) -> tuple[bool, list[str]]:
+    """(does the stored row differ, which stored values the JSON would blank).
+
+    Postgres compares, so numerics, dates, timestamps and arrays use the column types.
+    A column is "blanked" when the JSON gives NULL where the row holds a value."""
     if not values:
-        return False
+        return False, []
     cols = ", ".join(values)
     marks = ", ".join(["%s"] * len(values))
-    return cur.execute(
-        f"SELECT ({cols}) IS DISTINCT FROM ({marks}) FROM {table.name} WHERE {_id_where(table)}",
+    nulls = [c for c, v in values.items() if v is None]
+    flags = "".join(f", ({c} IS NOT NULL)" for c in nulls)
+    row = cur.execute(
+        f"SELECT ({cols}) IS DISTINCT FROM ({marks}){flags} FROM {table.name} "
+        f"WHERE {_id_where(table)}",
         [*(_param(v) for v in values.values()), *_id_params(table, row_id)],
-    ).fetchone()[0]
+    ).fetchone()
+    return row[0], [c for c, held in zip(nulls, row[1:], strict=True) if held]
 
 
 def _update(cur, table: Table, row_id, values: dict) -> None:
@@ -456,8 +467,9 @@ def reconcile_rows(cur, recon: Reconciliation, table: Table, robot: str,
     `incoming` is [(natural key, insert-column values)]. Returns [(row id, inserted)]
     aligned with `incoming`. Per row: no match -> INSERT; match and equal -> nothing;
     match and different -> UPDATE in place. Rows present but absent from the JSON are
-    never deleted here: each becomes a refusal naming its exact key, or, when the
-    operator authorized it, a pending removal executed after everything else.
+    never deleted here: each is preserved and reported, or, when the operator
+    authorized its removal, a pending removal executed after everything else.
+    A stored value the JSON would turn into NULL needs a `clear` entry.
     `immutable` rows (evidence) are not updated without an `update_evidence` entry.
     """
     def key_dict(key):
@@ -490,17 +502,17 @@ def reconcile_rows(cur, recon: Reconciliation, table: Table, robot: str,
         row = match[0]
         results.append((row.row_id, False))
         changeable = {c: v for c, v in values.items() if c not in table.fixed}
-        blocked = False
-        for col in table.protected:
-            if changeable.get(col) is None and row.peek.get(col):
-                entry = _entry("clear", table.name, robot, key_dict(key), col)
-                if not recon.authorize.allows(entry):
-                    recon.refuse(f"{where(key)}: the JSON would blank protected column {col}",
-                                 entry)
-                    blocked = True
-        if blocked:
+        differs, blanked = _compare(cur, table, row.row_id, changeable)
+        refused = False
+        for col in blanked:             # D1: a stored value is never erased implicitly
+            entry = _entry("clear", table.name, robot, key_dict(key), col)
+            if not recon.authorize.allows(entry):
+                recon.refuse(f"{where(key)}: the JSON would erase the stored value of {col}",
+                             entry)
+                refused = True
+        if refused:
             continue
-        if not _differs(cur, table, row.row_id, changeable):
+        if not differs:
             recon.count(table.name, "unchanged")
             continue
         if immutable:
@@ -518,9 +530,9 @@ def reconcile_rows(cur, recon: Reconciliation, table: Table, robot: str,
         entry = _entry("remove", table.name, robot, key_dict(key))
         if recon.authorize.allows(entry):
             recon.pending.append(Pending(table, rows[0].row_id, robot, key_dict(key)))
-        else:
-            recon.refuse(f"{where(key)}: in the database but no longer in the JSON "
-                         "(the importer never deletes without authorization)", entry)
+        else:                           # D1: omitted records are left untouched
+            recon.count(table.name, "preserved")
+            recon.preserved.append((table.name, robot, key_dict(key)))
     return results
 
 
@@ -615,10 +627,43 @@ def _upsert(cur, table: str, conflict: str, cols: list[str], vals: list, *,
     return None if row is None else (row[0], row[1])
 
 
+def _refuse_blanking(cur, recon: Reconciliation, table: str, conflict: str, cols: list[str],
+                     vals: list, *, skip=(), set_exprs=None, owner_sql: str = "",
+                     owner_params=()) -> bool:
+    """D1: an upsert may not turn a stored value into NULL without a `clear` entry.
+
+    Entity-level rows (robot, manufacturer, ...) are named by their slug/code with key {}.
+    Returns True when the upsert must not run. `set_exprs` columns (COALESCE: a file that
+    omits them never clears them) cannot blank and are exempt."""
+    set_exprs = set_exprs or {}
+    nulls = [c for c, v in zip(cols, vals, strict=True)
+             if v is None and c != conflict and c not in skip and c not in set_exprs]
+    if not nulls:
+        return False
+    who = vals[cols.index(conflict)]
+    row = cur.execute(
+        f"SELECT {', '.join(f'({c} IS NOT NULL)' for c in nulls)} FROM {table} "
+        f"WHERE {conflict} = %s{owner_sql}", (who, *owner_params)).fetchone()
+    if row is None:
+        return False
+    refused = False
+    for column, held in zip(nulls, row, strict=True):
+        if held:
+            entry = _entry("clear", table, str(who), {}, column)
+            if not recon.authorize.allows(entry):
+                recon.refuse(f"{table} {who}: the JSON would erase the stored value of {column}",
+                             entry)
+                refused = True
+    return refused
+
+
 def _upsert_entity(cur, recon: Reconciliation, table: str, conflict: str, cols: list[str],
                    vals: list, **kw):
     """`_upsert` for a table the importer owns outright: always returns the row id."""
-    row = _upsert(cur, table, conflict, cols, vals, **kw)
+    row = None
+    if not _refuse_blanking(cur, recon, table, conflict, cols, vals,
+                            skip=kw.get("skip", ()), set_exprs=kw.get("set_exprs")):
+        row = _upsert(cur, table, conflict, cols, vals, **kw)
     if row is None:
         recon.count(table, "unchanged")
         return cur.execute(
@@ -929,16 +974,19 @@ def import_spec_definitions(cur, data: dict, collisions: list[str],
     """
     recon = recon or Reconciliation()
     for d in data["spec_definitions"]:
-        row = _upsert(
-            cur, "spec_definition", "key",
-            ["key", "label", "category", "value_type", "unit", "is_filterable",
-             "sort_order", "managed_by"],
-            [d["key"], d["label"], d.get("category", "OTHER"), d["value_type"],
-             d.get("unit"), d.get("is_filterable", False), d.get("sort_order", 0),
-             MANAGED_BY],
-            skip=("managed_by",),
-            only_if="spec_definition.managed_by = %s", only_if_params=(MANAGED_BY,),
-        )
+        cols = ["key", "label", "category", "value_type", "unit", "is_filterable",
+                "sort_order", "managed_by"]
+        vals = [d["key"], d["label"], d.get("category", "OTHER"), d["value_type"],
+                d.get("unit"), d.get("is_filterable", False), d.get("sort_order", 0),
+                MANAGED_BY]
+        row = None
+        if not _refuse_blanking(cur, recon, "spec_definition", "key", cols, vals,
+                                skip=("managed_by",), owner_sql=" AND managed_by = %s",
+                                owner_params=(MANAGED_BY,)):
+            row = _upsert(
+                cur, "spec_definition", "key", cols, vals, skip=("managed_by",),
+                only_if="spec_definition.managed_by = %s", only_if_params=(MANAGED_BY,),
+            )
         if row is not None:
             recon.count("spec_definition", "inserted" if row[1] else "updated")
             continue
@@ -983,12 +1031,6 @@ def _spec_key(spec: dict) -> tuple:
     return (spec.get("variant_slug"), spec["key"])
 
 
-def _deployment_key(d: dict) -> tuple:
-    started = d.get("started_on")
-    return (d.get("customer_name"), d.get("region_code"),
-            None if started is None else str(started))
-
-
 def incoming_problems(robot: dict) -> list[str]:
     """Everything in one robot's JSON that makes reconciliation ambiguous. Pure.
 
@@ -1010,7 +1052,6 @@ def incoming_problems(robot: dict) -> list[str]:
     duplicates("extended spec", [_spec_key(x) for x in robot.get("extended_specs", [])])
     duplicates("pricing offer", [_offer_key(o) for o in offers])
     duplicates("availability offer", [_offer_key(o) for o in availability])
-    duplicates("deployment", [_deployment_key(d) for d in deployments])
     duplicates("image", [i["image_url"] for i in robot.get("images", [])])
     duplicates("capability", [c["slug"] for c in robot.get("capabilities", [])])
     duplicates("use-case fit", [f["use_case_slug"] for f in robot.get("use_case_fits", [])])
@@ -1034,13 +1075,85 @@ def incoming_problems(robot: dict) -> list[str]:
                            "one of its variants")
 
     evidence_lists = [("commercial_status_evidence", robot.get("commercial_status_evidence", []))]
-    for label, rows, key in (("pricing offer", offers, _offer_key),
-                             ("availability offer", availability, _offer_key),
-                             ("deployment", deployments, _deployment_key)):
-        evidence_lists += [(f"{label} {key(r)!r} evidence", r.get("evidence", [])) for r in rows]
+    for label, rows in (("pricing offer", offers), ("availability offer", availability)):
+        evidence_lists += [(f"{label} {_offer_key(r)!r} evidence", r.get("evidence", []))
+                           for r in rows]
+    evidence_lists += [(f"deployment #{i} evidence", r.get("evidence", []))
+                       for i, r in enumerate(deployments)]
     for label, evs in evidence_lists:
         duplicates(f"evidence key in {label}", [_evidence_key(e) for e in evs])
     return out
+
+
+DEPLOYMENT_COLUMNS = ("provider_id", "customer_name", "region_id", "use_case_id",
+                      "transaction_type", "unit_count", "contract_value", "contract_currency",
+                      "started_on", "status", "summary")
+
+
+def reconcile_deployments(cur, recon: Reconciliation, slug: str, robot_id,
+                          deployments: list[dict], region_id, use_case_id) -> None:
+    """Owner decision D2: a deployment has NO inferred identity.
+
+    Until an explicit durable `deployment_key` exists (a schema change that is not
+    approved), the only thing the importer can do is recognise an UNCHANGED set: the
+    incoming deployments equal the stored ones on every column, as a multiset. Then
+    nothing is written, ids stay, and their evidence is reconciled as usual. Any other
+    situation (a new, edited or missing deployment of a robot that already has some) is
+    refused, as is any `remove` authorization for a deployment. A robot with NO stored
+    deployment gets its first ones inserted."""
+    incoming = [{
+        "provider_id": _provider(cur, d.get("provider_slug")),
+        "customer_name": d.get("customer_name"), "region_id": region_id(d.get("region_code")),
+        "use_case_id": use_case_id(d.get("use_case_slug")),
+        "transaction_type": d.get("transaction_type"), "unit_count": d.get("unit_count"),
+        "contract_value": d.get("contract_value"),
+        "contract_currency": d.get("contract_currency"),
+        "started_on": d.get("started_on"), "status": d.get("status"),
+        "summary": d.get("summary"),
+    } for d in deployments]
+    stored = [r[0] for r in cur.execute(
+        "SELECT id FROM deployment WHERE robot_id = %s", (robot_id,)).fetchall()]
+    if not stored:
+        # First load of this robot's deployments: nothing stored can be confused with them,
+        # so no identity is inferred. They are inserted once; from then on D2 applies.
+        for d, values in zip(deployments, incoming, strict=True):
+            deployment_id = _insert(cur, T_DEPLOYMENT, {"robot_id": robot_id, **values})
+            recon.count("deployment", "inserted")
+            reconcile_evidence(cur, recon, slug, "DEPLOYMENT", deployment_id,
+                               d.get("evidence", []), {"deployment_id": str(deployment_id)},
+                               fresh=True)
+        return
+    claimed: list = []
+    unmatched = []
+    for i, values in enumerate(incoming):
+        cols = ", ".join(DEPLOYMENT_COLUMNS)
+        marks = ", ".join(["%s"] * len(DEPLOYMENT_COLUMNS))
+        found = cur.execute(
+            f"SELECT id FROM deployment WHERE robot_id = %s AND id <> ALL(%s) "
+            f"AND ({cols}) IS NOT DISTINCT FROM ({marks}) LIMIT 1",
+            [robot_id, claimed, *(_param(values[c]) for c in DEPLOYMENT_COLUMNS)],
+        ).fetchone()
+        if found is None:
+            unmatched.append(i)
+        else:
+            claimed.append(found[0])
+    missing = [d for d in stored if d not in claimed]
+    asked = [e for e in recon.authorize.entries
+             if e["table"] == "deployment" and e["robot"] == slug]
+    for entry in asked:
+        recon.authorize.allows(entry)       # reported below, not as "unused"
+    if unmatched or missing or asked:
+        recon.refuse(
+            f"deployment of {slug}: {len(unmatched)} new or edited and {len(missing)} missing "
+            f"or edited stored deployment(s)"
+            + ("; a `remove` for a deployment is not supported" if asked else "")
+            + ". Owner decision D2: deployments have no inferred identity; an explicit "
+              "`deployment_key` is required first (schema migration not approved).")
+        return
+    for d, deployment_id in zip(deployments, claimed, strict=True):
+        recon.count("deployment", "unchanged")
+        reconcile_evidence(cur, recon, slug, "DEPLOYMENT", deployment_id,
+                           d.get("evidence", []), {"deployment_id": str(deployment_id)})
 
 
 def import_robot(cur, robot: dict, region_id, manufacturer_id,
@@ -1108,7 +1221,9 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
     # state to preserve. On UPDATE the editorial columns are held back. A row
     # whose columns all already match is not rewritten at all.
     preserved = () if apply_publication_state else EDITORIAL_COLUMNS
-    row = _upsert(cur, "robot", "slug", cols, vals, skip=preserved)
+    row = None
+    if not _refuse_blanking(cur, recon, "robot", "slug", cols, vals, skip=preserved):
+        row = _upsert(cur, "robot", "slug", cols, vals, skip=preserved)
     if row is None:
         robot_id = cur.execute("SELECT id FROM robot WHERE slug = %s", (slug,)).fetchone()[0]
         robot_outcome = "unchanged"
@@ -1209,20 +1324,9 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
     got = reconcile(T_AVAILABILITY, incoming)
     reconcile_subject_evidence("AVAILABILITY_OFFER", T_AVAILABILITY, availability, incoming, got)
 
-    # Deployments.
-    deployments = robot.get("deployments", [])
-    incoming = [(_deployment_key(d), {
-        "robot_id": robot_id, "provider_id": _provider(cur, d.get("provider_slug")),
-        "customer_name": d.get("customer_name"), "region_id": region_id(d.get("region_code")),
-        "use_case_id": use_case_id(d.get("use_case_slug")),
-        "transaction_type": d.get("transaction_type"), "unit_count": d.get("unit_count"),
-        "contract_value": d.get("contract_value"),
-        "contract_currency": d.get("contract_currency"),
-        "started_on": d.get("started_on"), "status": d.get("status"),
-        "summary": d.get("summary"),
-    }) for d in deployments]
-    got = reconcile(T_DEPLOYMENT, incoming)
-    reconcile_subject_evidence("DEPLOYMENT", T_DEPLOYMENT, deployments, incoming, got)
+    # Deployments have no inferred identity (owner decision D2).
+    reconcile_deployments(cur, recon, slug, robot_id, robot.get("deployments", []),
+                          region_id, use_case_id)
 
     # Verified product images (MEDIA-01; see _ALLOWED_IMAGE_SOURCES).
     incoming = []

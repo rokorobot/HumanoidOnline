@@ -415,8 +415,11 @@ def test_an_authorized_removal_orphans_the_audit_target_and_the_gate_says_exactl
     path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n",
                     encoding="utf-8")
     before = _snap(url)
-    with pytest.raises(ic.ReconcileRefused, match="no longer in the JSON"):
-        ic.run(url, only={H2})                  # unauthorized: refused, audit target untouched
+    ic.run(url, only={H2})                      # unauthorized: the offer is preserved (D1)
+    with psycopg.connect(url) as conn:
+        conn.execute("SET search_path TO humanoid, public")
+        assert conn.execute("SELECT count(*) FROM pricing_offer WHERE id = %s",
+                            (offer_id,)).fetchone()[0] == 1
     ic.run(url, only={H2}, authorize={"version": 1, "entries": [{
         "action": "remove", "table": "pricing_offer", "robot": H2,
         "key": {"variant_slug": variant, "provider_slug": provider, "region_code": region,

@@ -4,7 +4,11 @@
 `docs/IMPORTER_HARDENING_PLAN_2026-10-19.md`. `db/import_catalogue.py` now reconciles by natural
 key; `_reset_robot_children` is gone. The acceptance tests in
 `apps/api/tests/test_importer_stable_ids.py` pass without any `xfail`. Section 8 is the
-update/ownership contract as implemented. Production use needs owner approval.
+update/ownership contract as implemented. It is reconciled with owner decisions D1-D3 of
+`docs/discovery/AUTOMATED_COMMERCIAL_INTELLIGENCE_PIPELINE_2026-10-19.md`: where §2 and §4 below
+describe deleting keys that left the JSON, and where §3/§7 propose a deployment key and an
+evidence hash, §8 and the subsection "Reconciliation with owner decisions D1-D5" govern.
+Production use needs owner approval.
 
 ## 1. Problem
 
@@ -155,11 +159,13 @@ A guard test asserts that every id table is non-empty.
 | Key in DB and JSON, every non-key column equal | **nothing** (no statement issued) |
 | Key in DB and JSON, a non-key column differs | `UPDATE` in place, **same id** (a corrected price, a retired offer `is_current: false`, a reworded limitation) |
 | Key only in JSON | `INSERT` once; the next run finds it unchanged |
-| Key only in DB (missing from the JSON) | **refuse**: the run aborts and rolls back, printing the exact `--authorize` entry |
+| Key only in DB (missing from the JSON) | **preserved**: left untouched, counted in the summary `preserved` column and listed under "PRESERVED (not in JSON, left untouched)" (D1). Removed only by an explicit `remove` authorization |
 | Same key twice in the JSON | refuse before any write |
 | Two DB rows share one key | refuse as ambiguous; the importer never picks one |
 | Matched evidence row whose non-key fields differ | refuse unless `update_evidence` is authorized: evidence is immutable to the importer |
-| JSON blanks a protected column that holds a value | refuse unless `clear` is authorized |
+| Evidence whose excerpt changed materially | a **new version** (D3): the excerpt is part of the key, so the new row is inserted and the old row is preserved with its id (and listed as preserved) |
+| JSON gives NULL (absent or explicit null) for a column that holds a value, in **any** reconciled table, the robot row or a shared-entity upsert | refuse unless a `clear` entry names (table, robot/slug, key, column). Non-NULL to a different non-NULL value is a normal in-place update (D1) |
+| Deployments | **no inferred identity (D2)**: an unchanged set (every column, as a multiset) is left alone with its ids and its evidence reconciled; a robot with no stored deployment gets its first ones inserted; any new, edited or missing deployment of a robot that already has some is refused, as is a `remove` for a deployment, until an explicit `deployment_key` exists (migration not approved) |
 | Removing a variant that still has a specification or offer not itself being removed | refuse: the `ON DELETE CASCADE` would take it |
 | `is_published` | written only when the robot row is first created; never by a routine import (`--apply-publication-state` is the separate, gated operation) |
 | Robot, region, manufacturer, provider, capability, use case, spec definition upserts | `WHERE (cols) IS DISTINCT FROM (EXCLUDED.cols)`: an unchanged row is not rewritten and its `updated_at` does not move |
@@ -176,17 +182,18 @@ A guard test asserts that every id table is non-empty.
   robot have no ownership column. They are matched by exact key. Nothing unmatched is ever
   deleted without an authorization naming that exact key.
 
-**Snapshot versus patch.** A robot file remains the complete statement of that robot. A field
-present in the file is written as the file says, and a null stays SQL NULL (AGENTS.md rule 6).
-A field or row **absent** never erases data:
-- an absent row refuses;
-- an absent protected value refuses.
+**Snapshot versus patch.** A robot file is the statement of what is now known, not an order to
+forget the rest. A field present in the file is written as the file says. A field or row
+**absent** never erases data:
+- an absent row is preserved and reported;
+- an absent (or null) value over a stored one refuses unless a `clear` entry names it.
 
 Whole-record replacement no longer happens.
 
 **Explicit operations (`--authorize FILE`):**
 - `{"version": 1, "entries": [{"action": "remove" | "update_evidence" | "clear", "table", "robot", "key", "column"?}]}`.
-- The refusal output prints these entries ready to paste.
+- A refusal (a `clear` or `update_evidence` that is needed) prints these entries ready to paste.
+  A preserved row is listed with its key, from which a `remove` entry is written.
 - An entry that matches nothing aborts the run, since it is a sign of drift.
 - An authorized removal of an offer or deployment also removes that row's own evidence rows,
   and counts them.
@@ -197,7 +204,7 @@ Whole-record replacement no longer happens.
 |---|---|
 | New evidence | a new key (URL, type, excerpt, observed date) is an insert |
 | New observation confirming unchanged information | the same excerpt with a new `observed_at` is a new row beside the old one (e.g. the 2026-09-11 and 2026-09-26 Reichelt rows) |
-| Correction | a changed excerpt is a new key, and the old row then refuses as missing until `remove` is authorized, so a correction never overwrites history silently |
+| Correction | a changed excerpt is a new key and so a new row (D3); the old row is preserved and reported until a `remove` is authorized, so a correction never overwrites history |
 | Withdrawal | an authorized `remove` |
 
 The importer never sets `verified_at`. A newly observed page is not human verification.
@@ -214,3 +221,22 @@ The importer never sets `verified_at`. A newly observed page is not human verifi
   It gave 0 ID_CHANGED, 0 ambiguous keys and 0 lost audit targets. The 25 historical dangling
   audit targets are unchanged.
 
+### Reconciliation with owner decisions D1-D5
+
+The owner decisions in `AUTOMATED_COMMERCIAL_INTELLIGENCE_PIPELINE_2026-10-19.md` supersede the
+conflicting parts of §2-§4 and §7 above:
+
+- **D1, non-destructive reconciliation.** A row, or a field, missing from the JSON is never a
+  reason to delete or blank anything. Omitted rows are preserved and reported; stored values
+  are never turned into NULL without a `clear` entry (every column, not only provenance);
+  deletion is the authorized `remove`, with the variant-dependency and own-evidence checks.
+- **D2, deployment identity.** No key is inferred for deployments (this replaces the
+  (customer, region, started_on) candidate in §3 and open question D2 in §7). Only an
+  unchanged set is accepted, plus the first load of a robot that has none. Anything else waits
+  for an explicit `deployment_key`, which needs a schema migration that is not approved.
+- **D3, evidence versioning.** Replaces the open question D3 in §7: the excerpt stays in the
+  evidence key, a changed excerpt is a new version, and the original is preserved.
+- **D4, rehearsal.** A local database restored from a read-only production dump is an
+  acceptable rehearsal environment; the rehearsal in §8 used one.
+- **D5, production automation credentials.** Not applicable to PR A: the importer is run by
+  an operator and gains no CI or production write path.

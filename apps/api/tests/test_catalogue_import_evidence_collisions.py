@@ -170,23 +170,22 @@ def _authorization(slug, action, source, **extra):
                 "observed_at": source["observed_at"]}, **extra}]}
 
 
-def test_a_managed_source_that_left_the_json_is_removed_only_when_authorized(cur) -> None:
+def test_a_managed_source_that_left_the_json_is_preserved_and_removed_only_when_authorized(
+        cur) -> None:
     slug, mid = _manufacturer(cur)
     _import(cur, slug, [CATALOGUE_SOURCE])
     (kept_id,) = [r[0] for r in _managed_rows(cur, mid)]
     other = {**CATALOGUE_SOURCE, "source_url": "https://example.test/collision/other"}
 
-    cur.execute("SAVEPOINT before_refusal")          # a refusal aborts the caller's transaction
-    with pytest.raises(ic.ReconcileRefused, match="no longer in the JSON"):
-        _import(cur, slug, [other])                 # CATALOGUE_SOURCE is gone from the file
-    cur.execute("ROLLBACK TO SAVEPOINT before_refusal")
-    assert [r[0] for r in _managed_rows(cur, mid)] == [kept_id]     # nothing deleted
+    _import(cur, slug, [other])                     # D1: CATALOGUE_SOURCE left the file ...
+    assert kept_id in [r[0] for r in _managed_rows(cur, mid)]   # ... and is left untouched
+    assert len(_managed_rows(cur, mid)) == 2
 
     recon = ic.Reconciliation(_authorization(slug, "remove", CATALOGUE_SOURCE))
     data = {"manufacturers": [{"slug": slug, "name": "Collision Robotics", "evidence": [other]}]}
     result = ic.import_manufacturers(cur, data, lambda code: None, recon)
     recon.finish()
-    assert (result["removed"], result["inserted"]) == (1, 1)
+    assert (result["removed"], result["inserted"], result["unchanged"]) == (1, 0, 1)
     assert kept_id not in [r[0] for r in _managed_rows(cur, mid)]
 
 

@@ -168,6 +168,8 @@ class _Recording:
         return self
 
     def fetchone(self):
+        if "IS NOT NULL)" in self.statements[-1]:
+            return None         # the blanking guard: no stored value exists
         return (1, "EUR")
 
     def fetchall(self):

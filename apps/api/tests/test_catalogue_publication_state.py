@@ -48,6 +48,8 @@ class _RecordingCursor:
     def fetchone(self):
         # Wide enough for every row this code path reads: the RETURNING id of
         # the upsert (index 0) and the price rollup's (price, currency) pair.
+        if "IS NOT NULL)" in self.statements[-1]:
+            return None         # the blanking guard: no stored value exists
         return (1, "EUR")
 
     def fetchall(self):

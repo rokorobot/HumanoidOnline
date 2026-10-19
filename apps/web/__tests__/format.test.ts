@@ -163,4 +163,17 @@ describe("formatObservedDate", () => {
     expect(formatObservedDate("2026-07-24T00:00:00Z")).toBe("24 JUL 2026");
     expect(formatObservedDate(null)).toBeNull();
   });
+
+  it("formats the catalogue-updated timestamp by its UTC day, never the local one", () => {
+    // 23:30 at UTC-02:00 is already the next day in UTC.
+    expect(formatObservedDate("2026-10-19T23:30:00-02:00")).toBe("20 OCT 2026");
+    expect(formatObservedDate("2026-10-19T00:15:00+02:00")).toBe("18 OCT 2026");
+    expect(formatObservedDate("2026-10-19T12:04:51.123456+00:00")).toBe("19 OCT 2026");
+  });
+
+  it("returns null (rendered UNKNOWN / omitted) for a missing or invalid date", () => {
+    expect(formatObservedDate(undefined)).toBeNull();
+    expect(formatObservedDate("")).toBeNull();
+    expect(formatObservedDate("not a date")).toBeNull();
+  });
 });

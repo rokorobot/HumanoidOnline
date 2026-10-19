@@ -38,7 +38,9 @@ _SNAPSHOT_SQL = text(
               WHERE r.is_published AND a.is_current AND a.condition = 'NEW'
                 AND a.transaction_type IN ('RENTAL', 'SUBSCRIPTION')
                 AND commercially_accessible(a.availability_status)) AS rental_offers_present,
-      (SELECT max(observed_at) FROM evidence_source) AS latest_observed_at
+      (SELECT max(observed_at) FROM evidence_source) AS latest_observed_at,
+      (SELECT latest_public_update_at FROM catalogue_freshness WHERE id = 1)
+        AS latest_catalogue_updated_at
     """
 )
 
@@ -57,4 +59,5 @@ def market_snapshot(
         manufacturers_published=row.manufacturers_published,
         rental_offers_present=row.rental_offers_present,
         latest_observed_at=row.latest_observed_at,
+        latest_catalogue_updated_at=row.latest_catalogue_updated_at,
     )

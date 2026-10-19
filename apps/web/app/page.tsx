@@ -29,7 +29,9 @@ export default async function HomePage() {
     listManufacturers({ limit: 100 }),
   ]);
 
-  const observed = formatObservedDate(snapshot.latest_observed_at);
+  // Catalogue freshness: the last committed change to public catalogue content,
+  // recorded by the database (never a deploy, schedule or evidence-observation date).
+  const catalogueUpdated = formatObservedDate(snapshot.latest_catalogue_updated_at);
   // "Obtainable now" = robots with a current commercially-accessible offer
   // (available_modes computed by the canonical predicate). Never re-derived here.
   const obtainable = robotPage.items
@@ -43,7 +45,9 @@ export default async function HomePage() {
         fields={[
           { value: snapshot.total_tracked, label: "" },
           { value: "PLATFORMS TRACKED", label: "" },
-          ...(observed ? [{ label: "DATA OBSERVED", value: observed }] : []),
+          ...(catalogueUpdated
+            ? [{ label: "CATALOGUE UPDATED", value: catalogueUpdated }]
+            : []),
         ]}
       />
 
@@ -145,7 +149,7 @@ export default async function HomePage() {
                   k="RENTAL"
                   v={snapshot.rental_offers_present ? "OFFERS PRESENT" : "NONE CURRENT"}
                 />
-                <Leader k="UPDATED" v={observed ?? "UNKNOWN"} />
+                <Leader k="UPDATED" v={catalogueUpdated ?? "UNKNOWN"} />
               </div>
             </div>
           </div>
@@ -273,8 +277,8 @@ export default async function HomePage() {
             className="ho-syslabel"
             style={{ marginTop: "var(--ho-sp-4)", maxWidth: "72ch", lineHeight: 1.8 }}
           >
-            {observed ? (
-              <>DATA OBSERVED {observed}. </>
+            {catalogueUpdated ? (
+              <>CATALOGUE UPDATED {catalogueUpdated}. </>
             ) : null}
             Every commercial fact carries an evidence source and confidence level —
             no commercial fact without evidence.

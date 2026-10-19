@@ -487,7 +487,11 @@ export interface MarketSnapshot {
   manufacturers_tracked: number;
   manufacturers_published: number;
   rental_offers_present: boolean;
+  // Newest evidence observation (evidence_source.observed_at). NOT catalogue freshness.
   latest_observed_at?: string | null;
+  // When PUBLIC catalogue content last changed: set by the database inside each
+  // committed catalogue write (migration 0026). Null = UNKNOWN.
+  latest_catalogue_updated_at?: string | null;
 }
 
 // ---- DATA-D1 operator review surface ---------------------------------------

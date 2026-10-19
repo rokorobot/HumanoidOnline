@@ -164,12 +164,18 @@ class Change:
         return CATEGORY.get(self.table, "other_catalogue")
 
 
-def snapshot(conn) -> dict[str, list[dict]]:
-    """Every humanoid table as id-free rows with foreign keys resolved to natural keys."""
+def snapshot(conn, exclude_tables=frozenset()) -> dict[str, list[dict]]:
+    """Every humanoid table as id-free rows with foreign keys resolved to natural keys.
+
+    `exclude_tables` names tables that are deliberately NOT read (a role without SELECT on them,
+    e.g. the promotion executor and the lead tables). The exclusion is explicit and symmetric:
+    the caller passes the same set for both sides of a comparison. Any other table the
+    connection cannot read raises (permission denied) - there is no silent skip."""
+    exclude_tables = frozenset(exclude_tables)
     cur = conn.cursor()
     cur.execute("SET search_path TO humanoid, public")
     cur.execute("select tablename from pg_tables where schemaname = 'humanoid' order by 1")
-    tables = [r[0] for r in cur.fetchall()]
+    tables = [r[0] for r in cur.fetchall() if r[0] not in exclude_tables]
     labels: dict[str, str] = {}
     for table, col in LABEL_TABLES.items():
         if table in tables:

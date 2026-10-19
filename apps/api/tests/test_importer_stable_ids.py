@@ -90,6 +90,23 @@ KEYED = {
 SHARED = ("manufacturer", "provider", "region", "capability", "use_case", "spec_definition")
 
 
+@pytest.fixture(autouse=True, params=["default", "opt_in"])
+def importer_mode(request, monkeypatch):
+    """Every test below runs twice: with the importer's defaults (exactly the pre-promotion
+    behaviour) and with the promotion executor's opt-ins (unchanged-row probe + a before_write
+    hook that takes the catalogue-write advisory lock)."""
+    real = ic.run
+    if request.param == "opt_in":
+        def lock(cur):
+            cur.execute("SELECT pg_advisory_xact_lock(hashtext('catalogue-write'))")
+
+        def run(url, **kw):
+            return real(url, before_write=lock, probe_unchanged=True, **kw)
+
+        monkeypatch.setattr(ic, "run", run)
+    return request.param
+
+
 @pytest.fixture
 def world(scratch_db, tmp_path, monkeypatch):  # noqa: F811
     cat = tmp_path / "catalogue"

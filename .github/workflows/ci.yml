@@ -92,6 +92,9 @@ jobs:
       DATABASE_URL: postgresql+psycopg://humanoid:humanoid@localhost:5432/humanoidonline
     steps:
       - uses: actions/checkout@v4
+        with:
+          # full history: the promotion-manifest check below needs the merge base with main
+          fetch-depth: 0
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
@@ -103,6 +106,24 @@ jobs:
       - name: Lint
         working-directory: apps/api
         run: uv run ruff check .
+      # GATING. A pull request that adds or changes a catalogue promotion manifest must carry
+      # a manifest that verifies: digest, version, all-ROUTINE fast lane, zero restricted
+      # impact, review file equal to its rendering, and a catalogue edit that is EXACTLY the
+      # base catalogue plus the manifest (no extra edit). No manifests: the step passes.
+      - name: Verify catalogue promotion manifests
+        working-directory: apps/api
+        shell: bash
+        run: |
+          git fetch --no-tags origin main
+          base="$(git merge-base origin/main HEAD)"
+          mapfile -t manifests < <({ git diff --name-only --diff-filter=AM "$base" HEAD -- 'db/catalogue/promotions/*.json' | grep -v '/decisions\.json$'; } || true)
+          status=0
+          for m in "${manifests[@]}"; do
+            [ -n "$m" ] || continue
+            uv run python -m app.cli.promotion verify --manifest "$GITHUB_WORKSPACE/$m" --base-ref "$base" || status=1
+          done
+          [ "${#manifests[@]}" -eq 0 ] && echo "no promotion manifests in this change"
+          exit "$status"
       - name: Test
         working-directory: apps/api
         run: uv run pytest

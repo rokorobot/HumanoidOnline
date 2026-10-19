@@ -97,6 +97,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 from collections import Counter
 from decimal import Decimal
@@ -604,6 +605,9 @@ def reconcile_evidence(cur, recon: Reconciliation, robot: str, subject_type: str
                    parent={"subject_type": subject_type, **parent}, immutable=True)
 
 
+_PROBE_UNCHANGED = False    # set only for the duration of run(probe_unchanged=True)
+
+
 def _upsert(cur, table: str, conflict: str, cols: list[str], vals: list, *,
             skip=(), set_exprs=None, only_if: str | None = None, only_if_params=()):
     """INSERT ... ON CONFLICT DO UPDATE that rewrites a row only if a column differs.
@@ -615,6 +619,29 @@ def _upsert(cur, table: str, conflict: str, cols: list[str], vals: list, *,
     new = {c: set_exprs.get(c, f"EXCLUDED.{c}") for c in changing}
     guard = (f"({', '.join(f'{table}.{c}' for c in changing)}) "
              f"IS DISTINCT FROM ({', '.join(new.values())})")
+    # OPT-IN (run(probe_unchanged=True), used only by the promotion executor): detect an
+    # unchanged row with a plain SELECT first. INSERT ... ON CONFLICT DO UPDATE needs the UPDATE
+    # privilege even when it would change nothing, so an INSERT-only role could not otherwise
+    # import a robot whose shared rows are already current. The SELECT uses the same guard, so
+    # the outcome is identical. By default (every other caller) no extra statement is issued.
+    if _PROBE_UNCHANGED:
+        params: list = []
+
+        def _bind(match):
+            params.append(vals[cols.index(match.group(1))])
+            return "%s"
+
+        probe = re.sub(r"EXCLUDED\.(\w+)", _bind, guard)
+        unchanged = False
+        try:
+            with cur.connection.transaction():  # a savepoint: a failed probe aborts nothing
+                unchanged = cur.execute(
+                    f"SELECT NOT ({probe}) FROM {table} WHERE {table}.{conflict} = %s",
+                    [*params, vals[cols.index(conflict)]]).fetchone() == (True,)
+        except psycopg.Error:
+            unchanged = False                   # fall through to the original statement
+        if unchanged:
+            return None
     if only_if:
         guard = f"{only_if} AND {guard}"
     row = cur.execute(
@@ -1560,10 +1587,28 @@ def _check_publication_transitions(cur, loaded: list[dict], was_published: dict)
 
 
 def run(url: str, *, apply_publication_state: bool = False,
-        only: set[str] | None = None, authorize=None) -> Reconciliation:
+        only: set[str] | None = None, authorize=None, before_write=None,
+        probe_unchanged: bool = False) -> Reconciliation:
     """Import the catalogue (or the `only` robots) in ONE transaction and return the
     reconciliation (its counters). `authorize` is an Authorization, an entries document
-    or an `--authorize` file path; the default authorizes nothing."""
+    or an `--authorize` file path; the default authorizes nothing.
+
+    `before_write(cur)`, when given, is called with the transaction's cursor after the write
+    transaction is open and before the first write; it may raise (e.g. ReconcileRefused) to
+    abort with nothing written; it is responsible for any locking it needs. Both `before_write`
+    and `probe_unchanged` (see _upsert) are OPT-IN for the promotion executor: with the defaults
+    the statements issued are exactly those of the pre-promotion importer."""
+    global _PROBE_UNCHANGED
+    _PROBE_UNCHANGED = probe_unchanged
+    try:
+        return _run(url, apply_publication_state=apply_publication_state, only=only,
+                    authorize=authorize, before_write=before_write)
+    finally:
+        _PROBE_UNCHANGED = False
+
+
+def _run(url: str, *, apply_publication_state: bool, only, authorize,
+         before_write) -> Reconciliation:
     recon = Reconciliation(authorize)
     regions = _load(CATALOGUE_DIR / "regions.json")
     providers = _load(CATALOGUE_DIR / "providers.json")
@@ -1613,6 +1658,8 @@ def run(url: str, *, apply_publication_state: bool = False,
     with psycopg.connect(url, autocommit=False) as conn:
         with conn.cursor() as cur:
             cur.execute("SET search_path TO humanoid, public")
+            if before_write is not None:
+                before_write(cur)
 
             # Resolver closures backed by simple per-key lookups.
             def region_id(code):

@@ -1,0 +1,148 @@
+# PROPOSAL ONLY (owner decision D5, 2026-10-19): GitHub Actions is NOT authorized to write to
+# production. This file lives outside .github/workflows and db/roles so that nothing runs or
+# applies it. See ../PROMOTION_EXECUTOR_SECURITY_PROPOSAL_2026-10-19.md.
+name: Catalogue promotion
+
+# Approved catalogue promotion (docs/discovery/CATALOGUE_PROMOTION_AUTOMATION_DESIGN_2026-10-19.md).
+# The owner approves by MERGING a pull request that adds db/catalogue/promotions/<id>.json (the
+# pinned manifest), its review file and the matching catalogue edit. This workflow then applies
+# exactly that manifest, fail-closed, and posts a receipt on the merged PR.
+#
+#   GATE   repository variable CATALOGUE_PROMOTION_ENABLED == 'true'. Anything else (including
+#          unset) and NOTHING runs: no checkout, no secret, no database access. This workflow is
+#          INERT until the owner provisions the environment `catalogue-production`, the
+#          `catalogue_importer` role (db/roles/catalogue_importer.sql) and a project-scoped Neon
+#          API key, and then sets the variable.
+#
+# Secrets and variables (environment catalogue-production, restricted to main):
+#   secrets  CATALOGUE_DATABASE_URL (role catalogue_importer), NEON_API_KEY, NEON_PROJECT_ID
+#   vars     PUBLIC_API_BASE, PUBLIC_WEB_BASE (public verification); NEON_DATABASE_NAME and
+#            NEON_ROLE_NAME (optional, used only if Neon returns no connection URI);
+#            NEON_PRODUCTION_BRANCH_ID (required: the explicit parent of every branch) and
+#            NEON_PRODUCTION_BRANCH_NAME (default "production"); PROMOTION_APPROVERS (comma-
+#            separated GitHub logins allowed to have merged the manifest PR; unset = refuse)
+# Hardening 2026-10-19: the executor is bound to the merged PR (--approved-pr, found from the
+# merge commit below), so the workflow's own trigger is not the approval. D5 still applies: this
+# file stays a proposal, and the initial executor is the owner-run local command (E3).
+# Connection strings are never echoed; the CLI prints exception types only.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "db/catalogue/promotions/*.json"
+      - "!db/catalogue/promotions/decisions.json"
+  workflow_dispatch:
+    inputs:
+      manifest:
+        description: "path of the manifest to execute, e.g. db/catalogue/promotions/<id>.json"
+        required: true
+        type: string
+      dry_run:
+        description: "rehearse on branches only; production is never written"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+# Never two promotions at once; a second run waits (inside the database the advisory lock
+# `catalogue-promotion` is the second line of defence).
+concurrency:
+  group: catalogue-promotion
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    if: vars.CATALOGUE_PROMOTION_ENABLED == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: catalogue-production
+    env:
+      APP_ENV: production
+      CATALOGUE_DATABASE_URL: ${{ secrets.CATALOGUE_DATABASE_URL }}
+      NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+      NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
+      NEON_DATABASE_NAME: ${{ vars.NEON_DATABASE_NAME }}
+      NEON_ROLE_NAME: ${{ vars.NEON_ROLE_NAME }}
+      NEON_PRODUCTION_BRANCH_ID: ${{ vars.NEON_PRODUCTION_BRANCH_ID }}
+      NEON_PRODUCTION_BRANCH_NAME: ${{ vars.NEON_PRODUCTION_BRANCH_NAME }}
+      PROMOTION_APPROVERS: ${{ vars.PROMOTION_APPROVERS }}
+      GITHUB_TOKEN: ${{ github.token }}
+      PUBLIC_API_BASE: ${{ vars.PUBLIC_API_BASE }}
+      PUBLIC_WEB_BASE: ${{ vars.PUBLIC_WEB_BASE }}
+      EVENT: ${{ github.event_name }}
+      INPUT_MANIFEST: ${{ inputs.manifest }}
+      INPUT_DRY_RUN: ${{ inputs.dry_run }}
+      BEFORE_SHA: ${{ github.event.before }}
+      COMMIT: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v5
+      - name: Install runner dependencies
+        working-directory: apps/api
+        run: uv sync --frozen --no-dev
+      - name: Promotion
+        id: promote
+        working-directory: apps/api
+        shell: bash
+        run: |
+          set +e
+          zero=0000000000000000000000000000000000000000
+          if [ "$EVENT" = push ]; then
+            # the manifests this push ADDED (a manifest is never edited in place)
+            base="$BEFORE_SHA"; [ "$base" = "$zero" ] && base="$COMMIT^"
+            mapfile -t manifests < <(git diff --name-only --diff-filter=A "$base" "$COMMIT" \
+              -- 'db/catalogue/promotions/*.json' | grep -v '/decisions\.json$')
+            dry=false
+          else
+            base="$COMMIT^"
+            manifests=("$INPUT_MANIFEST")
+            dry="$INPUT_DRY_RUN"
+          fi
+          code=0
+          # the PR whose merge produced this commit: the executor verifies it independently
+          pr=$(curl -fsS -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/commits/$COMMIT/pulls" \
+            | python -c 'import json,sys; d=json.load(sys.stdin); print(d[0]["number"] if d else "")')
+          for rel in "${manifests[@]}"; do
+            [ -n "$rel" ] || continue
+            args=(execute --manifest "$GITHUB_WORKSPACE/$rel" --commit "$COMMIT"
+                  --approved-pr "$pr"
+                  --base-ref "$base" --receipt "$RUNNER_TEMP/receipt-$(basename "$rel")"
+                  --api-base "$PUBLIC_API_BASE" --web-base "$PUBLIC_WEB_BASE")
+            [ "$dry" = true ] && args+=(--dry-run)
+            uv run --no-sync python -m app.cli.promotion "${args[@]}"
+            rc=$?
+            [ "$rc" -gt "$code" ] && code=$rc
+            [ "$rc" -ne 0 ] && break      # one failure stops the rest: never skip past it
+          done
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          exit "$code"
+      - name: Summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Catalogue promotion"
+            echo
+            echo "Trigger: $EVENT. Exit code: ${{ steps.promote.outputs.code }} (0 ok, 2 refused, 3 incident, 4 configuration)."
+            for f in "$RUNNER_TEMP"/receipt-*; do
+              [ -f "$f" ] || continue
+              echo
+              echo "Receipt $(basename "$f"): outcome $(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["outcome"])' "$f")"
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Retain receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: promotion-receipt-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/receipt-*
+          if-no-files-found: warn
+          retention-days: 90

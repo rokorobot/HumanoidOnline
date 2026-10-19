@@ -46,7 +46,7 @@ audit rows. Each audit row still carries `claim_id`, `robot_slug`, `target_table
 
 ## 2. Plan
 
-**Phase 0: measure (read-only, no schema change).** Add a `db/audit_integrity.py` report:
+**Phase 0: measure (read-only, no schema change). Started: `db/audit_integrity.py`.** Add a `db/audit_integrity.py` report:
 dangling audit targets, the evidence subjects missing their row, and the variant-scoped rows not
 owned by the importer. Run it in CI against the seed and in the import preflight, as a report
 (not a gate) at first.
@@ -73,11 +73,18 @@ if any row not `CATALOGUE_IMPORT`-managed references it. Optionally, change the 
 - *Prevention:* once Phase 1 makes IDs stable, newly materialized claims keep valid targets.
   Add an integrity check after each import: no audit target may dangle for the imported
   robots.
-- *Repair* of the 25 existing rows: `catalogue_write_audit` is append-only, so it is not
-  edited. Append a `catalogue_write_audit_relink` record (new table, a migration) mapping the
-  old target to the current row found by (`robot_slug`, `target_table`, `after_hash`). Rows
-  whose content no longer matches (the value changed since) are listed for human review, not
-  guessed.
+- *Repair* of the 25 existing rows, **conservatively**:
+  - `catalogue_write_audit` is append-only and is **never edited**. A repair is an **append-only
+    relink record** (new table, so a migration and owner review) that maps the old
+    `target_row_id` to a current row.
+  - A relink is written **only** when exactly **one** current row of the same `target_table` and
+    `robot_slug` reproduces the audit's `after_hash` under the **same** hash function the
+    materializer used. Phase 0 must verify that this function is reproducible first.
+  - Zero matches (the value changed since), several matches, or an unverifiable hash leave the
+    audit row **unresolved** and list it for human review. Nothing is inferred from proximity,
+    timing or similar values.
+  - Relinks are rehearsed on a production copy, and the preflight lists every relink as an
+    expected change.
 
 **Phase 4: preflight alignment.** Once Phase 1 lands, the semantic preflight gains an optional
 "no ID churn" check for the imported robots, so stability is enforced, not just documented.

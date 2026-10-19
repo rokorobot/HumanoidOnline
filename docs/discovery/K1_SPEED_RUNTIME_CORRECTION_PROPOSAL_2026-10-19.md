@@ -1,8 +1,8 @@
 # Booster K1: walking speed and runtime correction proposal (2026-10-19)
 
-**Status: PROPOSAL. No catalogue value has changed.** The six values held in Batch 2 (PR #170) stay
-as they are until the owner decides the semantics and display described below. This proposal
-changes no core field.
+**Status: DECIDED (owner, 2026-10-19). Documentation only:** the correction itself ships in a
+separate scoped PR with its own manifest, rehearsal and owner approval. Until then the six values
+held in Batch 2 (PR #170) stay as they are.
 
 ## What the two sources state
 
@@ -21,31 +21,39 @@ changes no core field.
   0.4 m/s. Booster: 20 min / 1 h 10 min at 1.1 m/s. Higher speed, shorter runtime: the pairs are
   consistent with each other. Each runtime is only meaningful together with its test speed.
 
-## Proposed correction (for a later scoped batch, after the semantics decision)
+## Decided semantics
 
-1. **Walking speed.** Record Booster's statement as the manufacturer walking speed: either
-   `walk_speed_ms = 2.0`, if the field means the manufacturer's stated walking speed, or the
-   long-tail `max_speed` (TEXT, "Maximum speed (as stated)") = "2 m/s", leaving `walk_speed_ms`
-   for whatever the ratified meaning is. The value 0.40 is removed from `walk_speed_ms` in
-   either option, because it never stated a walking speed.
-2. **Runtime.** Keep **both** measurements, each with its own test speed and source, in
-   `operating_time` (TEXT, "Operating time (as stated)"), e.g. for Geek:
-   - "20 min (walking at 1.1 m/s), Booster official specification";
-   - "~30 min at 0.4 m/s, RobotShop EU listing".
+1. **`walk_speed_ms` is the manufacturer-stated walking speed.** For K1 that is Booster's
+   "Walking Speed: 2 m/s", which the owner reads as **up to 2 m/s**, so the value is **2.0** for
+   all three editions. A spec caveat states "up to", and that the figure is Booster's
+   specification, not a measured cruising speed.
+2. **`runtime_minutes` holds one primary observation: the manufacturer's**, with its measurement
+   condition. That is **20 / 70 / 70 min**: Geek "20 min", Educational and Professional
+   "1 h 10 min", each **measured walking at 1.1 m/s**. The condition is never dropped: it is
+   stated in the field's spec caveat.
+3. **Measurement conditions are source-specific.** A runtime is only meaningful with its test
+   speed, and different sources test at different speeds. Neither observation is converted,
+   averaged or adjusted to the other's condition.
+4. **Multiple runtime observations.** The schema has one `runtime_minutes` per robot and no
+   per-observation runtime table, so there is **no second specification row**. The alternative
+   observation, RobotShop EU listing (retrieved 2026-08-16) "~30 min runtime at 0.4 m/s" (Geek) /
+   "~80 min runtime at 0.4 m/s" (Educational, Professional), is preserved verbatim, with its
+   source and date, in the `runtime_minutes` spec caveat and in `specs_note`.
+5. **0.4 m/s is a test condition, never a speed specification.** It appears only next to the
+   RobotShop runtime it qualifies.
+6. **Display.** Robot-detail and comparison pages show `runtime_minutes` together with its caveat
+   (conditions and the alternative observation). Summaries and use-case wording are rewritten so
+   that no runtime figure appears without its test speed and source.
 
-   `runtime_minutes` (a single number) cannot carry a test condition. Options: (a) leave it
-   UNKNOWN and show `operating_time`; (b) keep the manufacturer figure (20 / 70) with a
-   `spec_caveat` naming the 1.1 m/s condition; (c) keep the retailer figure with a caveat.
-   **Recommendation: (b)**, the manufacturer as primary source, with both statements visible.
-3. **Spec caveats** on `walk_speed_ms` / `runtime_minutes` stating the condition, so compare
-   tables and robot pages never show a runtime without its speed.
+## Correction PR scope
 
-## Owner decisions required
+The three K1 records only, scoped `--only booster-k1-geek --only booster-k1-educational --only
+booster-k1-professional`:
+- `walk_speed_ms` 0.40 → 2.0;
+- `runtime_minutes` 30 / 80 / 80 → 20 / 70 / 70;
+- two spec caveats per robot;
+- `specs_note` provenance;
+- summary and use-case wording.
 
-1. What `walk_speed_ms` means (manufacturer-stated walking speed vs typical vs maximum), and
-   whether `max_speed` is used alongside it.
-2. Which runtime is primary in `runtime_minutes`, or whether it stays UNKNOWN.
-3. The display rule: is a runtime always shown with its test speed? (Recommended.)
-
-Once decided, the change is an ordinary scoped batch: three K1 records, a manifest, a rehearsal
-and a preflight, as in Batches 1 and 2.
+It adds no specification rows and changes no schema, prices, offers, availability, images,
+evidence or publication.

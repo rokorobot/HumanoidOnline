@@ -10,8 +10,12 @@ class MarketSnapshot(BaseModel):
     """Aggregate counts derived entirely from canonical facts/views.
 
     No new predicate is defined here: obtainability comes from
-    `robot_commercial_snapshot` (which uses `commercially_accessible()`), and
-    `latest_observed_at` reflects catalogue freshness from `evidence_source`.
+    `robot_commercial_snapshot` (which uses `commercially_accessible()`).
+
+    Two different dates, never merged: `latest_catalogue_updated_at` is when PUBLIC
+    catalogue content last changed (the `catalogue_freshness` row, maintained by
+    database triggers inside each committed catalogue write; migration 0026), and
+    `latest_observed_at` is the newest evidence observation in `evidence_source`.
 
     TRACKED vs PUBLISHED are two different facts and are reported separately.
     *Tracked* is what the intelligence catalogue knows about; *published* is the
@@ -30,3 +34,4 @@ class MarketSnapshot(BaseModel):
     manufacturers_published: int
     rental_offers_present: bool
     latest_observed_at: datetime | None = None
+    latest_catalogue_updated_at: datetime | None = None

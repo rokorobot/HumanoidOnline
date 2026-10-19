@@ -2393,5 +2393,130 @@ CREATE TRIGGER trg_catalogue_write_audit_no_delete
     BEFORE DELETE ON catalogue_write_audit FOR EACH STATEMENT EXECUTE FUNCTION refuse_claim_proposal_mutation();
 
 -- =============================================================================
+-- CATALOGUE FRESHNESS (0026): when did canonical catalogue content last change?
+-- =============================================================================
+-- One row, maintained only by record_catalogue_change() inside the writing transaction
+-- (rollback-safe, no-op UPDATEs ignored, every write path covered). Definition, coverage
+-- and exclusions: db/migrations/0026_catalogue_freshness.sql. A fresh database starts at
+-- NULL (UNKNOWN) and is set by its first catalogue write.
+
+CREATE TABLE catalogue_freshness (
+    id                       SMALLINT PRIMARY KEY DEFAULT 1,
+    latest_public_update_at  TIMESTAMPTZ,
+    latest_update_at         TIMESTAMPTZ,
+    CONSTRAINT ck_catalogue_freshness_single_row CHECK (id = 1)
+);
+COMMENT ON TABLE catalogue_freshness IS
+    'Single row. Maintained ONLY by record_catalogue_change() inside the writing transaction: '
+    'latest_public_update_at = last committed change to public catalogue content, '
+    'latest_update_at = last committed change to any canonical content (drafts included).';
+
+CREATE OR REPLACE FUNCTION record_catalogue_change() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = humanoid, public AS $$
+DECLARE
+    old_row   JSONB;
+    new_row   JSONB;
+    ids       UUID[];
+    is_public BOOLEAN;
+BEGIN
+    IF TG_OP <> 'INSERT' THEN
+        old_row := to_jsonb(OLD) - 'updated_at' - 'search_vector';
+    END IF;
+    IF TG_OP <> 'DELETE' THEN
+        new_row := to_jsonb(NEW) - 'updated_at' - 'search_vector';
+    END IF;
+    IF TG_OP = 'UPDATE' AND old_row = new_row THEN
+        RETURN NULL;                                   -- a rewrite that changes nothing
+    END IF;
+
+    IF TG_TABLE_NAME = 'robot' THEN                    -- publishing / unpublishing is public
+        is_public := coalesce((old_row->>'is_published')::boolean, false)
+                  OR coalesce((new_row->>'is_published')::boolean, false);
+    ELSIF TG_TABLE_NAME IN ('manufacturer', 'provider', 'capability', 'use_case',
+                            'spec_definition') THEN
+        ids := ARRAY[(old_row->>'id')::uuid, (new_row->>'id')::uuid];
+        is_public := CASE TG_TABLE_NAME
+            WHEN 'manufacturer' THEN EXISTS (
+                SELECT 1 FROM robot r WHERE r.is_published AND r.manufacturer_id = ANY(ids))
+            WHEN 'provider' THEN EXISTS (
+                SELECT 1 FROM robot r WHERE r.is_published AND (
+                    EXISTS (SELECT 1 FROM pricing_offer o
+                            WHERE o.robot_id = r.id AND o.provider_id = ANY(ids))
+                    OR EXISTS (SELECT 1 FROM availability_offer o
+                               WHERE o.robot_id = r.id AND o.provider_id = ANY(ids))
+                    OR EXISTS (SELECT 1 FROM deployment d
+                               WHERE d.robot_id = r.id AND d.provider_id = ANY(ids))))
+            WHEN 'capability' THEN EXISTS (
+                SELECT 1 FROM robot_capability c JOIN robot r ON r.id = c.robot_id
+                WHERE r.is_published AND c.capability_id = ANY(ids))
+            WHEN 'use_case' THEN EXISTS (
+                SELECT 1 FROM use_case_fit f JOIN robot r ON r.id = f.robot_id
+                WHERE r.is_published AND f.use_case_id = ANY(ids))
+            ELSE EXISTS (
+                SELECT 1 FROM specification s JOIN robot r ON r.id = s.robot_id
+                WHERE r.is_published AND s.definition_id = ANY(ids))
+        END;
+    ELSE                                               -- a robot's own child rows
+        ids := ARRAY[(old_row->>'robot_id')::uuid, (new_row->>'robot_id')::uuid];
+        is_public := EXISTS (SELECT 1 FROM robot r WHERE r.is_published AND r.id = ANY(ids));
+    END IF;
+
+    -- At most one real write per transaction (now() is fixed for the transaction), and never
+    -- backwards: a long transaction that commits after a newer one cannot move the date back.
+    UPDATE catalogue_freshness
+       SET latest_update_at = GREATEST(latest_update_at, now()),
+           latest_public_update_at = CASE WHEN is_public
+                                          THEN GREATEST(latest_public_update_at, now())
+                                          ELSE latest_public_update_at END
+     WHERE id = 1
+       AND (latest_update_at IS NULL OR latest_update_at < now()
+            OR (is_public AND (latest_public_update_at IS NULL
+                               OR latest_public_update_at < now())));
+    RETURN NULL;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION guard_catalogue_freshness() RETURNS trigger
+LANGUAGE plpgsql AS $$
+BEGIN
+    IF TG_OP = 'UPDATE' AND pg_trigger_depth() > 1 THEN
+        RETURN NEW;                                    -- written by record_catalogue_change()
+    END IF;
+    RAISE EXCEPTION 'catalogue_freshness is maintained only by record_catalogue_change() '
+                    '(% refused)', TG_OP
+        USING ERRCODE = 'insufficient_privilege';
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_catalogue_freshness_guard ON catalogue_freshness;
+CREATE TRIGGER trg_catalogue_freshness_guard
+    BEFORE UPDATE OR DELETE ON catalogue_freshness
+    FOR EACH ROW EXECUTE FUNCTION guard_catalogue_freshness();
+DROP TRIGGER IF EXISTS trg_catalogue_freshness_no_truncate ON catalogue_freshness;
+CREATE TRIGGER trg_catalogue_freshness_no_truncate
+    BEFORE TRUNCATE ON catalogue_freshness
+    FOR EACH STATEMENT EXECUTE FUNCTION guard_catalogue_freshness();
+
+DO $$
+DECLARE t TEXT;
+BEGIN
+    FOR t IN
+        SELECT unnest(ARRAY[
+            'robot','robot_variant','robot_image','specification','robot_capability',
+            'use_case_fit','pricing_offer','availability_offer','deployment',
+            'manufacturer','provider','capability','use_case','spec_definition'
+        ])
+    LOOP
+        EXECUTE format('DROP TRIGGER IF EXISTS trg_%1$s_catalogue_freshness ON %1$s', t);
+        EXECUTE format(
+            'CREATE TRIGGER trg_%1$s_catalogue_freshness
+             AFTER INSERT OR UPDATE OR DELETE ON %1$s
+             FOR EACH ROW EXECUTE FUNCTION record_catalogue_change();', t);
+    END LOOP;
+END$$;
+
+INSERT INTO catalogue_freshness (id) VALUES (1);
+
+-- =============================================================================
 -- END OF SCHEMA
 -- =============================================================================

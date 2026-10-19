@@ -52,7 +52,8 @@ GRANT SELECT ON
     candidate_claim, candidate_image_ref, extraction_result, candidate_commercial_signal,
     discovery_evidence_excerpt, promotion_audit, freshness_target, freshness_observation,
     candidate_identity_decision, discovery_claim_proposal, discovery_proposal_observation,
-    discovery_proposal_decision, accepted_claim, claim_retraction, catalogue_write_audit
+    discovery_proposal_decision, accepted_claim, claim_retraction, catalogue_write_audit,
+    catalogue_freshness
 TO catalogue_importer;
 
 -- Shared entities: reconciled by natural key, never deleted by the importer.

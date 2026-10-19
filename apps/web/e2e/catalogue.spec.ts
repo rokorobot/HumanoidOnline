@@ -19,6 +19,12 @@ test("home renders live market-snapshot counts (not illustrative)", async ({ pag
   const tracked = Number(await snapshot.locator(".num").innerText());
   expect(tracked).toBeGreaterThanOrEqual(7);
   await expect(page.locator("body")).not.toContainText("20 PLATFORMS TRACKED");
+  // Freshness is the database-recorded CATALOGUE UPDATED date (set by the catalogue
+  // import that loaded this database), never the evidence-observation date.
+  await expect(
+    page.getByText(/CATALOGUE UPDATED\s+\d{2}\s+[A-Z]{3}\s+\d{4}/).first(),
+  ).toBeVisible();
+  await expect(page.locator("body")).not.toContainText("DATA OBSERVED");
 });
 
 test("robot detail: stored reach reaches the public surface, span stays UNKNOWN", async ({

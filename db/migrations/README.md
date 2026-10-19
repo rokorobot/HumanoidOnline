@@ -348,3 +348,9 @@ canonical set from these files on every CI run and fails on any drift.
   `OWNER_AUTHORIZED` source-access basis separately from any publisher ToS
   verdict, an append-only event table, and revised (still fail-closed)
   enablement constraint. The migration never enables a source or starts a crawl.
+- `0026_catalogue_freshness.sql` — automatic catalogue freshness: a single-row
+  `catalogue_freshness` table maintained only by row-level triggers on the canonical
+  content tables, inside the writing transaction (rollback-safe; equal-value UPDATEs
+  ignored; every write path covered). Feeds `latest_catalogue_updated_at` in
+  `/api/market-snapshot`. One-time bootstrap from stored `updated_at` values; no other
+  row changes.

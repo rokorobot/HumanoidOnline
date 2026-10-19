@@ -88,6 +88,9 @@ AUDIT_TABLES = frozenset({
 #:                             REDACTED (hash only): contact details must not reach reports, and
 #:                             a lead that arrives between the clone and the comparison shows up
 #:                             here as "production moved since the rehearsal"
+#: Derived state, never compared: maintained by database triggers from the gated catalogue
+#: tables (0026), so any change to it is fully explained by the changes it summarises.
+DERIVED_TABLES = frozenset({"catalogue_freshness"})
 REDACTED_TABLES = frozenset({"commercial_lead", "commercial_lead_robot",
                              "commercial_lead_provider", "buyer_requirement", "match_result"})
 #: Natural keys: a removed + added pair with the same key is one CHANGED row. A tuple is a
@@ -175,7 +178,8 @@ def snapshot(conn, exclude_tables=frozenset()) -> dict[str, list[dict]]:
     cur = conn.cursor()
     cur.execute("SET search_path TO humanoid, public")
     cur.execute("select tablename from pg_tables where schemaname = 'humanoid' order by 1")
-    tables = [r[0] for r in cur.fetchall() if r[0] not in exclude_tables]
+    tables = [r[0] for r in cur.fetchall()
+              if r[0] not in exclude_tables and r[0] not in DERIVED_TABLES]
     labels: dict[str, str] = {}
     for table, col in LABEL_TABLES.items():
         if table in tables:

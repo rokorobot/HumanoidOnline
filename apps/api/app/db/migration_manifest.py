@@ -98,4 +98,7 @@ MIGRATIONS: dict[str, str] = {
     "0025_owner_authorized_source_access": (
         "4bda22d1b2bdac28fa2f866db6957805cd4c67de3af6b2bc8c55dd6c0c7cbd62"
     ),
+    "0026_catalogue_freshness": (
+        "b9d2751bc39734d82e14ee8b8f8e1b8feb61b881460bd668bae9de90c2e89ec2"
+    ),
 }

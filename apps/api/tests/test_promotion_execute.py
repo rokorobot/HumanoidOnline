@@ -88,6 +88,22 @@ def test_single_approval_executes_end_to_end_and_leaves_a_receipt(world):  # noq
     assert "CATALOGUE_DATABASE_URL" not in json.dumps(receipt)
 
 
+def test_a_successful_promotion_advances_the_catalogue_updated_date(world):  # noqa: F811
+    """Migration 0026: the executor's apply (as the additions-only routine role) moves the
+    public CATALOGUE UPDATED date of a published robot; the refused re-run does not."""
+    def fresh():
+        return world.sql("SELECT latest_public_update_at, latest_update_at "
+                         "FROM catalogue_freshness")[0]
+
+    assert world.sql("SELECT is_published FROM robot WHERE slug = %s", (ROBOT,)) == [(True,)]
+    before = fresh()
+    assert world.execute()["outcome"] == "SUCCESS"
+    after = fresh()
+    assert after[0] > before[0] and after[1] > before[1]
+    assert world.execute()["outcome"] == "ALREADY_APPLIED"
+    assert fresh() == after
+
+
 def test_the_same_manifest_never_applies_twice(world):  # noqa: F811
     first = world.execute()
     assert first["outcome"] == "SUCCESS"

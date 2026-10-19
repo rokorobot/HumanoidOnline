@@ -52,7 +52,7 @@ owned by the importer. Run it in CI against the seed and in the import preflight
 (not a gate) at first.
 
 **Phase 1: stable IDs via diff-based reconcile (importer code, no migration if natural keys
-exist).** Design and acceptance tests: `docs/discovery/STABLE_ID_RECONCILIATION_DESIGN_2026-10-19.md`. Replace delete-all/insert-all with upsert-by-natural-key and delete-only-missing:
+exist).** Design and acceptance tests: `docs/discovery/STABLE_ID_RECONCILIATION_DESIGN_2026-10-19.md`. Replace delete-all/insert-all with upsert-by-natural-key; rows missing from the JSON are preserved, not deleted (owner decision D1, 2026-10-19):
 - `pricing_offer` / `availability_offer`: their existing logical uniqueness (provider, region,
   transaction type, condition, variant…, e.g. `uq_availability_logical`). Verify an equivalent
   key for pricing; if it is missing, adding the unique index is a migration (a schema change,

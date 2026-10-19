@@ -10,7 +10,10 @@ Pins the target behaviour of a re-import BEFORE the importer changes:
   importer deletes and reinserts a robot's child rows. Those tests are `xfail(strict=True)`:
   when Phase 1 lands they XPASS, strict turns that into a failure, and the marker must be
   removed, so the change is visible rather than silent;
-* a one-value edit changes only that row (also xfail until Phase 1).
+* a one-value edit changes only that row (also xfail until Phase 1);
+* a row omitted from the JSON is preserved, id and evidence intact (owner decision D1: routine
+  imports never delete by omission; removal is an explicit authorized operation). Also xfail:
+  today the reset deletes it.
 
 Real catalogue files on a scratch database; nothing here touches the importer.
 """
@@ -147,3 +150,28 @@ def test_a_one_value_edit_keeps_every_other_id(world):
         assert after[table] == before[table], table
     # the edited offer is updated in place, not recreated
     assert after["availability_offer"] == before["availability_offer"]
+
+
+@pytest.mark.xfail(strict=True, raises=AssertionError,
+                   reason="Phase 1 not implemented: the importer deletes every child row, so an "
+                          "omitted row is lost (D1 requires it to be preserved)")
+def test_an_omitted_row_is_preserved(world):
+    url, cat = world
+    before = _ids(url)
+    path = cat / "robots" / "unitree-h2-edu.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    omitted = doc["pricing_offers"].pop(0)
+    path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    ic.run(url, only=ROBOTS)
+    with psycopg.connect(url) as conn:
+        conn.execute("SET search_path TO humanoid, public")
+        kept = conn.execute(
+            "SELECT count(*) FROM pricing_offer o JOIN robot r ON r.id = o.robot_id "
+            "JOIN provider p ON p.id = o.provider_id "
+            "WHERE r.slug = 'unitree-h2-edu' AND p.slug = %s AND o.price = %s",
+            (omitted["provider_slug"], omitted["price"])).fetchone()[0]
+    assert kept == 1, "the omitted pricing offer was deleted"
+    # omission is not a change: every id, the omitted row's and its evidence's included, survives
+    after = _ids(url)
+    for table in ID_TABLES:
+        assert after[table] == before[table], table

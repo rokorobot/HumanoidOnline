@@ -6,6 +6,10 @@
 `xfail(strict=True)`. The implementation is a later PR that needs owner approval, a rehearsal on a
 production copy, and a separate review for any migration.
 
+**Owner decisions D1–D5 (2026-10-19) govern this design.** They are recorded in
+`docs/discovery/AUTOMATED_COMMERCIAL_INTELLIGENCE_PIPELINE_2026-10-19.md` (#175) and supersede
+anything here that conflicts with them. This revision aligns §2–§7 with them.
+
 ## 1. Problem
 
 `import_robot` calls `_reset_robot_children`, which deletes every child row of the robot and then
@@ -33,8 +37,13 @@ spec definition), are already upserted by natural key and keep their ids.
 For each selected robot, reconcile each child table by its **natural key**:
 - **update in place** a row whose key exists but whose content differs;
 - **insert** a key that is new;
-- **delete** a key that is no longer in the JSON;
-- **leave untouched** a row whose key and content are unchanged.
+- **leave untouched** a row whose key and content are unchanged;
+- **preserve** a row whose key the JSON no longer lists (**D1: no deletion by omission**).
+
+A missing JSON field or child row is not an instruction to delete. Deletion, retirement,
+replacement and retraction are **explicit, authorized operations**, separate from a routine
+import, each with ownership and evidence checks (see §4 step 7). A routine import may report
+omitted keys, but never removes them.
 
 Ids are never reassigned. The robot's whole reconciliation stays in **one transaction**, as
 today.
@@ -46,16 +55,16 @@ today.
 | robot_variant | (robot_id, slug) | yes: `UNIQUE (robot_id, slug)` |
 | specification (importer-owned) | (robot_id, variant_id, definition_id) | yes: `uq_specification_logical` (NULL-safe) |
 | availability_offer | (robot_id, variant_id, provider_id, region_id, transaction_type, condition) WHERE is_current | yes: `uq_availability_logical` |
-| pricing_offer | (robot_id, variant_id, provider_id, region_id, transaction_type, condition, price_type, billing_period) | **no** (see D1) |
-| robot_image | (robot_id, image_url) | **no** (see D1) |
-| deployment | candidate (robot_id, customer_name, region_id, started_on); `customer_name` may be undisclosed (NULL) | **no**; the key must be chosen (D2) |
+| pricing_offer | (robot_id, variant_id, provider_id, region_id, transaction_type, condition, price_type, billing_period) | **no** (see U1) |
+| robot_image | (robot_id, image_url) | **no** (see U1) |
+| deployment | (robot_id, deployment_key): an explicit durable key (D2) | **no**; needs a separately approved migration (D2) |
 | robot_capability | (robot_id, capability_id) | yes: primary key (no surrogate id) |
 | use_case_fit | (robot_id, use_case_id) | yes: unique (no surrogate id) |
-| evidence_source (importer-managed) | (subject_type, subject_id, source_url, source_type, sha256(excerpt)) | **no** (see D3) |
+| evidence_source (importer-managed) | (subject_type, subject_id, source_url, source_type, sha256(excerpt)); a changed excerpt is a new version (D3) | **no** |
 
 **Checked against the catalogue JSON (main @ b6afe89):**
 - The proposed `pricing_offer` key is unique across all 35 pricing offers; the `robot_image`
-  key across all 50 images. No collisions, so D1's indexes would build on today's data.
+  key across all 50 images. No collisions, so the U1 indexes would build on today's data.
 - The JSON carries **non-current offers**: `unitree-r1` pricing via quadruped-de (DE) and
   `unitree-r1-edu-u5` availability via reichelt (DE), each with `is_current: false` and no
   current sibling. `uq_availability_logical` is partial (`WHERE is_current`), so the reconcile
@@ -69,23 +78,31 @@ plan listed it, but the index does not include it.
 
 1. **Load.** Read the current rows for the robot, keyed by natural key. For variant-scoped
    tables, resolve variants first (step 2), so variant ids are known.
-2. **Variants first.** Upsert by (robot_id, slug), then delete only the slugs that are no
-   longer present.
-   - Phase 2 cascade protection runs **before** any variant delete: refuse if a row that is not
-     importer-owned references the variant.
+2. **Variants first.** Upsert by (robot_id, slug). A slug the JSON no longer lists is
+   **kept** (D1); a routine import never deletes a variant, so it never cascades.
 3. **Other tables.** For each JSON row, compute its key:
    - key exists and content is equal: do nothing;
    - key exists and content differs: `UPDATE ... WHERE id = <existing id>`;
    - key is missing: `INSERT`.
-   Afterwards, delete the existing keys the JSON no longer lists.
+   Existing keys the JSON no longer lists are left as they are and reported as **omitted** (D1).
 4. **Evidence follows its subject.** Its `subject_id` is the subject's (now stable) id.
-   Reconcile it by the evidence key under that subject, the same way.
+   Reconcile it by the evidence key under that subject, the same way. Because the key includes
+   `sha256(excerpt)`, a changed excerpt is inserted as a **new evidence version**; the earlier
+   version and its audit history stay (D3).
 5. **Duplicate keys in the JSON fail loudly** before any write. Today only the tables with a
    unique index reject them, and only at insert time.
 6. **Ownership boundaries do not change:**
    - unowned `specification` and evidence rows are never touched;
    - `is_published` stays editorial;
    - `--apply-publication-state` semantics stay as they are.
+
+7. **Removal is a separate, explicit operation** (D1). Deleting, retiring, replacing or
+   retracting a row needs an authorized instruction that names the row; its absence from the
+   JSON is not one. Before acting, the operation checks ownership (importer-owned rows only)
+   and evidence. For a variant it applies Phase 2 cascade protection: refuse if a row that is
+   not importer-owned references the variant. The form of that instruction (a CLI flag, a
+   manifest entry, a retirement status) is for the implementation PR to propose; it is not
+   decided here.
 
 The algorithm is deterministic, with no ordering or timing inputs.
 
@@ -97,6 +114,7 @@ The algorithm is deterministic, with no ordering or timing inputs.
 | `test_ids_that_are_already_stable_stay_stable[robot]` | pass | pass |
 | `test_reimporting_unchanged_files_changes_no_ids[<table>]` for robot_variant, specification, pricing_offer, availability_offer, deployment, robot_image, evidence_source | **xfail (strict)** | pass, and the marker is removed |
 | `test_a_one_value_edit_keeps_every_other_id` (an edited availability offer is updated in place; no other id changes) | **xfail (strict)** | pass, and the marker is removed |
+| `test_an_omitted_row_is_preserved` (a pricing offer dropped from the JSON keeps its row, its evidence and every id; D1) | **xfail (strict)** | pass, and the marker is removed |
 
 **What strict means here:**
 - A partial Phase 1 turns individual cases into XPASS, and strict mode turns those into
@@ -114,14 +132,21 @@ The algorithm is deterministic, with no ordering or timing inputs.
 A guard test asserts that every id table is non-empty.
 
 **Further tests the implementation PR adds:**
-- Removing a JSON row deletes exactly that row.
+- An explicit, authorized removal deletes (or retires) exactly the named row and nothing else.
 - Adding a row inserts exactly one.
 - Duplicate natural keys in the JSON are refused before any write.
-- Phase 2: deleting a variant referenced by an unowned row is refused.
+- A changed evidence excerpt adds a new evidence version and keeps the earlier one (D3).
+- Phase 2: an explicit removal of a variant referenced by an unowned row is refused.
 - A Phase 0 report after re-import shows **zero new RELINKABLE rows**. Audits written after
   Phase 1 stay CURRENT.
 
 ## 6. Rehearsal and rollout (implementation PR, not this one)
+
+A **production copy** is either an isolated Neon rehearsal branch or a local database restored
+from a read-only production dump (D4). Either is acceptable if it gives equivalent integrity,
+isolation and recovery: the rehearsal never writes to production, production is unchanged by
+it, and the copy can be discarded and recreated. No step needs, or may use, GitHub Actions
+production write credentials (D5).
 
 1. **Production copy, unchanged catalogue.** Run a scoped and then a full re-import with
    `import_preflight.py --report-only`. Require **zero business changes and zero id changes**,
@@ -129,19 +154,38 @@ A guard test asserts that every id table is non-empty.
 2. **Production copy, the next real content change.** The preflight lists exactly the expected
    rows, each with its id unchanged.
 3. **Phase 0 report before and after.** No CURRENT audit becomes RELINKABLE.
-4. **Production.** Owner approval, a Neon safety branch, and the same checks.
+4. **Production copy, an omitted row.** Drop one row from a copy of the JSON: the preflight
+   reports it as omitted, and the row, its evidence and its id remain (D1).
+5. **Production.** Owner approval, a Neon safety branch, and the same checks.
 
 ## 7. Owner decisions
 
-- **D1.** Add unique indexes for the `pricing_offer` and `robot_image` natural keys. This is a
+Decided by the owner on 2026-10-19 (`AUTOMATED_COMMERCIAL_INTELLIGENCE_PIPELINE_2026-10-19.md`,
+"Owner Architectural Decisions"). They are principles, not approvals: no implementation,
+migration, import, deployment or credential is approved by them.
+
+- **D1. Non-destructive reconciliation (decided).** Missing JSON fields or child rows do not
+  authorize deletion; routine imports preserve existing records. Retirement, replacement,
+  retraction and deletion are explicit authorized changes with ownership and evidence checks.
+  Applied in §2 and §4 (step 7). This replaces the earlier proposal to delete omitted keys.
+- **D2. Stable deployment identity (decided).** New deployments carry an explicit durable
+  `deployment_key`. Existing deployments are **not** re-keyed by inference (for example from
+  customer name, region and start date). Adding `deployment_key` is a migration that needs
+  **separate approval**. Until it lands, the implementation PR must not reconcile deployments
+  by an inferred key; how it handles existing keyless deployments in the meantime is for that
+  PR to propose. The earlier options (an inferred NULL-safe key, a JSON slug, or
+  delete-and-reinsert) are superseded.
+- **D3. Evidence versioning (decided).** A materially changed excerpt is a **new evidence
+  version**, not an update in place. The original evidence and its audit history are
+  preserved. This matches the excerpt-hash key in §3.
+- **D4. Rehearsals (decided).** An isolated Neon rehearsal branch or a local database restored
+  from a read-only production dump; see §6.
+- **D5. Production automation credentials (decided).** GitHub Actions gets no production write
+  access. Nothing in this design requires it.
+
+Still open, for owner review with the implementation PR:
+- **U1.** Unique indexes for the `pricing_offer` and `robot_image` natural keys. This is a
   migration and needs separate review. Without them, the importer enforces uniqueness itself
-  (step 5), which is weaker.
-- **D2.** The `deployment` natural key. The catalogue JSON has no stable deployment identifier.
-  Options:
-  - (customer_name, region, started_on), NULL-safe;
-  - a new `slug` in the JSON;
-  - keep delete-and-reinsert for deployments only, as a documented exception.
-- **D3.** The evidence key. Hashing the excerpt means an edited excerpt is a new evidence row,
-  not an update. That is arguably correct for provenance.
-- **D4.** Phase order. Phase 1 (this design) first, then Phase 3, which relinks the 25 historical
-  audits or records them as historical. Phase 0 shows they are all RELINKABLE.
+  (§4 step 5), which is weaker.
+- **U2.** Phase order. Phase 1 (this design) first, then Phase 3, which relinks the 25
+  historical audits or records them as historical. Phase 0 shows they are all RELINKABLE.

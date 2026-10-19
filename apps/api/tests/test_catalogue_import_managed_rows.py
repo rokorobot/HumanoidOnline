@@ -1,16 +1,16 @@
 """The importer owns its own rows — and only its own.
 
-`db/import_catalogue.py` replaces a robot's fact rows on every run so that
-re-importing is idempotent. `specification` is the one table where that
-ownership is *shared*: `db/seed/seed.sql` and hand authoring write rows there
-too, and `spec_definition` keys like `swappable_battery` are authored by the
-seed with their own labels and units.
+`db/import_catalogue.py` reconciles a robot's fact rows by natural key on every run
+so that re-importing is idempotent and keeps row ids. `specification` is the one
+table where that ownership is *shared*: `db/seed/seed.sql` and hand authoring write
+rows there too, and `spec_definition` keys like `swappable_battery` are authored by
+the seed with their own labels and units.
 
 Two failures follow from that, and both are pinned here:
 
-* a blanket delete would destroy somebody else's specification row while
+* a blanket reconciliation would touch somebody else's specification row while
   refreshing ours;
-* deleting only our rows is not enough if the INSERT that follows then writes
+* leaving only our rows alone is not enough if the write that follows then goes
   over an unmanaged row occupying the same logical key — the collision has to be
   detected and REPORTED, because a silently skipped value and a silently
   overwritten one are equally invisible.
@@ -23,6 +23,8 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
+import pytest
+
 REPO_ROOT = Path(__file__).resolve().parents[3]
 _spec = importlib.util.spec_from_file_location(
     "import_catalogue", REPO_ROOT / "db" / "import_catalogue.py"
@@ -32,53 +34,105 @@ _spec.loader.exec_module(ic)
 
 
 class _RecordingCursor:
-    """Captures SQL without a database; `fetchone` is scripted per test."""
+    """Captures SQL without a database; `fetchone` is scripted per test.
 
-    def __init__(self, rows=None) -> None:
+    `existing` maps a table name to the rows its reconciliation read would return
+    (id, natural-key columns, then the table's ownership/protection peeks)."""
+
+    def __init__(self, rows=None, existing=None) -> None:
         self.statements: list[str] = []
+        self.params: list[tuple] = []
         self._rows = list(rows or [])
+        self._existing = existing or {}
+        self._last = ""
 
     def execute(self, sql, params=None):
-        self.statements.append(" ".join(str(sql).split()))
+        self._last = " ".join(str(sql).split())
+        self.statements.append(self._last)
+        self.params.append(tuple(params or ()))
         return self
 
     def fetchone(self):
         return self._rows.pop(0) if self._rows else (1, "EUR")
 
+    def fetchall(self):
+        for table, rows in self._existing.items():
+            if f"FROM {table} t" in self._last:
+                return list(rows)
+        return []
+
     def matching(self, prefix: str) -> list[str]:
         return [s for s in self.statements if s.startswith(prefix)]
 
 
-# --- specification retirement is scoped to the importer's own rows -----------
-
-def test_reset_deletes_only_importer_managed_specifications():
-    """The delete must carry the ownership predicate. Without it, a routine
-    fact refresh silently destroys seed and hand-authored specifications."""
-    cur = _RecordingCursor()
-    ic._reset_robot_children(cur, robot_id=1)
-
-    deletes = cur.matching("DELETE FROM specification")
-    assert len(deletes) == 1, deletes
-    assert "managed_by = %s" in deletes[0], (
-        "specification rows were deleted without restricting to the importer's "
-        f"own managed rows: {deletes[0]}"
+def _import(cur, robot, authorize=None):
+    return ic.import_robot(
+        cur, robot,
+        region_id=lambda code: 1, manufacturer_id=lambda slug: 1,
+        capability_id=lambda slug: 1, use_case_id=lambda slug: 1,
+        spec_definition=lambda key: (7, "TEXT"), collisions=[], authorize=authorize,
     )
 
 
-def test_wholly_owned_child_tables_are_still_replaced_outright():
-    """The narrow specification rule must not accidentally spare the tables the
-    importer does own — those must keep being replaced, or re-import stops
-    being idempotent and rows accumulate."""
-    cur = _RecordingCursor()
-    ic._reset_robot_children(cur, robot_id=1)
+ROBOT = {"slug": "test-robot", "manufacturer_slug": "test-maker", "name": "Test Robot",
+         "commercial_status": "ANNOUNCED", "is_published": False, "specs": {}}
 
-    for table in ("pricing_offer", "availability_offer", "deployment"):
-        deletes = cur.matching(f"DELETE FROM {table}")
-        assert deletes, f"{table} is importer-owned and must be replaced on import"
-        assert "managed_by" not in deletes[0], (
-            f"{table} is wholly owned by the importer; it must not be filtered "
-            "by managed_by"
-        )
+#: The shape of an existing row as the reconciliation reads it: id, natural key, peeks.
+FOREIGN_SPEC = ("spec-1", None, "swappable_battery", "seed/hand-authored", False, False, False)
+OWN_SPEC = ("spec-2", None, "retired_key", ic.MANAGED_BY, False, False, False)
+
+
+# --- specification reconciliation is scoped to the importer's own rows -------
+
+def test_only_importer_managed_specifications_can_ever_be_removed():
+    """A routine refresh must never reach seed and hand-authored specifications: a row
+    that is not ours is not even a candidate for removal, while one of ours that left
+    the JSON is refused (never silently deleted) and named exactly."""
+    cur = _RecordingCursor(existing={"specification": [FOREIGN_SPEC, OWN_SPEC]})
+    with pytest.raises(ic.ReconcileRefused) as refused:
+        _import(cur, ROBOT)
+    message = str(refused.value)
+    assert "retired_key" in message and "swappable_battery" not in message
+    assert not [s for s in cur.statements if s.startswith("DELETE")], cur.statements
+
+
+def test_authorized_removal_deletes_only_the_named_managed_specification():
+    cur = _RecordingCursor(existing={"specification": [FOREIGN_SPEC, OWN_SPEC]})
+    _import(cur, ROBOT, authorize={"version": 1, "entries": [{
+        "action": "remove", "table": "specification", "robot": "test-robot",
+        "key": {"variant_slug": None, "key": "retired_key"}}]})
+    deletes = [(s, p) for s, p in zip(cur.statements, cur.params, strict=True)
+               if s.startswith("DELETE FROM specification")]
+    assert deletes == [("DELETE FROM specification WHERE id = %s", ("spec-2",))]
+
+
+_OFFER_KEY = {"variant_slug": None, "provider_slug": "shop", "region_code": "DE",
+              "transaction_type": "PURCHASE", "condition": "NEW"}
+TABLE_ROWS = {
+    "pricing_offer": (("offer-1", None, "shop", "DE", "PURCHASE", "NEW"), _OFFER_KEY),
+    "availability_offer": (("offer-1", None, "shop", "DE", "PURCHASE", "NEW"), _OFFER_KEY),
+    "deployment": (("dep-1", "Acme", "DE", "2026-01-01"),
+                   {"customer_name": "Acme", "region_code": "DE", "started_on": "2026-01-01"}),
+}
+
+
+@pytest.mark.parametrize("table", sorted(TABLE_ROWS))
+def test_wholly_owned_child_tables_are_removed_only_when_authorized(table):
+    """The importer owns these tables outright, so a row that left the JSON is neither
+    silently kept (rows would accumulate) nor silently deleted: it is refused, and removed
+    without any managed_by filter once the operator names it."""
+    row, key = TABLE_ROWS[table]
+    refused = _RecordingCursor(existing={table: [row]})
+    with pytest.raises(ic.ReconcileRefused):
+        _import(refused, ROBOT)
+    assert not [s for s in refused.statements if s.startswith("DELETE")]
+
+    cur = _RecordingCursor(existing={table: [row]})
+    _import(cur, ROBOT, authorize={"version": 1, "entries": [{
+        "action": "remove", "table": table, "robot": "test-robot", "key": key}]})
+    deletes = cur.matching(f"DELETE FROM {table}")
+    assert deletes, f"{table} is importer-owned and an authorized removal must delete the row"
+    assert "managed_by" not in deletes[0]
 
 
 def test_the_managed_marker_is_a_named_constant():
@@ -118,7 +172,7 @@ def test_an_unmanaged_spec_definition_is_preserved_and_reported():
 
 def test_a_definition_we_own_is_updated_without_a_collision_report():
     """The protection must not cry wolf on the importer's own keys."""
-    cur = _RecordingCursor(rows=[(1,)])
+    cur = _RecordingCursor(rows=[(1, True)])
     collisions: list[str] = []
     ic.import_spec_definitions(
         cur,
@@ -131,17 +185,28 @@ def test_a_definition_we_own_is_updated_without_a_collision_report():
     assert collisions == []
 
 
+def test_an_unchanged_definition_we_own_is_neither_rewritten_nor_reported():
+    """The upsert only fires when a column differs, so an unchanged definition returns no
+    row; that must read as 'ours and unchanged', not as a collision."""
+    cur = _RecordingCursor(rows=[None, (ic.MANAGED_BY,)])
+    collisions: list[str] = []
+    recon = ic.Reconciliation()
+    ic.import_spec_definitions(
+        cur,
+        {"spec_definitions": [
+            {"key": "arm_joint_torque_nm", "label": "Arm joint torque", "value_type": "TEXT"},
+        ]},
+        collisions, recon,
+    )
+    assert collisions == []
+    assert recon.counts["spec_definition"]["unchanged"] == 1
+
+
 def test_an_unmanaged_specification_row_is_skipped_not_overwritten():
-    """Our rows were already deleted, so anything still occupying the logical
-    key belongs to someone else. The catalogue value is skipped and the
-    preserved row is reported — never overwritten."""
+    """Anything occupying the logical key that is not ours belongs to someone else. The
+    catalogue value is skipped and the preserved row is reported — never overwritten."""
     robot = {
-        "slug": "test-robot",
-        "manufacturer_slug": "test-maker",
-        "name": "Test Robot",
-        "commercial_status": "ANNOUNCED",
-        "is_published": False,
-        "specs": {},
+        **ROBOT,
         "extended_specs": [
             {"key": "swappable_battery", "value": True,
              "source_label": "Maker spec sheet",
@@ -150,8 +215,7 @@ def test_an_unmanaged_specification_row_is_skipped_not_overwritten():
              "observed_at": "2026-09-11"},
         ],
     }
-    # robot upsert RETURNING id, then the occupancy probe finding a foreign row.
-    cur = _RecordingCursor(rows=[(1,), ("seed/hand-authored",)])
+    cur = _RecordingCursor(existing={"specification": [FOREIGN_SPEC]})
     collisions: list[str] = []
     ic.import_robot(
         cur, robot,
@@ -166,14 +230,14 @@ def test_an_unmanaged_specification_row_is_skipped_not_overwritten():
     assert not cur.matching("INSERT INTO specification"), (
         "an unmanaged specification row was overwritten by the catalogue import"
     )
+    assert not cur.matching("UPDATE specification")
     assert len(collisions) == 1
     assert "swappable_battery" in collisions[0] and "preserved" in collisions[0]
+    assert "seed/hand-authored" in collisions[0]
 
 
 def test_extended_specs_without_a_registry_fail_loudly():
     """Dropping an attributed fact silently is worse than refusing to write it."""
-    import pytest
-
     robot = {
         "slug": "test-robot", "manufacturer_slug": "test-maker", "name": "Test Robot",
         "commercial_status": "ANNOUNCED", "is_published": False, "specs": {},

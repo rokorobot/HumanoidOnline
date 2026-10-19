@@ -1,10 +1,10 @@
 # Stable-ID reconciliation: design (Importer Hardening Phase 1)
 
-**Status: DESIGN. No importer change, no migration.** This expands Phase 1 of
-`docs/IMPORTER_HARDENING_PLAN_2026-10-19.md`. Its acceptance tests are in
-`apps/api/tests/test_importer_stable_ids.py`; the ones the current importer cannot meet are
-`xfail(strict=True)`. The implementation is a later PR that needs owner approval, a rehearsal on a
-production copy, and a separate review for any migration.
+**Status: IMPLEMENTED in PR A (draft; not deployed, no migration).** This expands Phase 1 of
+`docs/IMPORTER_HARDENING_PLAN_2026-10-19.md`. `db/import_catalogue.py` now reconciles by natural
+key; `_reset_robot_children` is gone. The acceptance tests in
+`apps/api/tests/test_importer_stable_ids.py` pass without any `xfail`. Section 8 is the
+update/ownership contract as implemented. Production use needs owner approval.
 
 ## 1. Problem
 
@@ -145,3 +145,72 @@ A guard test asserts that every id table is non-empty.
   not an update. That is arguably correct for provenance.
 - **D4.** Phase order. Phase 1 (this design) first, then Phase 3, which relinks the 25 historical
   audits or records them as historical. Phase 0 shows they are all RELINKABLE.
+
+## 8. The update and ownership contract (as implemented)
+
+**Per row, inside one transaction per run:**
+
+| Situation | What the importer does |
+|---|---|
+| Key in DB and JSON, every non-key column equal | **nothing** (no statement issued) |
+| Key in DB and JSON, a non-key column differs | `UPDATE` in place, **same id** (a corrected price, a retired offer `is_current: false`, a reworded limitation) |
+| Key only in JSON | `INSERT` once; the next run finds it unchanged |
+| Key only in DB (missing from the JSON) | **refuse**: the run aborts and rolls back, printing the exact `--authorize` entry |
+| Same key twice in the JSON | refuse before any write |
+| Two DB rows share one key | refuse as ambiguous; the importer never picks one |
+| Matched evidence row whose non-key fields differ | refuse unless `update_evidence` is authorized: evidence is immutable to the importer |
+| JSON blanks a protected column that holds a value | refuse unless `clear` is authorized |
+| Removing a variant that still has a specification or offer not itself being removed | refuse: the `ON DELETE CASCADE` would take it |
+| `is_published` | written only when the robot row is first created; never by a routine import (`--apply-publication-state` is the separate, gated operation) |
+| Robot, region, manufacturer, provider, capability, use case, spec definition upserts | `WHERE (cols) IS DISTINCT FROM (EXCLUDED.cols)`: an unchanged row is not rewritten and its `updated_at` does not move |
+
+**What the importer owns, and what it leaves alone:**
+- `specification`: only rows with `managed_by = 'CATALOGUE_IMPORT'`. An unmanaged row on the
+  same key is preserved and reported as a collision, as before.
+- MANUFACTURER evidence: only `managed_by = 'CATALOGUE_IMPORT'` rows. Unmarked rows are
+  untouched; a URL/type/date collision is reported.
+- Robot-child evidence (PRICING_OFFER, AVAILABILITY_OFFER, DEPLOYMENT, COMMERCIAL_STATUS): the
+  rows under the importer's own subject rows, matched by key. Ownership is never backfilled.
+  Other subject types, such as hand-written ROBOT evidence, are never read or written.
+- Variants, offers, availability, deployments, images, capabilities and fits of a catalogue
+  robot have no ownership column. They are matched by exact key. Nothing unmatched is ever
+  deleted without an authorization naming that exact key.
+
+**Snapshot versus patch.** A robot file remains the complete statement of that robot. A field
+present in the file is written as the file says, and a null stays SQL NULL (AGENTS.md rule 6).
+A field or row **absent** never erases data:
+- an absent row refuses;
+- an absent protected value refuses.
+
+Whole-record replacement no longer happens.
+
+**Explicit operations (`--authorize FILE`):**
+- `{"version": 1, "entries": [{"action": "remove" | "update_evidence" | "clear", "table", "robot", "key", "column"?}]}`.
+- The refusal output prints these entries ready to paste.
+- An entry that matches nothing aborts the run, since it is a sign of drift.
+- An authorized removal of an offer or deployment also removes that row's own evidence rows,
+  and counts them.
+
+**Evidence kinds** (A1.3):
+
+| Kind | How it is expressed |
+|---|---|
+| New evidence | a new key (URL, type, excerpt, observed date) is an insert |
+| New observation confirming unchanged information | the same excerpt with a new `observed_at` is a new row beside the old one (e.g. the 2026-09-11 and 2026-09-26 Reichelt rows) |
+| Correction | a changed excerpt is a new key, and the old row then refuses as missing until `remove` is authorized, so a correction never overwrites history silently |
+| Withdrawal | an authorized `remove` |
+
+The importer never sets `verified_at`. A newly observed page is not human verification.
+
+**Rehearsal on a production copy** (dump 2026-10-19 08:23 UTC, local only):
+- A scoped re-import of unchanged `unitree-g1` gave every table unchanged, 0 writes, and
+  `db/import_identity_check.py` PASS: 0 ID_CHANGED, 0 TOUCHED. The previous importer, on the
+  same copy, gave 22 ID_CHANGED and 4 TOUCHED with 0 business changes.
+- A full import touched only three real main-vs-production differences, which predate this
+  change:
+  - 2 H1 re-observation evidence rows (2026-09-26), inserted;
+  - 1 changed provider (`alza-cz` description), updated.
+
+  It gave 0 ID_CHANGED, 0 ambiguous keys and 0 lost audit targets. The 25 historical dangling
+  audit targets are unchanged.
+

@@ -50,6 +50,10 @@ class _RecordingCursor:
         # the upsert (index 0) and the price rollup's (price, currency) pair.
         return (1, "EUR")
 
+    def fetchall(self):
+        # No existing child rows: the reconciliation inserts everything.
+        return []
+
     def upsert_sql(self) -> str:
         matches = [s for s in self.statements if s.startswith("INSERT INTO robot (")]
         assert len(matches) == 1, f"expected one robot upsert, saw {len(matches)}"
@@ -138,8 +142,8 @@ def test_preservation_is_independent_of_the_authored_value(authored):
 def test_an_import_never_deletes_a_robot_record():
     """The master catalogue is cumulative — synchronisation only ever adds.
 
-    The importer legitimately replaces a robot's *child* rows (offers, evidence,
-    images) so re-import is idempotent. It must never reach the parent record.
+    The importer reconciles a robot's *child* rows (offers, evidence, images) by
+    natural key so re-import is idempotent. It must never reach the parent record.
     """
     cur = _RecordingCursor()
     ic.import_robot(

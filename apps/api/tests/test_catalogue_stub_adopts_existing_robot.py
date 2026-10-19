@@ -170,6 +170,10 @@ class _Recording:
     def fetchone(self):
         return (1, "EUR")
 
+    def fetchall(self):
+        # No existing child rows: the reconciliation inserts everything.
+        return []
+
 
 def test_the_importer_matches_by_slug_and_never_rewrites_publication():
     cur = _Recording()

@@ -137,6 +137,10 @@ class _RecordingCursor:
     def fetchone(self):
         return self._rows.pop(0) if self._rows else (1, "EUR")
 
+    def fetchall(self):
+        # No existing child rows: the reconciliation inserts everything.
+        return []
+
 
 def test_an_unselected_robot_is_never_mutated():
     """The decisive property: importing the batch emits no statement carrying an

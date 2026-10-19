@@ -1,18 +1,20 @@
-"""Importer Hardening Phase 1 acceptance tests.
+"""Importer Hardening Phase 1 acceptance tests: stable-ID reconciliation.
 
 Design: docs/discovery/STABLE_ID_RECONCILIATION_DESIGN_2026-10-19.md.
 
-Pins the target behaviour of a re-import BEFORE the importer changes:
+Re-importing a catalogue file must keep every row id, rewrite nothing it did not need to
+change, and never delete or blank anything unless the operator authorized exactly that:
 
-* idempotency: re-importing unchanged catalogue files changes no business content (passes
-  today; must keep passing);
-* no ID churn: re-importing unchanged files keeps every row id. This FAILS today, because the
-  importer deletes and reinserts a robot's child rows. Those tests are `xfail(strict=True)`:
-  when Phase 1 lands they XPASS, strict turns that into a failure, and the marker must be
-  removed, so the change is visible rather than silent;
-* a one-value edit changes only that row (also xfail until Phase 1).
+* idempotency: re-importing unchanged files changes no business content, no row id, no
+  `updated_at` and issues no write (the whole row state, not just ids, is compared);
+* one edit changes one row: the edited row keeps its id, everything else is byte-identical;
+* additions are inserted exactly once;
+* fail closed: ambiguity (duplicate keys in the JSON or in the database) aborts, a row that
+  left the JSON is only removed under an explicit `--authorize` entry, evidence is immutable
+  unless authorized, protected provenance is never blanked silently;
+* `is_published` stays editorial.
 
-Real catalogue files on a scratch database; nothing here touches the importer.
+Real catalogue files on a scratch database.
 """
 from __future__ import annotations
 
@@ -45,33 +47,44 @@ SCHEMA = (REPO / "db" / "schema.sql").read_text(encoding="utf-8")
 # availability, a deployment, images, use-case fits, capabilities and their evidence.
 ROBOTS = {"4ne1-mini", "unitree-h2-edu", "agility-digit"}
 
-# Tables with a surrogate `id` that a robot import writes, and how to scope them to ROBOTS.
-ID_TABLES = {
-    "robot": "SELECT id FROM robot WHERE slug = ANY(%(s)s)",
-    "robot_variant": "SELECT t.id FROM robot_variant t JOIN robot r ON r.id = t.robot_id "
-                     "WHERE r.slug = ANY(%(s)s)",
-    "specification": "SELECT t.id FROM specification t JOIN robot r ON r.id = t.robot_id "
-                     "WHERE r.slug = ANY(%(s)s)",
-    "pricing_offer": "SELECT t.id FROM pricing_offer t JOIN robot r ON r.id = t.robot_id "
-                     "WHERE r.slug = ANY(%(s)s)",
-    "availability_offer": "SELECT t.id FROM availability_offer t JOIN robot r "
-                          "ON r.id = t.robot_id WHERE r.slug = ANY(%(s)s)",
-    "deployment": "SELECT t.id FROM deployment t JOIN robot r ON r.id = t.robot_id "
-                  "WHERE r.slug = ANY(%(s)s)",
-    "robot_image": "SELECT t.id FROM robot_image t JOIN robot r ON r.id = t.robot_id "
-                   "WHERE r.slug = ANY(%(s)s)",
-    # evidence whose subject is one of ROBOTS, its manufacturer, or one of its child rows
-    "evidence_source": "SELECT e.id FROM evidence_source e WHERE e.subject_id IN ("
-                       "SELECT r.id FROM robot r WHERE r.slug = ANY(%(s)s) "
-                       "UNION SELECT r.manufacturer_id FROM robot r WHERE r.slug = ANY(%(s)s) "
-                       + "".join(f"UNION SELECT t.id FROM {t} t JOIN robot r ON r.id = t.robot_id "
-                                 "WHERE r.slug = ANY(%(s)s) "
-                                 for t in ("robot_variant", "specification", "pricing_offer",
-                                           "availability_offer", "deployment"))
+_R = "JOIN robot r ON r.id = t.robot_id WHERE r.slug = ANY(%(s)s)"
+_VAR = "LEFT JOIN robot_variant v ON v.id = t.variant_id"
+_OFFER_KEY = ("r.slug||'|'||coalesce(v.slug,'-')||'|'"
+              "||coalesce((SELECT slug FROM provider WHERE id = t.provider_id),'-')||'|'"
+              "||coalesce((SELECT code FROM region WHERE id = t.region_id),'-')||'|'"
+              "||t.transaction_type||'|'||t.condition")
+# table -> SELECT <logical key>, <id>, <whole row as text> for the rows of ROBOTS. The key is
+# written here independently of the importer, so a mapping that survives is a real statement
+# about which row kept which id.
+KEYED = {
+    "robot": "SELECT t.slug, t.id, to_jsonb(t)::text FROM robot t WHERE t.slug = ANY(%(s)s)",
+    "robot_variant": f"SELECT r.slug||'|'||t.slug, t.id, to_jsonb(t)::text "
+                     f"FROM robot_variant t {_R}",
+    "specification": f"SELECT r.slug||'|'||coalesce(v.slug,'-')||'|'||d.key, t.id, "
+                     f"to_jsonb(t)::text FROM specification t {_VAR} "
+                     f"JOIN spec_definition d ON d.id = t.definition_id {_R}",
+    "pricing_offer": f"SELECT {_OFFER_KEY}, t.id, to_jsonb(t)::text "
+                     f"FROM pricing_offer t {_VAR} {_R}",
+    "availability_offer": f"SELECT {_OFFER_KEY}, t.id, to_jsonb(t)::text "
+                          f"FROM availability_offer t {_VAR} {_R}",
+    "deployment": f"SELECT r.slug||'|'||coalesce(t.customer_name,'-')||'|'||"
+                  f"coalesce((SELECT code FROM region WHERE id = t.region_id),'-')||'|'||"
+                  f"coalesce(t.started_on::text,'-'), t.id, to_jsonb(t)::text "
+                  f"FROM deployment t {_R}",
+    "robot_image": f"SELECT r.slug||'|'||t.image_url, t.id, to_jsonb(t)::text "
+                   f"FROM robot_image t {_R}",
+    # evidence whose subject is a ROBOT's commercial status or one of its offers/deployments
+    "evidence_source": "SELECT t.subject_type||'|'||t.subject_id||'|'||coalesce(t.source_url,'-')"
+                       "||'|'||t.source_type||'|'||md5(coalesce(t.excerpt,''))||'|'||"
+                       "t.observed_at::date, t.id, to_jsonb(t)::text FROM evidence_source t "
+                       "WHERE t.subject_id IN (SELECT r.id FROM robot r WHERE r.slug = ANY(%(s)s)"
+                       + "".join(f" UNION SELECT t2.id FROM {tb} t2 JOIN robot r ON "
+                                 "r.id = t2.robot_id WHERE r.slug = ANY(%(s)s)"
+                                 for tb in ("pricing_offer", "availability_offer", "deployment"))
                        + ")",
 }
-# Ids that already survive a re-import (upserted by natural key). Everything else churns.
-STABLE_TODAY = {"robot"}
+# Shared entities: whole rows (updated_at included) must not move on an unchanged re-import.
+SHARED = ("manufacturer", "provider", "region", "capability", "use_case", "spec_definition")
 
 
 @pytest.fixture
@@ -86,12 +99,25 @@ def world(scratch_db, tmp_path, monkeypatch):  # noqa: F811
     return scratch_db, cat
 
 
-def _ids(url) -> dict[str, set]:
+def _state(url) -> dict[str, dict[str, tuple]]:
+    """{table: {logical key: (id, whole row)}} for the fixture robots."""
     with psycopg.connect(url) as conn:
         conn.read_only = True
         conn.execute("SET search_path TO humanoid, public")
-        return {t: {r[0] for r in conn.execute(q, {"s": sorted(ROBOTS)})}
-                for t, q in ID_TABLES.items()}
+        return {t: {k: (i, row) for k, i, row in conn.execute(q, {"s": sorted(ROBOTS)})}
+                for t, q in KEYED.items()}
+
+
+def _ids(url) -> dict[str, dict[str, object]]:
+    return {t: {k: v[0] for k, v in rows.items()} for t, rows in _state(url).items()}
+
+
+def _shared(url) -> dict[str, list]:
+    with psycopg.connect(url) as conn:
+        conn.read_only = True
+        conn.execute("SET search_path TO humanoid, public")
+        return {t: conn.execute(f"SELECT to_jsonb(t)::text FROM {t} t ORDER BY 1").fetchall()
+                for t in SHARED}
 
 
 def _content(url):
@@ -99,6 +125,49 @@ def _content(url):
         conn.read_only = True
         return pf.snapshot(conn)
 
+
+def _exec(url, sql, params=None):
+    with psycopg.connect(url, autocommit=True) as conn:
+        conn.execute("SET search_path TO humanoid, public")
+        return conn.execute(sql, params or ())
+
+
+def _scalar(url, sql, params=None):
+    with psycopg.connect(url) as conn:
+        conn.execute("SET search_path TO humanoid, public")
+        return conn.execute(sql, params or ()).fetchone()[0]
+
+
+def _edit(cat, slug, change):
+    path = cat / "robots" / f"{slug}.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    change(doc)
+    path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def _changed(before, after):
+    """{(table, key)} whose id or row content differs, plus inserted/removed keys."""
+    out = set()
+    for table in before:
+        for key in before[table].keys() | after[table].keys():
+            if before[table].get(key) != after[table].get(key):
+                out.add((table, key))
+    return out
+
+
+def _authorization_in(error: BaseException) -> dict:
+    """The pasteable `--authorize` document at the end of a refusal."""
+    message = str(error)
+    return json.loads(message[message.index('{\n  "version"'):])
+
+
+def _authorize_file(tmp_path, entries) -> pathlib.Path:
+    path = tmp_path / "authorize.json"
+    path.write_text(json.dumps({"version": 1, "entries": entries}), encoding="utf-8")
+    return path
+
+
+# ---------------------------------------------------------------------- idempotency --
 
 def test_the_fixture_exercises_every_id_table(world):
     url, _ = world
@@ -112,38 +181,363 @@ def test_reimporting_unchanged_files_changes_no_business_content(world):
     assert pf.diff(before, _content(url)) == []      # the preflight's id-stripped comparison
 
 
-@pytest.mark.parametrize("table", sorted(STABLE_TODAY))
-def test_ids_that_are_already_stable_stay_stable(world, table):
+@pytest.mark.parametrize("table", sorted(KEYED))
+def test_reimporting_unchanged_files_keeps_every_logical_key_on_its_id(world, table):
     url, _ = world
     before = _ids(url)[table]
     ic.run(url, only=ROBOTS)
-    assert _ids(url)[table] == before
+    assert _ids(url)[table] == before          # same key -> same id, nothing added or lost
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError,
-                   reason="Phase 1 not implemented: the importer deletes and reinserts child "
-                          "rows, so their ids change")
-@pytest.mark.parametrize("table", sorted(set(ID_TABLES) - STABLE_TODAY))
-def test_reimporting_unchanged_files_changes_no_ids(world, table):
+def test_reimporting_unchanged_files_writes_nothing_at_all(world):
+    """Not just ids: whole rows, `updated_at` included, and the run reports zero changes."""
     url, _ = world
-    before = _ids(url)[table]
-    ic.run(url, only=ROBOTS)
-    assert _ids(url)[table] == before
+    before, shared = _state(url), _shared(url)
+    recon = ic.run(url, only=ROBOTS)
+    assert _state(url) == before
+    assert _shared(url) == shared              # robot's manufacturer, providers, regions, ...
+    for table, counts in recon.counts.items():
+        assert counts["inserted"] == counts["updated"] == counts["removed"] == 0, table
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError,
-                   reason="Phase 1 not implemented: one edit recreates every child row of the "
-                          "robot")
+def test_a_full_second_run_reports_zero_changes_for_every_table(world):
+    url, _ = world
+    recon = ic.run(url)                        # the first full run settles the other robots
+    again = ic.run(url)
+    assert recon.counts and again.counts
+    for table, counts in again.counts.items():
+        assert counts["inserted"] == counts["updated"] == counts["removed"] == 0, table
+
+
+# ------------------------------------------------------------------ one edit, one row --
+
 def test_a_one_value_edit_keeps_every_other_id(world):
     url, cat = world
     before = _ids(url)
-    path = cat / "robots" / "unitree-h2-edu.json"
-    doc = json.loads(path.read_text(encoding="utf-8"))
-    doc["availability_offers"][0]["seller_wording"] = "edited for the stable-id test"
-    path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    _edit(cat, "unitree-h2-edu",
+          lambda d: d["availability_offers"][0].update(seller_wording="edited for the test"))
+    ic.run(url, only=ROBOTS)
+    assert _ids(url) == before                 # the edited offer is updated in place
+
+
+def test_one_changed_spec_value_changes_only_that_row(world):
+    url, cat = world
+    before = _state(url)
+    _edit(cat, "unitree-h2-edu", lambda d: d["extended_specs"][0].update(value="edited value"))
+    recon = ic.run(url, only=ROBOTS)
+    after = _state(url)
+    ((table, key),) = _changed(before, after)           # exactly one row differs ...
+    assert table == "specification"
+    assert before[table][key][0] == after[table][key][0]  # ... and it kept its id
+    assert json.loads(after[table][key][1])["value_text"] == "edited value"
+    assert recon.counts["specification"]["updated"] == 1
+    assert recon.counts["pricing_offer"]["updated"] == 0
+
+
+def test_a_corrected_offer_price_keeps_its_id(world):
+    url, cat = world
+    before = _state(url)
+    _edit(cat, "unitree-h2-edu", lambda d: d["pricing_offers"][0].update(price=61111.0))
+    ic.run(url, only=ROBOTS)
+    after = _state(url)
+    key = "unitree-h2-edu|-|reichelt|DE|PURCHASE|NEW"
+    assert after["pricing_offer"][key][0] == before["pricing_offer"][key][0]
+    assert json.loads(after["pricing_offer"][key][1])["price"] == 61111.0
+    assert {t for t, _ in _changed(before, after)} <= {"pricing_offer", "robot"}   # robot: cache
+    assert _scalar(url, "SELECT lowest_purchase_price FROM robot WHERE slug='unitree-h2-edu'") \
+        is not None
+
+
+def test_retiring_an_offer_is_an_update_in_place(world):
+    url, cat = world
+    before = _ids(url)
+    _edit(cat, "unitree-h2-edu", lambda d: d["availability_offers"][1].update(is_current=False))
+    ic.run(url, only=ROBOTS)
+    assert _ids(url) == before
+    assert _scalar(url, "SELECT count(*) FROM availability_offer WHERE NOT is_current") == 1
+
+
+def test_a_new_spec_and_a_new_offer_are_inserted_exactly_once(world):
+    url, cat = world
+    before = _ids(url)
+
+    def add(doc):
+        doc["extended_specs"].append(dict(doc["extended_specs"][0], key="max_speed",
+                                          value="9 km/h"))
+        offer = dict(doc["pricing_offers"][0], provider_slug="alza-cz", region_code="CZ",
+                     transaction_type="RENTAL", price_type="QUOTE_ONLY", price=None)
+        doc["pricing_offers"].append({k: v for k, v in offer.items() if k != "evidence"}
+                                     | {"evidence": doc["pricing_offers"][0]["evidence"]})
+
+    _edit(cat, "unitree-h2-edu", add)
+    first = ic.run(url, only=ROBOTS)
+    mid = _ids(url)
+    assert first.counts["specification"]["inserted"] == 1
+    assert first.counts["pricing_offer"]["inserted"] == 1
+    for table in before:                       # every old row kept its id
+        assert before[table].items() <= mid[table].items(), table
+    assert len(mid["pricing_offer"]) == len(before["pricing_offer"]) + 1
+    second = ic.run(url, only=ROBOTS)
+    assert all(c["inserted"] == c["updated"] == c["removed"] == 0
+               for c in second.counts.values())
+    assert _ids(url) == mid
+
+
+def test_new_evidence_is_inserted_once(world):
+    url, cat = world
+
+    def add(doc):
+        doc["availability_offers"][0]["evidence"].append(
+            {"source_url": "https://example.test/new", "source_type": "MANUFACTURER_SITE",
+             "observed_at": "2026-10-01", "confidence": "HIGH"})
+
+    _edit(cat, "unitree-h2-edu", add)
+    assert ic.run(url, only=ROBOTS).counts["evidence_source"]["inserted"] == 1
+    assert ic.run(url, only=ROBOTS).counts["evidence_source"]["inserted"] == 0
+
+
+def test_an_image_primary_swap_never_trips_the_unique_index(world):
+    url, cat = world
+    before = _ids(url)
+
+    def swap(doc):
+        first = doc["images"][0]
+        second = dict(first, image_url="/robots/second.png", is_primary=True)
+        first["is_primary"] = False
+        doc["images"].append(second)
+
+    _edit(cat, "agility-digit", swap)
     ic.run(url, only=ROBOTS)
     after = _ids(url)
-    for table in set(ID_TABLES) - {"availability_offer"}:
-        assert after[table] == before[table], table
-    # the edited offer is updated in place, not recreated
-    assert after["availability_offer"] == before["availability_offer"]
+    assert before["robot_image"].items() <= after["robot_image"].items()
+    assert _scalar(url, "SELECT image_url FROM robot_image i JOIN robot r ON r.id = i.robot_id "
+                        "WHERE r.slug='agility-digit' AND i.is_primary") == "/robots/second.png"
+
+
+# ----------------------------------------------------------------- ownership / editorial --
+
+def test_unmanaged_specification_rows_are_preserved(world, capsys):
+    url, _ = world
+    with psycopg.connect(url) as conn:
+        conn.execute("SET search_path TO humanoid, public")
+        robot = conn.execute("SELECT id FROM robot WHERE slug='unitree-h2-edu'").fetchone()[0]
+        # (1) an unmanaged row on a key the catalogue never writes
+        free = conn.execute("INSERT INTO spec_definition (key, label, category, value_type) "
+                            "VALUES ('hand_made_key','Hand made','OTHER','TEXT') RETURNING id"
+                            ).fetchone()[0]
+        conn.execute("INSERT INTO specification (robot_id, definition_id, value_text) "
+                     "VALUES (%s,%s,'by hand')", (robot, free))
+        # (2) an unmanaged row sitting on a key the catalogue DOES write
+        taken = conn.execute(
+            "SELECT s.id, s.definition_id FROM specification s JOIN spec_definition d "
+            "ON d.id = s.definition_id WHERE s.robot_id=%s AND d.key='battery_pack'", (robot,)
+        ).fetchone()
+        conn.execute("DELETE FROM specification WHERE id=%s", (taken[0],))
+        conn.execute("INSERT INTO specification (robot_id, definition_id, value_text) "
+                     "VALUES (%s,%s,'seed value')", (robot, taken[1]))
+        conn.commit()
+    ic.run(url, only=ROBOTS)
+    out = capsys.readouterr().out
+    assert "PRESERVED (not overwritten)" in out and "battery_pack" in out
+    rows = dict(_exec(url, "SELECT d.key, s.value_text FROM specification s JOIN spec_definition "
+                           "d ON d.id = s.definition_id WHERE d.key IN ('hand_made_key',"
+                           "'battery_pack')").fetchall())
+    assert rows == {"hand_made_key": "by hand", "battery_pack": "seed value"}
+
+
+@pytest.mark.parametrize("apply_state", [False, True])
+def test_is_published_is_editorial(world, apply_state):
+    url, cat = world
+    _exec(url, "UPDATE robot SET is_published = FALSE WHERE slug = 'unitree-h2-edu'")
+    _edit(cat, "unitree-h2-edu", lambda d: (d.update(is_published=True),
+                                            d["extended_specs"][0].update(value="edit")))
+    ic.run(url, only=ROBOTS, apply_publication_state=apply_state)
+    expected = apply_state                    # only the deliberate publishing operation moves it
+    assert _scalar(url, "SELECT is_published FROM robot WHERE slug='unitree-h2-edu'") is expected
+
+
+def test_a_published_robot_stays_published_through_reimport_and_spec_edits(world):
+    url, cat = world
+    _exec(url, "UPDATE robot SET is_published = TRUE WHERE slug = 'unitree-h2-edu'")
+    _edit(cat, "unitree-h2-edu", lambda d: (d.update(is_published=False),
+                                            d["extended_specs"][0].update(value="edit")))
+    ic.run(url, only=ROBOTS)
+    ic.run(url, only=ROBOTS)
+    assert _scalar(url, "SELECT is_published FROM robot WHERE slug='unitree-h2-edu'") is True
+
+
+# ------------------------------------------------------------------------ fail closed --
+
+def test_a_duplicate_key_in_the_json_aborts_with_nothing_written(world):
+    url, cat = world
+    before, shared = _state(url), _shared(url)
+
+    def twice(doc):
+        doc["name"] = "a change that must not be applied"
+        doc["availability_offers"].append(dict(doc["availability_offers"][0]))
+
+    _edit(cat, "unitree-h2-edu", twice)
+    with pytest.raises(ic.ReconcileRefused, match="duplicate availability offer"):
+        ic.run(url, only=ROBOTS)
+    assert _state(url) == before and _shared(url) == shared
+
+
+def test_two_database_rows_on_one_key_abort_and_nothing_is_picked(world):
+    url, _ = world
+    _exec(url, "INSERT INTO pricing_offer (robot_id, variant_id, provider_id, region_id, "
+               "transaction_type, price_type, currency, price, condition) "
+               "SELECT robot_id, variant_id, provider_id, region_id, transaction_type, "
+               "price_type, currency, price + 1, condition FROM pricing_offer LIMIT 1")
+    before = _state(url)
+    with pytest.raises(ic.ReconcileRefused, match="ambiguous: 2 existing rows share one natural"):
+        ic.run(url, only=ROBOTS)
+    assert _state(url) == before
+
+
+def test_a_removed_offer_aborts_with_a_pasteable_diagnostic_unless_authorized(world, tmp_path):
+    url, cat = world
+    before = _state(url)
+    _edit(cat, "unitree-h2-edu", lambda d: d["pricing_offers"].pop(0))
+    with pytest.raises(ic.ReconcileRefused) as refused:
+        ic.run(url, only=ROBOTS)
+    assert "no longer in the JSON" in str(refused.value)
+    document = _authorization_in(refused.value)
+    assert document["entries"] == [{
+        "action": "remove", "table": "pricing_offer", "robot": "unitree-h2-edu",
+        "key": {"variant_slug": None, "provider_slug": "reichelt", "region_code": "DE",
+                "transaction_type": "PURCHASE", "condition": "NEW"}}]
+    assert _state(url) == before               # the refused run rolled back completely
+
+    path = _authorize_file(tmp_path, document["entries"])     # paste it, as an operator would
+    recon = ic.run(url, only=ROBOTS, authorize=path)
+    assert recon.counts["pricing_offer"]["removed"] == 1
+    assert recon.counts["evidence_source"]["removed"] == 2    # the offer's own evidence goes
+    after = _state(url)
+    gone = _changed(before, after)
+    assert ("pricing_offer", "unitree-h2-edu|-|reichelt|DE|PURCHASE|NEW") in gone
+    assert {t for t, _ in gone} <= {"pricing_offer", "evidence_source", "robot"}
+    for table in before:                       # every surviving row kept its id
+        assert {k: v[0] for k, v in after[table].items()} == \
+            {k: v[0] for k, v in before[table].items() if k in after[table]}
+
+
+def test_the_cli_takes_an_authorize_file(world, tmp_path, capsys):
+    url, cat = world
+    _edit(cat, "unitree-h2-edu", lambda d: d["pricing_offers"].pop(0))
+    argv = ["--database-url", url, "--only", ",".join(sorted(ROBOTS))]
+    with pytest.raises(ic.ReconcileRefused):
+        ic.main(argv)
+    entry = {"action": "remove", "table": "pricing_offer", "robot": "unitree-h2-edu",
+             "key": {"variant_slug": None, "provider_slug": "reichelt", "region_code": "DE",
+                     "transaction_type": "PURCHASE", "condition": "NEW"}}
+    ic.main([*argv, "--authorize", str(_authorize_file(tmp_path, [entry]))])
+    assert "pricing_offer" in capsys.readouterr().out
+    assert _scalar(url, "SELECT count(*) FROM pricing_offer p JOIN robot r ON r.id=p.robot_id "
+                        "WHERE r.slug='unitree-h2-edu'") == 2
+
+
+def test_an_authorization_that_matches_nothing_aborts(world, tmp_path):
+    url, _ = world
+    before = _state(url)
+    stale = {"action": "remove", "table": "pricing_offer", "robot": "unitree-h2-edu",
+             "key": {"variant_slug": None, "provider_slug": "nowhere", "region_code": "DE",
+                     "transaction_type": "PURCHASE", "condition": "NEW"}}
+    with pytest.raises(ic.ReconcileRefused, match="matched nothing"):
+        ic.run(url, only=ROBOTS, authorize=_authorize_file(tmp_path, [stale]))
+    assert _state(url) == before
+
+
+def test_removing_a_variant_with_a_dependent_that_is_not_removed_aborts(world, tmp_path):
+    url, cat = world
+    before = _state(url)
+    with psycopg.connect(url) as conn:         # someone else's specification on the variant
+        conn.execute("SET search_path TO humanoid, public")
+        conn.execute(
+            "INSERT INTO specification (robot_id, variant_id, definition_id, value_text) "
+            "SELECT v.robot_id, v.id, (SELECT id FROM spec_definition WHERE key='battery_pack'),"
+            " 'hand written' FROM robot_variant v JOIN robot r ON r.id = v.robot_id "
+            "WHERE r.slug='agility-digit' AND v.slug='digit-v5'")
+        conn.commit()
+    _edit(cat, "agility-digit", lambda d: d.update(variants=[], availability_offers=[]))
+    with pytest.raises(ic.ReconcileRefused) as refused:
+        ic.run(url, only=ROBOTS)
+    entries = _authorization_in(refused.value)["entries"]
+    assert {e["table"] for e in entries} == {"robot_variant", "availability_offer"}
+    with pytest.raises(ic.ReconcileRefused, match="still depends on it"):
+        ic.run(url, only=ROBOTS, authorize=_authorize_file(tmp_path, entries))
+    unchanged = {t: v for t, v in _state(url).items() if t != "specification"}
+    assert unchanged == {t: v for t, v in before.items() if t != "specification"}
+
+
+def test_an_authorized_variant_removal_removes_its_dependents_too(world, tmp_path):
+    url, cat = world
+    _edit(cat, "unitree-h2-edu",
+          lambda d: d.update(variants=[], availability_offers=d["availability_offers"][:1],
+                             pricing_offers=d["pricing_offers"][:2],
+                             extended_specs=[x for x in d["extended_specs"]
+                                             if x.get("variant_slug") is None]))
+    with pytest.raises(ic.ReconcileRefused) as refused:
+        ic.run(url, only=ROBOTS)
+    entries = _authorization_in(refused.value)["entries"]
+    recon = ic.run(url, only=ROBOTS, authorize=_authorize_file(tmp_path, entries))
+    assert recon.counts["robot_variant"]["removed"] == 1
+    assert _scalar(url, "SELECT count(*) FROM robot_variant v JOIN robot r ON r.id = v.robot_id "
+                        "WHERE r.slug='unitree-h2-edu'") == 0
+
+
+# ----------------------------------------------------------------- evidence immutability --
+
+def test_evidence_with_a_changed_note_aborts_unless_update_evidence_is_authorized(
+        world, tmp_path):
+    url, cat = world
+    before = _state(url)
+    _edit(cat, "unitree-h2-edu",
+          lambda d: d["availability_offers"][0]["evidence"][0].update(note="a rewritten note"))
+    with pytest.raises(ic.ReconcileRefused) as refused:
+        ic.run(url, only=ROBOTS)
+    entries = _authorization_in(refused.value)["entries"]
+    assert [e["action"] for e in entries] == ["update_evidence"]
+    assert entries[0]["table"] == "evidence_source" and entries[0]["robot"] == "unitree-h2-edu"
+    assert entries[0]["key"]["subject_type"] == "AVAILABILITY_OFFER"
+    assert _state(url) == before
+
+    ic.run(url, only=ROBOTS, authorize=_authorize_file(tmp_path, entries))
+    after = _state(url)
+    changed = _changed(before, after)
+    assert [t for t, _ in changed] == ["evidence_source"]       # same id, note rewritten
+    (key,) = [k for _, k in changed]
+    assert before["evidence_source"][key][0] == after["evidence_source"][key][0]
+    assert json.loads(after["evidence_source"][key][1])["note"] == "a rewritten note"
+
+
+# ---------------------------------------------------------------------- protected clears --
+
+PROTECTED = [
+    ("4ne1-mini", "robot_image", "attribution",
+     lambda d: d["images"][0].update(attribution=None)),
+    ("unitree-h2-edu", "robot_image", "display_approved_by",
+     lambda d: d["images"][0].update(display_approved_by=None)),
+    ("unitree-h2-edu", "specification", "source_url",
+     lambda d: d["extended_specs"][0].update(source_url=None)),
+]
+
+
+@pytest.mark.parametrize(("slug", "table", "column", "change"), PROTECTED,
+                         ids=[f"{t}.{c}" for _, t, c, _ in PROTECTED])
+def test_blanking_protected_provenance_needs_a_clear_entry(
+        world, tmp_path, slug, table, column, change):
+    url, cat = world
+    before = _state(url)
+    _edit(cat, slug, change)
+    with pytest.raises(ic.ReconcileRefused, match=f"protected column {column}") as refused:
+        ic.run(url, only=ROBOTS)
+    entries = _authorization_in(refused.value)["entries"]
+    assert len(entries) == 1 and entries[0]["action"] == "clear"
+    assert entries[0]["column"] == column and entries[0]["table"] == table
+    assert _state(url) == before
+
+    ic.run(url, only=ROBOTS, authorize=_authorize_file(tmp_path, entries))
+    after = _state(url)
+    ((_, key),) = _changed(before, after)
+    assert before[table][key][0] == after[table][key][0]
+    assert json.loads(after[table][key][1])[column] is None

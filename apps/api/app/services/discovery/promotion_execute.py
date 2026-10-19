@@ -204,7 +204,8 @@ def _import(url: str, robots: list[str], catalogue_dir: Path | None,
         ic.ROBOTS_DIR = Path(catalogue_dir) / "robots"
     out = io.StringIO()
     with contextlib.redirect_stdout(out):
-        ic.run(ic.normalize_url(url), only=set(robots), before_write=before_write)
+        ic.run(ic.normalize_url(url), only=set(robots), before_write=before_write,
+               probe_unchanged=True)
     return out.getvalue()
 
 
@@ -624,6 +625,47 @@ def check_compare_row(body: str, item: dict, label: str | None) -> bool:
                for row in spec_rows(body))
 
 
+def compare_supported_fields() -> frozenset[str]:
+    """The ONE source of truth for what the compare surface can render: the keys of
+    `reads.COMPARE_FIELDS`, which is what GET /api/compare serves and apps/web CompareView
+    shows (pinned by tests). Extended specs are not rendered on compare."""
+    from app.services import reads
+
+    return frozenset(attr for _group, attr, _label in reads.COMPARE_FIELDS)
+
+
+def compare_applicability(item: dict) -> tuple[str, str | None]:
+    """Deterministic, decided before any write: ("SUPPORTED", None) when the compare surface
+    renders this item's field, else ("NOT_APPLICABLE", reason)."""
+    key = item.get("definition")
+    if key in compare_supported_fields():
+        return "SUPPORTED", None
+    return ("NOT_APPLICABLE",
+            f"compare page renders only COMPARE_FIELDS base attributes; extended spec {key} "
+            "not supported")
+
+
+def public_ok(results: list[dict]) -> bool:
+    """Success = every SUPPORTED check PASSED. NOT_APPLICABLE results never count as a pass
+    and never fail the run on their own."""
+    return all(r["status"] == "PASS" for r in results if r["applicability"] == "SUPPORTED")
+
+
+def public_summary(results: list[dict]) -> dict[str, str]:
+    """Per surface: FAILED if any supported check failed, PASS if all passed, NOT_APPLICABLE
+    if the surface verified nothing, PARTIAL if some items passed and some were N/A."""
+    out = {}
+    for surface in ("api", "page", "compare"):
+        rows = [r for r in results if r["surface"] == surface]
+        if not rows:
+            continue
+        statuses = {r["status"] for r in rows}
+        out[surface] = ("FAILED" if "FAILED" in statuses else
+                        "NOT_APPLICABLE" if statuses == {"NOT_APPLICABLE"} else
+                        "PASS" if "NOT_APPLICABLE" not in statuses else "PARTIAL")
+    return out
+
+
 def check_public(manifest: dict, web: Web, api_base: str, web_base: str,
                  labels: dict | None = None) -> list[dict]:
     """One pass over every item and surface. Returns one result per (item, surface).
@@ -632,7 +674,11 @@ def check_public(manifest: dict, web: Web, api_base: str, web_base: str,
              and observed_at;
     page     the value is in that definition's spec row, with its provenance in the same row;
     compare  the value is in that definition's row, in this robot's column, of a comparison
-             with the manifest's published peer.
+             with the manifest's published peer - only where the compare surface supports the
+             field (`compare_applicability`); otherwise the result is NOT_APPLICABLE with the
+             reason, `ok` False, and nothing is fetched.
+    Every result carries `applicability` (SUPPORTED | NOT_APPLICABLE) and `status`
+    (PASS | FAILED | NOT_APPLICABLE); api and page are always SUPPORTED.
     `labels` maps definition key -> label (the catalogue's spec_definitions)."""
     results = []
     for item in manifest["items"]:
@@ -641,6 +687,7 @@ def check_public(manifest: dict, web: Web, api_base: str, web_base: str,
         page_url = f"{web_base.rstrip('/')}/robots/{urllib.parse.quote(slug)}"
         # A one-robot compare renders no comparison: compare against the manifest's peer.
         peer = item.get("compare_peer")
+        applicability, na_reason = compare_applicability(item)
         compare_url = (f"{web_base.rstrip('/')}/compare?ids={urllib.parse.quote(slug)},"
                        f"{urllib.parse.quote(peer)}" if peer else None)
         label = _label_for(item, labels)
@@ -655,10 +702,18 @@ def check_public(manifest: dict, web: Web, api_base: str, web_base: str,
         except (OSError, ValueError, urllib.error.URLError) as exc:
             note = _err(exc)
         results.append({"claim_id": item["claim_id"], "surface": "api", "url": api_url,
+                        "applicability": "SUPPORTED", "status": "PASS" if ok else "FAILED",
                         "ok": ok, "note": note})
         for surface, url in (("page", page_url), ("compare", compare_url)):
+            if surface == "compare" and applicability == "NOT_APPLICABLE":
+                results.append({"claim_id": item["claim_id"], "surface": surface, "url": None,
+                                "applicability": "NOT_APPLICABLE", "status": "NOT_APPLICABLE",
+                                "ok": False, "note": na_reason,
+                                "missing_capability": "compare_extended_spec"})
+                continue
             if url is None:     # refused earlier at the manifest step; never a pass
                 results.append({"claim_id": item["claim_id"], "surface": surface, "url": None,
+                                "applicability": "SUPPORTED", "status": "FAILED",
                                 "ok": False, "note": "no published compare peer"})
                 continue
             ok, note, seen = False, "", {}
@@ -676,6 +731,7 @@ def check_public(manifest: dict, web: Web, api_base: str, web_base: str,
             except (OSError, ValueError, urllib.error.URLError) as exc:
                 note = _err(exc)
             results.append({"claim_id": item["claim_id"], "surface": surface, "url": url,
+                            "applicability": "SUPPORTED", "status": "PASS" if ok else "FAILED",
                             "ok": ok, "note": note, **seen})
     return results
 
@@ -732,8 +788,14 @@ def execute(manifest: dict, *, commit: str, production: Production, branches: Br
         if problems:
             raise Refused("manifest", "; ".join(problems))
         # Public compare verification needs a published peer: found now, never after a write.
+        # (only where the compare surface supports the field; the rest are NOT_APPLICABLE).
+        applicability = {f"{i.get('robot')}:{i.get('definition')}": compare_applicability(i)
+                         for i in manifest["items"]}
+        receipt["compare_applicability"] = {
+            k: {"applicability": a, "reason": r} for k, (a, r) in applicability.items()}
         no_peer = [f"{i.get('robot')}:{i.get('definition')}" for i in manifest["items"]
-                   if not i.get("compare_peer")]
+                   if not i.get("compare_peer")
+                   and applicability[f"{i.get('robot')}:{i.get('definition')}"][0] == "SUPPORTED"]
         if no_peer:
             raise Refused("manifest", "no published compare peer for: " + ", ".join(no_peer))
         if base_catalogue_dir is not None:
@@ -742,9 +804,11 @@ def execute(manifest: dict, *, commit: str, production: Production, branches: Br
                                head_catalogue_dir=head)
             if not result.ok:
                 raise Refused("manifest", "; ".join(result.reasons))
-            step("manifest", "OK", catalogue_equals_base_plus_manifest=True)
+            step("manifest", "OK", catalogue_equals_base_plus_manifest=True,
+                 compare_applicability=receipt["compare_applicability"])
         else:
-            step("manifest", "OK", catalogue_equals_base_plus_manifest="NOT_CHECKED")
+            step("manifest", "OK", catalogue_equals_base_plus_manifest="NOT_CHECKED",
+                 compare_applicability=receipt["compare_applicability"])
 
         # 1b. approval: the merged PR is the approval -------------------------------------
         if getattr(approvals, "simulated", False):
@@ -886,8 +950,10 @@ def execute(manifest: dict, *, commit: str, production: Production, branches: Br
         drifted: dict[str, dict] = {}
 
         def recheck_under_lock(cur) -> None:
-            """Runs inside the importer's transaction, after the `catalogue-write` lock and
-            before its first write: the same snapshot, so nothing can slip in between."""
+            """Runs inside the importer's transaction before its first write: takes the
+            `catalogue-write` advisory lock (serializing against other promotions), then rechecks
+            the fingerprints in the same snapshot, so nothing can slip in between."""
+            cur.execute("SELECT pg_advisory_xact_lock(hashtext('catalogue-write'))")
             now = pm.fingerprints_from_connection(cur.connection, robots, excluded)
             for slug in robots:
                 if want_fp.get(slug) != now.get(slug):
@@ -951,18 +1017,22 @@ def execute(manifest: dict, *, commit: str, production: Production, branches: Br
             attempts, results = 0, []
             for attempts in range(1, retries + 1):
                 results = check_public(manifest, web, api_base, web_base, labels)
-                if all(r["ok"] for r in results):
+                if public_ok(results):
                     break
                 if attempts < retries:
                     sleep(retry_wait)
             receipt["public_verification"] = results
-            if not all(r["ok"] for r in results):
-                step("public_verify", "FAILED", attempts=attempts)
+            receipt["public_summary"] = public_summary(results)
+            if not public_ok(results):
+                step("public_verify", "FAILED", attempts=attempts,
+                     surfaces=receipt["public_summary"])
                 raise Incident("public_verify", "the committed value is not visible publicly "
                                f"after {attempts} attempt(s): "
                                + ", ".join(f"{r['surface']}:{r['claim_id'][:8]}"
-                                           for r in results if not r["ok"]))
-            step("public_verify", "PASS", attempts=attempts)
+                                           for r in results
+                                           if r["applicability"] == "SUPPORTED"
+                                           and r["status"] != "PASS"))
+            step("public_verify", "PASS", attempts=attempts, surfaces=receipt["public_summary"])
         else:
             step("public_verify", "SKIPPED_NO_BASE_URLS")
         receipt["outcome"] = "SUCCESS"
@@ -1025,6 +1095,12 @@ def render_receipt(receipt: dict) -> str:
              f"- safety branch: `{receipt['branches'].get('safety')}`"]
     if receipt.get("reason"):
         lines.append(f"- reason: {receipt['reason']}")
+    if receipt.get("public_summary"):
+        lines.append("- public verification: " + ", ".join(
+            f"{k}={v}" for k, v in receipt["public_summary"].items()))
+        not_applicable = sorted({r["note"] for r in receipt.get("public_verification", [])
+                                 if r["applicability"] == "NOT_APPLICABLE"})
+        lines.extend(f"- not applicable (not a pass): {n}" for n in not_applicable)
     lines.append("- steps: " + " > ".join(f"{s['step']}={s['status']}" for s in receipt["steps"]))
     return "\n".join(lines)
 

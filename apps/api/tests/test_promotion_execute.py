@@ -31,6 +31,14 @@ from app.services.discovery import promotion_execute as px
 from app.services.discovery import promotion_manifest as pm
 
 
+@pytest.fixture
+def compare_supported(monkeypatch):
+    """Declare the synthetic spec KEY as a field the compare surface renders (it is not: this
+    makes the SUPPORTED code path testable without touching the real field list)."""
+    real = px.compare_supported_fields()
+    monkeypatch.setattr(px, "compare_supported_fields", lambda: real | {KEY})
+
+
 def adapters():
     return pm.load_db_tool("promotion_adapters")
 
@@ -61,8 +69,17 @@ def test_single_approval_executes_end_to_end_and_leaves_a_receipt(world):  # noq
     assert receipt["rehearsal"]["identity_added"] == [f"specification {ROBOT}:-|{KEY}"]
     assert receipt["post_verify"]["publication_and_status_unchanged"] is True
     assert receipt["after_fingerprints"] != manifest["base"]["robot_fingerprints"]
-    assert all(r["ok"] for r in receipt["public_verification"])
-    assert {r["surface"] for r in receipt["public_verification"]} == {"api", "page", "compare"}
+    # an extended spec is not rendered on compare: that surface is NOT_APPLICABLE (recorded,
+    # never a pass); API and page are mandatory and passed
+    results = receipt["public_verification"]
+    assert {r["surface"] for r in results} == {"api", "page", "compare"}
+    assert {r["surface"] for r in results if r["status"] == "PASS"} == {"api", "page"}
+    compare = [r for r in results if r["surface"] == "compare"][0]
+    assert compare["applicability"] == "NOT_APPLICABLE" and compare["ok"] is False
+    assert receipt["public_summary"] == {"api": "PASS", "page": "PASS",
+                                         "compare": "NOT_APPLICABLE"}
+    assert receipt["compare_applicability"][f"{ROBOT}:{KEY}"]["applicability"] == "NOT_APPLICABLE"
+    assert "compare=NOT_APPLICABLE" in px.render_receipt(receipt)
     # the safety branch is retained, the rehearsal branch is gone
     assert len(world.branch_dbs()) == 1 and world.branch_dbs()[0].startswith("promo_")
     assert receipt["branches"]["rehearsal_deleted"] is True
@@ -296,7 +313,7 @@ def test_missing_public_base_urls_are_recorded_not_assumed(world):  # noqa: F811
 # --------------------------------------------------------------------- public checks ------
 
 
-def test_public_check_requires_value_and_source_on_the_api(world):  # noqa: F811
+def test_public_check_requires_value_and_source_on_the_api(world, compare_supported):  # noqa: F811
     manifest = world.manifest
     item = manifest["items"][0]
 
@@ -449,7 +466,8 @@ def test_ci_gates_pull_requests_on_promotion_manifest_verification():
     assert names.index("Verify catalogue promotion manifests") < names.index("Test")
 
 
-def test_compare_is_checked_against_a_peer_never_as_a_one_robot_compare(world):  # noqa: F811
+def test_compare_is_checked_against_a_peer_never_as_a_one_robot_compare(
+        world, compare_supported):  # noqa: F811
     """Pilot finding 2026-10-19: `/compare?ids=<one robot>` renders no comparison, so the
     value can never appear there. The check compares with the manifest's published peer; a
     manifest without a peer is REFUSED at the manifest step (before any write), and if
@@ -871,7 +889,8 @@ def test_value_matching_by_type():
     assert px._value_matches("  8-core   CPU ", "8-core CPU", None)
 
 
-def test_manifest_without_a_compare_peer_is_refused_before_any_write(world):  # noqa: F811
+def test_manifest_without_a_compare_peer_is_refused_before_any_write(
+        world, compare_supported):  # noqa: F811
     world.prepare()
     before = world.fingerprints()
     unpeered = copy.deepcopy(world.manifest)
@@ -896,14 +915,15 @@ def test_end_to_end_public_failure_when_value_only_elsewhere_on_the_page(world):
 
     receipt = world.execute(web=Web(manifest, True), retries=2)
     assert receipt["outcome"] == "INCIDENT:public_verify", receipt
-    failed = [r for r in receipt["public_verification"] if not r["ok"]]
+    failed = [r for r in receipt["public_verification"] if r["status"] == "FAILED"]
     assert [r["surface"] for r in failed] == ["page"]
 
 
 # ------------------------------------------- 5. drift recheck + concurrent-write protection ------
 
 
-def test_importer_takes_the_catalogue_write_lock_and_calls_the_hook_before_writing(world):  # noqa: F811
+def test_importer_calls_the_hook_before_writing_and_takes_no_lock_by_itself(world):  # noqa: F811
+    """The shared importer is opt-in: it takes no advisory lock unless the hook does."""
     seen = {}
 
     def hook(cur):
@@ -916,31 +936,67 @@ def test_importer_takes_the_catalogue_write_lock_and_calls_the_hook_before_writi
 
     world.prepare()
     px._import(world.owner_url, [ROBOT], world.head, before_write=hook)
-    assert seen == {"lock": 1, "specs": 0}            # lock held, nothing written yet
+    assert seen == {"lock": 0, "specs": 0}            # no implicit lock; nothing written yet
     assert world.spec_rows() == [(KEY, VALUE)]
 
 
-def test_every_importer_run_is_serialised_even_without_a_hook(world):  # noqa: F811
+def test_promotion_apply_is_serialised_by_the_catalogue_write_lock(world, monkeypatch):  # noqa: F811
+    """The executor's before_write hook takes `catalogue-write`: while another transaction
+    holds it, the production import waits (an ungranted advisory lock is visible) and has
+    written nothing; once released it proceeds."""
     import threading
     import time as _time
 
     world.prepare()
-    holder = psycopg.connect(world.owner_url)
-    holder.execute("SELECT pg_advisory_xact_lock(hashtext('catalogue-write'))")
-    done = threading.Event()
+    real = px._import
+    seen = {}
 
-    def run():
-        px._import(world.owner_url, [ROBOT], world.head)
-        done.set()
+    def import_behind_a_held_lock(url, robots, catalogue_dir, **kw):
+        if url != world.url:                       # the rehearsal copy is not under test
+            return real(url, robots, catalogue_dir, **kw)
+        holder = psycopg.connect(world.owner_url)
+        holder.execute("SELECT pg_advisory_xact_lock(hashtext('catalogue-write'))")
+        out = {}
 
-    thread = threading.Thread(target=run)
-    thread.start()
-    _time.sleep(1.5)
-    assert not done.is_set()                                  # blocked behind the lock
-    holder.rollback()
-    thread.join(timeout=60)
-    holder.close()
-    assert done.is_set() and world.spec_rows() == [(KEY, VALUE)]
+        def run():
+            try:
+                out["summary"] = real(url, robots, catalogue_dir, **kw)
+            except BaseException as exc:           # surfaced below, in the test thread
+                out["error"] = exc
+
+        thread = threading.Thread(target=run)
+        thread.start()
+        waiting, deadline = 0, _time.time() + 60
+        while not waiting and _time.time() < deadline:
+            waiting = holder.execute("SELECT count(*) FROM pg_locks WHERE locktype = "
+                                     "'advisory' AND NOT granted").fetchone()[0]
+            _time.sleep(0.2)
+        seen["waiting"], seen["alive"] = waiting, thread.is_alive()
+        seen["specs_while_blocked"] = world.spec_rows()
+        holder.rollback()
+        thread.join(timeout=120)
+        holder.close()
+        if "error" in out:
+            raise out["error"]
+        return out["summary"]
+
+    monkeypatch.setattr(px, "_import", import_behind_a_held_lock)
+    receipt = world.execute()
+    assert seen == {"waiting": 1, "alive": True, "specs_while_blocked": []}, seen
+    assert receipt["outcome"] == "SUCCESS", receipt
+    assert world.spec_rows() == [(KEY, VALUE)]
+
+
+def test_an_insert_only_role_imports_only_with_the_unchanged_row_probe(world):  # noqa: F811
+    """INSERT ... ON CONFLICT DO UPDATE needs UPDATE even when nothing changes; the opt-in
+    probe is what lets the additions-only role import a robot whose shared rows are current."""
+    ic = pm.load_db_tool("import_catalogue")
+    world.prepare()
+    px._import(world.url, [ROBOT], world.head)               # probe on: succeeds
+    ic.CATALOGUE_DIR, ic.ROBOTS_DIR = world.head, world.head / "robots"
+    with pytest.raises(psycopg.errors.InsufficientPrivilege):
+        ic.run(ic.normalize_url(world.url), only={ROBOT})     # default: UPDATE privilege needed
+    assert world.spec_rows() == [(KEY, VALUE)]
 
 
 def test_drift_between_the_check_and_the_apply_is_refused_and_nothing_is_written(
@@ -1128,3 +1184,102 @@ def test_receipt_records_branch_origins(world):  # noqa: F811
     assert b["production_origin"] == {"template_db": world.name, "production_db": world.name}
     assert b["safety_origin"]["template_db"] == world.name
     assert b["rehearsal_origin"]["template_db"] == world.name
+
+
+# ------------------------------------------------------- compare applicability (owner B) ------
+
+
+def test_compare_supported_fields_are_pinned_to_the_real_compare_field_list():
+    """Single source of truth: reads.COMPARE_FIELDS (what /api/compare serves). Pinned to a
+    literal and to the web's metric policy so a change cannot silently drift."""
+    import pathlib
+
+    from app.services import reads
+
+    literal = {
+        "commercial_status", "height_cm", "weight_kg", "payload_kg", "walk_speed_ms",
+        "runtime_minutes", "mobility", "hand_type", "hand_dof", "has_manipulation", "autonomy",
+        "has_teleoperation", "has_vision", "has_language_ui", "has_sdk", "ros_support",
+        "developer_edition"}
+    assert px.compare_supported_fields() == literal == {a for _g, a, _l in reads.COMPARE_FIELDS}
+    policy = (pathlib.Path(__file__).resolve().parents[2] / "web" / "lib"
+              / "comparison-policy.ts").read_text(encoding="utf-8")
+    in_policy = {k for k in literal if re.search(rf"^\s*{k}:\s*\{{", policy, re.M)}
+    assert {"commercial_status", "height_cm", "weight_kg", "payload_kg", "walk_speed_ms",
+            "runtime_minutes", "mobility", "hand_type", "hand_dof", "has_manipulation",
+            "autonomy", "has_vision"} <= in_policy       # the web keys rows by these same names
+    assert px.compare_applicability({"definition": KEY})[0] == "NOT_APPLICABLE"
+    assert px.compare_applicability({"definition": "payload_kg"}) == ("SUPPORTED", None)
+
+
+class _Web:
+    """Serves api + page + compare for one item; a False flag renders that surface without
+    the committed value."""
+
+    def __init__(self, item, *, api=True, page=True, compare=True):
+        self.item, self.api, self.page, self.compare = item, api, page, compare
+        self.urls = []
+
+    def get(self, url):
+        self.urls.append(url)
+        item = self.item
+        if "/api/robots/" in url:
+            specs = [{"key": KEY, "value": VALUE if self.api else "other",
+                      "unit": item.get("unit"), "source_url": item["source_url"],
+                      "variant_slug": item.get("variant_slug"),
+                      "observed_at": item["observed_at"]}]
+            return 200, json.dumps({"extended_specs": specs})
+        if "/compare" in url:
+            return 200, compare_html(item, decoy_only=not self.compare)
+        return 200, page_html(item, decoy_only=not self.page)
+
+
+def test_supported_compare_field_passes(world, compare_supported):  # noqa: F811
+    item = world.manifest["items"][0]
+    results = px.check_public(world.manifest, _Web(item), "http://a", "http://w")
+    assert {(r["surface"], r["applicability"], r["status"]) for r in results} == {
+        ("api", "SUPPORTED", "PASS"), ("page", "SUPPORTED", "PASS"),
+        ("compare", "SUPPORTED", "PASS")}
+    assert px.public_ok(results) and px.public_summary(results)["compare"] == "PASS"
+
+
+def test_unsupported_extended_spec_is_not_applicable_never_a_compare_success(world):  # noqa: F811
+    item = world.manifest["items"][0]
+    web = _Web(item)
+    results = px.check_public(world.manifest, web, "http://a", "http://w")
+    compare = [r for r in results if r["surface"] == "compare"][0]
+    assert compare["applicability"] == compare["status"] == "NOT_APPLICABLE"
+    assert compare["ok"] is False and compare["url"] is None
+    assert "extended spec" in compare["note"] and KEY in compare["note"]
+    assert not any("/compare" in u for u in web.urls)            # nothing was fetched
+    assert px.public_ok(results)                                  # API + page pass => success
+    assert px.public_summary(results) == {"api": "PASS", "page": "PASS",
+                                          "compare": "NOT_APPLICABLE"}
+    # and no peer is needed for it
+    unpeered = copy.deepcopy(world.manifest)
+    unpeered["items"][0]["compare_peer"] = None
+    assert [r for r in px.check_public(unpeered, _Web(item), "http://a", "http://w")
+            if r["surface"] == "compare"][0]["status"] == "NOT_APPLICABLE"
+
+
+def test_supported_compare_field_that_fails_is_failed_and_an_incident(world, compare_supported):  # noqa: F811
+    item = world.manifest["items"][0]
+    results = px.check_public(world.manifest, _Web(item, compare=False), "http://a", "http://w")
+    compare = [r for r in results if r["surface"] == "compare"][0]
+    assert compare["status"] == "FAILED" and compare["ok"] is False
+    assert not px.public_ok(results)
+    receipt = world.execute(web=_Web(item, compare=False), retries=2, sleep=lambda s: None)
+    assert receipt["outcome"] == "INCIDENT:public_verify", receipt
+    assert receipt["public_summary"]["compare"] == "FAILED"
+
+
+def test_api_or_page_failure_fails_even_when_compare_is_not_applicable(world):  # noqa: F811
+    item = world.manifest["items"][0]
+    for kw, surface in (({"api": False}, "api"), ({"page": False}, "page")):
+        results = px.check_public(world.manifest, _Web(item, **kw), "http://a", "http://w")
+        assert [r["surface"] for r in results if r["status"] == "FAILED"] == [surface]
+        assert not px.public_ok(results)
+    receipt = world.execute(web=_Web(item, page=False), retries=2, sleep=lambda s: None)
+    assert receipt["outcome"] == "INCIDENT:public_verify", receipt
+    assert receipt["public_summary"] == {"api": "PASS", "page": "FAILED",
+                                         "compare": "NOT_APPLICABLE"}

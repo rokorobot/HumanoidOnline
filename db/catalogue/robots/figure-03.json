@@ -3,7 +3,7 @@
   "name": "Figure 03",
   "manufacturer_slug": "figure-ai",
   "model_code": null,
-  "summary": null,
+  "summary": "Figure 03 is Figure AI’s third-generation general-purpose humanoid robot, succeeding the retired Figure 02. Manufacturer-reported specifications include a 20 kg payload, 1.2 m/s speed and five-hour runtime, with measurement conditions unspecified. Figure has documented the robot’s arrival at BMW Group Plant Spartanburg. General purchase availability and public pricing remain unconfirmed.",
   "announced_year": null,
   "commercial_status": "PILOT",
   "is_published": false,
@@ -63,7 +63,22 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": [],
+  "images": [
+    {
+      "image_url": "/robots/figure-03.webp",
+      "source_url": "https://time.com/7324233/figure-03-robot-humanoid-reveal/",
+      "source_name": "TIME",
+      "source_type": "EDITORIAL",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "ATTRIBUTION_REQUIRED",
+      "usage_basis": "NONE",
+      "is_official": false,
+      "is_primary": true,
+      "attribution": "Photograph by Spencer Lowell for TIME (background removed)",
+      "last_verified_at": "2026-10-19T00:00:00Z"
+    }
+  ],
   "spec_caveats": [
     {
       "field": "height_cm",

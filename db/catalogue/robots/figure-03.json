@@ -6,7 +6,7 @@
   "summary": "Figure 03 is Figure AI’s third-generation general-purpose humanoid robot, succeeding the retired Figure 02. Manufacturer-reported specifications include a 20 kg payload, 1.2 m/s speed and five-hour runtime, with measurement conditions unspecified. Figure has documented the robot’s arrival at BMW Group Plant Spartanburg. General purchase availability and public pricing remain unconfirmed.",
   "announced_year": null,
   "commercial_status": "PILOT",
-  "is_published": false,
+  "is_published": true,
   "specs": {
     "height_cm": 173.0,
     "weight_kg": 61.0,
@@ -16,7 +16,7 @@
     "walk_speed_ms": 1.2,
     "runtime_minutes": 300,
     "battery_wh": null,
-    "mobility": null,
+    "mobility": "BIPEDAL",
     "degrees_of_freedom": null,
     "hand_type": null,
     "hand_dof": null,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Commercial maturity PILOT recorded 2026-10-04 (owner decision, six-robot review). Basis: Figure 03 placed at an external customer site and a customer deployment agreement; no purchase or general availability is stated. Figure 03 is a separate, unpublished successor-generation robot to Figure 02 (figure-02); it is not merged with it. SPECIFICATIONS (owner-approved promotion batch 1, 2026-10-19): height, weight, payload, runtime and speed come from the stat block of Figure's official product page https://www.figure.ai/figure, captured on 2026-10-18 by HumanoidOnline's automated discovery observation of the owner-authorized source figure-ai-official (docs/28 A4; adapter 0.2.0) and stored as discovery claims (height 48923025, weight bd4d27ae, payload b4da6ae2, runtime c3258260, speed 6e17a216). Weight, payload, runtime and speed are recorded as stated (61KG, 20KG, 5HR, 1.2M/S); height is stated as 5'8\" and recorded as approximately 173 cm. Automated capture, not a MANUAL_BOOTSTRAP reading; not independently verified.",
+  "specs_note": "Commercial maturity PILOT recorded 2026-10-04 (owner decision, six-robot review). Basis: Figure 03 placed at an external customer site and a customer deployment agreement; no purchase or general availability is stated. Figure 03 is a separate, unpublished successor-generation robot to Figure 02 (figure-02); it is not merged with it. SPECIFICATIONS (owner-approved promotion batch 1, 2026-10-19): height, weight, payload, runtime and speed come from the stat block of Figure's official product page https://www.figure.ai/figure, captured on 2026-10-18 by HumanoidOnline's automated discovery observation of the owner-authorized source figure-ai-official (docs/28 A4; adapter 0.2.0) and stored as discovery claims (height 48923025, weight bd4d27ae, payload b4da6ae2, runtime c3258260, speed 6e17a216). Weight, payload, runtime and speed are recorded as stated (61KG, 20KG, 5HR, 1.2M/S); height is stated as 5'8\" and recorded as approximately 173 cm. Automated capture, not a MANUAL_BOOTSTRAP reading; not independently verified. MOBILITY: BIPEDAL recorded by owner decision 2026-10-19 (not part of Figure's stat block).",
   "official_url": "https://www.figure.ai/",
   "commercial_status_evidence": [
     {
@@ -63,7 +63,22 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": [],
+  "images": [
+    {
+      "image_url": "/robots/figure-03.webp",
+      "source_url": "https://time.com/7324233/figure-03-robot-humanoid-reveal/",
+      "source_name": "TIME",
+      "source_type": "EDITORIAL",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "ATTRIBUTION_REQUIRED",
+      "usage_basis": "NONE",
+      "is_official": false,
+      "is_primary": true,
+      "attribution": "Photograph by Spencer Lowell for TIME; background removed (AI-edited cutout, owner-approved)",
+      "last_verified_at": "2026-10-19T00:00:00Z"
+    }
+  ],
   "spec_caveats": [
     {
       "field": "height_cm",

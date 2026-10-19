@@ -2,8 +2,8 @@
 
 **Robot:** unitree-g1  
 **Classification:** ROUTINE  
-**Digest:** `50872b4016b002d8158b3a61beb0c5f982ab6f9c7e552eb9a61e9eb9e45bc3c1`  
-**Base commit:** `6ecf639e77a912d08791062bc5991633ed695076`
+**Digest:** `ccd057c337eae4053e7d61977086cf63270e26367b872ab41a6ff7db2446c90f`  
+**Base commit:** `7e4c3c3fea8b578a3ac8a557e7243ee9e16b8a3a`
 
 ## New manufacturer facts
 

@@ -60,7 +60,34 @@
   "variants": [],
   "pricing_offers": [],
   "availability_offers": [],
-  "deployments": [],
+  "deployments": [
+    {
+      "customer_name": "BMW Group",
+      "region_code": "US",
+      "use_case_slug": "manufacturing",
+      "provider_slug": null,
+      "transaction_type": "OTHER",
+      "unit_count": null,
+      "contract_value": null,
+      "contract_currency": null,
+      "started_on": "2026-06-30",
+      "status": "pilot",
+      "summary": "Figure 03 introduced at BMW Group Plant Spartanburg (Hall 52, an assembly and logistics hall), June/July 2026, per Figure's own post. Scale, tasks and commercial terms not disclosed.",
+      "evidence": [
+        {
+          "source_url": "https://www.figure.ai/news/f-03-at-bmw",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Figure — F.03 at BMW (2026-06-30)",
+          "excerpt": "our latest generation robot - Figure 03 - arrived in Hall 52, one of the assembly and logistics halls at BMW Group Plant Spartanburg.",
+          "published_at": "2026-06-30",
+          "observed_at": "2026-10-04",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "Deployment start recorded per owner decision 2026-10-19: introduced at BMW Group Plant Spartanburg in June/July 2026. started_on = 2026-06-30, the publication date of Figure's post documenting the arrival (month-level approximation, not a contract start). Unit count, commercial terms and production status are not disclosed. Retrieved under AGENT_ASSISTED_RESEARCH (docs/26) 2026-10-04; not human-verified."
+        }
+      ]
+    }
+  ],
   "capabilities": [],
   "use_case_fits": [],
   "images": [

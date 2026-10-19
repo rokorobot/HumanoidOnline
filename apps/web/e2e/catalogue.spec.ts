@@ -158,15 +158,17 @@ test("manufacturers: Figure card scopes its status to PUBLISHED models, never th
   // The Figure card is a whole-card link.
   const card = page.locator("a.mcard", { hasText: "Figure" });
   await expect(card).toBeVisible();
-  // Figure's only published catalogue model is discontinued while its other
-  // records are unpublished. The card must say that about PUBLISHED models —
-  // the old "PORTFOLIO: DISCONTINUED" read as a verdict on the whole company.
+  // Figure's published catalogue models are Figure 02 (discontinued) and
+  // Figure 03 (pilot, published 2026-10). The card must speak about PUBLISHED
+  // models — the old "PORTFOLIO: DISCONTINUED" read as a verdict on the whole
+  // company — and the retired Figure 02 must not make the maker read as retired.
   await expect(card).toContainText("PUBLISHED MODEL STATUS");
-  await expect(card).toContainText("ALL DISCONTINUED");
+  await expect(card).toContainText("Pilot");
+  await expect(card).not.toContainText("ALL DISCONTINUED");
   await expect(card).not.toContainText("PORTFOLIO");
   // Tracked and published remain two labelled, derived counts.
   await expect(card).toContainText("CATALOGUE MODELS");
-  await expect(card).toContainText(/\d+ TRACKED · 1 PUBLISHED/);
+  await expect(card).toContainText(/\d+ TRACKED · 2 PUBLISHED/);
   // The company's humanoid deployment column is not what the card shows.
   await expect(card).not.toContainText("DEPLOY");
   // Whole-card link is keyboard-focusable.

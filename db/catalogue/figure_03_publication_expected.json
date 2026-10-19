@@ -1,0 +1,22 @@
+{
+  "_comment": "Figure 03 publication (owner work package 2026-10-19): expected changes for `import_catalogue.py --only figure-03 --apply-publication-state`. Robot row CHANGED (summary from #184 + is_published false->true + mobility BIPEDAL + specs_note line; commercial_status PILOT unchanged) and one robot_image ADDED. No offer, spec, deployment, evidence or other-robot change.",
+  "expected": [
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "figure-03"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot_image",
+      "kind": "ADDED",
+      "match": {
+        "robot": "figure-03",
+        "image_url": "/robots/figure-03.webp"
+      },
+      "count": 1
+    }
+  ]
+}

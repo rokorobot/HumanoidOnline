@@ -1,0 +1,69 @@
+{
+  "manifest_version": 1,
+  "promotion_id": "2026-10-19-unitree-g1-compute-base",
+  "base": {
+    "catalogue_commit": "7e4c3c3fea8b578a3ac8a557e7243ee9e16b8a3a",
+    "robot_fingerprints": {
+      "unitree-g1": "72b4c8e6d2d83f1a24fd493033b9d0ce45f975d50fdc98e7cba71e147d84ddc2"
+    }
+  },
+  "scope": {
+    "robots": [
+      "unitree-g1"
+    ],
+    "allowed_tables": [
+      "specification"
+    ],
+    "edition_map": {
+      "unitree-g1": "G1"
+    }
+  },
+  "items": [
+    {
+      "robot": "unitree-g1",
+      "edition": "G1",
+      "variant_slug": null,
+      "field": "extended_specs.compute_base",
+      "definition": "compute_base",
+      "unit": null,
+      "existing_value": null,
+      "proposed_value": "8-core high-performance CPU",
+      "claim_value": "8-core high-performance CPU",
+      "interpretation": "",
+      "claim_id": "93b8f345-6980-47db-8872-f89546fff1bb",
+      "claim_field_key": "unitree.spec[G1]/Electrical Characteristics/Basic Computing Power",
+      "source_label": "Unitree Robotics official page, G1 column; discovery claim 93b8f345 (verbatim: '8-core high-performance CPU')",
+      "source_url": "https://www.unitree.com/g1",
+      "observed_at": "2026-10-18",
+      "content_hash": "e1a93cd0bd136246fe74f0fa968302d3a27aa1f0b46e0ce2e1c004eaf0b716a8",
+      "evidence_locator": "",
+      "evidence_class": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "confidence": "HIGH",
+      "classification": "ROUTINE",
+      "reasons": [],
+      "conflict": "NONE",
+      "expected_change": {
+        "table": "specification",
+        "kind": "ADDED",
+        "match": {
+          "robot": "unitree-g1",
+          "definition": "compute_base"
+        }
+      },
+      "display": "Robot detail spec table: 'Onboard computer: 8-core high-performance CPU', with source",
+      "compare_peer": "booster-t2-education"
+    }
+  ],
+  "restricted_impact": {
+    "prices": 0,
+    "availability": 0,
+    "publication": 0,
+    "commercial_status": 0,
+    "images": 0,
+    "deletions": 0,
+    "unrelated_robots": 0
+  },
+  "generated_on": "2026-10-19",
+  "digest": "ccd057c337eae4053e7d61977086cf63270e26367b872ab41a6ff7db2446c90f"
+}

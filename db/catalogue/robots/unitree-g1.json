@@ -295,6 +295,15 @@
       "source_kind": "MANUFACTURER",
       "edition_scope": "THIS_EDITION",
       "observed_at": "2026-10-18"
+    },
+    {
+      "key": "compute_base",
+      "value": "8-core high-performance CPU",
+      "source_label": "Unitree Robotics official page, G1 column; discovery claim 93b8f345 (verbatim: '8-core high-performance CPU')",
+      "source_url": "https://www.unitree.com/g1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
     }
   ]
 }

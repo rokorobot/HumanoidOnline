@@ -1,0 +1,119 @@
+{
+  "_comment": "K1 walking-speed / runtime correction (owner decision 2026-10-19; docs/discovery/K1_SPEED_RUNTIME_CORRECTION_PROPOSAL_2026-10-19.md): expected business changes for `import_catalogue.py --only booster-k1-geek --only booster-k1-educational --only booster-k1-professional`. 3 robot rows CHANGED (walk_speed_ms 0.40->2.0, runtime_minutes 30/80/80->20/70/70, spec_caveats, summary, specs_note); 5 use-case limitation rewrites, each a REMOVED+ADDED pair (use_case_fit has no natural key in the preflight). No spec rows, offers, evidence, images or publication.",
+  "expected": [
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "booster-k1-geek"
+      },
+      "count": 1
+    },
+    {
+      "table": "use_case_fit",
+      "kind": "REMOVED",
+      "match": {
+        "robot": "booster-k1-geek",
+        "use_case": "research-education",
+        "limitations~": "min runtime"
+      }
+    },
+    {
+      "table": "use_case_fit",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-geek",
+        "use_case": "research-education",
+        "limitations~": "runtime walking at 1.1 m/s per Booster"
+      }
+    },
+    {
+      "table": "use_case_fit",
+      "kind": "REMOVED",
+      "match": {
+        "robot": "booster-k1-geek",
+        "use_case": "events-entertainment",
+        "limitations~": "min runtime"
+      }
+    },
+    {
+      "table": "use_case_fit",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-geek",
+        "use_case": "events-entertainment",
+        "limitations~": "runtime walking at 1.1 m/s per Booster"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "booster-k1-educational"
+      },
+      "count": 1
+    },
+    {
+      "table": "use_case_fit",
+      "kind": "REMOVED",
+      "match": {
+        "robot": "booster-k1-educational",
+        "use_case": "research-education",
+        "limitations~": "min runtime"
+      }
+    },
+    {
+      "table": "use_case_fit",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-educational",
+        "use_case": "research-education",
+        "limitations~": "runtime walking at 1.1 m/s per Booster"
+      }
+    },
+    {
+      "table": "use_case_fit",
+      "kind": "REMOVED",
+      "match": {
+        "robot": "booster-k1-educational",
+        "use_case": "events-entertainment",
+        "limitations~": "min runtime"
+      }
+    },
+    {
+      "table": "use_case_fit",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-educational",
+        "use_case": "events-entertainment",
+        "limitations~": "runtime walking at 1.1 m/s per Booster"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "booster-k1-professional"
+      },
+      "count": 1
+    },
+    {
+      "table": "use_case_fit",
+      "kind": "REMOVED",
+      "match": {
+        "robot": "booster-k1-professional",
+        "use_case": "events-entertainment",
+        "limitations~": "min runtime"
+      }
+    },
+    {
+      "table": "use_case_fit",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-professional",
+        "use_case": "events-entertainment",
+        "limitations~": "runtime walking at 1.1 m/s per Booster"
+      }
+    }
+  ]
+}

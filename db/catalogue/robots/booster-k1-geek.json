@@ -3,7 +3,7 @@
   "name": "K1 GEEK",
   "manufacturer_slug": "booster-robotics",
   "model_code": "K1 Geek",
-  "summary": "Entry-level configuration of Booster Robotics' K1 humanoid platform: Qualcomm QCS8550 compute (48 TOPS dense), a 2Ah battery giving ~30 min runtime at 0.4 m/s, and a 3-month manufacturer warranty. Won the RoboCup 2025 KidSize championship. Source: RobotShop EU listing, 2026-08-16.",
+  "summary": "Entry-level configuration of Booster Robotics' K1 humanoid platform: Qualcomm QCS8550 compute (48 TOPS dense), a 2Ah battery (Booster: about 20 min walking at 1.1 m/s; RobotShop EU listing: ~30 min at 0.4 m/s), and a 3-month manufacturer warranty. Won the RoboCup 2025 KidSize championship. Source: RobotShop EU listing, 2026-08-16.",
   "announced_year": null,
   "commercial_status": "COMMERCIAL",
   "is_published": true,
@@ -13,8 +13,8 @@
     "arm_span_cm": null,
     "reach_cm": null,
     "payload_kg": null,
-    "walk_speed_ms": 0.4,
-    "runtime_minutes": 30,
+    "walk_speed_ms": 2.0,
+    "runtime_minutes": 20,
     "battery_wh": null,
     "mobility": "BIPEDAL",
     "degrees_of_freedom": 22,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": true
   },
-  "specs_note": "Entered by robert@humanoid.company from https://eu.robotshop.com/collections/booster-robotics (retrieved 2026-08-16). 10 field(s) not stated by the source and left UNKNOWN. ros_support and simulation_support are recorded TRUE per the source's own comparison table, which states 'Yes' for both -- but the same page's 'Open Software Stack' section qualifies this: 'ROS 2 or Isaac-Sim support may require developer integration rather than being fully built in.' Treat both as SDK-level capability, not out-of-the-box support. AI compute (Qualcomm QCS8550, 48 TOPS) and warranty (3 months) have no dedicated catalogue field and are recorded in `summary` instead. NOTE: source_url is RobotShop EU's Booster Robotics COLLECTION page, not the exact per-SKU product URL -- the precise product-page URL has been requested from the owner and should replace this citation once supplied.",
+  "specs_note": "Entered by robert@humanoid.company from https://eu.robotshop.com/collections/booster-robotics (retrieved 2026-08-16). 10 field(s) not stated by the source and left UNKNOWN. ros_support and simulation_support are recorded TRUE per the source's own comparison table, which states 'Yes' for both -- but the same page's 'Open Software Stack' section qualifies this: 'ROS 2 or Isaac-Sim support may require developer integration rather than being fully built in.' Treat both as SDK-level capability, not out-of-the-box support. AI compute (Qualcomm QCS8550, 48 TOPS) and warranty (3 months) have no dedicated catalogue field and are recorded in `summary` instead. NOTE: source_url is RobotShop EU's Booster Robotics COLLECTION page, not the exact per-SKU product URL -- the precise product-page URL has been requested from the owner and should replace this citation once supplied. CORRECTION 2026-10-19 (owner decision; docs/discovery/K1_SPEED_RUNTIME_CORRECTION_PROPOSAL_2026-10-19.md): walk_speed_ms is now Booster's stated walking speed, 'Walking Speed: 2 m/s', read as up to 2 m/s (discovery claim fc370db3); the previous 0.4 m/s was the RobotShop listing's runtime-test speed, not a walking speed. runtime_minutes is Booster's own observation, '20 min (walking at 1.1 m/s)' (claim c6f067a5), from https://www.booster.tech/booster-k1?target=en observed 2026-10-18. The RobotShop EU listing's alternative observation, '~30 min runtime at 0.4 m/s' (retrieved 2026-08-16), is preserved in the runtime caveat; the two were measured at different speeds and are not interchangeable.",
   "official_url": null,
   "commercial_status_evidence": [
     {
@@ -97,7 +97,7 @@
       "is_primary": true,
       "commercial_readiness": "COMMERCIAL",
       "notes": "Entry-level K1 configuration with SDK, ROS2 compatibility and Isaac Sim support stated by the distributor listing, which also cites a RoboCup 2025 KidSize championship (https://eu.robotshop.com/collections/booster-robotics, observed 2026-08-16): a low-cost entry point to the same development platform as the Educational and Professional configurations.",
-      "limitations": "About 30 min runtime and a 3-month warranty. ROS 2 / Isaac Sim may require developer integration. Third-party distributor source.",
+      "limitations": "About 20 min runtime walking at 1.1 m/s per Booster (~30 min at 0.4 m/s per RobotShop) and a 3-month warranty. ROS 2 / Isaac Sim may require developer integration. Third-party distributor source.",
       "confidence": "MEDIUM"
     },
     {
@@ -106,7 +106,7 @@
       "is_primary": false,
       "commercial_readiness": "COMMERCIAL",
       "notes": "The distributor listing cites a RoboCup 2025 KidSize championship: a competition platform, and a potential demonstration platform (https://eu.robotshop.com/collections/booster-robotics).",
-      "limitations": "A robot-soccer competition result, not a purpose-built entertainment product. Demonstrations or exhibitions are a potential use, not an established event-service capability. About 30 min runtime.",
+      "limitations": "A robot-soccer competition result, not a purpose-built entertainment product. Demonstrations or exhibitions are a potential use, not an established event-service capability. About 20 min runtime walking at 1.1 m/s per Booster (~30 min at 0.4 m/s per RobotShop).",
       "confidence": "LOW"
     }
   ],
@@ -172,6 +172,16 @@
       "source_kind": "MANUFACTURER",
       "edition_scope": "THIS_EDITION",
       "observed_at": "2026-10-18"
+    }
+  ],
+  "spec_caveats": [
+    {
+      "field": "walk_speed_ms",
+      "text": "Booster states 'Walking Speed: 2 m/s' (up to 2 m/s; claim fc370db3). A manufacturer specification, not a measured cruising speed."
+    },
+    {
+      "field": "runtime_minutes",
+      "text": "Booster: '20 min (walking at 1.1 m/s)' (claim c6f067a5). RobotShop EU listing (retrieved 2026-08-16): '~30 min runtime at 0.4 m/s'. Measured at different speeds; not interchangeable."
     }
   ]
 }

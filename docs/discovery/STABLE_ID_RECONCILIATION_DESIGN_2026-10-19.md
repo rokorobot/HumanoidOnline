@@ -53,6 +53,15 @@ today.
 | use_case_fit | (robot_id, use_case_id) | yes: unique (no surrogate id) |
 | evidence_source (importer-managed) | (subject_type, subject_id, source_url, source_type, sha256(excerpt)) | **no** (see D3) |
 
+**Checked against the catalogue JSON (main @ b6afe89):**
+- The proposed `pricing_offer` key is unique across all 35 pricing offers; the `robot_image`
+  key across all 50 images. No collisions, so D1's indexes would build on today's data.
+- The JSON carries **non-current offers**: `unitree-r1` pricing via quadruped-de (DE) and
+  `unitree-r1-edu-u5` availability via reichelt (DE), each with `is_current: false` and no
+  current sibling. `uq_availability_logical` is partial (`WHERE is_current`), so the reconcile
+  key must include `is_current`. Otherwise a non-current row and a later current row with the
+  same key would be collapsed into one.
+
 Correction to the hardening plan: the spec key in the schema has **no `edition_scope`**. The
 plan listed it, but the index does not include it.
 

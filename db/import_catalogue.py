@@ -97,6 +97,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 from collections import Counter
 from decimal import Decimal
@@ -615,6 +616,29 @@ def _upsert(cur, table: str, conflict: str, cols: list[str], vals: list, *,
     new = {c: set_exprs.get(c, f"EXCLUDED.{c}") for c in changing}
     guard = (f"({', '.join(f'{table}.{c}' for c in changing)}) "
              f"IS DISTINCT FROM ({', '.join(new.values())})")
+    # An unchanged row is detected with a plain SELECT first. INSERT ... ON CONFLICT DO UPDATE
+    # needs the UPDATE privilege even when it would change nothing, so without this a role with
+    # INSERT-only rights (the promotion executor) could not import a robot whose shared rows
+    # are already current. The SELECT uses the same guard, so the outcome is identical.
+    params: list = []
+
+    def _bind(match):
+        params.append(vals[cols.index(match.group(1))])
+        return "%s"
+
+    probe = re.sub(r"EXCLUDED\.(\w+)", _bind, guard)
+    unchanged = False
+    conn = getattr(cur, "connection", None)     # a bare statement-recording stand-in has none
+    if conn is not None:
+        try:
+            with conn.transaction():            # a savepoint: a failed probe aborts nothing
+                unchanged = cur.execute(
+                    f"SELECT NOT ({probe}) FROM {table} WHERE {table}.{conflict} = %s",
+                    [*params, vals[cols.index(conflict)]]).fetchone() == (True,)
+        except psycopg.Error:
+            unchanged = False                   # fall through to the original statement
+    if unchanged:
+        return None
     if only_if:
         guard = f"{only_if} AND {guard}"
     row = cur.execute(
@@ -1560,10 +1584,15 @@ def _check_publication_transitions(cur, loaded: list[dict], was_published: dict)
 
 
 def run(url: str, *, apply_publication_state: bool = False,
-        only: set[str] | None = None, authorize=None) -> Reconciliation:
+        only: set[str] | None = None, authorize=None, before_write=None) -> Reconciliation:
     """Import the catalogue (or the `only` robots) in ONE transaction and return the
     reconciliation (its counters). `authorize` is an Authorization, an entries document
-    or an `--authorize` file path; the default authorizes nothing."""
+    or an `--authorize` file path; the default authorizes nothing.
+
+    `before_write(cur)`, when given, is called with the transaction's cursor after the write
+    lock is held and before the first write; it may raise (e.g. ReconcileRefused) to abort with
+    nothing written. Every run first takes the transaction-scoped advisory lock
+    `catalogue-write`, so importer runs are serialized."""
     recon = Reconciliation(authorize)
     regions = _load(CATALOGUE_DIR / "regions.json")
     providers = _load(CATALOGUE_DIR / "providers.json")
@@ -1613,6 +1642,9 @@ def run(url: str, *, apply_publication_state: bool = False,
     with psycopg.connect(url, autocommit=False) as conn:
         with conn.cursor() as cur:
             cur.execute("SET search_path TO humanoid, public")
+            cur.execute("SELECT pg_advisory_xact_lock(hashtext('catalogue-write'))")
+            if before_write is not None:
+                before_write(cur)
 
             # Resolver closures backed by simple per-key lookups.
             def region_id(code):

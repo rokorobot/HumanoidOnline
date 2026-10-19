@@ -1,6 +1,10 @@
 -- PROPOSAL ONLY (owner decision D5, 2026-10-19): GitHub Actions is NOT authorized to write to
 -- production. This file lives outside .github/workflows and db/roles so that nothing runs or
 -- applies it. See ../PROMOTION_EXECUTOR_SECURITY_PROPOSAL_2026-10-19.md.
+-- FUTURE PROPOSAL - NOT FOR THE PILOT. The pilot role is catalogue_promoter_routine
+-- (catalogue_promoter_routine.sql): additions only, no UPDATE / DELETE / TRUNCATE. This broader
+-- role (INSERT / UPDATE / DELETE on a robot's child rows) would only be needed for a promotion
+-- lane that changes or removes facts, which does not exist and needs its own owner decision.
 -- catalogue_importer - PROPOSED least-privilege database role for the approved catalogue
 -- promotion workflow (docs/discovery/CATALOGUE_PROMOTION_AUTOMATION_DESIGN_2026-10-19.md,
 -- section 5). THIS FILE IS A PROPOSAL: nothing applies it, and nothing in the repository
@@ -22,13 +26,14 @@
 --          authorised, which the promotion workflow never passes). Shared entities (regions,
 --          manufacturers, providers, capabilities, use cases, spec definitions, robots) get
 --          INSERT and UPDATE only, never DELETE.
---   READ   the schema, because the pre/post verification gates (db/import_preflight.py and
---          db/import_identity_check.py) snapshot every table. OWNER DECISION: that includes
---          the lead tables, which those tools reduce to a content hash in memory and never
---          print or store. If that is unacceptable, revoke SELECT on commercial_lead,
---          commercial_lead_robot, commercial_lead_provider, buyer_requirement and
---          match_result; the post-verification step then fails closed (an incident), and the
---          snapshot would have to be taken with a separate read-only credential.
+--   READ   the 39 non-lead tables of the schema (an explicit list, no blanket grant): the
+--          pre/post verification gates (db/import_preflight.py, db/import_identity_check.py)
+--          snapshot every table they are not told to exclude. OWNER DECISION: the lead tables
+--          (commercial_lead, commercial_lead_robot, commercial_lead_provider,
+--          buyer_requirement, match_result) are OUT OF SCOPE of this role: no SELECT and no
+--          write privilege, so they cannot change through it. The executor passes them as the
+--          explicit `exclude_tables` of the snapshot on BOTH sides of every comparison and
+--          records them in the receipt; any other unreadable table fails the gate closed.
 -- What it cannot do: DDL or migrations (it owns nothing; migrations stay with the owner
 -- role), any write to the discovery, lead, claim, audit, source-registry or event tables,
 -- TRUNCATE, or any privilege on sequences.
@@ -38,7 +43,17 @@ SET search_path TO humanoid, public;
 GRANT USAGE ON SCHEMA humanoid TO catalogue_importer;
 
 -- Verification snapshots and the importer's own reads (see the OWNER DECISION above).
-GRANT SELECT ON ALL TABLES IN SCHEMA humanoid TO catalogue_importer;
+GRANT SELECT ON
+    region, manufacturer, provider, robot, robot_variant, robot_status_history,
+    robot_image, spec_definition, specification, capability, robot_capability, use_case,
+    use_case_fit, pricing_offer, availability_offer, deployment, evidence_source,
+    event_log, discovery_source, discovery_source_owner_authorization_event,
+    source_eligibility_review, crawl_run, fetched_page, discovery_candidate,
+    candidate_claim, candidate_image_ref, extraction_result, candidate_commercial_signal,
+    discovery_evidence_excerpt, promotion_audit, freshness_target, freshness_observation,
+    candidate_identity_decision, discovery_claim_proposal, discovery_proposal_observation,
+    discovery_proposal_decision, accepted_claim, claim_retraction, catalogue_write_audit
+TO catalogue_importer;
 
 -- Shared entities: reconciled by natural key, never deleted by the importer.
 GRANT INSERT, UPDATE ON

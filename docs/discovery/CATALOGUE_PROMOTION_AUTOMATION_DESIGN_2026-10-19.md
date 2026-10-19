@@ -111,19 +111,44 @@ never promoted automatically.
 ## 4. `promotion execute` (after merge), fail-closed in this order
 
 1. **Manifest.** Digest, commit and catalogue-diff verification (section 1). `manifest_version`
-   must be supported.
+   must be supported. Every item must name a published `compare_peer` (public verification
+   needs one), found here, never after a write.
+1b. **Approval (`approval`).** `--approved-pr N` is required. PR N must be merged, its base
+   `main`, `merge_commit_sha` equal to `--commit`, `merged_by` in the allowlist
+   `PROMOTION_APPROVERS` (unset or empty = REFUSED, never open), and its changed files exactly
+   the manifest `.json`, its `.md` review and the scoped robot JSON file(s). The manifest read
+   with `git show <commit>:<path>` must equal the manifest being executed (same digest). Any
+   API error = REFUSED. The receipt records PR number, head sha, merge sha and merger.
+   `--no-github` does not bypass this; a local pilot (`--local-branches --no-github`) records
+   `approval: SIMULATED_LOCAL`.
 2. **Halt switch.** Refuse if an open GitHub issue carries label `promotion-incident`. A
    post-commit failure opens one, which stops every later promotion until the owner closes it.
 3. **Concurrency.** The workflow concurrency group `catalogue-promotion` (no cancel). Inside the
    database, `pg_try_advisory_lock(hashtext('catalogue-promotion'))`. Refuse if a discovery
    `crawl_run` is RUNNING.
+3b. **Privileges (`privileges`).** On the production connection: refuse if the role is a
+   superuser, a member of `neon_superuser`, owns any humanoid table, has UPDATE / DELETE /
+   TRUNCATE on any, or lacks INSERT on `specification` / `evidence_source`. ROUTINE is additions
+   only, so its role (`catalogue_promoter_routine`) has INSERT only. The result is in the receipt.
 4. **Already applied?** If production already shows every item's post-state (the rows and
    values exist exactly) and the base fingerprints do not match, the run ends as
    `ALREADY_APPLIED` with a receipt and no write. An identical manifest never applies twice.
+4b. **Eligibility (`eligibility`).** The manifest's own classification is not trusted (its digest
+   proves integrity, not eligibility). Each item is re-derived read-only from production with
+   `propose` against the base catalogue; every item must still be ROUTINE with no conflict and
+   equal on robot, definition, variant, value, claim value, source URL, observation date and
+   content hash. A source disabled, a claim now in conflict, a changed page hash or a stale
+   observation refuses as `REFUSED:eligibility`.
 5. **Baseline.** Production's per-robot fingerprint equals `base.robot_fingerprints`. Otherwise
-   refuse as `BASE_DRIFT`: production changed since review, so a new review is needed.
-6. **Safety point.** Create a Neon branch `promo-<id>-<utc>` from `production`. It is retained;
-   cleanup is an owner decision. Failure refuses.
+   refuse as `BASE_DRIFT`: production changed since review, so a new review is needed. The
+   gates read every table except the explicit, symmetric `exclude_tables` (the lead / buyer
+   tables, recorded in the receipt); any other unreadable table fails closed.
+6. **Safety point.** Create a Neon branch `promo-<id>-<utc>` from `production`, with an explicit
+   `parent_id` (`NEON_PRODUCTION_BRANCH_ID`). Before the first create the parent is verified to
+   exist, be the default branch, be named `production`, and own the endpoint of the production
+   URL; each response's `parent_id` must equal it. Parent id and LSN are in the receipt (a local
+   pilot checks the template database is the production database). It is retained; cleanup is
+   an owner decision. Any mismatch or failure refuses.
 7. **Rehearsal.** Create a second branch, `rehearse-<id>-<utc>`, and import the scoped robots
    there.
    - `import_preflight.py --manifest <derived>` against the safety branch must PASS (no
@@ -132,7 +157,10 @@ never promoted automatically.
      and ADDED equal to the manifest's additions.
    - The rehearsal branch is deleted after the run.
 8. **Apply.** Scoped `import_catalogue.py --only <robots>` against production. One transaction;
-   no `--authorize`, so the fast lane cannot delete.
+   no `--authorize`, so the fast lane cannot delete. Every importer run first takes
+   `pg_advisory_xact_lock(hashtext('catalogue-write'))`; the executor's `before_write` hook then
+   recomputes the scoped fingerprints inside that transaction, before the first write, and
+   refuses (nothing written) if they differ from the manifest base.
 9. **Post-verify (production vs safety branch).**
    - Repeat the same preflight and identity check. They must equal the rehearsal results
      exactly.
@@ -141,8 +169,14 @@ never promoted automatically.
 10. **Public verification**, with bounded retries: up to 12 × 60 s, covering the API's 300 s
     cache. For each item:
     - the API `/api/robots/<slug>` returns the value, unit and source;
-    - the published page `/robots/<slug>` contains the value and its source label;
-    - `/compare?ids=<slug>` shows the value without dropping caveats that exist.
+    - the API entry matches key, variant, value, unit, `source_url` and `observed_at`;
+    - the published page `/robots/<slug>` has the value inside the spec row of that definition's
+      label (`div.srow`), with the source link (`href` = source URL) or source label in the same
+      row;
+    - `/compare?ids=<slug>,<peer>` has the value in this robot's cell of that label's row
+      (`tr` / `th.rowlab` / `td`). **Known gap:** the web compare matrix renders only the fixed
+      `COMPARE_FIELDS`, not extended specs, so this check cannot pass until the web renders them
+      or compare is dropped from the gating set (owner decision before any real run).
     - A catalogue-only change needs no deployment. If the manifest declares
       `requires_deploy`, it waits for the normal deploy gates first.
 11. **Receipt.** The receipt JSON records:
@@ -175,6 +209,13 @@ never promoted automatically.
 
 Connection strings are never echoed. Errors print the exception type only, as the existing CLIs
 already do.
+
+**Follow-up (not done): app writers outside the importer are not serialised by the
+`catalogue-write` lock.** `apps/api/app/admin_ops.py` is read-only (nothing to lock);
+`apps/api/app/services/discovery/materialize.py` only appends a `catalogue_write_audit` row in
+`verify_applied` and edits catalogue JSON files, so the lock is not an obvious two-line change
+there. The in-transaction fingerprint recheck covers a concurrent catalogue write; locking those
+writers is a follow-up.
 
 ## 6. Owner decisions before activation
 

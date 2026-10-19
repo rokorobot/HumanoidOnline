@@ -8,11 +8,12 @@ the public web. `LocalBranches` (CREATE DATABASE ... TEMPLATE) stands in for Neo
 from __future__ import annotations
 
 import contextlib
+import html
 import io
 import json
 import shutil
 import uuid
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import psycopg
@@ -27,7 +28,14 @@ from app.services.discovery import promotion_manifest as pm
 ROOT = Path(__file__).resolve().parents[3]
 REAL_CATALOGUE = ROOT / "db" / "catalogue"
 SCHEMA_SQL = ROOT / "db" / "schema.sql"
+ROUTINE_ROLE_SQL = (ROOT / "docs" / "discovery" / "promotion_executor_proposal"
+                    / "catalogue_promoter_routine.sql")
+ROUTINE_PASSWORD = "routine-test-pw"
 ROBOT = "unitree-g1"
+PEER = "agility-digit"            # a published robot for the compare check (real catalogue)
+FIXED_NOW = datetime(2026, 10, 19, 12, 0, tzinfo=UTC)
+#: template database name -> the additions-only role granted in it (see template_db)
+ROUTINE_ROLES: dict[str, str] = {}
 KEY = "synthetic_compute"
 VALUE = "SYNTHETIC 8-core test CPU"
 TODAY = date(2026, 10, 19)
@@ -45,6 +53,11 @@ def _admin_url() -> str:
 
 def _db_url(name: str) -> str:
     return plain(make_url(get_settings().resolved_database_url).set(database=name))
+
+
+def _role_url(db: str, role: str) -> str:
+    return plain(make_url(get_settings().resolved_database_url).set(
+        database=db, username=role, password=ROUTINE_PASSWORD))
 
 
 def _drop(name: str) -> None:
@@ -95,13 +108,26 @@ def template_db(tmp_path_factory, database_url):
                 "INSERT INTO spec_definition (key, label, category, value_type, sort_order,"
                 " managed_by) VALUES (%s, 'Onboard computer (synthetic)', 'AI_AUTONOMY',"
                 " 'TEXT', 99, 'CATALOGUE_IMPORT')", (KEY,))
-        run_import(url, catalogue)
+        run_import(url, catalogue, robots=(ROBOT, PEER))
         with psycopg.connect(url, autocommit=True) as conn:
             conn.execute("SET search_path TO humanoid, public")
             conn.execute(_SYNTHETIC_DISCOVERY_SQL)
+        # The production role of the tests is the proposal's additions-only role, granted by the
+        # proposal's own SQL (so the grants are exercised, not re-typed here).
+        role = f"promo_rt_{uuid.uuid4().hex[:8]}"
+        with psycopg.connect(_admin_url(), autocommit=True) as conn:
+            conn.execute(f"CREATE ROLE {role} LOGIN PASSWORD '{ROUTINE_PASSWORD}'")
+        with psycopg.connect(url, autocommit=True) as conn:
+            conn.execute(ROUTINE_ROLE_SQL.read_text(encoding="utf-8").replace(
+                "catalogue_promoter_routine", role))
+        ROUTINE_ROLES[name] = role
         yield name
     finally:
         _drop(name)
+        role = ROUTINE_ROLES.pop(name, None)
+        if role:
+            with psycopg.connect(_admin_url(), autocommit=True) as conn:
+                conn.execute(f"DROP ROLE IF EXISTS {role}")
 
 
 _SYNTHETIC_DISCOVERY_SQL = f"""
@@ -141,7 +167,9 @@ class World:
         self.name = f"promo_w_{uuid.uuid4().hex[:10]}"
         with psycopg.connect(_admin_url(), autocommit=True) as conn:
             conn.execute(f'CREATE DATABASE "{self.name}" TEMPLATE "{template}"')
-        self.url = _db_url(self.name)
+        self.owner_url = _db_url(self.name)            # fixtures / assertions only
+        self.role = ROUTINE_ROLES[template]
+        self.url = _role_url(self.name, self.role)     # production, as the executor
         self.admin = _admin_url()
         self.base = add_definition(copy_catalogue(tmp / "base")) or tmp / "base"
         self.head = tmp / "head"
@@ -153,7 +181,7 @@ class World:
 
     # -- database helpers --------------------------------------------------------------
     def sql(self, statement: str, params=()) -> list[tuple]:
-        with psycopg.connect(self.url, autocommit=True) as conn:
+        with psycopg.connect(self.owner_url, autocommit=True) as conn:
             conn.execute("SET search_path TO humanoid, public")
             cur = conn.execute(statement, params)
             return cur.fetchall() if cur.description else []
@@ -184,7 +212,7 @@ class World:
 
     def propose(self, items=None, *, catalogue=None, edition_map="default", today=TODAY,
                 promotion_id="synthetic-promo", **kw) -> dict:
-        engine = create_engine(self.url.replace("postgresql://", "postgresql+psycopg://", 1),
+        engine = create_engine(self.owner_url.replace("postgresql://", "postgresql+psycopg://", 1),
                                connect_args={"options": "-csearch_path=humanoid,public"})
         try:
             with Session(engine) as session:
@@ -208,13 +236,17 @@ class World:
         return self.manifest
 
     def execute(self, manifest=None, **over):
+        manifest = manifest or self.manifest
         kwargs = dict(commit="c0ffee", production=px.StaticProduction(self.url),
                       branches=self.branches, github=self.github,
-                      web=self.web_for(manifest or self.manifest), api_base="http://api.test",
+                      approvals=FakeApprovals(manifest), approved_pr=7, approvers={"owner"},
+                      read_at_commit=lambda commit, path: json.dumps(manifest),
+                      web=self.web_for(manifest), api_base="http://api.test",
                       web_base="http://web.test", catalogue_dir=self.head,
-                      base_catalogue_dir=self.base, sleep=lambda s: None, retry_wait=0)
+                      base_catalogue_dir=self.base, sleep=lambda s: None, retry_wait=0,
+                      utc_now=lambda: FIXED_NOW)
         kwargs.update(over)
-        return px.execute(manifest or self.manifest, **kwargs)
+        return px.execute(manifest, **kwargs)
 
     @staticmethod
     def web_for(manifest: dict, *, healthy: bool = True):
@@ -245,6 +277,60 @@ class FakeGithub:
         self.comments.append(body)
 
 
+class FakeApprovals:
+    """The merged manifest PR, as the GitHub API would describe it (all fields overridable)."""
+
+    simulated = False
+
+    def __init__(self, manifest: dict, *, commit="c0ffee", merged=True, base_ref="main",
+                 merged_by="owner", files=None, error=False):
+        self.data = {"merged": merged, "base_ref": base_ref, "head_sha": "headsha",
+                     "merge_commit_sha": commit, "merged_by": merged_by,
+                     "files": sorted(px.expected_pr_files(manifest)) if files is None else files}
+        self.error = error
+        self.asked: list[int] = []
+
+    def pull_request(self, number: int) -> dict:
+        self.asked.append(number)
+        if self.error:
+            raise OSError("github unreachable")
+        return dict(self.data)
+
+
+def page_html(item: dict, *, decoy_only: bool = False, provenance: bool = True) -> str:
+    """The robot detail page as apps/web renders it: `div.srow` > `span.k` + `span.v` + the
+    attribution link (ExtendedSpecRow). `decoy_only` shows the value elsewhere but not in the
+    row of the label."""
+    label = px._label_for(item, None)
+    value = html.escape(str(item["proposed_value"]))
+    shown = "SYNTHETIC other value" if decoy_only else value
+    link = (f'<span class="ho-syslabel d-blk"><a href="{html.escape(item["source_url"])}" '
+            f'target="_blank" rel="noopener noreferrer">{html.escape(item["source_label"])}'
+            f' &middot; observed {item["observed_at"]} &#8599;</a></span>' if provenance else "")
+    return ('<html><body><h1>Robot</h1>'
+            f'<p class="summary">Highlights: {value}</p>'
+            '<div class="specgrid"><div class="spectbl"><h3>Ai autonomy</h3>'
+            '<div class="srow"><span class="k">Payload</span><span class="d-blk">'
+            '<span class="v">3 kg</span></span></div>'
+            f'<div class="srow"><span class="k">{html.escape(label)}</span>'
+            f'<span class="d-blk"><span class="v">{shown}</span>{link}</span></div>'
+            '</div></div></body></html>')
+
+
+def compare_html(item: dict, *, decoy_only: bool = False) -> str:
+    """The comparison as apps/web renders it: `tr` > `th.rowlab` + one `td.cell` per robot."""
+    label = px._label_for(item, None)
+    value = html.escape(str(item["proposed_value"]))
+    mine = "SYNTHETIC other value" if decoy_only else value
+    return ('<html><body><table class="cmatrix"><tbody>'
+            '<tr class="grouprow"><th colspan="3">Group</th></tr>'
+            '<tr><th class="rowlab">Payload</th><td class="cell">3 kg</td>'
+            '<td class="cell">5 kg</td></tr>'
+            f'<tr><th class="rowlab">{html.escape(label)}</th>'
+            f'<td class="cell">{mine}</td><td class="cell"><span class="hatch">UNKNOWN</span>'
+            f'</td></tr></tbody></table><p>{value}</p></body></html>')
+
+
 class FakeWeb:
     """Serves the committed value on the API, the page and compare (or nothing)."""
 
@@ -259,11 +345,11 @@ class FakeWeb:
         items = self.manifest["items"]
         if "/api/robots/" in url:
             return 200, json.dumps({"extended_specs": [
-                {"key": i["definition"], "value": i["proposed_value"],
-                 "source_url": i["source_url"], "variant_slug": i.get("variant_slug")}
-                for i in items]})
-        return 200, "<html>" + " ".join(
-            f"{i['proposed_value']} {i['source_label']}" for i in items) + "</html>"
+                {"key": i["definition"], "value": i["proposed_value"], "unit": i.get("unit"),
+                 "source_url": i["source_url"], "variant_slug": i.get("variant_slug"),
+                 "observed_at": i["observed_at"]} for i in items]})
+        render = compare_html if "/compare" in url else page_html
+        return 200, "".join(render(i) for i in items)
 
 
 @pytest.fixture

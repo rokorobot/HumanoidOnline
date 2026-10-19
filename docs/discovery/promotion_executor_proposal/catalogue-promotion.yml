@@ -17,7 +17,13 @@ name: Catalogue promotion
 # Secrets and variables (environment catalogue-production, restricted to main):
 #   secrets  CATALOGUE_DATABASE_URL (role catalogue_importer), NEON_API_KEY, NEON_PROJECT_ID
 #   vars     PUBLIC_API_BASE, PUBLIC_WEB_BASE (public verification); NEON_DATABASE_NAME and
-#            NEON_ROLE_NAME (optional, used only if Neon returns no connection URI)
+#            NEON_ROLE_NAME (optional, used only if Neon returns no connection URI);
+#            NEON_PRODUCTION_BRANCH_ID (required: the explicit parent of every branch) and
+#            NEON_PRODUCTION_BRANCH_NAME (default "production"); PROMOTION_APPROVERS (comma-
+#            separated GitHub logins allowed to have merged the manifest PR; unset = refuse)
+# Hardening 2026-10-19: the executor is bound to the merged PR (--approved-pr, found from the
+# merge commit below), so the workflow's own trigger is not the approval. D5 still applies: this
+# file stays a proposal, and the initial executor is the owner-run local command (E3).
 # Connection strings are never echoed; the CLI prints exception types only.
 on:
   push:
@@ -61,6 +67,9 @@ jobs:
       NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
       NEON_DATABASE_NAME: ${{ vars.NEON_DATABASE_NAME }}
       NEON_ROLE_NAME: ${{ vars.NEON_ROLE_NAME }}
+      NEON_PRODUCTION_BRANCH_ID: ${{ vars.NEON_PRODUCTION_BRANCH_ID }}
+      NEON_PRODUCTION_BRANCH_NAME: ${{ vars.NEON_PRODUCTION_BRANCH_NAME }}
+      PROMOTION_APPROVERS: ${{ vars.PROMOTION_APPROVERS }}
       GITHUB_TOKEN: ${{ github.token }}
       PUBLIC_API_BASE: ${{ vars.PUBLIC_API_BASE }}
       PUBLIC_WEB_BASE: ${{ vars.PUBLIC_WEB_BASE }}
@@ -97,9 +106,14 @@ jobs:
             dry="$INPUT_DRY_RUN"
           fi
           code=0
+          # the PR whose merge produced this commit: the executor verifies it independently
+          pr=$(curl -fsS -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/commits/$COMMIT/pulls" \
+            | python -c 'import json,sys; d=json.load(sys.stdin); print(d[0]["number"] if d else "")')
           for rel in "${manifests[@]}"; do
             [ -n "$rel" ] || continue
             args=(execute --manifest "$GITHUB_WORKSPACE/$rel" --commit "$COMMIT"
+                  --approved-pr "$pr"
                   --base-ref "$base" --receipt "$RUNNER_TEMP/receipt-$(basename "$rel")"
                   --api-base "$PUBLIC_API_BASE" --web-base "$PUBLIC_WEB_BASE")
             [ "$dry" = true ] && args+=(--dry-run)

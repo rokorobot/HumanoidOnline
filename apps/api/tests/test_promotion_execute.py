@@ -8,10 +8,23 @@ from __future__ import annotations
 
 import copy
 import json
+import re
+from datetime import UTC, date, datetime
 
 import psycopg
 import pytest
-from promotion_support import KEY, ROBOT, VALUE, FakeWeb, template_db, world  # noqa: F401
+from promotion_support import (  # noqa: F401
+    KEY,
+    PEER,
+    ROBOT,
+    VALUE,
+    FakeApprovals,
+    FakeWeb,
+    compare_html,
+    page_html,
+    template_db,
+    world,
+)
 
 from app.cli import promotion as cli
 from app.services.discovery import promotion_execute as px
@@ -40,8 +53,9 @@ def test_single_approval_executes_end_to_end_and_leaves_a_receipt(world):  # noq
     assert receipt["outcome"] == "SUCCESS", receipt
     assert world.spec_rows() == [(KEY, VALUE)]
     assert [s for s, _ in steps(receipt)] == [
-        "manifest", "halt_switch", "concurrency", "already_applied", "base_drift",
-        "safety_branch", "rehearsal", "apply", "post_verify", "public_verify"]
+        "manifest", "approval", "halt_switch", "concurrency", "privileges", "already_applied",
+        "eligibility", "base_drift", "safety_branch", "rehearsal", "apply", "post_verify",
+        "public_verify"]
     assert receipt["digest"] == manifest["digest"] and receipt["robots"] == [ROBOT]
     assert receipt["fields"] == [f"{ROBOT}:{KEY}"] and receipt["commit"] == "c0ffee"
     assert receipt["rehearsal"]["identity_added"] == [f"specification {ROBOT}:-|{KEY}"]
@@ -69,7 +83,7 @@ def test_the_same_manifest_never_applies_twice(world):  # noqa: F811
     assert world.sql("SELECT count(*) FROM catalogue_write_audit") == audit
     assert world.branch_dbs() == branches                      # no new branch, nothing created
     assert [s for s, _ in steps(second)] == [
-        "manifest", "halt_switch", "concurrency", "already_applied"]
+        "manifest", "approval", "halt_switch", "concurrency", "privileges", "already_applied"]
     assert world.spec_rows() == [(KEY, VALUE)]                  # one row, not two
 
 
@@ -212,10 +226,10 @@ def test_unexpected_rehearsal_difference_refuses_and_production_stays_untouched(
 def test_importer_refusal_at_apply_writes_nothing(world, monkeypatch):  # noqa: F811
     real = px._import
 
-    def refuse_on_production(url, robots, catalogue_dir):
+    def refuse_on_production(url, robots, catalogue_dir, **kw):
         if url == world.url:
             raise SystemExit("IMPORT REFUSED - nothing was written")
-        return real(url, robots, catalogue_dir)
+        return real(url, robots, catalogue_dir, **kw)
 
     monkeypatch.setattr(px, "_import", refuse_on_production)
     before = world.fingerprints()
@@ -262,8 +276,8 @@ def test_post_verify_failure_opens_an_incident(world, monkeypatch):  # noqa: F81
 def test_importer_crash_that_moved_production_is_an_incident(world, monkeypatch):  # noqa: F811
     real = px._import
 
-    def write_then_crash(url, robots, catalogue_dir):
-        real(url, robots, catalogue_dir)
+    def write_then_crash(url, robots, catalogue_dir, **kw):
+        real(url, robots, catalogue_dir, **kw)
         if url == world.url:
             raise RuntimeError("connection lost after commit")
 
@@ -284,6 +298,7 @@ def test_missing_public_base_urls_are_recorded_not_assumed(world):  # noqa: F811
 
 def test_public_check_requires_value_and_source_on_the_api(world):  # noqa: F811
     manifest = world.manifest
+    item = manifest["items"][0]
 
     class Web:
         def __init__(self, entry):
@@ -292,10 +307,10 @@ def test_public_check_requires_value_and_source_on_the_api(world):  # noqa: F811
         def get(self, url):
             if "/api/robots/" in url:
                 return 200, json.dumps({"extended_specs": [self.entry]})
-            return 200, f"<p>{VALUE}</p>"
+            return 200, (compare_html(item) if "/compare" in url else page_html(item))
 
-    good = {"key": KEY, "value": VALUE, "source_url": manifest["items"][0]["source_url"],
-            "variant_slug": None}
+    good = {"key": KEY, "value": VALUE, "source_url": item["source_url"],
+            "variant_slug": None, "observed_at": item["observed_at"]}
     assert all(r["ok"] for r in px.check_public(manifest, Web(good), "http://a", "http://w"))
     wrong_source = {**good, "source_url": "https://elsewhere.example/"}
     results = px.check_public(manifest, Web(wrong_source), "http://a", "http://w")
@@ -310,25 +325,37 @@ def test_public_check_requires_value_and_source_on_the_api(world):  # noqa: F811
 def test_neon_branches_create_and_delete_via_the_rest_api(monkeypatch):
     monkeypatch.setenv("NEON_API_KEY", "key-should-not-leak")
     monkeypatch.setenv("NEON_PROJECT_ID", "proj-1")
+    monkeypatch.setenv("NEON_PRODUCTION_BRANCH_ID", "br-prod")
     calls = []
 
     def request(method, url, headers, body=None, timeout=60.0):
         calls.append((method, url.split("/api/v2")[1], body))
         assert headers["Authorization"] == "Bearer key-should-not-leak"
         if method == "POST":
-            return {"branch": {"id": "br-1"}, "operations": [{"id": "op-1"}],
+            return {"branch": {"id": "br-1", "parent_id": "br-prod", "parent_lsn": "0/1A"},
+                    "operations": [{"id": "op-1"}],
                     "endpoints": [{"id": "ep-1"}],
                     "connection_uris": [{"connection_uri": "postgresql://u:p@h/db"}]}
+        if url.endswith("/branches/br-prod"):
+            return {"branch": {"id": "br-prod", "name": "production", "default": True}}
+        if url.endswith("/branches/br-prod/endpoints"):
+            return {"endpoints": [{"host": "ep-prod-1.eu.aws.neon.tech"}]}
         if "/operations/" in url:
             return {"operation": {"status": "finished"}}
         return {"operations": []}
 
-    branches = adapters().NeonBranches(request=request, sleep=lambda s: None)
+    branches = adapters().NeonBranches(
+        request=request, sleep=lambda s: None,
+        production_url="postgresql://u:p@ep-prod-1-pooler.eu.aws.neon.tech/neondb")
     assert branches.create("promo-x") == "postgresql://u:p@h/db"
     branches.delete("promo-x")
-    assert calls[0] == ("POST", "/projects/proj-1/branches",
-                        {"branch": {"name": "promo-x"}, "endpoints": [{"type": "read_write"}]})
+    post = [c for c in calls if c[0] == "POST"][0]
+    assert post == ("POST", "/projects/proj-1/branches", {
+        "branch": {"name": "promo-x", "parent_id": "br-prod"},
+        "endpoints": [{"type": "read_write"}]})
     assert calls[-1][:2] == ("DELETE", "/projects/proj-1/branches/br-1")
+    assert branches.origins["promo-x"] == {"branch_id": "br-1", "parent_id": "br-prod",
+                                           "parent_lsn": "0/1A"}
     monkeypatch.delenv("NEON_API_KEY")
     with pytest.raises(RuntimeError):
         adapters().NeonBranches()
@@ -360,7 +387,7 @@ def test_cli_execute_refuses_a_commit_that_is_not_checked_out(world, tmp_path, c
     path = tmp_path / "m.json"
     path.write_text(json.dumps(world.manifest), encoding="utf-8")
     rc = cli.main(["execute", "--manifest", str(path), "--commit", "0" * 40,
-                   "--database-url", world.url, "--no-github"])
+                   "--approved-pr", "7", "--database-url", world.url, "--no-github"])
     assert rc == 2 and "not at --commit" in capsys.readouterr().err
     assert world.spec_rows() == []
 
@@ -424,16 +451,18 @@ def test_ci_gates_pull_requests_on_promotion_manifest_verification():
 
 def test_compare_is_checked_against_a_peer_never_as_a_one_robot_compare(world):  # noqa: F811
     """Pilot finding 2026-10-19: `/compare?ids=<one robot>` renders no comparison, so the
-    value can never appear there. The check compares with the manifest's published peer, and
-    without a peer it is recorded as SKIPPED, not silently passed."""
+    value can never appear there. The check compares with the manifest's published peer; a
+    manifest without a peer is REFUSED at the manifest step (before any write), and if
+    check_public is ever asked it records a failure, never a pass."""
     import copy
 
     seen = []
+    item0 = world.manifest["items"][0]
 
     class Web:
         def get(self, url):
             seen.append(url)
-            return 200, f"<p>{VALUE}</p>"
+            return 200, compare_html(item0) if "/compare" in url else page_html(item0)
 
     manifest = copy.deepcopy(world.manifest)
     manifest["items"][0]["compare_peer"] = "peer-robot"
@@ -444,4 +473,658 @@ def test_compare_is_checked_against_a_peer_never_as_a_one_robot_compare(world): 
     manifest["items"][0]["compare_peer"] = None
     compare = [r for r in px.check_public(manifest, Web(), "http://a", "http://w")
                if r["surface"] == "compare"][0]
-    assert compare["skipped"] and compare["url"] is None and "SKIPPED" in compare["note"]
+    assert compare["ok"] is False and compare["url"] is None and not compare.get("skipped")
+
+
+# =========================================================================================== #
+# Hardening (owner-required items 1-7, 2026-10-19)
+# =========================================================================================== #
+
+# ------------------------------------------------------------- 1. approval binding ------
+
+
+def _refused(receipt, step, *needles):
+    assert receipt["outcome"] == f"REFUSED:{step}", receipt
+    for needle in needles:
+        assert needle in receipt["reason"], receipt["reason"]
+
+
+def test_receipt_records_the_approving_pr(world):  # noqa: F811
+    receipt = world.execute()
+    assert receipt["outcome"] == "SUCCESS", receipt
+    assert receipt["approval"] == "GITHUB_PR"
+    assert receipt["approval_detail"] == {
+        "pr": 7, "head_sha": "headsha", "merge_commit_sha": "c0ffee", "merged_by": "owner",
+        "manifest_digest": world.manifest["digest"]}
+
+
+@pytest.mark.parametrize("case, needle", [
+    ("not_merged", "not merged"),
+    ("wrong_base", "base is 'develop'"),
+    ("wrong_commit", "merge commit is not --commit"),
+    ("stranger", "not an approver"),
+    ("extra_file", "other than the manifest"),
+    ("missing_file", "missing"),
+    ("manifest_differs", "differs from the manifest being executed"),
+    ("manifest_unreadable", "cannot read the manifest at the approved commit"),
+    ("api_error", "cannot read PR #7"),
+    ("no_allowlist", "allowlist"),
+    ("no_approval_source", "no approval source"),
+])
+def test_approval_must_be_the_merged_pr_of_exactly_this_manifest(world, case, needle):  # noqa: F811
+    manifest = world.manifest
+    before = world.fingerprints()
+    over = {}
+    approvals = {
+        "not_merged": FakeApprovals(manifest, merged=False),
+        "wrong_base": FakeApprovals(manifest, base_ref="develop"),
+        "wrong_commit": FakeApprovals(manifest, commit="deadbeef"),
+        "stranger": FakeApprovals(manifest, merged_by="someone-else"),
+        "extra_file": FakeApprovals(manifest, files=sorted(
+            px.expected_pr_files(manifest)) + ["db/schema.sql"]),
+        "missing_file": FakeApprovals(manifest, files=sorted(px.expected_pr_files(manifest))[:2]),
+        "api_error": FakeApprovals(manifest, error=True),
+    }.get(case, FakeApprovals(manifest))
+    over["approvals"] = approvals
+    if case == "manifest_differs":
+        over["read_at_commit"] = lambda c, p: json.dumps({**manifest, "digest": "0" * 64})
+    if case == "manifest_unreadable":
+        def boom(c, p):
+            raise OSError("git show failed")
+        over["read_at_commit"] = boom
+    if case == "no_allowlist":
+        over["approvers"] = set()
+    if case == "no_approval_source":
+        over["approvals"], over["approved_pr"] = None, None
+    receipt = world.execute(**over)
+    _refused(receipt, "approval", needle)
+    assert [s for s, _ in steps(receipt)] == ["manifest", "approval"]       # nothing else ran
+    assert_untouched(world, before)
+    assert world.branch_dbs() == []
+
+
+def test_approver_login_comparison_ignores_case(world):  # noqa: F811
+    receipt = world.execute(approvals=FakeApprovals(world.manifest, merged_by="OWNER"),
+                            dry_run=True)
+    assert receipt["outcome"] == "DRY_RUN_OK", receipt
+
+
+def test_manifest_read_at_the_commit_not_the_working_tree(world):  # noqa: F811
+    """The executed manifest is compared with `git show <commit>:<path>` (an injected reader),
+    asked for exactly the manifest path at exactly --commit."""
+    asked = []
+
+    def reader(commit, path):
+        asked.append((commit, path))
+        return json.dumps(world.manifest)
+
+    receipt = world.execute(read_at_commit=reader, dry_run=True)
+    assert receipt["outcome"] == "DRY_RUN_OK", receipt
+    assert asked == [("c0ffee", "db/catalogue/promotions/synthetic-promo.json")]
+
+
+def test_simulated_local_approval_is_recorded_and_only_for_local_branches(world):  # noqa: F811
+    class Simulated:
+        simulated = True
+
+        def pull_request(self, number):
+            raise AssertionError("a simulated approval consults no PR")
+
+    receipt = world.execute(approvals=Simulated(), approved_pr=None, approvers=None,
+                            read_at_commit=None)
+    assert receipt["outcome"] == "SUCCESS", receipt
+    assert receipt["approval"] == "SIMULATED_LOCAL"
+    assert ("approval", "SIMULATED_LOCAL") in steps(receipt)
+
+    class NotLocal(px.LocalBranches):
+        local = False
+
+    again = world.execute(approvals=Simulated(), branches=NotLocal(world.admin, world.name))
+    _refused(again, "approval", "only for local-database branches")
+
+
+def test_github_approvals_adapter_reads_pr_and_every_page_of_files(monkeypatch):
+    monkeypatch.setenv("GITHUB_TOKEN", "t")
+    monkeypatch.setenv("GITHUB_REPOSITORY", "o/r")
+    sent = []
+
+    def request(method, url, headers, body=None, timeout=60.0):
+        sent.append((method, url.split("/repos/o/r")[1]))
+        assert method == "GET" and body is None            # read-only
+        if url.endswith("/pulls/7"):
+            return {"merged": True, "base": {"ref": "main"}, "head": {"sha": "h1"},
+                    "merge_commit_sha": "m1", "merged_by": {"login": "owner"}}
+        if url.endswith("&page=1"):
+            return [{"filename": f"f{i}"} for i in range(100)]
+        return [{"filename": "last", "previous_filename": "was"}]
+
+    pr = adapters().GithubApprovals(request=request).pull_request(7)
+    assert pr["merged"] is True and pr["base_ref"] == "main" and pr["merged_by"] == "owner"
+    assert pr["head_sha"] == "h1" and pr["merge_commit_sha"] == "m1"
+    assert len(pr["files"]) == 102 and {"last", "was"} <= set(pr["files"])
+    assert [p for _, p in sent][1:] == ["/pulls/7/files?per_page=100&page=1",
+                                        "/pulls/7/files?per_page=100&page=2"]
+    monkeypatch.delenv("GITHUB_TOKEN")
+    with pytest.raises(RuntimeError):
+        adapters().GithubApprovals()
+
+
+def test_cli_requires_an_approved_pr_and_no_github_does_not_bypass_approval(
+        world, tmp_path, monkeypatch, capsys):  # noqa: F811
+    with pytest.raises(SystemExit):
+        cli.build_parser().parse_args(["execute", "--manifest", "m.json", "--commit", "abc"])
+    path = tmp_path / "m.json"
+    path.write_text(json.dumps(world.manifest), encoding="utf-8")
+    monkeypatch.delenv("GITHUB_TOKEN", raising=False)
+    monkeypatch.delenv("GITHUB_ACTIONS", raising=False)
+    monkeypatch.setenv("NEON_API_KEY", "k")
+    monkeypatch.setenv("NEON_PROJECT_ID", "p")
+    monkeypatch.setenv("NEON_PRODUCTION_BRANCH_ID", "br-prod")
+    head = cli._git("rev-parse", "HEAD")
+    rc = cli.main(["execute", "--manifest", str(path), "--commit", head, "--approved-pr", "7",
+                   "--database-url", world.url, "--no-github", "--dry-run"])
+    assert rc == 4 and "GITHUB_TOKEN" in capsys.readouterr().err        # real approvals needed
+    assert world.spec_rows() == []
+
+
+# --------------------------------------------- 2. no unnecessary database permissions ------
+
+
+def _schema_tables():
+    text = (REPO_ROOT / "db" / "schema.sql").read_text(encoding="utf-8")
+    return set(re.findall(r"^CREATE TABLE (\w+)", text, re.MULTILINE))
+
+
+def _granted_select(sql_text):
+    found = {}
+    for grant in re.finditer(r"GRANT SELECT ON\s+(.*?)\s+TO\s+(\w+);", sql_text, re.S):
+        found[grant.group(2)] = {t.strip() for t in grant.group(1).split(",")}
+    return found
+
+
+@pytest.mark.parametrize("name, role", [("catalogue_promoter_routine.sql",
+                                         "catalogue_promoter_routine"),
+                                        ("catalogue_importer.sql", "catalogue_importer")])
+def test_role_sql_grants_an_explicit_select_list_without_the_lead_tables(name, role):
+    text = (PROPOSAL / name).read_text(encoding="utf-8")
+    code = "\n".join(line for line in text.splitlines() if not line.lstrip().startswith("--"))
+    assert not re.search(r"ON\s+ALL\s+TABLES", code, re.I)
+    lead = set(pm.load_db_tool("import_preflight").REDACTED_TABLES)
+    assert lead == {"commercial_lead", "commercial_lead_robot", "commercial_lead_provider",
+                    "buyer_requirement", "match_result"}
+    granted = _granted_select(text)[role]
+    assert granted == _schema_tables() - lead          # a new table forces an owner decision
+    assert not granted & lead
+
+
+def test_routine_role_sql_is_additions_only():
+    text = "\n".join(line for line in (PROPOSAL / "catalogue_promoter_routine.sql").read_text(
+        encoding="utf-8").splitlines() if not line.lstrip().startswith("--"))
+    grants = re.findall(r"GRANT\s+(\w+)", text)
+    assert set(grants) <= {"USAGE", "SELECT", "INSERT"}
+    assert re.search(r"GRANT INSERT ON specification, evidence_source TO "
+                     r"catalogue_promoter_routine;", text)
+    assert not re.search(r"\b(UPDATE|DELETE|TRUNCATE|OWNER|SUPERUSER|ALL)\b", text.upper())
+
+
+def test_the_production_role_cannot_read_or_write_lead_tables(world):  # noqa: F811
+    with psycopg.connect(world.url, autocommit=True) as conn:
+        conn.execute("SET search_path TO humanoid, public")
+        for table in sorted(pm.excluded_tables()):
+            with pytest.raises(psycopg.errors.InsufficientPrivilege):
+                conn.execute(f"SELECT 1 FROM {table} LIMIT 1")
+        for statement in ("UPDATE robot SET summary = summary", "DELETE FROM specification",
+                          "TRUNCATE specification"):
+            with pytest.raises(psycopg.errors.InsufficientPrivilege):
+                conn.execute(statement)
+
+
+def test_snapshot_excludes_named_tables_and_fails_closed_on_any_other_unreadable_one(world):  # noqa: F811
+    pf = pm.load_db_tool("import_preflight")
+    with psycopg.connect(world.url) as conn:
+        conn.read_only = True
+        with pytest.raises(psycopg.errors.InsufficientPrivilege):
+            pf.snapshot(conn)                                   # leads unreadable: no skipping
+    with psycopg.connect(world.url) as conn:
+        conn.read_only = True
+        snap = pf.snapshot(conn, pm.excluded_tables())
+    assert not set(snap) & pm.excluded_tables() and "robot" in snap
+    # the same exclusion on the owner side gives the same view of the rest
+    with psycopg.connect(world.owner_url) as conn:
+        conn.read_only = True
+        assert pf.snapshot(conn, pm.excluded_tables()).keys() == snap.keys()
+
+
+def test_receipt_records_the_excluded_tables(world):  # noqa: F811
+    receipt = world.execute(dry_run=True)
+    assert receipt["excluded_tables"] == sorted(pm.excluded_tables())
+    assert "commercial_lead" in receipt["excluded_tables"]
+
+
+def test_unreadable_non_excluded_table_refuses_before_any_write(world):  # noqa: F811
+    world.prepare()
+    before = world.fingerprints()
+    world.sql(f"REVOKE SELECT ON event_log FROM {world.role}")
+    receipt = world.execute()
+    _refused(receipt, "base_drift", "database unreadable")
+    world.sql(f"GRANT SELECT ON event_log TO {world.role}")
+    assert_untouched(world, before)
+    assert world.branch_dbs() == []
+
+
+# ------------------------------------------------- 3. routine = non-destructive privileges ------
+
+
+def test_production_as_the_schema_owner_is_refused(world):  # noqa: F811
+    world.prepare()
+    before = world.fingerprints()
+    receipt = world.execute(production=px.StaticProduction(world.owner_url))
+    _refused(receipt, "privileges", "superuser")
+    assert [s for s, _ in steps(receipt)][-1] == "privileges"
+    assert_untouched(world, before)
+    assert world.branch_dbs() == []
+
+
+@pytest.mark.parametrize("grant, needle", [
+    ("GRANT UPDATE (summary) ON robot TO {role}", "UPDATE on: robot"),
+    ("GRANT DELETE ON specification TO {role}", "DELETE on: specification"),
+    ("GRANT TRUNCATE ON region TO {role}", "TRUNCATE on: region"),
+    ("REVOKE INSERT ON specification FROM {role}", "lacks INSERT on: specification"),
+    ("REVOKE INSERT ON evidence_source FROM {role}", "lacks INSERT on: evidence_source"),
+])
+def test_destructive_or_missing_privileges_refuse(world, grant, needle):  # noqa: F811
+    world.prepare()
+    before = world.fingerprints()
+    world.sql(grant.format(role=world.role))
+    receipt = world.execute()
+    _refused(receipt, "privileges", needle)
+    assert_untouched(world, before)
+
+
+def test_neon_superuser_membership_is_refused(world):  # noqa: F811
+    world.prepare()
+    before = world.fingerprints()
+    created = not world.sql("SELECT 1 FROM pg_roles WHERE rolname = 'neon_superuser'")
+    if created:
+        world.sql("CREATE ROLE neon_superuser")
+    try:
+        world.sql(f"GRANT neon_superuser TO {world.role}")
+        receipt = world.execute()
+    finally:
+        world.sql(f"REVOKE neon_superuser FROM {world.role}")
+        if created:
+            world.sql("DROP ROLE neon_superuser")
+    _refused(receipt, "privileges", "member of neon_superuser")
+    assert_untouched(world, before)
+
+
+def test_owning_a_humanoid_table_is_refused(world):  # noqa: F811
+    world.prepare()
+    before = world.fingerprints()
+    world.sql(f"ALTER TABLE region OWNER TO {world.role}")
+    receipt = world.execute()
+    _refused(receipt, "privileges", "owns: region")
+    assert_untouched(world, before)
+
+
+def test_receipt_records_the_privilege_result_and_routine_import_writes_only_additions(world):  # noqa: F811
+    """The import runs AS the additions-only role: it would fail with 'permission denied' on any
+    UPDATE or DELETE, so SUCCESS proves a ROUTINE scoped import is INSERT-only (specification)."""
+    receipt = world.execute()
+    assert receipt["outcome"] == "SUCCESS", receipt
+    priv = receipt["privileges"]
+    assert priv["ok"] is True and priv["user"] == world.role
+    assert priv["superuser"] is False and priv["neon_superuser_member"] is False
+    assert priv["owned"] == [] and priv["update"] == [] and priv["delete"] == []
+    assert priv["truncate"] == [] and {"specification", "evidence_source"} <= set(
+        priv["insert_tables"])
+    assert world.spec_rows() == [(KEY, VALUE)]
+
+
+# ----------------------------------------------- 4. strict public value + provenance ------
+
+
+def _item(world):  # noqa: F811
+    return copy.deepcopy(world.manifest["items"][0])
+
+
+def test_api_surface_also_matches_observed_at_and_unit(world):  # noqa: F811
+    manifest = world.manifest
+    item = manifest["items"][0]
+
+    class Web:
+        def __init__(self, entry):
+            self.entry = entry
+
+        def get(self, url):
+            if "/api/robots/" in url:
+                return 200, json.dumps({"extended_specs": [self.entry]})
+            return 200, compare_html(item) if "/compare" in url else page_html(item)
+
+    good = {"key": KEY, "value": VALUE, "source_url": item["source_url"], "variant_slug": None,
+            "observed_at": item["observed_at"]}
+    api = px.check_public(manifest, Web(good), "http://a", "http://w")[0]
+    assert api["ok"] is True
+    for bad in ({**good, "observed_at": "2020-01-01"}, {**good, "observed_at": None}):
+        assert px.check_public(manifest, Web(bad), "http://a", "http://w")[0]["ok"] is False
+    with_unit = copy.deepcopy(manifest)
+    with_unit["items"][0]["unit"] = "GHz"
+    assert px.check_public(with_unit, Web(good), "http://a", "http://w")[0]["ok"] is False
+    assert px.check_public(with_unit, Web({**good, "unit": "GHz"}), "http://a",
+                           "http://w")[0]["ok"] is True
+
+
+def test_page_requires_the_value_in_its_own_row_with_provenance_in_that_row(world):  # noqa: F811
+    item = _item(world)
+    label = px._label_for(item, None)
+    assert label == "Onboard computer (synthetic)"
+    ok, seen = px.check_page_row(page_html(item), item, label)
+    assert ok and seen == {"source_link_visible": True, "source_label_visible": True}
+    # the value is on the page (summary and elsewhere) but NOT in the labelled row: fail
+    decoy, _ = px.check_page_row(page_html(item, decoy_only=True), item, label)
+    assert decoy is False and px._collapse(item["proposed_value"]) in page_html(
+        item, decoy_only=True)
+    # the value is in the row but the row shows no provenance: fail
+    bare, seen = px.check_page_row(page_html(item, provenance=False), item, label)
+    assert bare is False and seen == {"source_link_visible": False,
+                                      "source_label_visible": False}
+    # a link to some other URL is not provenance
+    other = page_html(item).replace(item["source_url"], "https://elsewhere.example/")
+    other = other.replace(item["source_label"].replace("'", "&#x27;"), "something else")
+    assert px.check_page_row(other, item, label)[0] is False
+    # the value sits in a different label's row
+    moved = page_html(item).replace(label, "Another field")
+    assert px.check_page_row(moved, item, label)[0] is False
+
+
+def test_page_row_label_must_match_exactly_unless_variant_scoped(world):  # noqa: F811
+    item = _item(world)
+    html_ = page_html(item).replace("Onboard computer (synthetic)",
+                                    "Onboard computer (synthetic) extra")
+    assert px.check_page_row(html_, item, "Onboard computer (synthetic)")[0] is False
+    variant = {**item, "variant_slug": "pro"}
+    pro = page_html(item).replace(
+        '<span class="k">Onboard computer (synthetic)</span>',
+        '<span class="k">Onboard computer (synthetic)<span class="ho-syslabel d-blk">'
+        'Pro configuration</span></span>')
+    assert px.check_page_row(pro, variant, "Onboard computer (synthetic)")[0] is True
+    assert px.check_page_row(pro, item, "Onboard computer (synthetic)")[0] is False
+
+
+def test_compare_requires_the_value_in_the_robots_cell_of_the_labelled_row(world):  # noqa: F811
+    item = _item(world)
+    label = px._label_for(item, None)
+    assert px.check_compare_row(compare_html(item), item, label) is True
+    assert px.check_compare_row(compare_html(item, decoy_only=True), item, label) is False
+    peer_column = compare_html(item).replace(
+        f'<td class="cell">{item["proposed_value"]}</td>'
+        '<td class="cell"><span class="hatch">UNKNOWN</span></td>',
+        f'<td class="cell"><span class="hatch">UNKNOWN</span></td>'
+        f'<td class="cell">{item["proposed_value"]}</td>')
+    assert px.check_compare_row(peer_column, item, label) is False      # it is the peer's value
+
+
+def test_value_matching_by_type():
+    assert px._value_matches("8 kg", 8.0, "kg") and px._value_matches("1,200", 1200, None)
+    assert not px._value_matches("18 kg", 8, "kg") and not px._value_matches("8 lb", 8, "kg")
+    assert px._value_matches("YES", True, None) and not px._value_matches("NO", True, None)
+    assert px._value_matches("  8-core   CPU ", "8-core CPU", None)
+
+
+def test_manifest_without_a_compare_peer_is_refused_before_any_write(world):  # noqa: F811
+    world.prepare()
+    before = world.fingerprints()
+    unpeered = copy.deepcopy(world.manifest)
+    unpeered["items"][0]["compare_peer"] = None
+    unpeered.pop("digest")
+    unpeered = pm.seal(unpeered)
+    receipt = world.execute(unpeered)
+    _refused(receipt, "manifest", "no published compare peer")
+    assert steps(receipt) == [("manifest", "REFUSED")]
+    assert_untouched(world, before)
+
+
+def test_end_to_end_public_failure_when_value_only_elsewhere_on_the_page(world):  # noqa: F811
+    manifest = world.manifest
+
+    class Web(FakeWeb):
+        def get(self, url):
+            status, body = super().get(url)
+            if "/robots/" in url and "/api/" not in url:
+                body = page_html(manifest["items"][0], decoy_only=True)
+            return status, body
+
+    receipt = world.execute(web=Web(manifest, True), retries=2)
+    assert receipt["outcome"] == "INCIDENT:public_verify", receipt
+    failed = [r for r in receipt["public_verification"] if not r["ok"]]
+    assert [r["surface"] for r in failed] == ["page"]
+
+
+# ------------------------------------------- 5. drift recheck + concurrent-write protection ------
+
+
+def test_importer_takes_the_catalogue_write_lock_and_calls_the_hook_before_writing(world):  # noqa: F811
+    seen = {}
+
+    def hook(cur):
+        seen["lock"] = cur.execute(
+            "SELECT count(*) FROM pg_locks WHERE locktype = 'advisory' AND pid = pg_backend_pid()"
+            " AND granted").fetchone()[0]
+        seen["specs"] = cur.execute("SELECT count(*) FROM specification s JOIN spec_definition d "
+                                    "ON d.id = s.definition_id WHERE d.key = %s",
+                                    (KEY,)).fetchone()[0]
+
+    world.prepare()
+    px._import(world.owner_url, [ROBOT], world.head, before_write=hook)
+    assert seen == {"lock": 1, "specs": 0}            # lock held, nothing written yet
+    assert world.spec_rows() == [(KEY, VALUE)]
+
+
+def test_every_importer_run_is_serialised_even_without_a_hook(world):  # noqa: F811
+    import threading
+    import time as _time
+
+    world.prepare()
+    holder = psycopg.connect(world.owner_url)
+    holder.execute("SELECT pg_advisory_xact_lock(hashtext('catalogue-write'))")
+    done = threading.Event()
+
+    def run():
+        px._import(world.owner_url, [ROBOT], world.head)
+        done.set()
+
+    thread = threading.Thread(target=run)
+    thread.start()
+    _time.sleep(1.5)
+    assert not done.is_set()                                  # blocked behind the lock
+    holder.rollback()
+    thread.join(timeout=60)
+    holder.close()
+    assert done.is_set() and world.spec_rows() == [(KEY, VALUE)]
+
+
+def test_drift_between_the_check_and_the_apply_is_refused_and_nothing_is_written(
+        world, monkeypatch):  # noqa: F811
+    world.prepare()
+    real = px._import
+
+    def drift_just_before_apply(url, robots, catalogue_dir, **kw):
+        if url == world.url:        # after the base_drift step, before the importer's writes
+            world.sql("UPDATE robot SET summary = 'edited concurrently' WHERE slug = %s", (ROBOT,))
+        return real(url, robots, catalogue_dir, **kw)
+
+    monkeypatch.setattr(px, "_import", drift_just_before_apply)
+    receipt = world.execute()
+    _refused(receipt, "apply", "between the drift check and the write", ROBOT)
+    assert ROBOT in receipt["fingerprint_drift"]
+    assert world.spec_rows() == []                                   # the import wrote nothing
+    assert world.sql("SELECT summary FROM robot WHERE slug = %s", (ROBOT,)) == [
+        ("edited concurrently",)]
+    assert world.branch_dbs() == []                                  # safety point not needed
+    assert world.github.incidents == []
+
+
+# ------------------------------------------------ 6. independent eligibility at execute ------
+
+
+@pytest.mark.parametrize("case, sql, needle", [
+    ("source_disabled", "UPDATE discovery_source SET is_enabled = false",
+     "source not eligible"),
+    ("claim_conflict", "UPDATE candidate_claim SET claim_status = 'CONFLICT'", "CONFLICT"),
+    ("content_hash_differs",
+     "UPDATE fetched_page SET content_hash = repeat('f', 64)", "content_hash changed"),
+    ("claim_value_changed",
+     "UPDATE candidate_claim SET claimed_value = 'something else entirely'",
+     "claim_value changed"),
+    ("candidate_unmatched",
+     "UPDATE discovery_candidate SET identity_status = 'NEW_ENTITY'", "candidate identity"),
+])
+def test_eligibility_is_rederived_from_production_not_trusted_from_the_manifest(
+        world, case, sql, needle):  # noqa: F811
+    world.prepare()
+    before = world.fingerprints()
+    world.sql(sql)
+    receipt = world.execute()
+    _refused(receipt, "eligibility", needle)
+    assert [s for s, _ in steps(receipt)][-1] == "eligibility"
+    assert_untouched(world, before)
+    assert world.branch_dbs() == []
+
+
+def test_stale_observation_is_refused_at_execute(world):  # noqa: F811
+    world.prepare()
+    before = world.fingerprints()
+    receipt = world.execute(utc_now=lambda: datetime(2026, 12, 31, tzinfo=UTC))
+    _refused(receipt, "eligibility", "observation is")
+    assert_untouched(world, before)
+
+
+def test_a_claim_rejected_after_the_proposal_is_refused(world):  # noqa: F811
+    world.prepare()
+    pm.record_decision(world.head, world.manifest, "REJECT", "withdrawn", "Owner",
+                       date(2026, 10, 19))
+    receipt = world.execute()
+    _refused(receipt, "eligibility", "REJECTED after the proposal")
+    assert world.spec_rows() == []
+
+
+# --------------------------------------------------------------- 7. neon branch origin ------
+
+
+def _neon(monkeypatch, *, branch=None, endpoints=None, created_parent="br-prod",
+          url="postgresql://u:p@ep-prod-1-pooler.eu.aws.neon.tech/neondb", calls=None):
+    monkeypatch.setenv("NEON_API_KEY", "k")
+    monkeypatch.setenv("NEON_PROJECT_ID", "proj-1")
+    monkeypatch.setenv("NEON_PRODUCTION_BRANCH_ID", "br-prod")
+    branch = branch or {"id": "br-prod", "name": "production", "default": True}
+    endpoints = endpoints or [{"host": "ep-prod-1.eu.aws.neon.tech"}]
+
+    def request(method, url_, headers, body=None, timeout=60.0):
+        if calls is not None:
+            calls.append((method, url_.split("/api/v2/projects/proj-1")[1]))
+        if method == "POST":
+            return {"branch": {"id": "br-1", "parent_id": created_parent, "parent_lsn": "0/9"},
+                    "operations": [],
+                    "connection_uris": [{"connection_uri": "postgresql://u:p@h/db"}]}
+        if url_.endswith("/endpoints"):
+            return {"endpoints": endpoints}
+        if url_.endswith("/branches/br-prod"):
+            return {"branch": branch}
+        return {"operations": []}
+
+    return adapters().NeonBranches(request=request, sleep=lambda s: None, production_url=url)
+
+
+def test_neon_parent_is_verified_before_the_first_create_and_recorded(monkeypatch):
+    calls = []
+    branches = _neon(monkeypatch, calls=calls)
+    assert branches.create("a") == "postgresql://u:p@h/db"
+    branches.create("b")
+    assert [c[0] for c in calls].count("POST") == 2
+    first_post = [c[0] for c in calls].index("POST")
+    assert ("GET", "/branches/br-prod") in calls[:first_post]
+    assert ("GET", "/branches/br-prod/endpoints") in calls[:first_post]
+    assert calls.count(("GET", "/branches/br-prod")) == 1            # verified once, not per create
+    assert branches.origins["a"] == {"branch_id": "br-1", "parent_id": "br-prod",
+                                     "parent_lsn": "0/9"}
+
+
+@pytest.mark.parametrize("kwargs, needle", [
+    ({"branch": {"id": "br-prod", "name": "production", "default": False}}, "default branch"),
+    ({"branch": {"id": "br-prod", "name": "staging", "default": True}}, "named 'staging'"),
+    ({"branch": {"id": "br-other", "name": "production", "default": True}}, "does not exist"),
+    ({"endpoints": [{"host": "ep-someone-else.eu.aws.neon.tech"}]}, "endpoint host"),
+    ({"created_parent": "br-dev"}, "not from production"),
+])
+def test_neon_refuses_any_origin_mismatch(monkeypatch, kwargs, needle):
+    branches = _neon(monkeypatch, **kwargs)
+    with pytest.raises(Exception) as caught:
+        branches.create("a")
+    assert needle in str(caught.value) and caught.value.safe is True
+
+
+def test_neon_requires_the_production_branch_id_and_allows_a_name_override(monkeypatch):
+    monkeypatch.setenv("NEON_API_KEY", "k")
+    monkeypatch.setenv("NEON_PROJECT_ID", "p")
+    monkeypatch.delenv("NEON_PRODUCTION_BRANCH_ID", raising=False)
+    with pytest.raises(RuntimeError, match="NEON_PRODUCTION_BRANCH_ID"):
+        adapters().NeonBranches()
+    monkeypatch.setenv("NEON_PRODUCTION_BRANCH_NAME", "main")
+    branches = _neon(monkeypatch, branch={"id": "br-prod", "name": "main", "default": True})
+    assert branches._parent_name == "main"
+    assert branches.verify_origin()["parent_name"] == "main"
+
+
+def test_executor_refuses_when_the_branch_origin_is_not_production(world, monkeypatch):  # noqa: F811
+    world.prepare()
+    before = world.fingerprints()
+    wrong = px.LocalBranches(world.admin, "some_other_database")
+    receipt = world.execute(branches=wrong)
+    _refused(receipt, "safety_branch", "not the production database")
+    assert_untouched(world, before)
+    # a Neon-style failure carries its safe message into the receipt, a secret never
+    branches = _neon(monkeypatch, created_parent="br-dev")
+    receipt = world.execute(branches=_ExclusiveOff(branches))
+    _refused(receipt, "safety_branch", "not from production")
+    assert "u:p@" not in json.dumps(receipt)
+
+
+class _ExclusiveOff:
+    """A NeonBranches whose production URL check is skipped (the URL belongs to the test DB)."""
+
+    requires_exclusive_source = False
+
+    def __init__(self, inner):
+        self.inner, self.origins = inner, inner.origins
+
+    def verify_origin(self, production_url):
+        return {"parent_id": "br-prod"}
+
+    def create(self, name):
+        return self.inner.create(name)
+
+    def delete(self, name):
+        pass
+
+
+def test_rehearsal_branch_origin_mismatch_is_refused_as_rehearsal(world):  # noqa: F811
+    world.prepare()
+
+    class SecondIsWrong(px.LocalBranches):
+        def create(self, name):
+            if name.startswith("rehearse"):
+                raise px.BranchOriginError("branch was created from 'br-dev', not from production")
+            return super().create(name)
+
+    receipt = world.execute(branches=SecondIsWrong(world.admin, world.name))
+    _refused(receipt, "rehearsal", "not from production")
+    assert world.spec_rows() == [] and world.branch_dbs() == []
+
+
+def test_receipt_records_branch_origins(world):  # noqa: F811
+    receipt = world.execute()
+    assert receipt["outcome"] == "SUCCESS", receipt
+    b = receipt["branches"]
+    assert b["production_origin"] == {"template_db": world.name, "production_db": world.name}
+    assert b["safety_origin"]["template_db"] == world.name
+    assert b["rehearsal_origin"]["template_db"] == world.name

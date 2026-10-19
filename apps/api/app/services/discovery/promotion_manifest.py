@@ -426,17 +426,25 @@ def fingerprint_snapshot(snapshot: dict, slug: str) -> str:
     return hashlib.sha256("\n".join(sorted(rows)).encode("utf-8")).hexdigest()
 
 
-def fingerprints_from_connection(conn, slugs) -> dict[str, str]:
-    snap = load_db_tool("import_preflight").snapshot(conn)
+def excluded_tables() -> frozenset[str]:
+    """Tables the promotion gates never read: the lead / buyer tables (owner decision: they are
+    out of scope of the promotion role, which has no privilege on them). The fingerprint skips
+    them anyway (`_FP_SKIP_PREFIXES`), so excluding them changes no fingerprint."""
+    return frozenset(load_db_tool("import_preflight").REDACTED_TABLES)
+
+
+def fingerprints_from_connection(conn, slugs, exclude_tables=None) -> dict[str, str]:
+    snap = load_db_tool("import_preflight").snapshot(
+        conn, excluded_tables() if exclude_tables is None else exclude_tables)
     return {s: fingerprint_snapshot(snap, s) for s in sorted(slugs)}
 
 
-def fingerprints_from_url(url: str, slugs) -> dict[str, str]:
+def fingerprints_from_url(url: str, slugs, exclude_tables=None) -> dict[str, str]:
     import psycopg
 
     with psycopg.connect(url.replace("postgresql+psycopg://", "postgresql://", 1)) as conn:
         conn.read_only = True
-        return fingerprints_from_connection(conn, slugs)
+        return fingerprints_from_connection(conn, slugs, exclude_tables)
 
 
 # --------------------------------------------------------------------------------------- #

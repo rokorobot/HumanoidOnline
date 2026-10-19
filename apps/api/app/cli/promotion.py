@@ -5,7 +5,7 @@
         --value "8-core high-performance CPU" --promotion-id 2026-10-19-unitree-g1-compute
     ... render  --manifest db/catalogue/promotions/<id>.json
     ... verify  --manifest db/catalogue/promotions/<id>.json --base-ref origin/main
-    ... execute --manifest ... --commit <sha> [--dry-run] [--receipt PATH]
+    ... execute --manifest ... --commit <sha> --approved-pr N [--dry-run] [--receipt PATH]
     ... decide  --manifest ... --reject|--defer --reason "..." --by "Name"
 
 Exit codes
@@ -17,7 +17,12 @@ Exit codes
     4  configuration or database/HTTP failure (only the exception TYPE is printed)
 
 `propose` reads production READ-ONLY (the session is opened `default_transaction_read_only`).
-Secrets are never printed.
+`execute` is bound to the merged manifest PR (`--approved-pr`): the PR must be merged into main
+as `--commit` by a login in PROMOTION_APPROVERS (comma-separated; unset = refuse) and change only
+the manifest, its review and the scoped robot files. `--no-github` replaces incident/comment
+output only; combined with `--local-branches` (a non-production pilot) the approval is
+SIMULATED_LOCAL and recorded as such. Production runs as the additions-only role, never as the
+schema owner. Secrets are never printed.
 """
 from __future__ import annotations
 
@@ -53,6 +58,12 @@ def materialize_base(ref: str, target: Path) -> Path:
                               capture_output=True).stdout
         dest.write_bytes(blob)
     return target
+
+
+def read_at_commit(commit: str, path: str) -> str:
+    """A file as committed at `commit` (never the working tree)."""
+    return subprocess.run(["git", "show", f"{commit}:{path}"], cwd=pm.REPO_ROOT, check=True,
+                          capture_output=True).stdout.decode("utf-8")
 
 
 def _load_manifest(path: str) -> dict:
@@ -205,7 +216,7 @@ def cmd_execute(args) -> int:
                 return 4
             branches = px.LocalBranches(args.local_branches, args.source_db)
         else:
-            branches = ad.NeonBranches()
+            branches = ad.NeonBranches(production_url=url)
         if args.no_github:
             if os.environ.get("GITHUB_ACTIONS") == "true":
                 print("--no-github is for local pilots only", file=sys.stderr)
@@ -213,9 +224,16 @@ def cmd_execute(args) -> int:
             github = _NullGithub()
         else:
             github = ad.GithubApi(args.commit)
+        # --no-github does not bypass approval. Only a local-database pilot may go without
+        # GitHub, and its receipt says so.
+        if args.no_github and args.local_branches:
+            approvals = _SimulatedLocalApprovals()
+        else:
+            approvals = ad.GithubApprovals()
     except RuntimeError as exc:
         print(f"CONFIGURATION ERROR: {exc}", file=sys.stderr)
         return 4
+    approvers = [a for a in os.environ.get("PROMOTION_APPROVERS", "").split(",") if a.strip()]
     web = ad.HttpWeb() if args.api_base and args.web_base else None
     if not args.dry_run and web is None and not args.skip_public_verify:
         print("--api-base and --web-base are required (or --skip-public-verify)", file=sys.stderr)
@@ -228,7 +246,9 @@ def cmd_execute(args) -> int:
             return 4
         receipt = px.execute(
             manifest, commit=args.commit, production=px.StaticProduction(url),
-            branches=branches, github=github, web=web, api_base=args.api_base,
+            branches=branches, github=github, approvals=approvals,
+            approved_pr=args.approved_pr, approvers=approvers, read_at_commit=read_at_commit,
+            web=web, api_base=args.api_base,
             web_base=args.web_base, catalogue_dir=Path(args.catalogue_dir),
             base_catalogue_dir=base, dry_run=args.dry_run)
     _write_json(Path(args.receipt), receipt)
@@ -237,6 +257,16 @@ def cmd_execute(args) -> int:
     if outcome in ("SUCCESS", "ALREADY_APPLIED", "DRY_RUN_OK"):
         return 0
     return 3 if outcome.startswith("INCIDENT") else 2
+
+
+class _SimulatedLocalApprovals:
+    """No PR is consulted: a local, non-production pilot only (the executor insists on
+    local-database branches and records `approval: SIMULATED_LOCAL`)."""
+
+    simulated = True
+
+    def pull_request(self, number: int) -> dict:
+        raise RuntimeError("a simulated approval has no pull request")
 
 
 class _NullGithub:
@@ -301,6 +331,8 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("execute", parents=[common])
     p.add_argument("--manifest", required=True)
     p.add_argument("--commit", required=True)
+    p.add_argument("--approved-pr", required=True, type=int, metavar="N",
+                   help="the merged manifest PR that approved this run")
     p.add_argument("--base-ref", help="default: <commit>^")
     p.add_argument("--database-url", help="default: CATALOGUE_DATABASE_URL")
     p.add_argument("--local-branches", metavar="ADMIN_URL")
@@ -308,7 +340,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--api-base")
     p.add_argument("--web-base")
     p.add_argument("--skip-public-verify", action="store_true")
-    p.add_argument("--no-github", action="store_true", help="local pilot only")
+    p.add_argument("--no-github", action="store_true",
+                   help="no incident issue / PR comment; does NOT bypass approval "
+                        "(with --local-branches the approval is SIMULATED_LOCAL)")
     p.add_argument("--receipt", default="promotion-receipt.json")
     p.add_argument("--dry-run", action="store_true",
                    help="stop after the rehearsal; production is never written")

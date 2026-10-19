@@ -491,6 +491,17 @@ def test_waitlist_materialization_refuses_when_its_basis_is_retracted(dsession, 
 # ---------------------------------------------- importer, DB state, audit -----
 
 
+def dangling_audit_targets(session):
+    """Audit rows whose target row no longer exists (plain SQL, per target table)."""
+    out = []
+    for table in ("robot_variant", "specification", "pricing_offer", "availability_offer"):
+        out += [tuple(r) for r in session.execute(text(
+            "SELECT a.audit_seq, a.target_table FROM catalogue_write_audit a "
+            f"WHERE a.target_table = '{table}' AND NOT EXISTS "
+            f"(SELECT 1 FROM {table} t WHERE t.id = a.target_row_id)"))]
+    return out
+
+
 def _counts(session, w):
     q = lambda sql: session.scalar(text(sql), {"s": w.slug})  # noqa: E731
     return {
@@ -573,7 +584,7 @@ def test_the_importer_writes_the_approved_rows_and_nothing_inferred(dsession, tm
         "WHERE r.slug = :s AND p.price < 1000"), {"s": w.slug}) == 0
 
 
-def test_a_second_import_is_idempotent_and_the_audit_survives_uuid_churn(dsession, tmp_path):
+def test_a_second_import_is_idempotent_and_the_audit_targets_keep_resolving(dsession, tmp_path):
     w = seeded(dsession)
     made = full_slice(dsession, w)
     path = materialize_and_import(dsession, w, tmp_path)
@@ -587,12 +598,13 @@ def test_a_second_import_is_idempotent_and_the_audit_survives_uuid_churn(dsessio
         "SELECT p.id FROM pricing_offer p JOIN robot r ON r.id = p.robot_id WHERE r.slug = :s "
         "UNION SELECT a.id FROM availability_offer a JOIN robot r ON r.id = a.robot_id "
         "WHERE r.slug = :s"), {"s": w.slug})}
-    do_import(dsession, w, path)                                    # importer churns the UUIDs
+    do_import(dsession, w, path)                                    # re-import keeps the UUIDs
     live_after = {r[0] for r in dsession.execute(text(
         "SELECT p.id FROM pricing_offer p JOIN robot r ON r.id = p.robot_id WHERE r.slug = :s "
         "UNION SELECT a.id FROM availability_offer a JOIN robot r ON r.id = a.robot_id "
         "WHERE r.slug = :s"), {"s": w.slug})}
-    assert live_before and not (live_before & live_after)
+    assert live_before and live_before == live_after                # stable-ID reconciliation
+    assert not dangling_audit_targets(dsession)
     assert _counts(dsession, w) == snapshot                         # semantically idempotent
     assert materialize.verify_applied(dsession, w.slug, change_ref="chg-g24",
                                       applied_by=WHO) == []         # Part-A semantics hold

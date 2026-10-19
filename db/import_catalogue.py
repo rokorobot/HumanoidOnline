@@ -8,19 +8,64 @@
 SELF-CONTAINED (no ORM): reads the JSON catalogue under db/catalogue/ and
 idempotently loads it into the `humanoid` schema created by db/schema.sql
 (via db/bootstrap.py). Safe to run repeatedly — re-running produces no
-duplicate rows.
+duplicate rows, no new row ids and no writes.
 
-IDEMPOTENCY MODEL
-  - regions, manufacturers, providers, capabilities, use_cases and robots are
-    UPSERTed by their natural key (code / slug -> ON CONFLICT DO UPDATE).
-  - A robot's child facts (variants, pricing_offer, availability_offer,
-    deployment, robot_capability, use_case_fit) and their evidence_source rows
-    have no natural key, so on each import they are DELETED for that robot and
-    re-inserted from the JSON. This "replace children" pass keeps the import
-    fully idempotent while honouring UPSERT-by-slug for the parents.
-  - Manufacturer company evidence is replaced only where this importer owns it
-    (`evidence_source.managed_by = 'CATALOGUE_IMPORT'`, migration 0013);
-    manually maintained MANUFACTURER evidence is never deleted.
+IDEMPOTENCY MODEL (stable-ID, non-destructive reconciliation)
+  - regions, manufacturers, providers, capabilities, use_cases, spec_definitions
+    and robots are UPSERTed by their natural key (code / slug). The upsert only
+    writes when a column actually differs, so an unchanged row is not rewritten
+    and its `updated_at` does not move.
+  - A robot's child rows are RECONCILED by natural key, never deleted and
+    re-inserted, so a row keeps its id for as long as its key exists:
+        robot_variant       (robot, variant slug)
+        specification       (robot, variant, spec key)            importer-owned rows
+        pricing_offer       (robot, variant, provider, region, transaction_type, condition)
+        availability_offer  (same key as pricing_offer)
+        robot_image         (robot, image_url)
+        robot_capability    (robot, capability)
+        use_case_fit        (robot, use case)
+        evidence_source     (subject, source_url, source_type, excerpt, observed date)
+    Matching is NULL-safe. `is_current`, `price_type` and prices are NOT key
+    columns, so a corrected price or a retired offer is an UPDATE in place.
+    DEPLOYMENTS have no inferred identity (owner decision D2): an unchanged set
+    is left alone with its ids; any new, edited or missing deployment is refused
+    until an explicit `deployment_key` exists (a schema change not yet approved).
+  - Per row: key found and every other column equal -> no statement at all; key
+    found and different -> UPDATE that row (same id); key not found -> INSERT.
+  - OMITTED RECORDS ARE LEFT UNTOUCHED (owner decision D1). A database row in
+    scope whose key is absent from the JSON is preserved, counted in the summary
+    `preserved` column and listed under "PRESERVED (not in JSON, left untouched)".
+    It is removed only by an explicit `remove` authorization.
+  - NO VALUE IS ERASED IMPLICITLY. For every updatable non-key column of every
+    reconciled table, the robot row and the shared-entity upserts, a change from
+    a stored value to NULL (absent or explicit null in the JSON) is refused unless
+    a `clear` authorization names the table, robot/slug, key and column. A change
+    to a different non-NULL value is a normal in-place update.
+  - Evidence rows are immutable to the importer: a matched row whose other
+    columns differ is refused unless an `update_evidence` authorization names it.
+    A materially changed excerpt is a new key, hence a new evidence row (owner
+    decision D3); the old row is preserved under the rule above.
+  - FAIL CLOSED. A duplicate natural key in the JSON aborts before anything is
+    written. Two database rows on one key abort (the importer never picks one).
+  - Authorization is explicit: `--authorize PATH` takes a JSON file
+        {"version": 1, "entries": [{"action": "remove" | "update_evidence" | "clear",
+         "table": ..., "robot": <robot slug, or manufacturer slug for company
+         evidence; the slug/code for entity-level tables, with key {}>,
+         "key": {...natural key...}, "column": <clear only>}]}
+    Nothing is authorized by default, and an entry that matches nothing aborts
+    the run (it signals drift). Authorized removals run last, after every
+    insert/update; removing a variant that still has a dependent specification,
+    pricing_offer or availability_offer not itself being removed is refused.
+    A `remove` for a deployment is refused (D2).
+  - Robots are never deleted. Offer retirement is `is_current` true -> false.
+  - Scope of the evidence reconciled: PRICING_OFFER / AVAILABILITY_OFFER /
+    DEPLOYMENT evidence under the reconciled rows, COMMERCIAL_STATUS evidence of
+    the robot, and MANUFACTURER evidence marked `managed_by = 'CATALOGUE_IMPORT'`
+    (migration 0013). Every other evidence row (hand-written ROBOT rows, unmarked
+    MANUFACTURER rows) is never touched. Robot-child evidence is still inserted
+    unmarked, exactly as before.
+  - Every run prints a per-table summary: unchanged / updated / inserted /
+    removed / preserved.
 
 MANUFACTURER-ONLY MODE (`--manufacturers-only`)
   Imports manufacturer profiles and their company-level evidence and nothing
@@ -53,7 +98,10 @@ import argparse
 import json
 import os
 import sys
+from collections import Counter
+from decimal import Decimal
 from pathlib import Path
+from typing import NamedTuple
 
 import psycopg
 from psycopg.types.json import Json
@@ -111,31 +159,518 @@ def _load(path: Path) -> dict:
 # --------------------------------------------------------------------------- #
 def insert_evidence(cur, subject_type: str, subject_id, ev: dict,
                     *, managed_by: str | None = None) -> None:
-    cur.execute(
-        """
-        INSERT INTO evidence_source
-            (subject_type, subject_id, source_url, source_type, source_title,
-             excerpt, published_at, observed_at, verified_at, confidence, note,
-             claim_fields, managed_by)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-        """,
-        (
-            subject_type, subject_id,
-            ev.get("source_url"), ev["source_type"], ev.get("source_title"),
-            ev.get("excerpt"), ev.get("published_at"), ev.get("observed_at"),
-            ev.get("verified_at"), ev.get("confidence", "MEDIUM"), ev.get("note"),
-            # MANUFACTURER rows name the profile fields they support (migration
-            # 0013); every other row makes no field claim.
-            ev.get("claim_fields"),
-            managed_by,
-        ),
-    )
+    _insert(cur, T_EVIDENCE, _evidence_values(subject_type, subject_id, ev, managed_by))
 
 
 def _rowcount(result) -> int:
     """Rows affected by the statement just executed (0 when not reported)."""
     count = getattr(result, "rowcount", 0) or 0
     return count if count > 0 else 0
+
+
+# --------------------------------------------------------------------------- #
+# Stable-ID reconciliation machinery
+# --------------------------------------------------------------------------- #
+class ReconcileRefused(SystemExit):
+    """The import was refused because applying it would be ambiguous or destructive.
+
+    Raised inside the import transaction, so nothing is committed.
+    """
+
+
+AUTH_ACTIONS = ("remove", "update_evidence", "clear")
+#: Reported in this order; shared entities first, then the robot and its children.
+SUMMARY_TABLES = (
+    "region", "manufacturer", "provider", "capability", "use_case", "spec_definition",
+    "robot", "robot_variant", "specification", "pricing_offer", "availability_offer",
+    "deployment", "robot_image", "robot_capability", "use_case_fit", "evidence_source",
+)
+OUTCOMES = ("unchanged", "updated", "inserted", "removed", "preserved")
+#: Evidence subject type of the tables whose rows carry evidence of their own.
+EVIDENCE_SUBJECTS = {
+    "pricing_offer": "PRICING_OFFER",
+    "availability_offer": "AVAILABILITY_OFFER",
+}
+
+
+def _entry(action: str, table: str, robot: str, key: dict, column: str | None = None) -> dict:
+    """An authorization entry, in exactly the form an `--authorize` file holds."""
+    entry = {"action": action, "table": table, "robot": robot, "key": key}
+    if column is not None:
+        entry["column"] = column
+    return entry
+
+
+class Authorization:
+    """What the operator has explicitly permitted this run to do (default: nothing)."""
+
+    def __init__(self, entries=()) -> None:
+        self.entries: list[dict] = []
+        for i, entry in enumerate(entries):
+            self.entries.append(self._checked(i, entry))
+        self._used = [False] * len(self.entries)
+
+    @staticmethod
+    def _checked(i: int, entry) -> dict:
+        where = f"authorization entry {i}"
+        if not isinstance(entry, dict):
+            raise ReconcileRefused(f"{where}: not an object")
+        extra = sorted(set(entry) - {"action", "table", "robot", "key", "column"})
+        if extra:
+            raise ReconcileRefused(f"{where}: unknown field(s) {', '.join(extra)}")
+        if entry.get("action") not in AUTH_ACTIONS:
+            raise ReconcileRefused(f"{where}: action must be one of {', '.join(AUTH_ACTIONS)}")
+        for field in ("table", "robot"):
+            if not isinstance(entry.get(field), str) or not entry[field]:
+                raise ReconcileRefused(f"{where}: {field} must be a non-empty string")
+        if not isinstance(entry.get("key"), dict):
+            raise ReconcileRefused(f"{where}: key must be an object")
+        if (entry["action"] == "clear") != ("column" in entry):
+            raise ReconcileRefused(f"{where}: 'column' is required for, and only for, 'clear'")
+        return dict(entry)
+
+    @classmethod
+    def load(cls, path) -> Authorization:
+        doc = json.loads(Path(path).read_text(encoding="utf-8"))
+        return as_authorization(doc, source=str(path))
+
+    def allows(self, entry: dict) -> bool:
+        """True when the operator authorized exactly this entry (which is then marked used)."""
+        hit = False
+        for i, held in enumerate(self.entries):
+            if held == entry:
+                self._used[i] = True
+                hit = True
+        return hit
+
+    def unused(self) -> list[dict]:
+        return [e for e, used in zip(self.entries, self._used, strict=True) if not used]
+
+
+def as_authorization(value, source: str = "authorization") -> Authorization:
+    """None (nothing authorized), an Authorization, an entries document, or a file path."""
+    if value is None:
+        return Authorization()
+    if isinstance(value, Authorization):
+        return value
+    if isinstance(value, dict):
+        if value.get("version") != 1 or not isinstance(value.get("entries"), list):
+            raise ReconcileRefused(
+                f'{source}: an authorization file is {{"version": 1, "entries": [...]}}')
+        return Authorization(value["entries"])
+    return Authorization.load(value)
+
+
+class Pending(NamedTuple):
+    """An authorized removal, executed after every insert and update."""
+    table: Table
+    row_id: object
+    robot: str
+    key: dict
+
+
+class Reconciliation:
+    """Counters, refusals and authorized removals for one import run."""
+
+    def __init__(self, authorize=None) -> None:
+        self.authorize = as_authorization(authorize)
+        self.counts: dict[str, Counter] = {}
+        self.refusals: list[tuple[str, dict | None]] = []
+        self.pending: list[Pending] = []
+        self.preserved: list[tuple[str, str, dict]] = []
+
+    def count(self, table: str, outcome: str, n: int = 1) -> None:
+        self.counts.setdefault(table, Counter())[outcome] += n
+
+    def refuse(self, why: str, entry: dict | None = None) -> None:
+        self.refusals.append((why, entry))
+
+    def finish(self) -> None:
+        """Raise when anything was refused or an authorization matched nothing."""
+        for entry in self.authorize.unused():
+            self.refuse("authorization entry matched nothing in this run (drift?): "
+                        + json.dumps(entry))
+        if not self.refusals:
+            return
+        lines = ["IMPORT REFUSED - nothing was committed:"]
+        lines += [f"  - {why}" for why, _ in self.refusals]
+        wanted: list[dict] = []
+        for _, entry in self.refusals:
+            if entry is not None and entry not in wanted:
+                wanted.append(entry)
+        if wanted:
+            lines += ["To permit exactly these changes, an --authorize file would contain:",
+                      json.dumps({"version": 1, "entries": wanted}, indent=2)]
+        raise ReconcileRefused("\n".join(lines))
+
+    def summary(self) -> str:
+        lines = ["Reconciliation summary "
+                 "(unchanged / updated / inserted / removed / preserved):"]
+        for table in SUMMARY_TABLES:
+            c = self.counts.get(table, Counter())
+            lines.append(f"  {table:<19} " + " / ".join(f"{c[o]:>4}" for o in OUTCOMES))
+        if self.preserved:
+            lines.append("PRESERVED (not in JSON, left untouched):")
+            lines += [f"  {table} of {robot} {json.dumps(key)}"
+                      for table, robot, key in self.preserved]
+        return "\n".join(lines)
+
+
+class Table:
+    """How one reconciled table is read and matched.
+
+    `key` is the natural key in slug terms: (name, SQL expression over alias `t`
+    and the joins). Matching on slugs, not ids, keeps the NULL-safe comparison
+    trivial and lets a refusal quote the key exactly as the JSON writes it.
+    `fixed` are the insert columns an UPDATE never rewrites (the key and the owner).
+    `peek` are extra per-row facts read with the existing rows.
+    """
+
+    def __init__(self, name, key, fixed, *, joins="", id_cols=("id",), peek=None) -> None:
+        self.name = name
+        self.key = key
+        self.names = [n for n, _ in key]
+        self.fixed = set(fixed)
+        self.joins = joins
+        self.id_cols = id_cols
+        self.peek = dict(peek or {})
+
+
+class Existing(NamedTuple):
+    row_id: object
+    key: tuple
+    peek: dict
+
+
+_V = "LEFT JOIN robot_variant v ON v.id = t.variant_id"
+_PROVIDER = "(SELECT p.slug FROM provider p WHERE p.id = t.provider_id)"
+_REGION = "(SELECT g.code FROM region g WHERE g.id = t.region_id)"
+_OFFER_KEY = [
+    ("variant_slug", "v.slug"),
+    ("provider_slug", _PROVIDER),
+    ("region_code", _REGION),
+    ("transaction_type", "t.transaction_type::text"),
+    ("condition", "t.condition::text"),
+]
+_OFFER_FIXED = ("robot_id", "variant_id", "provider_id", "region_id", "transaction_type",
+                "condition")
+
+T_VARIANT = Table("robot_variant", [("slug", "t.slug")], ("robot_id", "slug"))
+T_SPEC = Table(
+    "specification",
+    [("variant_slug", "v.slug"), ("key", "d.key")],
+    ("robot_id", "variant_id", "definition_id"),
+    joins=_V + " JOIN spec_definition d ON d.id = t.definition_id",
+    peek={"managed_by": "coalesce(t.managed_by, 'seed/hand-authored')"},
+)
+T_PRICING = Table("pricing_offer", _OFFER_KEY, _OFFER_FIXED, joins=_V)
+T_AVAILABILITY = Table("availability_offer", _OFFER_KEY, _OFFER_FIXED, joins=_V)
+#: Only used to INSERT a robot's first deployments (D2 gives them no key to match on).
+T_DEPLOYMENT = Table("deployment", [], ("robot_id",))
+T_IMAGE = Table(
+    "robot_image", [("image_url", "t.image_url")], ("robot_id", "image_url"),
+    peek={"is_primary": "t.is_primary"},
+)
+T_CAPABILITY = Table(
+    "robot_capability",
+    [("capability_slug", "(SELECT c.slug FROM capability c WHERE c.id = t.capability_id)")],
+    ("robot_id", "capability_id"), id_cols=("robot_id", "capability_id"),
+)
+T_FIT = Table(
+    "use_case_fit",
+    [("use_case_slug", "(SELECT u.slug FROM use_case u WHERE u.id = t.use_case_id)")],
+    ("robot_id", "use_case_id"), id_cols=("robot_id", "use_case_id"),
+)
+T_EVIDENCE = Table(
+    "evidence_source",
+    [("source_url", "t.source_url"), ("source_type", "t.source_type::text"),
+     ("excerpt", "t.excerpt"), ("observed_at", "t.observed_at::date::text")],
+    ("subject_type", "subject_id", "source_url", "source_type", "excerpt", "observed_at",
+     "managed_by"),
+)
+
+
+def _param(value):
+    """Floats become exact decimals, so a NUMERIC column is never compared as float8."""
+    return Decimal(str(value)) if isinstance(value, float) else value
+
+
+def _day(value) -> str | None:
+    return None if value is None else str(value)[:10]
+
+
+def _id_where(table: Table) -> str:
+    return " AND ".join(f"{c} = %s" for c in table.id_cols)
+
+
+def _id_params(table: Table, row_id) -> tuple:
+    return tuple(row_id) if len(table.id_cols) > 1 else (row_id,)
+
+
+def _load_existing(cur, table: Table, where: str, params: tuple) -> list[Existing]:
+    exprs = [f"t.{c}" for c in table.id_cols] + [e for _, e in table.key]
+    exprs += list(table.peek.values())
+    n_id, n_key = len(table.id_cols), len(table.key)
+    rows = cur.execute(
+        f"SELECT {', '.join(exprs)} FROM {table.name} t {table.joins} WHERE {where}", params
+    ).fetchall()
+    out = []
+    for r in rows:
+        row_id = r[0] if n_id == 1 else tuple(r[:n_id])
+        peek = dict(zip(table.peek, r[n_id + n_key:], strict=True))
+        out.append(Existing(row_id, tuple(r[n_id:n_id + n_key]), peek))
+    return out
+
+
+def _insert(cur, table: Table, values: dict):
+    cols = list(values)
+    row = cur.execute(
+        f"INSERT INTO {table.name} ({', '.join(cols)}) VALUES ({', '.join(['%s'] * len(cols))}) "
+        f"RETURNING {', '.join(table.id_cols)}",
+        [_param(v) for v in values.values()],
+    ).fetchone()
+    return row[0] if len(table.id_cols) == 1 else tuple(row)
+
+
+def _compare(cur, table: Table, row_id, values: dict) -> tuple[bool, list[str]]:
+    """(does the stored row differ, which stored values the JSON would blank).
+
+    Postgres compares, so numerics, dates, timestamps and arrays use the column types.
+    A column is "blanked" when the JSON gives NULL where the row holds a value."""
+    if not values:
+        return False, []
+    cols = ", ".join(values)
+    marks = ", ".join(["%s"] * len(values))
+    nulls = [c for c, v in values.items() if v is None]
+    flags = "".join(f", ({c} IS NOT NULL)" for c in nulls)
+    row = cur.execute(
+        f"SELECT ({cols}) IS DISTINCT FROM ({marks}){flags} FROM {table.name} "
+        f"WHERE {_id_where(table)}",
+        [*(_param(v) for v in values.values()), *_id_params(table, row_id)],
+    ).fetchone()
+    return row[0], [c for c, held in zip(nulls, row[1:], strict=True) if held]
+
+
+def _update(cur, table: Table, row_id, values: dict) -> None:
+    sets = ", ".join(f"{c} = %s" for c in values)
+    cur.execute(
+        f"UPDATE {table.name} SET {sets} WHERE {_id_where(table)}",
+        [*(_param(v) for v in values.values()), *_id_params(table, row_id)],
+    )
+
+
+def reconcile_rows(cur, recon: Reconciliation, table: Table, robot: str,
+                   existing: list[Existing], incoming: list[tuple[tuple, dict]], *,
+                   parent: dict | None = None, immutable: bool = False) -> list[tuple]:
+    """Bring one robot's rows of one table in line with the JSON, keeping row ids.
+
+    `incoming` is [(natural key, insert-column values)]. Returns [(row id, inserted)]
+    aligned with `incoming`. Per row: no match -> INSERT; match and equal -> nothing;
+    match and different -> UPDATE in place. Rows present but absent from the JSON are
+    never deleted here: each is preserved and reported, or, when the operator
+    authorized its removal, a pending removal executed after everything else.
+    A stored value the JSON would turn into NULL needs a `clear` entry.
+    `immutable` rows (evidence) are not updated without an `update_evidence` entry.
+    """
+    def key_dict(key):
+        return {**(parent or {}), **dict(zip(table.names, key, strict=True))}
+
+    def where(key):
+        return f"{table.name} of {robot} {json.dumps(key_dict(key))}"
+
+    seen: set = set()
+    for key, _ in incoming:
+        if key in seen:
+            raise ReconcileRefused(f"duplicate natural key in the JSON: {where(key)}")
+        seen.add(key)
+    by_key: dict[tuple, list[Existing]] = {}
+    for row in existing:
+        by_key.setdefault(row.key, []).append(row)
+    for key, rows in by_key.items():
+        if len(rows) > 1:
+            raise ReconcileRefused(
+                f"ambiguous: {len(rows)} existing rows share one natural key, "
+                f"{where(key)}; the importer will not choose one")
+
+    results: list[tuple] = []
+    for key, values in incoming:
+        match = by_key.get(key)
+        if match is None:
+            results.append((_insert(cur, table, values), True))
+            recon.count(table.name, "inserted")
+            continue
+        row = match[0]
+        results.append((row.row_id, False))
+        changeable = {c: v for c, v in values.items() if c not in table.fixed}
+        differs, blanked = _compare(cur, table, row.row_id, changeable)
+        refused = False
+        for col in blanked:             # D1: a stored value is never erased implicitly
+            entry = _entry("clear", table.name, robot, key_dict(key), col)
+            if not recon.authorize.allows(entry):
+                recon.refuse(f"{where(key)}: the JSON would erase the stored value of {col}",
+                             entry)
+                refused = True
+        if refused:
+            continue
+        if not differs:
+            recon.count(table.name, "unchanged")
+            continue
+        if immutable:
+            entry = _entry("update_evidence", table.name, robot, key_dict(key))
+            if not recon.authorize.allows(entry):
+                recon.refuse(f"{where(key)}: evidence differs from the JSON but is immutable "
+                             "to the importer", entry)
+                continue
+        _update(cur, table, row.row_id, changeable)
+        recon.count(table.name, "updated")
+
+    for key, rows in by_key.items():
+        if key in seen:
+            continue
+        entry = _entry("remove", table.name, robot, key_dict(key))
+        if recon.authorize.allows(entry):
+            recon.pending.append(Pending(table, rows[0].row_id, robot, key_dict(key)))
+        else:                           # D1: omitted records are left untouched
+            recon.count(table.name, "preserved")
+            recon.preserved.append((table.name, robot, key_dict(key)))
+    return results
+
+
+def apply_removals(cur, recon: Reconciliation) -> None:
+    """Execute the authorized removals, last. Offers are retired with is_current, not here."""
+    pending, recon.pending = recon.pending, []
+    removing = {(p.table.name, p.row_id) for p in pending}
+    for p in pending:
+        if p.table is not T_VARIANT:
+            continue
+        for dependent in ("specification", "pricing_offer", "availability_offer"):
+            for (dep_id,) in cur.execute(
+                f"SELECT id FROM {dependent} WHERE variant_id = %s", (p.row_id,)
+            ).fetchall():
+                if (dependent, dep_id) not in removing:
+                    recon.refuse(
+                        f"cannot remove robot_variant {json.dumps(p.key)} of {p.robot}: "
+                        f"{dependent} {dep_id} still depends on it and is not itself "
+                        "being removed (the delete would cascade)")
+    if recon.refusals:
+        return
+    # Rows first, their variant last.
+    for p in sorted(pending, key=lambda p: p.table is T_VARIANT):
+        subject = EVIDENCE_SUBJECTS.get(p.table.name)
+        if subject:
+            gone = _rowcount(cur.execute(
+                "DELETE FROM evidence_source WHERE subject_type = %s AND subject_id = %s",
+                (subject, p.row_id)))
+            recon.count("evidence_source", "removed", gone)
+        cur.execute(f"DELETE FROM {p.table.name} WHERE {_id_where(p.table)}",
+                    _id_params(p.table, p.row_id))
+        recon.count(p.table.name, "removed")
+
+
+def _evidence_key(ev: dict) -> tuple:
+    return (ev.get("source_url"), ev["source_type"], ev.get("excerpt"),
+            _day(ev.get("observed_at")))
+
+
+def _evidence_values(subject_type: str, subject_id, ev: dict, managed_by: str | None) -> dict:
+    return {
+        "subject_type": subject_type, "subject_id": subject_id,
+        "source_url": ev.get("source_url"), "source_type": ev["source_type"],
+        "source_title": ev.get("source_title"), "excerpt": ev.get("excerpt"),
+        "published_at": ev.get("published_at"), "observed_at": ev.get("observed_at"),
+        "verified_at": ev.get("verified_at"), "confidence": ev.get("confidence", "MEDIUM"),
+        "note": ev.get("note"),
+        # MANUFACTURER rows name the profile fields they support (migration
+        # 0013); every other row makes no field claim.
+        "claim_fields": ev.get("claim_fields"), "managed_by": managed_by,
+    }
+
+
+def reconcile_evidence(cur, recon: Reconciliation, robot: str, subject_type: str, subject_id,
+                       evidence: list[dict], parent: dict, *, managed_by: str | None = None,
+                       fresh: bool = False) -> None:
+    """Reconcile the evidence under one (stable) subject. `fresh`: the subject was just
+    inserted, so it cannot have evidence yet. With `managed_by`, only rows carrying that
+    marker are in scope."""
+    existing: list[Existing] = []
+    if not fresh:
+        where, params = "t.subject_type = %s AND t.subject_id = %s", (subject_type, subject_id)
+        if managed_by is not None:
+            where, params = where + " AND t.managed_by = %s", params + (managed_by,)
+        existing = _load_existing(cur, T_EVIDENCE, where, params)
+    incoming = [(_evidence_key(ev), _evidence_values(subject_type, subject_id, ev, managed_by))
+                for ev in evidence]
+    reconcile_rows(cur, recon, T_EVIDENCE, robot, existing, incoming,
+                   parent={"subject_type": subject_type, **parent}, immutable=True)
+
+
+def _upsert(cur, table: str, conflict: str, cols: list[str], vals: list, *,
+            skip=(), set_exprs=None, only_if: str | None = None, only_if_params=()):
+    """INSERT ... ON CONFLICT DO UPDATE that rewrites a row only if a column differs.
+
+    Returns (id, inserted), or None when the row exists and nothing would change
+    (an UPDATE that changes nothing still fires updated_at triggers, so none is issued)."""
+    set_exprs = set_exprs or {}
+    changing = [c for c in cols if c != conflict and c not in skip]
+    new = {c: set_exprs.get(c, f"EXCLUDED.{c}") for c in changing}
+    guard = (f"({', '.join(f'{table}.{c}' for c in changing)}) "
+             f"IS DISTINCT FROM ({', '.join(new.values())})")
+    if only_if:
+        guard = f"{only_if} AND {guard}"
+    row = cur.execute(
+        f"INSERT INTO {table} ({', '.join(cols)}) VALUES ({', '.join(['%s'] * len(cols))}) "
+        f"ON CONFLICT ({conflict}) DO UPDATE SET "
+        f"{', '.join(f'{c} = {new[c]}' for c in changing)} WHERE {guard} "
+        "RETURNING id, (xmax = 0)",
+        [*vals, *only_if_params],
+    ).fetchone()
+    return None if row is None else (row[0], row[1])
+
+
+def _refuse_blanking(cur, recon: Reconciliation, table: str, conflict: str, cols: list[str],
+                     vals: list, *, skip=(), set_exprs=None, owner_sql: str = "",
+                     owner_params=()) -> bool:
+    """D1: an upsert may not turn a stored value into NULL without a `clear` entry.
+
+    Entity-level rows (robot, manufacturer, ...) are named by their slug/code with key {}.
+    Returns True when the upsert must not run. `set_exprs` columns (COALESCE: a file that
+    omits them never clears them) cannot blank and are exempt."""
+    set_exprs = set_exprs or {}
+    nulls = [c for c, v in zip(cols, vals, strict=True)
+             if v is None and c != conflict and c not in skip and c not in set_exprs]
+    if not nulls:
+        return False
+    who = vals[cols.index(conflict)]
+    row = cur.execute(
+        f"SELECT {', '.join(f'({c} IS NOT NULL)' for c in nulls)} FROM {table} "
+        f"WHERE {conflict} = %s{owner_sql}", (who, *owner_params)).fetchone()
+    if row is None:
+        return False
+    refused = False
+    for column, held in zip(nulls, row, strict=True):
+        if held:
+            entry = _entry("clear", table, str(who), {}, column)
+            if not recon.authorize.allows(entry):
+                recon.refuse(f"{table} {who}: the JSON would erase the stored value of {column}",
+                             entry)
+                refused = True
+    return refused
+
+
+def _upsert_entity(cur, recon: Reconciliation, table: str, conflict: str, cols: list[str],
+                   vals: list, **kw):
+    """`_upsert` for a table the importer owns outright: always returns the row id."""
+    row = None
+    if not _refuse_blanking(cur, recon, table, conflict, cols, vals,
+                            skip=kw.get("skip", ()), set_exprs=kw.get("set_exprs")):
+        row = _upsert(cur, table, conflict, cols, vals, **kw)
+    if row is None:
+        recon.count(table, "unchanged")
+        return cur.execute(
+            f"SELECT id FROM {table} WHERE {conflict} = %s", (vals[cols.index(conflict)],)
+        ).fetchone()[0]
+    recon.count(table, "inserted" if row[1] else "updated")
+    return row[0]
 
 
 # --------------------------------------------------------------------------- #
@@ -253,13 +788,30 @@ def validate_manufacturer_profiles(data: dict) -> list[str]:
     return errors
 
 
-def replace_manufacturer_evidence(cur, manufacturer_id, evidence: list[dict]) -> dict:
-    """Refresh ONE manufacturer's company-level evidence without touching rows
-    this importer does not own.
+def manufacturer_key_problems(data: dict) -> list[str]:
+    """A natural key (source, type, excerpt, observed date) given twice for one manufacturer.
 
-    * `managed_by = CATALOGUE_IMPORT` rows are the importer's: deleted, then the
-      catalogue's rows are re-inserted with that marker, so repeated runs never
-      duplicate them.
+    Pure. Checked before any write, so an ambiguous catalogue never reaches a transaction."""
+    out: list[str] = []
+    for m in data.get("manufacturers", []):
+        keys = [_evidence_key(ev) for ev in m.get("evidence") or []
+                if "source_type" in ev]
+        out += [f"manufacturer {m.get('slug')!r}: duplicate evidence key {k}"
+                for k, n in Counter(keys).items() if n > 1]
+    return out
+
+
+def reconcile_manufacturer_evidence(cur, recon: Reconciliation, manufacturer_slug: str,
+                                    manufacturer_id, evidence: list[dict]) -> dict:
+    """Reconcile ONE manufacturer's company-level evidence without touching rows this
+    importer does not own.
+
+    * `managed_by = CATALOGUE_IMPORT` rows are the importer's. They are matched by
+      (source_url, source_type, excerpt, observed date): equal rows are left alone
+      (same id, no write), new sources are inserted with that marker, and a managed
+      row whose source left the JSON is never deleted without a `remove`
+      authorization. A matched row whose content differs is refused unless an
+      `update_evidence` entry names it.
     * Every UNMARKED row is preserved exactly as it is: content, ownership and
       subject. The importer never deletes, rewrites or takes ownership of one.
       Row content says nothing reliable about who wrote a row, so even an
@@ -270,11 +822,7 @@ def replace_manufacturer_evidence(cur, manufacturer_id, evidence: list[dict]) ->
       collision. The report asserts no ownership; resolving it is an owner
       decision, never an import side effect.
     """
-    removed = _rowcount(cur.execute(
-        "DELETE FROM evidence_source "
-        "WHERE subject_type='MANUFACTURER' AND subject_id=%s AND managed_by = %s",
-        (manufacturer_id, MANAGED_BY),
-    ))
+    before = Counter(recon.counts.get("evidence_source", Counter()))
     collisions: list[str] = []
     for ev in evidence:
         shared = cur.execute(
@@ -291,14 +839,19 @@ def replace_manufacturer_evidence(cur, manufacturer_id, evidence: list[dict]) ->
                 f"{ev.get('source_url')} ({shared} unmarked row(s) share its URL, type "
                 "and observed date; preserved, ownership not assumed)"
             )
-        insert_evidence(cur, "MANUFACTURER", manufacturer_id, ev, managed_by=MANAGED_BY)
-    return {"removed": removed, "inserted": len(evidence), "collisions": collisions}
+    reconcile_evidence(cur, recon, manufacturer_slug, "MANUFACTURER", manufacturer_id,
+                       evidence, {}, managed_by=MANAGED_BY)
+    apply_removals(cur, recon)
+    after = recon.counts.get("evidence_source", Counter())
+    delta = {o: after[o] - before[o] for o in OUTCOMES}
+    return {**delta, "collisions": collisions}
 
 
 # --------------------------------------------------------------------------- #
 # Catalogue-level entities (upsert by natural key)
 # --------------------------------------------------------------------------- #
-def import_regions(cur, data: dict) -> None:
+def import_regions(cur, data: dict, recon: Reconciliation | None = None) -> None:
+    recon = recon or Reconciliation()
     rows = data["regions"]
     # Parents first so parent_code can resolve.
     for row in sorted(rows, key=lambda r: r.get("parent_code") is not None):
@@ -307,56 +860,34 @@ def import_regions(cur, data: dict) -> None:
             parent_id = cur.execute(
                 "SELECT id FROM region WHERE code = %s", (row["parent_code"],)
             ).fetchone()[0]
-        cur.execute(
-            """
-            INSERT INTO region (parent_id, type, code, name, iso_country)
-            VALUES (%s,%s,%s,%s,%s)
-            ON CONFLICT (code) DO UPDATE SET
-                parent_id = EXCLUDED.parent_id,
-                type      = EXCLUDED.type,
-                name      = EXCLUDED.name,
-                iso_country = EXCLUDED.iso_country
-            """,
-            (parent_id, row["type"], row["code"], row["name"], row.get("iso_country")),
+        _upsert_entity(
+            cur, recon, "region", "code",
+            ["parent_id", "type", "code", "name", "iso_country"],
+            [parent_id, row["type"], row["code"], row["name"], row.get("iso_country")],
         )
 
 
-def import_manufacturers(cur, data: dict, region_id) -> dict:
-    """Upsert manufacturer profiles by slug and refresh their company evidence.
+def import_manufacturers(cur, data: dict, region_id, recon: Reconciliation | None = None) -> dict:
+    """Upsert manufacturer profiles by slug and reconcile their company evidence.
 
     Shared by the full catalogue import and `--manufacturers-only`, so both write
     manufacturer data identically. Returns summed evidence counts and every
     evidence collision with an unmarked row (`slug: source_url (...)`).
+    Called without a shared `recon`, it finishes (and may refuse) on its own.
     """
-    totals: dict = {"manufacturers": 0, "removed": 0, "inserted": 0, "collisions": []}
+    own = recon is None
+    recon = recon or Reconciliation()
+    totals: dict = {"manufacturers": 0, "removed": 0, "inserted": 0, "updated": 0,
+                    "unchanged": 0, "collisions": []}
     for m in data["manufacturers"]:
-        mid = cur.execute(
-            """
-            INSERT INTO manufacturer
-                (slug, name, legal_name, country_region_id, headquarters_city,
-                 incorporation, operating_locations, website_url,
-                 founded_year, description, target_markets, commercial_model,
-                 deployment_status, deployment_note, is_public_company, ticker,
-                 parent_company, parent_listing, parent_relationship)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-            ON CONFLICT (slug) DO UPDATE SET
-                name = EXCLUDED.name, legal_name = EXCLUDED.legal_name,
-                country_region_id = EXCLUDED.country_region_id,
-                headquarters_city = EXCLUDED.headquarters_city,
-                incorporation = EXCLUDED.incorporation,
-                operating_locations = EXCLUDED.operating_locations,
-                website_url = EXCLUDED.website_url, founded_year = EXCLUDED.founded_year,
-                description = EXCLUDED.description, target_markets = EXCLUDED.target_markets,
-                commercial_model = EXCLUDED.commercial_model,
-                deployment_status = EXCLUDED.deployment_status,
-                deployment_note = EXCLUDED.deployment_note,
-                is_public_company = EXCLUDED.is_public_company, ticker = EXCLUDED.ticker,
-                parent_company = EXCLUDED.parent_company,
-                parent_listing = EXCLUDED.parent_listing,
-                parent_relationship = EXCLUDED.parent_relationship
-            RETURNING id
-            """,
-            (
+        mid = _upsert_entity(
+            cur, recon, "manufacturer", "slug",
+            ["slug", "name", "legal_name", "country_region_id", "headquarters_city",
+             "incorporation", "operating_locations", "website_url", "founded_year",
+             "description", "target_markets", "commercial_model", "deployment_status",
+             "deployment_note", "is_public_company", "ticker", "parent_company",
+             "parent_listing", "parent_relationship"],
+            [
                 m["slug"], m["name"], m.get("legal_name"),
                 region_id(m.get("country_region_code")), m.get("headquarters_city"),
                 m.get("incorporation"), m.get("operating_locations"), m.get("website_url"),
@@ -368,77 +899,69 @@ def import_manufacturers(cur, data: dict, region_id) -> dict:
                 m.get("is_public_company"), m.get("ticker"),
                 m.get("parent_company"), m.get("parent_listing"),
                 m.get("parent_relationship"),
-            ),
-        ).fetchone()[0]
-        # Refresh only this importer's own company evidence: idempotent, and
-        # manually maintained rows survive (see replace_manufacturer_evidence).
-        counts = replace_manufacturer_evidence(cur, mid, m.get("evidence") or [])
+            ],
+        )
+        # Reconcile only this importer's own company evidence: idempotent, and
+        # manually maintained rows survive (see reconcile_manufacturer_evidence).
+        counts = reconcile_manufacturer_evidence(
+            cur, recon, m["slug"], mid, m.get("evidence") or [])
         totals["manufacturers"] += 1
-        for key in ("removed", "inserted"):
+        for key in ("removed", "inserted", "updated", "unchanged"):
             totals[key] += counts[key]
         totals["collisions"].extend(f"{m['slug']}: {line}" for line in counts["collisions"])
+    if own:
+        recon.finish()
     return totals
 
 
-def import_providers(cur, data: dict, region_id, manufacturer_id) -> None:
+def import_providers(cur, data: dict, region_id, manufacturer_id,
+                     recon: Reconciliation | None = None) -> None:
+    recon = recon or Reconciliation()
     for p in data["providers"]:
-        cur.execute(
-            """
-            INSERT INTO provider
-                (slug, type, name, manufacturer_id, country_region_id,
-                 website_url, description)
-            VALUES (%s,%s,%s,%s,%s,%s,%s)
-            ON CONFLICT (slug) DO UPDATE SET
-                type = EXCLUDED.type, name = EXCLUDED.name,
-                manufacturer_id = EXCLUDED.manufacturer_id,
-                country_region_id = EXCLUDED.country_region_id,
-                website_url = EXCLUDED.website_url, description = EXCLUDED.description
-            """,
-            (
+        _upsert_entity(
+            cur, recon, "provider", "slug",
+            ["slug", "type", "name", "manufacturer_id", "country_region_id",
+             "website_url", "description"],
+            [
                 p["slug"], p["type"], p["name"],
                 manufacturer_id(p.get("manufacturer_slug")),
                 region_id(p.get("country_region_code")),
                 p.get("website_url"), p.get("description"),
-            ),
+            ],
         )
 
 
-def import_capabilities(cur, data: dict) -> None:
+def import_capabilities(cur, data: dict, recon: Reconciliation | None = None) -> None:
+    recon = recon or Reconciliation()
     for c in data["capabilities"]:
-        cur.execute(
-            """
-            INSERT INTO capability (slug, name, category, description)
-            VALUES (%s,%s,%s,%s)
-            ON CONFLICT (slug) DO UPDATE SET
-                name = EXCLUDED.name, category = EXCLUDED.category,
-                description = EXCLUDED.description
-            """,
-            (c["slug"], c["name"], c["category"], c.get("description")),
+        _upsert_entity(
+            cur, recon, "capability", "slug",
+            ["slug", "name", "category", "description"],
+            [c["slug"], c["name"], c["category"], c.get("description")],
         )
 
 
-def import_use_cases(cur, data: dict) -> None:
+def import_use_cases(cur, data: dict, recon: Reconciliation | None = None) -> None:
+    recon = recon or Reconciliation()
     for u in data["use_cases"]:
-        cur.execute(
-            """
-            INSERT INTO use_case (slug, name, category, description, typical_tasks,
-                                  typical_requirements, key_limitations)
-            VALUES (%s,%s,%s,%s,%s,%s,%s)
-            ON CONFLICT (slug) DO UPDATE SET
-                name = EXCLUDED.name, category = EXCLUDED.category,
-                description = EXCLUDED.description, typical_tasks = EXCLUDED.typical_tasks,
-                -- a file that omits these never clears a value already recorded
-                typical_requirements = COALESCE(EXCLUDED.typical_requirements,
-                                                use_case.typical_requirements),
-                key_limitations = COALESCE(EXCLUDED.key_limitations, use_case.key_limitations)
-            """,
-            (u["slug"], u["name"], u.get("category"), u.get("description"),
+        _upsert_entity(
+            cur, recon, "use_case", "slug",
+            ["slug", "name", "category", "description", "typical_tasks",
+             "typical_requirements", "key_limitations"],
+            [u["slug"], u["name"], u.get("category"), u.get("description"),
              u.get("typical_tasks"), u.get("typical_requirements"),
-             u.get("key_limitations")),
+             u.get("key_limitations")],
+            # a file that omits these never clears a value already recorded
+            set_exprs={
+                "typical_requirements": "COALESCE(EXCLUDED.typical_requirements, "
+                                        "use_case.typical_requirements)",
+                "key_limitations": "COALESCE(EXCLUDED.key_limitations, use_case.key_limitations)",
+            },
         )
 
 
-def import_spec_definitions(cur, data: dict, collisions: list[str]) -> None:
+def import_spec_definitions(cur, data: dict, collisions: list[str],
+                            recon: Reconciliation | None = None) -> None:
     """Upsert the long-tail spec keys this catalogue uses — its OWN ones only.
 
     `spec_definition` is shared with `db/seed/seed.sql`, which authors keys like
@@ -449,79 +972,196 @@ def import_spec_definitions(cur, data: dict, collisions: list[str]) -> None:
     keeps its own shape and is reported. The catalogue may still *reference* it —
     only redefining it is refused.
     """
+    recon = recon or Reconciliation()
     for d in data["spec_definitions"]:
-        row = cur.execute(
-            """
-            INSERT INTO spec_definition
-                (key, label, category, value_type, unit, is_filterable, sort_order, managed_by)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
-            ON CONFLICT (key) DO UPDATE SET
-                label = EXCLUDED.label, category = EXCLUDED.category,
-                value_type = EXCLUDED.value_type, unit = EXCLUDED.unit,
-                is_filterable = EXCLUDED.is_filterable, sort_order = EXCLUDED.sort_order
-            WHERE spec_definition.managed_by = %s
-            RETURNING id
-            """,
-            (d["key"], d["label"], d.get("category", "OTHER"), d["value_type"],
-             d.get("unit"), d.get("is_filterable", False), d.get("sort_order", 0),
-             MANAGED_BY, MANAGED_BY),
-        ).fetchone()
-        if row is None:
-            # The conflicting row exists but is not ours: DO UPDATE ... WHERE
-            # matched nothing, so nothing was written. Keep theirs, say so.
-            owner = cur.execute(
-                "SELECT coalesce(managed_by, 'seed/hand-authored') FROM spec_definition WHERE key = %s",
-                (d["key"],),
-            ).fetchone()[0]
-            collisions.append(
-                f"spec_definition {d['key']!r} already exists and is owned by "
-                f"{owner} — its definition was preserved, not overwritten"
+        cols = ["key", "label", "category", "value_type", "unit", "is_filterable",
+                "sort_order", "managed_by"]
+        vals = [d["key"], d["label"], d.get("category", "OTHER"), d["value_type"],
+                d.get("unit"), d.get("is_filterable", False), d.get("sort_order", 0),
+                MANAGED_BY]
+        row = None
+        if not _refuse_blanking(cur, recon, "spec_definition", "key", cols, vals,
+                                skip=("managed_by",), owner_sql=" AND managed_by = %s",
+                                owner_params=(MANAGED_BY,)):
+            row = _upsert(
+                cur, "spec_definition", "key", cols, vals, skip=("managed_by",),
+                only_if="spec_definition.managed_by = %s", only_if_params=(MANAGED_BY,),
             )
-
-
-# --------------------------------------------------------------------------- #
-# Robots (+ children). Upsert robot by slug; replace children.
-# --------------------------------------------------------------------------- #
-def _reset_robot_children(cur, robot_id) -> None:
-    """Delete a robot's fact rows and their evidence so re-import is idempotent."""
-    for subject, table in (
-        ("PRICING_OFFER", "pricing_offer"),
-        ("AVAILABILITY_OFFER", "availability_offer"),
-        ("DEPLOYMENT", "deployment"),
-    ):
-        cur.execute(
-            f"""
-            DELETE FROM evidence_source
-            WHERE subject_type = %s
-              AND subject_id IN (SELECT id FROM {table} WHERE robot_id = %s)
-            """,
-            (subject, robot_id),
+        if row is not None:
+            recon.count("spec_definition", "inserted" if row[1] else "updated")
+            continue
+        # Nothing was written: either the definition is ours and unchanged, or the
+        # conflicting row exists but is not ours. Keep theirs, and say so.
+        owner = cur.execute(
+            "SELECT coalesce(managed_by, 'seed/hand-authored') FROM spec_definition WHERE key = %s",
+            (d["key"],),
+        ).fetchone()[0]
+        if owner == MANAGED_BY:
+            recon.count("spec_definition", "unchanged")
+            continue
+        collisions.append(
+            f"spec_definition {d['key']!r} already exists and is owned by "
+            f"{owner} — its definition was preserved, not overwritten"
         )
-    cur.execute(
-        "DELETE FROM evidence_source WHERE subject_type='COMMERCIAL_STATUS' AND subject_id=%s",
-        (robot_id,),
-    )
-    for table in ("pricing_offer", "availability_offer", "deployment",
-                  "robot_capability", "use_case_fit", "robot_variant", "robot_image"):
-        cur.execute(f"DELETE FROM {table} WHERE robot_id = %s", (robot_id,))
-    # `specification` is NOT wholly owned here: the seed and hand authoring write
-    # rows to the same table. Only this importer's own rows are replaced.
-    cur.execute(
-        "DELETE FROM specification WHERE robot_id = %s AND managed_by = %s",
-        (robot_id, MANAGED_BY),
-    )
 
 
+# --------------------------------------------------------------------------- #
+# Robots (+ children). Upsert the robot by slug; reconcile its children by natural key.
+# --------------------------------------------------------------------------- #
 # Columns the importer owns outright: catalogue FACTS, refreshed from JSON on
 # every run. `is_published` is deliberately NOT among them — see below.
 EDITORIAL_COLUMNS = ("is_published",)
+
+# Verified product images (MEDIA-01). Provenance is mandatory and a synthesized
+# identity image is categorically rejected — `source_type` must be a real-source
+# enum value; GENERATED (or anything outside the enum) aborts the import rather
+# than silently degrading. Display eligibility is decided at read time by
+# identity_status + rights_status, never by the mere presence of image_url.
+_ALLOWED_IMAGE_SOURCES = {
+    "MANUFACTURER", "PRESS_KIT", "DISTRIBUTOR", "EDITORIAL", "VIDEO_FRAME",
+}
+
+
+def _offer_key(offer: dict) -> tuple:
+    return (offer.get("variant_slug"), offer.get("provider_slug"), offer.get("region_code"),
+            offer["transaction_type"], _condition(offer))
+
+
+def _spec_key(spec: dict) -> tuple:
+    return (spec.get("variant_slug"), spec["key"])
+
+
+def incoming_problems(robot: dict) -> list[str]:
+    """Everything in one robot's JSON that makes reconciliation ambiguous. Pure.
+
+    A natural key given twice, a variant reference that resolves to nothing (it
+    would silently widen a variant-scoped fact to the whole product), or two
+    primary images. Checked before any write."""
+    slug = robot.get("slug")
+    out: list[str] = []
+
+    def duplicates(label: str, keys: list) -> None:
+        out.extend(f"robot {slug!r}: duplicate {label} {k!r} in the JSON"
+                   for k, n in Counter(keys).items() if n > 1)
+
+    variants = robot.get("variants", [])
+    offers = robot.get("pricing_offers", [])
+    availability = robot.get("availability_offers", [])
+    deployments = robot.get("deployments", [])
+    duplicates("variant", [v["slug"] for v in variants])
+    duplicates("extended spec", [_spec_key(x) for x in robot.get("extended_specs", [])])
+    duplicates("pricing offer", [_offer_key(o) for o in offers])
+    duplicates("availability offer", [_offer_key(o) for o in availability])
+    duplicates("image", [i["image_url"] for i in robot.get("images", [])])
+    duplicates("capability", [c["slug"] for c in robot.get("capabilities", [])])
+    duplicates("use-case fit", [f["use_case_slug"] for f in robot.get("use_case_fits", [])])
+    if sum(1 for i in robot.get("images", []) if i.get("is_primary")) > 1:
+        out.append(f"robot {slug!r}: more than one primary image in the JSON")
+
+    known = {v["slug"] for v in variants}
+    for x in robot.get("extended_specs", []):
+        vs = x.get("variant_slug")
+        # An extended spec may identify ONE of this robot's own variants (G2-3, DR-A5);
+        # absent or null it is a product-level spec. An unknown slug fails loudly,
+        # never silently widening a variant-scoped fact to the whole product.
+        if vs is not None and vs not in known:
+            out.append(f"robot {slug!r}: extended spec {x['key']!r} names variant "
+                       f"{vs!r}, which is not one of its variants")
+    for label, rows in (("pricing offer", offers), ("availability offer", availability)):
+        for o in rows:
+            vs = o.get("variant_slug")
+            if vs is not None and vs not in known:
+                out.append(f"robot {slug!r}: {label} names variant {vs!r}, which is not "
+                           "one of its variants")
+
+    evidence_lists = [("commercial_status_evidence", robot.get("commercial_status_evidence", []))]
+    for label, rows in (("pricing offer", offers), ("availability offer", availability)):
+        evidence_lists += [(f"{label} {_offer_key(r)!r} evidence", r.get("evidence", []))
+                           for r in rows]
+    evidence_lists += [(f"deployment #{i} evidence", r.get("evidence", []))
+                       for i, r in enumerate(deployments)]
+    for label, evs in evidence_lists:
+        duplicates(f"evidence key in {label}", [_evidence_key(e) for e in evs])
+    return out
+
+
+DEPLOYMENT_COLUMNS = ("provider_id", "customer_name", "region_id", "use_case_id",
+                      "transaction_type", "unit_count", "contract_value", "contract_currency",
+                      "started_on", "status", "summary")
+
+
+def reconcile_deployments(cur, recon: Reconciliation, slug: str, robot_id,
+                          deployments: list[dict], region_id, use_case_id) -> None:
+    """Owner decision D2: a deployment has NO inferred identity.
+
+    Until an explicit durable `deployment_key` exists (a schema change that is not
+    approved), the only thing the importer can do is recognise an UNCHANGED set: the
+    incoming deployments equal the stored ones on every column, as a multiset. Then
+    nothing is written, ids stay, and their evidence is reconciled as usual. Any other
+    situation (a new, edited or missing deployment of a robot that already has some) is
+    refused, as is any `remove` authorization for a deployment. A robot with NO stored
+    deployment gets its first ones inserted."""
+    incoming = [{
+        "provider_id": _provider(cur, d.get("provider_slug")),
+        "customer_name": d.get("customer_name"), "region_id": region_id(d.get("region_code")),
+        "use_case_id": use_case_id(d.get("use_case_slug")),
+        "transaction_type": d.get("transaction_type"), "unit_count": d.get("unit_count"),
+        "contract_value": d.get("contract_value"),
+        "contract_currency": d.get("contract_currency"),
+        "started_on": d.get("started_on"), "status": d.get("status"),
+        "summary": d.get("summary"),
+    } for d in deployments]
+    stored = [r[0] for r in cur.execute(
+        "SELECT id FROM deployment WHERE robot_id = %s", (robot_id,)).fetchall()]
+    if not stored:
+        # First load of this robot's deployments: nothing stored can be confused with them,
+        # so no identity is inferred. They are inserted once; from then on D2 applies.
+        for d, values in zip(deployments, incoming, strict=True):
+            deployment_id = _insert(cur, T_DEPLOYMENT, {"robot_id": robot_id, **values})
+            recon.count("deployment", "inserted")
+            reconcile_evidence(cur, recon, slug, "DEPLOYMENT", deployment_id,
+                               d.get("evidence", []), {"deployment_id": str(deployment_id)},
+                               fresh=True)
+        return
+    claimed: list = []
+    unmatched = []
+    for i, values in enumerate(incoming):
+        cols = ", ".join(DEPLOYMENT_COLUMNS)
+        marks = ", ".join(["%s"] * len(DEPLOYMENT_COLUMNS))
+        found = cur.execute(
+            f"SELECT id FROM deployment WHERE robot_id = %s AND id <> ALL(%s) "
+            f"AND ({cols}) IS NOT DISTINCT FROM ({marks}) LIMIT 1",
+            [robot_id, claimed, *(_param(values[c]) for c in DEPLOYMENT_COLUMNS)],
+        ).fetchone()
+        if found is None:
+            unmatched.append(i)
+        else:
+            claimed.append(found[0])
+    missing = [d for d in stored if d not in claimed]
+    asked = [e for e in recon.authorize.entries
+             if e["table"] == "deployment" and e["robot"] == slug]
+    for entry in asked:
+        recon.authorize.allows(entry)       # reported below, not as "unused"
+    if unmatched or missing or asked:
+        recon.refuse(
+            f"deployment of {slug}: {len(unmatched)} new or edited and {len(missing)} missing "
+            f"or edited stored deployment(s)"
+            + ("; a `remove` for a deployment is not supported" if asked else "")
+            + ". Owner decision D2: deployments have no inferred identity; an explicit "
+              "`deployment_key` is required first (schema migration not approved).")
+        return
+    for d, deployment_id in zip(deployments, claimed, strict=True):
+        recon.count("deployment", "unchanged")
+        reconcile_evidence(cur, recon, slug, "DEPLOYMENT", deployment_id,
+                           d.get("evidence", []), {"deployment_id": str(deployment_id)})
 
 
 def import_robot(cur, robot: dict, region_id, manufacturer_id,
                  capability_id, use_case_id, spec_definition=None,
                  collisions=None, *,
-                 apply_publication_state: bool = False) -> None:
-    """Upsert one robot.
+                 apply_publication_state: bool = False,
+                 authorize=None, recon: Reconciliation | None = None) -> None:
+    """Upsert one robot and reconcile its children by natural key.
 
     The master catalogue (what we know about a robot) and the public catalogue
     (what is currently approved for display) are two different things. This
@@ -535,14 +1175,38 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
     data: stub entries carry `"is_published": false`, so any editorial decision
     to display them is silently reverted by the next import. That is exactly how
     46 stored robots once collapsed to 7 on screen.
+
+    Children keep their ids (see the module docstring). Anything that would need a
+    delete, or blank protected provenance, or change an evidence row, is refused
+    unless `authorize` names it. `recon` is shared by `run()`; called alone, this
+    function finishes (and may refuse) by itself.
     """
+    own = recon is None
+    recon = recon or Reconciliation(authorize)
+    slug = robot["slug"]
+    problems = incoming_problems(robot)
+    if problems:
+        raise ReconcileRefused("IMPORT REFUSED - nothing was written:\n  " + "\n  ".join(problems))
+    extended = robot.get("extended_specs", [])
+    # `spec_definition`/`collisions` default to None so a caller inspecting the
+    # robot upsert alone (the publication-state tests do exactly this) need not
+    # build a definition registry. They become required the moment there is
+    # actually a long-tail spec to write: writing one without a registry is
+    # impossible, and silently DROPPING it would lose an attributed fact. So
+    # their absence fails loudly here rather than quietly skipping the loop.
+    if extended and (spec_definition is None or collisions is None):
+        raise ValueError(
+            f"robot {slug!r} carries {len(extended)} extended_specs, which "
+            "require both `spec_definition` and `collisions`"
+        )
+
     specs = robot.get("specs", {})
     caveats = robot.get("spec_caveats")
     cols = ["slug", "manufacturer_id", "name", "model_code", "summary",
             "announced_year", "official_url", "spec_caveats",
             "commercial_status", "is_published"] + SPEC_COLUMNS
     vals = [
-        robot["slug"], manufacturer_id(robot["manufacturer_slug"]), robot["name"],
+        slug, manufacturer_id(robot["manufacturer_slug"]), robot["name"],
         robot.get("model_code"), robot.get("summary"), robot.get("announced_year"),
         # The maker's page for this model, and the per-field caveats explaining
         # UNKNOWNs/conflicts. Both were carried by the JSON and dropped for want
@@ -554,253 +1218,181 @@ def import_robot(cur, robot: dict, region_id, manufacturer_id,
     ] + [specs.get(c) for c in SPEC_COLUMNS]
 
     # On INSERT every column is written: a brand-new record has no editorial
-    # state to preserve. On UPDATE the editorial columns are held back.
+    # state to preserve. On UPDATE the editorial columns are held back. A row
+    # whose columns all already match is not rewritten at all.
     preserved = () if apply_publication_state else EDITORIAL_COLUMNS
-    placeholders = ",".join(["%s"] * len(cols))
-    updates = ",".join(
-        f"{c} = EXCLUDED.{c}" for c in cols if c != "slug" and c not in preserved
-    )
-    robot_id = cur.execute(
-        f"INSERT INTO robot ({','.join(cols)}) VALUES ({placeholders}) "
-        f"ON CONFLICT (slug) DO UPDATE SET {updates} RETURNING id",
-        vals,
-    ).fetchone()[0]
+    row = None
+    if not _refuse_blanking(cur, recon, "robot", "slug", cols, vals, skip=preserved):
+        row = _upsert(cur, "robot", "slug", cols, vals, skip=preserved)
+    if row is None:
+        robot_id = cur.execute("SELECT id FROM robot WHERE slug = %s", (slug,)).fetchone()[0]
+        robot_outcome = "unchanged"
+    else:
+        robot_id, robot_outcome = row[0], "inserted" if row[1] else "updated"
 
-    _reset_robot_children(cur, robot_id)
+    def reconcile(table, incoming, existing=None):
+        if existing is None:
+            existing = _load_existing(cur, table, "t.robot_id = %s", (robot_id,))
+        return reconcile_rows(cur, recon, table, slug, existing, incoming)
 
-    # Variants -> map slug to id for offers that target a variant.
-    variant_id: dict[str, object] = {}
-    for v in robot.get("variants", []):
-        vid = cur.execute(
-            """
-            INSERT INTO robot_variant (robot_id, slug, name, description, is_developer)
-            VALUES (%s,%s,%s,%s,%s)
-            ON CONFLICT (robot_id, slug) DO UPDATE SET
-                name = EXCLUDED.name, description = EXCLUDED.description,
-                is_developer = EXCLUDED.is_developer
-            RETURNING id
-            """,
-            (robot_id, v["slug"], v["name"], v.get("description"),
-             v.get("is_developer", False)),
-        ).fetchone()[0]
-        variant_id[v["slug"]] = vid
+    def reconcile_subject_evidence(subject_type, table, rows, incoming, got):
+        for r, (key, _), (subject_id, fresh) in zip(rows, incoming, got, strict=True):
+            parent = dict(zip(table.names, key, strict=True))
+            reconcile_evidence(cur, recon, slug, subject_type, subject_id,
+                               r.get("evidence", []), parent, fresh=fresh)
 
-    def vid_of(slug):
-        return variant_id.get(slug) if slug else None
+    # Variants first: their ids are what the variant-scoped rows below point at.
+    variants = robot.get("variants", [])
+    got = reconcile(T_VARIANT, [
+        ((v["slug"],), {"robot_id": robot_id, "slug": v["slug"], "name": v["name"],
+                        "description": v.get("description"),
+                        "is_developer": v.get("is_developer", False)})
+        for v in variants])
+    variant_id = {v["slug"]: r[0] for v, r in zip(variants, got, strict=True)}
 
-    # Commercial-status evidence (subject = the robot row).
-    for ev in robot.get("commercial_status_evidence", []):
-        insert_evidence(cur, "COMMERCIAL_STATUS", robot_id, ev)
-
-    # Pricing offers.
-    for po in robot.get("pricing_offers", []):
-        pid = cur.execute(
-            """
-            INSERT INTO pricing_offer
-                (robot_id, variant_id, provider_id, region_id, transaction_type,
-                 price_type, currency, price, price_min, price_max, billing_period,
-                 note, is_current, price_basis, shipping_terms, package_contents,
-                 warranty_terms, order_status_note, edition_confirmed, edition_note,
-                 condition)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-            RETURNING id
-            """,
-            (
-                robot_id, vid_of(po.get("variant_slug")),
-                _provider(cur, po.get("provider_slug")), region_id(po.get("region_code")),
-                po["transaction_type"], po["price_type"], po.get("currency", "USD"),
-                po.get("price"), po.get("price_min"), po.get("price_max"),
-                po.get("billing_period", "ONE_TIME"), po.get("note"),
-                # A retired offer keeps its row and its evidence; it simply stops
-                # being current. `edition_confirmed` stays tri-state: absent in the
-                # JSON means NOT ASSESSED (NULL), never "confirmed".
-                po.get("is_current", True),
-            ) + tuple(po.get(c) for c in PRICING_DETAIL_COLUMNS) + (_condition(po),),
-        ).fetchone()[0]
-        for ev in po.get("evidence", []):
-            insert_evidence(cur, "PRICING_OFFER", pid, ev)
-
-    # Availability offers.
-    for ao in robot.get("availability_offers", []):
-        aid = cur.execute(
-            """
-            INSERT INTO availability_offer
-                (robot_id, variant_id, provider_id, region_id, transaction_type,
-                 availability_status, available_from, lead_time_days, min_order_qty,
-                 note, is_current, seller_wording, delivery_estimate_label, condition)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-            RETURNING id
-            """,
-            (
-                robot_id, vid_of(ao.get("variant_slug")),
-                _provider(cur, ao.get("provider_slug")), region_id(ao.get("region_code")),
-                ao["transaction_type"], ao.get("availability_status", "ON_REQUEST"),
-                ao.get("available_from"), ao.get("lead_time_days"),
-                ao.get("min_order_qty"), ao.get("note"), ao.get("is_current", True),
-            ) + tuple(ao.get(c) for c in AVAILABILITY_DETAIL_COLUMNS) + (_condition(ao),),
-        ).fetchone()[0]
-        for ev in ao.get("evidence", []):
-            insert_evidence(cur, "AVAILABILITY_OFFER", aid, ev)
-
-    # Deployments.
-    for d in robot.get("deployments", []):
-        did = cur.execute(
-            """
-            INSERT INTO deployment
-                (robot_id, provider_id, customer_name, region_id, use_case_id,
-                 transaction_type, unit_count, contract_value, contract_currency,
-                 started_on, status, summary)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-            RETURNING id
-            """,
-            (
-                robot_id, _provider(cur, d.get("provider_slug")), d.get("customer_name"),
-                region_id(d.get("region_code")), use_case_id(d.get("use_case_slug")),
-                d.get("transaction_type"), d.get("unit_count"), d.get("contract_value"),
-                d.get("contract_currency"), d.get("started_on"), d.get("status"),
-                d.get("summary"),
-            ),
-        ).fetchone()[0]
-        for ev in d.get("evidence", []):
-            insert_evidence(cur, "DEPLOYMENT", did, ev)
-
-    # Verified product images (MEDIA-01). Provenance is mandatory and a synthesized
-    # identity image is categorically rejected — `source_type` must be a real-source
-    # enum value; GENERATED (or anything outside the enum) aborts the import rather
-    # than silently degrading. Display eligibility is decided at read time by
-    # identity_status + rights_status, never by the mere presence of image_url.
-    _ALLOWED_IMAGE_SOURCES = {
-        "MANUFACTURER", "PRESS_KIT", "DISTRIBUTOR", "EDITORIAL", "VIDEO_FRAME",
-    }
-    for im in robot.get("images", []):
-        src = im.get("source_type")
-        if src not in _ALLOWED_IMAGE_SOURCES:
-            raise ValueError(
-                f"robot {robot['slug']!r}: illegal image source_type {src!r} "
-                f"(MEDIA-01 forbids generated/synthesized identity imagery; "
-                f"allowed: {sorted(_ALLOWED_IMAGE_SOURCES)})"
-            )
-        cur.execute(
-            """
-            INSERT INTO robot_image
-                (robot_id, image_url, source_url, source_name, source_type, image_type,
-                 identity_status, rights_status, usage_basis, is_official, is_primary,
-                 attribution, is_representative, representative_note,
-                 display_approved_by, display_approved_at, captured_at, last_verified_at)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-            """,
-            (
-                robot_id, im["image_url"], im.get("source_url"), im.get("source_name"),
-                src, im.get("image_type", "FRONT"),
-                im.get("identity_status", "UNVERIFIED"),
-                im.get("rights_status", "UNKNOWN"),
-                im.get("usage_basis", "NONE"),
-                im.get("is_official", False), im.get("is_primary", False),
-                im.get("attribution"),
-                im.get("is_representative", False), im.get("representative_note"),
-                im.get("display_approved_by"), im.get("display_approved_at"),
-                im.get("captured_at"), im.get("last_verified_at"),
-            ),
-        )
-
-    # Capabilities.
-    for c in robot.get("capabilities", []):
-        cur.execute(
-            """
-            INSERT INTO robot_capability (robot_id, capability_id, supported, detail)
-            VALUES (%s,%s,%s,%s)
-            ON CONFLICT (robot_id, capability_id) DO UPDATE SET
-                supported = EXCLUDED.supported, detail = EXCLUDED.detail
-            """,
-            (robot_id, capability_id(c["slug"]), c.get("supported", True), c.get("detail")),
-        )
-
-    # Use-case fits (subjective fits carry LOW/MEDIUM confidence in the JSON note).
-    for f in robot.get("use_case_fits", []):
-        cur.execute(
-            """
-            INSERT INTO use_case_fit
-                (robot_id, use_case_id, fit_score, is_primary,
-                 commercial_readiness, notes, limitations)
-            VALUES (%s,%s,%s,%s,%s,%s,%s)
-            ON CONFLICT (robot_id, use_case_id) DO UPDATE SET
-                fit_score = EXCLUDED.fit_score, is_primary = EXCLUDED.is_primary,
-                commercial_readiness = EXCLUDED.commercial_readiness,
-                notes = EXCLUDED.notes, limitations = EXCLUDED.limitations
-            """,
-            (robot_id, use_case_id(f["use_case_slug"]), f.get("fit_score"),
-             f.get("is_primary", False), f.get("commercial_readiness"),
-             f.get("notes"), f.get("limitations")),
-        )
+    def vid_of(variant_slug):
+        return variant_id[variant_slug] if variant_slug else None
 
     # Long-tail specs. Each carries its own attribution and edition scope: these
     # values have no evidence_source row (they are descriptive, not commercial
     # facts), so provenance travels with the value or it does not exist at all.
-    # `spec_definition`/`collisions` default to None so a caller inspecting the
-    # robot upsert alone (the publication-state tests do exactly this) need not
-    # build a definition registry. They become required the moment there is
-    # actually a long-tail spec to write: writing one without a registry is
-    # impossible, and silently DROPPING it would lose an attributed fact. So
-    # their absence fails loudly here rather than quietly skipping the loop.
-    extended = robot.get("extended_specs", [])
-    if extended and (spec_definition is None or collisions is None):
-        raise ValueError(
-            f"robot {robot['slug']!r} carries {len(extended)} extended_specs, which "
-            "require both `spec_definition` and `collisions`"
-        )
+    # `specification` is NOT wholly owned here: the seed and hand authoring write
+    # rows to the same table. Only this importer's own rows are reconciled; a row
+    # of anyone else's occupying a key is preserved and reported, never overwritten.
+    spec_rows = _load_existing(cur, T_SPEC, "t.robot_id = %s", (robot_id,))
+    foreign = {r.key: r.peek["managed_by"] for r in spec_rows
+               if r.peek["managed_by"] != MANAGED_BY}
+    incoming = []
     for x in extended:
-        definition_id, value_type = spec_definition(x["key"])
-        # An extended spec may identify ONE of this robot's own variants (G2-3, DR-A5):
-        # `variant_slug` resolves through the variants written above. Absent or null it
-        # is a product-level spec, exactly as before. An unknown slug fails loudly, never
-        # silently widening a variant-scoped fact to the whole product.
-        spec_variant_slug = x.get("variant_slug")
-        spec_variant_id = None
-        if spec_variant_slug is not None:
-            spec_variant_id = variant_id.get(spec_variant_slug)
-            if spec_variant_id is None:
-                raise SystemExit(
-                    f"robot {robot['slug']!r}: extended spec {x['key']!r} names variant "
-                    f"{spec_variant_slug!r}, which is not one of its variants"
-                )
-        existing = cur.execute(
-            """
-            SELECT coalesce(managed_by, 'seed/hand-authored') FROM specification
-            WHERE robot_id = %s AND variant_id IS NOT DISTINCT FROM %s AND definition_id = %s
-            """,
-            (robot_id, spec_variant_id, definition_id),
-        ).fetchone()
-        if existing is not None:
-            # Our own rows were deleted above, so anything still here belongs to
-            # someone else and occupies this logical key. Preserve it and report:
-            # deleting only our rows is not enough if the insert then overwrites.
+        key = _spec_key(x)
+        if key in foreign:
             collisions.append(
-                f"robot {robot['slug']!r}: specification {x['key']!r} already exists "
-                f"and is owned by {existing[0]} — the catalogue value was skipped, "
+                f"robot {slug!r}: specification {x['key']!r} already exists "
+                f"and is owned by {foreign[key]} — the catalogue value was skipped, "
                 f"the existing row preserved"
             )
             continue
+        definition_id, value_type = spec_definition(x["key"])
         value = x.get("value")
-        cur.execute(
-            """
-            INSERT INTO specification
-                (robot_id, variant_id, definition_id, value_number, value_bool,
-                 value_text, unit, managed_by, source_label, source_url, source_kind,
-                 edition_scope, observed_at)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-            """,
-            (
-                robot_id, spec_variant_id, definition_id,
-                value if value_type == "NUMBER" else None,
-                value if value_type == "BOOLEAN" else None,
-                value if value_type == "TEXT" else None,
-                x.get("unit"), MANAGED_BY, x.get("source_label"), x.get("source_url"),
-                x.get("source_kind"), x.get("edition_scope"), x.get("observed_at"),
-            ),
-        )
+        incoming.append((key, {
+            "robot_id": robot_id, "variant_id": vid_of(x.get("variant_slug")),
+            "definition_id": definition_id,
+            "value_number": value if value_type == "NUMBER" else None,
+            "value_bool": value if value_type == "BOOLEAN" else None,
+            "value_text": value if value_type == "TEXT" else None,
+            "unit": x.get("unit"), "managed_by": MANAGED_BY,
+            "source_label": x.get("source_label"), "source_url": x.get("source_url"),
+            "source_kind": x.get("source_kind"), "edition_scope": x.get("edition_scope"),
+            "observed_at": x.get("observed_at"),
+        }))
+    reconcile(T_SPEC, incoming,
+              existing=[r for r in spec_rows if r.peek["managed_by"] == MANAGED_BY])
+
+    # Pricing offers. A retired offer keeps its row and its evidence; it simply stops
+    # being current (is_current is not part of the key). `edition_confirmed` stays
+    # tri-state: absent in the JSON means NOT ASSESSED (NULL), never "confirmed".
+    pricing = robot.get("pricing_offers", [])
+    incoming = [(_offer_key(po), {
+        "robot_id": robot_id, "variant_id": vid_of(po.get("variant_slug")),
+        "provider_id": _provider(cur, po.get("provider_slug")),
+        "region_id": region_id(po.get("region_code")),
+        "transaction_type": po["transaction_type"], "price_type": po["price_type"],
+        "currency": po.get("currency", "USD"), "price": po.get("price"),
+        "price_min": po.get("price_min"), "price_max": po.get("price_max"),
+        "billing_period": po.get("billing_period", "ONE_TIME"), "note": po.get("note"),
+        "is_current": po.get("is_current", True),
+        **{c: po.get(c) for c in PRICING_DETAIL_COLUMNS},
+        "condition": _condition(po),
+    }) for po in pricing]
+    got = reconcile(T_PRICING, incoming)
+    reconcile_subject_evidence("PRICING_OFFER", T_PRICING, pricing, incoming, got)
+
+    # Availability offers.
+    availability = robot.get("availability_offers", [])
+    incoming = [(_offer_key(ao), {
+        "robot_id": robot_id, "variant_id": vid_of(ao.get("variant_slug")),
+        "provider_id": _provider(cur, ao.get("provider_slug")),
+        "region_id": region_id(ao.get("region_code")),
+        "transaction_type": ao["transaction_type"],
+        "availability_status": ao.get("availability_status", "ON_REQUEST"),
+        "available_from": ao.get("available_from"), "lead_time_days": ao.get("lead_time_days"),
+        "min_order_qty": ao.get("min_order_qty"), "note": ao.get("note"),
+        "is_current": ao.get("is_current", True),
+        **{c: ao.get(c) for c in AVAILABILITY_DETAIL_COLUMNS},
+        "condition": _condition(ao),
+    }) for ao in availability]
+    got = reconcile(T_AVAILABILITY, incoming)
+    reconcile_subject_evidence("AVAILABILITY_OFFER", T_AVAILABILITY, availability, incoming, got)
+
+    # Deployments have no inferred identity (owner decision D2).
+    reconcile_deployments(cur, recon, slug, robot_id, robot.get("deployments", []),
+                          region_id, use_case_id)
+
+    # Verified product images (MEDIA-01; see _ALLOWED_IMAGE_SOURCES).
+    incoming = []
+    for im in robot.get("images", []):
+        src = im.get("source_type")
+        if src not in _ALLOWED_IMAGE_SOURCES:
+            raise ValueError(
+                f"robot {slug!r}: illegal image source_type {src!r} "
+                f"(MEDIA-01 forbids generated/synthesized identity imagery; "
+                f"allowed: {sorted(_ALLOWED_IMAGE_SOURCES)})"
+            )
+        incoming.append(((im["image_url"],), {
+            "robot_id": robot_id, "image_url": im["image_url"],
+            "source_url": im.get("source_url"), "source_name": im.get("source_name"),
+            "source_type": src, "image_type": im.get("image_type", "FRONT"),
+            "identity_status": im.get("identity_status", "UNVERIFIED"),
+            "rights_status": im.get("rights_status", "UNKNOWN"),
+            "usage_basis": im.get("usage_basis", "NONE"),
+            "is_official": im.get("is_official", False),
+            "is_primary": im.get("is_primary", False), "attribution": im.get("attribution"),
+            "is_representative": im.get("is_representative", False),
+            "representative_note": im.get("representative_note"),
+            "display_approved_by": im.get("display_approved_by"),
+            "display_approved_at": im.get("display_approved_at"),
+            "captured_at": im.get("captured_at"), "last_verified_at": im.get("last_verified_at"),
+        }))
+    images = _load_existing(cur, T_IMAGE, "t.robot_id = %s", (robot_id,))
+    # At most one primary image per robot (uq_robot_image_primary). Clear an old primary
+    # that is leaving before the new one is set; rows that stay are updated non-primary
+    # first, so the index can never fire.
+    incoming_keys = {k for k, _ in incoming}
+    if any(v["is_primary"] for _, v in incoming):
+        for old in images:
+            if old.peek["is_primary"] and old.key not in incoming_keys:
+                cur.execute("UPDATE robot_image SET is_primary = false WHERE id = %s",
+                            (old.row_id,))
+    reconcile(T_IMAGE, sorted(incoming, key=lambda kv: kv[1]["is_primary"]), existing=images)
+
+    # Capabilities.
+    reconcile(T_CAPABILITY, [
+        ((c["slug"],), {"robot_id": robot_id, "capability_id": capability_id(c["slug"]),
+                        "supported": c.get("supported", True), "detail": c.get("detail")})
+        for c in robot.get("capabilities", [])])
+
+    # Use-case fits (subjective fits carry LOW/MEDIUM confidence in the JSON note).
+    reconcile(T_FIT, [
+        ((f["use_case_slug"],), {
+            "robot_id": robot_id, "use_case_id": use_case_id(f["use_case_slug"]),
+            "fit_score": f.get("fit_score"), "is_primary": f.get("is_primary", False),
+            "commercial_readiness": f.get("commercial_readiness"),
+            "notes": f.get("notes"), "limitations": f.get("limitations")})
+        for f in robot.get("use_case_fits", [])])
+
+    # Commercial-status evidence (subject = the robot row).
+    reconcile_evidence(cur, recon, slug, "COMMERCIAL_STATUS", robot_id,
+                       robot.get("commercial_status_evidence", []), {})
+
+    # Authorized removals run last, after every insert and update.
+    apply_removals(cur, recon)
 
     # Denormalised lowest purchase price cache (source of truth stays pricing_offer).
-    _refresh_lowest_price(cur, robot_id)
+    if _refresh_lowest_price(cur, robot_id) and robot_outcome == "unchanged":
+        robot_outcome = "updated"
+    recon.count("robot", robot_outcome)
+    if own:
+        recon.finish()
 
 
 def _provider(cur, slug):
@@ -812,9 +1404,10 @@ def _provider(cur, slug):
     return row[0]
 
 
-def _refresh_lowest_price(cur, robot_id) -> None:
+def _refresh_lowest_price(cur, robot_id) -> bool:
     """Set robot.lowest_purchase_price to the cheapest current PUBLIC/FROM PURCHASE
-    point price, else NULL. Denormalised cache only (schema comment)."""
+    point price, else NULL. Denormalised cache only (schema comment). Writes only when
+    the cached value or currency actually changes; returns whether it did."""
     row = cur.execute(
         """
         SELECT price, currency FROM pricing_offer
@@ -831,16 +1424,18 @@ def _refresh_lowest_price(cur, robot_id) -> None:
         """,
         (robot_id,),
     ).fetchone()
-    if row:
-        cur.execute(
-            "UPDATE robot SET lowest_purchase_price=%s, lowest_price_currency=%s WHERE id=%s",
-            (row[0], row[1], robot_id),
-        )
-    else:
-        cur.execute(
-            "UPDATE robot SET lowest_purchase_price=NULL, lowest_price_currency=NULL WHERE id=%s",
-            (robot_id,),
-        )
+    wanted = (row[0], row[1]) if row else (None, None)
+    cached = cur.execute(
+        "SELECT lowest_purchase_price, lowest_price_currency FROM robot WHERE id = %s",
+        (robot_id,),
+    ).fetchone()
+    if tuple(cached[:2]) == wanted:
+        return False
+    cur.execute(
+        "UPDATE robot SET lowest_purchase_price=%s, lowest_price_currency=%s WHERE id=%s",
+        (*wanted, robot_id),
+    )
+    return True
 
 
 class UnknownSlugs(SystemExit):
@@ -965,7 +1560,11 @@ def _check_publication_transitions(cur, loaded: list[dict], was_published: dict)
 
 
 def run(url: str, *, apply_publication_state: bool = False,
-        only: set[str] | None = None) -> None:
+        only: set[str] | None = None, authorize=None) -> Reconciliation:
+    """Import the catalogue (or the `only` robots) in ONE transaction and return the
+    reconciliation (its counters). `authorize` is an Authorization, an entries document
+    or an `--authorize` file path; the default authorizes nothing."""
+    recon = Reconciliation(authorize)
     regions = _load(CATALOGUE_DIR / "regions.json")
     providers = _load(CATALOGUE_DIR / "providers.json")
     capabilities = _load(CATALOGUE_DIR / "capabilities.json")
@@ -977,6 +1576,13 @@ def run(url: str, *, apply_publication_state: bool = False,
     # written, and the filter is applied before any robot or child-row mutation.
     robot_files = select_robot_files(only)
     loaded = [_load(p) for p in robot_files]
+    # Ambiguity in the JSON itself (a natural key given twice) aborts before anything
+    # is written, and before a connection is opened.
+    problems = manufacturer_key_problems(manufacturers) + [
+        line for robot in loaded for line in incoming_problems(robot)]
+    if problems:
+        raise ReconcileRefused(
+            "IMPORT REFUSED - nothing was written:\n  " + "\n  ".join(problems))
 
     if only is not None:
         deps = scoped_dependencies(loaded, regions)
@@ -1052,12 +1658,12 @@ def run(url: str, *, apply_publication_state: bool = False,
 
             collisions: list[str] = []
 
-            import_regions(cur, regions)
-            manufacturer_totals = import_manufacturers(cur, manufacturers, region_id)
-            import_providers(cur, providers, region_id, manufacturer_id)
-            import_capabilities(cur, capabilities)
-            import_use_cases(cur, use_cases)
-            import_spec_definitions(cur, spec_definitions, collisions)
+            import_regions(cur, regions, recon)
+            manufacturer_totals = import_manufacturers(cur, manufacturers, region_id, recon)
+            import_providers(cur, providers, region_id, manufacturer_id, recon)
+            import_capabilities(cur, capabilities, recon)
+            import_use_cases(cur, use_cases, recon)
+            import_spec_definitions(cur, spec_definitions, collisions, recon)
 
             # G4-3: which robots are about to go from NOT published to published? Captured BEFORE
             # the import so the transition is judged against what the public sees today.
@@ -1070,8 +1676,12 @@ def run(url: str, *, apply_publication_state: bool = False,
             for robot in loaded:
                 import_robot(cur, robot, region_id, manufacturer_id,
                              capability_id, use_case_id, spec_definition, collisions,
-                             apply_publication_state=apply_publication_state)
+                             apply_publication_state=apply_publication_state, recon=recon)
                 n_robots += 1
+
+            # Refusals and unused authorizations abort here, inside the transaction:
+            # nothing above is committed.
+            recon.finish()
 
             if apply_publication_state:
                 _check_publication_transitions(cur, loaded, was_published)
@@ -1101,13 +1711,16 @@ def run(url: str, *, apply_publication_state: bool = False,
         print(f"{EVIDENCE_COLLISION_LABEL}: {line}")
     if apply_publication_state:
         print("Publication state was REWRITTEN from JSON (--apply-publication-state).")
+    print(recon.summary())
+    return recon
 
 
 class ManufacturerImportAborted(SystemExit):
     """`--manufacturers-only` refused before writing anything."""
 
 
-def run_manufacturers_only(url: str, *, manufacturers_path: Path | None = None) -> dict:
+def run_manufacturers_only(url: str, *, manufacturers_path: Path | None = None,
+                           authorize=None) -> dict:
     """Import ONLY manufacturer profiles and their company-level evidence.
 
     Reads `manufacturers.json` and nothing else. No robot file is opened, and no
@@ -1122,7 +1735,8 @@ def run_manufacturers_only(url: str, *, manufacturers_path: Path | None = None) 
     """
     path = manufacturers_path or CATALOGUE_DIR / "manufacturers.json"
     manufacturers = _load(path)
-    errors = validate_manufacturer_profiles(manufacturers)
+    errors = validate_manufacturer_profiles(manufacturers) + manufacturer_key_problems(
+        manufacturers)
     if errors:
         raise ManufacturerImportAborted(
             "manufacturer-only import refused before writing — "
@@ -1143,9 +1757,11 @@ def run_manufacturers_only(url: str, *, manufacturers_path: Path | None = None) 
                     f"not in the database: {', '.join(missing)}. This mode does not "
                     "write regions; load them through the catalogue import first."
                 )
+            recon = Reconciliation(authorize)
             totals = import_manufacturers(
-                cur, manufacturers, lambda code: regions[code] if code else None
+                cur, manufacturers, lambda code: regions[code] if code else None, recon
             )
+            recon.finish()
             preserved = cur.execute(
                 "SELECT count(*) FROM evidence_source "
                 "WHERE subject_type='MANUFACTURER' AND managed_by IS DISTINCT FROM %s",
@@ -1156,13 +1772,15 @@ def run_manufacturers_only(url: str, *, manufacturers_path: Path | None = None) 
     totals["preserved"] = preserved
     print(f"MANUFACTURER-ONLY IMPORT OK: {totals['manufacturers']} "
           "manufacturer profile(s) upserted.")
-    print(f"Company evidence: {totals['inserted']} catalogue-managed row(s) written, "
-          f"{totals['removed']} previous catalogue-managed row(s) replaced, "
+    print(f"Company evidence: {totals['inserted']} catalogue-managed row(s) inserted, "
+          f"{totals['updated']} updated in place, {totals['unchanged']} unchanged, "
+          f"{totals['removed']} removed (authorized), "
           f"{preserved} unmarked row(s) preserved, "
           f"{len(totals['collisions'])} collision(s) with unmarked rows.")
     # Reported, never resolved here: content cannot show who wrote an unmarked row.
     for line in totals["collisions"]:
         print(f"{EVIDENCE_COLLISION_LABEL}: {line}")
+    print(recon.summary())
     print("Robot records, publication state and robot-level evidence were not read or written.")
     return totals
 
@@ -1199,6 +1817,16 @@ def main(argv: list[str] | None = None) -> None:
              "in one transaction. Cannot be combined with --only or "
              "--apply-publication-state.",
     )
+    ap.add_argument(
+        "--authorize",
+        metavar="PATH",
+        help="JSON file of changes the importer may make beyond inserting and updating "
+             "rows by natural key: {\"version\": 1, \"entries\": [{\"action\": "
+             "\"remove\" | \"update_evidence\" | \"clear\", \"table\": ..., "
+             "\"robot\": ..., \"key\": {...}, \"column\": ...}]}. A refused run prints "
+             "the exact entries that would permit it. Nothing is authorized by default, "
+             "and an entry that matches nothing aborts the run.",
+    )
     args = ap.parse_args(argv)
     if args.manufacturers_only:
         conflicts = [flag for flag, given in (
@@ -1210,7 +1838,7 @@ def main(argv: list[str] | None = None) -> None:
     if not args.database_url:
         ap.error("no database URL: pass --database-url or set DATABASE_URL")
     if args.manufacturers_only:
-        run_manufacturers_only(normalize_url(args.database_url))
+        run_manufacturers_only(normalize_url(args.database_url), authorize=args.authorize)
         return
     only = None
     if args.only:
@@ -1218,7 +1846,7 @@ def main(argv: list[str] | None = None) -> None:
         if not only:
             ap.error("--only was given with no slugs")
     run(normalize_url(args.database_url), only=only,
-        apply_publication_state=args.apply_publication_state)
+        apply_publication_state=args.apply_publication_state, authorize=args.authorize)
 
 
 if __name__ == "__main__":

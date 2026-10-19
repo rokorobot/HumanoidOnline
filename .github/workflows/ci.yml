@@ -106,6 +106,11 @@ jobs:
       - name: Test
         working-directory: apps/api
         run: uv run pytest
+      # Importer Hardening Phase 0: a read-only report, not a gate (yet).
+      - name: Catalogue integrity report (read-only, non-gating)
+        working-directory: apps/api
+        continue-on-error: true
+        run: uv run python -m app.cli.audit_integrity
 
   web-build:
     name: Frontend (Next.js build + tests)

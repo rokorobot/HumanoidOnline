@@ -374,17 +374,28 @@ def test_derived_preflight_manifest_matches_the_items(world):  # noqa: F811
 # ------------------------------------------------------------------------- workflows ------
 
 
-def _workflow(name):
-    from pathlib import Path
+REPO_ROOT = __import__("pathlib").Path(__file__).resolve().parents[3]
+PROPOSAL = REPO_ROOT / "docs" / "discovery" / "promotion_executor_proposal"
 
+
+def _workflow(name, folder=None):
     import yaml
 
-    path = Path(__file__).resolve().parents[3] / ".github" / "workflows" / name
+    path = (folder or REPO_ROOT / ".github" / "workflows") / name
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
-def test_promotion_workflow_is_inert_unless_enabled_and_single_flight():
-    wf = _workflow("catalogue-promotion.yml")
+def test_no_production_promotion_workflow_is_installed():
+    """Owner decision D5: GitHub Actions has no production write access. The executor
+    workflow exists only as a proposal outside .github/workflows, so GitHub never runs it."""
+    assert not (REPO_ROOT / ".github" / "workflows" / "catalogue-promotion.yml").exists()
+    for wf in (REPO_ROOT / ".github" / "workflows").glob("*.yml"):
+        text = wf.read_text(encoding="utf-8")
+        assert "CATALOGUE_DATABASE_URL" not in text and "promotion execute" not in text, wf.name
+
+
+def test_proposed_promotion_workflow_is_inert_unless_enabled_and_single_flight():
+    wf = _workflow("catalogue-promotion.yml", PROPOSAL)
     triggers = wf.get("on", wf.get(True))
     assert set(triggers) == {"push", "workflow_dispatch"}                  # no schedule
     assert triggers["push"]["branches"] == ["main"]

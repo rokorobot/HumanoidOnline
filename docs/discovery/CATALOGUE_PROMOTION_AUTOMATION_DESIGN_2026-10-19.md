@@ -1,9 +1,15 @@
 # Catalogue promotion automation: design (Workstream B)
 
-**Status: DESIGN + implementation in a draft PR. Not activated.** This builds on PR A (the
-stable-ID importer). The workflow does nothing until the owner sets the repository variable
-`CATALOGUE_PROMOTION_ENABLED=true` and provisions its environment, and that only happens after
-PR A is approved and deployed.
+**Status: DESIGN + implementation in a draft PR. Not activated, and no executor is installed.**
+It builds on PR A (the stable-ID importer). Owner decision D5
+(`AUTOMATED_COMMERCIAL_INTELLIGENCE_PIPELINE_2026-10-19.md`) gives GitHub Actions no production
+write access. The executor is therefore code only:
+- the CLI `promotion execute`;
+- its draft workflow and role, kept in `promotion_executor_proposal/`;
+- the permissions and recovery proposal, in `PROMOTION_EXECUTOR_SECURITY_PROPOSAL_2026-10-19.md`.
+
+The CI `promotion verify` step, which gates PRs carrying a manifest, is installed. Where this
+document says "the workflow", read "the executor, once D5 is decided".
 
 ## 1. Flow and the single approval
 

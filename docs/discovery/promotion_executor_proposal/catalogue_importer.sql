@@ -1,3 +1,6 @@
+-- PROPOSAL ONLY (owner decision D5, 2026-10-19): GitHub Actions is NOT authorized to write to
+-- production. This file lives outside .github/workflows and db/roles so that nothing runs or
+-- applies it. See ../PROMOTION_EXECUTOR_SECURITY_PROPOSAL_2026-10-19.md.
 -- catalogue_importer - PROPOSED least-privilege database role for the approved catalogue
 -- promotion workflow (docs/discovery/CATALOGUE_PROMOTION_AUTOMATION_DESIGN_2026-10-19.md,
 -- section 5). THIS FILE IS A PROPOSAL: nothing applies it, and nothing in the repository

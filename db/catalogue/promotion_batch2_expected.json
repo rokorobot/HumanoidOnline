@@ -1,0 +1,125 @@
+{
+  "_comment": "A4 catalogue promotion batch 2 (Booster K1, 2026-10-19): expected business changes for `import_catalogue.py --only booster-k1-geek --only booster-k1-educational --only booster-k1-professional`. 15 edition-scoped manufacturer specifications ADDED; nothing else. The six conflicting walk-speed / runtime claims stay blocked (promotion_batch2_k1_draft.json).",
+  "expected": [
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-geek",
+        "definition": "compute_ai"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-geek",
+        "definition": "peak_joint_torque_nm"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-geek",
+        "definition": "manufacturer_warranty_months"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-geek",
+        "definition": "cameras"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-geek",
+        "definition": "audio"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-educational",
+        "definition": "compute_ai"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-educational",
+        "definition": "peak_joint_torque_nm"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-educational",
+        "definition": "manufacturer_warranty_months"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-educational",
+        "definition": "cameras"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-educational",
+        "definition": "audio"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-professional",
+        "definition": "compute_ai"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-professional",
+        "definition": "peak_joint_torque_nm"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-professional",
+        "definition": "manufacturer_warranty_months"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-professional",
+        "definition": "cameras"
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-professional",
+        "definition": "audio"
+      }
+    }
+  ]
+}

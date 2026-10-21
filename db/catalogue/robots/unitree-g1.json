@@ -304,6 +304,51 @@
       "source_kind": "MANUFACTURER",
       "edition_scope": "THIS_EDITION",
       "observed_at": "2026-10-18"
+    },
+    {
+      "key": "joint_breakdown",
+      "value": "6 per leg, 5 per arm, 1 waist — 23 body joints",
+      "source_label": "Unitree Robotics official page, G1 column; discovery claim ef475514 (verbatim: '6')",
+      "source_url": "https://www.unitree.com/g1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "swappable_battery",
+      "value": true,
+      "source_label": "Unitree Robotics official page, G1 column; discovery claim e33ad443 (verbatim: '9000mAh')",
+      "source_url": "https://www.unitree.com/g1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "connectivity",
+      "value": "Wi-Fi 6, Bluetooth 5.2",
+      "source_label": "Unitree Robotics official page, G1 column; discovery claim e08e492c (verbatim: 'YES')",
+      "source_url": "https://www.unitree.com/g1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "audio",
+      "value": "4-microphone array + 5 W speaker",
+      "source_label": "Unitree Robotics official page, G1 column; discovery claim e3ce8fc0 (verbatim: 'YES')",
+      "source_url": "https://www.unitree.com/g1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
+    },
+    {
+      "key": "ota_updates",
+      "value": true,
+      "source_label": "Unitree Robotics official page, G1 column; discovery claim 6c1d6536 (verbatim: 'YES')",
+      "source_url": "https://www.unitree.com/g1",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-18"
     }
   ]
 }

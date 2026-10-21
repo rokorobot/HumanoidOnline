@@ -1,0 +1,209 @@
+{
+  "manifest_version": 1,
+  "promotion_id": "2026-10-21-unitree-g1-basic-specs",
+  "base": {
+    "catalogue_commit": "efd81436af751a6d1a59193bc33956a66c06b557",
+    "robot_fingerprints": {
+      "unitree-g1": "6208cf652d173c697cb9e741abd5740addbfe67c90551470509a824d6c3a2f4d"
+    }
+  },
+  "scope": {
+    "robots": [
+      "unitree-g1"
+    ],
+    "allowed_tables": [
+      "specification"
+    ],
+    "edition_map": {
+      "unitree-g1": "G1"
+    }
+  },
+  "items": [
+    {
+      "robot": "unitree-g1",
+      "edition": "G1",
+      "variant_slug": null,
+      "field": "extended_specs.joint_breakdown",
+      "definition": "joint_breakdown",
+      "unit": null,
+      "existing_value": null,
+      "proposed_value": "6 per leg, 5 per arm, 1 waist — 23 body joints",
+      "claim_value": "6",
+      "interpretation": "Combined from three rows of the page's G1 column: Single Leg Degrees of Freedom '6' (claim ef475514), Single Arm Degrees of Freedom '5' (claim f7d5f1d2), Waist Degrees of Freedom '1' (claim ff4692a0); sums to the catalogue's 23 DoF. Single Hand Degrees of Freedom is '/' and is not included.",
+      "claim_id": "ef475514-f437-4a3b-baea-be7e8ed3b996",
+      "claim_field_key": "unitree.spec[G1]/Mechanical Dimensions/Single Leg Degrees of Freedom",
+      "source_label": "Unitree Robotics official page, G1 column; discovery claim ef475514 (verbatim: '6')",
+      "source_url": "https://www.unitree.com/g1",
+      "observed_at": "2026-10-18",
+      "content_hash": "e1a93cd0bd136246fe74f0fa968302d3a27aa1f0b46e0ce2e1c004eaf0b716a8",
+      "evidence_locator": "",
+      "evidence_class": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "confidence": "HIGH",
+      "classification": "ROUTINE",
+      "reasons": [],
+      "conflict": "NONE",
+      "expected_change": {
+        "table": "specification",
+        "kind": "ADDED",
+        "match": {
+          "robot": "unitree-g1",
+          "definition": "joint_breakdown"
+        }
+      },
+      "display": "Robot detail spec table: 'Joint breakdown: 6 per leg, 5 per arm, 1 waist — 23 body joints', with source",
+      "compare_peer": "booster-t2-education"
+    },
+    {
+      "robot": "unitree-g1",
+      "edition": "G1",
+      "variant_slug": null,
+      "field": "extended_specs.swappable_battery",
+      "definition": "swappable_battery",
+      "unit": null,
+      "existing_value": null,
+      "proposed_value": true,
+      "claim_value": "9000mAh",
+      "interpretation": "Row 'Smart Battery (Quick Release)' states '9000mAh' for the G1 column: the battery is quick-release. Only the quick-release fact is recorded; the 9000 mAh capacity is not added because battery_pack already holds a value (a change, not an addition).",
+      "claim_id": "e33ad443-a121-4081-bbbc-f0e9545e8602",
+      "claim_field_key": "unitree.spec[G1]/Accessories/Smart Battery (Quick Release)",
+      "source_label": "Unitree Robotics official page, G1 column; discovery claim e33ad443 (verbatim: '9000mAh')",
+      "source_url": "https://www.unitree.com/g1",
+      "observed_at": "2026-10-18",
+      "content_hash": "e1a93cd0bd136246fe74f0fa968302d3a27aa1f0b46e0ce2e1c004eaf0b716a8",
+      "evidence_locator": "",
+      "evidence_class": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "confidence": "HIGH",
+      "classification": "ROUTINE",
+      "reasons": [],
+      "conflict": "NONE",
+      "expected_change": {
+        "table": "specification",
+        "kind": "ADDED",
+        "match": {
+          "robot": "unitree-g1",
+          "definition": "swappable_battery"
+        }
+      },
+      "display": "Robot detail spec table: 'Swappable battery: Yes', with source",
+      "compare_peer": "unitree-h2"
+    },
+    {
+      "robot": "unitree-g1",
+      "edition": "G1",
+      "variant_slug": null,
+      "field": "extended_specs.connectivity",
+      "definition": "connectivity",
+      "unit": null,
+      "existing_value": null,
+      "proposed_value": "Wi-Fi 6, Bluetooth 5.2",
+      "claim_value": "YES",
+      "interpretation": "The page's row label is 'WiFi 6 、Bluetooth 5.2' and the G1 cell is 'YES'; the value is the confirmed row label.",
+      "claim_id": "e08e492c-6f8c-46d7-aa0a-01066f206d43",
+      "claim_field_key": "unitree.spec[G1]/Electrical Characteristics/WiFi 6 、Bluetooth 5.2",
+      "source_label": "Unitree Robotics official page, G1 column; discovery claim e08e492c (verbatim: 'YES')",
+      "source_url": "https://www.unitree.com/g1",
+      "observed_at": "2026-10-18",
+      "content_hash": "e1a93cd0bd136246fe74f0fa968302d3a27aa1f0b46e0ce2e1c004eaf0b716a8",
+      "evidence_locator": "",
+      "evidence_class": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "confidence": "HIGH",
+      "classification": "ROUTINE",
+      "reasons": [],
+      "conflict": "NONE",
+      "expected_change": {
+        "table": "specification",
+        "kind": "ADDED",
+        "match": {
+          "robot": "unitree-g1",
+          "definition": "connectivity"
+        }
+      },
+      "display": "Robot detail spec table: 'Connectivity: Wi-Fi 6, Bluetooth 5.2', with source",
+      "compare_peer": "booster-t2-education"
+    },
+    {
+      "robot": "unitree-g1",
+      "edition": "G1",
+      "variant_slug": null,
+      "field": "extended_specs.audio",
+      "definition": "audio",
+      "unit": null,
+      "existing_value": null,
+      "proposed_value": "4-microphone array + 5 W speaker",
+      "claim_value": "YES",
+      "interpretation": "Two rows of the G1 column, each 'YES': '4 Microphone Array' (claim e3ce8fc0) and '5W Speaker' (claim cf5c96ad); the value is the confirmed row labels.",
+      "claim_id": "e3ce8fc0-80f7-4911-8d3d-17ee6928f04b",
+      "claim_field_key": "unitree.spec[G1]/Electrical Characteristics/4 Microphone Array",
+      "source_label": "Unitree Robotics official page, G1 column; discovery claim e3ce8fc0 (verbatim: 'YES')",
+      "source_url": "https://www.unitree.com/g1",
+      "observed_at": "2026-10-18",
+      "content_hash": "e1a93cd0bd136246fe74f0fa968302d3a27aa1f0b46e0ce2e1c004eaf0b716a8",
+      "evidence_locator": "",
+      "evidence_class": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "confidence": "HIGH",
+      "classification": "ROUTINE",
+      "reasons": [],
+      "conflict": "NONE",
+      "expected_change": {
+        "table": "specification",
+        "kind": "ADDED",
+        "match": {
+          "robot": "unitree-g1",
+          "definition": "audio"
+        }
+      },
+      "display": "Robot detail spec table: 'Audio: 4-microphone array + 5 W speaker', with source",
+      "compare_peer": "booster-k1-educational"
+    },
+    {
+      "robot": "unitree-g1",
+      "edition": "G1",
+      "variant_slug": null,
+      "field": "extended_specs.ota_updates",
+      "definition": "ota_updates",
+      "unit": null,
+      "existing_value": null,
+      "proposed_value": true,
+      "claim_value": "YES",
+      "interpretation": "Row 'Upgraded Intelligent OTA' is 'YES' for the G1 column.",
+      "claim_id": "6c1d6536-5dc7-47ce-a72f-d894560c9d83",
+      "claim_field_key": "unitree.spec[G1]/Other/Upgraded Intelligent OTA",
+      "source_label": "Unitree Robotics official page, G1 column; discovery claim 6c1d6536 (verbatim: 'YES')",
+      "source_url": "https://www.unitree.com/g1",
+      "observed_at": "2026-10-18",
+      "content_hash": "e1a93cd0bd136246fe74f0fa968302d3a27aa1f0b46e0ce2e1c004eaf0b716a8",
+      "evidence_locator": "",
+      "evidence_class": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "confidence": "HIGH",
+      "classification": "ROUTINE",
+      "reasons": [],
+      "conflict": "NONE",
+      "expected_change": {
+        "table": "specification",
+        "kind": "ADDED",
+        "match": {
+          "robot": "unitree-g1",
+          "definition": "ota_updates"
+        }
+      },
+      "display": "Robot detail spec table: 'OTA updates: Yes', with source",
+      "compare_peer": "unitree-h2"
+    }
+  ],
+  "restricted_impact": {
+    "prices": 0,
+    "availability": 0,
+    "publication": 0,
+    "commercial_status": 0,
+    "images": 0,
+    "deletions": 0,
+    "unrelated_robots": 0
+  },
+  "generated_on": "2026-10-21",
+  "digest": "b45cafcfbccb19c707f13c7182e3c4519e29ce8cb5d695f66c4ba6804b3a57e5"
+}

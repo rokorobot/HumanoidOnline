@@ -71,7 +71,7 @@ those are P0.
 **Scope:** 54 values on 17 published robots, each filled from NULL. No P0 cell qualified: every P0 candidate was
 identity-, policy- or conflict-blocked (§5).
 
-**Mapping rules applied** (part of what the owner approves):
+**Authoring criteria applied** (part of what the owner approves). These are catalogue-authoring criteria for this batch, not DR-G4 projection-registry mappings:
 - A Boolean is set `true` only where the manufacturer states the capability **in words** for this product:
   - has_vision: cameras or vision sensors;
   - has_manipulation: grasping or manipulation;
@@ -83,6 +83,17 @@ identity-, policy- or conflict-blocked (§5).
   - has_language_ui: spoken or natural-language conversation stated in words, not just a microphone or "LLM support".
 - **No `false` is written.** Explicit negatives (Unitree "Only the EDU version supports secondary development") follow the DR-G4 §4.3 chain and are held.
 - mobility is set only from a stated locomotion type. hand_type only from a named standard end effector. Numeric fields only as stated, or by pure unit conversion.
+
+**Interpretive cells (the owner may strike them as a group).** Eleven accepted cells rest on a reading the owner
+may not share. Approving the batch **without** them gives an exact 43-cell batch on 16 robots: unitree-h2, agibot-a2-ultra, booster-t1, booster-t2-*, galbot-g1, fourier-intelligence-gr-2, ubtech-walker-s2, figure-03, boston-dynamics-atlas-electric, pal-reem-c, pal-talos, engineered-arts-ameca and softbank-pepper; the K1 records drop out.
+
+| Cells | Reading |
+|---|---|
+| has_teleoperation: booster-k1-educational, booster-k1-geek, booster-k1-professional, booster-t1, booster-t2-education, booster-t2-professional (6) | a manufacturer handheld remote controller counts as operator remote control |
+| has_teleoperation: pal-reem-c, pal-talos (2) | teleoperation offered as optional PAL premium software |
+| has_api: fourier-intelligence-gr-2 (1) | brochure phrase "through intuitive APIs" |
+| has_manipulation: ubtech-walker-s2 (1) | marketing phrase "extended-reach manipulation" |
+| mobility: galbot-g1 = WHEELED (1) | a wheeled base with a leg lift; HYBRID is arguable |
 
 **Expected production change:** `import_catalogue.py` scoped to the 17 slugs in
 `db/catalogue/ho_data_30_batch3_expected.json` → **17 robot rows CHANGED**, nothing else.
@@ -172,10 +183,10 @@ walking speed, hand detail, and the developer-interface flags of consumer or clo
 
 | Decision | Evidence-backed cells | Examples |
 |---|---|---|
-| **autonomy mapping rule** (new) | 28 | Atlas "works autonomously with minimal supervision"; Figure 03 "all autonomously" |
+| **autonomy authoring rule** (new) | 28 | Atlas "works autonomously with minimal supervision"; Figure 03 "all autonomously" |
 | **Identity: R1 EDU U1–U6** (do Unitree's R1/R1 EDU statements apply to the distributor U editions?) | 29 | ROS 2, teleoperation, payload 2 kg, arm span, weight 29 kg |
 | **D5 end effector / optional hands** | about 24 | T2, Galbot, GR-2 hand options; H2 EDU dexterous hand options |
-| **developer_edition mapping rule** (new) | 19 | Unitree EDU editions; K1/T2 "Education/Professional" tiers |
+| **developer_edition authoring rule** (new) | 19 | Unitree EDU editions; K1/T2 "Education/Professional" tiers |
 | **Label semantics** (Unitree "Arm Span 0.45 m", arm-segment lengths as reach, GR-2 "Arm Reach 1520 mm") | 14 | G1, R1, GR-2, Galbot |
 | **D4 language UI** | 12 | REEM-C "speaks over 30 languages", 4NE1 Mini "Natural Language Interaction" |
 | **Identity: NAO** (SoftBank vs Maxtronics, NAO6) | 11 | height 57.4 cm, weight 5.48 kg, 25 DoF, 62.5 Wh, SDK/API |

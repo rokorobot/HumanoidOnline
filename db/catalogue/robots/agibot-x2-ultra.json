@@ -1,6 +1,6 @@
 {
-  "slug": "agibot-x2",
-  "name": "X2",
+  "slug": "agibot-x2-ultra",
+  "name": "X2 Ultra",
   "manufacturer_slug": "agibot",
   "model_code": null,
   "summary": null,
@@ -9,7 +9,7 @@
   "is_published": false,
   "specs": {
     "height_cm": 131.0,
-    "weight_kg": 35.0,
+    "weight_kg": 39.0,
     "arm_span_cm": null,
     "reach_cm": null,
     "payload_kg": null,
@@ -17,7 +17,7 @@
     "runtime_minutes": null,
     "battery_wh": 500.0,
     "mobility": "BIPEDAL",
-    "degrees_of_freedom": 25,
+    "degrees_of_freedom": 30,
     "hand_type": null,
     "hand_dof": null,
     "autonomy": null,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "IDENTITY DRAFT (owner decision pending; not imported). RETRIEVAL: AUTOMATED discovery observation 2026-10-18 by an owner-authorized (docs/28 A4) source; values verbatim from https://www.agibot.com/products/X2 as stored in production candidate_claim rows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Identity candidate: the ORIGINAL AGIBOT X2 generation, edition 'X2', exactly as presented on agibot.com/products/X2 on 2026-10-18 (that page lists two editions of this generation, 'X2' and 'X2 Ultra'). Any later or revised X2 generation is a separate identity and is not covered by this record. Not merged with AGIBOT A2 Lite / A2 Ultra.",
+  "specs_note": "UNPUBLISHED CATALOGUE ENTRY, prepared from the A4 identity draft on owner approval (2026-10-21); import and publication remain separate owner decisions. RETRIEVAL: AUTOMATED discovery observation 2026-10-18 by an owner-authorized (docs/28 A4) source; values verbatim from https://www.agibot.com/products/X2 as stored in production candidate_claim rows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Identity candidate: the ORIGINAL AGIBOT X2 generation, edition 'X2 Ultra', exactly as presented on agibot.com/products/X2 on 2026-10-18 (that page lists two editions of this generation, 'X2' and 'X2 Ultra'). Any later or revised X2 generation is a separate identity and is not covered by this record. Not merged with AGIBOT A2 Lite / A2 Ultra.",
   "official_url": "https://www.agibot.com/products/X2",
   "commercial_status_evidence": [],
   "variants": [],
@@ -45,7 +45,7 @@
     {
       "key": "standing_dimensions_mm",
       "value": "1310mm（H）× 460mm（W）× 210mm（L）",
-      "source_label": "AgiBot X2 — specification table (X2 column); discovery claim f0af12b1 (verbatim: '1310mm（H）× 460mm（W）× 210mm（L）')",
+      "source_label": "AgiBot X2 — specification table (X2 Ultra column); discovery claim 8f3f0eb8 (verbatim: '1310mm（H）× 460mm（W）× 210mm（L）')",
       "source_url": "https://www.agibot.com/products/X2",
       "source_kind": "MANUFACTURER",
       "edition_scope": "THIS_EDITION",
@@ -54,7 +54,7 @@
     {
       "key": "peak_joint_torque_nm",
       "value": 120,
-      "source_label": "AgiBot X2 — specification table (X2 column); discovery claim 9ba140d2 (verbatim: '120N·m')",
+      "source_label": "AgiBot X2 — specification table (X2 Ultra column); discovery claim 81763516 (verbatim: '120N·m')",
       "source_url": "https://www.agibot.com/products/X2",
       "source_kind": "MANUFACTURER",
       "edition_scope": "THIS_EDITION",
@@ -63,7 +63,7 @@
     {
       "key": "max_speed",
       "value": "Up to : 1.8 m/s typical ≤0.8 m/s Laboratory Environment: ≤2m/s",
-      "source_label": "AgiBot X2 — specification table (X2 column); discovery claim e719aec5 (verbatim: 'Up to : 1.8 m/s typical ≤0.8 m/s Laboratory Environment: ≤2m/s')",
+      "source_label": "AgiBot X2 — specification table (X2 Ultra column); discovery claim 36dffe70 (verbatim: 'Up to : 1.8 m/s typical ≤0.8 m/s Laboratory Environment: ≤2m/s')",
       "source_url": "https://www.agibot.com/products/X2",
       "source_kind": "MANUFACTURER",
       "edition_scope": "THIS_EDITION",
@@ -72,7 +72,7 @@
     {
       "key": "operating_time",
       "value": "At 0.5 m/s walking Approx. 2 hours",
-      "source_label": "AgiBot X2 — specification table (X2 column); discovery claim b2b18036 (verbatim: 'At 0.5 m/s walking Approx. 2 hours')",
+      "source_label": "AgiBot X2 — specification table (X2 Ultra column); discovery claim b562a224 (verbatim: 'At 0.5 m/s walking Approx. 2 hours')",
       "source_url": "https://www.agibot.com/products/X2",
       "source_kind": "MANUFACTURER",
       "edition_scope": "THIS_EDITION",
@@ -80,8 +80,8 @@
     },
     {
       "key": "lidar",
-      "value": "Not equipped",
-      "source_label": "AgiBot X2 — specification table (X2 column); discovery claim 7ce7d49e (verbatim: 'Not equipped')",
+      "value": "Equipped",
+      "source_label": "AgiBot X2 — specification table (X2 Ultra column); discovery claim 34d1e2e1 (verbatim: 'Equipped')",
       "source_url": "https://www.agibot.com/products/X2",
       "source_kind": "MANUFACTURER",
       "edition_scope": "THIS_EDITION",
@@ -89,8 +89,8 @@
     },
     {
       "key": "cameras",
-      "value": "Interactive RGB camera",
-      "source_label": "AgiBot X2 — specification table (X2 column); discovery claim 8fda5c69 (verbatim: 'Interactive RGB camera')",
+      "value": "Interactive RGB + Front dual RGB + Rear RGB",
+      "source_label": "AgiBot X2 — specification table (X2 Ultra column); discovery claim e3efb48e (verbatim: 'Interactive RGB + Front dual RGB + Rear RGB')",
       "source_url": "https://www.agibot.com/products/X2",
       "source_kind": "MANUFACTURER",
       "edition_scope": "THIS_EDITION",
@@ -99,7 +99,7 @@
     {
       "key": "compute_base",
       "value": "RK3588 ×2",
-      "source_label": "AgiBot X2 — specification table (X2 column); discovery claim aab9d7af (verbatim: 'RK3588 ×2')",
+      "source_label": "AgiBot X2 — specification table (X2 Ultra column); discovery claim 5e5d0740 (verbatim: 'RK3588 ×2')",
       "source_url": "https://www.agibot.com/products/X2",
       "source_kind": "MANUFACTURER",
       "edition_scope": "THIS_EDITION",
@@ -107,8 +107,8 @@
     },
     {
       "key": "connectivity",
-      "value": "Wi-Fi, Bluetooth",
-      "source_label": "AgiBot X2 — specification table (X2 column); discovery claim 20e658b9 (verbatim: 'Wi-Fi, Bluetooth')",
+      "value": "Wi-Fi, Bluetooth 4G/5G module",
+      "source_label": "AgiBot X2 — specification table (X2 Ultra column); discovery claim 68443c1f (verbatim: 'Wi-Fi, Bluetooth 4G/5G module')",
       "source_url": "https://www.agibot.com/products/X2",
       "source_kind": "MANUFACTURER",
       "edition_scope": "THIS_EDITION",
@@ -122,7 +122,7 @@
     },
     {
       "field": "weight_kg",
-      "text": "AgiBot states 'Approx.35kg'."
+      "text": "AgiBot states 'Approx.39kg'."
     },
     {
       "field": "battery_wh",
@@ -130,7 +130,7 @@
     },
     {
       "field": "payload_kg",
-      "text": "Left UNKNOWN: AgiBot states 'Max (in specific postures): 3kg Excluding end effector Across full range： ≤1kg Excluding end effector' (posture-dependent)."
+      "text": "Left UNKNOWN: AgiBot states 'Max (in specific postures): 3kg Excluding end effector Across full range: ≤1kg Excluding end effector' (posture-dependent)."
     }
   ]
 }

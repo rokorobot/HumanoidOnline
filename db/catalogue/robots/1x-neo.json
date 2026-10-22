@@ -13,9 +13,9 @@
     "arm_span_cm": null,
     "reach_cm": null,
     "payload_kg": 24.9,
-    "walk_speed_ms": null,
+    "walk_speed_ms": 1.4,
     "runtime_minutes": 240,
-    "battery_wh": null,
+    "battery_wh": 842,
     "mobility": "BIPEDAL",
     "degrees_of_freedom": null,
     "hand_type": "22 DoF hands",
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "weight (~29.9 kg / 66 lb), carrying capacity (~24.9 kg / 55 lb), 22 DoF hands and 4 h runtime from the official NEO page https://www.1x.tech/discover/neo-home-robot (observed 2026-07-24); height ~5'6\" (167.6 cm) per 1X. Built-in LLM -> has_language_ui true; early tasks are teleop-assisted -> autonomy TELEOPERATED. Total-body DoF and battery Wh not stated -> NULL.",
+  "specs_note": "weight (~29.9 kg / 66 lb), carrying capacity (~24.9 kg / 55 lb), 22 DoF hands and 4 h runtime from the official NEO page https://www.1x.tech/discover/neo-home-robot (observed 2026-07-24); height ~5'6\" (167.6 cm) per 1X. Built-in LLM -> has_language_ui true; early tasks are teleop-assisted -> autonomy TELEOPERATED. Total-body DoF and battery Wh not stated -> NULL. SPECIFICATIONS (HO-DATA Fast Lane batch 2, 2026-10-22): walking speed and battery capacity from the specifications panel of 1X's NEO page https://www.1x.tech/neo. Total DoF stays UNKNOWN: the page lists per-part DoF only (hands 22x2, arms 7x2, neck 3, spine 2, legs 6x2) and no total, and per-part figures are not summed. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — curl 8.11.0: https://www.1x.tech/neo sha256 721f1a7a63b54c93… (same body as the HO-DATA-02C capture). Retrieved 2026-10-22 by Claude Opus 5.5 in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "commercial_status_evidence": [
     {
       "source_url": "https://www.1x.tech/discover/neo-home-robot",
@@ -169,6 +169,16 @@
       "attribution": "© 1X Technologies",
       "last_verified_at": "2026-08-19T00:00:00Z",
       "identity_confirmed_by": "robert@humanoid.company"
+    }
+  ],
+  "spec_caveats": [
+    {
+      "field": "walk_speed_ms",
+      "text": "1X states 'Walking speed 1.4 m/s' on the NEO specifications panel, next to 'Max run speed 6.2 m/s'; test conditions are not given."
+    },
+    {
+      "field": "battery_wh",
+      "text": "1X states 'Battery Capacity 842 Wh' for NEO (stated directly, not derived)."
     }
   ]
 }

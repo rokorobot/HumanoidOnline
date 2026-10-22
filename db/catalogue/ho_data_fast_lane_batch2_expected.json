@@ -1,0 +1,8 @@
+{
+  "_comment": "HO-DATA Fast Lane batch 2 (standing research work order 'HO-DATA-STANDING 2026-10-22'; docs/decisions/DR-D1; docs/audit/HO-DATA-FL2_BATCH_2026-10-22.md): expected business changes for `import_catalogue.py --only 1x-neo --only pal-talos --only engineered-arts-ameca`. 3 robot rows CHANGED (4 P0 + 3 P1 core values filled from NULL, spec_caveats). No spec rows, offers, evidence, images, use-case fits or publication. NOT for import until the owner approves the PR.",
+  "expected": [
+    {"table": "robot", "kind": "CHANGED", "match": {"slug": "1x-neo"}, "count": 1},
+    {"table": "robot", "kind": "CHANGED", "match": {"slug": "pal-talos"}, "count": 1},
+    {"table": "robot", "kind": "CHANGED", "match": {"slug": "engineered-arts-ameca"}, "count": 1}
+  ]
+}

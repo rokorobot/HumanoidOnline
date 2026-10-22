@@ -9,15 +9,15 @@
   "is_published": true,
   "specs": {
     "height_cm": 187.0,
-    "weight_kg": null,
-    "arm_span_cm": null,
+    "weight_kg": 62.0,
+    "arm_span_cm": 180.0,
     "reach_cm": null,
     "payload_kg": null,
     "walk_speed_ms": null,
     "runtime_minutes": null,
     "battery_wh": null,
     "mobility": "STATIONARY",
-    "degrees_of_freedom": null,
+    "degrees_of_freedom": 61,
     "hand_type": null,
     "hand_dof": null,
     "autonomy": "ASSISTED",
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Ameca is an expressive upper-body/interaction robot (base configuration does not walk); physical specs and mobility were not confirmed against an Engineered Arts primary source in this pass -> left NULL. Vision + conversational interaction are core Ameca features -> has_vision/has_language_ui true. Fields (height_cm, mobility, autonomy) were subsequently verified and ratified by the product owner during the 2026-08-18 duplicate-reconciliation review, superseding the earlier note that left them NULL pending a primary source.",
+  "specs_note": "Ameca is an expressive upper-body/interaction robot (base configuration does not walk); physical specs and mobility were not confirmed against an Engineered Arts primary source in this pass -> left NULL. Vision + conversational interaction are core Ameca features -> has_vision/has_language_ui true. Fields (height_cm, mobility, autonomy) were subsequently verified and ratified by the product owner during the 2026-08-18 duplicate-reconciliation review, superseding the earlier note that left them NULL pending a primary source. SPECIFICATIONS (HO-DATA Fast Lane batch 2, 2026-10-22): weight, total DoF and arm span from the Ameca specification table of Engineered Arts' own site (https://www.engineeredarts.com/robot/ameca/, a script-rendered page whose specification text is served in the site's own asset https://www.engineeredarts.com/assets/index-DwBa69-D.js; block 'model: Ameca, generation: 2.6 (2024)'). The table's height '1870 mm' matches the existing 187 cm. DoF is confirmed by Engineered Arts' user documentation https://docs.engineeredarts.co.uk/guide/reference/hardware/mesmer_full_size_gen2 ('Ameca … has 61 degrees of freedom'). The values describe the current generation 2.6; earlier Ameca builds may differ. Walking speed does not apply (Ameca does not walk; mobility STATIONARY). Payload and runtime are not stated; the robot runs from a mains 'Robot Power Supply'. All three stay UNKNOWN. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — Python urllib: site asset sha256 e33505fc9f503e50…; documentation page sha256 d77e5143e202f7fe…. Retrieved 2026-10-22 by Claude Opus 5.5 in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "commercial_status_evidence": [
     {
       "source_url": "https://engineeredarts.com",
@@ -176,6 +176,20 @@
       "is_primary": true,
       "attribution": "© Engineered Arts",
       "last_verified_at": "2026-07-25T00:00:00Z"
+    }
+  ],
+  "spec_caveats": [
+    {
+      "field": "weight_kg",
+      "text": "Engineered Arts' Ameca specification table states 'Weight 137.7 lbs | 62 kg' for model Ameca, generation '2.6 (2024)'."
+    },
+    {
+      "field": "degrees_of_freedom",
+      "text": "Engineered Arts states '61 Degrees of Freedom (DoF)' for Ameca (generation 2.6). Its user documentation gives the same total: 27 face, 5 neck, 8 shoulders, 10 arms, 8 hands, 3 torso. Ameca does not walk, so no leg DoF are included."
+    },
+    {
+      "field": "arm_span_cm",
+      "text": "Engineered Arts states 'Arm Span 70.9 in | 1800 mm' for Ameca (generation 2.6); 180 cm is a unit conversion."
     }
   ]
 }

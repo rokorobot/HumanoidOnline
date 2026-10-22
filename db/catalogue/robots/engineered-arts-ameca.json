@@ -19,19 +19,19 @@
     "mobility": "STATIONARY",
     "degrees_of_freedom": 61,
     "hand_type": null,
-    "hand_dof": null,
+    "hand_dof": 4,
     "autonomy": "ASSISTED",
     "has_manipulation": null,
     "has_teleoperation": null,
     "has_vision": true,
     "has_language_ui": true,
-    "has_sdk": null,
-    "has_api": null,
+    "has_sdk": true,
+    "has_api": true,
     "ros_support": null,
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Ameca is an expressive upper-body/interaction robot (base configuration does not walk); physical specs and mobility were not confirmed against an Engineered Arts primary source in this pass -> left NULL. Vision + conversational interaction are core Ameca features -> has_vision/has_language_ui true. Fields (height_cm, mobility, autonomy) were subsequently verified and ratified by the product owner during the 2026-08-18 duplicate-reconciliation review, superseding the earlier note that left them NULL pending a primary source. SPECIFICATIONS (HO-DATA Fast Lane batch 2, 2026-10-22): weight, total DoF and arm span from the Ameca specification table of Engineered Arts' own site (https://www.engineeredarts.com/robot/ameca/, a script-rendered page whose specification text is served in the site's own asset https://www.engineeredarts.com/assets/index-DwBa69-D.js; block 'model: Ameca, generation: 2.6 (2024)'). The table's height '1870 mm' matches the existing 187 cm. DoF is confirmed by Engineered Arts' user documentation https://docs.engineeredarts.co.uk/guide/reference/hardware/mesmer_full_size_gen2 ('Ameca … has 61 degrees of freedom'). The values describe the current generation 2.6; earlier Ameca builds may differ. Walking speed does not apply (Ameca does not walk; mobility STATIONARY). Payload and runtime are not stated; the robot runs from a mains 'Robot Power Supply'. All three stay UNKNOWN. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — Python urllib: site asset sha256 e33505fc9f503e50…; documentation page sha256 d77e5143e202f7fe…. Retrieved 2026-10-22 by Claude Opus 5.5 in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
+  "specs_note": "Ameca is an expressive upper-body/interaction robot (base configuration does not walk); physical specs and mobility were not confirmed against an Engineered Arts primary source in this pass -> left NULL. Vision + conversational interaction are core Ameca features -> has_vision/has_language_ui true. Fields (height_cm, mobility, autonomy) were subsequently verified and ratified by the product owner during the 2026-08-18 duplicate-reconciliation review, superseding the earlier note that left them NULL pending a primary source. SPECIFICATIONS (HO-DATA Fast Lane batch 2, 2026-10-22): weight, total DoF and arm span from the Ameca specification table of Engineered Arts' own site (https://www.engineeredarts.com/robot/ameca/, a script-rendered page whose specification text is served in the site's own asset https://www.engineeredarts.com/assets/index-DwBa69-D.js; block 'model: Ameca, generation: 2.6 (2024)'). The table's height '1870 mm' matches the existing 187 cm. DoF is confirmed by Engineered Arts' user documentation https://docs.engineeredarts.co.uk/guide/reference/hardware/mesmer_full_size_gen2 ('Ameca … has 61 degrees of freedom'). The values describe the current generation 2.6; earlier Ameca builds may differ. Walking speed does not apply (Ameca does not walk; mobility STATIONARY). Payload and runtime are not stated; the robot runs from a mains 'Robot Power Supply'. All three stay UNKNOWN. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — Python urllib: site asset sha256 e33505fc9f503e50…; documentation page sha256 d77e5143e202f7fe…. Retrieved 2026-10-22 by Claude Opus 5.5 in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. SPECIFICATIONS (HO-DATA-30 batch 3, 2026-10-22): hand_dof, has_sdk, has_api filled from first-party Engineered Arts sources, each quoted in spec_caveats. Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 mapping rules, docs/audit/HO-DATA-30_FEASIBILITY_AND_BATCH3_2026-10-22.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://docs.engineeredarts.co.uk/guide/reference/hardware/mesmer_full_size_gen2 sha256 d020b9833520aab2…; https://engineeredarts.com/assets/index-DwBa69-D.js sha256 e33505fc9f503e50…. Retrieved 2026-10-22 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "commercial_status_evidence": [
     {
       "source_url": "https://engineeredarts.com",
@@ -190,6 +190,18 @@
     {
       "field": "arm_span_cm",
       "text": "Engineered Arts states 'Arm Span 70.9 in | 1800 mm' for Ameca (generation 2.6); 180 cm is a unit conversion."
+    },
+    {
+      "field": "hand_dof",
+      "text": "Engineered Arts states '8 degrees of freedom in the hands, 4 left, 4 right' (https://docs.engineeredarts.co.uk/guide/reference/hardware/mesmer_full_size_gen2)."
+    },
+    {
+      "field": "has_sdk",
+      "text": "Engineered Arts states '\"controlAPI\":\"REST, WebSocket, Python & Node.js SDKs\"' (https://engineeredarts.com/assets/index-DwBa69-D.js)."
+    },
+    {
+      "field": "has_api",
+      "text": "Engineered Arts states '\"controlAPI\":\"REST, WebSocket, Python & Node.js SDKs\"' (https://engineeredarts.com/assets/index-DwBa69-D.js)."
     }
   ]
 }

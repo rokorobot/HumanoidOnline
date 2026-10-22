@@ -21,9 +21,9 @@
     "hand_type": null,
     "hand_dof": null,
     "autonomy": null,
-    "has_manipulation": null,
+    "has_manipulation": true,
     "has_teleoperation": null,
-    "has_vision": null,
+    "has_vision": true,
     "has_language_ui": null,
     "has_sdk": null,
     "has_api": null,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Commercial maturity COMMERCIAL recorded 2026-10-04 (owner decision, six-robot review). Basis: mass production, first-batch delivery, orders and named industrial customers stated by UBTECH. Specifications not yet verified.",
+  "specs_note": "Commercial maturity COMMERCIAL recorded 2026-10-04 (owner decision, six-robot review). Basis: mass production, first-batch delivery, orders and named industrial customers stated by UBTECH. Specifications not yet verified. SPECIFICATIONS (HO-DATA-30 batch 3, 2026-10-22): has_vision, has_manipulation filled from first-party UBTECH sources, each quoted in spec_caveats. Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 mapping rules, docs/audit/HO-DATA-30_FEASIBILITY_AND_BATCH3_2026-10-22.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://www.ubtrobot.com/en/humanoid/products/WalkerS2 sha256 aee635e54335ad39…. Retrieved 2026-10-22 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://www.ubtrobot.com/",
   "commercial_status_evidence": [
     {
@@ -89,6 +89,16 @@
       "display_approved_by": "robert@humanoid.company",
       "display_approved_at": "2026-10-06T00:00:00Z",
       "last_verified_at": "2026-10-06T00:00:00Z"
+    }
+  ],
+  "spec_caveats": [
+    {
+      "field": "has_vision",
+      "text": "UBTECH states 'The pure RGB binocular stereo vision solution is built in Walker S2's head.' (https://www.ubtrobot.com/en/humanoid/products/WalkerS2)."
+    },
+    {
+      "field": "has_manipulation",
+      "text": "UBTECH states 'achieving ground-reaching flexibility and extended-reach manipulation' (https://www.ubtrobot.com/en/humanoid/products/WalkerS2)."
     }
   ]
 }

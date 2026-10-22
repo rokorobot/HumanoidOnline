@@ -16,22 +16,22 @@
     "walk_speed_ms": null,
     "runtime_minutes": null,
     "battery_wh": null,
-    "mobility": null,
+    "mobility": "BIPEDAL",
     "degrees_of_freedom": 40,
-    "hand_type": null,
-    "hand_dof": null,
+    "hand_type": "6-DoF dexterous hand",
+    "hand_dof": 6,
     "autonomy": null,
-    "has_manipulation": null,
-    "has_teleoperation": null,
-    "has_vision": null,
-    "has_language_ui": null,
-    "has_sdk": null,
-    "has_api": null,
-    "ros_support": null,
+    "has_manipulation": true,
+    "has_teleoperation": true,
+    "has_vision": true,
+    "has_language_ui": true,
+    "has_sdk": true,
+    "has_api": true,
+    "ros_support": true,
     "developer_edition": null,
-    "simulation_support": null
+    "simulation_support": true
   },
-  "specs_note": "Commercial maturity COMMERCIAL recorded 2026-10-04 (owner decision, six-robot review). Identity: this record is the A2 Ultra model only; the former generic \"A2\" record was remediated (A2 Ultra and A2 Lite are separate products). Selected specifications retrieved from first-party manufacturer documentation on 2026-10-22 under HO-DATA-02B. Evidence status: AGENT_ASSISTED_RESEARCH; not human-verified. Remaining specifications are unknown unless separately documented. SPECIFICATIONS (HO-DATA-02B, 2026-10-22): height, weight and total DoF from the A2 Ultra column of AgiBot's product specification table https://www.agibot.com/products/A2_Ultra, cross-checked against https://agibot.com/jp/products/A2_Ultra. Speed and arm load are deliberately left UNKNOWN: the English page states 'Max 1.2m/s' and 'Max Arm Load ≈2kg' while the Japanese page states '最大0.8m/s, 通常使用≤0.6m/s' and '片腕最大負荷 約3kg' for the same model — a first-party conflict for the owner. Runtime is left UNKNOWN pending a policy on multi-mode figures ('Standing : 3h, Walking : 1.5h+'). Battery Wh is not stated (14.4 Ah only) and is not derived. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-22 by Claude Opus 5.5 (curl 8.11.0: https://www.agibot.com/products/A2_Ultra sha256 1b596c3d3c3a11fa…; and https://agibot.com/jp/products/A2_Ultra sha256 a1984883aecaa036…) in a session initiated by Robert Konecny, under research work order 'HO-DATA-02B 2026-10-22' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
+  "specs_note": "Commercial maturity COMMERCIAL recorded 2026-10-04 (owner decision, six-robot review). Identity: this record is the A2 Ultra model only; the former generic \"A2\" record was remediated (A2 Ultra and A2 Lite are separate products). Selected specifications retrieved from first-party manufacturer documentation on 2026-10-22 under HO-DATA-02B. Evidence status: AGENT_ASSISTED_RESEARCH; not human-verified. Remaining specifications are unknown unless separately documented. SPECIFICATIONS (HO-DATA-02B, 2026-10-22): height, weight and total DoF from the A2 Ultra column of AgiBot's product specification table https://www.agibot.com/products/A2_Ultra, cross-checked against https://agibot.com/jp/products/A2_Ultra. Speed and arm load are deliberately left UNKNOWN: the English page states 'Max 1.2m/s' and 'Max Arm Load ≈2kg' while the Japanese page states '最大0.8m/s, 通常使用≤0.6m/s' and '片腕最大負荷 約3kg' for the same model — a first-party conflict for the owner. Runtime is left UNKNOWN pending a policy on multi-mode figures ('Standing : 3h, Walking : 1.5h+'). Battery Wh is not stated (14.4 Ah only) and is not derived. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-22 by Claude Opus 5.5 (curl 8.11.0: https://www.agibot.com/products/A2_Ultra sha256 1b596c3d3c3a11fa…; and https://agibot.com/jp/products/A2_Ultra sha256 a1984883aecaa036…) in a session initiated by Robert Konecny, under research work order 'HO-DATA-02B 2026-10-22' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. SPECIFICATIONS (HO-DATA-30 batch 3, 2026-10-22): mobility, hand_type, hand_dof, has_vision, has_sdk, has_api, ros_support, simulation_support, has_language_ui, has_manipulation, has_teleoperation filled from first-party AgiBot sources, each quoted in spec_caveats. Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 mapping rules, docs/audit/HO-DATA-30_FEASIBILITY_AND_BATCH3_2026-10-22.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://www.agibot.com/products/A2_Ultra sha256 1b596c3d3c3a11fa…; https://open.agibot.com/docs/en/aimdk/a2/v2_1/dev_guide sha256 17fc94224fb45b4d…; https://open.agibot.com/docs/en/aimdk/a2/v2_1/dev_guide/03-second_develop_interface_overview sha256 c440e806aef66456…; https://open.agibot.com/docs/en/aimdk/a2/v2_1/dev_guide/08-motion_control_simulation sha256 d86c38a681bcbb60…; https://www.agibot.com/jp/products/A2_Ultra sha256 a1984883aecaa036…; https://open.agibot.com/docs/en/aimdk/a2/v2_1/dev_guide/01-a2_overview sha256 a9ce32eec755b0ae…; https://www.agibot.com/products/VR sha256 ef6a148eb63f2506…. Retrieved 2026-10-22 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://www.agibot.com/products/A2_Ultra",
   "commercial_status_evidence": [
     {
@@ -309,6 +309,50 @@
     {
       "field": "degrees_of_freedom",
       "text": "AgiBot states 'Total DOF 40' for A2 Ultra (Japanese page: 主動自由度 40, active DoF). The table also lists neck 2, single arm 7, single leg 6 and a '6-DOF Dexterous Hand'; the total is recorded as stated, not recomputed."
+    },
+    {
+      "field": "mobility",
+      "text": "AgiBot states 'Anthropomorphic walking' (https://www.agibot.com/products/A2_Ultra)."
+    },
+    {
+      "field": "hand_type",
+      "text": "AgiBot states 'Single Hand DOF 6-DOF Dexterous Hand' (https://www.agibot.com/products/A2_Ultra)."
+    },
+    {
+      "field": "hand_dof",
+      "text": "AgiBot states 'Single Hand DOF 6-DOF Dexterous Hand' (https://www.agibot.com/products/A2_Ultra)."
+    },
+    {
+      "field": "has_vision",
+      "text": "AgiBot states 'RGB-D Camera Equipped' (https://www.agibot.com/products/A2_Ultra)."
+    },
+    {
+      "field": "has_sdk",
+      "text": "AgiBot states 'Released the A2 Ultra Development Guide (v2.1)' / 'AimDK-A2-Ultra-V2.1-0603' (https://open.agibot.com/docs/en/aimdk/a2/v2_1/dev_guide)."
+    },
+    {
+      "field": "has_api",
+      "text": "AgiBot states 'we provide two forms of relatively simple and general interfaces for secondary development: HTTP JSON RPC and ROS2 Topic' (https://open.agibot.com/docs/en/aimdk/a2/v2_1/dev_guide/03-second_develop_interface_overview)."
+    },
+    {
+      "field": "ros_support",
+      "text": "AgiBot states 'The machine defaults to ROS2 Humble with Fastdds' (https://open.agibot.com/docs/en/aimdk/a2/v2_1/dev_guide/03-second_develop_interface_overview)."
+    },
+    {
+      "field": "simulation_support",
+      "text": "AgiBot states 'We provide a mujoco-based simulation system for the A2 robot' (https://open.agibot.com/docs/en/aimdk/a2/v2_1/dev_guide/08-motion_control_simulation)."
+    },
+    {
+      "field": "has_language_ui",
+      "text": "AgiBot states '物体認識,バイリンガル対話,レスポンスがいい.' (https://www.agibot.com/jp/products/A2_Ultra). Japanese product page ('bilingual dialogue')."
+    },
+    {
+      "field": "has_manipulation",
+      "text": "AgiBot states 'Dexterous Hand Delivery Capability Grasping weight (palm down): <3kg' (https://open.agibot.com/docs/en/aimdk/a2/v2_1/dev_guide/01-a2_overview)."
+    },
+    {
+      "field": "has_teleoperation",
+      "text": "AgiBot states 'VR Teleoperation Kit' / '(Compatible only with AGIBOT A2 Ultra and AGIBOT A2 Lite)' / 'Real-time Motion Mapping Control robot arms to follow human arm movements' (https://www.agibot.com/products/VR). Via AgiBot's VR Teleoperation Kit accessory."
     }
   ]
 }

@@ -22,16 +22,16 @@
     "hand_dof": null,
     "autonomy": null,
     "has_manipulation": true,
-    "has_teleoperation": null,
-    "has_vision": null,
+    "has_teleoperation": true,
+    "has_vision": true,
     "has_language_ui": null,
     "has_sdk": true,
     "has_api": null,
     "ros_support": true,
     "developer_edition": true,
-    "simulation_support": null
+    "simulation_support": true
   },
-  "specs_note": "Entered by claude-code (read for robert@humanoid.company) from https://pal-robotics.com/robot/talos/ (retrieved 2026-07-30). 13 field(s) not stated by the source and left UNKNOWN. Fields (has_sdk, developer_edition) were subsequently verified and ratified by the product owner during the 2026-08-18 duplicate-reconciliation review, superseding the earlier note that left them NULL pending a primary source. SPECIFICATIONS (HO-DATA Fast Lane batch 2, 2026-10-22): total DoF and battery energy from PAL Robotics' TALOS datasheet https://pal-robotics.com/wp-content/uploads/2025/09/TALOS-DataSheet-1.pdf (linked as 'Download Datasheet' from https://pal-robotics.com/robot/talos/). The datasheet's height 175 cm, weight 95 kg, arm payload 6 kg and battery autonomy '1.5h walking / 3h stand-by' match the existing values. Walking speed is not stated on either document and stays UNKNOWN. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — Python urllib: datasheet PDF sha256 7e32fb98db39e48b…; product page sha256 eb04d3ca67be668b…. Retrieved 2026-10-22 by Claude Opus 5.5 in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
+  "specs_note": "Entered by claude-code (read for robert@humanoid.company) from https://pal-robotics.com/robot/talos/ (retrieved 2026-07-30). 13 field(s) not stated by the source and left UNKNOWN. Fields (has_sdk, developer_edition) were subsequently verified and ratified by the product owner during the 2026-08-18 duplicate-reconciliation review, superseding the earlier note that left them NULL pending a primary source. SPECIFICATIONS (HO-DATA Fast Lane batch 2, 2026-10-22): total DoF and battery energy from PAL Robotics' TALOS datasheet https://pal-robotics.com/wp-content/uploads/2025/09/TALOS-DataSheet-1.pdf (linked as 'Download Datasheet' from https://pal-robotics.com/robot/talos/). The datasheet's height 175 cm, weight 95 kg, arm payload 6 kg and battery autonomy '1.5h walking / 3h stand-by' match the existing values. Walking speed is not stated on either document and stays UNKNOWN. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — Python urllib: datasheet PDF sha256 7e32fb98db39e48b…; product page sha256 eb04d3ca67be668b…. Retrieved 2026-10-22 by Claude Opus 5.5 in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. SPECIFICATIONS (HO-DATA-30 batch 3, 2026-10-22): has_vision, simulation_support, has_teleoperation filled from first-party PAL Robotics sources, each quoted in spec_caveats. Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 mapping rules, docs/audit/HO-DATA-30_FEASIBILITY_AND_BATCH3_2026-10-22.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://pal-robotics.com/wp-content/uploads/2025/09/TALOS-DataSheet-1.pdf sha256 11d3e9e9011ccd03…; https://pal-robotics.com/robot/talos/ sha256 c730e0f628da8447…. Retrieved 2026-10-22 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://pal-robotics.com/",
   "commercial_status_evidence": [],
   "variants": [],
@@ -75,6 +75,18 @@
     {
       "field": "battery_wh",
       "text": "PAL Robotics states 'Nominal energy 1080 Wh' (lithium-ion battery) on the TALOS datasheet."
+    },
+    {
+      "field": "has_vision",
+      "text": "PAL Robotics states 'RGB 1280x720 at 30 fps' (https://pal-robotics.com/wp-content/uploads/2025/09/TALOS-DataSheet-1.pdf)."
+    },
+    {
+      "field": "simulation_support",
+      "text": "PAL Robotics states 'Gazebo simulation and URDF model' (https://pal-robotics.com/wp-content/uploads/2025/09/TALOS-DataSheet-1.pdf)."
+    },
+    {
+      "field": "has_teleoperation",
+      "text": "PAL Robotics states 'Speed your research with extra software: from Whole-Body Control to navigation, HRI skills or teleoperation.' (https://pal-robotics.com/robot/talos/). Teleoperation is offered as optional PAL software, not necessarily installed by default."
     }
   ]
 }

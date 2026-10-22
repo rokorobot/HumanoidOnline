@@ -16,22 +16,22 @@
     "walk_speed_ms": 1.0,
     "runtime_minutes": 120,
     "battery_wh": null,
-    "mobility": null,
+    "mobility": "BIPEDAL",
     "degrees_of_freedom": 23,
     "hand_type": null,
     "hand_dof": null,
     "autonomy": null,
     "has_manipulation": null,
-    "has_teleoperation": null,
-    "has_vision": null,
-    "has_language_ui": null,
-    "has_sdk": null,
-    "has_api": null,
-    "ros_support": null,
+    "has_teleoperation": true,
+    "has_vision": true,
+    "has_language_ui": true,
+    "has_sdk": true,
+    "has_api": true,
+    "ros_support": true,
     "developer_edition": null,
-    "simulation_support": null
+    "simulation_support": true
   },
-  "specs_note": "Commercial maturity COMMERCIAL recorded 2026-10-04 (owner decision, six-robot review). Basis: manufacturer states it is now shipping worldwide, with institutional customers. Selected specifications retrieved from first-party manufacturer documentation on 2026-10-22 under HO-DATA-02B. Evidence status: AGENT_ASSISTED_RESEARCH; not human-verified. Remaining specifications are unknown unless separately documented. SPECIFICATIONS (HO-DATA-02B, 2026-10-22): height, weight, whole-body DoF, walking speed and endurance from the specifications chapter of Booster's own T1 product manual https://docs.booster.tech/zh-CN/docs/product-manual/t1/getting-started/specifications/ (the booster.tech marketing site no longer shows a T1 page). The manual's single table covers both T1 editions (Basic and Standard differ only in compute). Payload is not stated there and stays UNKNOWN; battery Wh is not stated ('48V 10.5Ah' only) and is not derived. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-22 by Claude Opus 5.5 (curl 8.11.0: https://docs.booster.tech/zh-CN/docs/product-manual/t1/getting-started/specifications/ sha256 f30c459c972c497f…) in a session initiated by Robert Konecny, under research work order 'HO-DATA-02B 2026-10-22' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
+  "specs_note": "Commercial maturity COMMERCIAL recorded 2026-10-04 (owner decision, six-robot review). Basis: manufacturer states it is now shipping worldwide, with institutional customers. Selected specifications retrieved from first-party manufacturer documentation on 2026-10-22 under HO-DATA-02B. Evidence status: AGENT_ASSISTED_RESEARCH; not human-verified. Remaining specifications are unknown unless separately documented. SPECIFICATIONS (HO-DATA-02B, 2026-10-22): height, weight, whole-body DoF, walking speed and endurance from the specifications chapter of Booster's own T1 product manual https://docs.booster.tech/zh-CN/docs/product-manual/t1/getting-started/specifications/ (the booster.tech marketing site no longer shows a T1 page). The manual's single table covers both T1 editions (Basic and Standard differ only in compute). Payload is not stated there and stays UNKNOWN; battery Wh is not stated ('48V 10.5Ah' only) and is not derived. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-22 by Claude Opus 5.5 (curl 8.11.0: https://docs.booster.tech/zh-CN/docs/product-manual/t1/getting-started/specifications/ sha256 f30c459c972c497f…) in a session initiated by Robert Konecny, under research work order 'HO-DATA-02B 2026-10-22' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. SPECIFICATIONS (HO-DATA-30 batch 3, 2026-10-22): mobility, has_vision, has_sdk, has_api, ros_support, simulation_support, has_language_ui, has_teleoperation filled from first-party Booster Robotics sources, each quoted in spec_caveats. Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 mapping rules, docs/audit/HO-DATA-30_FEASIBILITY_AND_BATCH3_2026-10-22.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://docs.booster.tech/zh-CN/docs/product-manual/t1/getting-started/overview/ sha256 165b48f07ebefc45…; https://docs.booster.tech/zh-CN/docs/developer-guide/booster-os-python-sdk/sdk-overview/ sha256 d06e48fea5fb203e…; https://docs.booster.tech/zh-CN/docs/developer-guide/cpp/sdk-overview/ sha256 1fcbe034adaa94a4…; https://docs.booster.tech/zh-CN/docs/developer-guide/open-source/booster-assets/ sha256 05840217604fb026…; https://docs.booster.tech/zh-CN/docs/product-manual/t1/getting-started/quick-start/ sha256 6ab5659a93f2a25b…. Retrieved 2026-10-22 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://www.boosterobotics.com/",
   "commercial_status_evidence": [
     {
@@ -120,6 +120,38 @@
     {
       "field": "runtime_minutes",
       "text": "Booster states '续航 2h' (battery endurance); conditions are not given. 120 min is a unit conversion."
+    },
+    {
+      "field": "mobility",
+      "text": "Booster Robotics states '单侧腿（6 个自由度）' / '全向行走 ：支持前向、后向、侧向行走，以及旋转和复合行走。' (https://docs.booster.tech/zh-CN/docs/product-manual/t1/getting-started/overview/)."
+    },
+    {
+      "field": "has_vision",
+      "text": "Booster Robotics states '深度相机、麦克风阵列、扬声器都在头部。' (https://docs.booster.tech/zh-CN/docs/product-manual/t1/getting-started/overview/)."
+    },
+    {
+      "field": "has_sdk",
+      "text": "Booster Robotics states '机型 Booster K1 / T1 / T2' (https://docs.booster.tech/zh-CN/docs/developer-guide/booster-os-python-sdk/sdk-overview/)."
+    },
+    {
+      "field": "has_api",
+      "text": "Booster Robotics states '并下发模式切换、速度控制、关节控制、动作、轨迹和音频播放等指令' (https://docs.booster.tech/zh-CN/docs/developer-guide/booster-os-python-sdk/sdk-overview/)."
+    },
+    {
+      "field": "ros_support",
+      "text": "Booster Robotics states 'ROS 2 节点与 Booster Robotics SDK 应用可以和 Booster 系统服务 互通' (https://docs.booster.tech/zh-CN/docs/developer-guide/cpp/sdk-overview/)."
+    },
+    {
+      "field": "simulation_support",
+      "text": "Booster Robotics states 'T1 (23 DoF)' / '23 自由度布局：头部 2、双臂各 4、腰部 1、双腿各 6 个关节。' / 'robots/T1/T1_23dof.urdf' (https://docs.booster.tech/zh-CN/docs/developer-guide/open-source/booster-assets/)."
+    },
+    {
+      "field": "has_language_ui",
+      "text": "Booster Robotics states 'Hi Chat ：支持语音对话' (https://docs.booster.tech/zh-CN/docs/product-manual/t1/getting-started/overview/)."
+    },
+    {
+      "field": "has_teleoperation",
+      "text": "Booster Robotics states '开机后等待约 1 分钟，机器人播放提示音，即可被遥控。' (https://docs.booster.tech/zh-CN/docs/product-manual/t1/getting-started/quick-start/)."
     }
   ]
 }

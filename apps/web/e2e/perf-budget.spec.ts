@@ -60,7 +60,9 @@ const STATIC: Budget[] = [
   // discovery claim id and verbatim value) and repeated in the streamed payload.
   // First governed promotion (#178, compute_base): 102 -> 104 (measured 102.6 in CI). Content,
   // not code: one more manufacturer-sourced extended spec with its source label.
-  { path: "/robots/unitree-g1", docKB: 104, jsRawKB: 412 },
+  // G1 Basic promotion (#187, five extended specs): 104 -> 109 (measured 108.0 in CI). Content,
+  // not code: five more manufacturer-sourced extended specs with their source labels.
+  { path: "/robots/unitree-g1", docKB: 109, jsRawKB: 412 },
   // UX-01: 32 -> 33 (measured 32.06). The compare price cell now carries its configuration,
   // basis tag, order note and the shared summary line, plus data-enum traceability.
   // SOCIAL-01: 33 -> 37 (measured 35.4).
@@ -74,7 +76,9 @@ const STATIC: Budget[] = [
   // (33 + 4 + 2 = 39): SOCIAL-01's cap already carried 1.6 kB of headroom, which this reuses.
   // A4 promotion batch 1: 38 -> 40 (measured 39.4 in CI): unitree-g1's six new extended specs
   // appear in its compare column. Measured size plus ~0.6 kB headroom.
-  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 40, jsRawKB: 431 },
+  // G1 Basic promotion (#187): 40 -> 43 (measured 41.9 in CI): the five new extended specs (and
+  // #178's compute_base) appear in unitree-g1's compare column. Measured size plus ~1 kB headroom.
+  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 43, jsRawKB: 431 },
   { path: "/find-a-humanoid", docKB: 46, jsRawKB: 424 },
 ];
 

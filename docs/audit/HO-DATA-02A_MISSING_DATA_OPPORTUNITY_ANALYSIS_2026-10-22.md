@@ -159,3 +159,7 @@ both against this baseline (65.4% / 46.1% @ `4f992c9`).
 Start with Batch 1. It needs only owner rulings D1–D8 and uses evidence already in production, and the same rulings
 set the semantics that Stage 3 extraction needs. Next would be Batch 2 (the A2 extractor, under an existing
 authorization) and the Batch 3 prefix authorizations. This document does not authorize any of them.
+
+> **Superseded in part by HO-DATA-02B** (`HO-DATA-02B_EVIDENCE_RECOVERY_PLAN_2026-10-22.md` §1 and §4). Once checked
+> against first-party sources, Batch 1 recovers 0 P0 cells, not 9. `unitree-r1 payload_kg` was a held but unmapped
+> claim (HELD_DECISION), not CRAWLED_PAGE_SILENT.

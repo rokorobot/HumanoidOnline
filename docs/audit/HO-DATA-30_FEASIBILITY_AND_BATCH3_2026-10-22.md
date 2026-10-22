@@ -85,7 +85,7 @@ identity-, policy- or conflict-blocked (§5).
 - mobility is set only from a stated locomotion type. hand_type only from a named standard end effector. Numeric fields only as stated, or by pure unit conversion.
 
 **Interpretive cells (the owner may strike them as a group).** Eleven accepted cells rest on a reading the owner
-may not share. Approving the batch **without** them gives an exact 43-cell batch on 16 robots: unitree-h2, agibot-a2-ultra, booster-t1, booster-t2-*, galbot-g1, fourier-intelligence-gr-2, ubtech-walker-s2, figure-03, boston-dynamics-atlas-electric, pal-reem-c, pal-talos, engineered-arts-ameca and softbank-pepper; the K1 records drop out.
+may not share. Approving the batch **without** them gives an exact 43-cell batch on 14 robots: unitree-h2, agibot-a2-ultra, booster-t1, booster-t2-*, galbot-g1, fourier-intelligence-gr-2, ubtech-walker-s2, figure-03, boston-dynamics-atlas-electric, pal-reem-c, pal-talos, engineered-arts-ameca and softbank-pepper; the K1 records drop out.
 
 | Cells | Reading |
 |---|---|

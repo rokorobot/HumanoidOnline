@@ -4,6 +4,10 @@
 commercially relevant robots with major P0 gaps; historical robots were deprioritized. Retrieval was read-only.
 Nothing was written to the catalogue, production or any discovery source.
 
+**Status of the 02C candidates:** this is a research report only. The 1X NEO values (walking speed 1.4 m/s, 842 Wh)
+are **unapproved catalogue candidates** and are **not** part of PR #191's 12-value promotion. This report's presence in
+that PR does not approve them. The Ameca values stay out of the catalogue until a raw first-party capture confirms them.
+
 **Method:** three Sonnet research agents used WebFetch, which returns a model summary of each page. The
 orchestrator then re-fetched every candidate value raw with curl. Only values seen in the raw body count as CLEAN.
 

@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "promotion_id": "2026-10-21-unitree-g1-basic-specs",
   "base": {
-    "catalogue_commit": "efd81436af751a6d1a59193bc33956a66c06b557",
+    "catalogue_commit": "7d39db63d8e9fb6e04a7303ca26820a67cae30f1",
     "robot_fingerprints": {
       "unitree-g1": "6208cf652d173c697cb9e741abd5740addbfe67c90551470509a824d6c3a2f4d"
     }
@@ -204,6 +204,6 @@
     "deletions": 0,
     "unrelated_robots": 0
   },
-  "generated_on": "2026-10-21",
-  "digest": "b45cafcfbccb19c707f13c7182e3c4519e29ce8cb5d695f66c4ba6804b3a57e5"
+  "generated_on": "2026-10-22",
+  "digest": "ee6f2711239a27227ccbd61d0d95866b727bf823feac119c7ee0dfd3540f0010"
 }

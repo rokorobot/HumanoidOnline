@@ -8,8 +8,8 @@
   "commercial_status": "COMMERCIAL",
   "is_published": true,
   "specs": {
-    "height_cm": null,
-    "weight_kg": null,
+    "height_cm": 169.0,
+    "weight_kg": 69.0,
     "arm_span_cm": null,
     "reach_cm": null,
     "payload_kg": null,
@@ -17,7 +17,7 @@
     "runtime_minutes": null,
     "battery_wh": null,
     "mobility": null,
-    "degrees_of_freedom": null,
+    "degrees_of_freedom": 40,
     "hand_type": null,
     "hand_dof": null,
     "autonomy": null,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Commercial maturity COMMERCIAL recorded 2026-10-04 (owner decision, six-robot review). Identity: this record is the A2 Ultra model only; the former generic \"A2\" record was remediated (A2 Ultra and A2 Lite are separate products). Specifications not yet verified.",
+  "specs_note": "Commercial maturity COMMERCIAL recorded 2026-10-04 (owner decision, six-robot review). Identity: this record is the A2 Ultra model only; the former generic \"A2\" record was remediated (A2 Ultra and A2 Lite are separate products). Selected specifications retrieved from first-party manufacturer documentation on 2026-10-22 under HO-DATA-02B. Evidence status: AGENT_ASSISTED_RESEARCH; not human-verified. Remaining specifications are unknown unless separately documented. SPECIFICATIONS (HO-DATA-02B, 2026-10-22): height, weight and total DoF from the A2 Ultra column of AgiBot's product specification table https://www.agibot.com/products/A2_Ultra, cross-checked against https://agibot.com/jp/products/A2_Ultra. Speed and arm load are deliberately left UNKNOWN: the English page states 'Max 1.2m/s' and 'Max Arm Load ≈2kg' while the Japanese page states '最大0.8m/s, 通常使用≤0.6m/s' and '片腕最大負荷 約3kg' for the same model — a first-party conflict for the owner. Runtime is left UNKNOWN pending a policy on multi-mode figures ('Standing : 3h, Walking : 1.5h+'). Battery Wh is not stated (14.4 Ah only) and is not derived. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-22 by Claude Opus 5.5 (curl 8.11.0: https://www.agibot.com/products/A2_Ultra sha256 1b596c3d3c3a11fa…; and https://agibot.com/jp/products/A2_Ultra sha256 a1984883aecaa036…) in a session initiated by Robert Konecny, under research work order 'HO-DATA-02B 2026-10-22' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://www.agibot.com/products/A2_Ultra",
   "commercial_status_evidence": [
     {
@@ -295,6 +295,20 @@
       "display_approved_by": "robert@humanoid.company",
       "display_approved_at": "2026-10-06T00:00:00Z",
       "last_verified_at": "2026-10-06T00:00:00Z"
+    }
+  ],
+  "spec_caveats": [
+    {
+      "field": "height_cm",
+      "text": "AgiBot's A2 Ultra specification table states 'Height 169cm' (English and Japanese product pages agree)."
+    },
+    {
+      "field": "weight_kg",
+      "text": "AgiBot states '≈69kg' for A2 Ultra: an approximate figure (English and Japanese pages agree)."
+    },
+    {
+      "field": "degrees_of_freedom",
+      "text": "AgiBot states 'Total DOF 40' for A2 Ultra (Japanese page: 主動自由度 40, active DoF). The table also lists neck 2, single arm 7, single leg 6 and a '6-DOF Dexterous Hand'; the total is recorded as stated, not recomputed."
     }
   ]
 }

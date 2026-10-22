@@ -8,16 +8,16 @@
   "commercial_status": "COMMERCIAL",
   "is_published": true,
   "specs": {
-    "height_cm": null,
-    "weight_kg": null,
+    "height_cm": 118.0,
+    "weight_kg": 30.0,
     "arm_span_cm": null,
     "reach_cm": null,
     "payload_kg": null,
-    "walk_speed_ms": null,
-    "runtime_minutes": null,
+    "walk_speed_ms": 1.0,
+    "runtime_minutes": 120,
     "battery_wh": null,
     "mobility": null,
-    "degrees_of_freedom": null,
+    "degrees_of_freedom": 23,
     "hand_type": null,
     "hand_dof": null,
     "autonomy": null,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Commercial maturity COMMERCIAL recorded 2026-10-04 (owner decision, six-robot review). Basis: manufacturer states it is now shipping worldwide, with institutional customers. Specifications not yet verified.",
+  "specs_note": "Commercial maturity COMMERCIAL recorded 2026-10-04 (owner decision, six-robot review). Basis: manufacturer states it is now shipping worldwide, with institutional customers. Selected specifications retrieved from first-party manufacturer documentation on 2026-10-22 under HO-DATA-02B. Evidence status: AGENT_ASSISTED_RESEARCH; not human-verified. Remaining specifications are unknown unless separately documented. SPECIFICATIONS (HO-DATA-02B, 2026-10-22): height, weight, whole-body DoF, walking speed and endurance from the specifications chapter of Booster's own T1 product manual https://docs.booster.tech/zh-CN/docs/product-manual/t1/getting-started/specifications/ (the booster.tech marketing site no longer shows a T1 page). The manual's single table covers both T1 editions (Basic and Standard differ only in compute). Payload is not stated there and stays UNKNOWN; battery Wh is not stated ('48V 10.5Ah' only) and is not derived. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-22 by Claude Opus 5.5 (curl 8.11.0: https://docs.booster.tech/zh-CN/docs/product-manual/t1/getting-started/specifications/ sha256 f30c459c972c497f…) in a session initiated by Robert Konecny, under research work order 'HO-DATA-02B 2026-10-22' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://www.boosterobotics.com/",
   "commercial_status_evidence": [
     {
@@ -98,6 +98,28 @@
       "display_approved_by": "robert@humanoid.company",
       "display_approved_at": "2026-10-06T00:00:00Z",
       "last_verified_at": "2026-10-06T00:00:00Z"
+    }
+  ],
+  "spec_caveats": [
+    {
+      "field": "height_cm",
+      "text": "Booster's T1 product manual states '高（站直） 1.18m' (standing upright); 118 cm is a unit conversion."
+    },
+    {
+      "field": "weight_kg",
+      "text": "Booster states '约 30kg' (approximately 30 kg); whether the battery is included is not stated."
+    },
+    {
+      "field": "degrees_of_freedom",
+      "text": "Booster states '全身自由度 23' (whole-body DoF): 6 per leg, 4 per arm (marked expandable, '4（可拓展）'), 1 waist, 2 head."
+    },
+    {
+      "field": "walk_speed_ms",
+      "text": "Booster states '行走速度 1m/s' (walking speed); test conditions are not given."
+    },
+    {
+      "field": "runtime_minutes",
+      "text": "Booster states '续航 2h' (battery endurance); conditions are not given. 120 min is a unit conversion."
     }
   ]
 }

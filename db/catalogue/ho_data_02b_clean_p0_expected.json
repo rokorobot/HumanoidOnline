@@ -1,0 +1,29 @@
+{
+  "_comment": "HO-DATA-02B CLEAN P0 enrichment (AGENT_ASSISTED_RESEARCH work order 'HO-DATA-02B 2026-10-22'; docs/audit/HO-DATA-02B_EVIDENCE_RECOVERY_PLAN_2026-10-22.md): expected business changes for `import_catalogue.py --only agibot-a2-ultra --only booster-t1 --only galbot-g1`. 3 robot rows CHANGED (12 core P0 values filled from NULL, spec_caveats, specs_note). No spec rows, offers, evidence, images, use-case fits or publication. NOT for import until the owner approves the PR.",
+  "expected": [
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "agibot-a2-ultra"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "booster-t1"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "galbot-g1"
+      },
+      "count": 1
+    }
+  ]
+}

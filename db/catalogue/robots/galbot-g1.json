@@ -9,15 +9,15 @@
   "is_published": true,
   "specs": {
     "height_cm": null,
-    "weight_kg": null,
+    "weight_kg": 92.5,
     "arm_span_cm": null,
     "reach_cm": null,
-    "payload_kg": null,
+    "payload_kg": 5.0,
     "walk_speed_ms": null,
-    "runtime_minutes": null,
+    "runtime_minutes": 480,
     "battery_wh": null,
     "mobility": null,
-    "degrees_of_freedom": null,
+    "degrees_of_freedom": 21,
     "hand_type": null,
     "hand_dof": null,
     "autonomy": null,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Commercial maturity COMMERCIAL recorded 2026-10-04 (owner decision, six-robot review). Basis: external deployments stated by the manufacturer and a public purchase link. Specifications not yet verified.",
+  "specs_note": "Commercial maturity COMMERCIAL recorded 2026-10-04 (owner decision, six-robot review). Basis: external deployments stated by the manufacturer and a public purchase link. Selected specifications retrieved from first-party manufacturer documentation on 2026-10-22 under HO-DATA-02B. Evidence status: AGENT_ASSISTED_RESEARCH; not human-verified. Remaining specifications are unknown unless separately documented. SPECIFICATIONS (HO-DATA-02B, 2026-10-22): weight, per-arm payload, DoF and working time from the specification table of Galbot's own G1 page http://www.galbot.com/g1/ (Chinese). Height is left UNKNOWN pending a policy for height-adjustable robots (stated '整机高度（最高）1730 mm', with a 650 mm leg-lift range); speed is left UNKNOWN pending a policy for wheeled-base maximum speed (stated '最大速度 1.5 m/s'). Battery Wh is not stated ('48 V 30 Ah' only) and is not derived. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-22 by Claude Opus 5.5 (curl 8.11.0: http://www.galbot.com/g1/ sha256 4f3b10993e3cdb1d…) in a session initiated by Robert Konecny, under research work order 'HO-DATA-02B 2026-10-22' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://www.galbot.com/",
   "commercial_status_evidence": [
     {
@@ -89,6 +89,24 @@
       "display_approved_by": "robert@humanoid.company",
       "display_approved_at": "2026-10-06T00:00:00Z",
       "last_verified_at": "2026-10-06T00:00:00Z"
+    }
+  ],
+  "spec_caveats": [
+    {
+      "field": "weight_kg",
+      "text": "Galbot states '机身重量 92.5 kg' (body weight); whether the battery is included is not stated."
+    },
+    {
+      "field": "payload_kg",
+      "text": "Galbot states '负载能力（腕部中心）单臂 5 kg / 合计 10 kg': 5 kg per arm at the wrist centre, 10 kg for both arms combined. The per-arm figure is recorded."
+    },
+    {
+      "field": "degrees_of_freedom",
+      "text": "Galbot states '自由度（不含底盘和末端执行器）合计 21': 21 DoF excluding the chassis and end effectors (neck 2, arms 7×2, waist 3, legs 2)."
+    },
+    {
+      "field": "runtime_minutes",
+      "text": "Galbot states '工作时长 8 小时' under the heading '续航与充电' (battery endurance and charging), next to '适配器充电 3.5 小时'; the duty cycle is not stated. 480 min is a unit conversion."
     }
   ]
 }

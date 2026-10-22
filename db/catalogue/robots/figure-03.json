@@ -15,7 +15,7 @@
     "payload_kg": 20.0,
     "walk_speed_ms": 1.2,
     "runtime_minutes": 300,
-    "battery_wh": null,
+    "battery_wh": 2300.0,
     "mobility": "BIPEDAL",
     "degrees_of_freedom": null,
     "hand_type": null,
@@ -23,15 +23,15 @@
     "autonomy": null,
     "has_manipulation": null,
     "has_teleoperation": null,
-    "has_vision": null,
-    "has_language_ui": null,
+    "has_vision": true,
+    "has_language_ui": true,
     "has_sdk": null,
     "has_api": null,
     "ros_support": null,
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Commercial maturity PILOT recorded 2026-10-04 (owner decision, six-robot review). Basis: Figure 03 placed at an external customer site and a customer deployment agreement; no purchase or general availability is stated. Figure 03 is a separate, unpublished successor-generation robot to Figure 02 (figure-02); it is not merged with it. SPECIFICATIONS (owner-approved promotion batch 1, 2026-10-19): height, weight, payload, runtime and speed come from the stat block of Figure's official product page https://www.figure.ai/figure, captured on 2026-10-18 by HumanoidOnline's automated discovery observation of the owner-authorized source figure-ai-official (docs/28 A4; adapter 0.2.0) and stored as discovery claims (height 48923025, weight bd4d27ae, payload b4da6ae2, runtime c3258260, speed 6e17a216). Weight, payload, runtime and speed are recorded as stated (61KG, 20KG, 5HR, 1.2M/S); height is stated as 5'8\" and recorded as approximately 173 cm. Automated capture, not a MANUAL_BOOTSTRAP reading; not independently verified. MOBILITY: BIPEDAL recorded by owner decision 2026-10-19 (not part of Figure's stat block).",
+  "specs_note": "Commercial maturity PILOT recorded 2026-10-04 (owner decision, six-robot review). Basis: Figure 03 placed at an external customer site and a customer deployment agreement; no purchase or general availability is stated. Figure 03 is a separate, unpublished successor-generation robot to Figure 02 (figure-02); it is not merged with it. SPECIFICATIONS (owner-approved promotion batch 1, 2026-10-19): height, weight, payload, runtime and speed come from the stat block of Figure's official product page https://www.figure.ai/figure, captured on 2026-10-18 by HumanoidOnline's automated discovery observation of the owner-authorized source figure-ai-official (docs/28 A4; adapter 0.2.0) and stored as discovery claims (height 48923025, weight bd4d27ae, payload b4da6ae2, runtime c3258260, speed 6e17a216). Weight, payload, runtime and speed are recorded as stated (61KG, 20KG, 5HR, 1.2M/S); height is stated as 5'8\" and recorded as approximately 173 cm. Automated capture, not a MANUAL_BOOTSTRAP reading; not independently verified. MOBILITY: BIPEDAL recorded by owner decision 2026-10-19 (not part of Figure's stat block). SPECIFICATIONS (HO-DATA-30 batch 3, 2026-10-22): battery_wh, has_vision, has_language_ui filled from first-party Figure sources, each quoted in spec_caveats. Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 authoring criteria, docs/audit/HO-DATA-30_FEASIBILITY_AND_BATCH3_2026-10-22.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://www.figure.ai/news/f-03-battery-development sha256 66c09914b2c8cc4d…; https://www.figure.ai/news/introducing-figure-03 sha256 55f71016f522bb41…. Retrieved 2026-10-22 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://www.figure.ai/",
   "commercial_status_evidence": [
     {
@@ -95,6 +95,18 @@
     {
       "field": "walk_speed_ms",
       "text": "Figure states 'Speed 1.2M/S' (claim 6e17a216); stated as the robot's speed, conditions not given."
+    },
+    {
+      "field": "battery_wh",
+      "text": "Figure states '2.3 kWh enables 5 hours of run time at peak performance' (https://www.figure.ai/news/f-03-battery-development). 2.3 kWh = 2300 Wh (unit conversion)."
+    },
+    {
+      "field": "has_vision",
+      "text": "Figure states 'Figure 03 introduces a next-generation vision system engineered for high-frequency visuomotor control. Its new camera architecture delivers twice the frame rate' (https://www.figure.ai/news/introducing-figure-03)."
+    },
+    {
+      "field": "has_language_ui",
+      "text": "Figure states 'To make it easier to communicate naturally with the robot, Figure 03 features an upgraded audio hardware system for better real time speech-to-speech.' (https://www.figure.ai/news/introducing-figure-03)."
     }
   ]
 }

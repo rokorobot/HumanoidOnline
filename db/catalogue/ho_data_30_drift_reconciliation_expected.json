@@ -1,0 +1,8 @@
+{
+  "_comment": "HO-DATA-30 Phase 2 drift reconciliation (docs/audit/HO-DATA-30_PHASE2_2026-10-22.md §2): expected business changes for `import_catalogue.py --only unitree-h1 --only unitree-h2-edu` with the catalogue JSON exactly as on main (no new values). Two H1 manufacturer-store evidence rows from the 2026-09-26 freshness pass (already merged in PR #66, never imported) are ADDED to the existing H1 QUOTE_ONLY pricing offer and ON_REQUEST availability offer, which themselves do not change; the alza-cz provider description is updated to main's text (owner monitoring approval 2026-10-18, monitoring not active). NOT for import until the owner approves.",
+  "only": ["unitree-h1", "unitree-h2-edu"],
+  "expected": [
+    {"table": "evidence_source", "kind": "ADDED", "match": {"source_url": "https://shop.unitree.com/products/unitree-h1", "observed_at~": "2026-09-26"}, "count": 2},
+    {"table": "provider", "kind": "CHANGED", "match": {"slug": "alza-cz"}, "count": 1}
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "_comment": "HO-DATA-30 batch 4 WITHOUT the drift-dependent robots (use only if the drift reconciliation is not approved): 6 robot rows CHANGED, 15 core values filled from NULL. The unitree-h1 / unitree-h2-edu JSON changes stay merged but are not imported.",
+  "only": [
+    "1x-eve",
+    "agility-digit",
+    "galbot-g1",
+    "softbank-pepper",
+    "ubtech-walker-s1",
+    "ubtech-walker-s2"
+  ],
+  "expected": [
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "1x-eve"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "agility-digit"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "galbot-g1"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "softbank-pepper"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "ubtech-walker-s1"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "ubtech-walker-s2"
+      },
+      "count": 1
+    }
+  ]
+}

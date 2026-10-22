@@ -1,0 +1,620 @@
+slug,field,priority,kind,class,basis,a4_source,commercial_status
+1x-eve,arm_span_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+1x-eve,reach_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+1x-eve,payload_kg,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+1x-eve,walk_speed_ms,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+1x-eve,runtime_minutes,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+1x-eve,battery_wh,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+1x-eve,degrees_of_freedom,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+1x-eve,hand_type,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+1x-eve,hand_dof,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+1x-eve,has_teleoperation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+1x-eve,has_vision,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+1x-eve,has_language_ui,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+1x-eve,has_sdk,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+1x-eve,has_api,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+1x-eve,ros_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+1x-eve,developer_edition,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+1x-eve,simulation_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+1x-neo,arm_span_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,EARLY_ACCESS
+1x-neo,reach_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,EARLY_ACCESS
+1x-neo,walk_speed_ms,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,EARLY_ACCESS
+1x-neo,battery_wh,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,,EARLY_ACCESS
+1x-neo,degrees_of_freedom,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,,EARLY_ACCESS
+1x-neo,has_sdk,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,EARLY_ACCESS
+1x-neo,has_api,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,EARLY_ACCESS
+1x-neo,ros_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,EARLY_ACCESS
+1x-neo,developer_edition,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,EARLY_ACCESS
+1x-neo,simulation_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,EARLY_ACCESS
+4ne1-mini,arm_span_cm,P2,value,CRAWLED_PAGE_SILENT,crawled neura-robotics.com product pages + datasheet: no claim states this field,neura-robotics-official,UNKNOWN
+4ne1-mini,reach_cm,P2,value,CRAWLED_PAGE_SILENT,crawled neura-robotics.com product pages + datasheet: no claim states this field,neura-robotics-official,UNKNOWN
+4ne1-mini,walk_speed_ms,P0,value,HELD_DECISION,'Max. 4.6 km/h' deliberately UNMAPPED: max speed is not walking speed,neura-robotics-official,UNKNOWN
+4ne1-mini,battery_wh,P1-tech,value,CRAWLED_PAGE_SILENT,crawled neura-robotics.com product pages + datasheet: no claim states this field,neura-robotics-official,UNKNOWN
+4ne1-mini,mobility,P1-tech,value,CRAWLED_PAGE_SILENT,crawled neura-robotics.com product pages + datasheet: no claim states this field,neura-robotics-official,UNKNOWN
+4ne1-mini,hand_type,P1-tech,value,CRAWLED_PAGE_SILENT,crawled neura-robotics.com product pages + datasheet: no claim states this field,neura-robotics-official,UNKNOWN
+4ne1-mini,hand_dof,P1-tech,value,CRAWLED_PAGE_SILENT,crawled neura-robotics.com product pages + datasheet: no claim states this field,neura-robotics-official,UNKNOWN
+4ne1-mini,autonomy,P1-capability,value,CRAWLED_PAGE_SILENT,crawled neura-robotics.com product pages + datasheet: no claim states this field,neura-robotics-official,UNKNOWN
+4ne1-mini,has_manipulation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled neura-robotics.com product pages + datasheet: no claim states this field,neura-robotics-official,UNKNOWN
+4ne1-mini,has_teleoperation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled neura-robotics.com product pages + datasheet: no claim states this field,neura-robotics-official,UNKNOWN
+4ne1-mini,has_vision,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled neura-robotics.com product pages + datasheet: no claim states this field,neura-robotics-official,UNKNOWN
+4ne1-mini,has_language_ui,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled neura-robotics.com product pages + datasheet: no claim states this field,neura-robotics-official,UNKNOWN
+4ne1-mini,has_sdk,P1-tech,boolean,HELD_DIRECT,"datasheet 'ROS2, C++, & Python SDK' (proposal DATASHEET_INTERFACES)",neura-robotics-official,UNKNOWN
+4ne1-mini,has_api,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled neura-robotics.com product pages + datasheet: no claim states this field,neura-robotics-official,UNKNOWN
+4ne1-mini,ros_support,P1-tech,boolean,HELD_DIRECT,"datasheet 'ROS2, C++, & Python SDK' (proposal DATASHEET_INTERFACES)",neura-robotics-official,UNKNOWN
+4ne1-mini,developer_edition,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled neura-robotics.com product pages + datasheet: no claim states this field,neura-robotics-official,UNKNOWN
+4ne1-mini,simulation_support,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled neura-robotics.com product pages + datasheet: no claim states this field,neura-robotics-official,UNKNOWN
+agibot-a2-ultra,height_cm,P0,value,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,weight_kg,P0,value,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,arm_span_cm,P2,value,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,reach_cm,P2,value,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,payload_kg,P0,value,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,walk_speed_ms,P0,value,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,runtime_minutes,P0,value,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,battery_wh,P1-tech,value,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,mobility,P1-tech,value,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,degrees_of_freedom,P0,value,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,hand_type,P1-tech,value,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,hand_dof,P1-tech,value,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,autonomy,P1-capability,value,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,has_manipulation,P1-capability,boolean,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,has_teleoperation,P1-capability,boolean,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,has_vision,P1-tech,boolean,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,has_language_ui,P1-tech,boolean,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,has_sdk,P1-tech,boolean,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,has_api,P1-tech,boolean,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,ros_support,P1-tech,boolean,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,developer_edition,P1-tech,boolean,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agibot-a2-ultra,simulation_support,P1-tech,boolean,FETCHED_NOT_EXTRACTED,https://www.agibot.com/products/A2 fetched by agibot-official; 0 A2 claims extracted (all 70 are X2),agibot-official,COMMERCIAL
+agility-digit,arm_span_cm,P2,value,CRAWLED_PAGE_SILENT,"crawled agilityrobotics.com/solutions/digit-5 (identity pending, D7): no claim states this field",agility-robotics-official,RAAS_DEPLOYMENT
+agility-digit,reach_cm,P2,value,HELD_DECISION,'Digit 5' NEW_ENTITY claim 'Reach 2.2m' - identity + vertical-vs-arm reach semantics,agility-robotics-official,RAAS_DEPLOYMENT
+agility-digit,walk_speed_ms,P0,value,CRAWLED_PAGE_SILENT,"crawled agilityrobotics.com/solutions/digit-5 (identity pending, D7): no claim states this field",agility-robotics-official,RAAS_DEPLOYMENT
+agility-digit,runtime_minutes,P0,value,HELD_DECISION,"'Digit 5' 'Work/Shift 20HRS/24HRS', 'Run to charge 10:1' - shift, not battery runtime",agility-robotics-official,RAAS_DEPLOYMENT
+agility-digit,battery_wh,P1-tech,value,CRAWLED_PAGE_SILENT,"crawled agilityrobotics.com/solutions/digit-5 (identity pending, D7): no claim states this field",agility-robotics-official,RAAS_DEPLOYMENT
+agility-digit,degrees_of_freedom,P0,value,CRAWLED_PAGE_SILENT,"crawled agilityrobotics.com/solutions/digit-5 (identity pending, D7): no claim states this field",agility-robotics-official,RAAS_DEPLOYMENT
+agility-digit,hand_type,P1-tech,value,CRAWLED_PAGE_SILENT,"crawled agilityrobotics.com/solutions/digit-5 (identity pending, D7): no claim states this field",agility-robotics-official,RAAS_DEPLOYMENT
+agility-digit,hand_dof,P1-tech,value,CRAWLED_PAGE_SILENT,"crawled agilityrobotics.com/solutions/digit-5 (identity pending, D7): no claim states this field",agility-robotics-official,RAAS_DEPLOYMENT
+agility-digit,has_teleoperation,P1-capability,boolean,CRAWLED_PAGE_SILENT,"crawled agilityrobotics.com/solutions/digit-5 (identity pending, D7): no claim states this field",agility-robotics-official,RAAS_DEPLOYMENT
+agility-digit,has_language_ui,P1-tech,boolean,CRAWLED_PAGE_SILENT,"crawled agilityrobotics.com/solutions/digit-5 (identity pending, D7): no claim states this field",agility-robotics-official,RAAS_DEPLOYMENT
+agility-digit,has_sdk,P1-tech,boolean,CRAWLED_PAGE_SILENT,"crawled agilityrobotics.com/solutions/digit-5 (identity pending, D7): no claim states this field",agility-robotics-official,RAAS_DEPLOYMENT
+agility-digit,ros_support,P1-tech,boolean,CRAWLED_PAGE_SILENT,"crawled agilityrobotics.com/solutions/digit-5 (identity pending, D7): no claim states this field",agility-robotics-official,RAAS_DEPLOYMENT
+agility-digit,developer_edition,P1-tech,boolean,CRAWLED_PAGE_SILENT,"crawled agilityrobotics.com/solutions/digit-5 (identity pending, D7): no claim states this field",agility-robotics-official,RAAS_DEPLOYMENT
+agility-digit,simulation_support,P1-tech,boolean,CRAWLED_PAGE_SILENT,"crawled agilityrobotics.com/solutions/digit-5 (identity pending, D7): no claim states this field",agility-robotics-official,RAAS_DEPLOYMENT
+apptronik-apollo,arm_span_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,PILOT
+apptronik-apollo,reach_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,PILOT
+apptronik-apollo,walk_speed_ms,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,PILOT
+apptronik-apollo,battery_wh,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,PILOT
+apptronik-apollo,degrees_of_freedom,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,,PILOT
+apptronik-apollo,hand_type,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,PILOT
+apptronik-apollo,hand_dof,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,PILOT
+apptronik-apollo,has_teleoperation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PILOT
+apptronik-apollo,has_language_ui,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PILOT
+apptronik-apollo,has_sdk,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PILOT
+apptronik-apollo,has_api,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PILOT
+apptronik-apollo,ros_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PILOT
+apptronik-apollo,developer_edition,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PILOT
+apptronik-apollo,simulation_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PILOT
+booster-k1-educational,arm_span_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-educational,reach_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-educational,payload_kg,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-educational,battery_wh,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-educational,hand_type,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-educational,hand_dof,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-educational,autonomy,P1-capability,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-educational,has_manipulation,P1-capability,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-educational,has_teleoperation,P1-capability,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-educational,developer_edition,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-geek,arm_span_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-geek,reach_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-geek,payload_kg,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-geek,battery_wh,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-geek,hand_type,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-geek,hand_dof,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-geek,autonomy,P1-capability,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-geek,has_manipulation,P1-capability,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-geek,has_teleoperation,P1-capability,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-geek,developer_edition,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-professional,arm_span_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-professional,reach_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-professional,payload_kg,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-professional,battery_wh,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-professional,hand_type,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-professional,hand_dof,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-professional,autonomy,P1-capability,value,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-professional,has_manipulation,P1-capability,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-professional,has_teleoperation,P1-capability,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-k1-professional,developer_edition,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,booster-robotics-official,COMMERCIAL
+booster-t1,height_cm,P0,value,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,weight_kg,P0,value,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,arm_span_cm,P2,value,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,reach_cm,P2,value,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,payload_kg,P0,value,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,walk_speed_ms,P0,value,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,runtime_minutes,P0,value,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,battery_wh,P1-tech,value,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,mobility,P1-tech,value,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,degrees_of_freedom,P0,value,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,hand_type,P1-tech,value,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,hand_dof,P1-tech,value,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,autonomy,P1-capability,value,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,has_manipulation,P1-capability,boolean,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,has_teleoperation,P1-capability,boolean,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,has_vision,P1-tech,boolean,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,has_language_ui,P1-tech,boolean,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,has_sdk,P1-tech,boolean,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,has_api,P1-tech,boolean,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,ros_support,P1-tech,boolean,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,developer_edition,P1-tech,boolean,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t1,simulation_support,P1-tech,boolean,SOURCE_PREFIX_EXTENSION,"booster-robotics-official authorizes /booster-t2, /booster-k1 only",booster-robotics-official,COMMERCIAL
+booster-t2-education,arm_span_cm,P2,value,CRAWLED_PAGE_SILENT,crawled booster.tech/booster-t2: no claim states this field,booster-robotics-official,COMMERCIAL
+booster-t2-education,reach_cm,P2,value,CRAWLED_PAGE_SILENT,crawled booster.tech/booster-t2: no claim states this field,booster-robotics-official,COMMERCIAL
+booster-t2-education,payload_kg,P0,value,HELD_DECISION,'Maximum Dual-Arm Payload 10 kg*' (footnoted); note keeps payload UNKNOWN,booster-robotics-official,COMMERCIAL
+booster-t2-education,battery_wh,P1-tech,value,HELD_DECISION,"'Battery Rating 48 V, 10 Ah' -> 480 Wh only by V x Ah derivation",booster-robotics-official,COMMERCIAL
+booster-t2-education,hand_type,P1-tech,value,HELD_DECISION,"'End Effector (Optional): standard, gripper, or dexterous hand' - configuration-dependent",booster-robotics-official,COMMERCIAL
+booster-t2-education,hand_dof,P1-tech,value,CRAWLED_PAGE_SILENT,crawled booster.tech/booster-t2: no claim states this field,booster-robotics-official,COMMERCIAL
+booster-t2-education,autonomy,P1-capability,value,CRAWLED_PAGE_SILENT,crawled booster.tech/booster-t2: no claim states this field,booster-robotics-official,COMMERCIAL
+booster-t2-education,has_manipulation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled booster.tech/booster-t2: no claim states this field,booster-robotics-official,COMMERCIAL
+booster-t2-education,has_teleoperation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled booster.tech/booster-t2: no claim states this field,booster-robotics-official,COMMERCIAL
+booster-t2-education,has_language_ui,P1-tech,boolean,HELD_DECISION,'Large-Model Support: Supported' + mic array/speaker (G1 precedent),booster-robotics-official,COMMERCIAL
+booster-t2-education,developer_edition,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled booster.tech/booster-t2: no claim states this field,booster-robotics-official,COMMERCIAL
+booster-t2-professional,arm_span_cm,P2,value,CRAWLED_PAGE_SILENT,crawled booster.tech/booster-t2: no claim states this field,booster-robotics-official,COMMERCIAL
+booster-t2-professional,reach_cm,P2,value,CRAWLED_PAGE_SILENT,crawled booster.tech/booster-t2: no claim states this field,booster-robotics-official,COMMERCIAL
+booster-t2-professional,payload_kg,P0,value,HELD_DECISION,'Maximum Dual-Arm Payload 10 kg*' (footnoted); note keeps payload UNKNOWN,booster-robotics-official,COMMERCIAL
+booster-t2-professional,battery_wh,P1-tech,value,HELD_DECISION,"'Battery Rating 48 V, 10 Ah' -> 480 Wh only by V x Ah derivation",booster-robotics-official,COMMERCIAL
+booster-t2-professional,hand_type,P1-tech,value,HELD_DECISION,"'End Effector (Optional): standard, gripper, or dexterous hand' - configuration-dependent",booster-robotics-official,COMMERCIAL
+booster-t2-professional,hand_dof,P1-tech,value,CRAWLED_PAGE_SILENT,crawled booster.tech/booster-t2: no claim states this field,booster-robotics-official,COMMERCIAL
+booster-t2-professional,autonomy,P1-capability,value,CRAWLED_PAGE_SILENT,crawled booster.tech/booster-t2: no claim states this field,booster-robotics-official,COMMERCIAL
+booster-t2-professional,has_manipulation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled booster.tech/booster-t2: no claim states this field,booster-robotics-official,COMMERCIAL
+booster-t2-professional,has_teleoperation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled booster.tech/booster-t2: no claim states this field,booster-robotics-official,COMMERCIAL
+booster-t2-professional,has_language_ui,P1-tech,boolean,HELD_DECISION,'Large-Model Support: Supported' + mic array/speaker (G1 precedent),booster-robotics-official,COMMERCIAL
+booster-t2-professional,developer_edition,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled booster.tech/booster-t2: no claim states this field,booster-robotics-official,COMMERCIAL
+boston-dynamics-atlas-electric,arm_span_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+boston-dynamics-atlas-electric,walk_speed_ms,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+boston-dynamics-atlas-electric,battery_wh,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+boston-dynamics-atlas-electric,hand_type,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+boston-dynamics-atlas-electric,hand_dof,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+boston-dynamics-atlas-electric,autonomy,P1-capability,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+boston-dynamics-atlas-electric,has_teleoperation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+boston-dynamics-atlas-electric,has_vision,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+boston-dynamics-atlas-electric,has_language_ui,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+boston-dynamics-atlas-electric,has_sdk,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+boston-dynamics-atlas-electric,has_api,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+boston-dynamics-atlas-electric,ros_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+boston-dynamics-atlas-electric,developer_edition,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+boston-dynamics-atlas-electric,simulation_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+engineered-arts-ameca,weight_kg,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+engineered-arts-ameca,arm_span_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+engineered-arts-ameca,reach_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+engineered-arts-ameca,payload_kg,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+engineered-arts-ameca,walk_speed_ms,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+engineered-arts-ameca,runtime_minutes,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+engineered-arts-ameca,battery_wh,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+engineered-arts-ameca,degrees_of_freedom,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+engineered-arts-ameca,hand_type,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+engineered-arts-ameca,hand_dof,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+engineered-arts-ameca,has_manipulation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+engineered-arts-ameca,has_teleoperation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+engineered-arts-ameca,has_sdk,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+engineered-arts-ameca,has_api,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+engineered-arts-ameca,ros_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+engineered-arts-ameca,developer_edition,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+engineered-arts-ameca,simulation_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+figure-02,height_cm,P0,value,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-02,weight_kg,P0,value,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-02,arm_span_cm,P2,value,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-02,reach_cm,P2,value,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-02,payload_kg,P0,value,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-02,walk_speed_ms,P0,value,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-02,runtime_minutes,P0,value,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-02,battery_wh,P1-tech,value,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-02,degrees_of_freedom,P0,value,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-02,hand_type,P1-tech,value,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-02,hand_dof,P1-tech,value,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-02,has_teleoperation,P1-capability,boolean,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-02,has_language_ui,P1-tech,boolean,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-02,has_sdk,P1-tech,boolean,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-02,has_api,P1-tech,boolean,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-02,ros_support,P1-tech,boolean,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-02,developer_edition,P1-tech,boolean,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-02,simulation_support,P1-tech,boolean,SOURCE_PREFIX_EXTENSION,figure-ai-official authorizes /figure only (F.03 page),figure-ai-official,DISCONTINUED
+figure-03,arm_span_cm,P2,value,CRAWLED_PAGE_SILENT,crawled figure.ai/figure: no claim states this field,figure-ai-official,PILOT
+figure-03,reach_cm,P2,value,CRAWLED_PAGE_SILENT,crawled figure.ai/figure: no claim states this field,figure-ai-official,PILOT
+figure-03,battery_wh,P1-tech,value,CRAWLED_PAGE_SILENT,crawled figure.ai/figure: no claim states this field,figure-ai-official,PILOT
+figure-03,degrees_of_freedom,P0,value,CRAWLED_PAGE_SILENT,crawled figure.ai/figure: no claim states this field,figure-ai-official,PILOT
+figure-03,hand_type,P1-tech,value,CRAWLED_PAGE_SILENT,crawled figure.ai/figure: no claim states this field,figure-ai-official,PILOT
+figure-03,hand_dof,P1-tech,value,CRAWLED_PAGE_SILENT,crawled figure.ai/figure: no claim states this field,figure-ai-official,PILOT
+figure-03,autonomy,P1-capability,value,CRAWLED_PAGE_SILENT,crawled figure.ai/figure: no claim states this field,figure-ai-official,PILOT
+figure-03,has_manipulation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled figure.ai/figure: no claim states this field,figure-ai-official,PILOT
+figure-03,has_teleoperation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled figure.ai/figure: no claim states this field,figure-ai-official,PILOT
+figure-03,has_vision,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled figure.ai/figure: no claim states this field,figure-ai-official,PILOT
+figure-03,has_language_ui,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled figure.ai/figure: no claim states this field,figure-ai-official,PILOT
+figure-03,has_sdk,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled figure.ai/figure: no claim states this field,figure-ai-official,PILOT
+figure-03,has_api,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled figure.ai/figure: no claim states this field,figure-ai-official,PILOT
+figure-03,ros_support,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled figure.ai/figure: no claim states this field,figure-ai-official,PILOT
+figure-03,developer_edition,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled figure.ai/figure: no claim states this field,figure-ai-official,PILOT
+figure-03,simulation_support,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled figure.ai/figure: no claim states this field,figure-ai-official,PILOT
+fourier-intelligence-gr-2,arm_span_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+fourier-intelligence-gr-2,reach_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+fourier-intelligence-gr-2,battery_wh,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+fourier-intelligence-gr-2,hand_type,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+fourier-intelligence-gr-2,hand_dof,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+fourier-intelligence-gr-2,autonomy,P1-capability,value,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+fourier-intelligence-gr-2,has_manipulation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+fourier-intelligence-gr-2,has_teleoperation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+fourier-intelligence-gr-2,has_vision,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+fourier-intelligence-gr-2,has_language_ui,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+fourier-intelligence-gr-2,has_api,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+fourier-intelligence-gr-2,developer_edition,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+fourier-intelligence-gr-2,simulation_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+galbot-g1,height_cm,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,weight_kg,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,arm_span_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,reach_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,payload_kg,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,walk_speed_ms,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,runtime_minutes,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,battery_wh,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,mobility,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,degrees_of_freedom,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,hand_type,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,hand_dof,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,autonomy,P1-capability,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,has_manipulation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,has_teleoperation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,has_vision,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,has_language_ui,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,has_sdk,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,has_api,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,ros_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,developer_edition,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+galbot-g1,simulation_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+hanson-sophia,arm_span_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+hanson-sophia,reach_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+hanson-sophia,payload_kg,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+hanson-sophia,walk_speed_ms,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+hanson-sophia,runtime_minutes,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+hanson-sophia,battery_wh,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+hanson-sophia,mobility,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+hanson-sophia,hand_type,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+hanson-sophia,hand_dof,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+hanson-sophia,autonomy,P1-capability,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+hanson-sophia,has_manipulation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+hanson-sophia,has_teleoperation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+hanson-sophia,has_sdk,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+hanson-sophia,has_api,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+hanson-sophia,ros_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+hanson-sophia,developer_edition,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+hanson-sophia,simulation_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,arm_span_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,reach_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,payload_kg,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,walk_speed_ms,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,runtime_minutes,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,battery_wh,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,degrees_of_freedom,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,hand_type,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,hand_dof,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,autonomy,P1-capability,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,has_manipulation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,has_teleoperation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,has_vision,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,has_language_ui,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,has_sdk,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,has_api,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,ros_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,developer_edition,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+honda-asimo,simulation_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+kepler-k2-forerunner,arm_span_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+kepler-k2-forerunner,reach_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+kepler-k2-forerunner,battery_wh,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+kepler-k2-forerunner,mobility,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+kepler-k2-forerunner,hand_type,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+kepler-k2-forerunner,hand_dof,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+kepler-k2-forerunner,autonomy,P1-capability,value,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+kepler-k2-forerunner,has_manipulation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+kepler-k2-forerunner,has_teleoperation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+kepler-k2-forerunner,has_vision,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+kepler-k2-forerunner,has_language_ui,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+kepler-k2-forerunner,has_sdk,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+kepler-k2-forerunner,has_api,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+kepler-k2-forerunner,ros_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+kepler-k2-forerunner,developer_edition,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+kepler-k2-forerunner,simulation_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+pal-reem-c,arm_span_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-reem-c,reach_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-reem-c,battery_wh,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-reem-c,hand_type,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-reem-c,hand_dof,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-reem-c,autonomy,P1-capability,value,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-reem-c,has_teleoperation,P1-capability,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-reem-c,has_vision,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-reem-c,has_language_ui,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-reem-c,has_api,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-reem-c,developer_edition,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-reem-c,simulation_support,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-talos,arm_span_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-talos,reach_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-talos,walk_speed_ms,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-talos,battery_wh,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-talos,degrees_of_freedom,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-talos,hand_type,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-talos,hand_dof,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-talos,autonomy,P1-capability,value,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-talos,has_teleoperation,P1-capability,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-talos,has_vision,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-talos,has_language_ui,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-talos,has_api,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+pal-talos,simulation_support,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,,UNKNOWN
+rainbow-hubo,height_cm,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,weight_kg,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,arm_span_cm,P2,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,reach_cm,P2,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,payload_kg,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,walk_speed_ms,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,runtime_minutes,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,battery_wh,P1-tech,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,mobility,P1-tech,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,degrees_of_freedom,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,hand_type,P1-tech,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,hand_dof,P1-tech,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,autonomy,P1-capability,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,has_manipulation,P1-capability,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,has_teleoperation,P1-capability,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,has_vision,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,has_language_ui,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,has_sdk,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,has_api,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,ros_support,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,developer_edition,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+rainbow-hubo,simulation_support,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+sanctuary-phoenix,arm_span_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+sanctuary-phoenix,reach_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+sanctuary-phoenix,battery_wh,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+sanctuary-phoenix,hand_type,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+sanctuary-phoenix,has_vision,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+sanctuary-phoenix,has_language_ui,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+sanctuary-phoenix,has_sdk,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+sanctuary-phoenix,has_api,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+sanctuary-phoenix,ros_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+sanctuary-phoenix,developer_edition,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+sanctuary-phoenix,simulation_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,PROTOTYPE
+softbank-nao,height_cm,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,weight_kg,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,arm_span_cm,P2,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,reach_cm,P2,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,payload_kg,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,walk_speed_ms,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,runtime_minutes,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,battery_wh,P1-tech,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,mobility,P1-tech,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,degrees_of_freedom,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,hand_type,P1-tech,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,hand_dof,P1-tech,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,autonomy,P1-capability,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,has_manipulation,P1-capability,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,has_teleoperation,P1-capability,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,has_vision,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,has_language_ui,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,has_sdk,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,has_api,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,ros_support,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,developer_edition,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-nao,simulation_support,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,height_cm,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,weight_kg,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,arm_span_cm,P2,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,reach_cm,P2,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,payload_kg,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,walk_speed_ms,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,runtime_minutes,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,battery_wh,P1-tech,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,mobility,P1-tech,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,degrees_of_freedom,P0,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,hand_type,P1-tech,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,hand_dof,P1-tech,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,autonomy,P1-capability,value,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,has_manipulation,P1-capability,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,has_teleoperation,P1-capability,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,has_vision,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,has_language_ui,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,has_sdk,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,has_api,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,ros_support,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,developer_edition,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+softbank-pepper,simulation_support,P1-tech,boolean,RESEARCH_NEVER_STARTED,placeholder specs_note; no spec research recorded,,UNKNOWN
+tesla-optimus,arm_span_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+tesla-optimus,reach_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+tesla-optimus,payload_kg,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+tesla-optimus,walk_speed_ms,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+tesla-optimus,runtime_minutes,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+tesla-optimus,battery_wh,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+tesla-optimus,degrees_of_freedom,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+tesla-optimus,hand_type,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+tesla-optimus,hand_dof,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+tesla-optimus,autonomy,P1-capability,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+tesla-optimus,has_teleoperation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+tesla-optimus,has_language_ui,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+tesla-optimus,has_sdk,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+tesla-optimus,has_api,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+tesla-optimus,ros_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+tesla-optimus,developer_edition,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+tesla-optimus,simulation_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+ubtech-walker-s1,arm_span_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+ubtech-walker-s1,reach_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+ubtech-walker-s1,walk_speed_ms,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+ubtech-walker-s1,runtime_minutes,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+ubtech-walker-s1,battery_wh,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+ubtech-walker-s1,degrees_of_freedom,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+ubtech-walker-s1,hand_type,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+ubtech-walker-s1,hand_dof,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+ubtech-walker-s1,has_teleoperation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+ubtech-walker-s1,has_vision,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+ubtech-walker-s1,has_language_ui,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+ubtech-walker-s1,has_sdk,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+ubtech-walker-s1,has_api,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+ubtech-walker-s1,ros_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+ubtech-walker-s1,developer_edition,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+ubtech-walker-s1,simulation_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,UNKNOWN
+ubtech-walker-s2,height_cm,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,weight_kg,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,arm_span_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,reach_cm,P2,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,payload_kg,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,walk_speed_ms,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,runtime_minutes,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,battery_wh,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,mobility,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,degrees_of_freedom,P0,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,hand_type,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,hand_dof,P1-tech,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,autonomy,P1-capability,value,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,has_manipulation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,has_teleoperation,P1-capability,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,has_vision,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,has_language_ui,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,has_sdk,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,has_api,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,ros_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,developer_edition,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+ubtech-walker-s2,simulation_support,P1-tech,boolean,RESEARCH,no held evidence and no recorded source check for this field,,COMMERCIAL
+unitree-g1-edu-plus-u2,arm_span_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-g1-edu-plus-u2,walk_speed_ms,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-g1-edu-plus-u2,battery_wh,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-g1-edu-plus-u2,autonomy,P1-capability,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-g1-edu-plus-u2,has_manipulation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/g1 (G1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-g1,arm_span_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-g1,walk_speed_ms,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-g1,battery_wh,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-g1,has_manipulation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/g1: no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-g1,has_sdk,P1-tech,boolean,HELD_DECISION,G1 column 'Secondary Development: /',unitree-robotics-official,COMMERCIAL
+unitree-g1,has_api,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/g1: no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-g1,developer_edition,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/g1: no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-h1,arm_span_cm,P2,value,SOURCE_PREFIX_EXTENSION,"unitree-robotics-official authorizes /H2, /R1, /g1 only",unitree-robotics-official,COMMERCIAL
+unitree-h1,reach_cm,P2,value,SOURCE_PREFIX_EXTENSION,"unitree-robotics-official authorizes /H2, /R1, /g1 only",unitree-robotics-official,COMMERCIAL
+unitree-h1,payload_kg,P0,value,SOURCE_PREFIX_EXTENSION,"unitree-robotics-official authorizes /H2, /R1, /g1 only",unitree-robotics-official,COMMERCIAL
+unitree-h1,runtime_minutes,P0,value,SOURCE_PREFIX_EXTENSION,"unitree-robotics-official authorizes /H2, /R1, /g1 only",unitree-robotics-official,COMMERCIAL
+unitree-h1,degrees_of_freedom,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-h1,hand_type,P1-tech,value,SOURCE_PREFIX_EXTENSION,"unitree-robotics-official authorizes /H2, /R1, /g1 only",unitree-robotics-official,COMMERCIAL
+unitree-h1,hand_dof,P1-tech,value,SOURCE_PREFIX_EXTENSION,"unitree-robotics-official authorizes /H2, /R1, /g1 only",unitree-robotics-official,COMMERCIAL
+unitree-h1,autonomy,P1-capability,value,SOURCE_PREFIX_EXTENSION,"unitree-robotics-official authorizes /H2, /R1, /g1 only",unitree-robotics-official,COMMERCIAL
+unitree-h1,has_teleoperation,P1-capability,boolean,SOURCE_PREFIX_EXTENSION,"unitree-robotics-official authorizes /H2, /R1, /g1 only",unitree-robotics-official,COMMERCIAL
+unitree-h1,has_language_ui,P1-tech,boolean,SOURCE_PREFIX_EXTENSION,"unitree-robotics-official authorizes /H2, /R1, /g1 only",unitree-robotics-official,COMMERCIAL
+unitree-h1,has_api,P1-tech,boolean,SOURCE_PREFIX_EXTENSION,"unitree-robotics-official authorizes /H2, /R1, /g1 only",unitree-robotics-official,COMMERCIAL
+unitree-h1,developer_edition,P1-tech,boolean,SOURCE_PREFIX_EXTENSION,"unitree-robotics-official authorizes /H2, /R1, /g1 only",unitree-robotics-official,COMMERCIAL
+unitree-h2-edu,arm_span_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2-edu,reach_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2-edu,walk_speed_ms,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2-edu,hand_type,P1-tech,value,HELD_DECISION,"H2 EDU column 'Dexterous Hand (Multiple Model Options)' - option, not fitted spec",unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2-edu,hand_dof,P1-tech,value,CRAWLED_PAGE_SILENT,crawled unitree.com/H2 (H2 EDU column): no claim states this field,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2-edu,autonomy,P1-capability,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2-edu,has_manipulation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/H2 (H2 EDU column): no claim states this field,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2-edu,has_teleoperation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/H2 (H2 EDU column): no claim states this field,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2-edu,has_api,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/H2 (H2 EDU column): no claim states this field,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2-edu,ros_support,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2-edu,simulation_support,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2,arm_span_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2,reach_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2,walk_speed_ms,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2,hand_type,P1-tech,value,HELD_DECISION,H2 column 'Dexterous Hand: /',unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2,hand_dof,P1-tech,value,HELD_DECISION,H2 column 'Dexterous Hand: /',unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2,autonomy,P1-capability,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2,has_manipulation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/H2: no claim states this field,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2,has_teleoperation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/H2: no claim states this field,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2,has_sdk,P1-tech,boolean,HELD_DECISION,H2 column 'Secondary Development: /',unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2,has_api,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/H2: no claim states this field,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2,ros_support,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2,developer_edition,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/H2: no claim states this field,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-h2,simulation_support,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,LIMITED_COMMERCIAL
+unitree-r1-edu-u1,arm_span_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u1,reach_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u1,payload_kg,P0,value,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u1,walk_speed_ms,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u1,battery_wh,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u1,degrees_of_freedom,P0,value,HELD_DECISION,R1 EDU column '26-40' - range; per-U-edition value not stated,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u1,hand_type,P1-tech,value,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u1,hand_dof,P1-tech,value,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u1,autonomy,P1-capability,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u1,has_manipulation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u1,has_teleoperation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u1,ros_support,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u2,arm_span_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u2,reach_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u2,payload_kg,P0,value,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u2,walk_speed_ms,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u2,battery_wh,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u2,hand_type,P1-tech,value,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u2,hand_dof,P1-tech,value,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u2,autonomy,P1-capability,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u2,has_manipulation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u2,has_teleoperation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u2,ros_support,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u3,weight_kg,P0,value,HELD_DECISION,R1 EDU column 'About 29kg' - generic EDU column; U-edition hand fit-out may change mass,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u3,arm_span_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u3,reach_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u3,payload_kg,P0,value,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u3,walk_speed_ms,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u3,battery_wh,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u3,autonomy,P1-capability,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u3,has_teleoperation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u3,ros_support,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u4,weight_kg,P0,value,HELD_DECISION,R1 EDU column 'About 29kg' - generic EDU column; U-edition hand fit-out may change mass,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u4,arm_span_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u4,reach_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u4,payload_kg,P0,value,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u4,walk_speed_ms,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u4,battery_wh,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u4,autonomy,P1-capability,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u4,has_teleoperation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u4,ros_support,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u5,weight_kg,P0,value,HELD_DECISION,R1 EDU column 'About 29kg' - generic EDU column; U-edition hand fit-out may change mass,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u5,arm_span_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u5,reach_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u5,payload_kg,P0,value,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u5,walk_speed_ms,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u5,battery_wh,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u5,autonomy,P1-capability,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u5,has_teleoperation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u5,ros_support,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u6,weight_kg,P0,value,HELD_DECISION,R1 EDU column 'About 29kg' - generic EDU column; U-edition hand fit-out may change mass,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u6,arm_span_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u6,reach_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u6,payload_kg,P0,value,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u6,walk_speed_ms,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u6,battery_wh,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u6,autonomy,P1-capability,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u6,has_teleoperation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/R1 (R1 EDU column): no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1-edu-u6,ros_support,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1,arm_span_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1,reach_cm,P2,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1,payload_kg,P0,value,CRAWLED_PAGE_SILENT,crawled unitree.com/R1: no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1,walk_speed_ms,P0,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1,battery_wh,P1-tech,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1,hand_type,P1-tech,value,HELD_DECISION,R1 column 'Dexterous Hand: /',unitree-robotics-official,COMMERCIAL
+unitree-r1,hand_dof,P1-tech,value,HELD_DECISION,R1 column 'Dexterous Hand: /',unitree-robotics-official,COMMERCIAL
+unitree-r1,autonomy,P1-capability,value,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1,has_manipulation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/R1: no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1,has_teleoperation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/R1: no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1,has_sdk,P1-tech,boolean,HELD_DECISION,R1 column 'Secondary Development: /',unitree-robotics-official,COMMERCIAL
+unitree-r1,has_api,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/R1: no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1,ros_support,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+unitree-r1,developer_edition,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled unitree.com/R1: no claim states this field,unitree-robotics-official,COMMERCIAL
+unitree-r1,simulation_support,P1-tech,boolean,SOURCE_SILENT,specs_note: checked primary source does not state it,unitree-robotics-official,COMMERCIAL
+xpeng-iron,height_cm,P0,value,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,weight_kg,P0,value,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,arm_span_cm,P2,value,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,reach_cm,P2,value,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,payload_kg,P0,value,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,walk_speed_ms,P0,value,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,runtime_minutes,P0,value,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,battery_wh,P1-tech,value,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,mobility,P1-tech,value,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,hand_type,P1-tech,value,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,autonomy,P1-capability,value,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,has_manipulation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,has_teleoperation,P1-capability,boolean,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,has_vision,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,has_language_ui,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,has_sdk,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,has_api,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,ros_support,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,developer_edition,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED
+xpeng-iron,simulation_support,P1-tech,boolean,CRAWLED_PAGE_SILENT,crawled xpeng.com IRON page + 3 news pages: no claim states this field,xpeng-official,ANNOUNCED

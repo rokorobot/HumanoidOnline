@@ -1,6 +1,13 @@
 # HO-DATA-02B — Evidence Recovery and P0 Enrichment: Research Plan and Backlog (2026-10-22)
 
 **Status:** plan and evidence backlog only. **Nothing here is approved, promoted, imported or published.**
+
+> **Update 2026-10-22 (later):** the 12 CLEAN P0 values were imported as HO-DATA Fast Lane batch 1 (PR #191 @ `6a725da`;
+> P0 UNKNOWN 46.1% → 41.5%). Research for this backlog now runs under the standing 90-day work order
+> `HO-DATA-STANDING 2026-10-22` (`docs/decisions/DR-D1_HO_DATA_FAST_LANE_AND_STANDING_RESEARCH_AUTHORIZATION.md`):
+> the per-row "Work order" basis in §6 is satisfied by that authorization for manufacturer sources, and no further
+> research work order is needed within its scope. Catalogue changes, identity decisions and D1–D12 still need the
+> owner. Batch 2 progress: `HO-DATA-FL2_BATCH_2026-10-22.md`.
 No catalogue file, production row, source authorization or publication state was changed.
 
 **Baseline:** HO-DATA-02A @ `4f992c9`. P0 UNKNOWN = 119/258 = **46.1%**. Target: below 30% (≤77 UNKNOWN), i.e. ≥42 P0 cells must be resolved.
@@ -105,7 +112,10 @@ Every manifest row carries `evidence_status`, using the distinctions the brief a
 "Verified undisclosed" is scoped to the documents listed. Walker S2, for example, is undisclosed on UBTECH's EN and CN
 product pages; a UBTECH brochure could still state it.
 
-## 6. Source-by-source plan for the remaining P0 gaps (next work order — PROPOSE ONLY)
+## 6. Source-by-source plan for the remaining P0 gaps
+
+*Research basis since 2026-10-22: the standing work order in DR-D1 (manufacturer sources). Rows whose basis is
+"Owner action" or an identity decision still need the owner.*
 
 The remaining 67 P0 cells are outside this work order. Ranked by expected first-party disclosure × cells. "Basis"
 is what the owner would need to authorize. No A4 change is needed for agent-assisted research.

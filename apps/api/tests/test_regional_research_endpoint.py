@@ -87,7 +87,7 @@ def test_groups_exclude_qualifying_and_empty_groups_and_explain_each_reason():
 def test_faq_is_generated_from_data_and_never_claims_unavailability():
     p = _projection(*_sample())
     faq = {f["question"]: f["answer"] for f in p["faq"]}
-    assert len(faq) == 4
+    assert len(faq) == 8
     assert "A and B" in faq["Can I buy a humanoid robot in Europe?"]
     assert faq["Which humanoid robots in Europe have a published price?"].count("A") >= 1
     meaning = faq['What does "no confirmed Europe offer" mean?']

@@ -240,7 +240,18 @@ describe("valid North America preview", () => {
     const editorial = container.querySelector('[data-testid="editorial"]')?.textContent ?? "";
     expect(editorial).toContain("DRAFT");
     expect(editorial).toContain("UN M49 North America classification");
+    expect(editorial).toContain("Covered List");
     expect(editorial).not.toContain("Reviewed");
+    // Every source is cited, not only the first.
+    const sources = [...container.querySelectorAll('[data-testid="editorial-source"] a')].map(
+      (a) => a.getAttribute("href"),
+    );
+    expect(sources).toEqual(EDITORIAL["north-america"].sources);
+    expect(container.querySelector('[data-testid="editorial-source"]')?.textContent).toContain(
+      "FCC — Public Notice DA 26-786 (28 July 2026)",
+    );
+    // No changing figure is hard-coded into the editorial text.
+    expect(EDITORIAL["north-america"].paragraphs.join(" ")).not.toMatch(/\$|USD|\d+ robots?/);
     expect(container.querySelector("h1")?.textContent).toBe(
       "Which humanoid robots are available in North America?",
     );

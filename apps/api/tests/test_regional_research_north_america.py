@@ -290,3 +290,48 @@ def test_real_catalogue_known_findings_at_the_audit_snapshot():
     deployed = {d.robot_slug for d in r.deployments}
     assert {"agility-digit", "figure-02"} <= deployed
     assert "apptronik-apollo" not in deployed  # deployment region unresolved
+
+
+# --- buyer FAQs (generated from the projection) ------------------------------------------
+
+def test_buyer_faqs_separate_direct_from_gated_seller_type_countries_and_deployments():
+    robots = (
+        RobotRow("g1", "G1", "unitree", "Unitree", True, "COMMERCIAL",
+                 (fx.offer("US", provider="robotshop-us"),)),
+        RobotRow("neo", "NEO", "1x", "1X", True, "COMMERCIAL",
+                 (fx.offer("US", "PREORDER", provider="1x-store", ptype="OEM"),)),
+        RobotRow("nao", "NAO", "softbank", "SoftBank", True, "COMMERCIAL",
+                 (fx.offer("CA", "ON_REQUEST", provider="robotlab", ptype="INTEGRATOR"),
+                  fx.offer("CA", "ON_REQUEST", tx="LEASE", provider="robotlab",
+                           ptype="INTEGRATOR"))),
+        RobotRow("digit", "Digit", "agility", "Agility", True, "RAAS_DEPLOYMENT", (), (),
+                 (_dep("US"),)),
+    )
+    faq = {f["question"]: f["answer"] for f in project(*robots)["faq"]}
+    direct = faq["Which humanoid robots can be ordered directly in North America, and which "
+                 "need a quote, preorder or sales contact?"]
+    assert "(available or limited) are on file for: G1." in direct
+    assert "sales contact are on file for: NAO and NEO." in direct
+    seller = faq["Are North America humanoid robot offers sold by manufacturers or by resellers?"]
+    assert "manufacturer: NEO" in seller and "third-party seller: G1 and NAO" in seller
+    where = faq["In which North America countries is a humanoid robot offer confirmed?"]
+    assert "name: Canada and United States." in where
+    assert "not proof that robots cannot be obtained there" in where
+    deploy = faq["Does a humanoid robot deployment in North America mean I can buy it there?"]
+    assert deploy.startswith("No.") and "for: Digit" in deploy
+    assert len(faq) == 8
+
+
+def test_real_catalogue_na02_batch_reaches_the_gate_without_double_counting():
+    """HO-RESEARCH-NA-02 batch (pending owner approval): K1 Educational via RobotShop
+    US and NAO6 via RobotLAB. NAO's purchase and lease rows are one robot."""
+    r = _real()
+    slugs = [o.robot_slug for o in r.qualifying_offers]
+    assert {"booster-k1-educational", "softbank-nao"} <= set(slugs)
+    assert slugs.count("softbank-nao") == 2  # purchase + lease offers
+    assert r.key_figures.qualifying_robots == len(set(slugs))
+    assert r.gate.passes and r.reconciles
+    assert "unitree-g1-edu-plus-u2" not in slugs  # RoboStore lists it sold out: not recorded
+    k1 = next(o for o in r.qualifying_offers if o.robot_slug == "booster-k1-educational"
+              and o.region_code == "US")
+    assert (k1.provider_slug, k1.availability_status) == ("robotshop-us", "ON_REQUEST")

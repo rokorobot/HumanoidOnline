@@ -211,7 +211,7 @@ export function ResearchResource({
             <tr><th scope="row">Purchasable robots with price not published</th><td>{kf.purchase_robots_price_not_published}</td></tr>
             {kf.robots_by_other_transaction.map((t) => (
               <tr key={t.transaction_type}>
-                <th scope="row">With a confirmed {transactionLabel(t.transaction_type).toLowerCase()} offer</th>
+                <th scope="row">With a confirmed {t.transaction_type === "RAAS" ? "RaaS" : transactionLabel(t.transaction_type).toLowerCase()} offer</th>
                 <td>{t.robots}</td>
               </tr>
             ))}
@@ -347,10 +347,13 @@ export function ResearchResource({
           {editorial.fragment.sources.length > 0 && (
             <p data-testid="editorial-source">
               <small>
-                Source:{" "}
-                <a href={editorial.fragment.sources[0]} rel="noopener">
-                  {editorialSourceLabel(editorial.fragment.sources[0])}
-                </a>
+                {editorial.fragment.sources.length === 1 ? "Source: " : "Sources: "}
+                {editorial.fragment.sources.map((url, i) => (
+                  <span key={url}>
+                    {i > 0 && "; "}
+                    <a href={url} rel="noopener">{editorialSourceLabel(url)}</a>
+                  </span>
+                ))}
               </small>
             </p>
           )}

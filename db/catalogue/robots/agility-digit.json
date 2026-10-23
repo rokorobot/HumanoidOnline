@@ -62,7 +62,7 @@
       "provider_slug": "agility-raas",
       "variant_slug": null,
       "lead_time_days": null,
-      "note": "Engaged via multi-year RaaS contract; no outright unit purchase offered. Current route (owner decision D4, 2026-10-23): contact sales through Agility's 'Deploy Digit' page; that page names no transaction type, price or country, so the RaaS model and US scope still rest on the 2024 GXO agreement.",
+      "note": "Historical engagement: the 2024 GXO multi-year RaaS contract (Digit 4 per Agility, 2026-09-15); no outright unit purchase was offered. Current channel (owner decision D4, 2026-10-23): contact sales via agilityrobotics.com/sales ('Get Digit in your facility'), reached from both 'Deploy Digit' and 'Deploy Digit 5' buttons. That page names no generation, transaction type, price or country, so this offer is generation-unspecified: the RAAS transaction and US scope rest on the 2024 GXO contract. Digit 5 is in development (early access expected H1 2027, general availability by end-2027, per Agility 2026-09-15) and none of its specifications or availability are recorded on this record.",
       "evidence": [
         {
           "source_url": "https://www.agilityrobotics.com/sales",
@@ -73,7 +73,7 @@
           "observed_at": "2026-10-23",
           "verified_at": null,
           "confidence": "HIGH",
-          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-23 by Claude Opus 5.5 (WebFetch; processed page text) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-NA-01 — Complete North America Research Resource' (2026-10-23), owner decision D4 (keep Digit listed as a contact-sales offer). Not a MANUAL_BOOTSTRAP reading. Not human-verified. The homepage 'Deploy Digit' buttons link here. The page states no RaaS, purchase, lease, price or country; it confirms only that Digit is obtained by contacting sales (ON_REQUEST)."
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-23 by Claude Opus 5.5 (WebFetch; processed page text) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-NA-01 — Complete North America Research Resource' (2026-10-23), owner decision D4 (keep Digit listed as a contact-sales offer). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Both 'Deploy Digit' and 'Deploy Digit 5' buttons (homepage and /solutions/digit-5) link here, so the page is generation-neutral and is not evidence about any specific generation. The page states no RaaS, purchase, lease, price or country; it confirms only that Digit is obtained by contacting sales (ON_REQUEST)."
         },
         {
           "source_url": "https://www.agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics",

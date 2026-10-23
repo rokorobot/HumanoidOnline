@@ -459,6 +459,14 @@ describe("JSON-LD and parity", () => {
     expect(formatPriceState({ ...range, price_min: null, price_max: null })).toBe("Not published");
   });
 
+  it("a FROM price reads as a starting price, never as a flat price", () => {
+    const base = projection().offers[0].prices[0];
+    expect(formatPriceState({ ...base, price_type: "FROM", amount: 16990, currency: "USD" }))
+      .toBe("From 16,990 USD");
+    expect(formatPriceState({ ...base, price_type: "PUBLIC", amount: 16990, currency: "USD" }))
+      .toBe("16,990 USD");
+  });
+
   it("price formatting never turns UNKNOWN into a number", () => {
     const unknown = projection().offers[1].prices[0];
     expect(formatPriceState(unknown)).toBe("Not published");

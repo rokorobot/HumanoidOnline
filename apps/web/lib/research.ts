@@ -277,7 +277,8 @@ export function formatPriceState(p: ResearchPriceState): string {
   const cur = p.currency ? ` ${p.currency}` : "";
   switch (p.kind) {
     case "PUBLISHED":
-      if (p.amount !== null) return `${money(p.amount)}${cur}${per}`;
+      // A FROM price is a starting price ("Starting at"), never shown as a flat price.
+      if (p.amount !== null) return `${p.price_type === "FROM" ? "From " : ""}${money(p.amount)}${cur}${per}`;
       // A range is shown only with BOTH bounds; there is no path to a made-up 0.
       if (p.price_min !== null && p.price_max !== null) {
         return `${money(p.price_min)}–${money(p.price_max)}${cur}${per}`;

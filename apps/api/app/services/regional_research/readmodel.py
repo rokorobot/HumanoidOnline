@@ -174,6 +174,8 @@ class RegionalAvailability:
     region_name: str
     snapshot_date: date
     member_region_codes: tuple[str, ...]
+    # (code, name) of each region a qualifying offer names, sorted by code.
+    offer_regions: tuple[tuple[str, str], ...]
     key_figures: KeyFigures
     qualifying_offers: tuple[QualifyingOffer, ...]
     deployments: tuple[RegionalDeployment, ...]
@@ -499,7 +501,8 @@ def build_regional_availability(
     min_manufacturers: int = DEFAULT_MIN_MANUFACTURERS,
 ) -> RegionalAvailability:
     members = region_members(snapshot.regions, region_code)
-    region_name = next(r.name for r in snapshot.regions if r.code == region_code)
+    names = {r.code: r.name for r in snapshot.regions}
+    region_name = names[region_code]
 
     published = sorted((r for r in snapshot.robots if r.is_published), key=lambda r: r.slug)
     deployments = tuple(
@@ -597,6 +600,9 @@ def build_regional_availability(
         region_name=region_name,
         snapshot_date=snapshot.snapshot_date,
         member_region_codes=tuple(sorted(members)),
+        offer_regions=tuple(sorted(
+            {(o.region_code, names.get(o.region_code, o.region_code)) for o in qualifying_offers}
+        )),
         key_figures=kf,
         qualifying_offers=qualifying_offers,
         deployments=deployments,

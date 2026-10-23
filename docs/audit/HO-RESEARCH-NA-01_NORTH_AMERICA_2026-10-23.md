@@ -65,16 +65,21 @@ Price and availability are commercial assertions, so the standing Fast Lane poli
 ```json
 {
   "source_url": "https://www.1x.tech/order",
-  "source_type": "MANUFACTURER_SITE",
+  "source_type": "MANUFACTURER_STORE",
   "source_title": "1X — Order NEO",
   "excerpt": "<record-specific: '$20,000' | '$499/mo' | 'US Deliveries start 2026'; '$200 Deposit Due Today'>",
   "published_at": null,
   "observed_at": "2026-10-23",
   "verified_at": null,
   "confidence": "HIGH",
-  "note": "Agent observation under HO-RESEARCH-NA-01 (2026-10-23); not owner-verified."
+  "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-23 by Claude (public GET, no login) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-NA-01 — Complete North America Research Resource' (2026-10-23). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Page names US deliveries only; no other country."
 }
 ```
+
+This follows the existing convention for agent-retrieved commercial evidence in the catalogue:
+- 9 manufacturer-store rows: `HIGH` / `MANUFACTURER_STORE`.
+- 47 third-party rows: `MEDIUM` / `OTHER`.
+- All of them have `verified_at` null. None is `VERIFIED`, and none is attributed to the owner.
 
 **Expected production effect** (scoped import `--only 1x-neo`):
 - Exactly 3 evidence_source rows added.
@@ -96,7 +101,13 @@ Even with all four steps, the realistic outcome is about 4–5 robots from 3 man
 
 ## 5. Owner decisions
 
-- **D1 Geography.** NORTH_AMERICA = all 41 UN M49 003 codes, **including territories** (PR, VI, GL, BM, KY, …), as this brief asks. Europe v0.1 is sovereign states only, so the two regions differ: accept the difference, or restrict NA to sovereign states.
+- **D1 Geography (conflict to resolve).** This PR implements NORTH_AMERICA as all 41 UN M49 003 codes, **including territories** (PR, VI, GL, BM, KY, …), as the HO-RESEARCH-NA-01 brief asks.
+  - This **differs from ADR-027 §4**, which reads "North America = US, CA, MX (+ NORTH_AMERICA row)", and from Europe v0.1, which covers sovereign states only.
+  - The ADR is not edited here.
+  - Today both readings give identical figures, because only US offers exist.
+  - Choose one:
+    - (a) keep M49 003 and amend ADR-027 §4; or
+    - (b) restrict to US / CA / MX. That means a 3-code `regions.json` change plus `test_catalogue_regions_north_america.py` and the editorial paragraph 1.
 - **D2 Hierarchy import.** `regions.json` adds NORTH_AMERICA and reparents the 41 codes. It changes only `region.parent_id`.
   - No offer, price or deployment references NORTH_AMERICA, so matching, lead routing and `commercial_offer` behave identically (pinned by a test).
   - It needs a governed production import of the regions. Until then the API returns 404 for North America, even with a preview token.

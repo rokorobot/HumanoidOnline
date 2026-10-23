@@ -5,9 +5,11 @@ Membership lives in the catalogue's region hierarchy, never in the page layer
 North America (003) = Northern America (021) + Central America (013) + Caribbean
 (029). Unlike EUROPE v0.1 (sovereign states only), it deliberately INCLUDES the
 M49 territories that have an ISO 3166-1 row (PR, VI, GL, BM, ...), as the
-HO-RESEARCH-NA-01 brief asks; that asymmetry is an owner decision recorded in
-the PR. Every member is a direct child, so reparenting changes only
-`region.parent_id`. These tests pin the hierarchy shape, not the page.
+HO-RESEARCH-NA-01 brief asks. ADR-027 §4 names only US, CA, MX: which reading
+stands is owner decision D1 in
+docs/audit/HO-RESEARCH-NA-01_NORTH_AMERICA_2026-10-23.md. Every member is a
+direct child, so reparenting changes only `region.parent_id`. These tests pin
+the hierarchy shape, not the page.
 """
 from __future__ import annotations
 

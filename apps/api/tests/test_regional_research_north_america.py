@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 import sys
-from datetime import date, timedelta
+from datetime import date
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -280,18 +280,10 @@ def test_real_catalogue_north_america_invariants():
 
 
 def test_real_catalogue_known_findings_at_the_audit_snapshot():
-    """Monotone where possible, so a later evidence refresh cannot break it."""
+    """Monotone only (like Europe's), so a later evidence refresh or a newly
+    authorized source cannot break it."""
     r = _real()
     assert "unitree-g1" in {o.robot_slug for o in r.qualifying_offers}
     deployed = {d.robot_slug for d in r.deployments}
     assert {"agility-digit", "figure-02"} <= deployed
     assert "apptronik-apollo" not in deployed  # deployment region unresolved
-    for slug in ("engineered-arts-ameca", "unitree-h1", "unitree-h2", "unitree-r1"):
-        assert group_of(r, slug) != QUALIFYING  # GLOBAL store offers only
-
-
-def test_real_catalogue_g1_us_offer_ages_out_after_the_window():
-    later = _real(date(2026, 8, 17) + timedelta(days=91))
-    assert "unitree-g1" not in {
-        o.robot_slug for o in later.qualifying_offers if o.provider_slug == "robotshop-us"
-    }

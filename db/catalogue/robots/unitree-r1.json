@@ -193,6 +193,33 @@
       "package_contents": "Robot (selected version), battery, controller, charger",
       "is_current": false,
       "order_status_note": "Withdrawn: this supplier no longer offers the R1 Base variant."
+    },
+    {
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "CNY",
+      "price": 39900,
+      "price_min": null,
+      "price_max": null,
+      "billing_period": "ONE_TIME",
+      "region_code": "CN",
+      "provider_slug": "unitree-cn",
+      "variant_slug": null,
+      "price_basis": "Manufacturer's China list price, tax included (售价（含税）); shipping not stated",
+      "note": "Unitree China list price for the 'R1' configuration, as published in CNY including tax. Not converted. Edition match: the 'R1' column (between 'R1 AIR' ¥2.99万 and 'R1 EDU' 联系销售) is the mid-tier R1 this record describes; R1 AIR and R1 EDU are not this record.",
+      "evidence": [
+        {
+          "source_url": "https://www.unitree.com/cn/R1",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Unitree R1 — Unitree China product page (unitree.com/cn)",
+          "excerpt": "型号 R1 ... 售价（含税） ¥3.99万元",
+          "published_at": null,
+          "observed_at": "2026-10-24",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-24 by Claude Opus 5.5 (curl, browser UA; body sha256 7b124a43abde252b25596e6c137570e8b3801900ef59354ed4c080427fd98ec4) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-ASIA-01 — Asia Regional Research Resource' (2026-10-24). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own China page, spec table column 'R1', row '售价（含税）' (selling price, tax included). CNY, as published; not converted."
+        }
+      ]
     }
   ],
   "availability_offers": [
@@ -260,6 +287,63 @@
       ],
       "seller_wording": "Limited stock, delivery within 1 - 2 business days",
       "delivery_estimate_label": "Delivery estimate for Germany: 1–2 business days"
+    },
+    {
+      "transaction_type": "PURCHASE",
+      "availability_status": "ON_REQUEST",
+      "region_code": "CN",
+      "provider_slug": "unitree-cn",
+      "variant_slug": null,
+      "lead_time_days": null,
+      "note": "China: the manufacturer publishes a tax-inclusive CNY price and takes orders through an intent-order form confirmed by its sales team. Mapped to ON_REQUEST: the order is confirmed by Unitree after contact, and no stock or lead time is stated; the Tmall checkout could not be read (login wall). Edition match: the 'R1' column (between 'R1 AIR' ¥2.99万 and 'R1 EDU' 联系销售) is the mid-tier R1 this record describes; R1 AIR and R1 EDU are not this record.",
+      "seller_wording": "本预约定购是一种意向性定购",
+      "evidence": [
+        {
+          "source_url": "https://www.unitree.com/cn/R1",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Unitree R1 — Unitree China product page (unitree.com/cn)",
+          "excerpt": "型号 R1 ... 售价（含税） ¥3.99万元",
+          "published_at": null,
+          "observed_at": "2026-10-24",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-24 by Claude Opus 5.5 (curl, browser UA; body sha256 7b124a43abde252b25596e6c137570e8b3801900ef59354ed4c080427fd98ec4) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-ASIA-01 — Asia Regional Research Resource' (2026-10-24). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own China page, spec table column 'R1', row '售价（含税）' (selling price, tax included). CNY, as published; not converted."
+        },
+        {
+          "source_url": "https://www.unitree.com/cn/booking",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "立即购买 (Buy now) — Unitree China purchase / cooperation page",
+          "excerpt": "有教育科研/行业应用端机器人需求的，请直接联系销售团队 ... 销售热线: 400-626-6518 ... ※ 本预约定购是一种意向性定购。※ 在您提交订单后我们将会在五个工作日内和您取得联系以确认您的购买意向",
+          "published_at": null,
+          "observed_at": "2026-10-24",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-24 by Claude Opus 5.5 (curl, browser UA; body sha256 5b5b469f52f799000e13178b2edb5166de73bad0ec285bd5c337b70d0e66e138) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-ASIA-01 — Asia Regional Research Resource' (2026-10-24). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own Chinese-language purchase page: an intent-order form ('意向性定购', confirmed by Unitree within five working days) and a mainland-China 400 sales hotline. The page's consumer 'buy now' link goes to a Tmall listing that requires a Taobao login and could not be read, so no direct-checkout status is recorded. Country scope CN: Chinese-language site, CNY tax-inclusive (含税) list prices on the product pages and a 400 number; the form's country/region field is not treated as an export offer."
+        }
+      ]
+    },
+    {
+      "transaction_type": "PURCHASE",
+      "availability_status": "ON_REQUEST",
+      "region_code": "JP",
+      "provider_slug": "gmo-air",
+      "variant_slug": null,
+      "lead_time_days": null,
+      "note": "Japan: configuration 'R1 Basic' can be added to a quotation cart on GMO's shop; prices and lead times are quoted individually. No price published (unknown, not zero).",
+      "seller_wording": "お見積もりへ",
+      "evidence": [
+        {
+          "source_url": "https://gmo-humanoid.shop/unitree/r1/",
+          "source_type": "OTHER",
+          "source_title": "Unitree R1 — GMO ヒューマノイド.shop configuration page (GMO AI & Robotics, Japan)",
+          "excerpt": "R1 Basic | 非対応 / 26 / 5 / なし / ヒューマノイド用ステレオカメラ | カートに追加 ... お見積もりへ",
+          "published_at": null,
+          "observed_at": "2026-10-24",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-24 by Claude Opus 5.5 (curl, browser UA; body sha256 72d4e93208d2551186b864a0971edeec066cbc4506038b31409912095e268d23) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-ASIA-01 — Asia Regional Research Resource' (2026-10-24). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Each configuration has 'カートに追加' (add to cart) and the cart leads to 'お見積もりへ' (to quotation); no price is shown. Mapped to ON_REQUEST (quote), not AVAILABLE. Edition match: R1 Basic: 26 DoF, stereo camera, no secondary development — the mid-tier R1 of this record (GMO's FAQ distinguishes it from the 20-DoF R1 AIR and the R1 Edu series). GMO AI & Robotics states on its shop ('GMO AIRは、Unitreeの国内正規代理店です') and in its 2026-10-13 release (https://ai-robotics.gmo/news/article/g1-plus/, sha256 df10d25949efec29f8893c786350aa72051f32bba15224637aea261035978ab4: '2026年6月19日（金）にUnitree Roboticsと国内正規代理店契約を締結') that it is Unitree's authorized distributor for Japan; that is SELF-DECLARED by the distributor and not confirmed on a Unitree first-party source. The release states prices and lead times are quoted individually."
+        }
+      ]
     }
   ],
   "deployments": [],

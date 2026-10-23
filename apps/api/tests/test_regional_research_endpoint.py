@@ -132,7 +132,7 @@ def test_default_gate_hides_the_resource(client, gate):
 
 def test_unknown_region_is_404_even_with_a_valid_token(client, gate):
     gate(published="europe", token="tok")
-    for slug in ("atlantis", "asia"):
+    for slug in ("atlantis", "south-america"):
         r = client.get(f"/api/research/humanoid-availability/{slug}",
                        headers={"X-Research-Preview": "tok"})
         assert r.status_code == 404, slug

@@ -64,7 +64,7 @@ describe("publication gate", () => {
     const env = { RESEARCH_PUBLISHED_REGIONS: "europe", RESEARCH_PREVIEW_TOKEN: "t" };
     expect(resolveResearchAccess("europe", session("t"), env)).toEqual({ mode: "published" });
     expect(resolveResearchAccess("north-america", session("t"), env)).toEqual({ mode: "closed" });
-    expect(resolveResearchAccess("asia", null, { RESEARCH_PUBLISHED_REGIONS: "asia" })).toEqual({ mode: "closed" });
+    expect(resolveResearchAccess("atlantis", null, { RESEARCH_PUBLISHED_REGIONS: "atlantis" })).toEqual({ mode: "closed" });
   });
 });
 

@@ -62,6 +62,26 @@ export const EDITORIAL: Record<ResearchRegion, EditorialFragment> = {
       "United States regulation is a separate question from commercial availability. On 28 July 2026 the US Federal Communications Commission added foreign-produced \"advanced robotic devices\", including humanoid robots, to its Covered List, so new models generally cannot receive FCC equipment authorization unless the Department of War has granted a Conditional Approval. The FCC states that this does not stop the import, sale or use of models it authorized earlier, or affect devices already bought. The listing depends on where a product is produced, not on a named company. HumanoidOnline does not record whether a particular robot is FCC-authorized; buyers should confirm the authorization of the exact model with the seller.",
     ],
   },
+  asia: {
+    // DRAFT (HO-RESEARCH-ASIA-01, 2026-10-24): NOT owner-reviewed. It renders only in
+    // preview, marked DRAFT, until the owner sets reviewed_at; review approves the
+    // text only and does not publish the resource. No price, status, count or
+    // robot-specific commercial claim: those come only from the governed projection.
+    reviewed_at: null,
+    reviewed_by: null,
+    // Paragraph 1: UN Statistics Division M49 page (Asia 142 and its five
+    // sub-regions; Cyprus is listed under Western Asia). The Cyprus and Taiwan
+    // handling is HumanoidOnline's own coding (db/catalogue/regions.json, owner
+    // decisions D1/D2). Paragraphs 2-5 explain HumanoidOnline's own semantics.
+    sources: ["https://unstats.un.org/unsd/methodology/m49/overview/"],
+    paragraphs: [
+      "In this resource \"Asia\" is a market geography for research, not a statement about political status or about common customs and trade rules. It follows the UN M49 Asia classification: Central, Eastern, South-eastern, Southern and Western Asia. Two coding choices are disclosed: Cyprus, which M49 places in Western Asia, is counted with the European Union in the Europe resource and not here, and Taiwan, which the catalogue codes as a separate commercial destination, is included as a market; that is not a claim that M49 lists it as a separate entry. Russia is counted in Europe. Asia here is not Asia-Pacific: Australia, New Zealand and the Pacific are not included.",
+      "An offer counts only for the country its seller documents. A manufacturer headquartered in China, Japan or South Korea is not evidence that its robots can be bought in every Asian country, and an offer documented for China says nothing about Japan, South Korea, India or Singapore. A manufacturer store that sells worldwide without naming countries is shown as a global offer, not as Asian availability. Each offer names its seller and whether it is the manufacturer or a distributor, reseller or integrator.",
+      "Offers differ in how close they are to a purchase. An available or limited offer can be ordered directly, although a limited or special-order item may still have to be sourced after the order. A preorder or waitlist reserves a place for a product that is not yet shipping. A quote or contact-sales offer confirms a sales route, not stock, a price or a delivery date. A rental or lease offer is not a purchase offer. Each offer shows when it was last observed: an offer stays current until newer evidence replaces it.",
+      "Public news about humanoid robots in Asia ranges from showroom demonstrations and factory trials to volume orders from a single industrial customer. Deployments show real use and are listed separately; a pilot, a demonstration or a customer contract is not an offer a new buyer can take up. A robot with no confirmed Asia offer may well be obtainable; it means only that HumanoidOnline holds no qualifying Asia evidence for it yet.",
+      "Import rules, radio and safety certification, warranty, language support and after-sales service differ between Asian markets. HumanoidOnline does not record whether a particular robot is certified or may be imported in a given country; buyers should confirm this for the exact model with the seller. This resource is commercial research, not legal or regulatory clearance.",
+    ],
+  },
 };
 
 // Readable citation text for a source URL (shown beside the link). An unlisted host

@@ -1,0 +1,124 @@
+{
+  "_comment": "HO-DATA-30 batch 5 (standing work order 'HO-DATA-STANDING 2026-10-22'; docs/audit/HO-DATA-30_RATIFICATION_PACKAGE_2026-10-23.md): expected business changes for `import_catalogue.py` scoped to the 13 robots below. 13 robot rows CHANGED (36 core values filled from NULL, spec_caveats). No spec rows, offers, evidence, images, use-case fits or publication. NOT for import until the owner approves the PR. XPENG IRON removed 2026-10-23: governance-pinned record (owner decisions 2026-10-03; facts only via the G3 claim pipeline).",
+  "only": [
+    "agibot-a2-ultra",
+    "booster-t1",
+    "fourier-intelligence-gr-2",
+    "honda-asimo",
+    "pal-reem-c",
+    "softbank-nao",
+    "unitree-r1",
+    "unitree-r1-edu-u1",
+    "unitree-r1-edu-u2",
+    "unitree-r1-edu-u3",
+    "unitree-r1-edu-u4",
+    "unitree-r1-edu-u5",
+    "unitree-r1-edu-u6"
+  ],
+  "expected": [
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "agibot-a2-ultra"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "booster-t1"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "fourier-intelligence-gr-2"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "honda-asimo"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "pal-reem-c"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "softbank-nao"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-r1"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-r1-edu-u1"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-r1-edu-u2"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-r1-edu-u3"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-r1-edu-u4"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-r1-edu-u5"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-r1-edu-u6"
+      },
+      "count": 1
+    }
+  ]
+}

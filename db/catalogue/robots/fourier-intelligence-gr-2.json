@@ -18,7 +18,7 @@
     "battery_wh": 950.0,
     "mobility": "BIPEDAL",
     "degrees_of_freedom": 53,
-    "hand_type": null,
+    "hand_type": "Basic dexterous hand",
     "hand_dof": null,
     "autonomy": null,
     "has_manipulation": true,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": true
   },
-  "specs_note": "height_cm, weight_kg, degrees_of_freedom, walk_speed_ms and runtime_minutes confirmed by the product owner against Fourier's own official GR-2 documentation (2026-08-19); height_cm and weight_kg were already on file and independently match that documentation. walk_speed_ms converted from the source's stated 5 km/h (5 / 3.6 = 1.39 m/s); this schema has no km/h field. payload_kg (10 kg) is unchanged and remains separately sourced -- Fourier's documentation separately states an approximately 3 kg SINGLE-HAND load capacity, a distinct measurement this schema has no field for, recorded here rather than conflated with payload_kg or dropped. SPECIFICATIONS (HO-DATA-30 batch 3, 2026-10-22): battery_wh, has_vision, has_api, simulation_support, has_manipulation, has_teleoperation filled from first-party Fourier sources, each quoted in spec_caveats. Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 authoring criteria, docs/audit/HO-DATA-30_FEASIBILITY_AND_BATCH3_2026-10-22.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://www.fftai.com/pdf/en/gr2.pdf sha256 6e9869104c857d3b…. Retrieved 2026-10-22 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
+  "specs_note": "height_cm, weight_kg, degrees_of_freedom, walk_speed_ms and runtime_minutes confirmed by the product owner against Fourier's own official GR-2 documentation (2026-08-19); height_cm and weight_kg were already on file and independently match that documentation. walk_speed_ms converted from the source's stated 5 km/h (5 / 3.6 = 1.39 m/s); this schema has no km/h field. payload_kg (10 kg) is unchanged and remains separately sourced -- Fourier's documentation separately states an approximately 3 kg SINGLE-HAND load capacity, a distinct measurement this schema has no field for, recorded here rather than conflated with payload_kg or dropped. SPECIFICATIONS (HO-DATA-30 batch 3, 2026-10-22): battery_wh, has_vision, has_api, simulation_support, has_manipulation, has_teleoperation filled from first-party Fourier sources, each quoted in spec_caveats. Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 authoring criteria, docs/audit/HO-DATA-30_FEASIBILITY_AND_BATCH3_2026-10-22.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://www.fftai.com/pdf/en/gr2.pdf sha256 6e9869104c857d3b…. Retrieved 2026-10-22 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. SPECIFICATIONS (HO-DATA-30 batch 5, 2026-10-22): hand_type filled from first-party Fourier sources, each quoted in spec_caveats. Released by owner rulings recorded in the ratification package (DEC ids in spec_caveats). Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 mapping rules, docs/audit/HO-DATA-30_RATIFICATION_PACKAGE_2026-10-23.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://www.fftai.com/pdf/en/gr2.pdf sha256 6e9869104c857d3b…. Retrieved 2026-10-22/23 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://www.fftai.com/products-gr2",
   "commercial_status_evidence": [
     {
@@ -112,6 +112,10 @@
     {
       "field": "has_teleoperation",
       "text": "Fourier states 'Teleoperation Real-time Remote Control Systems (Pico/VisionPro)' (https://www.fftai.com/pdf/en/gr2.pdf)."
+    },
+    {
+      "field": "hand_type",
+      "text": "Fourier states 'Basic Dexterous Hand Enhanced DexterousHand (Optional)' (https://www.fftai.com/pdf/en/gr2.pdf). DEC-07 (standard end effector): the basic dexterous hand is standard; the enhanced 12-DoF hand is optional (owner ruling)."
     }
   ]
 }

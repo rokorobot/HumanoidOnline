@@ -21,9 +21,9 @@
     "hand_type": null,
     "hand_dof": null,
     "autonomy": null,
-    "has_manipulation": null,
+    "has_manipulation": true,
     "has_teleoperation": null,
-    "has_vision": null,
+    "has_vision": true,
     "has_language_ui": null,
     "has_sdk": null,
     "has_api": null,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Specifications not yet verified. Additional fields (height_cm, weight_kg, mobility) filled from the pre-catalogue internal record pending confirmation against a primary source -- not yet manufacturer-verified. SPECIFICATIONS (HO-DATA-30 batch 5, 2026-10-22): degrees_of_freedom, walk_speed_ms filled from first-party Honda sources, each quoted in spec_caveats. Released by owner rulings recorded in the ratification package (DEC ids in spec_caveats). Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 mapping rules, docs/audit/HO-DATA-30_RATIFICATION_PACKAGE_2026-10-23.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://global.honda/en/newsroom/news/2005/c051213-asimo-eng.html sha256 eb1d0a169ec2c86e…. Retrieved 2026-10-22/23 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
+  "specs_note": "Specifications not yet verified. Additional fields (height_cm, weight_kg, mobility) filled from the pre-catalogue internal record pending confirmation against a primary source -- not yet manufacturer-verified. SPECIFICATIONS (HO-DATA-30 batch 5, 2026-10-22): degrees_of_freedom, walk_speed_ms filled from first-party Honda sources, each quoted in spec_caveats. Released by owner rulings recorded in the ratification package (DEC ids in spec_caveats). Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 mapping rules, docs/audit/HO-DATA-30_RATIFICATION_PACKAGE_2026-10-23.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://global.honda/en/newsroom/news/2005/c051213-asimo-eng.html sha256 eb1d0a169ec2c86e…. Retrieved 2026-10-22/23 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. SPECIFICATIONS (HO-DATA-30 close-out batch 6, 2026-10-23): has_vision, has_manipulation under owner rulings already ratified on 2026-10-23 (see spec_caveats). RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — https://global.honda/en/newsroom/news/2005/c051213-asimo-eng.html sha256 eb1d0a169ec2c86e…. Retrieved 2026-10-22/23 by Claude in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://global.honda/",
   "commercial_status_evidence": [],
   "variants": [],
@@ -65,6 +65,14 @@
     {
       "field": "walk_speed_ms",
       "text": "Honda states 'Normal walking speed: 2.7km/hour' (https://global.honda/en/newsroom/news/2005/c051213-asimo-eng.html). DEC-05: 2.7 km/h = 0.75 m/s (unit conversion), Honda's 2005 New ASIMO release; running speed 6 km/h is not walking speed. This record is the 2005 New ASIMO (owner ruling)."
+    },
+    {
+      "field": "has_vision",
+      "text": "Honda states ASIMO can 'recognize the surrounding environment through its visual sensors' (https://global.honda/en/newsroom/news/2005/c051213-asimo-eng.html). DEC-05: 2005 New ASIMO (owner ruling 2026-10-23)."
+    },
+    {
+      "field": "has_manipulation",
+      "text": "Honda states 'A new function to carry objects using a cart was also added' and shows 'ASIMO passing tray' (https://global.honda/en/newsroom/news/2005/c051213-asimo-eng.html). DEC-05: 2005 New ASIMO (owner ruling 2026-10-23)."
     }
   ]
 }

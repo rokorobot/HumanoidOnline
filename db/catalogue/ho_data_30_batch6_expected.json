@@ -1,0 +1,52 @@
+{
+  "_comment": "HO-DATA-30 close-out batch 6 (docs/audit/HO-DATA-30_CLOSEOUT_2026-10-23.md): 7 core values filled from NULL under owner rulings ratified 2026-10-23 (DEC-04/05/07/11-D9) + NAO caveat attribution text fix. 5 robot rows CHANGED; nothing else. NOT for import until the owner approves the PR.",
+  "only": [
+    "fourier-intelligence-gr-2",
+    "honda-asimo",
+    "pal-talos",
+    "softbank-nao",
+    "softbank-pepper"
+  ],
+  "expected": [
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "fourier-intelligence-gr-2"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "honda-asimo"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "pal-talos"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "softbank-nao"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "softbank-pepper"
+      },
+      "count": 1
+    }
+  ]
+}

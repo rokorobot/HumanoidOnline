@@ -5,7 +5,7 @@
 import { verifyPreviewSession } from "./research-preview";
 import { API_BASE_URL } from "./server";
 
-export const RESEARCH_REGIONS = ["europe"] as const;
+export const RESEARCH_REGIONS = ["europe", "north-america"] as const;
 export type ResearchRegion = (typeof RESEARCH_REGIONS)[number];
 
 export const RESEARCH_BASE_PATH = "/research/humanoid-availability";

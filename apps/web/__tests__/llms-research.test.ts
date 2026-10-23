@@ -79,7 +79,7 @@ describe("Research section", () => {
   });
 
   it("enumerates only public resources: no other region is named or teased", async () => {
-    process.env.RESEARCH_PUBLISHED_REGIONS = "europe,asia,north-america";
+    process.env.RESEARCH_PUBLISHED_REGIONS = "europe,asia";
     apiServes = true;
     const text = await body();
     expect(text).not.toContain("North America");

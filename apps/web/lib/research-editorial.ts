@@ -33,6 +33,26 @@ export const EDITORIAL: Record<ResearchRegion, EditorialFragment> = {
       "A robot with no confirmed Europe offer may well be obtainable; it means only that HumanoidOnline holds no qualifying Europe evidence for it yet.",
     ],
   },
+  "north-america": {
+    // DRAFT (HO-RESEARCH-NA-01, 2026-10-23): NOT owner-reviewed. It renders only in
+    // preview, marked DRAFT, until the owner sets reviewed_at; review approves the
+    // text only and does not publish the resource.
+    reviewed_at: null,
+    reviewed_by: null,
+    // Paragraph 1: UN Statistics Division, M49 standard country or area codes (lists
+    // the 021 / 013 / 029 members). The continental grouping 003 "North America" =
+    // 021 + 029 + 013 is not shown as a row on the current UNSD page; it is attested
+    // by the BCP 47 registration of region 003 citing UN M.49
+    // (https://www.iana.org/assignments/lang-subtags-templates/003.txt).
+    // Paragraphs 2-4 explain HumanoidOnline's own semantics.
+    sources: ["https://unstats.un.org/unsd/methodology/m49/"],
+    paragraphs: [
+      "In this resource \"North America\" is a research grouping, not a political or trade claim. It follows the UN M49 North America classification: Northern America, Central America and the Caribbean, so it covers Canada, Mexico and the United States together with the Central American and Caribbean countries and territories. It is not defined by where a manufacturer is headquartered.",
+      "An offer counts only for the country its seller documents. A United States listing is not evidence of availability in Canada, Mexico or elsewhere in North America, and a manufacturer store that sells worldwide without naming countries is shown as a global offer, not as North American availability.",
+      "Public news about humanoid robots in North America ranges from demonstrations and pilot projects to multi-year service agreements and seller listings. Only a current, evidenced seller offer makes a robot count as obtainable here. Deployments show real use and are listed separately; a pilot or a customer contract is not an offer a new buyer can take up.",
+      "Read each row's seller, country, status, evidence date and confidence together. A robot with no confirmed North America offer may well be obtainable; it means only that HumanoidOnline holds no qualifying, current North America evidence for it yet.",
+    ],
+  },
 };
 
 // Readable citation text for a source URL (shown beside the link). An unlisted host

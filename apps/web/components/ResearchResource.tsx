@@ -143,14 +143,15 @@ export function ResearchResource({
   return (
     <article className="research-resource" data-region={data.region.slug}>
       {preview && (
-        <p role="note" data-testid="preview-banner">
+        // A <div>, not a <p>: the End preview <form> cannot sit inside a paragraph.
+        <div role="note" data-testid="preview-banner">
           <strong>Preview — not published.</strong> This resource is not public, is excluded from
           the sitemap and is marked noindex.
           <form method="post" action="/research/preview" style={{ display: "inline", marginLeft: 12 }}>
             <input type="hidden" name="action" value="end" />
             <button type="submit">End preview</button>
           </form>
-        </p>
+        </div>
       )}
 
       <h1>Which humanoid robots are available in {region}?</h1>
@@ -162,11 +163,20 @@ export function ResearchResource({
 
       {data.publication_health.status === "LIMITED_EVIDENCE" && (
         <div role="note" data-testid="limited-evidence-warning">
-          <p>
-            <strong>Limited current evidence.</strong> This resource remains published, but the
-            current evidence on file no longer meets HumanoidOnline’s normal publication threshold.
-            Stale offers are excluded from current availability figures.
-          </p>
+          {/* A preview is of a resource that is not public, so it must not say it "remains published". */}
+          {preview ? (
+            <p>
+              <strong>Limited current evidence.</strong> This resource is not published, and the
+              current evidence on file does not meet HumanoidOnline’s normal publication threshold.
+              Stale offers are excluded from current availability figures.
+            </p>
+          ) : (
+            <p>
+              <strong>Limited current evidence.</strong> This resource remains published, but the
+              current evidence on file no longer meets HumanoidOnline’s normal publication threshold.
+              Stale offers are excluded from current availability figures.
+            </p>
+          )}
           {data.publication_health.reasons.length > 0 && (
             <ul>
               {data.publication_health.reasons.map((reason) => (

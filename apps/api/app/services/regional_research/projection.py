@@ -16,7 +16,7 @@ from .readmodel import (
     RegionalDeployment,
 )
 
-REGION_SLUGS = {"europe": "EUROPE"}
+REGION_SLUGS = {"europe": "EUROPE", "north-america": "NORTH_AMERICA"}
 
 _REASON_LABELS = {
     "CONFIRMED_NOT_OBTAINABLE": "Evidence on file that it is not currently obtainable here",

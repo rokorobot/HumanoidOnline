@@ -1,0 +1,24 @@
+Where: https://aldebaran.com/en/contact (contact form)
+Cc / alternative: SBRG-pepper-global@softbankrobotics.com
+Subject: Pepper specification confirmation for HumanoidOnline
+
+Hello Aldebaran team,
+
+I run HumanoidOnline (humanoidonline.com), an independent catalogue of humanoid robots. We publish only manufacturer-supported specifications and show anything we cannot source as "unknown" - we never estimate.
+
+From the Pepper technical documentation (NAOqi 2.5 on doc.aldebaran.com) we already list height 121 cm, battery 795 Wh, wheeled base, cameras, SDK, API and ROS support. The following are not stated there. Please tell us which Pepper hardware version (for example 1.8) your answers refer to.
+
+1. Weight including battery (kg)
+2. Rated payload per arm (kg), if any
+3. Battery runtime in typical use (minutes)
+4. Maximum driving speed of the wheeled base (m/s)
+5. Total actuated degrees of freedom (one number)
+6. Hand type as shipped (and whether the hands can grasp objects)
+7. Official simulation support for Pepper (yes/no; which simulator)
+8. Teleoperation by a remote operator supported (yes/no)
+9. Arm span, fingertip to fingertip (cm) and single-arm reach (cm)
+
+Please answer from an Aldebaran address or point to a public Aldebaran page or PDF. We will show the values as manufacturer statements with the date of your reply and can share the entries with you before they go live.
+
+Thank you,
+Robert Konecny - HumanoidOnline (humanoidonline.com)

@@ -62,8 +62,19 @@
       "provider_slug": "agility-raas",
       "variant_slug": null,
       "lead_time_days": null,
-      "note": "Engaged via multi-year RaaS contract; no outright unit purchase offered.",
+      "note": "Engaged via multi-year RaaS contract; no outright unit purchase offered. Current route (owner decision D4, 2026-10-23): contact sales through Agility's 'Deploy Digit' page; that page names no transaction type, price or country, so the RaaS model and US scope still rest on the 2024 GXO agreement.",
       "evidence": [
+        {
+          "source_url": "https://www.agilityrobotics.com/sales",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Agility Robotics — Get Digit in your facility (sales contact)",
+          "excerpt": "Get Digit in your facility ... Tell us what you're working with. We'll show you how Digit fits in.",
+          "published_at": null,
+          "observed_at": "2026-10-23",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-23 by Claude Opus 5.5 (WebFetch; processed page text) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-NA-01 — Complete North America Research Resource' (2026-10-23), owner decision D4 (keep Digit listed as a contact-sales offer). Not a MANUAL_BOOTSTRAP reading. Not human-verified. The homepage 'Deploy Digit' buttons link here. The page states no RaaS, purchase, lease, price or country; it confirms only that Digit is obtained by contacting sales (ON_REQUEST)."
+        },
         {
           "source_url": "https://www.agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics",
           "source_type": "PRESS_RELEASE",
@@ -75,7 +86,8 @@
           "confidence": "HIGH",
           "note": "RaaS engagement model (contract, not unit sale) confirmed by the announcement; recorded as ON_REQUEST (bespoke contract)."
         }
-      ]
+      ],
+      "seller_wording": "Get Digit in your facility"
     }
   ],
   "deployments": [

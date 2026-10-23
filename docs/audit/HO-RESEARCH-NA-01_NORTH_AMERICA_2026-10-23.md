@@ -26,7 +26,7 @@ How the figures were obtained: the production catalogue was read with a read-onl
 |---|---|---|---|---|---|
 | unitree-g1 | robotshop-us, PURCHASE, USD 17,900 PUBLIC, lead_time_days 56 | US | AVAILABLE | 2026-08-17, MEDIUM, no human verification | **Qualifies** |
 | 1x-neo | 1x-store, PURCHASE (USD 20,000) + SUBSCRIPTION (USD 499/month) | US | PREORDER | 2026-07-24, VERIFIED | **Qualifies** (preorder; USD 20,000 shown; the USD 499/month SUBSCRIPTION price has no matching offer, so it is not shown) |
-| agility-digit | agility-raas, RAAS | US | ON_REQUEST | 2026-07-24, HIGH | **Qualifies** (RaaS; price not published). Its only evidence is the 2024 GXO announcement (see D4) |
+| agility-digit | agility-raas, RAAS | US | ON_REQUEST | 2026-10-23, HIGH (after D4) | **Qualifies** (RaaS, contact sales, price not published). D4 adds today's agilityrobotics.com/sales evidence |
 | unitree-g1 / h1 / h2 / r1 | unitree-store | GLOBAL | various | 2026-07-24 … 09-26 | Global only, not regional |
 | engineered-arts-ameca | engineered-arts-oem, RENTAL + PURCHASE | GLOBAL | AVAILABLE / ON_REQUEST | 2026-07-24 | Global only |
 | 4ne1-mini | none, PURCHASE (two identical rows) | NULL | WAITLIST | 2026-10-02 | Unresolved region (governance-pinned; untouched) |
@@ -40,7 +40,7 @@ These sources were read by an agent under this work order. They are not owner-ve
 | Robot | Source | What it states | Use |
 |---|---|---|---|
 | 1x-neo | https://www.1x.tech/order (manufacturer) | "$20,000" Early Access (ownership); "$499/mo" (subscription); "$200 Deposit Due Today", "Fully Refundable"; "US Deliveries start 2026"; "Order Now". No other country named. | **Refresh the existing US offer and prices** (§4, batch NA-1) |
-| agility-digit | https://agilityrobotics.com/ (manufacturer) | Contact-sales route only. No RaaS, purchase, price or country wording. | No refresh possible. The existing RaaS row's only evidence is the 2024 GXO deployment press release (owner decision D4). |
+| agility-digit | https://www.agilityrobotics.com/sales (manufacturer; the homepage "Deploy Digit" buttons link here) | "Get Digit in your facility"; "Tell us what you're working with. We'll show you how Digit fits in." No RaaS, purchase, price or country wording. | **Applied in this PR (owner decision D4):** added as the offer's latest evidence, with seller wording "Get Digit in your facility"; status stays ON_REQUEST |
 | unitree-g1 | https://robostore.com/products/unitree-g1-robotic-humanoid | RoboStore: "The Official US Distributor of Unitree". G1 Base "$17,990.00" (regular $21,600), USD. **"Sold Out - Notify me when it's available"**. Shipping policy: "primarily ships within the United States". | New provider and source. Needs owner authorization (A4); status mapping needs a decision. |
 | unitree-g1-edu-plus-u2 | robostore.com, "G1 (U2) EDU Plus" | $53,900 USD (product page not opened) | Candidate; edition match and status unverified |
 | unitree-r1-edu-* | robostore.com, "R1 … Starting at $8,990" | Edition not identified (R1 EDU U1–U6 exist in the catalogue) | Candidate; identity is ambiguous |
@@ -114,7 +114,12 @@ With RoboStore (G1 EDU U2) and RobotLAB (NAO), North America would reach **5 rob
   - No offer, price or deployment references NORTH_AMERICA, so matching, lead routing and `commercial_offer` behave identically (pinned by a test).
   - It needs a governed production import of the regions. Until then the API returns 404 for North America, even with a preview token.
 - **D3 Batch NA-1** (§4).
-- **D4 Agility Digit RaaS row.** It now counts as a current North America offer. Its only evidence is the 2024 GXO announcement, and Agility's site today shows only a contact-sales route. Keep it, re-evidence it, or record it as non-current.
+- **D4 Agility Digit — DECIDED 2026-10-23: keep Digit listed as a contact-sales offer.** This PR changes `db/catalogue/robots/agility-digit.json`:
+  - It adds one evidence row: agilityrobotics.com/sales, observed 2026-10-23, HIGH, `MANUFACTURER_SITE`, with a RETRIEVAL note and not human-verified.
+  - It sets `seller_wording` to "Get Digit in your facility" and extends the offer note.
+  - Status (ON_REQUEST), transaction (RAAS), region (US) and provider are unchanged. The RaaS model and US scope still rest on the 2024 GXO agreement, which stays as the older evidence row.
+  - Expected production effect (scoped import `--only agility-digit`): +1 evidence_source row and 2 changed offer fields (note, seller_wording). Verified on a fresh local import: evidence rows 209 → 210.
+  - It is not imported to production. That needs the Fast Lane approval to merge and import.
 - **D5 New sources** RoboStore and RobotLAB (A4), with edition and status mapping.
 - **D6 Editorial.** The North America fragment is DRAFT (`reviewed_at: null`) and is shown only in preview.
 - **D7 Preview access.** `RESEARCH_PREVIEW_TOKEN` is unset everywhere. Setting it on both the API and the web app is needed to review on production.

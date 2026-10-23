@@ -1,6 +1,6 @@
 # HO-DATA-30 — Owner ratification package, batch 5 and outreach wave 1 (2026-10-23)
 
-**Status:** PROPOSED. Nothing is ratified, merged, imported or sent. Each owner ruling, the batch and each outreach
+**Status:** DEC-02/03/04/05/06/07/11-D9/13 ratified by the owner 2026-10-23. Batch 5 was reduced from 40 to 36 cells after backend CI enforced the XPENG IRON governance pin; the reduced batch needs a new exact approval. Nothing is ratified, merged, imported or sent. Each owner ruling, the batch and each outreach
 message is a separate owner act.
 
 **Basis:** evidence already gathered under `HO-DATA-STANDING 2026-10-22` (DR-D1). This step adds no new research.
@@ -29,7 +29,7 @@ projection double-counts.
 | **D** | Unsupported: no usable value under any proposed ruling (weak or future-tense wording, internal-only simulation, other generation, variant-scoped 4NE1 Mini facts, ranges) | 55 |
 
 **Projected release, without double counting:**
-- **Recommended rulings:** **40 cells (13 P0)**: 1 tier A, 35 tier C, 4 tier B.
+- **Recommended rulings:** **36 cells (13 P0)**: 1 tier A, 31 tier C, 4 tier B. The 4 XPENG IRON cells are excluded because IRON is governance-pinned (see DEC-06).
 - **Alternative rulings only:** a further **27 cells (9 P0)**.
 - **Never released by a ruling:** 185 cells (tier D, plus the tier B/C cells whose recommended outcome is UNKNOWN).
 
@@ -42,7 +42,7 @@ projection double-counts.
 | DEC-04+DEC-07 | 1 | 0 | 1 | 0 | 0 | 0 (0) | 1 (0) | 1 |
 | DEC-04+DEC-11 | 1 | 0 | 1 | 0 | 0 | 0 (0) | 1 (1) | 1 |
 | DEC-05 | 8 | 0 | 0 | 7 | 1 | 2 (2) | 1 (1) | 1 |
-| DEC-06 | 26 | 0 | 0 | 12 | 14 | 4 (0) | 8 (0) | 6 |
+| DEC-06 | 26 | 0 | 0 | 12 | 14 | 0 (0) — IRON pinned | 8 (0) | 6 |
 | DEC-07 | 27 | 0 | 27 | 0 | 0 | 1 (0) | 3 (0) | 18 |
 | DEC-08 | 8 | 0 | 8 | 0 | 0 | 0 (0) | 0 (0) | 8 |
 | DEC-09 | 7 | 0 | 4 | 0 | 3 | 0 (0) | 4 (0) | 7 |
@@ -58,7 +58,7 @@ projection double-counts.
 | DEC-18 | 7 | 0 | 0 | 0 | 7 | 0 (0) | 0 (0) | 6 |
 | NEW-P2 | 12 | 0 | 0 | 0 | 12 | 0 (0) | 0 (0) | 10 |
 | — | 4 | 0 | 0 | 0 | 4 | 0 (0) | 0 (0) | 4 |
-| **Total** | **252** | **1** | **142** | **54** | **55** | **40 (13)** | **27 (9)** | |
+| **Total** | **252** | **1** | **142** | **54** | **55** | **36 (13)** | **27 (9)** | |
 
 ### Recommended rulings (each is a separate yes/no)
 
@@ -68,7 +68,7 @@ projection double-counts.
 | DEC-03 | The six R1 EDU U1–U6 records are R1 EDU configurations. Release **only values Unitree states identically for every R1 edition or for the R1 family**: payload 2 kg, ROS 2, teleoperation. Weight (27 vs 29 kg by column), DoF (a range) and arm span stay UNKNOWN | 18 (6 P0) |
 | DEC-04 | `softbank-nao` is NAO6, and NAO6 documentation published by Maxtronics/Aldebaran counts as first-party. The manufacturer of record does not change | 11 (3 P0) |
 | DEC-05 | `honda-asimo` is the **2005 New ASIMO**: Honda's 2005 release states 130 cm and 54 kg, matching the record. Releases DoF 34 and walking 2.7 km/h. The 2004-only runtime and the 2011 values are not used | 2 (2 P0) |
-| DEC-06 | `xpeng-iron` is the Next-Gen IRON (the record's DoF 76/21 matches XPENG's Sept 2026 release). Releases mobility, manipulation, conversation and dexterous hand, with no hand DoF (first-party sources say 21 vs 22). Kepler, Sophia, Apollo and Atlas items stay held | 4 |
+| DEC-06 | Ratified 2026-10-23, but **not releasable by catalogue authoring**. XPENG IRON is governance-pinned by the owner decisions of 2026-10-03: IRON facts enter only through the G3 claim pipeline (proposal → ACCEPT → claim → materialization), and the catalogue entry stays identity and reference only. Backend CI rejected the 4 cells (`test_xpeng_iron`, `test_iron_current_slice`). They need a G3 claim promotion instead. Kepler, Sophia, Apollo and Atlas items stay held | 0 |
 | DEC-11 (D9) | Multi-mode runtime: take the walking-mode figure, with the qualifier in a caveat (A2 Ultra "Walking: 1.5h+" → 90 min) | 1 (P0) |
 | DEC-07 (D5) | `hand_type` = the standard shipped end effector only (GR-2: basic dexterous hand); optional hands are not used | 1 |
 | DEC-02 | `developer_edition` = true only where the manufacturer describes the record itself as a developer or research platform (Booster T1 "development platform for developers", REEM-C "a research platform") | 2 |
@@ -87,7 +87,7 @@ projection double-counts.
 
 ## 2. Batch 5: the maximum clean batch that can follow the recommended rulings
 
-`db/catalogue/ho_data_30_batch5_expected.json`: **40 values on 14 robots**, each filled from NULL. Each caveat names its
+`db/catalogue/ho_data_30_batch5_expected.json`: **36 values on 13 robots**, each filled from NULL. Each caveat names its
 decision ID and quotes the manufacturer.
 
 The JSON in this PR already carries the values. **Merging and importing require ratification of the listed decisions
@@ -129,10 +129,6 @@ and re-rehearsed for a new exact approval.
 | DEC-04 | softbank-nao | weight_kg | 5.48 | https://maxtronics.com/wp-content/uploads/nao-v6-datasheet-en-20260605-maxtronics_v5.pdf |
 | DEC-05 | honda-asimo | degrees_of_freedom | 34 | https://global.honda/en/newsroom/news/2005/c051213-asimo-eng.html |
 | DEC-05 | honda-asimo | walk_speed_ms | 0.75 | https://global.honda/en/newsroom/news/2005/c051213-asimo-eng.html |
-| DEC-06 | xpeng-iron | hand_type | Dexterous hand | https://www.xpeng.com/technology/ai_robot_iron |
-| DEC-06 | xpeng-iron | has_language_ui | True | https://www.xpeng.com/news/019a56f54fe99a2a0a8d8a0282e402b7 |
-| DEC-06 | xpeng-iron | has_manipulation | True | https://www.xpeng.com/technology/ai_robot_iron |
-| DEC-06 | xpeng-iron | mobility | BIPEDAL | https://www.xpeng.com/technology/ai_robot_iron |
 | DEC-07 | fourier-intelligence-gr-2 | hand_type | Basic dexterous hand | https://www.fftai.com/pdf/en/gr2.pdf |
 | DEC-11/D9 | agibot-a2-ultra | runtime_minutes | 90 | https://www.agibot.com/products/A2_Ultra |
 | DEC-13 | unitree-r1 | payload_kg | 2.0 | https://doc-cdn.unitree.com/27/1135/en/27_1135_en |
@@ -144,7 +140,7 @@ and re-rehearsed for a new exact approval.
 - `validate_catalogue.py`: G2 and MEDIA-01 OK;
 - column diff: exactly the 40 cells, all NULL → value.
 
-**Projected: core UNKNOWN 486/946 = 51.4%; P0 88/258 = 34.1%.**
+**Projected: core UNKNOWN 490/946 = 51.8%; P0 88/258 = 34.1%.**
 
 ## 3. Outreach wave 1 (drafts, not sent)
 
@@ -185,15 +181,15 @@ Rule-only fields (autonomy, developer edition), identity-blocked values and rele
 | Starting point | Core UNKNOWN | Still needed for ≤ 316 | Required usable answers from the 363-cell pool | Wave 1 (188 cells) alone |
 |---|---|---|---|---|
 | Today | 526 (55.6%) | 210 | 57.9% | insufficient (210 > 188) |
-| After batch 5 (recommended rulings) | 486 (51.4%) | **170** | **46.8%** | would need 90.4% |
-| After batch 5 + every alternative ruling | 459 (48.5%) | 143 | 40.5% (of 353) | would need 76.1% |
+| After batch 5 (36 cells) | 490 (51.8%) | **174** | **47.9%** | would need 92.6% |
+| After batch 5 + every alternative ruling | 463 (48.9%) | 147 | 41.6% (of 353) | would need 78.2% |
 
 **Conclusion:** ≤ 33.4% is reachable only with all three of:
 1. the recommended rulings (batch 5);
 2. outreach to essentially every manufacturer: wave 1 plus a wave 2 covering 175 cells (Figure, Rainbow, NEURA, a Tesla
    capture, XPENG, Apptronik, Hanson, Agility, Sanctuary, Boston Dynamics, Galbot, Honda, Engineered Arts, Kepler,
    AgiBot, Fourier);
-3. usable answers for at least ~47% of all requested cells (about 170 cells).
+3. usable answers for at least ~48% of all requested cells (about 174 cells).
 
 Unsolicited specification requests are usually answered at far lower rates. Unless several large manufacturers answer
 in full, the realistic outcome stays about 38–45%. No value will be estimated to close the gap.

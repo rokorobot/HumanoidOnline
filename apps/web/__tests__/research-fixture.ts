@@ -45,7 +45,6 @@ export function projection(overrides: Partial<ResearchProjection> = {}): Researc
   return {
     region: { slug: "europe", code: "EUROPE", name: "Europe" },
     snapshot_date: "2026-10-04",
-    freshness_days: 90,
     latest_evidence_date: "2026-09-26",
     publication_health: { status: "CURRENT", reasons: [] },
     direct_answer:

@@ -16,13 +16,11 @@ from .readmodel import (
     RegionalDeployment,
 )
 
-REGION_SLUGS = {"europe": "EUROPE"}
+REGION_SLUGS = {"europe": "EUROPE", "north-america": "NORTH_AMERICA"}
 
 _REASON_LABELS = {
     "CONFIRMED_NOT_OBTAINABLE": "Evidence on file that it is not currently obtainable here",
-    "STALE_OR_NON_CURRENT": (
-        "Regional offer on file is non-current or its evidence is older than the freshness window"
-    ),
+    "STALE_OR_NON_CURRENT": "Regional offer on file was withdrawn (recorded as no longer current)",
     "OFFER_WITHOUT_EVIDENCE": "Regional offer on file without supporting evidence",
     "UNRESOLVED_REGION": "Offer on file whose region is not resolved",
     "PRICE_ONLY": "Regional price on file but no availability offer",
@@ -122,9 +120,78 @@ def _faq(r: RegionalAvailability) -> list[dict]:
             f"As of {date_s}, no published purchase price is on file for a confirmed "
             f"{region} offer."
         )
+    direct = _names(offers, lambda o: o.availability_status in ("AVAILABLE", "LIMITED"))
+    gated = [n for n in _names(offers, lambda o: True) if n not in direct]
+    if offers:
+        q_direct = (
+            f"As of {date_s}, offers that can be ordered directly (available or limited) are on "
+            f"file for: {_list(direct) or 'none'}. Offers that need a preorder, a waitlist place, "
+            f"a quote or a sales contact are on file for: {_list(gated) or 'none'}. A quote or "
+            "contact-sales offer confirms a sales route, not stock or a delivery date."
+        )
+    else:
+        q_direct = f"As of {date_s}, no confirmed {region} offer of either kind is on file."
+
+    by_type: dict[str, set[str]] = {}
+    for o in offers:
+        kind = "manufacturer" if o.provider_type == "OEM" else "third-party seller"
+        by_type.setdefault(kind, set()).add(o.robot_name)
+    if offers:
+        parts = [
+            f"{label}: {_list(sorted(by_type[label]))}"
+            for label in ("manufacturer", "third-party seller")
+            if label in by_type
+        ]
+        q_seller = (
+            f"As of {date_s}, confirmed {region} offers on file come from the "
+            f"{'; and from the '.join(parts)}. A third-party seller is a distributor, "
+            "reseller or integrator, not the manufacturer; each offer names its seller."
+        )
+    else:
+        q_seller = f"As of {date_s}, no confirmed {region} offer is on file from any seller."
+
+    if r.offer_regions:
+        q_where = (
+            f"As of {date_s}, confirmed offers on file name: "
+            f"{_list([name for _, name in r.offer_regions])}. HumanoidOnline holds no "
+            f"confirmed offer for any other {region} country or territory; that is a gap in "
+            "the evidence, not proof that robots cannot be obtained there. An offer counts "
+            "only for the country its seller documents."
+        )
+    else:
+        q_where = f"As of {date_s}, no confirmed offer is on file for any {region} country."
+
+    deployed = sorted({d.robot_name for d in r.deployments})
+    q_deploy = (
+        "No. A deployment is evidence that a robot has been used in a region, for example in "
+        "a pilot or under a service contract with one customer. It is not an offer a new "
+        f"buyer can take up, so deployments never count toward {region} availability."
+        + (
+            f" As of {date_s}, evidenced {region} deployments are on file for: "
+            f"{_list(deployed)}; they are listed separately from the offers."
+            if deployed else ""
+        )
+    )
+
     return [
         {"question": f"Can I buy a humanoid robot in {region}?", "answer": q1},
         {"question": f"Which humanoid robots in {region} have a published price?", "answer": q2},
+        {
+            "question": f"Which humanoid robots can be ordered directly in {region}, and which "
+                        "need a quote, preorder or sales contact?",
+            "answer": q_direct,
+        },
+        {
+            "question": f"Are {region} humanoid robot offers sold by manufacturers or by "
+                        "resellers?",
+            "answer": q_seller,
+        },
+        {"question": f"In which {region} countries is a humanoid robot offer confirmed?",
+         "answer": q_where},
+        {
+            "question": f"Does a humanoid robot deployment in {region} mean I can buy it there?",
+            "answer": q_deploy,
+        },
         {
             "question": f"What does \"no confirmed {region} offer\" mean?",
             "answer": (
@@ -135,10 +202,11 @@ def _faq(r: RegionalAvailability) -> list[dict]:
         {
             "question": "How current is this data?",
             "answer": (
-                f"The snapshot date is {date_s}. An offer counts only when its latest evidence "
-                f"is within {r.freshness_days} days of the snapshot. Confidence is shown per "
-                "offer and is never upgraded by publication; human verification is not "
-                "required, and a row without a verification date has none recorded."
+                f"The snapshot date is {date_s}. An offer stays current until newer evidence "
+                "replaces it, so each offer shows the date it was last observed; check that "
+                "date before relying on it. Confidence is shown per offer and is never "
+                "upgraded by publication; human verification is not required, and a row "
+                "without a verification date has none recorded."
             ),
         },
     ]
@@ -151,15 +219,10 @@ def _plural(n: int, one: str, many: str) -> str:
 def _health(r: RegionalAvailability) -> dict:
     """Public, deterministic evidence health (not the review-only gate object).
 
-    CURRENT: the normal publication threshold is met AND no published robot has only
-    AGED-OUT regional offer evidence (older than the freshness window).
-    LIMITED_EVIDENCE: the threshold is missed (insufficient current evidence), OR at
-    least one published robot has only aged-out evidence (lost freshness).
-    Fresh evidence that an offer was explicitly withdrawn (`is_current` false) is
-    resolved current knowledge: the offer is excluded from current offers and counts
-    but does NOT by itself downgrade health. A robot that still has another qualifying
-    current offer is QUALIFYING, so an alternate old or withdrawn offer on it never
-    warns. Excluded offers are never shown as current either way.
+    CURRENT: the normal publication threshold (robots / manufacturers with a current
+    offer) is met. LIMITED_EVIDENCE: it is not. Evidence age alone never downgrades
+    health: an offer stays current until newer evidence replaces it (owner decision
+    2026-10-23), and each offer shows its last-observed date instead.
     """
     g = r.gate
     reasons = []
@@ -173,13 +236,6 @@ def _health(r: RegionalAvailability) -> dict:
             f"{g.qualifying_manufacturers} "
             f"{_plural(g.qualifying_manufacturers, 'manufacturer', 'manufacturers')}; "
             f"minimum {g.min_manufacturers}"
-        )
-    aged_n = len(r.aged_out)
-    if aged_n:
-        reasons.append(
-            f"{aged_n} published {_plural(aged_n, 'robot has', 'robots have')} only aged-out "
-            f"{r.region_name} offer evidence (older than {r.freshness_days} days) excluded "
-            f"from current figures."
         )
     return {
         "status": "LIMITED_EVIDENCE" if reasons else "CURRENT",
@@ -195,7 +251,6 @@ def build_projection(
     out = {
         "region": {"slug": region_slug, "code": r.region_code, "name": r.region_name},
         "snapshot_date": r.snapshot_date.isoformat(),
-        "freshness_days": r.freshness_days,
         "latest_evidence_date": (
             max(o.evidence_date for o in offers).isoformat() if offers else None
         ),
@@ -246,10 +301,14 @@ def build_projection(
                 "offers are not counted as regional availability."
             ),
             "qualifying_offer": (
-                "A region-specific availability offer that is current, linked to evidence, "
-                f"has evidence dated within {r.freshness_days} days of the snapshot, and has "
-                "an obtainable status (available, limited, preorder, waitlist or on request). "
-                "A price on its own is not an availability offer."
+                "A region-specific availability offer that is current, linked to evidence and "
+                "has an obtainable status (available, limited, preorder, waitlist or on "
+                "request). A price on its own is not an availability offer."
+            ),
+            "evidence_age": (
+                "An offer and its price stay current until newer evidence replaces them: an "
+                "offer recorded as withdrawn or not obtainable stops counting, but age alone "
+                "never removes one. Each offer shows the date it was last observed."
             ),
             "unknown_treatment": (
                 "Unknown values stay unknown: a missing price is shown as not published, "

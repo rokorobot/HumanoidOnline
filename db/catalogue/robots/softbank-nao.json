@@ -35,8 +35,76 @@
   "official_url": "https://www.softbankrobotics.com/",
   "commercial_status_evidence": [],
   "variants": [],
-  "pricing_offers": [],
-  "availability_offers": [],
+  "pricing_offers": [
+    {
+      "provider_slug": "robotlab",
+      "region_code": "US",
+      "transaction_type": "PURCHASE",
+      "price_type": "FROM",
+      "currency": "USD",
+      "price": 16990,
+      "billing_period": "ONE_TIME",
+      "price_basis": "NAO V6 Standard Edition purchase price as stated by RobotLAB ('Starting at'); taxes, shipping and services not stated",
+      "note": "FROM, not PUBLIC: the seller presents it as 'Starting at $16,990' while also stating 'Purchase Price $16,990' for the Standard Edition; the final price is by quote. Currency USD: US storefront with US sales and service.",
+      "evidence": [
+        {
+          "source_url": "https://www.robotlab.com/store/nao/",
+          "source_type": "OTHER",
+          "source_title": "NAO V6 Humanoid Robot — RobotLAB store page (US reseller and integrator)",
+          "excerpt": "Starting at $16,990 ... Purchase Price $16,990 ... RobotLAB sells the NAO V6 Standard Edition for $16,990",
+          "published_at": null,
+          "observed_at": "2026-10-23",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-23 by Claude Opus 5.5 (WebFetch; processed page text) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-NA-02 — Close North America Evidence Gaps' (2026-10-23), which names this exact URL. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party reseller and integrator, not the manufacturer; the page does not call RobotLAB authorized. Edition match: 'NAO V6 (NAO6) Standard Edition' is NAO6, which this record is (owner ruling DEC-04). The page's spec table names 'SoftBank Robotics / Aldebaran'; its product metadata lists 'Manufacturer: RobotLAB' (a conflict, not used); Maxtronics, the current NAO6 publisher, is not mentioned. Manufacturer of record is unchanged."
+        }
+      ]
+    }
+  ],
+  "availability_offers": [
+    {
+      "provider_slug": "robotlab",
+      "region_code": "US",
+      "transaction_type": "PURCHASE",
+      "availability_status": "ON_REQUEST",
+      "note": "Quote and demo request forms only (no cart): 'Get pricing & lead time'. US scope: 'US sales, setup & service' and 'Sold, deployed, and serviced nationwide by RobotLAB'. No stock or lead time stated.",
+      "evidence": [
+        {
+          "source_url": "https://www.robotlab.com/store/nao/",
+          "source_type": "OTHER",
+          "source_title": "NAO V6 Humanoid Robot — RobotLAB store page (US reseller and integrator)",
+          "excerpt": "RobotLAB sells the NAO V6 Standard Edition for $16,990 ... Get pricing & lead time ... US sales, setup & service",
+          "published_at": null,
+          "observed_at": "2026-10-23",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-23 by Claude Opus 5.5 (WebFetch; processed page text) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-NA-02 — Close North America Evidence Gaps' (2026-10-23), which names this exact URL. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party reseller and integrator, not the manufacturer; the page does not call RobotLAB authorized. Edition match: 'NAO V6 (NAO6) Standard Edition' is NAO6, which this record is (owner ruling DEC-04). The page's spec table names 'SoftBank Robotics / Aldebaran'; its product metadata lists 'Manufacturer: RobotLAB' (a conflict, not used); Maxtronics, the current NAO6 publisher, is not mentioned. Manufacturer of record is unchanged."
+        }
+      ],
+      "seller_wording": "Get pricing & lead time"
+    },
+    {
+      "provider_slug": "robotlab",
+      "region_code": "US",
+      "transaction_type": "LEASE",
+      "availability_status": "ON_REQUEST",
+      "note": "Lease through RobotLAB's Robot-as-a-Service leasing, by quote. No lease price is published.",
+      "evidence": [
+        {
+          "source_url": "https://www.robotlab.com/store/nao/",
+          "source_type": "OTHER",
+          "source_title": "NAO V6 Humanoid Robot — RobotLAB store page (US reseller and integrator)",
+          "excerpt": "Purchase · Lease ... RobotLAB also offers Robot-as-a-Service (RaaS) leasing and financing.",
+          "published_at": null,
+          "observed_at": "2026-10-23",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-23 by Claude Opus 5.5 (WebFetch; processed page text) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-NA-02 — Close North America Evidence Gaps' (2026-10-23), which names this exact URL. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party reseller and integrator, not the manufacturer; the page does not call RobotLAB authorized. Edition match: 'NAO V6 (NAO6) Standard Edition' is NAO6, which this record is (owner ruling DEC-04). The page's spec table names 'SoftBank Robotics / Aldebaran'; its product metadata lists 'Manufacturer: RobotLAB' (a conflict, not used); Maxtronics, the current NAO6 publisher, is not mentioned. Manufacturer of record is unchanged."
+        }
+      ],
+      "seller_wording": "RobotLAB also offers Robot-as-a-Service (RaaS) leasing and financing."
+    }
+  ],
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [

@@ -7,9 +7,10 @@ Publication lifecycle (ADR-027 §12):
   (groups do not reconcile, region structure missing, projection failure): then 404.
 * The 5 robots / 3 manufacturers threshold is a launch readiness check, verified in
   the review-only preview BEFORE the flag is first set. After publication, a decline
-  below it (or evidence ageing) is not a kill switch: the page stays public and
-  carries a `publication_health` of LIMITED_EVIDENCE with deterministic reasons.
-  Stale offers are never counted as current.
+  below it is not a kill switch: the page stays public and carries a
+  `publication_health` of LIMITED_EVIDENCE with deterministic reasons. An offer stays
+  current until newer evidence replaces it (owner decision 2026-10-23); withdrawn
+  offers are never counted as current.
 * Not flagged: 404 unless the caller presents the review token (`X-Research-Preview`),
   which returns the full, noindex readiness report.
 

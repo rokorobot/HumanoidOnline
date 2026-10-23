@@ -1,0 +1,396 @@
+{
+  "_comment": "HO-RESEARCH-NA-02 commercial-data batch (docs/audit/HO-RESEARCH-NA-01_NORTH_AMERICA_2026-10-23.md §6): expected business changes of a FULL `import_catalogue.py` run (no --only; a scoped run would reparent only US) with the catalogue JSON of PR #200. NORTH_AMERICA region + 41 reparented members; provider robotlab; Booster K1 Educational US offer and price (RobotShop US); NAO6 US purchase and lease offers and purchase price (RobotLAB); Agility Digit offer note/seller wording + contact-sales evidence (owner decision D4; the importer replaces the offer row, hence REMOVED + ADDED); the trigger-derived lowest purchase price on softbank-nao. NOT for import until the owner approves the batch.",
+  "expected": [
+    {
+      "table": "region",
+      "kind": "ADDED",
+      "match": {
+        "code": "NORTH_AMERICA"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "AG"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "AI"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "AW"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "BB"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "BL"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "BM"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "BQ"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "BS"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "BZ"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "CA"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "CR"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "CU"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "CW"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "DM"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "DO"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "GD"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "GL"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "GP"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "GT"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "HN"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "HT"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "JM"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "KN"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "KY"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "LC"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "MF"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "MQ"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "MS"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "MX"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "NI"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "PA"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "PM"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "PR"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "SV"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "SX"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "TC"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "TT"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "US"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "VC"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "VG"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "VI"
+      }
+    },
+    {
+      "table": "provider",
+      "kind": "ADDED",
+      "match": {
+        "slug": "robotlab"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "softbank-nao"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "REMOVED",
+      "match": {
+        "robot": "agility-digit",
+        "provider": "agility-raas"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "agility-digit",
+        "provider": "agility-raas"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-educational",
+        "provider": "robotshop-us"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "softbank-nao",
+        "provider": "robotlab",
+        "transaction_type": "PURCHASE"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "softbank-nao",
+        "provider": "robotlab",
+        "transaction_type": "LEASE"
+      }
+    },
+    {
+      "table": "pricing_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-educational",
+        "provider": "robotshop-us",
+        "price": 15699.0
+      }
+    },
+    {
+      "table": "pricing_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "softbank-nao",
+        "provider": "robotlab",
+        "price": 16990.0
+      }
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "source_url": "https://www.agilityrobotics.com/sales"
+      }
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "source_url": "https://www.robotshop.com/products/booster-robotics-k1-educational-humanoid-robot"
+      },
+      "count": 2
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "source_url": "https://www.robotlab.com/store/nao/"
+      },
+      "count": 3
+    }
+  ]
+}

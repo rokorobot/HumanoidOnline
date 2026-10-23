@@ -5,7 +5,7 @@
 import { verifyPreviewSession } from "./research-preview";
 import { API_BASE_URL } from "./server";
 
-export const RESEARCH_REGIONS = ["europe"] as const;
+export const RESEARCH_REGIONS = ["europe", "north-america"] as const;
 export type ResearchRegion = (typeof RESEARCH_REGIONS)[number];
 
 export const RESEARCH_BASE_PATH = "/research/humanoid-availability";
@@ -79,7 +79,6 @@ export interface ResearchHealth {
 export interface ResearchProjection {
   region: { slug: string; code: string; name: string };
   snapshot_date: string;
-  freshness_days: number;
   latest_evidence_date: string | null;
   direct_answer: string;
   publication_health: ResearchHealth;
@@ -278,7 +277,8 @@ export function formatPriceState(p: ResearchPriceState): string {
   const cur = p.currency ? ` ${p.currency}` : "";
   switch (p.kind) {
     case "PUBLISHED":
-      if (p.amount !== null) return `${money(p.amount)}${cur}${per}`;
+      // A FROM price is a starting price ("Starting at"), never shown as a flat price.
+      if (p.amount !== null) return `${p.price_type === "FROM" ? "From " : ""}${money(p.amount)}${cur}${per}`;
       // A range is shown only with BOTH bounds; there is no path to a made-up 0.
       if (p.price_min !== null && p.price_max !== null) {
         return `${money(p.price_min)}–${money(p.price_max)}${cur}${per}`;

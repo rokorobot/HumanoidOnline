@@ -119,7 +119,10 @@ const ROBOTS_FIXED_KB = 22; // measured 20.1
 // UX-01: 4.0 -> 4.35 (measured 4.32/card; main 3.96). Per card: the one-line commercial summary,
 // buyer-facing labels with data-enum, and the "Price terms" disclosure - each counted twice
 // because the RSC payload repeats the server-rendered tree.
-const ROBOTS_PER_CARD_KB = 4.35;
+// HO-RESEARCH-NA-02: 4.35 -> 4.40. The NA-02 batch gives NAO its first price and offers, so its
+// card gains the commercial summary and price terms: measured 209.2kB for 43 cards (4.353/card
+// over the 22kB fixed term), 0.14kB over the 4.35 allowance. Content growth, not a heavier card.
+const ROBOTS_PER_CARD_KB = 4.4;
 const ROBOTS_JS_RAW_KB = 411; // unchanged from the flat budget
 
 test("@perf built-route budget: /robots (scales with rendered cards)", async ({

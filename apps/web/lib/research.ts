@@ -79,7 +79,6 @@ export interface ResearchHealth {
 export interface ResearchProjection {
   region: { slug: string; code: string; name: string };
   snapshot_date: string;
-  freshness_days: number;
   latest_evidence_date: string | null;
   direct_answer: string;
   publication_health: ResearchHealth;

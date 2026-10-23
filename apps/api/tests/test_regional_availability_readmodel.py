@@ -126,7 +126,6 @@ def test_a_current_evidenced_fresh_obtainable_regional_offer_qualifies():
 
 @pytest.mark.parametrize("kwargs,expected", [
     (dict(current=False), STALE_OR_NON_CURRENT),
-    (dict(evidence=[ev(91)]), STALE_OR_NON_CURRENT),
     (dict(evidence=[]), OFFER_WITHOUT_EVIDENCE),
     (dict(status="NOT_AVAILABLE"), CONFIRMED_NOT_OBTAINABLE),
     (dict(status="DISCONTINUED"), CONFIRMED_NOT_OBTAINABLE),
@@ -137,32 +136,41 @@ def test_each_disqualifier_lands_in_its_own_group(kwargs, expected):
     assert r.key_figures.qualifying_robots == 0
 
 
-def test_freshness_boundary_is_90_days_inclusive():
-    assert group_of(build(robot("a", offers=[offer(evidence=[ev(90)])])), "a") == QUALIFYING
-    stale = build(robot("a", offers=[offer(evidence=[ev(91)])]))
-    assert group_of(stale, "a") == STALE_OR_NON_CURRENT
+@pytest.mark.parametrize("days_old", [90, 91, 400, 2000])
+def test_an_offer_stays_current_until_newer_evidence_replaces_it(days_old):
+    """Owner decision 2026-10-23: evidence age alone never removes an offer."""
+    r = build(robot("a", offers=[offer(evidence=[ev(days_old)])],
+                    prices=[price(evidence=[ev(days_old)])]))
+    assert group_of(r, "a") == QUALIFYING
+    o = r.qualifying_offers[0]
+    assert o.evidence_date == SNAP - timedelta(days=days_old)  # last observed, shown as is
+    assert o.prices[0].kind == "PUBLISHED"
 
 
-def test_freshness_is_configurable():
-    r = build(robot("a", offers=[offer(evidence=[ev(40)])]), freshness_days=30)
+def test_only_a_withdrawal_on_newer_evidence_stops_an_old_offer():
+    r = build(robot("a", offers=[offer(current=False, evidence=[ev(3)])]))
     assert group_of(r, "a") == STALE_OR_NON_CURRENT
+    assert r.key_figures.qualifying_robots == 0
 
 
-def test_evidence_dated_after_the_snapshot_is_not_fresh():
+def test_evidence_dated_after_the_snapshot_is_ignored():
     future = EvidenceRow("https://x.example", "MEDIUM", observed_at=SNAP + timedelta(days=1))
     r = build(robot("a", offers=[offer(evidence=[future])]))
-    assert group_of(r, "a") == STALE_OR_NON_CURRENT
+    assert group_of(r, "a") == OFFER_WITHOUT_EVIDENCE
+    both = build(robot("a", offers=[offer(evidence=[future, ev(30)])]))
+    assert both.qualifying_offers[0].evidence_date == SNAP - timedelta(days=30)
 
 
-def test_freshness_uses_verified_at_when_present_else_observed_at():
+def test_evidence_date_uses_verified_at_when_present_else_observed_at():
     old_observed_new_verified = EvidenceRow(
         "https://x.example", "HIGH",
         observed_at=SNAP - timedelta(days=200), verified_at=SNAP - timedelta(days=5))
     r = build(robot("a", offers=[offer(evidence=[old_observed_new_verified])]))
     assert group_of(r, "a") == QUALIFYING
+    assert r.qualifying_offers[0].evidence_date == SNAP - timedelta(days=5)
 
 
-def test_one_fresh_evidence_row_is_enough_when_another_is_old():
+def test_the_latest_evidence_row_sets_the_last_observed_date():
     r = build(robot("a", offers=[offer(evidence=[ev(300), ev(5)])]))
     assert group_of(r, "a") == QUALIFYING
     assert r.qualifying_offers[0].evidence_date == SNAP - timedelta(days=5)
@@ -246,10 +254,16 @@ def test_estimates_are_never_counted_as_a_published_price():
     assert r.key_figures.purchase_robots_with_published_price == 0
 
 
-def test_price_without_fresh_evidence_or_not_current_is_not_published():
-    r = build(robot("a", offers=[offer()],
-                    prices=[price(evidence=[]), price(evidence=[ev(200)]), price(current=False)]))
+def test_price_without_evidence_or_not_current_is_not_published():
+    r = build(robot("a", offers=[offer()], prices=[price(evidence=[]), price(current=False)]))
     assert [p.kind for p in _prices_of(r, "a")] == ["NOT_PUBLISHED"]
+
+
+def test_an_old_price_stays_published_until_replaced():
+    r = build(robot("a", offers=[offer(evidence=[ev(200)])],
+                    prices=[price(amount=17900.0, evidence=[ev(200)])]))
+    (p,) = _prices_of(r, "a")
+    assert (p.kind, p.amount) == ("PUBLISHED", 17900.0)
 
 
 def test_price_must_match_the_offers_provider_region_and_transaction():
@@ -268,21 +282,21 @@ def test_weekly_rental_price_is_kept_apart_from_purchase_price():
 
 # --- confidence is never upgraded --------------------------------------------------------------
 
-def test_offer_reports_weakest_in_window_confidence_and_no_false_verification():
+def test_offer_reports_weakest_latest_confidence_and_no_false_verification():
     r = build(robot("a", offers=[offer(evidence=[ev(5, conf="VERIFIED", verified=True),
-                                                  ev(6, conf="MEDIUM")])]))
+                                                  ev(5, conf="MEDIUM", url="https://y.example")])]))
     o = r.qualifying_offers[0]
     assert o.confidence == "MEDIUM"
     assert o.human_verified is False
 
 
-def test_human_verified_only_when_every_in_window_row_is_verified():
+def test_human_verified_only_when_every_latest_row_is_verified():
     r = build(robot("a", offers=[offer(evidence=[ev(5, conf="VERIFIED", verified=True)])]))
     o = r.qualifying_offers[0]
     assert (o.confidence, o.human_verified) == ("VERIFIED", True)
 
 
-def test_an_old_weak_row_does_not_downgrade_a_fresh_strong_one():
+def test_an_old_weak_row_does_not_downgrade_a_newer_strong_one():
     r = build(robot("a", offers=[offer(evidence=[ev(5, conf="HIGH"), ev(400, conf="LOW")])]))
     assert r.qualifying_offers[0].confidence == "HIGH"
 

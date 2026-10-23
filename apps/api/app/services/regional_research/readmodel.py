@@ -12,9 +12,13 @@ Rules pinned here (all from ADR-027):
 * A region is a *membership set*: the requested region plus every descendant in
   the region tree. `GLOBAL` is never a member, so a GLOBAL offer is never
   regional availability (it is reported as `GLOBAL_ONLY`).
-* An offer **qualifies** only if it is region-specific, current, evidence-linked,
-  fresh (latest evidence date within `freshness_days` of the snapshot date) and
-  its status is obtainable. A price row alone never qualifies.
+* An offer **qualifies** only if it is region-specific, current, evidence-linked
+  and its status is obtainable. A price row alone never qualifies.
+* **An offer stays current until newer evidence replaces it** (owner decision
+  2026-10-23, amending ADR-027 §12). Evidence does not age out: only an offer
+  recorded as non-current (`is_current` false), or one recorded as not obtainable,
+  stops counting. Every offer carries its last-observed date. Evidence dated after
+  the snapshot is ignored, so a historical snapshot stays reproducible.
 * A missing offer is never `NOT_AVAILABLE`: robots without a qualifying offer are
   grouped by *why* (no evidence on file), and the answer text says "no confirmed
   offer on file", never "not available".
@@ -22,8 +26,8 @@ Rules pinned here (all from ADR-027):
   is `PRICE_ON_REQUEST`; manufacturer/HumanoidOnline estimates are `ESTIMATE`
   and are never counted as a published price. Nothing defaults to 0.
 * Confidence is never upgraded: an offer reports the weakest confidence among its
-  in-window evidence, and `human_verified` is true only when every in-window row
-  carries `verified_at`.
+  LATEST evidence (the rows on its last-observed date), and `human_verified` is
+  true only when every one of those rows carries `verified_at`.
 """
 from __future__ import annotations
 
@@ -40,7 +44,6 @@ from .inputs import (
 )
 
 GLOBAL_CODE = "GLOBAL"
-DEFAULT_FRESHNESS_DAYS = 90
 DEFAULT_MIN_ROBOTS = 5
 DEFAULT_MIN_MANUFACTURERS = 3
 
@@ -93,9 +96,9 @@ class QualifyingOffer:
     region_code: str
     transaction_type: str
     availability_status: str
-    evidence_date: date
-    confidence: str                 # weakest in-window confidence; never upgraded
-    human_verified: bool            # every in-window evidence row has verified_at
+    evidence_date: date             # last observed (latest evidence on or before the snapshot)
+    confidence: str                 # weakest confidence of the latest evidence; never upgraded
+    human_verified: bool            # every latest evidence row has verified_at
     source_urls: tuple[str, ...]
     prices: tuple[PriceState, ...]
 
@@ -103,7 +106,7 @@ class QualifyingOffer:
 @dataclass(frozen=True)
 class RegionalDeployment:
     """Evidenced use in the region. Separate from purchasability: a deployment
-    never makes a robot a qualifying offer, and carries no freshness window
+    never makes a robot a qualifying offer, and has no age limit
     (it records something that happened)."""
 
     robot_slug: str
@@ -170,15 +173,11 @@ class RegionalAvailability:
     region_code: str
     region_name: str
     snapshot_date: date
-    freshness_days: int
     member_region_codes: tuple[str, ...]
     key_figures: KeyFigures
     qualifying_offers: tuple[QualifyingOffer, ...]
     deployments: tuple[RegionalDeployment, ...]
     groups: tuple[GroupSummary, ...]
-    # Robots in STALE_OR_NON_CURRENT whose regional evidence has AGED OUT. A subset of
-    # that group: robots only freshly, explicitly withdrawn are not listed here.
-    aged_out: tuple[RobotRef, ...]
     reconciles: bool
     gate: GateResult
     direct_answer: str
@@ -211,21 +210,26 @@ def region_members(regions: tuple[RegionNode, ...], region_code: str) -> frozens
 
 
 # --------------------------------------------------------------------------- #
-# Evidence freshness
+# Evidence as of the snapshot
 # --------------------------------------------------------------------------- #
 def _evidence_date(ev: EvidenceRow) -> date:
     return ev.verified_at or ev.observed_at
 
 
-def _in_window(ev: EvidenceRow, snapshot: date, freshness_days: int) -> bool:
-    age = (snapshot - _evidence_date(ev)).days
-    return 0 <= age <= freshness_days
-
-
-def _fresh_evidence(
-    evidence: tuple[EvidenceRow, ...], snapshot: date, freshness_days: int
+def _evidence_as_of(
+    evidence: tuple[EvidenceRow, ...], snapshot: date
 ) -> tuple[EvidenceRow, ...]:
-    return tuple(e for e in evidence if _in_window(e, snapshot, freshness_days))
+    """Evidence dated on or before the snapshot. There is no age limit: an offer
+    stays current until newer evidence replaces it. Later-dated rows are ignored so
+    a historical snapshot stays reproducible."""
+    return tuple(e for e in evidence if _evidence_date(e) <= snapshot)
+
+
+def _latest(evidence: tuple[EvidenceRow, ...]) -> tuple[EvidenceRow, ...]:
+    """The rows on the last-observed date: they, not older rows, state what is
+    currently known (an old weak row never downgrades a newer strong one)."""
+    last = max(_evidence_date(e) for e in evidence)
+    return tuple(e for e in evidence if _evidence_date(e) == last)
 
 
 # --------------------------------------------------------------------------- #
@@ -255,11 +259,12 @@ def _price_sort_key(s: PriceState) -> tuple:
 
 
 def _prices_for_offer(
-    robot: RobotRow, offer: OfferRow, snapshot: date, freshness_days: int
+    robot: RobotRow, offer: OfferRow, snapshot: date
 ) -> tuple[PriceState, ...]:
     """Prices for the same robot × provider × transaction × region as the offer.
-    Only current, evidence-linked, fresh price rows count; otherwise the price is
-    NOT_PUBLISHED (UNKNOWN), never an invented value."""
+    Only current, evidence-linked price rows count (an old price stays until newer
+    evidence replaces it); otherwise the price is NOT_PUBLISHED (UNKNOWN), never an
+    invented value."""
     states = [
         _price_state(p)
         for p in robot.prices
@@ -267,7 +272,7 @@ def _prices_for_offer(
         and p.provider_slug == offer.provider_slug
         and p.transaction_type == offer.transaction_type
         and p.region_code == offer.region_code
-        and _fresh_evidence(p.evidence, snapshot, freshness_days)
+        and _evidence_as_of(p.evidence, snapshot)
     ]
     if not states:
         return (PriceState(kind="NOT_PUBLISHED"),)
@@ -278,36 +283,26 @@ def _prices_for_offer(
 # Classification
 # --------------------------------------------------------------------------- #
 def _classify(
-    robot: RobotRow, members: frozenset[str], snapshot: date, freshness_days: int
-) -> tuple[str, tuple[QualifyingOffer, ...], bool]:
-    """(group, qualifying offers, aged_out).
+    robot: RobotRow, members: frozenset[str], snapshot: date
+) -> tuple[str, tuple[QualifyingOffer, ...]]:
+    """(group, qualifying offers).
 
-    `aged_out` separates two things the combined STALE_OR_NON_CURRENT group holds:
-
-    * AGED OUT: evidence older than the freshness window (a current offer nobody has
-      re-observed) or a non-current offer whose withdrawal is itself not freshly
-      evidenced. That is lost freshness and degrades publication health.
-    * EXPLICITLY NON-CURRENT: fresh evidence marking the offer withdrawn. That is
-      resolved current knowledge: the offer is excluded from current offers and
-      counts, but does not by itself downgrade health.
+    An offer stops counting only when newer evidence replaced it: it is recorded
+    as non-current (STALE_OR_NON_CURRENT; the code is kept for JSON stability) or
+    as not obtainable. The age of its evidence alone never removes it.
     """
     qualifying: list[QualifyingOffer] = []
-    confirmed_not_obtainable = stale = no_evidence = aged_out = False
+    confirmed_not_obtainable = non_current = no_evidence = False
 
     for o in (o for o in robot.offers if o.region_code in members):
         if not o.is_current:
-            stale = True
-            if not _fresh_evidence(o.evidence, snapshot, freshness_days):
-                aged_out = True  # withdrawal not freshly evidenced: knowledge has aged
+            non_current = True
             continue
-        if not o.evidence:
+        known = _evidence_as_of(o.evidence, snapshot)
+        if not known:
             no_evidence = True
             continue
-        fresh = _fresh_evidence(o.evidence, snapshot, freshness_days)
-        if not fresh:
-            stale = True
-            aged_out = True
-            continue
+        latest = _latest(known)
         if o.availability_status in NOT_OBTAINABLE:
             confirmed_not_obtainable = True
             continue
@@ -324,33 +319,33 @@ def _classify(
                 region_code=o.region_code or "",
                 transaction_type=o.transaction_type,
                 availability_status=o.availability_status,
-                evidence_date=max(_evidence_date(e) for e in fresh),
-                confidence=min((e.confidence for e in fresh),
+                evidence_date=_evidence_date(latest[0]),
+                confidence=min((e.confidence for e in latest),
                                key=lambda c: _CONFIDENCE_RANK.get(c, -1)),
-                human_verified=all(e.verified_at is not None for e in fresh),
-                source_urls=tuple(sorted({e.source_url for e in fresh})),
-                prices=_prices_for_offer(robot, o, snapshot, freshness_days),
+                human_verified=all(e.verified_at is not None for e in latest),
+                source_urls=tuple(sorted({e.source_url for e in known})),
+                prices=_prices_for_offer(robot, o, snapshot),
             )
         )
     if qualifying:
-        return QUALIFYING, tuple(qualifying), False
+        return QUALIFYING, tuple(qualifying)
     if confirmed_not_obtainable:
-        return CONFIRMED_NOT_OBTAINABLE, (), False
-    if stale:
-        return STALE_OR_NON_CURRENT, (), aged_out
+        return CONFIRMED_NOT_OBTAINABLE, ()
+    if non_current:
+        return STALE_OR_NON_CURRENT, ()
     if no_evidence:
-        return OFFER_WITHOUT_EVIDENCE, (), False
+        return OFFER_WITHOUT_EVIDENCE, ()
 
     rows = list(robot.offers) + list(robot.prices)
     if any(r.region_code is None for r in rows):
-        return UNRESOLVED_REGION, (), False
+        return UNRESOLVED_REGION, ()
     if any(p.region_code in members for p in robot.prices):
-        return PRICE_ONLY, (), False
+        return PRICE_ONLY, ()
     if any(r.region_code == GLOBAL_CODE for r in rows):
-        return GLOBAL_ONLY, (), False
+        return GLOBAL_ONLY, ()
     if rows:
-        return OTHER_REGION_ONLY, (), False
-    return NO_OFFERS, (), False
+        return OTHER_REGION_ONLY, ()
+    return NO_OFFERS, ()
 
 
 # --------------------------------------------------------------------------- #
@@ -500,7 +495,6 @@ def build_regional_availability(
     snapshot: RegionalSnapshot,
     region_code: str,
     *,
-    freshness_days: int = DEFAULT_FRESHNESS_DAYS,
     min_robots: int = DEFAULT_MIN_ROBOTS,
     min_manufacturers: int = DEFAULT_MIN_MANUFACTURERS,
 ) -> RegionalAvailability:
@@ -517,12 +511,9 @@ def build_regional_availability(
     )
     grouped: dict[str, list[RobotRow]] = {g: [] for g in GROUP_ORDER}
     offers_by_robot: dict[str, tuple[QualifyingOffer, ...]] = {}
-    aged_out: list[RobotRow] = []
     for robot in published:
-        reason, q, aged = _classify(robot, members, snapshot.snapshot_date, freshness_days)
+        reason, q = _classify(robot, members, snapshot.snapshot_date)
         grouped[reason].append(robot)
-        if aged:
-            aged_out.append(robot)
         if q:
             offers_by_robot[robot.slug] = q
 
@@ -605,15 +596,11 @@ def build_regional_availability(
         region_code=region_code,
         region_name=region_name,
         snapshot_date=snapshot.snapshot_date,
-        freshness_days=freshness_days,
         member_region_codes=tuple(sorted(members)),
         key_figures=kf,
         qualifying_offers=qualifying_offers,
         deployments=deployments,
         groups=groups,
-        aged_out=tuple(
-            RobotRef(r.slug, r.name, r.manufacturer_slug, r.manufacturer_name) for r in aged_out
-        ),
         reconciles=reconciles,
         gate=gate,
         direct_answer=_direct_answer(region_name, snapshot.snapshot_date, kf, qualifying_offers),

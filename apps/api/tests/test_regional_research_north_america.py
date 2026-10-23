@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 import sys
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -135,16 +135,18 @@ def test_a_global_price_does_not_price_a_us_offer():
     assert [x["kind"] for x in p["offers"][0]["prices"]] == ["NOT_PUBLISHED"]
 
 
-def test_expired_evidence_is_excluded_and_degrades_health():
-    """The 1X NEO / Agility Digit shape: a current US offer last observed 91 days ago."""
+def test_old_evidence_stays_current_until_replaced():
+    """The 1X NEO / Agility Digit shape: a current US offer last observed 91 days
+    ago still counts (owner decision 2026-10-23), with its own last-observed date;
+    only a withdrawal recorded on newer evidence removes an offer."""
     r = build(fx.robot("neo", offers=[fx.offer("US", "PREORDER", evidence=[fx.ev(91)])]),
-              fx.robot("fresh", maker="m2", offers=[fx.offer("US", evidence=[fx.ev(90)])]))
-    assert group_of(r, "neo") == STALE_OR_NON_CURRENT
-    assert group_of(r, "fresh") == QUALIFYING
-    assert [x.slug for x in r.aged_out] == ["neo"]
+              fx.robot("gone", maker="m2", offers=[fx.offer("CA", current=False,
+                                                            evidence=[fx.ev(2)])]))
+    assert group_of(r, "neo") == QUALIFYING
+    assert r.qualifying_offers[0].evidence_date == fx.SNAP - timedelta(days=91)
+    assert group_of(r, "gone") == STALE_OR_NON_CURRENT
     health = build_projection(r, "north-america")["publication_health"]
-    assert health["status"] == "LIMITED_EVIDENCE"
-    assert any("aged-out North America offer evidence" in s for s in health["reasons"])
+    assert not any("aged" in s for s in health["reasons"])
 
 
 def test_deployments_never_establish_purchasability():
@@ -283,7 +285,8 @@ def test_real_catalogue_known_findings_at_the_audit_snapshot():
     """Monotone only (like Europe's), so a later evidence refresh or a newly
     authorized source cannot break it."""
     r = _real()
-    assert "unitree-g1" in {o.robot_slug for o in r.qualifying_offers}
+    # Offers stay current until newer evidence replaces them (owner decision 2026-10-23).
+    assert {"unitree-g1", "1x-neo", "agility-digit"} <= {o.robot_slug for o in r.qualifying_offers}
     deployed = {d.robot_slug for d in r.deployments}
     assert {"agility-digit", "figure-02"} <= deployed
     assert "apptronik-apollo" not in deployed  # deployment region unresolved

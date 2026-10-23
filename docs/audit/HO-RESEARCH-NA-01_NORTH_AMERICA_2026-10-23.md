@@ -8,23 +8,25 @@
 | | Result |
 |---|---|
 | Published robots (population) | 43 |
-| Robots with a qualifying North America offer | **1** (Unitree G1 via RobotShop US) |
-| Manufacturers with a qualifying offer | **1** |
-| Launch gate (5 robots / 3 manufacturers, unchanged) | **FAILS** |
-| Publication health | LIMITED_EVIDENCE (shortfall + 2 robots aged out) |
-| Groups reconcile | yes (1 + 2 + 1 + 4 + 14 + 21 = 43) |
+| Robots with a qualifying North America offer | **3**: Unitree G1 (RobotShop US), 1X NEO (1X store, preorder), Agility Digit (RaaS, on request) |
+| Manufacturers with a qualifying offer | **3** |
+| Launch gate (5 robots / 3 manufacturers, unchanged) | **FAILS** on robots only (3 < 5) |
+| Publication health | LIMITED_EVIDENCE (3 qualifying robots; minimum 5) |
+| Groups reconcile | yes (3 + 1 + 4 + 14 + 21 = 43) |
 
-**North America stays unpublished.** The code, data hierarchy and article are complete and tested; the evidence is not. The single qualifying row (G1 / `robotshop-us`, observed 2026-08-17) itself ages out on **2026-11-16**, after which the resource would show 0 / 0 unless re-observed.
+**Owner decision 2026-10-23 (amends ADR-027 §12):** an offer and its price stay current until newer evidence replaces them. Evidence age alone no longer removes an offer; each offer shows its last-observed date. Before this decision, the same data gave 1 robot / 1 manufacturer: NEO and Digit had aged past the 90-day window, and G1 would have aged out on 2026-11-16.
 
-How the figures were obtained: the production catalogue was read with a read-only transaction (Neon `production`, `SET TRANSACTION READ ONLY`), loaded through the real `load_regional_snapshot`, and the proposed NORTH_AMERICA hierarchy was applied **in memory only**. The local full stack built from the repository catalogue (fresh DB, `import_catalogue.py`) produced the identical projection, and Europe on the same snapshot is unchanged (10 robots / 3 manufacturers, CURRENT).
+**North America stays unpublished.** The code, data hierarchy and article are complete and tested, but two more qualifying robots are needed.
+
+How the figures were obtained: the production catalogue was read with a read-only transaction (Neon `production`, `SET TRANSACTION READ ONLY`), loaded through the real `load_regional_snapshot`, and the proposed NORTH_AMERICA hierarchy was applied **in memory only**. The local full stack built from the repository catalogue (fresh DB, `import_catalogue.py`) produced the identical projection, and Europe on the same snapshot is unchanged by both the hierarchy and the evidence-age decision (10 robots / 3 manufacturers, CURRENT). Under the old rule, Europe's three RobotShop K1 rows would have aged out about 2026-11-14; they now stay counted.
 
 ## 2. Production records relevant to North America (read-only, 2026-10-23)
 
 | Robot | Record | Region | Status | Evidence (latest) | Treatment |
 |---|---|---|---|---|---|
-| unitree-g1 | robotshop-us, PURCHASE, USD 17,900 PUBLIC, lead_time_days 56 | US | AVAILABLE | 2026-08-17, MEDIUM, no human verification | **Qualifies** until 2026-11-15 |
-| 1x-neo | 1x-store, PURCHASE (USD 20,000) + SUBSCRIPTION (USD 499/month) | US | PREORDER | 2026-07-24 (91 days) | Aged out; excluded |
-| agility-digit | agility-raas, RAAS | US | ON_REQUEST | 2026-07-24 (91 days) | Aged out; excluded |
+| unitree-g1 | robotshop-us, PURCHASE, USD 17,900 PUBLIC, lead_time_days 56 | US | AVAILABLE | 2026-08-17, MEDIUM, no human verification | **Qualifies** |
+| 1x-neo | 1x-store, PURCHASE (USD 20,000) + SUBSCRIPTION (USD 499/month) | US | PREORDER | 2026-07-24, VERIFIED | **Qualifies** (preorder; USD 20,000 shown; the USD 499/month SUBSCRIPTION price has no matching offer, so it is not shown) |
+| agility-digit | agility-raas, RAAS | US | ON_REQUEST | 2026-07-24, HIGH | **Qualifies** (RaaS; price not published). Its only evidence is the 2024 GXO announcement (see D4) |
 | unitree-g1 / h1 / h2 / r1 | unitree-store | GLOBAL | various | 2026-07-24 … 09-26 | Global only, not regional |
 | engineered-arts-ameca | engineered-arts-oem, RENTAL + PURCHASE | GLOBAL | AVAILABLE / ON_REQUEST | 2026-07-24 | Global only |
 | 4ne1-mini | none, PURCHASE (two identical rows) | NULL | WAITLIST | 2026-10-02 | Unresolved region (governance-pinned; untouched) |
@@ -83,8 +85,8 @@ This follows the existing convention for agent-retrieved commercial evidence in 
 
 **Expected production effect** (scoped import `--only 1x-neo`):
 - Exactly 3 evidence_source rows added.
-- 1x-neo moves from STALE to QUALIFYING (PREORDER, with a published price).
-- North America becomes 2 robots / 2 manufacturers. **The gate still fails.**
+- NEO already counts under the 2026-10-23 rule. The batch moves its last-observed date from 2026-07-24 to 2026-10-23 and its displayed confidence to HIGH (the latest evidence decides confidence; never upgraded).
+- The counts do not change: 3 robots / 3 manufacturers. **The gate still fails.**
 - Re-observe before importing if the approval comes days later.
 - Existing rows keep their VERIFIED 2026-07-24 evidence. Nothing is re-dated.
 
@@ -92,12 +94,12 @@ This follows the existing convention for agent-retrieved commercial evidence in 
 
 | Step | Adds | Owner decision |
 |---|---|---|
-| NA-1 (above) | 1x-neo | approve the batch |
-| Owner capture of RobotShop US G1 | keeps unitree-g1 after 2026-11-15 | capture the evidence |
+| Already counted (2026-10-23 rule) | unitree-g1, 1x-neo, agility-digit (3 robots / 3 manufacturers) | none |
+| NA-1 (above) | newer last-observed date for 1x-neo; no count change | approve the batch |
 | RoboStore as A4 source + provider `robostore-us` (DISTRIBUTOR) | unitree-g1-edu-plus-u2; possibly an R1 EDU edition; G1 Base only if "Sold Out" maps to an obtainable status | source authorization; edition matching; status mapping for "Sold Out - Notify me" (probably NOT obtainable) |
 | RobotLAB as A4 source + provider (reseller and integrator) | softbank-nao (US, ON_REQUEST, FROM USD 16,990); this would be a 3rd manufacturer | source authorization; NAO manufacturer identity (Aldebaran / Maxtronics caveat) |
 
-Even with all four steps, the realistic outcome is about 4–5 robots from 3 manufacturers, which is borderline. Do **not** lower the threshold.
+With RoboStore (G1 EDU U2) and RobotLAB (NAO), North America would reach **5 robots from 4 manufacturers and pass the gate**. That needs both source authorizations and confirmation that each listing is obtainable. Do **not** lower the threshold.
 
 ## 5. Owner decisions
 
@@ -112,7 +114,7 @@ Even with all four steps, the realistic outcome is about 4–5 robots from 3 man
   - No offer, price or deployment references NORTH_AMERICA, so matching, lead routing and `commercial_offer` behave identically (pinned by a test).
   - It needs a governed production import of the regions. Until then the API returns 404 for North America, even with a preview token.
 - **D3 Batch NA-1** (§4).
-- **D4 Agility Digit RaaS row.** Its only evidence is a 2024 deployment announcement. Re-evidence it, or record it as a non-current offer.
+- **D4 Agility Digit RaaS row.** It now counts as a current North America offer. Its only evidence is the 2024 GXO announcement, and Agility's site today shows only a contact-sales route. Keep it, re-evidence it, or record it as non-current.
 - **D5 New sources** RoboStore and RobotLAB (A4), with edition and status mapping.
 - **D6 Editorial.** The North America fragment is DRAFT (`reviewed_at: null`) and is shown only in preview.
 - **D7 Preview access.** `RESEARCH_PREVIEW_TOKEN` is unset everywhere. Setting it on both the API and the web app is needed to review on production.

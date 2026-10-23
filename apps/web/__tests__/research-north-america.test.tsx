@@ -105,7 +105,7 @@ function naProjection(overrides: Partial<ResearchProjection> = {}): ResearchProj
     no_confirmed_offer: [
       {
         reason: "STALE_OR_NON_CURRENT",
-        label: "Regional offer on file is non-current or its evidence is older than the freshness window",
+        label: "Regional offer on file was withdrawn (recorded as no longer current)",
         robots: [{ slug: "1x-neo", name: "NEO", manufacturer_slug: "1x-technologies", manufacturer_name: "1X" }],
       },
       {

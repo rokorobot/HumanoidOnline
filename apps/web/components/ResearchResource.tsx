@@ -86,7 +86,7 @@ function OfferTable({
           <th scope="col">Seller</th>
           <th scope="col">Region</th>
           <th scope="col">Price</th>
-          <th scope="col">Evidence date</th>
+          <th scope="col">Last observed</th>
           <th scope="col">Confidence</th>
           <th scope="col">Sources</th>
         </tr>
@@ -157,8 +157,8 @@ export function ResearchResource({
       <h1>Which humanoid robots are available in {region}?</h1>
       <p>
         Snapshot <time dateTime={data.snapshot_date}>{data.snapshot_date}</time>. Generated from the
-        HumanoidOnline catalogue; evidence must be dated within {data.freshness_days} days of the
-        snapshot to count.
+        HumanoidOnline catalogue. An offer stays current until newer evidence replaces it, so each
+        offer shows the date it was last observed.
       </p>
 
       {data.publication_health.status === "LIMITED_EVIDENCE" && (
@@ -168,13 +168,11 @@ export function ResearchResource({
             <p>
               <strong>Limited current evidence.</strong> This resource is not published, and the
               current evidence on file does not meet HumanoidOnline’s normal publication threshold.
-              Stale offers are excluded from current availability figures.
             </p>
           ) : (
             <p>
               <strong>Limited current evidence.</strong> This resource remains published, but the
               current evidence on file no longer meets HumanoidOnline’s normal publication threshold.
-              Stale offers are excluded from current availability figures.
             </p>
           )}
           {data.publication_health.reasons.length > 0 && (

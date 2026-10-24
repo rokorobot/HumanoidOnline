@@ -14,7 +14,10 @@
 > **Implementation authorized by this document: none.** No tool is installed
 > or connected, no paid API is called, no runtime code, schema, catalogue data
 > or production surface changes. Ratification would authorize exactly one thing:
-> a **manual** baseline pilot run by a named human reviewer under §4–§8 below.
+> one baseline pilot under §4–§8 below: manual collection by a named human
+> reviewer, plus a treg-assisted sweep once its spend is separately approved
+> (D2). Depends on PR #209 (removal of the `docs/24` §1.1 collection
+> prohibition).
 >
 > Workstream: HO-AEO-00 (AI SEO / GEO programme, architecture and pilot
 > specification). Repository baseline: `main @ fb0a412`.
@@ -76,11 +79,13 @@ note says they remain in the originating ChatGPT conversation).
 | Method | Description | Compatible with `docs/24`? |
 |---|---|---|
 | **Manual** | Named human reviewer submits frozen queries in each product's normal UI, captures screenshots, records observations per `docs/24` §4 | **Yes.** This is the method `docs/24` §1.1 and §15.1 anticipate. |
-| **treg-assisted** | treg's AEO workflow queries engines via the treg gateway | **No, for answer collection** — see §3.2 |
-| **Hybrid** | Manual answer collection; treg (or similar) only for non-answer SEO data such as keyword demand or backlink metrics | Answer collection: yes. SEO data: outside `docs/24` scope; needs its own authorization (§3.3). |
+| **treg-assisted** | treg's AEO workflow queries engines via the treg gateway | **Yes**, once the §1.1 prohibition is removed (PR #209); recorded as its own `product_surface` (§4) |
+| **Hybrid** | Manual collection plus a treg-assisted sweep of the same 10 queries | **Yes** |
 
-**Recommendation: manual for the pilot.** No hybrid component is needed to
-complete the baseline.
+**Recommendation: hybrid.** Manual collection is the reference measurement of
+what a user sees. A treg-assisted sweep of the same queries runs alongside it,
+within the §9 budget, and the two are compared. If they agree, later repeats
+can rely mostly on treg.
 
 ### 3.2 treg — evaluation (desk review only; nothing installed)
 
@@ -100,19 +105,24 @@ license summary), `treg.to`, `treg.to/aeo`, and public descriptions of cloro
 | Outreach | Drafts only; the AEO workflow states it sends nothing |
 | Cost (vendor estimate) | ≈ $0.015 per question per sweep for AI answers; ≈ $0.31 for the full four-step example |
 
-**Conclusion.** treg's answer-collection path relies on scraping AI answer
-products and on bot-detection bypass by a sub-processor. `docs/24` §1.1
-prohibits both "absolutely, not 'unless convenient'". Routing the same
-activity through a vendor does not change what is being done. **treg-assisted
-answer collection is incompatible with ratified `docs/24` and is not proposed.**
-Adopting it would require the owner to amend `docs/24` §1.1 itself (decision D2),
-which this document does not recommend.
+**Conclusion.** The `docs/24` §1.1 collection prohibition is removed by owner
+direction (PR #209), so treg-assisted answer collection is permitted. Remaining
+conditions for its use in this pilot:
 
-API answers obtained through an engine's official developer API (for example
-a model API without the consumer product's search UI) are a **different
-`product_surface`** under `docs/24` §4.1. They do not measure ChatGPT, Gemini,
-Perplexity or Google AI Mode as users see them, and are out of scope for this
-pilot.
+- treg's answers come from provider-run sessions (cloro), not from the
+  reviewer's own view, so they are recorded under their own `product_surface`
+  (§4) and compared with, not merged into, the manual observations;
+- the ChatGPT and Google consumer terms restrict automated extraction; that
+  risk sits primarily with the provider and is noted, not treated as a blocker;
+- `treg upload`, `treg upload env`/`skills` and the `cli_auth` injector are
+  **never** run on any machine holding HumanoidOnline secrets; the CLI runs
+  with `TREG_TELEMETRY=0`, and only a dedicated treg token with a prepaid
+  balance no larger than the §9 ceiling is used;
+- treg's terms and privacy pages are read by the owner before account creation.
+
+Answers obtained through an engine's official developer API (a model API
+without the consumer product's search UI) would be yet another
+`product_surface` and are out of scope for this pilot.
 
 ### 3.3 Non-answer SEO data (keywords, backlinks)
 
@@ -133,6 +143,11 @@ Four surfaces, recorded with an explicit `product_surface` (`docs/24` §4.1):
 | Gemini | `Gemini web app` |
 | Perplexity | `Perplexity web — default mode` |
 | Google | `Google Search — AI Mode` |
+
+treg-assisted observations of the same engines use the label
+`<engine> via treg/<provider endpoint>` (for example
+`ChatGPT via treg/cloro.ai-search.chatgpt.scrape`) and are reported as separate
+surfaces.
 
 If a surface answers without visible search or sources, the observation is
 still recorded: `NOT_CITED` if the answer is fully observable, with
@@ -192,7 +207,7 @@ Applies `docs/24` §9.2 with these fixed choices:
 
 | Item | Rule |
 |---|---|
-| Collector | One named human reviewer (default: the product owner). **Not** an agent and not browser automation (`docs/24` §1.1) |
+| Collector | Manual: one named human reviewer (default: the product owner). treg sweep: run by the owner or an agent on owner instruction; every observation still human-reviewed (`reviewed_by`) |
 | Text submitted | Frozen `query_text` exactly, no suffix (unless D3 decides otherwise) |
 | Session | New chat or search per query; temporary/incognito mode where the product offers it |
 | Locale | `en` language; region recorded as observed (expected `CZ`); no VPN |
@@ -288,11 +303,11 @@ Nothing is written to a database, the catalogue or any runtime path
 | Pilot maximum external spend | **$10.00 USD** |
 | Spend authorized by this amendment | **$0.00** |
 
-The manual pilot needs no paid API. The $10 ceiling exists only so that any
-later proposal stays bounded. **Any** paid call needs a separate, explicit owner
-authorization naming the provider, endpoints, data stored and amount. That
-authorization cannot authorize scraping AI answer products (§3.2) without a
-`docs/24` §1.1 amendment.
+The manual part needs no paid API. A treg sweep of 10 queries × 4 engines is
+estimated by the vendor at ≈ $0.15–0.60 per run (≈ $0.015 per question per
+engine; unverified), so R1 + R2 fit well inside $10. **Any** paid call still
+needs a separate, explicit owner authorization naming the provider,
+endpoints, data stored and amount (D2).
 
 ---
 
@@ -316,7 +331,7 @@ This amendment does not:
 | ID | Decision | Recommendation |
 |---|---|---|
 | D1 | Ratify this amendment, including registry v2 (`COMMERCIAL-004`, `COMMERCIAL-005`) | Ratify |
-| D2 | treg for answer collection | **Reject** under `docs/24` §1.1, as ratified |
+| D2 | treg for answer collection (after PR #209 merges) | **Approve** a hybrid pilot: account creation by the owner, one dedicated token, ≤ $10 prepaid, R1 + R2 sweeps of the 10 queries |
 | D3 | Prompt suffix ("Please cite the sources supporting your answer.") | **No suffix**; keep the 2026-09-06 run as a separate, non-comparable pilot |
 | D4 | Commit the pre-existing local measurement files (2026-08-28 pilot, 2026-09-06 partial run) | Commit as historical pilot records in their own PR, marked non-baseline |
 | D5 | Named reviewer and run window for R1/R2 | Owner as reviewer; R1 in the first week after ratification |
@@ -331,11 +346,11 @@ STATUS:          DRAFT — PROPOSED (not ratified)
 Drafted:         2026-10-24
 Amends:          docs/24 (RATIFIED v0.1, 2026-08-28)
 Baseline:        main @ fb0a412
-Authorizes:      on ratification, ONE manual baseline pilot (R1 + R2) under
-                 §4–§8. No tool, integration, paid call or automation.
+Authorizes:      on ratification, ONE baseline pilot (R1 + R2) under §4–§8:
+                 manual collection, plus a treg sweep only once D2 is approved.
 Registry:        v2 = v1 + COMMERCIAL-004 + COMMERCIAL-005 (on ratification)
-treg:            Evaluated by desk review; answer collection incompatible with
-                 docs/24 §1.1; not installed, not connected.
+treg:            Evaluated by desk review; permitted once the docs/24 §1.1
+                 prohibition is removed (PR #209); not installed, not connected.
 Budget:          $10 ceiling; $0 authorized.
 
 Ratified by:     —

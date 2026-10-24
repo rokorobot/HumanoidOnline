@@ -67,6 +67,33 @@
           "note": "Third-party distributor price, not manufacturer MSRP. Exact product URL pending."
         }
       ]
+    },
+    {
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "JPY",
+      "price": 3148200,
+      "price_min": null,
+      "price_max": null,
+      "billing_period": "ONE_TIME",
+      "region_code": "JP",
+      "provider_slug": "switch-science",
+      "variant_slug": null,
+      "price_basis": "Japanese retail price including consumption tax (税込); shipping not included",
+      "note": "Third-party Japanese retailer price for Booster K1 Professional (BOOSTER-K1-PRO). JPY as published, not converted; not a manufacturer MSRP.",
+      "evidence": [
+        {
+          "source_url": "https://www.switch-science.com/products/10851",
+          "source_type": "OTHER",
+          "source_title": "《お取り寄せ商品》Booster K1 Pro - Jetson AGX Orin搭載 人型ロボット — Switch Science (Japan)",
+          "excerpt": "この商品は取寄商品です ¥3,148,200 （税込） ... カートに追加",
+          "published_at": null,
+          "observed_at": "2026-10-24",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-24 by Claude Opus 5.5 (curl, browser UA; body sha256 057869dbdbde596b103812b731ded2d79898211675aae51c0c16529aa1dc89dc) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-ASIA-01 — Asia Regional Research Resource' (2026-10-24). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Japanese electronics retailer, a third-party seller, not the manufacturer. Its 2026-04-16 PR Times release (https://prtimes.jp/main/html/rd/p/000000239.000064534.html) announces that it handles Booster Robotics products from that date; it does not call itself an authorized distributor. Edition match: product code BOOSTER-K1-PRO, body text 'Booster K1 Professional', Jetson AGX Orin 32GB (200 TOPS) — this record. The page's structured data says InStock, but the page text says it is a special-order item (取寄商品) ordered from the manufacturer after payment; the text governs. The release price (2,748,900 円) is older than the current page price and is not used."
+        }
+      ]
     }
   ],
   "availability_offers": [
@@ -84,6 +111,29 @@
           "observed_at": "2026-08-16",
           "confidence": "MEDIUM",
           "note": "ON_REQUEST chosen over PREORDER: the product already exists and ships, it is simply not held in standing stock."
+        }
+      ]
+    },
+    {
+      "transaction_type": "PURCHASE",
+      "availability_status": "ON_REQUEST",
+      "region_code": "JP",
+      "provider_slug": "switch-science",
+      "variant_slug": null,
+      "lead_time_days": null,
+      "note": "Special order (取寄商品): can be added to the cart and paid, after which Switch Science orders it from the manufacturer; stated lead time usually 2-3 months (not converted to days). Mapped to ON_REQUEST, the same mapping as this edition's RobotShop 'Special order' offers.",
+      "seller_wording": "本商品はお取り寄せ商品です ... 納期は通常2～3ヶ月ほどです。",
+      "evidence": [
+        {
+          "source_url": "https://www.switch-science.com/products/10851",
+          "source_type": "OTHER",
+          "source_title": "《お取り寄せ商品》Booster K1 Pro - Jetson AGX Orin搭載 人型ロボット — Switch Science (Japan)",
+          "excerpt": "本商品はお取り寄せ商品です。... この商品のお買い求め手続きを完了し、代金のお支払いをいただいてから、お取り寄せを行います ... 納期は通常2～3ヶ月ほどです。",
+          "published_at": null,
+          "observed_at": "2026-10-24",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-24 by Claude Opus 5.5 (curl, browser UA; body sha256 057869dbdbde596b103812b731ded2d79898211675aae51c0c16529aa1dc89dc) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-ASIA-01 — Asia Regional Research Resource' (2026-10-24). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Japanese electronics retailer, a third-party seller, not the manufacturer. Its 2026-04-16 PR Times release (https://prtimes.jp/main/html/rd/p/000000239.000064534.html) announces that it handles Booster Robotics products from that date; it does not call itself an authorized distributor. Edition match: product code BOOSTER-K1-PRO, body text 'Booster K1 Professional', Jetson AGX Orin 32GB (200 TOPS) — this record. The page's structured data says InStock, but the page text says it is a special-order item (取寄商品) ordered from the manufacturer after payment; the text governs. The release price (2,748,900 円) is older than the current page price and is not used."
         }
       ]
     }

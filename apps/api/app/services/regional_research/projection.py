@@ -16,7 +16,20 @@ from .readmodel import (
     RegionalDeployment,
 )
 
-REGION_SLUGS = {"europe": "EUROPE", "north-america": "NORTH_AMERICA"}
+REGION_SLUGS = {"europe": "EUROPE", "north-america": "NORTH_AMERICA", "asia": "ASIA"}
+
+# Coverage statements for a region whose catalogue membership departs from its
+# reference classification. Fixed text about the hierarchy (db/catalogue/regions.json),
+# never a commercial fact; appended to the methodology's region_membership.
+_MEMBERSHIP_NOTES = {
+    "ASIA": (
+        " It follows the UN M49 Asia classification (Central, Eastern, South-eastern, "
+        "Southern and Western Asia) with two disclosed exceptions: Cyprus is counted in "
+        "Europe with the European Union, not here, and Taiwan, coded separately as a "
+        "commercial destination, is included. Russia is counted in Europe; Australia, New "
+        "Zealand and the Pacific (Asia-Pacific) are not included."
+    ),
+}
 
 _REASON_LABELS = {
     "CONFIRMED_NOT_OBTAINABLE": "Evidence on file that it is not currently obtainable here",
@@ -299,6 +312,7 @@ def build_projection(
                 f"{r.region_name} = the {r.region_code} region and every region beneath it in "
                 f"the catalogue hierarchy ({len(r.member_region_codes)} regions). Global "
                 "offers are not counted as regional availability."
+                + _MEMBERSHIP_NOTES.get(r.region_code, "")
             ),
             "qualifying_offer": (
                 "A region-specific availability offer that is current, linked to evidence and "

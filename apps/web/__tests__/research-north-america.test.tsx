@@ -383,7 +383,7 @@ describe("preview access route", () => {
   });
 
   it("refuses an unbuilt or unknown region without a cookie", async () => {
-    for (const region of ["asia", "atlantis", ""]) {
+    for (const region of ["south-america", "atlantis", ""]) {
       const res = await post({ token: TOKEN, region });
       expect(res.status).toBe(400);
       expect(res.headers.get("set-cookie")).toBeNull();

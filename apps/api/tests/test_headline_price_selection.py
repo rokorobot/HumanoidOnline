@@ -326,6 +326,29 @@ def test_price_never_decides_across_currencies() -> None:
     assert display.amount == 9000.0
 
 
+def test_without_a_market_a_worldwide_listing_heads_an_incomparable_country_price() -> None:
+    """HO-RESEARCH-ASIA-01: the manufacturer's GLOBAL USD store and its own CN CNY
+    list price are both manufacturer-direct and incomparable. With no market chosen
+    the worldwide listing is the headline; the provider slug ('maker-cn' sorts
+    first) no longer decides."""
+    cn = oem(provider="maker-cn", region="CN", currency="CNY", price=85000.0)
+    world = oem(provider="maker-store", region="GLOBAL", currency="USD", price=13500.0)
+    for rows in ((cn, world), (world, cn)):
+        display = price_display_for(robot_with(*rows))
+        assert display is not None
+        assert (display.provider, display.region, display.currency, display.amount) == (
+            "maker-store", "GLOBAL", "USD", 13500.0)
+
+
+def test_a_china_market_still_heads_with_the_china_price() -> None:
+    cn = oem(provider="maker-cn", region="CN", currency="CNY", price=85000.0)
+    world = oem(provider="maker-store", region="GLOBAL", currency="USD", price=13500.0)
+    cn_market = {"CN": MARKET_RANK_EXACT, "GLOBAL": MARKET_RANK_GLOBAL, None: MARKET_RANK_AGNOSTIC}
+    display = price_display_for(robot_with(cn, world), market_rank=cn_market)
+    assert display is not None
+    assert (display.region, display.currency) == ("CN", "CNY")
+
+
 # --- market scope -------------------------------------------------------------
 
 def test_an_offer_outside_the_market_is_dropped_not_ranked() -> None:

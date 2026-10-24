@@ -60,7 +60,34 @@
   "variants": [],
   "pricing_offers": [],
   "availability_offers": [],
-  "deployments": [],
+  "deployments": [
+    {
+      "customer_name": "Hitachi (China) Ltd.",
+      "region_code": "CN",
+      "use_case_slug": "manufacturing",
+      "provider_slug": null,
+      "transaction_type": "PILOT",
+      "unit_count": null,
+      "contract_value": null,
+      "contract_currency": null,
+      "started_on": null,
+      "status": "pilot",
+      "summary": "On-site operational testing and application validation of Walker S2 in selected Hitachi manufacturing environments in China, including a Hitachi Elevator workshop, under a UBTECH–Hitachi (China) strategic cooperation agreement.",
+      "evidence": [
+        {
+          "source_url": "https://www.ubtrobot.com/en/about/news/826577556529221",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "UBTECH and Hitachi Enter into Strategic Partnership to Jointly Explore Intelligent Solutions Across Multiple Fields — UBTECH news",
+          "excerpt": "Hitachi has already introduced UBTECH's industrial-grade humanoid robot, Walker S2, into select manufacturing environments, working alongside UBTECH to advance on-site operational testing and application scenario validation.",
+          "published_at": "2026-07-13",
+          "observed_at": "2026-10-24",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-24 by Claude Opus 5.5 (curl, browser UA; body sha256 43306307ee513099ec3cfb6d9998daf298fa4bbc5d31d85b3d94853ea5425874) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-ASIA-01 — Asia Regional Research Resource' (2026-10-24). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own news item dated 2026-07-13. Counterparty 'Hitachi (China) Ltd.'; the testing is described within 'China's manufacturing sector' and involves the Hitachi China Research Institute and Hitachi Elevator; the exact site and city are not named, hence MEDIUM. Stage is testing/validation (pilot), not production; start date and unit count not stated (NULL). A deployment is not an offer and never counts toward availability."
+        }
+      ]
+    }
+  ],
   "capabilities": [],
   "use_case_fits": [
     {

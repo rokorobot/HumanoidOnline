@@ -71,12 +71,12 @@ describe("publication helpers", () => {
   it("count only built, env-published regions", () => {
     expect(publishedResearchRegions({})).toEqual([]);
     expect(publishedResearchRegions({ RESEARCH_PUBLISHED_REGIONS: " Europe " })).toEqual(["europe"]);
-    // asia has no built resource, so listing it publishes nothing
-    expect(publishedResearchRegions({ RESEARCH_PUBLISHED_REGIONS: "asia" })).toEqual([]);
-    expect(publishedResearchRegions({ RESEARCH_PUBLISHED_REGIONS: "asia,north-america" })).toEqual([
+    // atlantis has no built resource, so listing it publishes nothing
+    expect(publishedResearchRegions({ RESEARCH_PUBLISHED_REGIONS: "atlantis" })).toEqual([]);
+    expect(publishedResearchRegions({ RESEARCH_PUBLISHED_REGIONS: "atlantis,north-america" })).toEqual([
       "north-america",
     ]);
-    expect(researchNavVisible({ RESEARCH_PUBLISHED_REGIONS: "asia" })).toBe(false);
+    expect(researchNavVisible({ RESEARCH_PUBLISHED_REGIONS: "atlantis" })).toBe(false);
     expect(researchNavVisible({ RESEARCH_PUBLISHED_REGIONS: "europe" })).toBe(true);
   });
 
@@ -105,7 +105,7 @@ describe("navigation", () => {
   });
 
   it("an env flag for a region with no built resource changes nothing", () => {
-    publish("asia");
+    publish("atlantis");
     const { container } = render(<SiteNav />);
     expect(hrefs(container)).not.toContain("/research");
   });

@@ -183,9 +183,94 @@
       "package_contents": "Robot, smart battery (quick-change), charger, handheld remote control, lifting crane",
       "warranty_terms": "8 months (supplier-stated, H2 Basic)",
       "order_status_note": "Supplier states availability from 28 December 2026. Delivery date not confirmed."
+    },
+    {
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "CNY",
+      "price": 199000,
+      "price_min": null,
+      "price_max": null,
+      "billing_period": "ONE_TIME",
+      "region_code": "CN",
+      "provider_slug": "unitree-cn",
+      "variant_slug": null,
+      "price_basis": "Manufacturer's China list price, tax included (售价（含税）); shipping not stated",
+      "note": "Unitree China list price for the 'H2' configuration, as published in CNY including tax. Not converted. Edition match: the 'H2' column (base edition); 'H2 EDU' says 联系销售 (contact sales) and is a separate record.",
+      "evidence": [
+        {
+          "source_url": "https://www.unitree.com/cn/H2",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Unitree H2 — Unitree China product page (unitree.com/cn)",
+          "excerpt": "型号 H2 ... 售价（含税） ¥19.9万元",
+          "published_at": null,
+          "observed_at": "2026-10-24",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-24 by Claude Opus 5.5 (curl, browser UA; body sha256 aaf0fafdc3ebd8919cbcb949928261ac389575681278e8ed21a7c058bce3ffb8) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-ASIA-01 — Asia Regional Research Resource' (2026-10-24). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own China page, spec table column 'H2', row '售价（含税）' (selling price, tax included). CNY, as published; not converted."
+        }
+      ]
     }
   ],
-  "availability_offers": [],
+  "availability_offers": [
+    {
+      "transaction_type": "PURCHASE",
+      "availability_status": "ON_REQUEST",
+      "region_code": "CN",
+      "provider_slug": "unitree-cn",
+      "variant_slug": null,
+      "lead_time_days": null,
+      "note": "China: the manufacturer publishes a tax-inclusive CNY price and takes orders through an intent-order form confirmed by its sales team. Mapped to ON_REQUEST: the order is confirmed by Unitree after contact, and no stock or lead time is stated; the Tmall checkout could not be read (login wall). Edition match: the 'H2' column (base edition); 'H2 EDU' says 联系销售 (contact sales) and is a separate record.",
+      "seller_wording": "本预约定购是一种意向性定购",
+      "evidence": [
+        {
+          "source_url": "https://www.unitree.com/cn/H2",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Unitree H2 — Unitree China product page (unitree.com/cn)",
+          "excerpt": "型号 H2 ... 售价（含税） ¥19.9万元",
+          "published_at": null,
+          "observed_at": "2026-10-24",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-24 by Claude Opus 5.5 (curl, browser UA; body sha256 aaf0fafdc3ebd8919cbcb949928261ac389575681278e8ed21a7c058bce3ffb8) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-ASIA-01 — Asia Regional Research Resource' (2026-10-24). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own China page, spec table column 'H2', row '售价（含税）' (selling price, tax included). CNY, as published; not converted."
+        },
+        {
+          "source_url": "https://www.unitree.com/cn/booking",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "立即购买 (Buy now) — Unitree China purchase / cooperation page",
+          "excerpt": "有教育科研/行业应用端机器人需求的，请直接联系销售团队 ... 销售热线: 400-626-6518 ... ※ 本预约定购是一种意向性定购。※ 在您提交订单后我们将会在五个工作日内和您取得联系以确认您的购买意向",
+          "published_at": null,
+          "observed_at": "2026-10-24",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-24 by Claude Opus 5.5 (curl, browser UA; body sha256 5b5b469f52f799000e13178b2edb5166de73bad0ec285bd5c337b70d0e66e138) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-ASIA-01 — Asia Regional Research Resource' (2026-10-24). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Manufacturer's own Chinese-language purchase page: an intent-order form ('意向性定购', confirmed by Unitree within five working days) and a mainland-China 400 sales hotline. The page's consumer 'buy now' link goes to a Tmall listing that requires a Taobao login and could not be read, so no direct-checkout status is recorded. Country scope CN: Chinese-language site, CNY tax-inclusive (含税) list prices on the product pages and a 400 number; the form's country/region field is not treated as an export offer."
+        }
+      ]
+    },
+    {
+      "transaction_type": "PURCHASE",
+      "availability_status": "ON_REQUEST",
+      "region_code": "JP",
+      "provider_slug": "gmo-air",
+      "variant_slug": null,
+      "lead_time_days": null,
+      "note": "Japan: configuration 'H2-Basic' can be added to a quotation cart on GMO's shop; prices and lead times are quoted individually. No price published (unknown, not zero).",
+      "seller_wording": "お見積もりへ",
+      "evidence": [
+        {
+          "source_url": "https://gmo-humanoid.shop/unitree/h2/",
+          "source_type": "OTHER",
+          "source_title": "Unitree H2 — GMO ヒューマノイド.shop configuration page (GMO AI & Robotics, Japan)",
+          "excerpt": "H2-Basic | 非対応 / Intel Core i5 / なし / なし | カートに追加 ... お見積もりへ",
+          "published_at": null,
+          "observed_at": "2026-10-24",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-24 by Claude Opus 5.5 (curl, browser UA; body sha256 c7e69a0841032eda6c45fc69dd3935a72e92608e97f1b544efbad77ffc91b08d) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-ASIA-01 — Asia Regional Research Resource' (2026-10-24). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Each configuration has 'カートに追加' (add to cart) and the cart leads to 'お見積もりへ' (to quotation); no price is shown. Mapped to ON_REQUEST (quote), not AVAILABLE. Edition match: H2-Basic: one Intel Core i5 computer, SDK not open — the base H2 of this record. GMO AI & Robotics states on its shop ('GMO AIRは、Unitreeの国内正規代理店です') and in its 2026-10-13 release (https://ai-robotics.gmo/news/article/g1-plus/, sha256 df10d25949efec29f8893c786350aa72051f32bba15224637aea261035978ab4: '2026年6月19日（金）にUnitree Roboticsと国内正規代理店契約を締結') that it is Unitree's authorized distributor for Japan; that is SELF-DECLARED by the distributor and not confirmed on a Unitree first-party source. The release states prices and lead times are quoted individually."
+        }
+      ]
+    }
+  ],
   "deployments": [],
   "capabilities": [
     {

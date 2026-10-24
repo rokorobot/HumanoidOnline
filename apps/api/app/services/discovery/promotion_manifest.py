@@ -38,7 +38,7 @@ from typing import Any
 from sqlalchemy import text
 
 MANIFEST_VERSION = 1
-SUPPORTED_VERSIONS = (1,)
+SUPPORTED_VERSIONS = (1, 2)    # 2 = core robot columns from research (promotion_research)
 ROUTINE = "ROUTINE"
 REVIEW_REQUIRED = "REVIEW_REQUIRED"
 RESTRICTED = "RESTRICTED"
@@ -78,6 +78,13 @@ def load_db_tool(name: str):
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
+
+
+def _research():
+    """The version-2 (core columns from research) module; imported late: it imports this one."""
+    from app.services.discovery import promotion_research
+
+    return promotion_research
 
 
 # --------------------------------------------------------------------------------------- #
@@ -319,8 +326,9 @@ def _matching_bracket(text_: str, start: int) -> int:
     raise CatalogueEditRefused("unbalanced brackets in the robot JSON")
 
 
-def edit_robot_text(original: str, entries: list[dict]) -> str:
-    """Append `entries` to the robot's extended_specs without re-serialising anything else."""
+def edit_robot_text(original: str, entries: list[dict], key: str = "extended_specs") -> str:
+    """Append `entries` to the robot's `key` array (default extended_specs) without
+    re-serialising anything else."""
     if not entries:
         return original
     eol = "\r\n" if "\r\n" in original else "\n"
@@ -330,13 +338,13 @@ def edit_robot_text(original: str, entries: list[dict]) -> str:
         return eol.join("    " + line for line in body.split("\n"))
 
     new = ("," + eol).join(block(e) for e in entries)
-    marker = re.search(r'^  "extended_specs": \[', original, re.MULTILINE)
+    marker = re.search(rf'^  "{key}": \[', original, re.MULTILINE)
     if marker is None:
         end = original.rstrip().rfind("}")
         if end < 0:
             raise CatalogueEditRefused("robot JSON has no closing brace")
         head = original[:end].rstrip()
-        return (head + "," + eol + '  "extended_specs": [' + eol + new + eol + "  ]"
+        return (head + "," + eol + f'  "{key}": [' + eol + new + eol + "  ]"
                 + eol + original[end:])
     open_at = marker.end() - 1
     close_at = _matching_bracket(original, open_at)
@@ -350,6 +358,8 @@ def edit_robot_text(original: str, entries: list[dict]) -> str:
 def _planned_edits(manifest: dict, catalogue_dir: Path) -> dict[str, tuple[Path, str, str]]:
     """slug -> (path, original_text, new_text) for robots that need an edit. Idempotent: an
     entry already present and identical is skipped; present but different is refused."""
+    if manifest.get("manifest_version") == 2:
+        return _research().planned_edits(manifest, catalogue_dir)
     by_robot: dict[str, list[dict]] = {}
     for item in manifest["items"]:
         by_robot.setdefault(item["robot"], []).append(item)
@@ -643,6 +653,8 @@ def _impact_key(item: dict) -> str:
 # --------------------------------------------------------------------------------------- #
 def derive_preflight_manifest(manifest: dict) -> dict:
     """The import_preflight expected-change manifest, derived from the items only."""
+    if manifest.get("manifest_version") == 2:
+        return _research().derive_preflight_manifest(manifest)
     return {"_comment": f"derived from promotion {manifest['promotion_id']} "
                         f"(digest {manifest.get('digest', '')[:12]})",
             "expected": [{**i["expected_change"], "count": 1} for i in manifest["items"]]}
@@ -650,11 +662,15 @@ def derive_preflight_manifest(manifest: dict) -> dict:
 
 def expected_added_keys(manifest: dict) -> set[str]:
     """The import_identity_check ADDED lines the manifest predicts."""
+    if manifest.get("manifest_version") == 2:
+        return set()                     # core columns change the robot row; nothing is added
     return {f"specification {i['robot']}:{i.get('variant_slug') or '-'}|{i['definition']}"
             for i in manifest["items"]}
 
 
 def render_review(manifest: dict) -> str:
+    if manifest.get("manifest_version") == 2:
+        return _research().render_review(manifest)
     items = manifest["items"]
     robots = ", ".join(manifest["scope"]["robots"])
     lanes = {i["classification"] for i in items}
@@ -739,7 +755,9 @@ def manifest_problems(manifest: dict) -> list[str]:
             RESTRICTED_IMPACT_KEYS):
         reasons.append("restricted impact is not all zero")
     scope = manifest.get("scope", {})
-    if scope.get("allowed_tables") != ALLOWED_TABLES:
+    if manifest["manifest_version"] == 2:
+        reasons += _research().manifest_problems(manifest)
+    elif scope.get("allowed_tables") != ALLOWED_TABLES:
         reasons.append("scope.allowed_tables must be exactly ['specification']")
     if sorted(scope.get("robots", [])) != sorted({i["robot"] for i in items}):
         reasons.append("scope.robots does not equal the robots named by the items")

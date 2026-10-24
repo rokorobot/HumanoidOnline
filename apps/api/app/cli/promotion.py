@@ -3,7 +3,9 @@
     uv run --directory apps/api python -m app.cli.promotion propose --robot unitree-g1 \\
         --edition G1 --claim <claim-id> --definition compute_base \\
         --value "8-core high-performance CPU" --promotion-id 2026-10-19-unitree-g1-compute
-    ... render  --manifest db/catalogue/promotions/<id>.json
+    ... propose --research <evidence-package.json> --edition-map ROBOT=EDITION ... \\
+        --promotion-id <id>       (core robot columns from agent-assisted research; version 2)
+    ... render  --manifest db/catalogue/promotions/<id>.json [--preflight]
     ... verify  --manifest db/catalogue/promotions/<id>.json --base-ref origin/main
     ... execute --manifest ... --commit <sha> --approved-pr N [--dry-run] [--receipt PATH]
     ... decide  --manifest ... --reject|--defer --reason "..." --by "Name"
@@ -86,7 +88,22 @@ def cmd_propose(args) -> int:
         print("no database URL: pass --database-url or set DATABASE_URL", file=sys.stderr)
         return 4
     catalogue = Path(args.catalogue_dir)
-    if args.items:
+    records = None
+    if args.research:
+        if args.items or args.claim:
+            print("--research cannot be combined with --items or --claim", file=sys.stderr)
+            return 2
+        from app.services.discovery import promotion_research
+        try:
+            records = promotion_research.load_records(Path(args.research))
+        except (pm.ProposalRefused, OSError, ValueError) as exc:
+            print(f"PROPOSAL REFUSED: {exc}", file=sys.stderr)
+            return 2
+        items = []
+    elif not args.robot:
+        print("--robot is required (except with --research)", file=sys.stderr)
+        return 2
+    elif args.items:
         items = json.loads(Path(args.items).read_text(encoding="utf-8"))
     else:
         missing = [f for f in ("claim", "definition", "value") if getattr(args, f) is None]
@@ -100,14 +117,14 @@ def cmd_propose(args) -> int:
     for item in items:
         item.setdefault("edition", args.edition)
     edition_map = dict(e.split("=", 1) for e in args.edition_map or [])
-    if args.edition:
+    if args.edition and args.robot:
         edition_map.setdefault(args.robot, args.edition)
     try:
         base_commit = args.base_commit or _git("rev-parse", "origin/main")
     except (subprocess.CalledProcessError, OSError):
         base_commit = args.base_commit or _git("rev-parse", "HEAD")
     today = date.fromisoformat(args.today) if args.today else datetime.now(UTC).date()
-    promotion_id = args.promotion_id or f"{today.isoformat()}-{args.robot}"
+    promotion_id = args.promotion_id or f"{today.isoformat()}-{args.robot or 'research'}"
     if url.startswith("postgresql://"):
         url = url.replace("postgresql://", "postgresql+psycopg://", 1)
     engine = create_engine(
@@ -115,10 +132,16 @@ def cmd_propose(args) -> int:
                                       "-cdefault_transaction_read_only=on"})
     try:
         with Session(engine) as session:
-            manifest = pm.propose(session, args.robot, items, catalogue_dir=catalogue,
-                                  base_commit=base_commit, promotion_id=promotion_id,
-                                  today=today, edition_map=edition_map,
-                                  reconsider=args.reconsider)
+            if records is not None:
+                manifest = promotion_research.propose_research(
+                    session, records, catalogue_dir=catalogue, base_commit=base_commit,
+                    promotion_id=promotion_id, today=today, edition_map=edition_map,
+                    reconsider=args.reconsider)
+            else:
+                manifest = pm.propose(session, args.robot, items, catalogue_dir=catalogue,
+                                      base_commit=base_commit, promotion_id=promotion_id,
+                                      today=today, edition_map=edition_map,
+                                      reconsider=args.reconsider)
     except pm.ProposalRefused as exc:
         print(f"PROPOSAL REFUSED: {exc}", file=sys.stderr)
         return 2
@@ -150,7 +173,11 @@ def cmd_propose(args) -> int:
 
 
 def cmd_render(args) -> int:
-    print(pm.render_review(_load_manifest(args.manifest)))
+    manifest = _load_manifest(args.manifest)
+    if args.preflight:      # the expected-change manifest for db/import_preflight.py
+        print(json.dumps(pm.derive_preflight_manifest(manifest), indent=2, ensure_ascii=False))
+    else:
+        print(pm.render_review(manifest))
     return 0
 
 
@@ -289,8 +316,11 @@ def build_parser() -> argparse.ArgumentParser:
     common.add_argument("--catalogue-dir", default=str(DEFAULT_CATALOGUE))
 
     p = sub.add_parser("propose", parents=[common])
-    p.add_argument("--robot", required=True)
+    p.add_argument("--robot", help="required except with --research")
     p.add_argument("--items", help="JSON list of items (claim_id, definition, proposed_value...)")
+    p.add_argument("--research", metavar="FILE",
+                   help="evidence package of agent-assisted research records: core robot "
+                        "columns, manifest version 2 (see promotion_research.py)")
     p.add_argument("--claim")
     p.add_argument("--definition")
     p.add_argument("--value")
@@ -311,6 +341,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("render")
     p.add_argument("--manifest", required=True)
+    p.add_argument("--preflight", action="store_true",
+                   help="print the derived db/import_preflight.py expected-change manifest")
     p.set_defaults(func=cmd_render)
 
     p = sub.add_parser("verify", parents=[common])

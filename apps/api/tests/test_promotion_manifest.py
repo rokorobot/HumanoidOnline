@@ -242,9 +242,14 @@ def test_verify_rejects_a_modified_manifest_unsupported_version_and_review_lane(
     bad["items"][0]["proposed_value"] = "edited after approval"
     assert any("digest" in r for r in pm.verify(
         bad, base_catalogue_dir=world.base, head_catalogue_dir=world.head).reasons)
-    future = pm.seal({**json.loads(json.dumps(m)), "manifest_version": 2})
+    future = pm.seal({**json.loads(json.dumps(m)), "manifest_version": 3})
     assert any("unsupported" in r for r in pm.verify(
         future, base_catalogue_dir=world.base, head_catalogue_dir=world.head).reasons)
+    # version 2 is core robot columns from research: a specification manifest relabelled as 2
+    # fails its scope checks
+    relabelled = pm.seal({**json.loads(json.dumps(m)), "manifest_version": 2})
+    assert any("allowed_tables must be exactly ['robot']" in r for r in pm.verify(
+        relabelled, base_catalogue_dir=world.base, head_catalogue_dir=world.head).reasons)
     review = json.loads(json.dumps(m))
     review["items"][0]["classification"] = pm.REVIEW_REQUIRED
     assert any("only ROUTINE" in r for r in pm.verify(

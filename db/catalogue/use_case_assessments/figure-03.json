@@ -2,14 +2,14 @@
   "robot_slug": "figure-03",
   "assessed_on": "2026-10-24",
   "assessed_by": "Claude (Opus 5.5) in a session initiated by Robert Konecny; owner rule HO-UC-01 catch-up. Not human-verified.",
-  "method": "Catch-up evaluation (HO-UC-01) against all categories in use_cases.json, from the manufacturer information and documented capabilities already recorded in robots/figure-03.json (commercial_status_evidence, specs_note, spec_caveats). Manufacturing assessed first. Figure 02's historical BMW performance claims are NOT transferred: Figure 03 is a separate successor record. Introducing-Figure-03 wording re-read 2026-10-24.",
+  "method": "Catch-up evaluation (HO-UC-01) against all categories in use_cases.json, from the manufacturer information and documented capabilities already recorded in robots/figure-03.json (commercial_status_evidence, specs_note, spec_caveats). Manufacturing assessed first. Figure 02's historical BMW performance claims are NOT transferred: Figure 03 is a separate successor record. Introducing-Figure-03 wording re-read 2026-10-24. Revised 2026-10-24: manufacturing scored after re-reading f-03-at-bmw in full.",
   "categories": {
     "manufacturing": {
       "status": "FIT",
       "sources": [
         "https://www.figure.ai/news/f-03-at-bmw"
       ],
-      "basis": "Figure 03 is documented at an external customer manufacturing site (BMW Group Plant Spartanburg, Hall 52, an assembly and logistics hall) under the robot's PILOT status. Score left NULL: arrival is documented, Figure 03 task results are not."
+      "basis": "Figure documents the first demonstration of Figure 03 performing a parts-sequencing logistics workflow on the line at BMW Group Plant Spartanburg (factory intralogistics, inside this category's definition), under the robot's PILOT status. Scored 0.70 by owner decision 2026-10-24 (re-read of the full article; the earlier 'arrival only' basis was incomplete). No volumes, durations or success rates are stated."
     },
     "home": {
       "status": "FIT",
@@ -20,7 +20,7 @@
     },
     "warehouse-logistics": {
       "status": "UNSUPPORTED_POSSIBILITY",
-      "basis": "The Catalyst Brands distribution and logistics agreement names 'Figure humanoids', not Figure 03; the BMW hall is described as assembly and logistics without stating Figure 03 performs logistics tasks. Plausible, not yet attributable to this model."
+      "basis": "The Catalyst Brands distribution and logistics agreement names 'Figure humanoids', not Figure 03; the BMW hall is described as assembly and logistics without stating Figure 03 performs logistics tasks. Plausible, not yet attributable to this model. The BMW sequencing work is factory intralogistics (Manufacturing), not a warehouse or distribution centre."
     },
     "retail-service": {
       "status": "UNSUPPORTED_POSSIBILITY",

@@ -16,7 +16,7 @@
     "walk_speed_ms": null,
     "runtime_minutes": 150,
     "battery_wh": null,
-    "mobility": null,
+    "mobility": "BIPEDAL",
     "degrees_of_freedom": 25,
     "hand_type": null,
     "hand_dof": null,
@@ -276,6 +276,10 @@
     {
       "field": "payload_kg",
       "text": "The datasheet states 'Payload 3 kg' without saying whether it is per arm or in total."
+    },
+    {
+      "field": "mobility",
+      "text": "Mobility BIPEDAL as stated by the owner, Robert Konecny, in chat on 2026-10-24 ('4NE1 Mini - mobility : Bipedal'). Owner statement; no first-party manufacturer quote is recorded for this field."
     }
   ]
 }

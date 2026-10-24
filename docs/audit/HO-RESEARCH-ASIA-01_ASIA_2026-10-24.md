@@ -156,6 +156,7 @@ Every retrieval happened on 2026-10-24 under this work order (agent-assisted res
 | D8 | Review the Asia DRAFT editorial (`reviewed_at`) | DRAFT, preview only |
 | D9 | Publication: add `asia` to `RESEARCH_PUBLISHED_REGIONS` on the Vercel API and on Netlify | **Not authorized.** Flag stays `europe,north-america` |
 | D10 | ADR-027 §4 wording for Asia (UN M49 142 minus CY plus TW) | Recorded here; docs/27 is not edited |
+| D11 | Catalogue card headline price: with no `offered_in` market, when the remaining manufacturer-direct finalists are incomparable (different currency or basis), a GLOBAL listing now precedes the arbitrary tie-break (`services/reads.py`). Without this, G1, R1 and H2 cards would switch to the CNY list price on import. No existing headline moves. | Implemented, needs review |
 
 ## 7. Launch readiness
 

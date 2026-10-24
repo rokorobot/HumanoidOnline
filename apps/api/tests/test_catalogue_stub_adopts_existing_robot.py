@@ -206,11 +206,11 @@ def _state(conn, robot_id, maker_id):
         "manufacturers": q("SELECT count(*) FROM manufacturer"),
         "same_name_or_slug": q("SELECT count(*) FROM robot WHERE name = %s OR slug = %s",
                                NAME, SLUG),
-        # everything but the identity/readiness metadata and the datasheet-stated values, which
-        # are asserted explicitly below ("datasheet" key)
+        # everything but the identity/readiness metadata, the datasheet-stated values and the
+        # owner-stated mobility, which are asserted explicitly below
         "robot": q("SELECT md5((to_jsonb(r) - 'updated_at' - 'summary' - 'official_url' "
                    "- 'search_vector' - 'height_cm' - 'weight_kg' - 'payload_kg' "
-                   "- 'runtime_minutes' - 'degrees_of_freedom' - 'spec_caveats')::text) "
+                   "- 'runtime_minutes' - 'degrees_of_freedom' - 'spec_caveats' - 'mobility')::text) "
                    "FROM robot r WHERE id = %s",
                    robot_id),
         "datasheet": conn.execute(
@@ -219,6 +219,7 @@ def _state(conn, robot_id, maker_id):
         "manufacturer": q("SELECT md5((to_jsonb(m) - 'updated_at')::text) "
                           "FROM manufacturer m WHERE id = %s", maker_id),
         "is_published": q("SELECT is_published FROM robot WHERE id = %s", robot_id),
+        "mobility": q("SELECT mobility::text FROM robot WHERE id = %s", robot_id),
         "evidence": conn.execute(
             "SELECT id, md5(e::text) FROM evidence_source e "
             "WHERE subject_type = 'ROBOT' AND subject_id = %s ORDER BY id", (robot_id,)
@@ -272,6 +273,7 @@ def test_the_stub_adopts_the_existing_database_robot(scratch_db):  # noqa: F811
         assert after["robot"] == before["robot"]                      # identical but updated_at
         assert tuple(float(x) for x in after["datasheet"]) == (132.0, 36.0, 3.0, 150.0, 25.0)
         assert all(x is None for x in before["datasheet"])            # nothing was there before
+        assert (before["mobility"], after["mobility"]) == (None, "BIPEDAL")   # owner-stated
         assert after["manufacturer"] == before["manufacturer"]
         assert after["is_published"] is False and before["is_published"] is False
         assert after["evidence"] == before["evidence"]                # id AND content intact

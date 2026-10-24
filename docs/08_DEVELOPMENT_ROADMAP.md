@@ -3,7 +3,7 @@
 > **Status:** Living delivery roadmap
 > **Current programme:** Governed Catalogue Discovery & Live Operations (§1.1)
 > **Historical product-delivery programme:** WS0–WS8 (§1, §2–§8); the WS8 exit gate is not formally closed (§8)
-> **Last updated:** 2026-10-02
+> **Last updated:** 2026-10-24
 
 This document defines **implementation sequencing and workstream boundaries**: in
 what order we build the product, what each workstream owns, what is already
@@ -193,6 +193,22 @@ conservative, compare, agent tools); **G4-3** an **integrity gate** (only truthf
 audit** and loss-preventing fact accounting (*incomplete is publishable, misleading is not*); **G4-4**
 read-only catalogue-wide coverage audit for enrichment priorities. No schema migration is planned. G4 does not
 renumber G2-6.
+
+#### Live operations tracks since 2026-10-04
+
+These tracks run alongside Stages A–G. Each one is PR-gated, and each production step
+(import, migration, flag change) was a separate owner authorization. They change no
+boundary listed above.
+
+| Track | Delivers | Status (2026-10-24) |
+|---|---|---|
+| **Stable importer + promotion** | Stable-ID importer (no child-row churn), preflight manifests, identity check, opt-in write lock (`docs/IMPORTER_HARDENING_PLAN_2026-10-19.md`, `docs/discovery/CATALOGUE_PROMOTION_AUTOMATION_DESIGN_2026-10-19.md`) | ✅ **LIVE** — #176, #177 merged; production pilot and K1 correction (#172) imported 2026-10-19. Every catalogue import since then runs E3: owner-controlled, rehearsed on a Neon branch, with a retained safety branch. GitHub Actions holds no production write credentials. The first claim → catalogue promotion (G1 `compute_base`) is **prepared, not authorized** |
+| **Automated Commercial Intelligence (ACIP)** | Spec for automated commercial updates (`docs/discovery/AUTOMATED_COMMERCIAL_INTELLIGENCE_PIPELINE_2026-10-19.md`) | 📄 **PROPOSED** (#175). Owner principles D1–D5: missing JSON never deletes; explicit `deployment_key`; changed evidence = new version; rehearse first; no CI production writes. **No implementation approved.** The `deployment_key` migration is unapproved, so edits to existing deployments refuse |
+| **Catalogue freshness** | Trigger-maintained `catalogue_freshness` row; homepage *CATALOGUE UPDATED* date (migration 0026) | ✅ **LIVE** — #186, 2026-10-19 |
+| **A4 owner-authorized sources** | `docs/28` amendment; structural source reviews (`docs/discovery/*_STRUCTURAL_REVIEW_*`) | 🟢 **OPERATIONAL** — 8 of 9 sources enabled (#162–#166, migration 0025); Alza.cz blocked by the source. Source adapters not built |
+| **HO-DATA completeness (Fast Lane)** | Evidence-backed enrichment batches under `DR-D1` (`docs/audit/HO-DATA-*`) | ✅ Batches 1–6 **LIVE**. Core UNKNOWN 65.4% → **51.1%**, P0 46.1% → **33.7%**. **All 216 held cells are final** (`docs/audit/ho-data-30/closeout_register.csv`; 209 CLOSED-UNKNOWN are re-opened only by a manufacturer statement or a ruling change). Next lever: manufacturer outreach (owner act; draft #199). Fast Lane tooling drafts #192 (FL-00) and #194 (FL-1) are open |
+| **Regional research resources (`docs/27`)** | Europe, North America and Asia research pages + JSON, gated by `RESEARCH_PUBLISHED_REGIONS` | ✅ **PUBLISHED** — Europe (2026-10-05), North America (2026-10-23), Asia (2026-10-24). Owner decision 2026-10-23: offers stay current until newer evidence replaces them. **Editorial text remains DRAFT** for all three; open owner decisions are listed in `docs/audit/HO-RESEARCH-NA-01_*` and `HO-RESEARCH-ASIA-01_*` |
+| **HO-UC-01 use-case evaluation** | Every new robot is assessed against all use-case categories (`db/catalogue/use_case_assessments/`), enforced in CI | ✅ **LIVE** — #203–#205 |
 
 #### Deferred — not authorized
 
@@ -481,10 +497,22 @@ from whatever `main` is at cut time and verified 0 ahead / 0 behind then.)*
 Last completed workstream merge:  7056031d7f46b100ed5b35728791caaddd581dfb  (WS7, PR #14)
 Historical programme:             WS0–WS7 complete; WS8 partial (exit gate not formally closed, §8)
 Current programme:                Governed Catalogue Discovery & Live Operations (§1.1)
+State of main at this update:     fb0a412 (PR #206)
 Operational:                      Stages A–F; NEURA scheduled (Mon + Thu 06:37 UTC, 48 h cadence)
-Latest foundation:                Stage G1 proposal-only extraction (PR #84, merge 42954ed)
-Next:                             Stage G2 — governed proposal review and claim promotion
-                                  (DR-A5; G2-1, G2-2 and the first G2-3 slice implemented; G2-5 operational for NEURA Mini; G2-4 Mini slice implemented)
+                                  G4 resolver live; G5-1 planner live; A4 sources 8/9 enabled
+Live operations (§1.1 tracks):    stable importer (E3), catalogue freshness, HO-DATA batches 1–6,
+                                  Europe / North America / Asia research resources published,
+                                  HO-UC-01 enforced in CI
+Catalogue:                        63 robot records; core UNKNOWN 51.1%, P0 33.7%
+In progress:                      Stage G2 (DR-A5; G2-1, G2-2, first G2-3 slice, G2-4 Mini slice
+                                  implemented; G2-5 operational for NEURA Mini only);
+                                  G3 (XPENG IRON only); G5-2 Lane B in review
+Prepared, awaiting owner:         first claim → catalogue promotion (G1 compute_base; evidence
+                                  fresh until 2026-11-17); manufacturer outreach wave 1 (#199);
+                                  regional editorial review; robot publication decisions
+Open drafts:                      #192 / #194 Fast Lane tooling; #173 importer audit report;
+                                  #158 CI Postgres images; #32 WS8.7 (stale vs. live hosting)
+Not approved:                     ACIP implementation; deployment_key migration
 Strategic, not immediate:         Commercial Architecture — Rent / Buy / Lease-RaaS
 
 Completed:  ✅ WS0  ✅ WS1  ✅ WS2A  ✅ WS2B  ✅ UI-D1  ✅ WS3  ✅ WS4  ✅ WS5  ✅ WS6  ✅ WS7

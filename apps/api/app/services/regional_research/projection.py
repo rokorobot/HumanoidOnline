@@ -125,7 +125,7 @@ def _faq(r: RegionalAvailability) -> list[dict]:
     available = by_status.get("AVAILABLE", 0)
     if purchase:
         # Name only the statuses actually on file, never the full vocabulary.
-        rest = [
+        parts = [f"{available} {'is' if available == 1 else 'are'} listed as available"] + [
             f"{n} as {_STATUS_LABELS[s]}"
             for s, n in kf.purchase_by_best_status
             if s != "AVAILABLE" and n
@@ -133,10 +133,8 @@ def _faq(r: RegionalAvailability) -> list[dict]:
         q1 = (
             f"As of {date_s}, {len(purchase)} published humanoid "
             f"{'robot has' if len(purchase) == 1 else 'robots have'} a confirmed purchase "
-            f"offer on file in {region}: {_list(purchase)}. Of these, {available} "
-            f"{'is' if available == 1 else 'are'} listed as available"
-            f"{' and ' + _list(rest) if rest else ''}. See the offers table for "
-            f"each status, seller and evidence."
+            f"offer on file in {region}: {_list(purchase)}. Of these, {_list(parts)}. "
+            f"See the offers table for each status, seller and evidence."
         )
     else:
         q1 = (

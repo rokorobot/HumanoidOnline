@@ -181,6 +181,11 @@ def _offer_market_rank(offer: PricingOffer, market_rank: dict[str | None, int]) 
     return market_rank.get(code)
 
 
+def _scope_rank(offer: PricingOffer) -> int:
+    """0 = a worldwide (GLOBAL) listing, 1 = scoped to a region or region-agnostic."""
+    return 0 if offer.region is not None and offer.region.code == "GLOBAL" else 1
+
+
 #: Seller preference. 0 = the manufacturer selling its own robot, 1 = anyone else.
 SELLER_MANUFACTURER_DIRECT = 0
 SELLER_OTHER = 1
@@ -347,6 +352,13 @@ def price_display_for(
                 arbitrary(p),
             ),
         )
+    elif market_rank is None:
+        # Incomparable amounts and no market chosen: a worldwide listing speaks for
+        # the record, a single-country list price is a fact about that market (e.g.
+        # the manufacturer's GLOBAL USD store vs its own CN CNY list price,
+        # HO-RESEARCH-ASIA-01). Only the arbitrary tie-break is replaced; nothing
+        # decided on merit or amount changes. With `offered_in`, market rank governs.
+        p = min(finalists, key=lambda p: (_scope_rank(p), arbitrary(p)))
     else:
         p = min(finalists, key=arbitrary)
     return PriceDisplay(

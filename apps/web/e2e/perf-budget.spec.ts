@@ -62,7 +62,9 @@ const STATIC: Budget[] = [
   // not code: one more manufacturer-sourced extended spec with its source label.
   // G1 Basic promotion (#187, five extended specs): 104 -> 109 (measured 108.0 in CI). Content,
   // not code: five more manufacturer-sourced extended specs with their source labels.
-  { path: "/robots/unitree-g1", docKB: 109, jsRawKB: 412 },
+  // HO-RESEARCH-ASIA-01 batch: 109 -> 117 (measured 116.0 in CI). Content, not code: two new
+  // offers (Unitree China, GMO AI & Robotics Japan) and a CNY list price, with their evidence.
+  { path: "/robots/unitree-g1", docKB: 117, jsRawKB: 412 },
   // UX-01: 32 -> 33 (measured 32.06). The compare price cell now carries its configuration,
   // basis tag, order note and the shared summary line, plus data-enum traceability.
   // SOCIAL-01: 33 -> 37 (measured 35.4).
@@ -78,7 +80,9 @@ const STATIC: Budget[] = [
   // appear in its compare column. Measured size plus ~0.6 kB headroom.
   // G1 Basic promotion (#187): 40 -> 43 (measured 41.9 in CI): the five new extended specs (and
   // #178's compute_base) appear in unitree-g1's compare column. Measured size plus ~1 kB headroom.
-  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 43, jsRawKB: 431 },
+  // HO-RESEARCH-ASIA-01 batch: 43 -> 45 (measured 44.5 in CI): unitree-g1's two new offers and
+  // CNY price reach its compare column. Measured size plus ~0.5 kB headroom.
+  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 45, jsRawKB: 431 },
   { path: "/find-a-humanoid", docKB: 46, jsRawKB: 424 },
 ];
 

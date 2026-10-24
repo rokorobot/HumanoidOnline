@@ -322,6 +322,28 @@ def test_buyer_faqs_separate_direct_from_gated_seller_type_countries_and_deploym
     assert len(faq) == 8
 
 
+def test_buyer_faqs_name_only_statuses_on_file_and_keep_rental_apart_from_purchase():
+    """A robot rentable directly but bought only on request is not 'orderable directly'
+    as a purchase; the status summary names only statuses actually on file."""
+    robots = (
+        RobotRow("g1", "G1", "unitree", "Unitree", True, "COMMERCIAL",
+                 (fx.offer("US", provider="robotshop-us"),)),
+        RobotRow("a2", "A2 Ultra", "agibot", "AgiBot", True, "COMMERCIAL",
+                 (fx.offer("US", "ON_REQUEST", provider="rent-co"),
+                  fx.offer("US", tx="RENTAL", provider="rent-co"))),
+        RobotRow("k1", "K1", "booster", "Booster", True, "COMMERCIAL",
+                 (fx.offer("US", "ON_REQUEST", provider="robotshop-us"),)),
+    )
+    faq = {f["question"]: f["answer"] for f in project(*robots)["faq"]}
+    buy = faq["Can I buy a humanoid robot in North America?"]
+    assert "1 is listed as available and 2 as on request." in buy
+    assert "waitlist" not in buy and "preorder" not in buy and "limited" not in buy
+    direct = faq["Which humanoid robots can be ordered directly in North America, and which "
+                 "need a quote, preorder or sales contact?"]
+    assert "(available or limited) are on file for: A2 Ultra (rental only) and G1." in direct
+    assert "sales contact are on file for: A2 Ultra (purchase) and K1." in direct
+
+
 def test_real_catalogue_na02_batch_reaches_the_gate_without_double_counting():
     """HO-RESEARCH-NA-02 batch (pending owner approval): K1 Educational via RobotShop
     US and NAO6 via RobotLAB. NAO's purchase and lease rows are one robot."""

@@ -96,6 +96,20 @@ def _list(names: list[str]) -> str:
     return ", ".join(names[:-1]) + " and " + names[-1]
 
 
+_STATUS_LABELS = {
+    "LIMITED": "limited",
+    "PREORDER": "preorder",
+    "WAITLIST": "waitlist",
+    "ON_REQUEST": "on request",
+}
+
+_TX_LABELS = {"PURCHASE": "purchase", "RENTAL": "rental", "LEASE": "lease", "RAAS": "RaaS"}
+
+
+def _tx_words(types: set[str]) -> str:
+    return _list(sorted(_TX_LABELS.get(t, t.lower()) for t in types))
+
+
 def _faq(r: RegionalAvailability) -> list[dict]:
     kf = r.key_figures
     region = r.region_name
@@ -107,14 +121,21 @@ def _faq(r: RegionalAvailability) -> list[dict]:
         lambda o: o.transaction_type == "PURCHASE"
         and any(p.kind == "PUBLISHED" for p in o.prices),
     )
-    available = dict(kf.purchase_by_best_status).get("AVAILABLE", 0)
+    by_status = dict(kf.purchase_by_best_status)
+    available = by_status.get("AVAILABLE", 0)
     if purchase:
+        # Name only the statuses actually on file, never the full vocabulary.
+        rest = [
+            f"{n} as {_STATUS_LABELS[s]}"
+            for s, n in kf.purchase_by_best_status
+            if s != "AVAILABLE" and n
+        ]
         q1 = (
             f"As of {date_s}, {len(purchase)} published humanoid "
             f"{'robot has' if len(purchase) == 1 else 'robots have'} a confirmed purchase "
             f"offer on file in {region}: {_list(purchase)}. Of these, {available} "
-            f"{'is' if available == 1 else 'are'} listed as available and the "
-            f"rest are limited, waitlist, preorder or on request. See the offers table for "
+            f"{'is' if available == 1 else 'are'} listed as available"
+            f"{' and ' + _list(rest) if rest else ''}. See the offers table for "
             f"each status, seller and evidence."
         )
     else:
@@ -133,8 +154,26 @@ def _faq(r: RegionalAvailability) -> list[dict]:
             f"As of {date_s}, no published purchase price is on file for a confirmed "
             f"{region} offer."
         )
-    direct = _names(offers, lambda o: o.availability_status in ("AVAILABLE", "LIMITED"))
-    gated = [n for n in _names(offers, lambda o: True) if n not in direct]
+    # Directness is per transaction type: a robot that can be rented directly but only
+    # bought on request is "rental only" on the direct side and "purchase" on the gated.
+    direct_tx: dict[str, set[str]] = {}
+    gated_tx: dict[str, set[str]] = {}
+    names: dict[str, str] = {}
+    for o in offers:
+        names[o.robot_slug] = o.robot_name
+        if o.availability_status in ("AVAILABLE", "LIMITED"):
+            direct_tx.setdefault(o.robot_slug, set()).add(o.transaction_type)
+    for o in offers:
+        if o.transaction_type not in direct_tx.get(o.robot_slug, set()):
+            gated_tx.setdefault(o.robot_slug, set()).add(o.transaction_type)
+    direct = [
+        names[s] + ("" if "PURCHASE" in direct_tx[s] else f" ({_tx_words(direct_tx[s])} only)")
+        for s in sorted(direct_tx)
+    ]
+    gated = [
+        names[s] + (f" ({_tx_words(gated_tx[s])})" if s in direct_tx else "")
+        for s in sorted(gated_tx)
+    ]
     if offers:
         q_direct = (
             f"As of {date_s}, offers that can be ordered directly (available or limited) are on "

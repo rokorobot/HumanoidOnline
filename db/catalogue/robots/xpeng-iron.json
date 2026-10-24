@@ -16,7 +16,7 @@
     "walk_speed_ms": null,
     "runtime_minutes": null,
     "battery_wh": null,
-    "mobility": null,
+    "mobility": "BIPEDAL",
     "degrees_of_freedom": 76,
     "hand_type": null,
     "hand_dof": 21,
@@ -78,6 +78,12 @@
       "source_kind": "MANUFACTURER",
       "edition_scope": "THIS_EDITION",
       "observed_at": "2026-10-03"
+    }
+  ],
+  "spec_caveats": [
+    {
+      "field": "mobility",
+      "text": "Mobility BIPEDAL as stated by the owner, Robert Konecny, in chat on 2026-10-24 ('Iron mobility:Bipedal'). Owner statement; no first-party manufacturer quote is recorded for this field. This owner statement extends the owner-approved IRON spec slice of 2026-10-03 to this field."
     }
   ]
 }

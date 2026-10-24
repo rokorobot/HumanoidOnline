@@ -112,13 +112,17 @@ Channel status values:
 | ID | Decision | Blocks |
 |---|---|---|
 | D1 | Which legal/public identity HumanoidOnline presents (entity, founder name, location) on company profiles | C3–C6 |
-| D2 | Whose name signs pitches and articles (no fabricated identities; MIT TR bans AI-written pitches) | All Tier A/C pitches |
+| D2 | ~~Whose name signs pitches and articles~~ **DECIDED 2026-10-24: Robert Konecny.** MIT TR bans AI-written pitches, so C2 is written by Robert himself | — |
 | D3 | Whether to join euRobotics | A11 |
 | D4 | Whether to publish a licensed dataset snapshot (new scope; own WorkOrder) | B1 |
 | D5 | Whether to apply to speak at Humanoids Summit SV | A10 |
 | D6 | Approval of each individual draft before it is sent | Everything |
 
-## 6. Proposed next step (PROPOSE ONLY)
+## 6. Next step
+
+Unsent drafts for A2, A3 and A4 are in
+[`HO-SEO-DIST-01_DRAFTS_A2_A3_A4.md`](HO-SEO-DIST-01_DRAFTS_A2_A3_A4.md) (2026-10-24).
+The original proposal:
 
 Draft, without sending, the first three Tier A items once D2 is answered: A2 Robohub
 article outline, A3 Humanoids Daily tip, A4 Weekly Robotics suggestion. Each draft

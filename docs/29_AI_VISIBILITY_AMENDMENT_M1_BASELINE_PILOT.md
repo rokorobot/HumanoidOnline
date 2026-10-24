@@ -1,6 +1,6 @@
 # AI Visibility Measurement — Amendment M1: Baseline Pilot (HO-AEO-00)
 
-> ## STATUS: DRAFT — PROPOSED, NOT RATIFIED (2026-10-24)
+> ## STATUS: RATIFIED — 2026-10-24, Robert Konecny (product owner); D1–D6 approved as recommended (§11)
 >
 > This document amends `24_AI_VISIBILITY_AND_CITATION_MEASUREMENT.md`
 > (RATIFIED v0.1, 2026-08-28). It **operationalizes** the ratified baseline
@@ -326,9 +326,9 @@ This amendment does not:
 
 ---
 
-## 11. Owner decisions required
+## 11. Owner decisions — all APPROVED as recommended (2026-10-24)
 
-| ID | Decision | Recommendation |
+| ID | Decision | Approved outcome |
 |---|---|---|
 | D1 | Ratify this amendment, including registry v2 (`COMMERCIAL-004`, `COMMERCIAL-005`) | Ratify |
 | D2 | treg for answer collection (after PR #209 merges) | **Approve** a hybrid pilot: account creation by the owner, one dedicated token, ≤ $10 prepaid, R1 + R2 sweeps of the 10 queries |
@@ -342,7 +342,7 @@ This amendment does not:
 ## 12. Ratification record
 
 ```
-STATUS:          DRAFT — PROPOSED (not ratified)
+STATUS:          RATIFIED
 Drafted:         2026-10-24
 Amends:          docs/24 (RATIFIED v0.1, 2026-08-28)
 Baseline:        main @ fb0a412
@@ -353,6 +353,6 @@ treg:            Evaluated by desk review; permitted once the docs/24 §1.1
                  prohibition is removed (PR #209); not installed, not connected.
 Budget:          $10 ceiling; $0 authorized.
 
-Ratified by:     —
-Ratification date: —
+Ratified by:     Robert Konecny — Product Owner (D1–D6 approved as recommended)
+Ratification date: 2026-10-24
 ```

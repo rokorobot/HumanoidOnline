@@ -16,9 +16,9 @@
 > content.** It is the measurement contract implementing `docs/23` §20 and
 > `CITATION-01.10` (Measurability).
 >
-> **Amendment proposed (DRAFT, not ratified):** `docs/29` (Amendment M1,
-> HO-AEO-00) — manual baseline pilot, registry v2 proposal, treg evaluation.
-> Until ratified, this document applies unchanged.
+> **Amended by `docs/29` (Amendment M1, HO-AEO-00) — RATIFIED 2026-10-24:**
+> baseline pilot (manual + treg-assisted hybrid), benchmark registry v2
+> (adds `COMMERCIAL-004`, `COMMERCIAL-005`), $10 pilot ceiling.
 >
 > **Implementation authorized by this document: none.** No runtime code, no
 > database model, no API, no collector, no scheduler, no third-party

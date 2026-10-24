@@ -62,7 +62,26 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "manufacturing",
+      "fit_score": null,
+      "is_primary": true,
+      "commercial_readiness": "PILOT",
+      "notes": "Figure reports that Figure 03 arrived in Hall 52, one of the assembly and logistics halls at BMW Group Plant Spartanburg (https://www.figure.ai/news/f-03-at-bmw). Associated, not rated: no Figure 03 task or performance result is recorded. Figure 02's BMW production results are not carried over to Figure 03. HO-UC-01 catch-up evaluation 2026-10-24 (use_case_assessments/figure-03.json).",
+      "limitations": "Placement at a customer plant under a pilot; no Figure 03 task, throughput or duration results are recorded. Purchase availability and pricing are unconfirmed.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "use_case_slug": "home",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": "PILOT",
+      "notes": "Manufacturer design positioning: Figure states that Figure 03 is designed for the home, with perception for cluttered spaces, battery safety for home use and washable soft goods (https://www.figure.ai/news/introducing-figure-03). Associated, not rated. Editorial judgement from the manufacturer's stated design intent; not a demonstrated application. HO-UC-01 catch-up evaluation 2026-10-24.",
+      "limitations": "Design intent only: no home deployment, home pilot or consumer availability is recorded for Figure 03. The recorded pilot is industrial (BMW), not domestic.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/figure-03.webp",

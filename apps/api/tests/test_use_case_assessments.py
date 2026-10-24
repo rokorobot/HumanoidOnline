@@ -47,7 +47,7 @@ BASELINE = json.loads(BASELINE_FILE.read_text(encoding="utf-8"))["robots"]
 
 #: Size of the baseline when it was frozen. It may shrink, never grow: a new robot is
 #: assessed, not grandfathered. Lower this number when slugs leave the baseline.
-BASELINE_FROZEN_SIZE = 63
+BASELINE_FROZEN_SIZE = 62
 
 STATUSES = {"FIT", "UNSUPPORTED_POSSIBILITY", "NO_BASIS"}
 

@@ -210,7 +210,8 @@ def _state(conn, robot_id, maker_id):
         # owner-stated mobility, which are asserted explicitly below
         "robot": q("SELECT md5((to_jsonb(r) - 'updated_at' - 'summary' - 'official_url' "
                    "- 'search_vector' - 'height_cm' - 'weight_kg' - 'payload_kg' "
-                   "- 'runtime_minutes' - 'degrees_of_freedom' - 'spec_caveats' - 'mobility')::text) "
+                   "- 'runtime_minutes' - 'degrees_of_freedom' - 'spec_caveats' "
+                   "- 'mobility')::text) "
                    "FROM robot r WHERE id = %s",
                    robot_id),
         "datasheet": conn.execute(

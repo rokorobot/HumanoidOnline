@@ -65,11 +65,11 @@
   "use_case_fits": [
     {
       "use_case_slug": "manufacturing",
-      "fit_score": null,
+      "fit_score": 0.7,
       "is_primary": true,
       "commercial_readiness": "PILOT",
-      "notes": "Figure reports that Figure 03 arrived in Hall 52, one of the assembly and logistics halls at BMW Group Plant Spartanburg (https://www.figure.ai/news/f-03-at-bmw). Associated, not rated: no Figure 03 task or performance result is recorded. Figure 02's BMW production results are not carried over to Figure 03. HO-UC-01 catch-up evaluation 2026-10-24 (use_case_assessments/figure-03.json).",
-      "limitations": "Placement at a customer plant under a pilot; no Figure 03 task, throughput or duration results are recorded. Purchase availability and pricing are unconfirmed.",
+      "notes": "Figure reports the first demonstration of Figure 03 performing a parts-sequencing logistics workflow on the line at BMW Group Plant Spartanburg (Hall 52): two-handed picking and placement of parts into the correct slots while stepping and repositioning, and pulling a heavy cart down the line (https://www.figure.ai/news/f-03-at-bmw). Score 0.70 (owner decision 2026-10-24): on a par with other robots in customer-plant pilots. Figure 02's BMW production results are not carried over to Figure 03. HO-UC-01 evaluation (use_case_assessments/figure-03.json).",
+      "limitations": "Reported as a first demonstration under a pilot; no shifts, durations, volumes, success rates or robot count are stated for Figure 03. Figure 02's 30,000-car figure is not attributed to Figure 03. Purchase availability and pricing are unconfirmed.",
       "confidence": "MEDIUM"
     },
     {
@@ -79,6 +79,15 @@
       "commercial_readiness": "PILOT",
       "notes": "Manufacturer design positioning: Figure states that Figure 03 is designed for the home, with perception for cluttered spaces, battery safety for home use and washable soft goods (https://www.figure.ai/news/introducing-figure-03). Associated, not rated. Editorial judgement from the manufacturer's stated design intent; not a demonstrated application. HO-UC-01 catch-up evaluation 2026-10-24.",
       "limitations": "Design intent only: no home deployment, home pilot or consumer availability is recorded for Figure 03. The recorded pilot is industrial (BMW), not domestic.",
+      "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "warehouse-logistics",
+      "fit_score": 0.5,
+      "is_primary": false,
+      "commercial_readiness": "PILOT",
+      "notes": "Owner decision 2026-10-24. Figure has a commercial agreement with Catalyst Brands to deploy Figure humanoids into their distribution and logistics network (https://www.figure.ai/news/figure-signs-agreement-with-catalyst-brands); Figure 03 is Figure's current generation (Figure 02 is retired). Figure 03 has demonstrated material-movement tasks (parts handling and pulling a heavy cart) in a logistics workflow at BMW Spartanburg (https://www.figure.ai/news/f-03-at-bmw). Editorial score 0.50: the agreement does not name Figure 03, and the demonstrated work was in a factory, not a warehouse.",
+      "limitations": "The Catalyst Brands agreement names 'Figure humanoids', not Figure 03 specifically, and no warehouse or distribution-centre deployment, task result or volume is recorded for Figure 03. Purchase availability and pricing are unconfirmed.",
       "confidence": "LOW"
     }
   ],

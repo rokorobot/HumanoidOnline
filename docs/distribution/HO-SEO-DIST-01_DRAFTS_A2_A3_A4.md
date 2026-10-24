@@ -36,12 +36,20 @@ availability". Offers are MEDIUM confidence without human verification.
    purchasable robots are "limited, waitlist, preorder or on request", but the tables
    show only "On request". It also lists A2 Ultra as directly orderable, though its
    purchase status is "On request" and it is orderable only as a rental. **Fix
-   before pitching the Europe page.** Separate change, not made here.
-2. **Editorial status.** Project records mark the North America and Asia copy as
-   editorial DRAFT, though the live pages show no marker. Robert confirms they're
-   final before A3 links them.
+   before pitching the Europe page.** Fix in PR #212 (shared generator, all three
+   regions; Asia's rental-only Pepper had the same problem). Must be merged and
+   deployed, and the Europe FAQ checked live, before A2/A4 are sent.
+2. ~~Editorial status~~ **Not a blocker.** North America and Asia have
+   `reviewed_at: null` in `apps/web/lib/research-editorial.ts`, but those are
+   supplementary editorial paragraphs, hidden from public pages until reviewed. The
+   governed research data on the pages can be cited.
 3. **Snapshot drift.** Re-check the fact sheet against the live pages on the day of
-   sending. Pages refresh as evidence changes.
+   sending. Pages refresh as evidence changes. Check that every confidence or
+   verification statement matches each offer the draft refers to.
+
+**Send order (after #212 is live and each final text is approved individually):**
+A2 Robohub first (the strongest opening: method and original data, not a listing
+request), then A4 Weekly Robotics, then A3 Humanoids Daily.
 
 ---
 
@@ -106,8 +114,9 @@ mention NA/Asia URLs.
 > has one robot marked straightforwardly "Available". We count deployments separately:
 > we have evidence of none in Europe, two in North America and one pilot in Asia.
 >
-> Caveat for accuracy: offers are rated medium confidence, with no human verification
-> recorded. The pages show each offer's evidence and last-observed date.
+> Caveat for accuracy: each offer carries its own confidence rating and verification
+> status. In Europe and Asia every offer is currently medium confidence with no human
+> verification recorded. The pages show each offer's evidence and last-observed date.
 >
 > Europe: https://humanoidonline.com/research/humanoid-availability/europe
 > North America: https://humanoidonline.com/research/humanoid-availability/north-america

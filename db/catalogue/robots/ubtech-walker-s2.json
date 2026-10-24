@@ -16,7 +16,7 @@
     "walk_speed_ms": null,
     "runtime_minutes": null,
     "battery_wh": null,
-    "mobility": null,
+    "mobility": "BIPEDAL",
     "degrees_of_freedom": null,
     "hand_type": "Dexterous hand",
     "hand_dof": null,
@@ -130,6 +130,10 @@
     {
       "field": "hand_type",
       "text": "UBTECH states 'Dexterous Hands*2' (https://owebsite-cdn.ubtrobot.com/resources/image/2025/07/24/701244770754629.png). Transcribed from UBTECH's annotated specification image on the Walker S2 product page; no hand model or DoF is given."
+    },
+    {
+      "field": "mobility",
+      "text": "Mobility BIPEDAL as stated by the owner, Robert Konecny, in chat on 2026-10-24 ('Walker S2 mobility: Bipedal'). Owner statement; no first-party manufacturer quote is recorded for this field."
     }
   ]
 }

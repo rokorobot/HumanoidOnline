@@ -1,0 +1,43 @@
+{
+  "_comment": "Owner-stated mobility BIPEDAL (Robert Konecny, chat 2026-10-24), PR #206: 4 robot rows CHANGED (specs.mobility NULL->BIPEDAL + mobility spec caveat); nothing else.",
+  "only": [
+    "4ne1-mini",
+    "kepler-k2-forerunner",
+    "ubtech-walker-s2",
+    "xpeng-iron"
+  ],
+  "expected": [
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "4ne1-mini"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "kepler-k2-forerunner"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "ubtech-walker-s2"
+      },
+      "count": 1
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "xpeng-iron"
+      },
+      "count": 1
+    }
+  ]
+}

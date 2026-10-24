@@ -24,6 +24,7 @@ db/catalogue/
   providers.json         <- commercial counterparties (OEM store, RaaS provider ...)
   capabilities.json      <- capability catalogue (descriptive, not commercial)
   use_cases.json         <- use-case catalogue
+  use_case_assessments/  <- per-robot use-case evaluations (section 7)
   manufacturers.json     <- OEM company profiles (+ MANUFACTURER evidence, each row's
                             claim_fields naming the profile fields it supports;
                             field meanings in docs/03 §8)
@@ -395,3 +396,66 @@ uv run db/import_catalogue.py --apply-publication-state
 
 This regression is pinned by `apps/api/tests/test_catalogue_publication_state.py`
 (no database required, so it always runs).
+
+## 7. New-robot use-case evaluation (binding — HO-UC-01, owner rule 2026-10-24)
+
+Every robot record added to `robots/` is evaluated against **every** use-case category in
+`use_cases.json` before it lands, and the evaluation lands in the same change as the
+record. The live rows stay the robot file's `use_case_fits` (what the importer writes and
+the Use Cases pages show). The evaluation is a review record beside it:
+
+```
+use_case_assessments/<slug>.json      <- one per robot record; <slug> = robot file stem
+use_case_assessments/legacy_baseline.json  <- records that predate the rule (shrink-only)
+```
+
+```json
+{
+  "robot_slug": "robot-x",
+  "assessed_on": "2026-10-24",
+  "method": "Manufacturer information and documented capabilities recorded in robots/robot-x.json",
+  "categories": {
+    "manufacturing":        { "status": "FIT", "basis": "...", "sources": ["<URL recorded in the robot file>"] },
+    "warehouse-logistics":  { "status": "UNSUPPORTED_POSSIBILITY", "basis": "..." },
+    "home":                 { "status": "NO_BASIS", "basis": "..." }
+  }
+}
+```
+
+Each of the categories in `use_cases.json` gets exactly one of:
+
+| status | meaning | `use_case_fits` row |
+|---|---|---|
+| `FIT` | Defensible on the robot's recorded sources. `sources` lists them; each URL must already be recorded in the robot file. | required |
+| `UNSUPPORTED_POSSIBILITY` | Plausible, but the recorded evidence does not support it yet. | forbidden |
+| `NO_BASIS` | Nothing recorded links the robot to this category. Suitability is unknown, not negative. | forbidden |
+
+Rules:
+
+1. Assign **every** defensible use case, not just the primary one (`is_primary` on at most one).
+2. A fit records a basis (`notes`), `limitations`, and `commercial_readiness` (the robot's own
+   `commercial_status`; NULL only when that is `UNKNOWN`). `fit_score` is set only where it can
+   be justified; otherwise NULL ("associated, not rated"). Unknown suitability stays unknown.
+3. No fit for anything else, including another edition or a predecessor: each edition file
+   is its own record and gets its own assessment, and a predecessor's demonstrated results
+   are not carried over to a successor.
+4. A robot with no `FIT` at all is a valid outcome when every category's reason is written down.
+5. The fits ride in the robot's normal catalogue promotion, under the same single owner
+   approval. Nothing here publishes a robot or imports to production on its own.
+6. After the controlled deployment, confirm the published robot is listed on every assigned
+   `/use-cases/[slug]` page (the site lags an import by up to 5 minutes, the 300 s catalogue cache).
+
+`legacy_baseline.json` lists the 63 records that existed when the rule took effect. It may only
+shrink: when a legacy robot is assessed (catch-up), remove its slug in the same change. A new
+robot is never added to it. Adding a ninth category re-opens every assessment on purpose: each
+one must then rate the new category.
+
+Enforced in CI (Backend job):
+
+- `apps/api/tests/test_use_case_assessments.py` (no database): every robot outside the baseline
+  has a complete assessment; FIT ⇔ fit row; FIT sources are recorded sources of that robot;
+  assessments match a robot record; the baseline only shrinks.
+- `apps/api/tests/test_use_case_assessment_api.py` (database): imports the whole catalogue into
+  a scratch database with the real importer and checks every fit row imports and every published
+  assignment appears at `/api/use-cases/<slug>` (the data behind `/use-cases/[slug]`) with the
+  file's score and readiness.

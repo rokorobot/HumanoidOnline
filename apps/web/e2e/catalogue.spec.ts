@@ -262,14 +262,18 @@ test("manufacturer detail: own listing, listed parent, locations and company sou
   await expect(factValue(page, "Other locations")).toContainText("Wrocław");
 });
 
-test("use-cases: robot count uses singular grammar ('1 ROBOT') and whole-card links", async ({
+test("use-cases: robot counts use singular/plural grammar and whole-card links", async ({
   page,
 }) => {
   await page.goto("/use-cases");
   const body = await page.locator("body").innerText();
-  // Singular must appear somewhere; the malformed '1 ROBOTS' must not.
-  expect(body).toContain("1 ROBOT");
-  expect(body).not.toContain("1 ROBOTS");
+  // Every rendered count is grammatical, whichever counts the catalogue holds today
+  // ('1 ROBOT', never '1 ROBOTS'; formatRobotCount itself is pinned in format.test.ts).
+  const counts = [...body.matchAll(/\b(\d+) (ROBOTS?)\b/g)];
+  expect(counts.length).toBeGreaterThan(0);
+  for (const [text, n, word] of counts) {
+    expect(word, text).toBe(n === "1" ? "ROBOT" : "ROBOTS");
+  }
   const tile = page.locator("a.app").first();
   await expect(tile).toBeVisible();
   await tile.focus();

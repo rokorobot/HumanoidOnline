@@ -1,0 +1,46 @@
+{
+  "robot_slug": "figure-03",
+  "assessed_on": "2026-10-24",
+  "assessed_by": "Claude (Opus 5.5) in a session initiated by Robert Konecny; owner rule HO-UC-01 catch-up. Not human-verified.",
+  "method": "Catch-up evaluation (HO-UC-01) against all categories in use_cases.json, from the manufacturer information and documented capabilities already recorded in robots/figure-03.json (commercial_status_evidence, specs_note, spec_caveats). Manufacturing assessed first. Figure 02's historical BMW performance claims are NOT transferred: Figure 03 is a separate successor record. Introducing-Figure-03 wording re-read 2026-10-24.",
+  "categories": {
+    "manufacturing": {
+      "status": "FIT",
+      "sources": [
+        "https://www.figure.ai/news/f-03-at-bmw"
+      ],
+      "basis": "Figure 03 is documented at an external customer manufacturing site (BMW Group Plant Spartanburg, Hall 52, an assembly and logistics hall) under the robot's PILOT status. Score left NULL: arrival is documented, Figure 03 task results are not."
+    },
+    "home": {
+      "status": "FIT",
+      "sources": [
+        "https://www.figure.ai/news/introducing-figure-03"
+      ],
+      "basis": "Figure states Figure 03 is designed for the home and describes home-specific design work (cluttered-space perception, battery safety in a home environment, washable soft goods). Fit on manufacturer design positioning only, score NULL, confidence LOW."
+    },
+    "warehouse-logistics": {
+      "status": "UNSUPPORTED_POSSIBILITY",
+      "basis": "The Catalyst Brands distribution and logistics agreement names 'Figure humanoids', not Figure 03; the BMW hall is described as assembly and logistics without stating Figure 03 performs logistics tasks. Plausible, not yet attributable to this model."
+    },
+    "retail-service": {
+      "status": "UNSUPPORTED_POSSIBILITY",
+      "basis": "Figure describes Figure 03 as suited to commercial environments (navigation, pick and place, fleet uniforms) but names no retail or service setting and records no such deployment."
+    },
+    "research-education": {
+      "status": "NO_BASIS",
+      "basis": "No developer edition, SDK, API or research/education programme is recorded for Figure 03 (has_sdk, has_api, developer_edition are NULL)."
+    },
+    "events-entertainment": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links Figure 03 to events or entertainment use."
+    },
+    "healthcare-rehabilitation": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links Figure 03 to healthcare or rehabilitation; no clinical validation or regulatory approval is recorded."
+    },
+    "security-inspection": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links Figure 03 to security or inspection use."
+    }
+  }
+}

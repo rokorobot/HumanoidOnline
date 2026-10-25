@@ -86,7 +86,7 @@ function OfferTable({
           <th scope="col">Seller</th>
           <th scope="col">Region</th>
           <th scope="col">Price</th>
-          <th scope="col">Evidence date</th>
+          <th scope="col">Last observed</th>
           <th scope="col">Confidence</th>
           <th scope="col">Sources</th>
         </tr>
@@ -143,30 +143,38 @@ export function ResearchResource({
   return (
     <article className="research-resource" data-region={data.region.slug}>
       {preview && (
-        <p role="note" data-testid="preview-banner">
+        // A <div>, not a <p>: the End preview <form> cannot sit inside a paragraph.
+        <div role="note" data-testid="preview-banner">
           <strong>Preview — not published.</strong> This resource is not public, is excluded from
           the sitemap and is marked noindex.
           <form method="post" action="/research/preview" style={{ display: "inline", marginLeft: 12 }}>
             <input type="hidden" name="action" value="end" />
             <button type="submit">End preview</button>
           </form>
-        </p>
+        </div>
       )}
 
       <h1>Which humanoid robots are available in {region}?</h1>
       <p>
         Snapshot <time dateTime={data.snapshot_date}>{data.snapshot_date}</time>. Generated from the
-        HumanoidOnline catalogue; evidence must be dated within {data.freshness_days} days of the
-        snapshot to count.
+        HumanoidOnline catalogue. An offer stays current until newer evidence replaces it, so each
+        offer shows the date it was last observed.
       </p>
 
       {data.publication_health.status === "LIMITED_EVIDENCE" && (
         <div role="note" data-testid="limited-evidence-warning">
-          <p>
-            <strong>Limited current evidence.</strong> This resource remains published, but the
-            current evidence on file no longer meets HumanoidOnline’s normal publication threshold.
-            Stale offers are excluded from current availability figures.
-          </p>
+          {/* A preview is of a resource that is not public, so it must not say it "remains published". */}
+          {preview ? (
+            <p>
+              <strong>Limited current evidence.</strong> This resource is not published, and the
+              current evidence on file does not meet HumanoidOnline’s normal publication threshold.
+            </p>
+          ) : (
+            <p>
+              <strong>Limited current evidence.</strong> This resource remains published, but the
+              current evidence on file no longer meets HumanoidOnline’s normal publication threshold.
+            </p>
+          )}
           {data.publication_health.reasons.length > 0 && (
             <ul>
               {data.publication_health.reasons.map((reason) => (
@@ -203,7 +211,7 @@ export function ResearchResource({
             <tr><th scope="row">Purchasable robots with price not published</th><td>{kf.purchase_robots_price_not_published}</td></tr>
             {kf.robots_by_other_transaction.map((t) => (
               <tr key={t.transaction_type}>
-                <th scope="row">With a confirmed {transactionLabel(t.transaction_type).toLowerCase()} offer</th>
+                <th scope="row">With a confirmed {t.transaction_type === "RAAS" ? "RaaS" : transactionLabel(t.transaction_type).toLowerCase()} offer</th>
                 <td>{t.robots}</td>
               </tr>
             ))}
@@ -339,10 +347,13 @@ export function ResearchResource({
           {editorial.fragment.sources.length > 0 && (
             <p data-testid="editorial-source">
               <small>
-                Source:{" "}
-                <a href={editorial.fragment.sources[0]} rel="noopener">
-                  {editorialSourceLabel(editorial.fragment.sources[0])}
-                </a>
+                {editorial.fragment.sources.length === 1 ? "Source: " : "Sources: "}
+                {editorial.fragment.sources.map((url, i) => (
+                  <span key={url}>
+                    {i > 0 && "; "}
+                    <a href={url} rel="noopener">{editorialSourceLabel(url)}</a>
+                  </span>
+                ))}
               </small>
             </p>
           )}

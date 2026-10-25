@@ -22,8 +22,8 @@
     "hand_dof": null,
     "autonomy": null,
     "has_manipulation": true,
-    "has_teleoperation": null,
-    "has_vision": null,
+    "has_teleoperation": true,
+    "has_vision": true,
     "has_language_ui": null,
     "has_sdk": null,
     "has_api": null,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "height_cm, weight_kg, payload_kg, degrees_of_freedom, runtime_minutes and reach_cm verified by the product owner against Boston Dynamics' own current Atlas product page (2026-08-18), superseding the earlier pre-catalogue internal-record height_cm value (150 cm). payload_kg records Boston Dynamics' 30 kg SUSTAINED capacity; the manufacturer separately states a 50 kg INSTANTANEOUS capacity, which this schema has no second field for and is recorded here rather than dropped. Boston Dynamics also states an IP67 ingress-protection rating, for which this schema has no structured field; recorded here for the same reason. mobility and has_manipulation remain from the earlier internal-record pass, not yet independently re-confirmed against the manufacturer page.",
+  "specs_note": "height_cm, weight_kg, payload_kg, degrees_of_freedom, runtime_minutes and reach_cm verified by the product owner against Boston Dynamics' own current Atlas product page (2026-08-18), superseding the earlier pre-catalogue internal-record height_cm value (150 cm). payload_kg records Boston Dynamics' 30 kg SUSTAINED capacity; the manufacturer separately states a 50 kg INSTANTANEOUS capacity, which this schema has no second field for and is recorded here rather than dropped. Boston Dynamics also states an IP67 ingress-protection rating, for which this schema has no structured field; recorded here for the same reason. mobility and has_manipulation remain from the earlier internal-record pass, not yet independently re-confirmed against the manufacturer page. SPECIFICATIONS (HO-DATA-30 batch 3, 2026-10-22): has_vision, has_teleoperation filled from first-party Boston Dynamics sources, each quoted in spec_caveats. Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 authoring criteria, docs/audit/HO-DATA-30_FEASIBILITY_AND_BATCH3_2026-10-22.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://bostondynamics.com/products/atlas/ sha256 357d6a2820d1c290…; https://bostondynamics.com/blog/boston-dynamics-unveils-new-atlas-robot-to-revolutionize-industry/ sha256 798f1d97007ae865…. Retrieved 2026-10-22 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://bostondynamics.com/atlas/",
   "commercial_status_evidence": [],
   "variants": [],
@@ -65,6 +65,16 @@
       "attribution": "Boston Dynamics",
       "last_verified_at": "2026-08-18T00:00:00Z",
       "identity_confirmed_by": "robert@humanoid.company"
+    }
+  ],
+  "spec_caveats": [
+    {
+      "field": "has_vision",
+      "text": "Boston Dynamics states 'Tactile and 360° camera view' (https://bostondynamics.com/products/atlas/)."
+    },
+    {
+      "field": "has_teleoperation",
+      "text": "Boston Dynamics states 'The robot can be controlled in three different ways: autonomous mode, teleoperated, or by using a tablet steering interface.' (https://bostondynamics.com/blog/boston-dynamics-unveils-new-atlas-robot-to-revolutionize-industry/)."
     }
   ]
 }

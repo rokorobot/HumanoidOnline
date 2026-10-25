@@ -16,22 +16,22 @@
     "walk_speed_ms": null,
     "runtime_minutes": 480,
     "battery_wh": null,
-    "mobility": null,
+    "mobility": "WHEELED",
     "degrees_of_freedom": 21,
     "hand_type": null,
     "hand_dof": null,
     "autonomy": null,
-    "has_manipulation": null,
+    "has_manipulation": true,
     "has_teleoperation": null,
-    "has_vision": null,
-    "has_language_ui": null,
-    "has_sdk": null,
-    "has_api": null,
+    "has_vision": true,
+    "has_language_ui": true,
+    "has_sdk": true,
+    "has_api": true,
     "ros_support": null,
     "developer_edition": null,
-    "simulation_support": null
+    "simulation_support": true
   },
-  "specs_note": "Commercial maturity COMMERCIAL recorded 2026-10-04 (owner decision, six-robot review). Basis: external deployments stated by the manufacturer and a public purchase link. Selected specifications retrieved from first-party manufacturer documentation on 2026-10-22 under HO-DATA-02B. Evidence status: AGENT_ASSISTED_RESEARCH; not human-verified. Remaining specifications are unknown unless separately documented. SPECIFICATIONS (HO-DATA-02B, 2026-10-22): weight, per-arm payload, DoF and working time from the specification table of Galbot's own G1 page http://www.galbot.com/g1/ (Chinese). Height is left UNKNOWN pending a policy for height-adjustable robots (stated '整机高度（最高）1730 mm', with a 650 mm leg-lift range); speed is left UNKNOWN pending a policy for wheeled-base maximum speed (stated '最大速度 1.5 m/s'). Battery Wh is not stated ('48 V 30 Ah' only) and is not derived. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-22 by Claude Opus 5.5 (curl 8.11.0: http://www.galbot.com/g1/ sha256 4f3b10993e3cdb1d…) in a session initiated by Robert Konecny, under research work order 'HO-DATA-02B 2026-10-22' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
+  "specs_note": "Commercial maturity COMMERCIAL recorded 2026-10-04 (owner decision, six-robot review). Basis: external deployments stated by the manufacturer and a public purchase link. Selected specifications retrieved from first-party manufacturer documentation on 2026-10-22 under HO-DATA-02B. Evidence status: AGENT_ASSISTED_RESEARCH; not human-verified. Remaining specifications are unknown unless separately documented. SPECIFICATIONS (HO-DATA-02B, 2026-10-22): weight, per-arm payload, DoF and working time from the specification table of Galbot's own G1 page http://www.galbot.com/g1/ (Chinese). Height is left UNKNOWN pending a policy for height-adjustable robots (stated '整机高度（最高）1730 mm', with a 650 mm leg-lift range); speed is left UNKNOWN pending a policy for wheeled-base maximum speed (stated '最大速度 1.5 m/s'). Battery Wh is not stated ('48 V 30 Ah' only) and is not derived. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-22 by Claude Opus 5.5 (curl 8.11.0: http://www.galbot.com/g1/ sha256 4f3b10993e3cdb1d…) in a session initiated by Robert Konecny, under research work order 'HO-DATA-02B 2026-10-22' (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. SPECIFICATIONS (HO-DATA-30 batch 3, 2026-10-22): mobility, has_vision, has_language_ui, has_manipulation filled from first-party Galbot sources, each quoted in spec_caveats. Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 authoring criteria, docs/audit/HO-DATA-30_FEASIBILITY_AND_BATCH3_2026-10-22.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://www.galbot.com/g1 sha256 4f3b10993e3cdb1d…. Retrieved 2026-10-22 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. SPECIFICATIONS (HO-DATA-30 batch 4, 2026-10-22): has_sdk, has_api, simulation_support filled from first-party Galbot sources, each quoted in spec_caveats. Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 mapping rules, docs/audit/HO-DATA-30_PHASE2_2026-10-23.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://developer.galbot.com/docs/SDK/1.10.0/g1/en/overview sha256 93d6237e2500ccaf…; https://developer.galbot.com/products sha256 5e2583ede031adca…. Retrieved 2026-10-22/23 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://www.galbot.com/",
   "commercial_status_evidence": [
     {
@@ -107,6 +107,34 @@
     {
       "field": "runtime_minutes",
       "text": "Galbot states '工作时长 8 小时' under the heading '续航与充电' (battery endurance and charging), next to '适配器充电 3.5 小时'; the duty cycle is not stated. 480 min is a unit conversion."
+    },
+    {
+      "field": "mobility",
+      "text": "Galbot states '底盘形式 4 轮全向移动底盘' (https://www.galbot.com/g1)."
+    },
+    {
+      "field": "has_vision",
+      "text": "Galbot states '头部 双目相机 ×1' (https://www.galbot.com/g1)."
+    },
+    {
+      "field": "has_language_ui",
+      "text": "Galbot states '对话自然流畅，动作精准配合' (https://www.galbot.com/g1)."
+    },
+    {
+      "field": "has_manipulation",
+      "text": "Galbot states '快速准确地完成取货与交付' / '单臂 5 kg' (https://www.galbot.com/g1)."
+    },
+    {
+      "field": "has_sdk",
+      "text": "Galbot states 'Galbot SDK is a unified secondary development toolkit specifically designed for the Galbot series robot platform.' (https://developer.galbot.com/docs/SDK/1.10.0/g1/en/overview). developer.galbot.com is linked from galbot.com."
+    },
+    {
+      "field": "has_api",
+      "text": "Galbot states 'it helps developers quickly implement motion control, perceptual interaction, and autonomous navigation through concise APIs.' (https://developer.galbot.com/docs/SDK/1.10.0/g1/en/overview). developer.galbot.com is linked from galbot.com."
+    },
+    {
+      "field": "simulation_support",
+      "text": "Galbot states 'G1 / S1 标准化模型（URDF / MJCF / USD）' (https://developer.galbot.com/products). Standard G1 models in URDF / MJCF / USD on developer.galbot.com (linked from galbot.com)."
     }
   ]
 }

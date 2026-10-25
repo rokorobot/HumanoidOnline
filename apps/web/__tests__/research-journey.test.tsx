@@ -239,7 +239,6 @@ describe("published but degraded: limited evidence stays public (ADR-027 section
     const warning = container.querySelector('[data-testid="limited-evidence-warning"]');
     expect(warning?.textContent).toContain("Limited current evidence.");
     expect(warning?.textContent).toContain("This resource remains published");
-    expect(warning?.textContent).toContain("Stale offers are excluded from current availability figures.");
     expect(warning?.textContent).toContain("4 qualifying robots; minimum 5");
     expect((await visitMeta()).robots).toBeUndefined();
   });

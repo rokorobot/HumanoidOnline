@@ -22,7 +22,7 @@
     "hand_dof": null,
     "autonomy": null,
     "has_manipulation": null,
-    "has_teleoperation": null,
+    "has_teleoperation": true,
     "has_vision": true,
     "has_language_ui": true,
     "has_sdk": true,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": true
   },
-  "specs_note": "Entered by robert@humanoid.company from https://eu.robotshop.com/collections/booster-robotics (retrieved 2026-08-16). 10 field(s) not stated by the source and left UNKNOWN. ros_support and simulation_support are recorded TRUE per the source's own text ('compatible with the ROS2 communication protocol, with simulation support available for Isaac Sim') -- but the same page's 'Open Software Stack' section still qualifies this platform-wide: 'ROS 2 or Isaac-Sim support may require developer integration rather than being fully built in.' Treat both as SDK-level capability, not out-of-the-box support. AI compute (Jetson Orin NX 8GB, 117 TOPS) and warranty (12 months, 24h support) have no dedicated catalogue field and are recorded in `summary` instead. NOTE: source_url is RobotShop EU's Booster Robotics COLLECTION page, not the exact per-SKU product URL -- the precise product-page URL has been requested from the owner and should replace this citation once supplied. CORRECTION 2026-10-19 (owner decision; docs/discovery/K1_SPEED_RUNTIME_CORRECTION_PROPOSAL_2026-10-19.md): walk_speed_ms is now Booster's stated walking speed, 'Walking Speed: 2 m/s', read as up to 2 m/s (discovery claim 89e5d72c); the previous 0.4 m/s was the RobotShop listing's runtime-test speed, not a walking speed. runtime_minutes is Booster's own observation, '1 h 10 min (walking at 1.1 m/s)' (claim a55b65de), from https://www.booster.tech/booster-k1?target=en observed 2026-10-18. The RobotShop EU listing's alternative observation, '~80 min runtime at 0.4 m/s' (retrieved 2026-08-16), is preserved in the runtime caveat; the two were measured at different speeds and are not interchangeable.",
+  "specs_note": "Entered by robert@humanoid.company from https://eu.robotshop.com/collections/booster-robotics (retrieved 2026-08-16). 10 field(s) not stated by the source and left UNKNOWN. ros_support and simulation_support are recorded TRUE per the source's own text ('compatible with the ROS2 communication protocol, with simulation support available for Isaac Sim') -- but the same page's 'Open Software Stack' section still qualifies this platform-wide: 'ROS 2 or Isaac-Sim support may require developer integration rather than being fully built in.' Treat both as SDK-level capability, not out-of-the-box support. AI compute (Jetson Orin NX 8GB, 117 TOPS) and warranty (12 months, 24h support) have no dedicated catalogue field and are recorded in `summary` instead. NOTE: source_url is RobotShop EU's Booster Robotics COLLECTION page, not the exact per-SKU product URL -- the precise product-page URL has been requested from the owner and should replace this citation once supplied. CORRECTION 2026-10-19 (owner decision; docs/discovery/K1_SPEED_RUNTIME_CORRECTION_PROPOSAL_2026-10-19.md): walk_speed_ms is now Booster's stated walking speed, 'Walking Speed: 2 m/s', read as up to 2 m/s (discovery claim 89e5d72c); the previous 0.4 m/s was the RobotShop listing's runtime-test speed, not a walking speed. runtime_minutes is Booster's own observation, '1 h 10 min (walking at 1.1 m/s)' (claim a55b65de), from https://www.booster.tech/booster-k1?target=en observed 2026-10-18. The RobotShop EU listing's alternative observation, '~80 min runtime at 0.4 m/s' (retrieved 2026-08-16), is preserved in the runtime caveat; the two were measured at different speeds and are not interchangeable. SPECIFICATIONS (HO-DATA-30 batch 3, 2026-10-22): has_teleoperation filled from first-party Booster Robotics sources, each quoted in spec_caveats. Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 authoring criteria, docs/audit/HO-DATA-30_FEASIBILITY_AND_BATCH3_2026-10-22.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://www.booster.tech/booster-k1 sha256 7784976dc5e8b305…. Retrieved 2026-10-22 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": null,
   "commercial_status_evidence": [
     {
@@ -54,7 +54,7 @@
       "transaction_type": "PURCHASE",
       "price_type": "PUBLIC",
       "currency": "EUR",
-      "price": 15398.90,
+      "price": 15398.9,
       "billing_period": "ONE_TIME",
       "note": "RobotShop EU 'Sale price', tax included, SKU RB-Boo-10. Not necessarily list/MSRP -- it is the storefront's current sale price.",
       "evidence": [
@@ -65,6 +65,29 @@
           "observed_at": "2026-08-16",
           "confidence": "MEDIUM",
           "note": "Third-party distributor price, not manufacturer MSRP. Exact product URL pending."
+        }
+      ]
+    },
+    {
+      "provider_slug": "robotshop-us",
+      "region_code": "US",
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "USD",
+      "price": 15699,
+      "billing_period": "ONE_TIME",
+      "note": "RobotShop US storefront price, SKU RB-Boo-10. The agent-facing listing does not state whether tariffs, taxes or shipping are included, so price_basis is left unknown.",
+      "evidence": [
+        {
+          "source_url": "https://www.robotshop.com/products/booster-robotics-k1-educational-humanoid-robot",
+          "source_type": "OTHER",
+          "source_title": "Booster Robotics K1 Educational Humanoid Robot (SKU RB-Boo-10) — RobotShop US product listing",
+          "excerpt": "Price: 15699.00 USD",
+          "published_at": "2026-10-14",
+          "observed_at": "2026-10-23",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-23 by Claude Opus 5.5 (WebFetch) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-NA-02 — Close North America Evidence Gaps' (2026-10-23), which names this exact URL. RobotShop answers plain requests with HTTP 403; WebFetch received RobotShop's own agent-facing product summary (its cart links carry ref=ai-md), which states 'Data as of: 2026-10-14T00:23:35Z (UTC)'. No block was circumvented. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party retailer, not the manufacturer. Edition match: the listing's 'K1 EDU', 'Jetson Orin NX 8GB, 117 TOPS' and 'approx. 80 minutes (5Ah battery) at 0.4 m/s' are this record's configuration (same SKU RB-Boo-10 as the RobotShop EU listing)."
         }
       ]
     }
@@ -86,6 +109,27 @@
           "note": "ON_REQUEST chosen over PREORDER: the product already exists and ships, it is simply not held in standing stock."
         }
       ]
+    },
+    {
+      "provider_slug": "robotshop-us",
+      "region_code": "US",
+      "transaction_type": "PURCHASE",
+      "availability_status": "ON_REQUEST",
+      "note": "RobotShop US lists it as 'Special order' with an add-to-cart and checkout route; no lead time is stated. Mapped to ON_REQUEST, consistent with the same SKU's RobotShop EU 'On Demand' offer: the product exists and ships but is ordered from the supplier per order, not held in stock. It is not immediate stock availability.",
+      "evidence": [
+        {
+          "source_url": "https://www.robotshop.com/products/booster-robotics-k1-educational-humanoid-robot",
+          "source_type": "OTHER",
+          "source_title": "Booster Robotics K1 Educational Humanoid Robot (SKU RB-Boo-10) — RobotShop US product listing",
+          "excerpt": "Availability: Special order ... Add to cart ... Checkout directly ... Customs, inspection, and prep handled locally before shipment.",
+          "published_at": "2026-10-14",
+          "observed_at": "2026-10-23",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-23 by Claude Opus 5.5 (WebFetch) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-NA-02 — Close North America Evidence Gaps' (2026-10-23), which names this exact URL. RobotShop answers plain requests with HTTP 403; WebFetch received RobotShop's own agent-facing product summary (its cart links carry ref=ai-md), which states 'Data as of: 2026-10-14T00:23:35Z (UTC)'. No block was circumvented. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party retailer, not the manufacturer. Edition match: the listing's 'K1 EDU', 'Jetson Orin NX 8GB, 117 TOPS' and 'approx. 80 minutes (5Ah battery) at 0.4 m/s' are this record's configuration (same SKU RB-Boo-10 as the RobotShop EU listing)."
+        }
+      ],
+      "seller_wording": "Special order"
     }
   ],
   "deployments": [],
@@ -182,6 +226,10 @@
     {
       "field": "runtime_minutes",
       "text": "Booster: '1 h 10 min (walking at 1.1 m/s)' (claim a55b65de). RobotShop EU listing (retrieved 2026-08-16): '~80 min runtime at 0.4 m/s'. Measured at different speeds; not interchangeable."
+    },
+    {
+      "field": "has_teleoperation",
+      "text": "Booster Robotics states 'Handheld remote controller: Available' / 'Handheld Controller. Responsive and easy to use. Use the thumbsticks to control walking and turning' (https://www.booster.tech/booster-k1). Operator remote control with Booster's handheld controller."
     }
   ]
 }

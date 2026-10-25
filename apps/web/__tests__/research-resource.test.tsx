@@ -64,7 +64,7 @@ describe("publication gate", () => {
     const env = { RESEARCH_PUBLISHED_REGIONS: "europe", RESEARCH_PREVIEW_TOKEN: "t" };
     expect(resolveResearchAccess("europe", session("t"), env)).toEqual({ mode: "published" });
     expect(resolveResearchAccess("north-america", session("t"), env)).toEqual({ mode: "closed" });
-    expect(resolveResearchAccess("asia", null, { RESEARCH_PUBLISHED_REGIONS: "asia" })).toEqual({ mode: "closed" });
+    expect(resolveResearchAccess("atlantis", null, { RESEARCH_PUBLISHED_REGIONS: "atlantis" })).toEqual({ mode: "closed" });
   });
 });
 
@@ -276,16 +276,15 @@ describe("limited-evidence warning", () => {
     );
     const w = screen.getByTestId("limited-evidence-warning");
     expect(w.textContent).toContain(
-      "Limited current evidence. This resource remains published, but the current evidence on file no longer meets HumanoidOnline’s normal publication threshold. Stale offers are excluded from current availability figures.",
+      "Limited current evidence. This resource remains published, but the current evidence on file no longer meets HumanoidOnline’s normal publication threshold.",
     );
     const items = within(w).getAllByRole("listitem").map((li) => li.textContent);
     expect(items).toEqual(["4 qualifying robots; minimum 5", "2 manufacturers; minimum 3"]);
     expect(w.getAttribute("role")).toBe("note");
   });
 
-  it("shows the partial-ageing reason in full while the offers stay as projected", () => {
-    const reason =
-      "1 published robot has only aged-out Europe offer evidence (older than 90 days) excluded from current figures.";
+  it("shows a reason in full while the offers stay as projected", () => {
+    const reason = "4 qualifying robots; minimum 5";
     renderPage(projection({ publication_health: { status: "LIMITED_EVIDENCE", reasons: [reason] } }));
     const w = screen.getByTestId("limited-evidence-warning");
     expect(within(w).getByText(reason)).toBeTruthy();
@@ -458,6 +457,14 @@ describe("JSON-LD and parity", () => {
     expect(formatPriceState({ ...range, price_max: null })).toBe("Not published");
     expect(formatPriceState({ ...range, price_min: null })).toBe("Not published");
     expect(formatPriceState({ ...range, price_min: null, price_max: null })).toBe("Not published");
+  });
+
+  it("a FROM price reads as a starting price, never as a flat price", () => {
+    const base = projection().offers[0].prices[0];
+    expect(formatPriceState({ ...base, price_type: "FROM", amount: 16990, currency: "USD" }))
+      .toBe("From 16,990 USD");
+    expect(formatPriceState({ ...base, price_type: "PUBLIC", amount: 16990, currency: "USD" }))
+      .toBe("16,990 USD");
   });
 
   it("price formatting never turns UNKNOWN into a number", () => {

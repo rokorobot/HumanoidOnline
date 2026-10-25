@@ -5,10 +5,20 @@
 > **Repository baseline:** `main @ 73397e6336fda040206e037940469611053944d6`
 > (AI Citation Layer v0.1, PR #45, merged and production-verified).
 >
+> **Amended 2026-10-24 (owner direction, Robert Konecny):** the collection
+> prohibition formerly in §1.1, §14 and §15 (scraping AI answer products,
+> browser automation, CAPTCHA/bot-detection bypass and related items) is
+> **removed**. The owner states it was never his decision.
+> Third-party data providers and tools are a permitted collection method.
+>
 > This document defines **how HumanoidOnline measures whether external AI and
 > search systems retrieve, cite, link to, or correctly represent HumanoidOnline
 > content.** It is the measurement contract implementing `docs/23` §20 and
 > `CITATION-01.10` (Measurability).
+>
+> **Amended by `docs/29` (Amendment M1, HO-AEO-00) — RATIFIED 2026-10-24:**
+> baseline pilot (manual + treg-assisted hybrid), benchmark registry v2
+> (adds `COMMERCIAL-004`, `COMMERCIAL-005`), $10 pilot ceiling.
 >
 > **Implementation authorized by this document: none.** No runtime code, no
 > database model, no API, no collector, no scheduler, no third-party
@@ -55,14 +65,11 @@ observations may be collected by:
 
 - the owner or a named human reviewer;
 - an explicitly authorized browser/tooling workflow, governed separately;
-- a future, separately-governed platform integration using supported APIs.
-
-**Not authorized by this document, in any form:** scraping AI answer products,
-browser automation against them, terms-of-service circumvention, automated
-account creation or credentialed session automation, CAPTCHA or bot-detection
-bypass, or undocumented/hidden API discovery. These are prohibited absolutely,
-not "unless convenient" — the same discipline DATA-D1.9 applies to our outbound
-access to third parties applies to our measurement of them.
+- a future, separately-governed platform integration using supported APIs;
+- a third-party data provider or tool (for example an AI-answer monitoring
+  API). Its observations are recorded under their own `product_surface`
+  (§4.1), naming the provider, and paid use follows the cost authorization of
+  the run that uses it.
 
 ---
 
@@ -671,7 +678,6 @@ This document does **not**, and no work authorized by it may:
 - change the model-training crawler stance (a separate owner decision, and
   deliberately untouched — see `docs/23` §12 and the `CIT-H` regression test);
 - integrate an external AI API;
-- perform browser automation or scraping of AI answer products;
 - create a scheduled collector;
 - store credentials;
 - integrate an analytics vendor;
@@ -693,9 +699,8 @@ Authorizes:                 NOTHING beyond documentation. No collector, no
                             tooling, no integration, no statistic.
 Collection model:           Partly manual by design. No claim of automatic
                             access to every answer engine (§1.1).
-Prohibited absolutely:      scraping AI answer products, browser automation
-                            against them, ToS circumvention, account/credential
-                            automation, CAPTCHA bypass, hidden API discovery.
+Collection prohibition:     REMOVED 2026-10-24 by owner direction. Third-party
+                            data providers/tools permitted (§1.1).
 Result states:              MUTUALLY EXCLUSIVE — exactly one per observation,
                             evaluated in listed order. CITED vs
                             LINKED_NOT_CITED turns on SOURCE TREATMENT BY THE

@@ -15,7 +15,7 @@
     "payload_kg": 20.0,
     "walk_speed_ms": 1.2,
     "runtime_minutes": 300,
-    "battery_wh": null,
+    "battery_wh": 2300.0,
     "mobility": "BIPEDAL",
     "degrees_of_freedom": null,
     "hand_type": null,
@@ -23,15 +23,15 @@
     "autonomy": null,
     "has_manipulation": null,
     "has_teleoperation": null,
-    "has_vision": null,
-    "has_language_ui": null,
+    "has_vision": true,
+    "has_language_ui": true,
     "has_sdk": null,
     "has_api": null,
     "ros_support": null,
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Commercial maturity PILOT recorded 2026-10-04 (owner decision, six-robot review). Basis: Figure 03 placed at an external customer site and a customer deployment agreement; no purchase or general availability is stated. Figure 03 is a separate, unpublished successor-generation robot to Figure 02 (figure-02); it is not merged with it. SPECIFICATIONS (owner-approved promotion batch 1, 2026-10-19): height, weight, payload, runtime and speed come from the stat block of Figure's official product page https://www.figure.ai/figure, captured on 2026-10-18 by HumanoidOnline's automated discovery observation of the owner-authorized source figure-ai-official (docs/28 A4; adapter 0.2.0) and stored as discovery claims (height 48923025, weight bd4d27ae, payload b4da6ae2, runtime c3258260, speed 6e17a216). Weight, payload, runtime and speed are recorded as stated (61KG, 20KG, 5HR, 1.2M/S); height is stated as 5'8\" and recorded as approximately 173 cm. Automated capture, not a MANUAL_BOOTSTRAP reading; not independently verified. MOBILITY: BIPEDAL recorded by owner decision 2026-10-19 (not part of Figure's stat block).",
+  "specs_note": "Commercial maturity PILOT recorded 2026-10-04 (owner decision, six-robot review). Basis: Figure 03 placed at an external customer site and a customer deployment agreement; no purchase or general availability is stated. Figure 03 is a separate, unpublished successor-generation robot to Figure 02 (figure-02); it is not merged with it. SPECIFICATIONS (owner-approved promotion batch 1, 2026-10-19): height, weight, payload, runtime and speed come from the stat block of Figure's official product page https://www.figure.ai/figure, captured on 2026-10-18 by HumanoidOnline's automated discovery observation of the owner-authorized source figure-ai-official (docs/28 A4; adapter 0.2.0) and stored as discovery claims (height 48923025, weight bd4d27ae, payload b4da6ae2, runtime c3258260, speed 6e17a216). Weight, payload, runtime and speed are recorded as stated (61KG, 20KG, 5HR, 1.2M/S); height is stated as 5'8\" and recorded as approximately 173 cm. Automated capture, not a MANUAL_BOOTSTRAP reading; not independently verified. MOBILITY: BIPEDAL recorded by owner decision 2026-10-19 (not part of Figure's stat block). SPECIFICATIONS (HO-DATA-30 batch 3, 2026-10-22): battery_wh, has_vision, has_language_ui filled from first-party Figure sources, each quoted in spec_caveats. Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 authoring criteria, docs/audit/HO-DATA-30_FEASIBILITY_AND_BATCH3_2026-10-22.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://www.figure.ai/news/f-03-battery-development sha256 66c09914b2c8cc4d…; https://www.figure.ai/news/introducing-figure-03 sha256 55f71016f522bb41…. Retrieved 2026-10-22 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://www.figure.ai/",
   "commercial_status_evidence": [
     {
@@ -62,7 +62,35 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "manufacturing",
+      "fit_score": 0.7,
+      "is_primary": true,
+      "commercial_readiness": "PILOT",
+      "notes": "Figure reports the first demonstration of Figure 03 performing a parts-sequencing logistics workflow on the line at BMW Group Plant Spartanburg (Hall 52): two-handed picking and placement of parts into the correct slots while stepping and repositioning, and pulling a heavy cart down the line (https://www.figure.ai/news/f-03-at-bmw). Score 0.70 (owner decision 2026-10-24): on a par with other robots in customer-plant pilots. Figure 02's BMW production results are not carried over to Figure 03. HO-UC-01 evaluation (use_case_assessments/figure-03.json).",
+      "limitations": "Reported as a first demonstration under a pilot; no shifts, durations, volumes, success rates or robot count are stated for Figure 03. Figure 02's 30,000-car figure is not attributed to Figure 03. Purchase availability and pricing are unconfirmed.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "use_case_slug": "home",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": "PILOT",
+      "notes": "Manufacturer design positioning: Figure states that Figure 03 is designed for the home, with perception for cluttered spaces, battery safety for home use and washable soft goods (https://www.figure.ai/news/introducing-figure-03). Associated, not rated. Editorial judgement from the manufacturer's stated design intent; not a demonstrated application. HO-UC-01 catch-up evaluation 2026-10-24.",
+      "limitations": "Design intent only: no home deployment, home pilot or consumer availability is recorded for Figure 03. The recorded pilot is industrial (BMW), not domestic.",
+      "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "warehouse-logistics",
+      "fit_score": 0.5,
+      "is_primary": false,
+      "commercial_readiness": "PILOT",
+      "notes": "Owner decision 2026-10-24. Figure has a commercial agreement with Catalyst Brands to deploy Figure humanoids into their distribution and logistics network (https://www.figure.ai/news/figure-signs-agreement-with-catalyst-brands); Figure 03 is Figure's current generation (Figure 02 is retired). Figure 03 has demonstrated material-movement tasks (parts handling and pulling a heavy cart) in a logistics workflow at BMW Spartanburg (https://www.figure.ai/news/f-03-at-bmw). Editorial score 0.50: the agreement does not name Figure 03, and the demonstrated work was in a factory, not a warehouse.",
+      "limitations": "The Catalyst Brands agreement names 'Figure humanoids', not Figure 03 specifically, and no warehouse or distribution-centre deployment, task result or volume is recorded for Figure 03. Purchase availability and pricing are unconfirmed.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/figure-03.webp",
@@ -95,6 +123,18 @@
     {
       "field": "walk_speed_ms",
       "text": "Figure states 'Speed 1.2M/S' (claim 6e17a216); stated as the robot's speed, conditions not given."
+    },
+    {
+      "field": "battery_wh",
+      "text": "Figure states '2.3 kWh enables 5 hours of run time at peak performance' (https://www.figure.ai/news/f-03-battery-development). 2.3 kWh = 2300 Wh (unit conversion)."
+    },
+    {
+      "field": "has_vision",
+      "text": "Figure states 'Figure 03 introduces a next-generation vision system engineered for high-frequency visuomotor control. Its new camera architecture delivers twice the frame rate' (https://www.figure.ai/news/introducing-figure-03)."
+    },
+    {
+      "field": "has_language_ui",
+      "text": "Figure states 'To make it easier to communicate naturally with the robot, Figure 03 features an upgraded audio hardware system for better real time speech-to-speech.' (https://www.figure.ai/news/introducing-figure-03)."
     }
   ]
 }

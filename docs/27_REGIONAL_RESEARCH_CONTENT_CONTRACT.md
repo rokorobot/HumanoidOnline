@@ -3,7 +3,7 @@
 > Internal terminology: these are **Regional Research Resources**, not "SEO articles". SEO, GEO/AEO and agent citation are distribution and retrieval objectives of the resource, not its editorial format.
 
 **Status:** Accepted
-**Date:** 2026-10-04
+**Date:** 2026-10-04 · **Amended:** 2026-10-23 (§12 evidence age: offers stay current until newer evidence replaces them; owner decision)
 **Decision Owners:** HumanoidOnline / Humanoid.Company
 **Scope:** Structure, data derivation, evidence rules, SEO/GEO/AI-agent surfaces and publication gates for regional humanoid-market research resources (Europe, North America, Asia). Does not authorize implementation, publication, or any schema change.
 **Related:**
@@ -177,19 +177,21 @@ A regional page MAY be published only when all hold:
 
 1. The relevant region rows and membership list exist in the catalogue.
 2. At least **5 published robots from at least 3 manufacturers** have a current, evidence-linked, region-specific availability offer (owner decision 2026-10-04; a region below this minimum is held back or published as "limited evidence" with that stated plainly). Counting follows §4 and §7: GLOBAL offers and price-only rows do not count.
-3. Every rendered price/availability row has `evidence_source` whose latest evidence date is within the **90-day freshness window** for regional commercial-offer evidence (owner decision 2026-10-04; doc 25 §14 leaves TTLs per field, this sets it for v0.1). The evidence date is `verified_at` when set, otherwise `observed_at`, measured against the page snapshot date. A row older than 90 days is stale: it is not counted toward the §12 minimum and is not rendered as current.
+3. Every rendered price/availability row has `evidence_source`, and shows its **last-observed date**: `verified_at` when set, otherwise `observed_at`, of its latest evidence on or before the page snapshot date.
+   - **Amended 2026-10-23 (owner decision):** an offer and its price **stay current until newer evidence replaces them**. Only an offer recorded as no longer current (`is_current` false), or as not obtainable, stops counting. Evidence age alone never removes an offer or a price.
+   - This **replaces** the original 90-day freshness window (owner decision 2026-10-04), under which a row older than 90 days was stale and not counted.
 4. Counts reconcile: sections 3–7 sum to the stated population.
 5. Rendered facts match JSON-LD and JSON endpoint (contract test).
 6. Robots excluded because unpublished are not leaked anywhere in output.
 7. Owner approval of the region's editorial fragment and of publication itself. Publication is the owner's decision; it is not implied by this contract or by the data being ready.
 
-**Human verification is not required for regional-resource publication.** A current, evidence-linked regional commercial offer may qualify when `verified_at` is null, provided its confidence and provenance are shown honestly. `verified_at` represents a stronger verification state; it is not a publication prerequisite. Freshness is measured from `verified_at` when present, otherwise from `observed_at`.
+**Human verification is not required for regional-resource publication.** A current, evidence-linked regional commercial offer may qualify when `verified_at` is null, provided its confidence and provenance are shown honestly. `verified_at` represents a stronger verification state; it is not a publication prerequisite. The last-observed date is `verified_at` when present, otherwise `observed_at`. Confidence and verification are read from the latest evidence.
 
 **Confidence must not be upgraded by publication.** A MEDIUM agent-observed row remains MEDIUM on the Regional Research Resource and must not be presented as verified.
 
-**The minimum is a launch threshold, not a runtime switch.** The 5-robot / 3-manufacturer minimum is an initial publication-readiness threshold, not a permanent runtime publication switch. Once a regional resource has been owner-published, later evidence ageing or a decline below the minimum does not unpublish it. Current counts continue to exclude stale and non-current evidence. The resource degrades visibly with a limited-evidence warning for **freshness loss or insufficient current evidence**: when the minimum is missed, or when at least one published robot's only regional offer evidence has aged beyond the freshness window, even though the minimum is still met. Fresh evidence that an offer has explicitly ended (marked non-current) is resolved current knowledge, not degradation: the offer is excluded from current offers and counts, but does not by itself trigger the warning. Structural integrity failures (for example, counts that do not reconcile, or a missing region structure) may still fail closed.
+**The minimum is a launch threshold, not a runtime switch.** The 5-robot / 3-manufacturer minimum is an initial publication-readiness threshold, not a permanent runtime publication switch. Once a regional resource has been owner-published, a decline below the minimum does not unpublish it. Current counts exclude non-current (withdrawn) offers. The resource degrades visibly with a limited-evidence warning **only when the minimum is missed** (amended 2026-10-23: evidence age no longer triggers it). Evidence that an offer has ended (marked non-current) is resolved knowledge, not degradation: the offer is excluded from current offers and counts, but does not by itself trigger the warning. Structural integrity failures (for example, counts that do not reconcile, or a missing region structure) may still fail closed.
 
-Pages failing freshness after publication degrade visibly ("Last observed …, some entries stale") rather than disappearing silently.
+Every offer row shows its last-observed date, so the age of each fact stays visible to readers and to agents even though age no longer removes it (amended 2026-10-23).
 
 ## 13. Tests (AGENTS.md rule 5)
 

@@ -8,35 +8,93 @@
   "commercial_status": "UNKNOWN",
   "is_published": true,
   "specs": {
-    "height_cm": null,
+    "height_cm": 121.0,
     "weight_kg": null,
     "arm_span_cm": null,
     "reach_cm": null,
     "payload_kg": null,
     "walk_speed_ms": null,
     "runtime_minutes": null,
-    "battery_wh": null,
-    "mobility": null,
+    "battery_wh": 795.0,
+    "mobility": "WHEELED",
     "degrees_of_freedom": null,
     "hand_type": null,
-    "hand_dof": null,
+    "hand_dof": 1,
     "autonomy": null,
     "has_manipulation": null,
     "has_teleoperation": null,
-    "has_vision": null,
-    "has_language_ui": null,
-    "has_sdk": null,
-    "has_api": null,
-    "ros_support": null,
+    "has_vision": true,
+    "has_language_ui": true,
+    "has_sdk": true,
+    "has_api": true,
+    "ros_support": true,
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Specifications not yet verified.",
+  "specs_note": "Specifications not yet verified. SPECIFICATIONS (HO-DATA-30 batch 3, 2026-10-22): has_language_ui filled from first-party SoftBank Robotics sources, each quoted in spec_caveats. Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 authoring criteria, docs/audit/HO-DATA-30_FEASIBILITY_AND_BATCH3_2026-10-22.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://us.softbankrobotics.com/pepper sha256 cb0697d2e7b59c4a…. Retrieved 2026-10-22 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. SPECIFICATIONS (HO-DATA-30 batch 4, 2026-10-22): height_cm, battery_wh, mobility, has_vision, has_sdk, has_api, ros_support filled from first-party SoftBank Robotics sources, each quoted in spec_caveats. Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 mapping rules, docs/audit/HO-DATA-30_PHASE2_2026-10-23.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: http://doc.aldebaran.com/2-5/family/pepper_technical/dimensions_pep.html sha256 15facd6bd0157db8…; http://doc.aldebaran.com/2-5/family/pepper_technical/battery_pep.html sha256 82d9fe216e732f33…; http://doc.aldebaran.com/2-5/family/pepper_technical/bodyparts_pep.html sha256 9ae16512d4feedfa…; http://doc.aldebaran.com/2-5/family/pepper_technical/video_overview.html sha256 adda27a8958f18a4…; http://doc.aldebaran.com/index.html sha256 12c34bf1c8ab4be6…; http://doc.aldebaran.com/2-5/dev/programming_index.html sha256 034c69a6f5e857ec…; http://doc.aldebaran.com/2-5/dev/ros/index_ros.html sha256 59e1dfe8d094c42d…. Retrieved 2026-10-22/23 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. SPECIFICATIONS (HO-DATA-30 close-out batch 6, 2026-10-23): hand_dof under owner rulings already ratified on 2026-10-23 (see spec_caveats). RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — http://doc.aldebaran.com/2-5/family/pepper_technical/joints_pep.html sha256 cccb3986e6f5…. Retrieved 2026-10-22/23 by Claude in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://www.softbankrobotics.com/",
   "commercial_status_evidence": [],
-  "variants": [],
-  "pricing_offers": [],
-  "availability_offers": [],
+  "variants": [
+    {
+      "slug": "for-home-2",
+      "name": "Pepper for Home 2.0 (home rental model, Japan)",
+      "is_developer": false
+    }
+  ],
+  "pricing_offers": [
+    {
+      "transaction_type": "RENTAL",
+      "price_type": "FROM",
+      "currency": "JPY",
+      "price": 43780,
+      "price_min": null,
+      "price_max": null,
+      "billing_period": "MONTHLY",
+      "region_code": "JP",
+      "provider_slug": "tent-pepper-rental",
+      "variant_slug": "for-home-2",
+      "price_basis": "Monthly rental fee including tax; the lowest plan, the 1-year contract basic plan (基本プラン（1年契約）); round-trip shipping free",
+      "note": "FROM, as the store presents it ('月額39,800円（税抜）/43,780円（税込）からレンタルできます'): 43,780 yen per month including tax on the 1-year plan. The month-to-month basic plan (基本プラン（月額）, minimum one month) is 76,780 yen per month including tax; one price row per offer key, so it is recorded here, not as a second row. Not a purchase price.",
+      "evidence": [
+        {
+          "source_url": "https://kauriru.com/pepper/items/12835",
+          "source_type": "OTHER",
+          "source_title": "Pepper for Home 2.0 レンタル 基本プラン（1年契約） — Kauriru rental mall store operated by TENT Inc. (Japan)",
+          "excerpt": "サブスク 43,780円月額 ※レンタル後の購入不可 今すぐ月額レンタルする 受取日を選ぶ ... 月額69,800円（税抜）/76,780円（税込）で最短1か月からのレンタルが可能です。",
+          "published_at": null,
+          "observed_at": "2026-10-24",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-24 by Claude Opus 5.5 (built-in browser, rendered page text; the raw body is a client-rendered app shell; body sha256 b41e1bdc90d4872e245aa69ff71fb1e17d08ef5d55b576f3b73df79a22d5285b (shell, identical for every kauriru.com/pepper URL; the rendered text is the evidence)) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-ASIA-01 — Asia Regional Research Resource' (2026-10-24). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Store 'Pepper for Home 2.0' on the Kauriru rental mall, operated by 株式会社TENT (TENT Inc., Minato-ku, Tokyo; store contact prj-sbrtent-pepper@tent-inc.jp). SoftBank's own Pepper purchase page (https://www.softbank.jp/robot/consumer/buy/, sha256 7caae18720431455f90b4659ff63bf6cb70fbf81cb59e628ae3dcf7968671b92) says 'Pepper(一般販売モデル)の販売は終了しました。' and links 'Pepper for Home レンタルプランのお申し込みはこちら' to this store, which is the authorization basis recorded. RENTAL only: the plan page says '※レンタル後の購入不可' (no purchase after rental); it is never a purchase offer. Edition: the home model 'Pepper for Home 2.0', pinned by the variant; business models are referred to SoftBank Robotics. Japan only: '海外でのご利用については想定しておりません'; remote islands may not be served."
+        }
+      ]
+    }
+  ],
+  "availability_offers": [
+    {
+      "transaction_type": "RENTAL",
+      "availability_status": "AVAILABLE",
+      "region_code": "JP",
+      "provider_slug": "tent-pepper-rental",
+      "variant_slug": "for-home-2",
+      "lead_time_days": null,
+      "note": "Japan: the rental can be started online now ('今すぐ月額レンタルする') with a delivery date chosen from a calendar. RENTAL only; ordinary Pepper retail sales have ended (SoftBank), so no purchase offer is recorded. Eligibility: applicant identity and address documents; Japan only.",
+      "seller_wording": "今すぐ月額レンタルする",
+      "evidence": [
+        {
+          "source_url": "https://kauriru.com/pepper/items/12835",
+          "source_type": "OTHER",
+          "source_title": "Pepper for Home 2.0 レンタル 基本プラン（1年契約） — Kauriru rental mall store operated by TENT Inc. (Japan)",
+          "excerpt": "サブスク 43,780円月額 ※レンタル後の購入不可 今すぐ月額レンタルする 受取日を選ぶ ... 月額69,800円（税抜）/76,780円（税込）で最短1か月からのレンタルが可能です。",
+          "published_at": null,
+          "observed_at": "2026-10-24",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-24 by Claude Opus 5.5 (built-in browser, rendered page text; the raw body is a client-rendered app shell; body sha256 b41e1bdc90d4872e245aa69ff71fb1e17d08ef5d55b576f3b73df79a22d5285b (shell, identical for every kauriru.com/pepper URL; the rendered text is the evidence)) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-ASIA-01 — Asia Regional Research Resource' (2026-10-24). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Store 'Pepper for Home 2.0' on the Kauriru rental mall, operated by 株式会社TENT (TENT Inc., Minato-ku, Tokyo; store contact prj-sbrtent-pepper@tent-inc.jp). SoftBank's own Pepper purchase page (https://www.softbank.jp/robot/consumer/buy/, sha256 7caae18720431455f90b4659ff63bf6cb70fbf81cb59e628ae3dcf7968671b92) says 'Pepper(一般販売モデル)の販売は終了しました。' and links 'Pepper for Home レンタルプランのお申し込みはこちら' to this store, which is the authorization basis recorded. RENTAL only: the plan page says '※レンタル後の購入不可' (no purchase after rental); it is never a purchase offer. Edition: the home model 'Pepper for Home 2.0', pinned by the variant; business models are referred to SoftBank Robotics. Japan only: '海外でのご利用については想定しておりません'; remote islands may not be served."
+        }
+      ]
+    }
+  ],
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [
@@ -92,6 +150,44 @@
       "attribution": "Wikimedia Commons / CC BY-SA",
       "last_verified_at": "2026-08-05T00:00:00+00:00",
       "identity_confirmed_by": "robert@humanoid.company"
+    }
+  ],
+  "spec_caveats": [
+    {
+      "field": "has_language_ui",
+      "text": "SoftBank Robotics states 'starts making conversation' (https://us.softbankrobotics.com/pepper)."
+    },
+    {
+      "field": "height_cm",
+      "text": "SoftBank Robotics states 'Height (mm) Width (mm) Depth (mm) 1210 480 425' (http://doc.aldebaran.com/2-5/family/pepper_technical/dimensions_pep.html). Aldebaran/SoftBank Robotics Pepper technical documentation (NAOqi 2.5), arms-down height; 1210 mm = 121 cm."
+    },
+    {
+      "field": "battery_wh",
+      "text": "SoftBank Robotics states 'Energy 795 Wh' (http://doc.aldebaran.com/2-5/family/pepper_technical/battery_pep.html)."
+    },
+    {
+      "field": "mobility",
+      "text": "SoftBank Robotics states 'Leg Wheel center, at floor level' (http://doc.aldebaran.com/2-5/family/pepper_technical/bodyparts_pep.html)."
+    },
+    {
+      "field": "has_vision",
+      "text": "SoftBank Robotics states 'AL::kTopCamera 0 2D Cameras' (http://doc.aldebaran.com/2-5/family/pepper_technical/video_overview.html)."
+    },
+    {
+      "field": "has_sdk",
+      "text": "SoftBank Robotics states 'Pepper QiSDK [ Pepper SDK for Android ]' (http://doc.aldebaran.com/index.html)."
+    },
+    {
+      "field": "has_api",
+      "text": "SoftBank Robotics states 'NAOqi Python - API' (http://doc.aldebaran.com/2-5/dev/programming_index.html). NAOqi programming API documentation for SoftBank Robotics robots (NAOqi 2.5 doc set covering Pepper)."
+    },
+    {
+      "field": "ros_support",
+      "text": "SoftBank Robotics states 'It runs on a desktop and is able to communicate with all the Aldebaran robots.' (http://doc.aldebaran.com/2-5/dev/ros/index_ros.html). The NAOqi ROS documentation states the ROS driver works with all Aldebaran robots, Pepper included."
+    },
+    {
+      "field": "hand_dof",
+      "text": "Aldebaran/SoftBank Robotics Pepper joint list: 'LHand Left hand Open and Close' (one joint per hand) (http://doc.aldebaran.com/2-5/family/pepper_technical/joints_pep.html). DEC-07: standard hand, one actuated joint."
     }
   ]
 }

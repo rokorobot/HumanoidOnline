@@ -52,6 +52,8 @@ READINESS_KEYS = ("summary", "official_url", "images", "is_published")
 DATASHEET_KEYS = ("specs", "specs_note", "spec_caveats")
 DATASHEET_SPECS = {"height_cm": 132, "weight_kg": 36, "payload_kg": 3.0, "runtime_minutes": 150,
                    "degrees_of_freedom": 25}
+# owner statement in chat, 2026-10-24: "4NE1 Mini - mobility : Bipedal"
+OWNER_SPECS = {"mobility": "BIPEDAL"}
 
 
 def test_the_file_is_the_canonical_stub_plus_only_the_materialized_delta():
@@ -97,9 +99,10 @@ def test_the_file_still_asserts_identity_and_no_commercial_or_derived_fact():
     assert doc["is_published"] is True        # published by the owner decision of 2026-10-03
     assert doc["commercial_status"] == "UNKNOWN"           # asserts no maturity
     assert set(doc["specs"]) == set(ce.SPEC_FIELDS)         # the full field set
-    # only the five datasheet-stated values are known; everything else (hand_dof, manipulation,
-    # vision, ...) stays UNKNOWN
-    assert {k: v for k, v in doc["specs"].items() if v is not None} == DATASHEET_SPECS
+    # only the five datasheet-stated values and the owner-stated mobility are known; everything
+    # else (hand_dof, manipulation, vision, ...) stays UNKNOWN
+    assert {k: v for k, v in doc["specs"].items() if v is not None} == {**DATASHEET_SPECS,
+                                                                        **OWNER_SPECS}
     for scalar in ("model_code", "announced_year"):
         assert doc[scalar] is None, scalar
     assert doc["official_url"] == "https://neura-robotics.com/product/4ne1-mini-reservation"
@@ -120,7 +123,8 @@ def test_the_file_still_asserts_identity_and_no_commercial_or_derived_fact():
             and image["usage_basis"] == "OFFICIAL_MANUFACTURER_MEDIA")
     # publication does not imply maturity, and no unknown spec was filled
     assert doc["commercial_status"] == "UNKNOWN"
-    assert {k: v for k, v in doc["specs"].items() if v is not None} == DATASHEET_SPECS
+    assert {k: v for k, v in doc["specs"].items() if v is not None} == {**DATASHEET_SPECS,
+                                                                        **OWNER_SPECS}
     assert image["source_url"] == doc["official_url"]
     for collection in ("commercial_status_evidence", "deployments", "capabilities",
                        "use_case_fits"):
@@ -137,7 +141,7 @@ def test_the_datasheet_delta_is_exactly_what_the_sheet_states():
     # NOT mapped: the sheet does not say walking speed, hand DoF, manipulation, vision or UI
     for unmapped in ("walk_speed_ms", "hand_dof", "hand_type", "has_manipulation", "has_vision",
                      "has_language_ui", "has_sdk", "ros_support", "has_teleoperation",
-                     "battery_wh", "arm_span_cm", "reach_cm", "autonomy", "mobility"):
+                     "battery_wh", "arm_span_cm", "reach_cm", "autonomy"):
         assert specs[unmapped] is None, unmapped
     note = doc["specs_note"]
     assert "AGENT_ASSISTED_RESEARCH" in note and "not human-verified" in note.lower()
@@ -149,6 +153,9 @@ def test_the_datasheet_delta_is_exactly_what_the_sheet_states():
     assert "base unit only" in caveats["degrees_of_freedom"]
     assert "12 DoF" in caveats["degrees_of_freedom"]
     assert "per arm or in total" in caveats["payload_kg"]
+    # mobility is the owner's statement, not a datasheet value, and says so
+    assert specs["mobility"] == "BIPEDAL"
+    assert "Robert Konecny" in caveats["mobility"] and "2026-10-24" in caveats["mobility"]
     sheet = [x for x in doc["extended_specs"] if x.get("source_kind") == "MANUFACTURER_DOC"]
     assert {x["key"] for x in sheet} == {"max_speed", "operating_time", "motion_endurance",
                                          "safety_sensors"}
@@ -199,11 +206,12 @@ def _state(conn, robot_id, maker_id):
         "manufacturers": q("SELECT count(*) FROM manufacturer"),
         "same_name_or_slug": q("SELECT count(*) FROM robot WHERE name = %s OR slug = %s",
                                NAME, SLUG),
-        # everything but the identity/readiness metadata and the datasheet-stated values, which
-        # are asserted explicitly below ("datasheet" key)
+        # everything but the identity/readiness metadata, the datasheet-stated values and the
+        # owner-stated mobility, which are asserted explicitly below
         "robot": q("SELECT md5((to_jsonb(r) - 'updated_at' - 'summary' - 'official_url' "
                    "- 'search_vector' - 'height_cm' - 'weight_kg' - 'payload_kg' "
-                   "- 'runtime_minutes' - 'degrees_of_freedom' - 'spec_caveats')::text) "
+                   "- 'runtime_minutes' - 'degrees_of_freedom' - 'spec_caveats' "
+                   "- 'mobility')::text) "
                    "FROM robot r WHERE id = %s",
                    robot_id),
         "datasheet": conn.execute(
@@ -212,6 +220,7 @@ def _state(conn, robot_id, maker_id):
         "manufacturer": q("SELECT md5((to_jsonb(m) - 'updated_at')::text) "
                           "FROM manufacturer m WHERE id = %s", maker_id),
         "is_published": q("SELECT is_published FROM robot WHERE id = %s", robot_id),
+        "mobility": q("SELECT mobility::text FROM robot WHERE id = %s", robot_id),
         "evidence": conn.execute(
             "SELECT id, md5(e::text) FROM evidence_source e "
             "WHERE subject_type = 'ROBOT' AND subject_id = %s ORDER BY id", (robot_id,)
@@ -265,6 +274,7 @@ def test_the_stub_adopts_the_existing_database_robot(scratch_db):  # noqa: F811
         assert after["robot"] == before["robot"]                      # identical but updated_at
         assert tuple(float(x) for x in after["datasheet"]) == (132.0, 36.0, 3.0, 150.0, 25.0)
         assert all(x is None for x in before["datasheet"])            # nothing was there before
+        assert (before["mobility"], after["mobility"]) == (None, "BIPEDAL")   # owner-stated
         assert after["manufacturer"] == before["manufacturer"]
         assert after["is_published"] is False and before["is_published"] is False
         assert after["evidence"] == before["evidence"]                # id AND content intact

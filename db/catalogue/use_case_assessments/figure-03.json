@@ -1,0 +1,50 @@
+{
+  "robot_slug": "figure-03",
+  "assessed_on": "2026-10-24",
+  "assessed_by": "Claude (Opus 5.5) in a session initiated by Robert Konecny; owner rule HO-UC-01 catch-up. Not human-verified.",
+  "method": "Catch-up evaluation (HO-UC-01) against all categories in use_cases.json, from the manufacturer information and documented capabilities already recorded in robots/figure-03.json (commercial_status_evidence, specs_note, spec_caveats). Manufacturing assessed first. Figure 02's historical BMW performance claims are NOT transferred: Figure 03 is a separate successor record. Introducing-Figure-03 wording re-read 2026-10-24. Revised 2026-10-24: manufacturing scored after re-reading f-03-at-bmw in full.",
+  "categories": {
+    "manufacturing": {
+      "status": "FIT",
+      "sources": [
+        "https://www.figure.ai/news/f-03-at-bmw"
+      ],
+      "basis": "Figure documents the first demonstration of Figure 03 performing a parts-sequencing logistics workflow on the line at BMW Group Plant Spartanburg (factory intralogistics, inside this category's definition), under the robot's PILOT status. Scored 0.70 by owner decision 2026-10-24 (re-read of the full article; the earlier 'arrival only' basis was incomplete). No volumes, durations or success rates are stated."
+    },
+    "home": {
+      "status": "FIT",
+      "sources": [
+        "https://www.figure.ai/news/introducing-figure-03"
+      ],
+      "basis": "Figure states Figure 03 is designed for the home and describes home-specific design work (cluttered-space perception, battery safety in a home environment, washable soft goods). Fit on manufacturer design positioning only, score NULL, confidence LOW."
+    },
+    "warehouse-logistics": {
+      "status": "FIT",
+      "sources": [
+        "https://www.figure.ai/news/figure-signs-agreement-with-catalyst-brands",
+        "https://www.figure.ai/news/f-03-at-bmw"
+      ],
+      "basis": "Owner decision 2026-10-24 (previously UNSUPPORTED_POSSIBILITY). Figure's Catalyst Brands agreement covers deploying Figure humanoids in a distribution and logistics network, and Figure 03 is Figure's current generation; Figure 03 has demonstrated material movement in a logistics workflow at BMW. Score 0.50, confidence LOW: the agreement does not name Figure 03, and no warehouse deployment is recorded."
+    },
+    "retail-service": {
+      "status": "UNSUPPORTED_POSSIBILITY",
+      "basis": "Figure describes Figure 03 as suited to commercial environments (navigation, pick and place, fleet uniforms) but names no retail or service setting and records no such deployment."
+    },
+    "research-education": {
+      "status": "NO_BASIS",
+      "basis": "No developer edition, SDK, API or research/education programme is recorded for Figure 03 (has_sdk, has_api, developer_edition are NULL)."
+    },
+    "events-entertainment": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links Figure 03 to events or entertainment use."
+    },
+    "healthcare-rehabilitation": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links Figure 03 to healthcare or rehabilitation; no clinical validation or regulatory approval is recorded."
+    },
+    "security-inspection": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links Figure 03 to security or inspection use."
+    }
+  }
+}

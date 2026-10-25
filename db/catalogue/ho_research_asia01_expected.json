@@ -1,0 +1,617 @@
+{
+  "_comment": "HO-RESEARCH-ASIA-01 commercial-data batch (docs/audit/HO-RESEARCH-ASIA-01_ASIA_2026-10-24.md): expected business changes of a FULL `import_catalogue.py` run (no --only: a scoped run would not reparent the 50 Asia members) of this branch's catalogue JSON over production (= main d6a1b6e, which holds the executed NA-02 + AgiBot X2 import). ASIA region + 50 reparented members (49 UN M49 142 codes + TW; CY keeps parent EU); providers unitree-cn, gmo-air, switch-science, tent-pepper-rental (registration needs owner approval); Pepper variant for-home-2; Unitree China CN purchase offers + tax-inclusive CNY prices for G1 Basic, R1 and H2; GMO AI & Robotics JP quote offers for G1 Basic, G1 EDU Plus, R1, H2 and H2 EDU; Switch Science JP special-order offer + JPY price for Booster K1 Professional; Pepper for Home 2.0 JP rental offer + FROM JPY monthly price; UBTECH Walker S2 CN pilot deployment (Hitachi (China) Ltd.); 20 evidence rows. Written from the intended change set. NOT for import until the owner approves the batch.",
+  "expected": [
+    {
+      "table": "region",
+      "kind": "ADDED",
+      "match": {
+        "code": "ASIA"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "AE"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "AF"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "AM"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "AZ"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "BD"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "BH"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "BN"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "BT"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "CN"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "GE"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "HK"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "ID"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "IL"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "IN"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "IQ"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "IR"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "JO"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "JP"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "KG"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "KH"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "KP"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "KR"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "KW"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "KZ"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "LA"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "LB"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "LK"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "MM"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "MN"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "MO"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "MV"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "MY"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "NP"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "OM"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "PH"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "PK"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "PS"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "QA"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "SA"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "SG"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "SY"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "TH"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "TJ"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "TL"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "TM"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "TR"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "TW"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "UZ"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "VN"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "YE"
+      }
+    },
+    {
+      "table": "provider",
+      "kind": "ADDED",
+      "match": {
+        "slug": "unitree-cn"
+      }
+    },
+    {
+      "table": "provider",
+      "kind": "ADDED",
+      "match": {
+        "slug": "gmo-air"
+      }
+    },
+    {
+      "table": "provider",
+      "kind": "ADDED",
+      "match": {
+        "slug": "switch-science"
+      }
+    },
+    {
+      "table": "provider",
+      "kind": "ADDED",
+      "match": {
+        "slug": "tent-pepper-rental"
+      }
+    },
+    {
+      "table": "robot_variant",
+      "kind": "ADDED",
+      "match": {
+        "robot": "softbank-pepper",
+        "slug": "for-home-2"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "unitree-g1",
+        "provider": "unitree-cn"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "unitree-r1",
+        "provider": "unitree-cn"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "unitree-h2",
+        "provider": "unitree-cn"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "unitree-g1",
+        "provider": "gmo-air"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "unitree-g1-edu-plus-u2",
+        "provider": "gmo-air"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "unitree-r1",
+        "provider": "gmo-air"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "unitree-h2",
+        "provider": "gmo-air"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "unitree-h2-edu",
+        "provider": "gmo-air"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-professional",
+        "provider": "switch-science"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "softbank-pepper",
+        "provider": "tent-pepper-rental",
+        "transaction_type": "RENTAL"
+      }
+    },
+    {
+      "table": "pricing_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "unitree-g1",
+        "provider": "unitree-cn",
+        "price": 85000.0
+      }
+    },
+    {
+      "table": "pricing_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "unitree-r1",
+        "provider": "unitree-cn",
+        "price": 39900.0
+      }
+    },
+    {
+      "table": "pricing_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "unitree-h2",
+        "provider": "unitree-cn",
+        "price": 199000.0
+      }
+    },
+    {
+      "table": "pricing_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-professional",
+        "provider": "switch-science",
+        "price": 3148200.0
+      }
+    },
+    {
+      "table": "pricing_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "softbank-pepper",
+        "provider": "tent-pepper-rental",
+        "price": 43780.0
+      }
+    },
+    {
+      "table": "deployment",
+      "kind": "ADDED",
+      "match": {
+        "robot": "ubtech-walker-s2",
+        "customer_name": "Hitachi (China) Ltd."
+      }
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "source_url": "https://www.unitree.com/cn/g1/"
+      },
+      "count": 2
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "source_url": "https://www.unitree.com/cn/R1"
+      },
+      "count": 2
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "source_url": "https://www.unitree.com/cn/H2"
+      },
+      "count": 2
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "source_url": "https://www.unitree.com/cn/booking"
+      },
+      "count": 3
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "source_url": "https://english.beijing.gov.cn/consuminginbeijing/wheretobuy/firststores/updatesoffirststores/202605/t20260507_4639802.html"
+      }
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "source_url": "https://gmo-humanoid.shop/unitree/g1/"
+      },
+      "count": 2
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "source_url": "https://gmo-humanoid.shop/unitree/r1/"
+      }
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "source_url": "https://gmo-humanoid.shop/unitree/h2/"
+      },
+      "count": 2
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "source_url": "https://www.switch-science.com/products/10851"
+      },
+      "count": 2
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "source_url": "https://kauriru.com/pepper/items/12835"
+      },
+      "count": 2
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "source_url": "https://www.ubtrobot.com/en/about/news/826577556529221"
+      }
+    }
+  ]
+}

@@ -302,8 +302,12 @@ def test_the_catalogue_entry_is_identity_and_reference_only():
     # the owner-approved current-configuration slice (2026-10-03) and nothing else
     # + hand_dof = 21 PER HAND (owner decision A, same date); never a two-hand total
     assert (d["specs"]["degrees_of_freedom"], d["specs"]["hand_dof"]) == (76, 21)
+    # + mobility = BIPEDAL by owner statement (2026-10-24), attributed in its spec caveat
+    assert d["specs"]["mobility"] == "BIPEDAL"
+    [mobility] = d["spec_caveats"]
+    assert mobility["field"] == "mobility" and "Robert Konecny" in mobility["text"]
     assert all(v is None for k, v in d["specs"].items()
-               if k not in ("degrees_of_freedom", "hand_dof"))
+               if k not in ("degrees_of_freedom", "hand_dof", "mobility"))
     [compute] = d["extended_specs"]
     assert compute["key"] == "compute_ai" and compute["value"].startswith("three Turing AI chips")
     assert compute["source_kind"] == "MANUFACTURER" and "variant_slug" not in compute

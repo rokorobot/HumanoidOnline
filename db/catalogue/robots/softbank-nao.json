@@ -8,35 +8,103 @@
   "commercial_status": "UNKNOWN",
   "is_published": true,
   "specs": {
-    "height_cm": null,
-    "weight_kg": null,
+    "height_cm": 57.4,
+    "weight_kg": 5.48,
     "arm_span_cm": null,
     "reach_cm": null,
     "payload_kg": null,
     "walk_speed_ms": null,
-    "runtime_minutes": null,
-    "battery_wh": null,
-    "mobility": null,
-    "degrees_of_freedom": null,
+    "runtime_minutes": 60,
+    "battery_wh": 62.5,
+    "mobility": "BIPEDAL",
+    "degrees_of_freedom": 25,
     "hand_type": null,
-    "hand_dof": null,
+    "hand_dof": 1,
     "autonomy": null,
     "has_manipulation": null,
     "has_teleoperation": null,
-    "has_vision": null,
-    "has_language_ui": null,
-    "has_sdk": null,
-    "has_api": null,
-    "ros_support": null,
+    "has_vision": true,
+    "has_language_ui": true,
+    "has_sdk": true,
+    "has_api": true,
+    "ros_support": true,
     "developer_edition": null,
-    "simulation_support": null
+    "simulation_support": true
   },
-  "specs_note": "Specifications not yet verified.",
+  "specs_note": "Specifications not yet verified. SPECIFICATIONS (HO-DATA-30 batch 5, 2026-10-22): battery_wh, degrees_of_freedom, has_api, has_language_ui, has_sdk, has_vision, height_cm, mobility, ros_support, simulation_support, weight_kg filled from first-party SoftBank Robotics sources, each quoted in spec_caveats. Released by owner rulings recorded in the ratification package (DEC ids in spec_caveats). Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 mapping rules, docs/audit/HO-DATA-30_RATIFICATION_PACKAGE_2026-10-23.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://maxtronics.com/wp-content/uploads/nao-v6-datasheet-en-20260605-maxtronics_v5.pdf sha256 7328ed995d587ac9…; https://maxtronics.com/en/nao6/ sha256 6f7e747b7a451755…; https://maxtronics.com/en/nao-robot-user-guide/ sha256 33a4a1d082e56da4…; https://maxtronics.com/wp-content/uploads/nao6_userguide_en_maxtronic_web-1-1.pdf sha256 bbf8e8ec3fc22d75…; http://doc.aldebaran.com/2-5/dev/ros/index_ros.html sha256 59e1dfe8d094c42d…. Retrieved 2026-10-22/23 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. SPECIFICATIONS (HO-DATA-30 close-out batch 6, 2026-10-23): hand_dof, runtime_minutes under owner rulings already ratified on 2026-10-23 (see spec_caveats). RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — https://maxtronics.com/wp-content/uploads/nao-v6-datasheet-en-20260605-maxtronics_v5.pdf sha256 7328ed995d58…. Retrieved 2026-10-22/23 by Claude in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://www.softbankrobotics.com/",
   "commercial_status_evidence": [],
   "variants": [],
-  "pricing_offers": [],
-  "availability_offers": [],
+  "pricing_offers": [
+    {
+      "provider_slug": "robotlab",
+      "region_code": "US",
+      "transaction_type": "PURCHASE",
+      "price_type": "FROM",
+      "currency": "USD",
+      "price": 16990,
+      "billing_period": "ONE_TIME",
+      "price_basis": "NAO V6 Standard Edition purchase price as stated by RobotLAB ('Starting at'); taxes, shipping and services not stated",
+      "note": "FROM, not PUBLIC: the seller presents it as 'Starting at $16,990' while also stating 'Purchase Price $16,990' for the Standard Edition; the final price is by quote. Currency USD: US storefront with US sales and service.",
+      "evidence": [
+        {
+          "source_url": "https://www.robotlab.com/store/nao/",
+          "source_type": "OTHER",
+          "source_title": "NAO V6 Humanoid Robot — RobotLAB store page (US reseller and integrator)",
+          "excerpt": "Starting at $16,990 ... Purchase Price $16,990 ... RobotLAB sells the NAO V6 Standard Edition for $16,990",
+          "published_at": null,
+          "observed_at": "2026-10-23",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-23 by Claude Opus 5.5 (WebFetch; processed page text) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-NA-02 — Close North America Evidence Gaps' (2026-10-23), which names this exact URL. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party reseller and integrator, not the manufacturer; the page does not call RobotLAB authorized. Edition match: 'NAO V6 (NAO6) Standard Edition' is NAO6, which this record is (owner ruling DEC-04). The page's spec table names 'SoftBank Robotics / Aldebaran'; its product metadata lists 'Manufacturer: RobotLAB' (a conflict, not used); Maxtronics, the current NAO6 publisher, is not mentioned. Manufacturer of record is unchanged."
+        }
+      ]
+    }
+  ],
+  "availability_offers": [
+    {
+      "provider_slug": "robotlab",
+      "region_code": "US",
+      "transaction_type": "PURCHASE",
+      "availability_status": "ON_REQUEST",
+      "note": "Quote and demo request forms only (no cart): 'Get pricing & lead time'. US scope: 'US sales, setup & service' and 'Sold, deployed, and serviced nationwide by RobotLAB'. No stock or lead time stated.",
+      "evidence": [
+        {
+          "source_url": "https://www.robotlab.com/store/nao/",
+          "source_type": "OTHER",
+          "source_title": "NAO V6 Humanoid Robot — RobotLAB store page (US reseller and integrator)",
+          "excerpt": "RobotLAB sells the NAO V6 Standard Edition for $16,990 ... Get pricing & lead time ... US sales, setup & service",
+          "published_at": null,
+          "observed_at": "2026-10-23",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-23 by Claude Opus 5.5 (WebFetch; processed page text) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-NA-02 — Close North America Evidence Gaps' (2026-10-23), which names this exact URL. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party reseller and integrator, not the manufacturer; the page does not call RobotLAB authorized. Edition match: 'NAO V6 (NAO6) Standard Edition' is NAO6, which this record is (owner ruling DEC-04). The page's spec table names 'SoftBank Robotics / Aldebaran'; its product metadata lists 'Manufacturer: RobotLAB' (a conflict, not used); Maxtronics, the current NAO6 publisher, is not mentioned. Manufacturer of record is unchanged."
+        }
+      ],
+      "seller_wording": "Get pricing & lead time"
+    },
+    {
+      "provider_slug": "robotlab",
+      "region_code": "US",
+      "transaction_type": "LEASE",
+      "availability_status": "ON_REQUEST",
+      "note": "Lease through RobotLAB's Robot-as-a-Service leasing, by quote. No lease price is published.",
+      "evidence": [
+        {
+          "source_url": "https://www.robotlab.com/store/nao/",
+          "source_type": "OTHER",
+          "source_title": "NAO V6 Humanoid Robot — RobotLAB store page (US reseller and integrator)",
+          "excerpt": "Purchase · Lease ... RobotLAB also offers Robot-as-a-Service (RaaS) leasing and financing.",
+          "published_at": null,
+          "observed_at": "2026-10-23",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-23 by Claude Opus 5.5 (WebFetch; processed page text) in a session initiated by Robert Konecny, under owner work order 'HO-RESEARCH-NA-02 — Close North America Evidence Gaps' (2026-10-23), which names this exact URL. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Third-party reseller and integrator, not the manufacturer; the page does not call RobotLAB authorized. Edition match: 'NAO V6 (NAO6) Standard Edition' is NAO6, which this record is (owner ruling DEC-04). The page's spec table names 'SoftBank Robotics / Aldebaran'; its product metadata lists 'Manufacturer: RobotLAB' (a conflict, not used); Maxtronics, the current NAO6 publisher, is not mentioned. Manufacturer of record is unchanged."
+        }
+      ],
+      "seller_wording": "RobotLAB also offers Robot-as-a-Service (RaaS) leasing and financing."
+    }
+  ],
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [
@@ -74,6 +142,60 @@
       "attribution": "Wikimedia Commons / CC BY-SA",
       "last_verified_at": "2026-08-05T00:00:00+00:00",
       "identity_confirmed_by": "robert@humanoid.company"
+    }
+  ],
+  "spec_caveats": [
+    {
+      "field": "battery_wh",
+      "text": "Maxtronics (NAO6 publisher) states 'Lithium-Ion 21.6 V / 2.9 Ah 25.2 V 1.8 A 2.1 A / 2.0 A 62.5 Wh' (https://maxtronics.com/wp-content/uploads/nao-v6-datasheet-en-20260605-maxtronics_v5.pdf). DEC-04: NAO6 documentation published by Maxtronics (current NAO publisher, successor to Aldebaran/SoftBank Robotics); this record is NAO6 (owner ruling)."
+    },
+    {
+      "field": "degrees_of_freedom",
+      "text": "Maxtronics (NAO6 publisher) states 'Standing 58 cm tall with 25 degrees of freedom' (https://maxtronics.com/en/nao6/). DEC-04: NAO6 documentation published by Maxtronics (current NAO publisher, successor to Aldebaran/SoftBank Robotics); this record is NAO6 (owner ruling)."
+    },
+    {
+      "field": "has_api",
+      "text": "Maxtronics (NAO6 publisher) states 'Includes APIs and libraries (Python, C++)' (https://maxtronics.com/wp-content/uploads/nao-v6-datasheet-en-20260605-maxtronics_v5.pdf). DEC-04: NAO6 documentation published by Maxtronics (current NAO publisher, successor to Aldebaran/SoftBank Robotics); this record is NAO6 (owner ruling)."
+    },
+    {
+      "field": "has_language_ui",
+      "text": "Maxtronics (NAO6 publisher) states 'When NAO is chatting with a human' (https://maxtronics.com/en/nao-robot-user-guide/). DEC-04: NAO6 documentation published by Maxtronics (current NAO publisher, successor to Aldebaran/SoftBank Robotics); this record is NAO6 (owner ruling)."
+    },
+    {
+      "field": "has_sdk",
+      "text": "Maxtronics (NAO6 publisher) states 'Software development kit for creating and controlling applications on NAO.' (https://maxtronics.com/wp-content/uploads/nao-v6-datasheet-en-20260605-maxtronics_v5.pdf). DEC-04: NAO6 documentation published by Maxtronics (current NAO publisher, successor to Aldebaran/SoftBank Robotics); this record is NAO6 (owner ruling)."
+    },
+    {
+      "field": "has_vision",
+      "text": "Maxtronics (NAO6 publisher) states '2D CAMERAS' (https://maxtronics.com/wp-content/uploads/nao-v6-datasheet-en-20260605-maxtronics_v5.pdf). DEC-04: NAO6 documentation published by Maxtronics (current NAO publisher, successor to Aldebaran/SoftBank Robotics); this record is NAO6 (owner ruling)."
+    },
+    {
+      "field": "height_cm",
+      "text": "Maxtronics (NAO6 publisher) states '574x311x275 mm / 22.6x12.2x10.8 in' (https://maxtronics.com/wp-content/uploads/nao-v6-datasheet-en-20260605-maxtronics_v5.pdf). DEC-04: NAO6 datasheet (Maxtronics), size 574 × 311 × 275 mm (H×D×W); 574 mm = 57.4 cm. This record is NAO6 (owner ruling)."
+    },
+    {
+      "field": "mobility",
+      "text": "Maxtronics (NAO6 publisher) states 'avoid carrying and touching the robot when it is moving, walking' (https://maxtronics.com/wp-content/uploads/nao6_userguide_en_maxtronic_web-1-1.pdf). DEC-04: NAO6 documentation published by Maxtronics (current NAO publisher, successor to Aldebaran/SoftBank Robotics); this record is NAO6 (owner ruling)."
+    },
+    {
+      "field": "ros_support",
+      "text": "Aldebaran's NAOqi documentation states 'It runs on a desktop and is able to communicate with all the Aldebaran robots.' (http://doc.aldebaran.com/2-5/dev/ros/index_ros.html). DEC-04: the NAOqi ROS documentation states the driver works with all Aldebaran robots; this record is NAO6 (owner ruling)."
+    },
+    {
+      "field": "simulation_support",
+      "text": "Maxtronics (NAO6 publisher) states 'visual programming tools, simulation environment, and development documentation' (https://maxtronics.com/wp-content/uploads/nao-v6-datasheet-en-20260605-maxtronics_v5.pdf). DEC-04: NAO6 documentation published by Maxtronics (current NAO publisher, successor to Aldebaran/SoftBank Robotics); this record is NAO6 (owner ruling)."
+    },
+    {
+      "field": "weight_kg",
+      "text": "Maxtronics (NAO6 publisher) states '5.48 kg / 12.08 lbs' (https://maxtronics.com/wp-content/uploads/nao-v6-datasheet-en-20260605-maxtronics_v5.pdf). DEC-04: NAO6 documentation published by Maxtronics (current NAO publisher, successor to Aldebaran/SoftBank Robotics); this record is NAO6 (owner ruling)."
+    },
+    {
+      "field": "hand_dof",
+      "text": "Maxtronics (NAO6 publisher) datasheet DoF table: Head 2, Arm 5 (in each), Pelvis 1, Leg 5 (in each), Hand 1 (in each) — consistent with the stated total of 25 (https://maxtronics.com/wp-content/uploads/nao-v6-datasheet-en-20260605-maxtronics_v5.pdf). DEC-04 + DEC-07 (standard end effector)."
+    },
+    {
+      "field": "runtime_minutes",
+      "text": "Maxtronics (NAO6 publisher) datasheet: '60 min (Active use) 90 min (Normal use)' (https://maxtronics.com/wp-content/uploads/nao-v6-datasheet-en-20260605-maxtronics_v5.pdf). DEC-11/D9: the active-use figure is recorded; 90 min normal use stays in this caveat."
     }
   ]
 }

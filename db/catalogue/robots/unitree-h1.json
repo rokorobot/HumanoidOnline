@@ -22,16 +22,16 @@
     "hand_dof": null,
     "autonomy": null,
     "has_manipulation": true,
-    "has_teleoperation": null,
+    "has_teleoperation": true,
     "has_vision": true,
     "has_language_ui": null,
     "has_sdk": true,
-    "has_api": null,
+    "has_api": true,
     "ros_support": true,
     "developer_edition": null,
     "simulation_support": true
   },
-  "specs_note": "height (~180 cm), weight (~47 kg), max moving speed 3.3 m/s, battery 864 Wh from the official spec page https://www.unitree.com/h1/ (observed 2026-07-24). A single total DoF figure is not stated there (page lists per-limb DoF only) -> degrees_of_freedom left NULL rather than inferred.",
+  "specs_note": "height (~180 cm), weight (~47 kg), max moving speed 3.3 m/s, battery 864 Wh from the official spec page https://www.unitree.com/h1/ (observed 2026-07-24). A single total DoF figure is not stated there (page lists per-limb DoF only) -> degrees_of_freedom left NULL rather than inferred. SPECIFICATIONS (HO-DATA-30 batch 4, 2026-10-22): has_api, has_teleoperation filled from first-party Unitree sources, each quoted in spec_caveats. Capability booleans are set only where the manufacturer states the capability in words (HO-DATA-30 mapping rules, docs/audit/HO-DATA-30_PHASE2_2026-10-23.md); a negative only where it is stated in words. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — raw bodies: https://doc-cdn.unitree.com/10/171/en/10_171_en sha256 65ae6d62ba922d0c…; https://raw.githubusercontent.com/unitreerobotics/kinect_teleoperate/main/README.md sha256 456a230b2b92f1dc…. Retrieved 2026-10-22/23 by Claude (Opus 5.5 orchestrating Sonnet research agents; every value re-checked against the saved raw body) in a session initiated by Robert Konecny, under research work order 'HO-DATA-STANDING 2026-10-22' (docs/26 §2.1; docs/decisions/DR-D1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "commercial_status_evidence": [
     {
       "source_url": "https://shop.unitree.com/products/unitree-h1",
@@ -153,6 +153,16 @@
       "is_primary": true,
       "attribution": "© Unitree Robotics",
       "last_verified_at": "2026-07-25T00:00:00Z"
+    }
+  ],
+  "spec_caveats": [
+    {
+      "field": "has_api",
+      "text": "Unitree states 'API call | Similar to restapi, fill in the request content and request topic when sending the request | unitree_sdk2' (https://doc-cdn.unitree.com/10/171/en/10_171_en)."
+    },
+    {
+      "field": "has_teleoperation",
+      "text": "Unitree states 'This repository implements teleoperation of the humanoid robot Unitree H1 using Azure Kinect DK camera.' (https://raw.githubusercontent.com/unitreerobotics/kinect_teleoperate/main/README.md)."
     }
   ]
 }

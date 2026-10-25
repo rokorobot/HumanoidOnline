@@ -29,9 +29,9 @@
     "has_api": null,
     "ros_support": null,
     "developer_edition": null,
-    "simulation_support": null
+    "simulation_support": true
   },
-  "specs_note": "Specifications not yet verified.",
+  "specs_note": "Selected specifications retrieved from first-party manufacturer documentation on 2026-10-25 under HO-DATA-STANDING 2026-10-22. Evidence status: AGENT_ASSISTED_RESEARCH; not human-verified. Remaining specifications are unknown unless separately documented. SPECIFICATIONS (HO-DATA-STANDING 2026-10-22, 2026-10-25): simulation support from Fourier (FFTAI) official Wiki-GRx-Models repository README (GR-1 = GR1T1; GR1T1 URDF models; Isaac Sim / Isaac Gym support) https://raw.githubusercontent.com/FFTAI/Wiki-GRx-Models/master/README.md (sha256 a6a799c046f97e77…). RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-25 by Claude (Sonnet research agent; re-verified by orchestrator) (curl) in a session initiated by Robert Konecny for HO-DATA-32 unpublished-record research 2026-10-25, under research work order HO-DATA-STANDING 2026-10-22 (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://www.fourierintelligence.com/",
   "commercial_status_evidence": [],
   "variants": [],
@@ -40,5 +40,11 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": []
+  "images": [],
+  "spec_caveats": [
+    {
+      "field": "simulation_support",
+      "text": "Fourier (FFTAI) official Wiki-GRx-Models repository README (GR-1 = GR1T1; GR1T1 URDF models; Isaac Sim / Isaac Gym support) states 'resources to simulate and develop with the GRx robot'; evidence AGENT_ASSISTED_RESEARCH, not human-verified."
+    }
+  ]
 }

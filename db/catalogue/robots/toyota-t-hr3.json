@@ -8,7 +8,7 @@
   "commercial_status": "UNKNOWN",
   "is_published": false,
   "specs": {
-    "height_cm": null,
+    "height_cm": 154.0,
     "weight_kg": null,
     "arm_span_cm": null,
     "reach_cm": null,
@@ -22,7 +22,7 @@
     "hand_dof": null,
     "autonomy": null,
     "has_manipulation": null,
-    "has_teleoperation": null,
+    "has_teleoperation": true,
     "has_vision": null,
     "has_language_ui": null,
     "has_sdk": null,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Specifications not yet verified.",
+  "specs_note": "Selected specifications retrieved from first-party manufacturer documentation on 2026-10-25 under HO-DATA-STANDING 2026-10-22. Evidence status: AGENT_ASSISTED_RESEARCH; not human-verified. Remaining specifications are unknown unless separately documented. SPECIFICATIONS (HO-DATA-STANDING 2026-10-22, 2026-10-25): teleoperation, height from Toyota T-HR3 announcement (global.toyota, November 2017) https://global.toyota/en/detail/19666346 (sha256 49b3b5249f143a5a…). RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-25 by Claude (Sonnet research agent; re-verified by orchestrator) (curl) in a session initiated by Robert Konecny for HO-DATA-32 unpublished-record research 2026-10-25, under research work order HO-DATA-STANDING 2026-10-22 (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://global.toyota/",
   "commercial_status_evidence": [],
   "variants": [],
@@ -40,5 +40,15 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": []
+  "images": [],
+  "spec_caveats": [
+    {
+      "field": "has_teleoperation",
+      "text": "Toyota T-HR3 announcement (global.toyota, November 2017) states 'T-HR3 is controlled from a Master Maneuvering System'; evidence AGENT_ASSISTED_RESEARCH, not human-verified."
+    },
+    {
+      "field": "height_cm",
+      "text": "Toyota T-HR3 announcement (global.toyota, November 2017) states 'H: 1540 mm'; 154.0 cm is a unit conversion; evidence AGENT_ASSISTED_RESEARCH, not human-verified."
+    }
+  ]
 }

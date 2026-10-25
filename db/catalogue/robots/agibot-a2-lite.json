@@ -8,13 +8,13 @@
   "commercial_status": "UNKNOWN",
   "is_published": false,
   "specs": {
-    "height_cm": null,
-    "weight_kg": null,
+    "height_cm": 169.0,
+    "weight_kg": 63.0,
     "arm_span_cm": null,
     "reach_cm": null,
     "payload_kg": null,
     "walk_speed_ms": null,
-    "runtime_minutes": null,
+    "runtime_minutes": 90,
     "battery_wh": null,
     "mobility": null,
     "degrees_of_freedom": null,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Specifications not yet verified.",
+  "specs_note": "Selected specifications retrieved from first-party manufacturer documentation on 2026-10-25 under HO-DATA-STANDING 2026-10-22. Evidence status: AGENT_ASSISTED_RESEARCH; not human-verified. Remaining specifications are unknown unless separately documented. SPECIFICATIONS (HO-DATA-STANDING 2026-10-22, 2026-10-25): height, runtime, weight from AgiBot A2 Lite product page (store.agibot.com) https://store.agibot.com/products/a2-lite (sha256 884b566ef485f1d3…). RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-25 by Claude (Sonnet research agent; re-verified by orchestrator) (curl) in a session initiated by Robert Konecny for HO-DATA-32 unpublished-record research 2026-10-25, under research work order HO-DATA-STANDING 2026-10-22 (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://store.agibot.com/products/a2-lite",
   "commercial_status_evidence": [],
   "variants": [],
@@ -40,5 +40,19 @@
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [],
-  "images": []
+  "images": [],
+  "spec_caveats": [
+    {
+      "field": "height_cm",
+      "text": "AgiBot A2 Lite product page (store.agibot.com) states 'AGIBOT A2 Lite Height 169cm'; evidence AGENT_ASSISTED_RESEARCH, not human-verified."
+    },
+    {
+      "field": "runtime_minutes",
+      "text": "AgiBot A2 Lite product page (store.agibot.com) states 'Endurance standing: 4h35min ,Walking: 1.5h'; 90 min is a unit conversion; stated measurement condition: Walking (standing: 4h35min; DEC-11 walking-mode figure); evidence AGENT_ASSISTED_RESEARCH, not human-verified."
+    },
+    {
+      "field": "weight_kg",
+      "text": "AgiBot A2 Lite product page (store.agibot.com) states 'Net Weight ≈63kg'; the figure is stated as approximate; evidence AGENT_ASSISTED_RESEARCH, not human-verified."
+    }
+  ]
 }

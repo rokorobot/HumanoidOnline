@@ -251,8 +251,9 @@ already-collected research records:
   on multi-edition robots, missing provenance and non-manufacturer sources need review; price,
   availability and other restricted words are RESTRICTED; UNKNOWN is refused.
 - **Owner rulings** (each a review reason, never routine, when unmet): DEC-09 battery only in
-  Wh/kWh (Ah/V have no exact conversion); DEC-10 `arm_span_cm` needs "arm span"/"wingspan" and
-  `reach_cm` needs "reach" without "workspace" in the verbatim label; DEC-07 `hand_dof` needs
+  Wh/kWh (Ah/V have no exact conversion); DEC-10 `arm_span_cm` and `reach_cm` are always review
+  (literal "Arm Span"/"Arm Reach" labels were closed by the owner when the figure was not a
+  fingertip span or shoulder-to-tip reach); DEC-07 `hand_dof` needs
   the record key `"end_effector": "STANDARD"`; DEC-02 `developer_edition` is always review;
   DEC-08 `has_language_ui` needs `"spoken_conversation": true`. A flag item needs `"asserts":
   true` and proposes only `true`; `"asserts": false` or a stated negative is never written
@@ -275,6 +276,43 @@ already-collected research records:
 - **Execution:** `promotion execute` refuses version 2. After the owner's approval of the exact
   PR, the operator runs the scoped `db/import_catalogue.py --only` import on a rehearsal branch
   and then production, gated by `db/import_preflight.py` with the derived manifest (as PR #191).
+
+### 7.1 Operator runbook (version 2, after the owner's approval of the exact PR)
+
+The approval is recorded on the PR before merge (DR-D1 §2.3). It covers every step below. Any
+unexpected change or failed gate STOPS the run, and a changed batch needs a new approval.
+`<slugs>` is `--only a --only b …` for the manifest's robots, and `$M` is the manifest path.
+
+1. **Prepare (before approval).** `promotion propose --research <package> --edition-map
+   SLUG=EDITION … --promotion-id <id>` writes the manifest and the catalogue edit. Then run
+   `promotion verify --manifest $M --base-ref origin/main` (VERIFY OK) and
+   `promotion render --manifest $M --preflight > expected.json`.
+2. **Local rehearsal (before approval).** Use a disposable database loaded with base main's
+   full catalogue (`bootstrap.py`, then `import_catalogue.py`). Copy it, run
+   `import_catalogue.py <slugs>` from the head, and expect:
+   - `import_preflight.py --before BASE --after COPY --manifest expected.json` PASS;
+   - `import_identity_check.py` PASS (TOUCHED = only the manifest's robots);
+   - a column diff of exactly the manifest's cells;
+   - a second import that is a no-op (`import_preflight.py` with `{"expected": []}`).
+3. **Merge** with `gh pr merge --match-head-commit <approved head>`, and check that the merge
+   tree equals the head.
+4. **Neon.** From production, create:
+   - a safety branch `pre-<id>-<yyyymmdd>`, RETAINED;
+   - a rehearsal branch, deleted after use.
+
+   Use connection URLs for the catalogue owner role (`neonctl connection-string … --role-name
+   neondb_owner`). Never print them.
+5. **Production-copy rehearsal.** Repeat step 2 from a worktree at the merge commit with
+   BEFORE = safety branch and AFTER = rehearsal branch.
+6. **Drift check.** Run `import_preflight.py --before SAFETY --after PRODUCTION` with
+   `{"expected": []}`. It must show 0 business changes.
+7. **Production import.** Run `import_catalogue.py <slugs>` against production. Then re-run
+   the step 2 gates with BEFORE = safety branch and AFTER = production.
+8. **Verify and report.**
+   - Published robots: the API serves each value (`/api/robots/<slug>`), and the page cache
+     lags up to 5 minutes. Unpublished robots: run a read-only SQL check.
+   - Post a receipt on the PR: changes, gates, and the safety branch id.
+   - Measure completeness again over published robots × 22 core fields.
 
 **Open (separate decisions):** executor support for core columns (column-scoped UPDATE grant,
 post-state check, D5); G2 claim policies for the six columns so G5 Lane B accepted claims can

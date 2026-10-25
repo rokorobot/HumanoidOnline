@@ -17,8 +17,9 @@ Scope, deliberately small:
   developer_edition. mobility, hand_type and autonomy stay out. A known value is a change
   (REVIEW_REQUIRED); the same value is refused; UNKNOWN stays UNKNOWN (AGENTS.md rule 6).
 * Owner rulings, each a REVIEW_REQUIRED reason (never ROUTINE) when not met: DEC-09 battery is
-  routine only in Wh or kWh (Ah / V have no exact conversion); DEC-10 arm_span_cm needs "arm
-  span" or "wingspan" in the verbatim label, reach_cm needs "reach" and not "workspace"; DEC-07
+  routine only in Wh or kWh (Ah / V have no exact conversion); DEC-10 arm_span_cm and reach_cm
+  are always review (the owner closed even literal "Arm Span" / "Arm Reach" labels whose figure
+  is not a fingertip span or shoulder-to-tip reach, so no label check is enough); DEC-07
   hand_dof needs the record key "end_effector": "STANDARD"; DEC-02 developer_edition is always
   review (the owner judges the manufacturer's own wording); DEC-08 has_language_ui needs the
   record key "spoken_conversation": true.
@@ -269,13 +270,9 @@ def check_boolean(record: dict, field: str) -> tuple[bool | None, list[str]]:
 
 def check_rulings(record: dict, field: str) -> list[str]:
     """Owner rulings for numeric columns whose label or context decides what they mean."""
-    label = str(record.get("verbatim") or "").lower()
-    if field == "arm_span_cm" and "arm span" not in label and "wingspan" not in label:
-        return ["DEC-10: arm_span_cm is routine only when the verbatim label says 'arm span' "
-                "or 'wingspan'"]
-    if field == "reach_cm" and ("reach" not in label or "workspace" in label):
-        return ["DEC-10: reach_cm is routine only when the verbatim label says 'reach' and "
-                "not 'workspace'"]
+    if field in ("arm_span_cm", "reach_cm"):
+        return [f"DEC-10: {field} is always the owner's judgement (fingertip span / "
+                "shoulder-to-tip reach); a label alone does not establish it"]
     if field == "hand_dof" and record.get("end_effector") != "STANDARD":
         return ['DEC-07: hand_dof is routine only with "end_effector": "STANDARD"']
     if field == "battery_wh" and (record.get("stated_unit") or None) not in \

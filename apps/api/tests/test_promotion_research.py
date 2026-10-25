@@ -424,29 +424,25 @@ def test_battery_not_in_wh_or_kwh_has_no_exact_conversion(catalogue, unit, verba
     assert any("DEC-09" in r for r in item["reasons"]), item["reasons"]
 
 
-@pytest.mark.parametrize("field, verbatim, ok", [
-    ("arm_span_cm", "Arm span: 180 cm", True),
-    ("arm_span_cm", "Wingspan 180 cm", True),
-    ("arm_span_cm", "ARM SPAN 180 cm", True),
-    ("arm_span_cm", "Width 180 cm", False),
-    ("arm_span_cm", "Reach 180 cm", False),
-    ("reach_cm", "Arm reach: 180 cm", True),
-    ("reach_cm", "REACH 180 cm", True),
-    ("reach_cm", "Workspace reach 180 cm", False),
-    ("reach_cm", "Arm length 180 cm", False),
+@pytest.mark.parametrize("field, verbatim", [
+    # the owner closed literal "Arm Span" / "Arm Reach" labels (HO-DATA-30 close-out: Unitree
+    # "Arm Span | About 0.45M", GR-2 "Arm Reach 1520 mm"), so no label is ever routine
+    ("arm_span_cm", "Arm span: 180 cm"),
+    ("arm_span_cm", "Wingspan 180 cm"),
+    ("arm_span_cm", "Width 180 cm"),
+    ("reach_cm", "Arm reach: 180 cm"),
+    ("reach_cm", "Workspace reach 180 cm"),
+    ("reach_cm", "Arm length 180 cm"),
 ])
-def test_dec_10_span_and_reach_depend_on_the_verbatim_label(catalogue, field, verbatim, ok):
+def test_dec_10_span_and_reach_are_always_review(catalogue, field, verbatim):
     item = only(propose([numeric(field, "180", "cm", verbatim)], catalogue))
-    if ok:
-        assert item["classification"] == pm.ROUTINE, item["reasons"]
-        assert item["proposed_value"] == 180.0 and item["unit"] == "cm"
-    else:
-        assert item["classification"] == pm.REVIEW_REQUIRED
-        assert any("DEC-10" in r for r in item["reasons"]), item["reasons"]
+    assert item["classification"] == pm.REVIEW_REQUIRED
+    assert any("DEC-10" in r for r in item["reasons"]), item["reasons"]
+    assert item["proposed_value"] == 180.0 and item["unit"] == "cm"
     item = only(propose([numeric(field, "1.8", "m", verbatim.replace("180 cm", "1.8 m"))],
                         catalogue))
-    assert (item["proposed_value"], item["conversion"]) == (
-        180.0, "1.8 m = 180.0 cm") and (item["classification"] == pm.ROUTINE) == ok
+    assert (item["proposed_value"], item["conversion"]) == (180.0, "1.8 m = 180.0 cm")
+    assert item["classification"] == pm.REVIEW_REQUIRED
 
 
 def test_dec_07_hand_dof_needs_a_standard_end_effector(catalogue):

@@ -251,8 +251,9 @@ already-collected research records:
   on multi-edition robots, missing provenance and non-manufacturer sources need review; price,
   availability and other restricted words are RESTRICTED; UNKNOWN is refused.
 - **Owner rulings** (each a review reason, never routine, when unmet): DEC-09 battery only in
-  Wh/kWh (Ah/V have no exact conversion); DEC-10 `arm_span_cm` needs "arm span"/"wingspan" and
-  `reach_cm` needs "reach" without "workspace" in the verbatim label; DEC-07 `hand_dof` needs
+  Wh/kWh (Ah/V have no exact conversion); DEC-10 `arm_span_cm` and `reach_cm` are always review
+  (literal "Arm Span"/"Arm Reach" labels were closed by the owner when the figure was not a
+  fingertip span or shoulder-to-tip reach); DEC-07 `hand_dof` needs
   the record key `"end_effector": "STANDARD"`; DEC-02 `developer_edition` is always review;
   DEC-08 `has_language_ui` needs `"spoken_conversation": true`. A flag item needs `"asserts":
   true` and proposes only `true`; `"asserts": false` or a stated negative is never written

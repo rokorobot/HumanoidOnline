@@ -14,7 +14,7 @@
     "reach_cm": null,
     "payload_kg": null,
     "walk_speed_ms": null,
-    "runtime_minutes": null,
+    "runtime_minutes": 120,
     "battery_wh": 500.0,
     "mobility": "BIPEDAL",
     "degrees_of_freedom": 30,
@@ -23,7 +23,7 @@
     "autonomy": null,
     "has_manipulation": null,
     "has_teleoperation": null,
-    "has_vision": null,
+    "has_vision": true,
     "has_language_ui": null,
     "has_sdk": null,
     "has_api": null,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "UNPUBLISHED CATALOGUE ENTRY, prepared from the A4 identity draft on owner approval (2026-10-21); import and publication remain separate owner decisions. RETRIEVAL: AUTOMATED discovery observation 2026-10-18 by an owner-authorized (docs/28 A4) source; values verbatim from https://www.agibot.com/products/X2 as stored in production candidate_claim rows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Identity candidate: the ORIGINAL AGIBOT X2 generation, edition 'X2 Ultra', exactly as presented on agibot.com/products/X2 on 2026-10-18 (that page lists two editions of this generation, 'X2' and 'X2 Ultra'). Any later or revised X2 generation is a separate identity and is not covered by this record. Not merged with AGIBOT A2 Lite / A2 Ultra.",
+  "specs_note": "UNPUBLISHED CATALOGUE ENTRY, prepared from the A4 identity draft on owner approval (2026-10-21); import and publication remain separate owner decisions. RETRIEVAL: AUTOMATED discovery observation 2026-10-18 by an owner-authorized (docs/28 A4) source; values verbatim from https://www.agibot.com/products/X2 as stored in production candidate_claim rows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Identity candidate: the ORIGINAL AGIBOT X2 generation, edition 'X2 Ultra', exactly as presented on agibot.com/products/X2 on 2026-10-18 (that page lists two editions of this generation, 'X2' and 'X2 Ultra'). Any later or revised X2 generation is a separate identity and is not covered by this record. Not merged with AGIBOT A2 Lite / A2 Ultra. SPECIFICATIONS (HO-DATA-STANDING 2026-10-22, 2026-10-25): vision, runtime from AgiBot X2 product page https://www.agibot.com/products/X2 (sha256 96d0c53acd6c5ff4…). RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-10-25 by Claude (Opus 5.5, orchestrator) (curl) in a session initiated by Robert Konecny for HO-DATA-32 AgiBot X2 enrichment 2026-10-25, under research work order HO-DATA-STANDING 2026-10-22 (docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://www.agibot.com/products/X2",
   "commercial_status_evidence": [],
   "variants": [],
@@ -131,6 +131,14 @@
     {
       "field": "payload_kg",
       "text": "Left UNKNOWN: AgiBot states 'Max (in specific postures): 3kg Excluding end effector Across full range: ≤1kg Excluding end effector' (posture-dependent)."
+    },
+    {
+      "field": "has_vision",
+      "text": "AgiBot X2 product page states 'X2 Ultra is equipped with LiDAR and RGB-D cameras, enabling precise environmental perception'; evidence AGENT_ASSISTED_RESEARCH, not human-verified."
+    },
+    {
+      "field": "runtime_minutes",
+      "text": "AgiBot X2 product page states 'Operating Time | At 0.5 m/s walking | Approx. 2 hours'; the figure is stated as approximate; 120 min is a unit conversion; stated measurement condition: At 0.5 m/s walking; evidence AGENT_ASSISTED_RESEARCH, not human-verified."
     }
   ]
 }

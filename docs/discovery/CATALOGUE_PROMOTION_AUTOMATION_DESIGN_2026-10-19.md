@@ -228,3 +228,54 @@ writers is a follow-up.
    should be enforced.
 5. Optional migration, a durable `catalogue_promotion_receipt` table. v1 does not need it,
    because step 4 makes re-application idempotent from the data itself.
+
+## 7. Manifest version 2: core robot columns from agent-assisted research (HO-DATA FL-1, 2026-10-22)
+
+**Status: proposal path only. Not executable by `promotion execute`.**
+
+Version 1 promotes DATA-D1 `candidate_claim` rows into `extended_specs` only. Agent-assisted
+research (docs/26 A3; batches such as HO-DATA-02B) produces no `candidate_claim`, and the six
+core columns are `robot` columns: `height_cm`, `weight_kg`, `payload_kg`, `walk_speed_ms`,
+`runtime_minutes`, `degrees_of_freedom`, `battery_wh` (Wh), `hand_dof`, `arm_span_cm`, `reach_cm`,
+and the flags `has_vision`, `has_sdk`, `has_api`, `ros_support`, `simulation_support`,
+`has_language_ui`, `has_manipulation`, `has_teleoperation`, `developer_edition` (`mobility`,
+`hand_type` and `autonomy` stay out). `promotion propose --research <evidence package>`
+(`apps/api/app/services/discovery/promotion_research.py`) builds a version-2 manifest from
+already-collected research records:
+
+- **Routine** only for NULL -> value on an existing robot, an explicit edition mapping, a
+  verbatim label that is part of the excerpt, a direct statement or an exact unit conversion at
+  the column's precision, no qualifier other than "approximately", and a stated (or explicitly
+  `NOT_STATED`) measurement condition for speed and runtime. Known values, existing caveats,
+  disagreeing statements, ranges, rounding, per-arm/up-to/peak qualifiers, edition-scoped values
+  on multi-edition robots, missing provenance and non-manufacturer sources need review; price,
+  availability and other restricted words are RESTRICTED; UNKNOWN is refused.
+- **Owner rulings** (each a review reason, never routine, when unmet): DEC-09 battery only in
+  Wh/kWh (Ah/V have no exact conversion); DEC-10 `arm_span_cm` needs "arm span"/"wingspan" and
+  `reach_cm` needs "reach" without "workspace" in the verbatim label; DEC-07 `hand_dof` needs
+  the record key `"end_effector": "STANDARD"`; DEC-02 `developer_edition` is always review;
+  DEC-08 `has_language_ui` needs `"spoken_conversation": true`. A flag item needs `"asserts":
+  true` and proposes only `true`; `"asserts": false` or a stated negative is never written
+  (review, no proposed value: the DR-G4 §4.3 negative chain); an existing `true` is refused as
+  already present and an existing `false` is a change for review, never overwritten.
+- **Edit:** text-level, three touches per robot: the `specs.<field>: null` line, appended
+  `spec_caveats` (verbatim label, conversion, qualifier, condition), and the docs/26 §3.1
+  provenance statement appended to `specs_note`. The exact sentence "Specifications not yet
+  verified." is replaced by the owner-approved evidence-status wording of PR #191; any other
+  note wording is kept and, where it may contradict the new value, listed as a non-blocking
+  review note.
+- **Provenance:** every item carries URL, excerpt, verbatim label, retrieval date, actor, tool,
+  initiator, work order, scope and content sha256, and stays `AGENT_ASSISTED_RESEARCH` /
+  `NOT_HUMAN_VERIFIED`. When a `fetched_page` with the same content hash exists (for example a
+  manual capture), its id is bound; otherwise the observation is `EVIDENCE_PACKAGE`.
+- **Gates:** CI `promotion verify` checks the digest, the version-2 scope (`allowed_tables ==
+  ['robot']`, core columns only, research provenance) and that head == base + the edit.
+  `promotion render --preflight` prints the derived expected-change manifest (one `robot
+  CHANGED` per robot) for `db/import_preflight.py`.
+- **Execution:** `promotion execute` refuses version 2. After the owner's approval of the exact
+  PR, the operator runs the scoped `db/import_catalogue.py --only` import on a rehearsal branch
+  and then production, gated by `db/import_preflight.py` with the derived manifest (as PR #191).
+
+**Open (separate decisions):** executor support for core columns (column-scoped UPDATE grant,
+post-state check, D5); G2 claim policies for the six columns so G5 Lane B accepted claims can
+feed this path (DR-A5 §8 registry); mapping DATA-D1 `candidate_claim` field keys to core columns.

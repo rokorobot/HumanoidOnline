@@ -788,6 +788,13 @@ def execute(manifest: dict, *, commit: str, production: Production, branches: Br
         problems = pm.manifest_problems(manifest)
         if problems:
             raise Refused("manifest", "; ".join(problems))
+        # Only version 1 (additions to `specification`) is executable: the role, the post-state
+        # check and the public verification cover nothing else. A version-2 manifest (core
+        # robot columns) is applied by the operator's scoped import after the owner's approval.
+        if manifest.get("manifest_version") != 1 or any(
+                i.get("table", "specification") != "specification" for i in manifest["items"]):
+            raise Refused("manifest", "only version-1 specification additions are executable; "
+                                      "core robot columns are not activated for the executor")
         # Public compare verification needs a published peer: found now, never after a write.
         # (only where the compare surface supports the field; the rest are NOT_APPLICABLE).
         applicability = {f"{i.get('robot')}:{i.get('definition')}": compare_applicability(i)

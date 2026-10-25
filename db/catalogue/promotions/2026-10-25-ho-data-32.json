@@ -1,0 +1,608 @@
+{
+  "manifest_version": 2,
+  "promotion_id": "2026-10-25-ho-data-32",
+  "base": {
+    "catalogue_commit": "03ef40b18d1111e7a153f9146f45e1c449ed66a5",
+    "robot_fingerprints": {
+      "agibot-a2-lite": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "agibot-x2": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "agibot-x2-ultra": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "engineered-arts-ameca-desktop": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fourier-intelligence-gr-1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "toyota-t-hr3": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "scope": {
+    "robots": [
+      "agibot-a2-lite",
+      "agibot-x2",
+      "agibot-x2-ultra",
+      "engineered-arts-ameca-desktop",
+      "fourier-intelligence-gr-1",
+      "toyota-t-hr3"
+    ],
+    "allowed_tables": [
+      "robot"
+    ],
+    "edition_map": {
+      "agibot-x2": "X2",
+      "agibot-x2-ultra": "X2 Ultra",
+      "agibot-a2-lite": "A2 Lite",
+      "engineered-arts-ameca-desktop": "Ameca Desktop",
+      "toyota-t-hr3": "T-HR3",
+      "fourier-intelligence-gr-1": "GR-1"
+    }
+  },
+  "items": [
+    {
+      "robot": "agibot-a2-lite",
+      "edition": "A2 Lite",
+      "edition_scope": "THIS_EDITION",
+      "table": "robot",
+      "field": "specs.height_cm",
+      "definition": "height_cm",
+      "unit": "cm",
+      "existing_value": null,
+      "proposed_value": 169.0,
+      "stated_value": "169",
+      "stated_unit": "cm",
+      "conversion": "none",
+      "qualifiers": [],
+      "measurement_condition": null,
+      "verbatim": "AGIBOT A2 Lite Height 169cm",
+      "excerpt": "droom Pitch Joint: ±23°,Rotating Joint: ±45° AGIBOT A2 Lite AGIBOT A2 Lite Height 169cm Size 169(H)*75(W)*30(L)cm Net Weight ≈63kg Active degrees of freedom Both arms 5*2dof, both legs 6*2dof, head 1dof Endurance standing: 4h35min ,Walking: 1.5h Battery Capacity 14.4Ah Charging T",
+      "source_title": "AgiBot A2 Lite product page (store.agibot.com)",
+      "source_url": "https://store.agibot.com/products/a2-lite",
+      "content_sha256": "884b566ef485f1d330d1787ed817a70f55f18e44c4e0e31f188e15107f54359c",
+      "observed_at": "2026-10-25",
+      "evidence_locator": "A2 Lite specification, row Height",
+      "retrieval": {
+        "retrieved_at": "2026-10-25T19:55:37Z",
+        "retrieval_actor": "Claude (Sonnet research agent; re-verified by orchestrator)",
+        "retrieval_tool": "curl",
+        "initiated_by": "Robert Konecny",
+        "work_order": "HO-DATA-STANDING 2026-10-22",
+        "scope": "HO-DATA-32 unpublished-record research 2026-10-25"
+      },
+      "observation": {
+        "kind": "EVIDENCE_PACKAGE",
+        "fetched_page_id": null
+      },
+      "claim_id": "research-2e604618aac6d9f4",
+      "evidence_class": "AGENT_ASSISTED_RESEARCH",
+      "verification": "NOT_HUMAN_VERIFIED",
+      "classification": "ROUTINE",
+      "reasons": [],
+      "conflict": "NONE",
+      "expected_change": {
+        "table": "robot",
+        "kind": "CHANGED",
+        "match": {
+          "slug": "agibot-a2-lite"
+        }
+      },
+      "caveat": "AgiBot A2 Lite product page (store.agibot.com) states 'AGIBOT A2 Lite Height 169cm'; evidence AGENT_ASSISTED_RESEARCH, not human-verified.",
+      "display": "Robot detail: 'Height: 169.0 cm', with caveat"
+    },
+    {
+      "robot": "agibot-a2-lite",
+      "edition": "A2 Lite",
+      "edition_scope": "THIS_EDITION",
+      "table": "robot",
+      "field": "specs.runtime_minutes",
+      "definition": "runtime_minutes",
+      "unit": "min",
+      "existing_value": null,
+      "proposed_value": 90,
+      "stated_value": "1.5",
+      "stated_unit": "h",
+      "conversion": "1.5 h = 90 min",
+      "qualifiers": [],
+      "measurement_condition": "Walking (standing: 4h35min; DEC-11 walking-mode figure)",
+      "verbatim": "Endurance standing: 4h35min ,Walking: 1.5h",
+      "excerpt": "es of freedom Both arms 5*2dof, both legs 6*2dof, head 1dof Endurance standing: 4h35min ,Walking: 1.5h Battery Capacity 14.4Ah Charging Time 2h Charging Power ≤500W Charging Voltage 48V DC Working Temperature and Humidity 0 ~ 40℃, relative humidity 10% ~ 90%, no condensation Stor",
+      "source_title": "AgiBot A2 Lite product page (store.agibot.com)",
+      "source_url": "https://store.agibot.com/products/a2-lite",
+      "content_sha256": "884b566ef485f1d330d1787ed817a70f55f18e44c4e0e31f188e15107f54359c",
+      "observed_at": "2026-10-25",
+      "evidence_locator": "A2 Lite specification, row Endurance",
+      "retrieval": {
+        "retrieved_at": "2026-10-25T19:55:37Z",
+        "retrieval_actor": "Claude (Sonnet research agent; re-verified by orchestrator)",
+        "retrieval_tool": "curl",
+        "initiated_by": "Robert Konecny",
+        "work_order": "HO-DATA-STANDING 2026-10-22",
+        "scope": "HO-DATA-32 unpublished-record research 2026-10-25"
+      },
+      "observation": {
+        "kind": "EVIDENCE_PACKAGE",
+        "fetched_page_id": null
+      },
+      "claim_id": "research-3dd04901f8aa59e0",
+      "evidence_class": "AGENT_ASSISTED_RESEARCH",
+      "verification": "NOT_HUMAN_VERIFIED",
+      "classification": "ROUTINE",
+      "reasons": [],
+      "conflict": "NONE",
+      "expected_change": {
+        "table": "robot",
+        "kind": "CHANGED",
+        "match": {
+          "slug": "agibot-a2-lite"
+        }
+      },
+      "caveat": "AgiBot A2 Lite product page (store.agibot.com) states 'Endurance standing: 4h35min ,Walking: 1.5h'; 90 min is a unit conversion; stated measurement condition: Walking (standing: 4h35min; DEC-11 walking-mode figure); evidence AGENT_ASSISTED_RESEARCH, not human-verified.",
+      "display": "Robot detail: 'Runtime: 90 min', with caveat"
+    },
+    {
+      "robot": "agibot-a2-lite",
+      "edition": "A2 Lite",
+      "edition_scope": "THIS_EDITION",
+      "table": "robot",
+      "field": "specs.weight_kg",
+      "definition": "weight_kg",
+      "unit": "kg",
+      "existing_value": null,
+      "proposed_value": 63.0,
+      "stated_value": "63",
+      "stated_unit": "kg",
+      "conversion": "none",
+      "qualifiers": [
+        "approximately"
+      ],
+      "measurement_condition": null,
+      "verbatim": "Net Weight ≈63kg",
+      "excerpt": "Lite AGIBOT A2 Lite Height 169cm Size 169(H)*75(W)*30(L)cm Net Weight ≈63kg Active degrees of freedom Both arms 5*2dof, both legs 6*2dof, head 1dof Endurance standing: 4h35min ,Walking: 1.5h Battery Capacity 14.4Ah Charging Time 2h Charging Power ≤500W Charging Voltage 48V DC Wo",
+      "source_title": "AgiBot A2 Lite product page (store.agibot.com)",
+      "source_url": "https://store.agibot.com/products/a2-lite",
+      "content_sha256": "884b566ef485f1d330d1787ed817a70f55f18e44c4e0e31f188e15107f54359c",
+      "observed_at": "2026-10-25",
+      "evidence_locator": "A2 Lite specification, row Net Weight",
+      "retrieval": {
+        "retrieved_at": "2026-10-25T19:55:37Z",
+        "retrieval_actor": "Claude (Sonnet research agent; re-verified by orchestrator)",
+        "retrieval_tool": "curl",
+        "initiated_by": "Robert Konecny",
+        "work_order": "HO-DATA-STANDING 2026-10-22",
+        "scope": "HO-DATA-32 unpublished-record research 2026-10-25"
+      },
+      "observation": {
+        "kind": "EVIDENCE_PACKAGE",
+        "fetched_page_id": null
+      },
+      "claim_id": "research-57448a6a155d8cc6",
+      "evidence_class": "AGENT_ASSISTED_RESEARCH",
+      "verification": "NOT_HUMAN_VERIFIED",
+      "classification": "ROUTINE",
+      "reasons": [],
+      "conflict": "NONE",
+      "expected_change": {
+        "table": "robot",
+        "kind": "CHANGED",
+        "match": {
+          "slug": "agibot-a2-lite"
+        }
+      },
+      "caveat": "AgiBot A2 Lite product page (store.agibot.com) states 'Net Weight ≈63kg'; the figure is stated as approximate; evidence AGENT_ASSISTED_RESEARCH, not human-verified.",
+      "display": "Robot detail: 'Weight: 63.0 kg', with caveat"
+    },
+    {
+      "robot": "agibot-x2",
+      "edition": "X2",
+      "edition_scope": "THIS_EDITION",
+      "table": "robot",
+      "field": "specs.runtime_minutes",
+      "definition": "runtime_minutes",
+      "unit": "min",
+      "existing_value": null,
+      "proposed_value": 120,
+      "stated_value": "2",
+      "stated_unit": "h",
+      "conversion": "2 h = 120 min",
+      "qualifiers": [
+        "approximately"
+      ],
+      "measurement_condition": "At 0.5 m/s walking",
+      "verbatim": "Operating Time | At 0.5 m/s walking | Approx. 2 hours",
+      "excerpt": "Operating Time | At 0.5 m/s walking | Approx. 2 hours | At 0.5 m/s walking | Approx. 2 hours | Power Supply Method | Direct charging, swappable battery | Direct",
+      "source_title": "AgiBot X2 product page",
+      "source_url": "https://www.agibot.com/products/X2",
+      "content_sha256": "96d0c53acd6c5ff4021698c868120dccc06e645218a970adeb3ba3045b81ff50",
+      "observed_at": "2026-10-25",
+      "evidence_locator": "specification table, row Operating Time, column X2",
+      "retrieval": {
+        "retrieved_at": "2026-10-25T19:45:12Z",
+        "retrieval_actor": "Claude (Opus 5.5, orchestrator)",
+        "retrieval_tool": "curl",
+        "initiated_by": "Robert Konecny",
+        "work_order": "HO-DATA-STANDING 2026-10-22",
+        "scope": "HO-DATA-32 AgiBot X2 enrichment 2026-10-25"
+      },
+      "observation": {
+        "kind": "EVIDENCE_PACKAGE",
+        "fetched_page_id": null
+      },
+      "claim_id": "research-52ad3c3b41981c68",
+      "evidence_class": "AGENT_ASSISTED_RESEARCH",
+      "verification": "NOT_HUMAN_VERIFIED",
+      "classification": "ROUTINE",
+      "reasons": [],
+      "conflict": "NONE",
+      "expected_change": {
+        "table": "robot",
+        "kind": "CHANGED",
+        "match": {
+          "slug": "agibot-x2"
+        }
+      },
+      "caveat": "AgiBot X2 product page states 'Operating Time | At 0.5 m/s walking | Approx. 2 hours'; the figure is stated as approximate; 120 min is a unit conversion; stated measurement condition: At 0.5 m/s walking; evidence AGENT_ASSISTED_RESEARCH, not human-verified.",
+      "display": "Robot detail: 'Runtime: 120 min', with caveat"
+    },
+    {
+      "robot": "agibot-x2-ultra",
+      "edition": "X2 Ultra",
+      "edition_scope": "THIS_EDITION",
+      "table": "robot",
+      "field": "specs.has_vision",
+      "definition": "has_vision",
+      "unit": null,
+      "existing_value": null,
+      "proposed_value": true,
+      "stated_value": "equipped with LiDAR and RGB-D",
+      "stated_unit": null,
+      "conversion": "none",
+      "qualifiers": [],
+      "measurement_condition": null,
+      "verbatim": "X2 Ultra is equipped with LiDAR and RGB-D cameras, enabling precise environmental perception",
+      "excerpt": "X2 Ultra is equipped with LiDAR and RGB-D cameras, enabling precise environmental perception and autonomous route planning | Proactive Obstacle Avoidance | With LiDAR,",
+      "source_title": "AgiBot X2 product page",
+      "source_url": "https://www.agibot.com/products/X2",
+      "content_sha256": "96d0c53acd6c5ff4021698c868120dccc06e645218a970adeb3ba3045b81ff50",
+      "observed_at": "2026-10-25",
+      "evidence_locator": "feature text, LiDAR + RGB-D section; also specification table row RGB-D Camera (X2 Not equipped / X2 Ultra Equipped)",
+      "retrieval": {
+        "retrieved_at": "2026-10-25T19:45:12Z",
+        "retrieval_actor": "Claude (Opus 5.5, orchestrator)",
+        "retrieval_tool": "curl",
+        "initiated_by": "Robert Konecny",
+        "work_order": "HO-DATA-STANDING 2026-10-22",
+        "scope": "HO-DATA-32 AgiBot X2 enrichment 2026-10-25"
+      },
+      "observation": {
+        "kind": "EVIDENCE_PACKAGE",
+        "fetched_page_id": null
+      },
+      "claim_id": "research-fa1adccb62bd3aa0",
+      "evidence_class": "AGENT_ASSISTED_RESEARCH",
+      "verification": "NOT_HUMAN_VERIFIED",
+      "classification": "ROUTINE",
+      "reasons": [],
+      "conflict": "NONE",
+      "expected_change": {
+        "table": "robot",
+        "kind": "CHANGED",
+        "match": {
+          "slug": "agibot-x2-ultra"
+        }
+      },
+      "caveat": "AgiBot X2 product page states 'X2 Ultra is equipped with LiDAR and RGB-D cameras, enabling precise environmental perception'; evidence AGENT_ASSISTED_RESEARCH, not human-verified.",
+      "display": "Robot detail: 'Vision: yes', with caveat"
+    },
+    {
+      "robot": "agibot-x2-ultra",
+      "edition": "X2 Ultra",
+      "edition_scope": "THIS_EDITION",
+      "table": "robot",
+      "field": "specs.runtime_minutes",
+      "definition": "runtime_minutes",
+      "unit": "min",
+      "existing_value": null,
+      "proposed_value": 120,
+      "stated_value": "2",
+      "stated_unit": "h",
+      "conversion": "2 h = 120 min",
+      "qualifiers": [
+        "approximately"
+      ],
+      "measurement_condition": "At 0.5 m/s walking",
+      "verbatim": "Operating Time | At 0.5 m/s walking | Approx. 2 hours",
+      "excerpt": "Operating Time | At 0.5 m/s walking | Approx. 2 hours | At 0.5 m/s walking | Approx. 2 hours | Power Supply Method | Direct charging, swappable battery | Direct",
+      "source_title": "AgiBot X2 product page",
+      "source_url": "https://www.agibot.com/products/X2",
+      "content_sha256": "96d0c53acd6c5ff4021698c868120dccc06e645218a970adeb3ba3045b81ff50",
+      "observed_at": "2026-10-25",
+      "evidence_locator": "specification table, row Operating Time, column X2 Ultra",
+      "retrieval": {
+        "retrieved_at": "2026-10-25T19:45:12Z",
+        "retrieval_actor": "Claude (Opus 5.5, orchestrator)",
+        "retrieval_tool": "curl",
+        "initiated_by": "Robert Konecny",
+        "work_order": "HO-DATA-STANDING 2026-10-22",
+        "scope": "HO-DATA-32 AgiBot X2 enrichment 2026-10-25"
+      },
+      "observation": {
+        "kind": "EVIDENCE_PACKAGE",
+        "fetched_page_id": null
+      },
+      "claim_id": "research-b51c76614390c88a",
+      "evidence_class": "AGENT_ASSISTED_RESEARCH",
+      "verification": "NOT_HUMAN_VERIFIED",
+      "classification": "ROUTINE",
+      "reasons": [],
+      "conflict": "NONE",
+      "expected_change": {
+        "table": "robot",
+        "kind": "CHANGED",
+        "match": {
+          "slug": "agibot-x2-ultra"
+        }
+      },
+      "caveat": "AgiBot X2 product page states 'Operating Time | At 0.5 m/s walking | Approx. 2 hours'; the figure is stated as approximate; 120 min is a unit conversion; stated measurement condition: At 0.5 m/s walking; evidence AGENT_ASSISTED_RESEARCH, not human-verified.",
+      "display": "Robot detail: 'Runtime: 120 min', with caveat"
+    },
+    {
+      "robot": "engineered-arts-ameca-desktop",
+      "edition": "Ameca Desktop",
+      "edition_scope": "THIS_EDITION",
+      "table": "robot",
+      "field": "specs.degrees_of_freedom",
+      "definition": "degrees_of_freedom",
+      "unit": null,
+      "existing_value": null,
+      "proposed_value": 32,
+      "stated_value": "32",
+      "stated_unit": null,
+      "conversion": "none",
+      "qualifiers": [],
+      "measurement_condition": null,
+      "verbatim": "They have 32 degrees of freedom",
+      "excerpt": "ned for entertainment, education and research applications. They have 32 degrees of freedom, consisting of 5 in the neck and 27 animating the eyes, lips and other facial features. The robots include microphones, cameras and a speaker to enable two-way audio-visual interaction. Al",
+      "source_title": "Engineered Arts Desktop Robot Gen 2 manual (docs.engineeredarts.co.uk; applies to Ameca Desktop)",
+      "source_url": "https://docs.engineeredarts.co.uk/guide/reference/hardware/desktop_robot_gen2",
+      "content_sha256": "a046b5e9fc998d6c867885c732b59cd73d386555807795411f9aa5c9a0cf9a02",
+      "observed_at": "2026-10-25",
+      "evidence_locator": "Desktop Robot Gen 2 manual (Applicable Models: Ameca Desktop); the Gen 3 manual states the same 32 / 8 kg",
+      "retrieval": {
+        "retrieved_at": "2026-10-25T19:54:45Z",
+        "retrieval_actor": "Claude (Sonnet research agent; re-verified by orchestrator)",
+        "retrieval_tool": "curl",
+        "initiated_by": "Robert Konecny",
+        "work_order": "HO-DATA-STANDING 2026-10-22",
+        "scope": "HO-DATA-32 unpublished-record research 2026-10-25"
+      },
+      "observation": {
+        "kind": "EVIDENCE_PACKAGE",
+        "fetched_page_id": null
+      },
+      "claim_id": "research-73a9a8de6773a3e3",
+      "evidence_class": "AGENT_ASSISTED_RESEARCH",
+      "verification": "NOT_HUMAN_VERIFIED",
+      "classification": "ROUTINE",
+      "reasons": [],
+      "conflict": "NONE",
+      "expected_change": {
+        "table": "robot",
+        "kind": "CHANGED",
+        "match": {
+          "slug": "engineered-arts-ameca-desktop"
+        }
+      },
+      "caveat": "Engineered Arts Desktop Robot Gen 2 manual (docs.engineeredarts.co.uk; applies to Ameca Desktop) states 'They have 32 degrees of freedom'; evidence AGENT_ASSISTED_RESEARCH, not human-verified.",
+      "display": "Robot detail: 'Degrees of freedom: 32', with caveat"
+    },
+    {
+      "robot": "engineered-arts-ameca-desktop",
+      "edition": "Ameca Desktop",
+      "edition_scope": "THIS_EDITION",
+      "table": "robot",
+      "field": "specs.weight_kg",
+      "definition": "weight_kg",
+      "unit": "kg",
+      "existing_value": null,
+      "proposed_value": 8.0,
+      "stated_value": "8",
+      "stated_unit": "kg",
+      "conversion": "none",
+      "qualifiers": [
+        "approximately"
+      ],
+      "measurement_condition": null,
+      "verbatim": "The robot weighs approximately 8 kg",
+      "excerpt": "y dimensions ¶ Installation ¶ Unboxing Lifting and Handling The robot weighs approximately 8 kg. Take care and follow good manual handling practices while lifting and moving. Lifting and Handling The robot is an intricate and delicate product. Take care to avoid harsh handling, k",
+      "source_title": "Engineered Arts Desktop Robot Gen 2 manual (docs.engineeredarts.co.uk; applies to Ameca Desktop)",
+      "source_url": "https://docs.engineeredarts.co.uk/guide/reference/hardware/desktop_robot_gen2",
+      "content_sha256": "a046b5e9fc998d6c867885c732b59cd73d386555807795411f9aa5c9a0cf9a02",
+      "observed_at": "2026-10-25",
+      "evidence_locator": "Desktop Robot Gen 2 manual",
+      "retrieval": {
+        "retrieved_at": "2026-10-25T19:54:45Z",
+        "retrieval_actor": "Claude (Sonnet research agent; re-verified by orchestrator)",
+        "retrieval_tool": "curl",
+        "initiated_by": "Robert Konecny",
+        "work_order": "HO-DATA-STANDING 2026-10-22",
+        "scope": "HO-DATA-32 unpublished-record research 2026-10-25"
+      },
+      "observation": {
+        "kind": "EVIDENCE_PACKAGE",
+        "fetched_page_id": null
+      },
+      "claim_id": "research-306f0ed8c005662e",
+      "evidence_class": "AGENT_ASSISTED_RESEARCH",
+      "verification": "NOT_HUMAN_VERIFIED",
+      "classification": "ROUTINE",
+      "reasons": [],
+      "conflict": "NONE",
+      "expected_change": {
+        "table": "robot",
+        "kind": "CHANGED",
+        "match": {
+          "slug": "engineered-arts-ameca-desktop"
+        }
+      },
+      "caveat": "Engineered Arts Desktop Robot Gen 2 manual (docs.engineeredarts.co.uk; applies to Ameca Desktop) states 'The robot weighs approximately 8 kg'; the figure is stated as approximate; evidence AGENT_ASSISTED_RESEARCH, not human-verified.",
+      "display": "Robot detail: 'Weight: 8.0 kg', with caveat"
+    },
+    {
+      "robot": "fourier-intelligence-gr-1",
+      "edition": "GR-1",
+      "edition_scope": "THIS_EDITION",
+      "table": "robot",
+      "field": "specs.simulation_support",
+      "definition": "simulation_support",
+      "unit": null,
+      "existing_value": null,
+      "proposed_value": true,
+      "stated_value": "simulate",
+      "stated_unit": null,
+      "conversion": "none",
+      "qualifiers": [],
+      "measurement_condition": null,
+      "verbatim": "resources to simulate and develop with the GRx robot",
+      "excerpt": "repository contains the necessary URDF files and associated resources to simulate and develop with the GRx robot using popular robotics software tools. ## Features - **URDF Files**: Complete set of URDF files describing the GRx robots' kinematic and dynamic properties. - **Visual",
+      "source_title": "Fourier (FFTAI) official Wiki-GRx-Models repository README (GR-1 = GR1T1; GR1T1 URDF models; Isaac Sim / Isaac Gym support)",
+      "source_url": "https://raw.githubusercontent.com/FFTAI/Wiki-GRx-Models/master/README.md",
+      "content_sha256": "a6a799c046f97e77e1de8c0236b5e59800bc10f73056bbd2923fe44049128653",
+      "observed_at": "2026-10-25",
+      "evidence_locator": "Overview; name table \"GR-1 | GR1T1 with dexterous hand\"; model list gr1t1 urdf",
+      "retrieval": {
+        "retrieved_at": "2026-10-25T19:55:37Z",
+        "retrieval_actor": "Claude (Sonnet research agent; re-verified by orchestrator)",
+        "retrieval_tool": "curl",
+        "initiated_by": "Robert Konecny",
+        "work_order": "HO-DATA-STANDING 2026-10-22",
+        "scope": "HO-DATA-32 unpublished-record research 2026-10-25"
+      },
+      "observation": {
+        "kind": "EVIDENCE_PACKAGE",
+        "fetched_page_id": null
+      },
+      "claim_id": "research-d377610fc662d890",
+      "evidence_class": "AGENT_ASSISTED_RESEARCH",
+      "verification": "NOT_HUMAN_VERIFIED",
+      "classification": "ROUTINE",
+      "reasons": [],
+      "conflict": "NONE",
+      "expected_change": {
+        "table": "robot",
+        "kind": "CHANGED",
+        "match": {
+          "slug": "fourier-intelligence-gr-1"
+        }
+      },
+      "caveat": "Fourier (FFTAI) official Wiki-GRx-Models repository README (GR-1 = GR1T1; GR1T1 URDF models; Isaac Sim / Isaac Gym support) states 'resources to simulate and develop with the GRx robot'; evidence AGENT_ASSISTED_RESEARCH, not human-verified.",
+      "display": "Robot detail: 'Simulation support: yes', with caveat"
+    },
+    {
+      "robot": "toyota-t-hr3",
+      "edition": "T-HR3",
+      "edition_scope": "THIS_EDITION",
+      "table": "robot",
+      "field": "specs.has_teleoperation",
+      "definition": "has_teleoperation",
+      "unit": null,
+      "existing_value": null,
+      "proposed_value": true,
+      "stated_value": "controlled from a Master Maneuvering System",
+      "stated_unit": null,
+      "conversion": "none",
+      "qualifiers": [],
+      "measurement_condition": null,
+      "verbatim": "T-HR3 is controlled from a Master Maneuvering System",
+      "excerpt": "Partner Robot Division. Master Maneuvering System and T-HR3 T-HR3 is controlled from a Master Maneuvering System that allows the entire body of the robot to be operated instinctively with wearable controls that map hand, arm and foot movements to the robot, and a head-mounted dis",
+      "source_title": "Toyota T-HR3 announcement (global.toyota, November 2017)",
+      "source_url": "https://global.toyota/en/detail/19666346",
+      "content_sha256": "49b3b5249f143a5a7ca89a70e4daef1b90165725414ac6693c82da0ca6813e53",
+      "observed_at": "2026-10-25",
+      "evidence_locator": "announcement text",
+      "retrieval": {
+        "retrieved_at": "2026-10-25T19:54:45Z",
+        "retrieval_actor": "Claude (Sonnet research agent; re-verified by orchestrator)",
+        "retrieval_tool": "curl",
+        "initiated_by": "Robert Konecny",
+        "work_order": "HO-DATA-STANDING 2026-10-22",
+        "scope": "HO-DATA-32 unpublished-record research 2026-10-25"
+      },
+      "observation": {
+        "kind": "EVIDENCE_PACKAGE",
+        "fetched_page_id": null
+      },
+      "claim_id": "research-3f8a49c2e803c358",
+      "evidence_class": "AGENT_ASSISTED_RESEARCH",
+      "verification": "NOT_HUMAN_VERIFIED",
+      "classification": "ROUTINE",
+      "reasons": [],
+      "conflict": "NONE",
+      "expected_change": {
+        "table": "robot",
+        "kind": "CHANGED",
+        "match": {
+          "slug": "toyota-t-hr3"
+        }
+      },
+      "caveat": "Toyota T-HR3 announcement (global.toyota, November 2017) states 'T-HR3 is controlled from a Master Maneuvering System'; evidence AGENT_ASSISTED_RESEARCH, not human-verified.",
+      "display": "Robot detail: 'Teleoperation: yes', with caveat"
+    },
+    {
+      "robot": "toyota-t-hr3",
+      "edition": "T-HR3",
+      "edition_scope": "THIS_EDITION",
+      "table": "robot",
+      "field": "specs.height_cm",
+      "definition": "height_cm",
+      "unit": "cm",
+      "existing_value": null,
+      "proposed_value": 154.0,
+      "stated_value": "1540",
+      "stated_unit": "mm",
+      "conversion": "1540 mm = 154.0 cm",
+      "qualifiers": [],
+      "measurement_condition": null,
+      "verbatim": "H: 1540 mm",
+      "excerpt": "ering System T-HR3 Size W: 850 mm x D: 1500 mm x H: 1450 mm H: 1540 mm Weight 170 kg 75 kg Moving Parts 16 axes 32 axes and 10 fingers Accessories Data Glove, Head-Mounted Display - Downloads (Videos) B-roll of T-HR3 (1) B-roll of T-HR3 (2) Downloads (Images) Master Maneuvering S",
+      "source_title": "Toyota T-HR3 announcement (global.toyota, November 2017)",
+      "source_url": "https://global.toyota/en/detail/19666346",
+      "content_sha256": "49b3b5249f143a5a7ca89a70e4daef1b90165725414ac6693c82da0ca6813e53",
+      "observed_at": "2026-10-25",
+      "evidence_locator": "specification table, T-HR3 column (the other column is the Master Maneuvering System)",
+      "retrieval": {
+        "retrieved_at": "2026-10-25T19:54:45Z",
+        "retrieval_actor": "Claude (Sonnet research agent; re-verified by orchestrator)",
+        "retrieval_tool": "curl",
+        "initiated_by": "Robert Konecny",
+        "work_order": "HO-DATA-STANDING 2026-10-22",
+        "scope": "HO-DATA-32 unpublished-record research 2026-10-25"
+      },
+      "observation": {
+        "kind": "EVIDENCE_PACKAGE",
+        "fetched_page_id": null
+      },
+      "claim_id": "research-33fd54cf4e75e19e",
+      "evidence_class": "AGENT_ASSISTED_RESEARCH",
+      "verification": "NOT_HUMAN_VERIFIED",
+      "classification": "ROUTINE",
+      "reasons": [],
+      "conflict": "NONE",
+      "expected_change": {
+        "table": "robot",
+        "kind": "CHANGED",
+        "match": {
+          "slug": "toyota-t-hr3"
+        }
+      },
+      "caveat": "Toyota T-HR3 announcement (global.toyota, November 2017) states 'H: 1540 mm'; 154.0 cm is a unit conversion; evidence AGENT_ASSISTED_RESEARCH, not human-verified.",
+      "display": "Robot detail: 'Height: 154.0 cm', with caveat"
+    }
+  ],
+  "restricted_impact": {
+    "prices": 0,
+    "availability": 0,
+    "publication": 0,
+    "commercial_status": 0,
+    "images": 0,
+    "deletions": 0,
+    "unrelated_robots": 0
+  },
+  "review_notes": [],
+  "generated_on": "2026-10-25",
+  "digest": "7b2d518cef1255c3fef7534fc40868cb086399dcc9bee0a12a38ecb89b944eec"
+}

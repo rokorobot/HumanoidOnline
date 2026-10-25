@@ -67,8 +67,19 @@ def _drop(name: str) -> None:
         conn.execute(f'DROP DATABASE IF EXISTS "{name}"')
 
 
+#: core cells the synthetic research evidence fills. Enrichment batches fill real cells over time,
+#: so the test copy clears these (value and caveat) instead of depending on them staying NULL.
+SYNTHETIC_NULL_CELLS = ((PEER, "degrees_of_freedom"), (ROBOT, "walk_speed_ms"))
+
+
 def copy_catalogue(target: Path) -> Path:
     shutil.copytree(REAL_CATALOGUE, target, ignore=shutil.ignore_patterns("promotions"))
+    for slug, field in SYNTHETIC_NULL_CELLS:
+        path = target / "robots" / f"{slug}.json"
+        doc = json.loads(path.read_text(encoding="utf-8-sig"))
+        doc["specs"][field] = None
+        doc["spec_caveats"] = [c for c in doc.get("spec_caveats") or [] if c["field"] != field]
+        path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return target
 
 

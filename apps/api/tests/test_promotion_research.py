@@ -15,9 +15,9 @@ import psycopg
 import pytest
 from promotion_support import (  # noqa: F401
     PEER,
-    REAL_CATALOGUE,
     ROBOT,
     TODAY,
+    copy_catalogue,
     plain,
     run_import,
     template_db,
@@ -30,7 +30,7 @@ from app.cli import promotion as cli
 from app.services.discovery import promotion_manifest as pm
 from app.services.discovery import promotion_research as research
 
-DIGIT = PEER                                # agility-digit: degrees_of_freedom is null
+DIGIT = PEER                                # agility-digit; copy_catalogue clears its DoF
 EDITIONS = {DIGIT: "Digit", ROBOT: "G1"}
 FINGERPRINTS = {DIGIT: "synthetic-fp-digit", ROBOT: "synthetic-fp-g1",
                 "4ne1-mini": "synthetic-fp-mini"}
@@ -65,9 +65,7 @@ def g1_speed(**over) -> dict:
 
 @pytest.fixture
 def catalogue(tmp_path) -> Path:
-    target = tmp_path / "catalogue"
-    shutil.copytree(REAL_CATALOGUE, target)
-    return target
+    return copy_catalogue(tmp_path / "catalogue")
 
 
 def propose(records, catalogue, **kw) -> dict:

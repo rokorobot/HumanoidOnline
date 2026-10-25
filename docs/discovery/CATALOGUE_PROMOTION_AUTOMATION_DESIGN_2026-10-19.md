@@ -235,8 +235,11 @@ writers is a follow-up.
 
 Version 1 promotes DATA-D1 `candidate_claim` rows into `extended_specs` only. Agent-assisted
 research (docs/26 A3; batches such as HO-DATA-02B) produces no `candidate_claim`, and the six
-core columns (`height_cm`, `weight_kg`, `payload_kg`, `walk_speed_ms`, `runtime_minutes`,
-`degrees_of_freedom`) are `robot` columns. `promotion propose --research <evidence package>`
+core columns are `robot` columns: `height_cm`, `weight_kg`, `payload_kg`, `walk_speed_ms`,
+`runtime_minutes`, `degrees_of_freedom`, `battery_wh` (Wh), `hand_dof`, `arm_span_cm`, `reach_cm`,
+and the flags `has_vision`, `has_sdk`, `has_api`, `ros_support`, `simulation_support`,
+`has_language_ui`, `has_manipulation`, `has_teleoperation`, `developer_edition` (`mobility`,
+`hand_type` and `autonomy` stay out). `promotion propose --research <evidence package>`
 (`apps/api/app/services/discovery/promotion_research.py`) builds a version-2 manifest from
 already-collected research records:
 
@@ -247,6 +250,14 @@ already-collected research records:
   disagreeing statements, ranges, rounding, per-arm/up-to/peak qualifiers, edition-scoped values
   on multi-edition robots, missing provenance and non-manufacturer sources need review; price,
   availability and other restricted words are RESTRICTED; UNKNOWN is refused.
+- **Owner rulings** (each a review reason, never routine, when unmet): DEC-09 battery only in
+  Wh/kWh (Ah/V have no exact conversion); DEC-10 `arm_span_cm` needs "arm span"/"wingspan" and
+  `reach_cm` needs "reach" without "workspace" in the verbatim label; DEC-07 `hand_dof` needs
+  the record key `"end_effector": "STANDARD"`; DEC-02 `developer_edition` is always review;
+  DEC-08 `has_language_ui` needs `"spoken_conversation": true`. A flag item needs `"asserts":
+  true` and proposes only `true`; `"asserts": false` or a stated negative is never written
+  (review, no proposed value: the DR-G4 §4.3 negative chain); an existing `true` is refused as
+  already present and an existing `false` is a change for review, never overwritten.
 - **Edit:** text-level, three touches per robot: the `specs.<field>: null` line, appended
   `spec_caveats` (verbatim label, conversion, qualifier, condition), and the docs/26 §3.1
   provenance statement appended to `specs_note`. The exact sentence "Specifications not yet

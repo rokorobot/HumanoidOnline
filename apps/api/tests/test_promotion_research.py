@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import io
 import json
+import re
 import shutil
 from contextlib import redirect_stdout
 from pathlib import Path
@@ -255,7 +256,9 @@ def test_known_values_are_never_overwritten(catalogue):
     ({"content_sha256": None}, "missing evidence: content_sha256"),
     ({"source_class": "DISTRIBUTOR"}, "not MANUFACTURER"),
     ({"retrieved_at": "2026-08-01"}, "days old"),
-    ({"field": "arm_span_cm"}, "not one of the Fast Lane core columns"),
+    ({"field": "mobility"}, "not one of the Fast Lane core columns"),
+    ({"field": "hand_type"}, "not one of the Fast Lane core columns"),
+    ({"field": "autonomy"}, "not one of the Fast Lane core columns"),
 ])
 def test_unsupported_derivations_and_missing_evidence_need_review(catalogue, over, fragment):
     item = only(propose([record(**over)], catalogue))
@@ -372,3 +375,231 @@ def test_cli_propose_research_dry_run_and_preflight(world, tmp_path, monkeypatch
     assert json.loads(buf.getvalue())["expected"] == [
         {"table": "robot", "kind": "CHANGED", "match": {"slug": DIGIT}, "count": 1}]
     assert cli.main(["propose", "--research", str(package), "--items", "x.json"]) == 2
+
+
+# ----------------------------------------- FL-1 extension: more numerics and boolean flags ----
+def numeric(field, stated, unit, verbatim, **over) -> dict:
+    return record(field=field, stated_value=stated, stated_unit=unit, verbatim=verbatim,
+                  excerpt=f"SYNTHETIC page. {verbatim}.", **over)
+
+
+def flag(field="ros_support", verbatim="ROS support: Yes", **over) -> dict:
+    fields = dict(field=field, stated_value="Yes", stated_unit=None, verbatim=verbatim,
+                  excerpt=f"SYNTHETIC page. {verbatim}.", asserts=True)
+    return record(**{**fields, **over})
+
+
+def set_spec(catalogue: Path, slug: str, field: str, value) -> None:
+    path = pm.robot_path(catalogue, slug)
+    doc = robot_json(catalogue, slug)
+    doc["specs"][field] = value
+    if value is None:
+        doc["spec_caveats"] = [c for c in doc.get("spec_caveats") or [] if c["field"] != field]
+    path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def test_battery_wh_routine_with_exact_kwh_conversion(catalogue):
+    item = only(propose([numeric("battery_wh", "842", "Wh", "Battery capacity: 842 Wh")],
+                        catalogue))
+    assert item["classification"] == pm.ROUTINE, item["reasons"]
+    assert (item["proposed_value"], item["unit"], item["conversion"]) == (842.0, "Wh", "none")
+    assert item["display"] == "Robot detail: 'Battery capacity: 842.0 Wh', with caveat"
+    item = only(propose([numeric("battery_wh", "0.8421", "kWh", "Battery 0.8421 kWh")],
+                        catalogue))
+    assert item["classification"] == pm.ROUTINE, item["reasons"]
+    assert item["proposed_value"] == 842.1 and item["conversion"] == "0.8421 kWh = 842.1 Wh"
+    assert "unit conversion" in item["caveat"]
+    # a figure that is not exact at NUMERIC(8,1) is rounding: review
+    item = only(propose([numeric("battery_wh", "0.84215", "kWh", "Battery 0.84215 kWh")],
+                        catalogue))
+    assert any("not exact at the column's precision" in r for r in item["reasons"])
+
+
+@pytest.mark.parametrize("unit, verbatim", [("Ah", "Battery 20 Ah"), ("V", "Battery 48 V"),
+                                            (None, "Battery 842")])
+def test_battery_not_in_wh_or_kwh_has_no_exact_conversion(catalogue, unit, verbatim):
+    item = only(propose([numeric("battery_wh", verbatim.split()[1], unit, verbatim)],
+                        catalogue))
+    assert item["classification"] == pm.REVIEW_REQUIRED and item["proposed_value"] is None
+    assert any("DEC-09" in r for r in item["reasons"]), item["reasons"]
+
+
+@pytest.mark.parametrize("field, verbatim, ok", [
+    ("arm_span_cm", "Arm span: 180 cm", True),
+    ("arm_span_cm", "Wingspan 180 cm", True),
+    ("arm_span_cm", "ARM SPAN 180 cm", True),
+    ("arm_span_cm", "Width 180 cm", False),
+    ("arm_span_cm", "Reach 180 cm", False),
+    ("reach_cm", "Arm reach: 180 cm", True),
+    ("reach_cm", "REACH 180 cm", True),
+    ("reach_cm", "Workspace reach 180 cm", False),
+    ("reach_cm", "Arm length 180 cm", False),
+])
+def test_dec_10_span_and_reach_depend_on_the_verbatim_label(catalogue, field, verbatim, ok):
+    item = only(propose([numeric(field, "180", "cm", verbatim)], catalogue))
+    if ok:
+        assert item["classification"] == pm.ROUTINE, item["reasons"]
+        assert item["proposed_value"] == 180.0 and item["unit"] == "cm"
+    else:
+        assert item["classification"] == pm.REVIEW_REQUIRED
+        assert any("DEC-10" in r for r in item["reasons"]), item["reasons"]
+    item = only(propose([numeric(field, "1.8", "m", verbatim.replace("180 cm", "1.8 m"))],
+                        catalogue))
+    assert (item["proposed_value"], item["conversion"]) == (
+        180.0, "1.8 m = 180.0 cm") and (item["classification"] == pm.ROUTINE) == ok
+
+
+def test_dec_07_hand_dof_needs_a_standard_end_effector(catalogue):
+    rec = numeric("hand_dof", "6", None, "Hand degrees of freedom: 6")
+    item = only(propose([rec], catalogue))
+    assert item["classification"] == pm.REVIEW_REQUIRED
+    assert any("DEC-07" in r for r in item["reasons"]), item["reasons"]
+    for other in ("DEXTEROUS", None, ""):
+        item = only(propose([{**rec, "end_effector": other}], catalogue))
+        assert any("DEC-07" in r for r in item["reasons"])
+    item = only(propose([{**rec, "end_effector": "STANDARD"}], catalogue))
+    assert item["classification"] == pm.ROUTINE, item["reasons"]
+    assert item["proposed_value"] == 6 and item["unit"] is None
+    assert item["display"] == "Robot detail: 'Hand degrees of freedom: 6', with caveat"
+
+
+def test_boolean_flag_routine_true_edits_only_its_lines(catalogue, tmp_path):
+    base = tmp_path / "base"
+    shutil.copytree(catalogue, base)
+    manifest = propose([flag(), numeric("battery_wh", "842", "Wh", "Battery capacity: 842 Wh")],
+                       catalogue)
+    battery, ros = manifest["items"]
+    assert (ros["definition"], ros["classification"]) == ("ros_support", pm.ROUTINE), ros
+    assert ros["proposed_value"] is True and ros["existing_value"] is None
+    assert ros["unit"] is None and ros["conversion"] == "none"
+    assert ros["display"] == "Robot detail: 'ROS support: yes', with caveat"
+    assert ros["caveat"] == ("Synthetic Maker datasheet states 'ROS support: Yes'; evidence "
+                             "AGENT_ASSISTED_RESEARCH, not human-verified.")
+    assert pm.manifest_problems(manifest) == []
+    review = pm.render_review(manifest)
+    assert "`ros_support` (Digit, ALL_EDITIONS): UNKNOWN -> yes" in review
+    assert "`battery_wh` (Digit, ALL_EDITIONS): UNKNOWN -> 842.0 Wh" in review
+
+    assert pm.apply_to_catalogue(manifest, catalogue) == [DIGIT]
+    text = pm.robot_path(catalogue, DIGIT).read_text(encoding="utf-8")
+    assert re.search(r'^    "ros_support": true,?$', text, re.MULTILINE)
+    assert '"battery_wh": 842.0' in text
+    after, before = robot_json(catalogue, DIGIT), robot_json(base, DIGIT)
+    assert after["specs"] == {**before["specs"], "ros_support": True, "battery_wh": 842.0}
+    assert "battery capacity, ROS support from Synthetic Maker datasheet" in after["specs_note"]
+    changed = [p.relative_to(catalogue).as_posix() for p in catalogue.rglob("*")
+               if p.is_file() and p.read_bytes() != (base / p.relative_to(catalogue)).read_bytes()]
+    assert changed == [f"robots/{DIGIT}.json"]
+    assert pm.verify(manifest, base_catalogue_dir=base, head_catalogue_dir=catalogue).ok
+    snapshot = pm.robot_path(catalogue, DIGIT).read_bytes()
+    assert pm.apply_to_catalogue(manifest, catalogue) == []
+    assert pm.robot_path(catalogue, DIGIT).read_bytes() == snapshot
+
+
+@pytest.mark.parametrize("over", [
+    {"asserts": False},
+    {"asserts": False, "stated_value": "Yes"},
+    {"stated_value": "No", "verbatim": "ROS support: No", "excerpt": "ROS support: No"},
+    {"stated_value": "Not supported", "verbatim": "ROS support: Not supported",
+     "excerpt": "ROS support: Not supported"},
+])
+def test_explicit_negatives_are_never_written(catalogue, over):
+    manifest = propose([flag(**over)], catalogue)
+    item = only(manifest)
+    assert item["classification"] == pm.REVIEW_REQUIRED and item["proposed_value"] is None
+    assert item["caveat"] is None and item["display"] == ""
+    assert research.NEGATIVE_CHAIN in item["reasons"]
+    assert "UNKNOWN -> (no value proposed)" in pm.render_review(manifest)
+    assert pm.manifest_problems(manifest)
+    with pytest.raises(pm.CatalogueEditRefused):
+        pm.apply_to_catalogue(manifest, catalogue)
+
+
+def test_a_flag_without_asserts_true_or_with_a_qualifier_needs_review(catalogue):
+    rec = flag()
+    del rec["asserts"]
+    item = only(propose([rec], catalogue))
+    assert item["classification"] == pm.REVIEW_REQUIRED and item["proposed_value"] is True
+    assert any('"asserts": true' in r for r in item["reasons"]), item["reasons"]
+    item = only(propose([flag(asserts="yes")], catalogue))
+    assert item["classification"] == pm.REVIEW_REQUIRED
+    item = only(propose([flag(qualifiers=["approximately"])], catalogue))
+    assert any("'approximately' qualifier on a flag" in r for r in item["reasons"])
+    assert item["classification"] == pm.REVIEW_REQUIRED
+
+
+def test_existing_true_is_refused_and_existing_false_is_a_change(catalogue):
+    set_spec(catalogue, DIGIT, "has_api", True)
+    with pytest.raises(pm.ProposalRefused, match="already has exactly this value"):
+        propose([flag("has_api", "API available: Yes")], catalogue)
+    set_spec(catalogue, DIGIT, "has_sdk", False)
+    before = pm.robot_path(catalogue, DIGIT).read_bytes()
+    manifest = propose([flag("has_sdk", "SDK available: Yes")], catalogue)
+    item = only(manifest)
+    assert item["classification"] == pm.REVIEW_REQUIRED and item["existing_value"] is False
+    assert any("change, not an addition" in r for r in item["reasons"]), item["reasons"]
+    with pytest.raises(pm.CatalogueEditRefused):
+        pm.apply_to_catalogue(manifest, catalogue)
+    assert pm.robot_path(catalogue, DIGIT).read_bytes() == before
+    # a negative against an existing true is a change for review too, never a refusal
+    item = only(propose([flag("has_api", "API available: No", asserts=False)], catalogue))
+    assert item["classification"] == pm.REVIEW_REQUIRED and item["existing_value"] is True
+    # and the edit itself never overwrites a known flag, even from a hand-built item
+    forged = [{**item, "proposed_value": True, "caveat": "x", "definition": "has_sdk"}]
+    with pytest.raises(pm.CatalogueEditRefused, match="already holds"):
+        research.edit_robot_core(pm.robot_path(catalogue, DIGIT).read_text(encoding="utf-8"),
+                                 forged)
+
+
+def test_developer_edition_is_always_review(catalogue):
+    item = only(propose([flag("developer_edition", "Developer edition: Yes")], catalogue))
+    assert item["classification"] == pm.REVIEW_REQUIRED and item["proposed_value"] is True
+    assert any("DEC-02" in r for r in item["reasons"]), item["reasons"]
+
+
+def test_dec_08_language_ui_needs_spoken_conversation(catalogue):
+    verbatim = "Voice conversation: Yes"
+    item = only(propose([flag("has_language_ui", verbatim)], catalogue))
+    assert item["classification"] == pm.REVIEW_REQUIRED
+    assert any("DEC-08" in r for r in item["reasons"]), item["reasons"]
+    item = only(propose([flag("has_language_ui", verbatim, spoken_conversation=False)],
+                        catalogue))
+    assert any("DEC-08" in r for r in item["reasons"])
+    item = only(propose([flag("has_language_ui", verbatim, spoken_conversation=True)],
+                        catalogue))
+    assert item["classification"] == pm.ROUTINE, item["reasons"]
+    assert item["display"] == "Robot detail: 'Language UI: yes', with caveat"
+
+
+@pytest.mark.parametrize("field", ["has_vision", "has_sdk", "has_api", "ros_support",
+                                   "has_manipulation", "has_teleoperation",
+                                   "simulation_support"])
+def test_every_plain_flag_is_routine_when_asserted(catalogue, field):
+    if field in ("has_manipulation", "has_teleoperation", "simulation_support"):
+        set_spec(catalogue, DIGIT, field, None)
+    item = only(propose([flag(field, f"{field}: Yes")], catalogue))
+    assert item["classification"] == pm.ROUTINE, item["reasons"]
+    assert item["proposed_value"] is True
+
+
+def test_import_of_a_flag_and_battery_changes_only_robot_rows(world):  # noqa: F811
+    pf = pm.load_db_tool("import_preflight")
+    manifest = _session_propose(world, [
+        flag("has_vision", "Vision: Yes"),
+        numeric("battery_wh", "842", "Wh", "Battery capacity: 842 Wh", robot=ROBOT,
+                edition="G1", content_sha256="cd" * 32)])
+    assert [i["classification"] for i in manifest["items"]] == [pm.ROUTINE, pm.ROUTINE]
+    pm.apply_to_catalogue(manifest, world.head)
+    before = _snapshot(world.owner_url)
+    run_import(world.owner_url, world.head, robots=(ROBOT, DIGIT))
+    after = _snapshot(world.owner_url)
+    report = pf.classify(pf.diff(before, after), pm.derive_preflight_manifest(manifest))
+    assert report["ok"], report
+    assert report["business_changes"] == 2, report
+    changes = [c for c in pf.diff(before, after) if c.gated]
+    assert {(c.table, c.kind, c.fields["slug"]) for c in changes} == {
+        ("robot", "CHANGED", DIGIT), ("robot", "CHANGED", ROBOT)}
+    assert {c.fields["slug"]: set(c.detail) for c in changes} == {
+        DIGIT: {"has_vision", "spec_caveats"}, ROBOT: {"battery_wh", "spec_caveats"}}
+    run_import(world.owner_url, world.head, robots=(ROBOT, DIGIT))
+    assert [c for c in pf.diff(after, _snapshot(world.owner_url)) if c.gated] == []

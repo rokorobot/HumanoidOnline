@@ -10,8 +10,22 @@ uses the existing review rendering, deterministic catalogue edit and CI `promoti
 
 Scope, deliberately small:
 
-* Only the six core columns in `CORE_FIELDS`, and only NULL -> value. A known value is a change
+* Only the core columns in `CORE_FIELDS`, and only NULL -> value: the numeric columns height_cm,
+  weight_kg, payload_kg, walk_speed_ms, runtime_minutes, degrees_of_freedom, battery_wh,
+  hand_dof, arm_span_cm and reach_cm, and the boolean flags has_vision, has_sdk, has_api,
+  ros_support, simulation_support, has_language_ui, has_manipulation, has_teleoperation and
+  developer_edition. mobility, hand_type and autonomy stay out. A known value is a change
   (REVIEW_REQUIRED); the same value is refused; UNKNOWN stays UNKNOWN (AGENTS.md rule 6).
+* Owner rulings, each a REVIEW_REQUIRED reason (never ROUTINE) when not met: DEC-09 battery is
+  routine only in Wh or kWh (Ah / V have no exact conversion); DEC-10 arm_span_cm needs "arm
+  span" or "wingspan" in the verbatim label, reach_cm needs "reach" and not "workspace"; DEC-07
+  hand_dof needs the record key "end_effector": "STANDARD"; DEC-02 developer_edition is always
+  review (the owner judges the manufacturer's own wording); DEC-08 has_language_ui needs the
+  record key "spoken_conversation": true.
+* A boolean item needs the record key "asserts": true and proposes only JSON `true`. An
+  "asserts": false record or a stated negative is never written: it is REVIEW_REQUIRED with no
+  proposed value (the DR-G4 §4.3 negative chain). An existing `true` is refused as already
+  present; an existing `false` is a change and is never overwritten.
 * Only a direct manufacturer statement or an EXACT unit conversion at the column's precision.
   Ranges, rounding, per-arm / up-to / peak qualifiers and other derivations need review.
 * Provenance stays `AGENT_ASSISTED_RESEARCH` (docs/26 §3.1): the catalogue edit writes the fixed
@@ -74,6 +88,7 @@ class CoreField:
     integer: bool
     conversions: dict             # stated unit -> exact factor to the column's unit
     needs_condition: bool = False  # speed / runtime only mean something with their condition
+    boolean: bool = False         # a flag column: only ever proposed as `true`
 
 
 def _unit(field: str) -> str | None:
@@ -95,7 +110,28 @@ CORE_FIELDS: dict[str, CoreField] = {
                                  {"min": Fraction(1), "h": Fraction(60)}, needs_condition=True),
     "degrees_of_freedom": CoreField("Degrees of freedom", None, Fraction(1), True,
                                     {None: Fraction(1)}),
+    "battery_wh": CoreField("Battery capacity", "Wh", Fraction(1, 10), False,
+                            {"Wh": Fraction(1), "kWh": Fraction(1000)}),
+    "hand_dof": CoreField("Hand degrees of freedom", None, Fraction(1), True,
+                          {None: Fraction(1)}),
+    "arm_span_cm": CoreField("Arm span", "cm", Fraction(1, 10), False,
+                             {"cm": Fraction(1), "mm": Fraction(1, 10), "m": Fraction(100)}),
+    "reach_cm": CoreField("Reach", "cm", Fraction(1, 10), False,
+                          {"cm": Fraction(1), "mm": Fraction(1, 10), "m": Fraction(100)}),
 }
+for _flag, _label_text in (("has_vision", "Vision"), ("has_sdk", "SDK"), ("has_api", "API"),
+                           ("ros_support", "ROS support"),
+                           ("simulation_support", "Simulation support"),
+                           ("has_language_ui", "Language UI"),
+                           ("has_manipulation", "Manipulation"),
+                           ("has_teleoperation", "Teleoperation"),
+                           ("developer_edition", "Developer edition")):
+    CORE_FIELDS[_flag] = CoreField(_label_text, None, Fraction(1), True, {}, boolean=True)
+
+#: a stated text that denies the flag (never written; goes through the negative chain)
+_NEGATIVE = re.compile(r"^\s*(no|not|none|false|never|without|unsupported)\b|"
+                       r"\bnot (supported|available|included)\b", re.IGNORECASE)
+NEGATIVE_CHAIN = "explicit negatives go through the DR-G4 §4.3 negative chain"
 
 
 # --------------------------------------------------------------------------------------- #
@@ -213,6 +249,42 @@ def check_qualifiers(record: dict, core: CoreField) -> list[str]:
     return reasons
 
 
+def check_boolean(record: dict, field: str) -> tuple[bool | None, list[str]]:
+    """(proposed value, reasons) for a flag. `true` or nothing: a negative is never proposed."""
+    reasons = []
+    qualifiers = record.get("qualifiers") or []
+    if isinstance(qualifiers, list) and "approximately" in qualifiers:
+        reasons.append("an 'approximately' qualifier on a flag needs review")
+    if record.get("asserts") is False or _NEGATIVE.search(str(record.get("stated_value"))):
+        return None, [NEGATIVE_CHAIN] + reasons
+    if record.get("asserts") is not True:
+        reasons.append('a boolean item needs the record key "asserts": true')
+    if field == "developer_edition":
+        reasons.append("DEC-02: whether the manufacturer calls this a developer/research "
+                       "platform is the owner's judgement")
+    if field == "has_language_ui" and record.get("spoken_conversation") is not True:
+        reasons.append('DEC-08: has_language_ui is routine only with "spoken_conversation": true')
+    return True, reasons
+
+
+def check_rulings(record: dict, field: str) -> list[str]:
+    """Owner rulings for numeric columns whose label or context decides what they mean."""
+    label = str(record.get("verbatim") or "").lower()
+    if field == "arm_span_cm" and "arm span" not in label and "wingspan" not in label:
+        return ["DEC-10: arm_span_cm is routine only when the verbatim label says 'arm span' "
+                "or 'wingspan'"]
+    if field == "reach_cm" and ("reach" not in label or "workspace" in label):
+        return ["DEC-10: reach_cm is routine only when the verbatim label says 'reach' and "
+                "not 'workspace'"]
+    if field == "hand_dof" and record.get("end_effector") != "STANDARD":
+        return ['DEC-07: hand_dof is routine only with "end_effector": "STANDARD"']
+    if field == "battery_wh" and (record.get("stated_unit") or None) not in \
+            CORE_FIELDS[field].conversions:
+        return ["DEC-09: a battery stated in Ah / V or any unit other than Wh / kWh has no "
+                "exact conversion"]
+    return []
+
+
 def _literal(value: Fraction, core: CoreField) -> str:
     """The JSON literal for the column: ints for INT columns, at least one decimal otherwise
     (as the catalogue writes NUMERIC columns, e.g. 118.0, 1.0, 1.25)."""
@@ -224,6 +296,22 @@ def _literal(value: Fraction, core: CoreField) -> str:
 
 def _json_value(value: Fraction, core: CoreField):
     return int(value) if core.integer else float(_literal(value, core))
+
+
+def shown_value(item: dict) -> str:
+    """The proposed value as a reader sees it: '842.0 Wh', 'yes'."""
+    value, core = item["proposed_value"], CORE_FIELDS.get(item["definition"])
+    if value is None:
+        return "(no value proposed)"
+    if value is True:
+        return "yes"
+    return f"{value}{' ' + core.unit if core and core.unit else ''}"
+
+
+def _label(field: str) -> str:
+    """Field label inside a sentence: lower-cased, except acronyms (SDK, ROS support)."""
+    label = CORE_FIELDS[field].label
+    return label if label.split()[0].isupper() else label.lower()
 
 
 def caveat_text(item: dict) -> str:
@@ -326,20 +414,25 @@ def _item(session, record: dict, robot_json: dict, edition_map, today: date,
         restricted.append(f"{field!r} is a restricted field (price, availability, publication, "
                           "commercial status, image/rights, evidence or deletion)")
     review = check_provenance(record, today) + check_identity(record, robot_json, edition_map)
-    value, conversion = None, "none"
+    value, conversion, flag = None, "none", None
     if core is None:
         if not restricted:
             review.append(f"{field!r} is not one of the Fast Lane core columns "
                           f"({', '.join(CORE_FIELDS)})")
+    elif core.boolean:
+        flag, flag_reasons = check_boolean(record, field)
+        review += flag_reasons + check_qualifiers(record, core)
     else:
         value, conversion, value_reasons = convert(record, core)
-        review += value_reasons + check_qualifiers(record, core)
+        review += value_reasons + check_qualifiers(record, core) + check_rulings(record, field)
     specs = robot_json.get("specs") or {}
     existing = specs.get(field)
     if core is not None and field not in specs:
         review.append(f"the robot file has no specs.{field} entry")
     elif existing is not None:
-        if value is not None and Fraction(str(existing)) == value:
+        if (flag is True and existing is True) or (
+                core is not None and not core.boolean and value is not None
+                and Fraction(str(existing)) == value):
             raise pm.ProposalRefused(f"{slug}: {field} already has exactly this value")
         review.append(f"catalogue already holds {existing!r}: this is a change, not an "
                       "addition")
@@ -359,7 +452,8 @@ def _item(session, record: dict, robot_json: dict, edition_map, today: date,
         "definition": field,
         "unit": core.unit if core else None,
         "existing_value": existing,
-        "proposed_value": _json_value(value, core) if core and value is not None else None,
+        "proposed_value": (flag if core and core.boolean else
+                           _json_value(value, core) if core and value is not None else None),
         "stated_value": str(record.get("stated_value")),
         "stated_unit": record.get("stated_unit") or None,
         "conversion": conversion,
@@ -385,8 +479,7 @@ def _item(session, record: dict, robot_json: dict, edition_map, today: date,
         "expected_change": {"table": "robot", "kind": "CHANGED", "match": {"slug": slug}},
     }
     item["caveat"] = caveat_text(item) if classification == pm.ROUTINE else None
-    item["display"] = (f"Robot detail: '{core.label}: {item['proposed_value']}"
-                       f"{' ' + core.unit if core.unit else ''}', with caveat"
+    item["display"] = (f"Robot detail: '{core.label}: {shown_value(item)}', with caveat"
                        if core and item["proposed_value"] is not None else "")
     return item
 
@@ -413,7 +506,7 @@ def provenance_note(items: list[dict]) -> str:
         by_source.setdefault((i["source_title"], i["source_url"], i["content_sha256"]),
                              []).append(i)
     sources = "; ".join(
-        f"{', '.join(CORE_FIELDS[i['definition']].label.lower() for i in group)} from "
+        f"{', '.join(_label(i['definition']) for i in group)} from "
         f"{title} {url} (sha256 {sha[:16]}…)" for (title, url, sha), group in by_source.items())
     work_orders = sorted({i["retrieval"]["work_order"] for i in items})
     dates = sorted({i["observed_at"] for i in items})
@@ -474,10 +567,12 @@ def edit_robot_core(original: str, items: list[dict]) -> str:
     for item in sorted(items, key=lambda i: i["definition"]):
         field, core = item["definition"], CORE_FIELDS[item["definition"]]
         have = (parsed.get("specs") or {}).get(field)
-        literal = _literal(Fraction(str(item["proposed_value"])), core)
+        literal = ("true" if core.boolean
+                   else _literal(Fraction(str(item["proposed_value"])), core))
         entry = {"field": field, "text": item["caveat"]}
         if have is not None:
-            if Fraction(str(have)) != Fraction(str(item["proposed_value"])):
+            if (have is not item["proposed_value"] if core.boolean
+                    else Fraction(str(have)) != Fraction(str(item["proposed_value"]))):
                 raise pm.CatalogueEditRefused(f"{parsed['slug']}: specs.{field} already holds "
                                               f"{have!r}; refusing to change it")
         else:
@@ -527,7 +622,7 @@ def planned_edits(manifest: dict, catalogue_dir: Path) -> dict[str, tuple[Path, 
 # Manifest checks, derived artefacts, review
 # --------------------------------------------------------------------------------------- #
 def manifest_problems(manifest: dict) -> list[str]:
-    """Version-2 scope: the robot table, the six core columns, research provenance only."""
+    """Version-2 scope: the robot table, the core columns, research provenance only."""
     reasons = []
     if manifest.get("scope", {}).get("allowed_tables") != ALLOWED_TABLES:
         reasons.append("scope.allowed_tables must be exactly ['robot']")
@@ -569,9 +664,8 @@ def render_review(manifest: dict) -> str:
              "`db/import_preflight.py` after the owner's approval", "",
              "## Core specifications (UNKNOWN -> value)", ""]
     for i in items:
-        unit = f" {i['unit']}" if i.get("unit") else ""
         lines.append(f"- **{i['robot']}** `{i['definition']}` ({i['edition']}, "
-                     f"{i['edition_scope']}): UNKNOWN -> {i['proposed_value']}{unit}  "
+                     f"{i['edition_scope']}): UNKNOWN -> {shown_value(i)}  "
                      f"[{i['classification']}]")
         if i.get("existing_value") is not None:
             lines.append(f"  - catalogue already holds: {i['existing_value']}")

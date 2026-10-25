@@ -69,7 +69,12 @@ def _drop(name: str) -> None:
 
 #: core cells the synthetic research evidence fills. Enrichment batches fill real cells over time,
 #: so the test copy clears these (value and caveat) instead of depending on them staying NULL.
-SYNTHETIC_NULL_CELLS = ((PEER, "degrees_of_freedom"), (ROBOT, "walk_speed_ms"))
+SYNTHETIC_NULL_CELLS = (
+    (PEER, "degrees_of_freedom"), (ROBOT, "walk_speed_ms"),
+    # FL-1 extension: the extra numeric columns and flags the research tests fill or probe
+    (PEER, "battery_wh"), (PEER, "hand_dof"), (PEER, "arm_span_cm"), (PEER, "reach_cm"),
+    (PEER, "has_vision"), (PEER, "has_sdk"), (PEER, "has_api"), (PEER, "ros_support"),
+    (PEER, "has_language_ui"), (PEER, "developer_edition"), (ROBOT, "battery_wh"))
 
 
 def copy_catalogue(target: Path) -> Path:

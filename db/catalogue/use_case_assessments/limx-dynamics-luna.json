@@ -28,8 +28,11 @@
       "basis": "LimX describes Luna as designed primarily for commercial performance scenarios. Score NULL, confidence LOW."
     },
     "retail-service": {
-      "status": "NO_BASIS",
-      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+      "status": "FIT",
+      "basis": "LimX's page (meta description, retrieved 2026-10-31) says Luna provides 'a one-stop performance solution for shopping malls, tourist attractions, trade shows, and other entertainment venues'. Fit on manufacturer positioning only (venue named, no retail task), score NULL, confidence LOW.",
+      "sources": [
+        "https://www.limxdynamics.com/en/products/luna"
+      ]
     },
     "healthcare-rehabilitation": {
       "status": "NO_BASIS",

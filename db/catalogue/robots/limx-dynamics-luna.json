@@ -48,6 +48,15 @@
       "notes": "LimX describes Luna as designed primarily for commercial performance scenarios. Manufacturer positioning only.",
       "limitations": "No deployments or demonstrations are recorded; fit rests on the maker's stated purpose only.",
       "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "retail-service",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "LimX's page (meta description, retrieved 2026-10-31) says Luna provides 'a one-stop performance solution for shopping malls, tourist attractions, trade shows, and other entertainment venues'. Shopping malls are customer-facing venues; no retail task (assisting or informing customers) is stated. Manufacturer positioning only (https://www.limxdynamics.com/en/products/luna). Added on owner instruction 2026-10-31. HO-UC-01 evaluation (use_case_assessments/limx-dynamics-luna.json).",
+      "limitations": "Positioning statement only; the page frames Luna as a performance robot. No deployment, results, availability or pricing are recorded. Associated, not rated.",
+      "confidence": "LOW"
     }
   ],
   "images": [],

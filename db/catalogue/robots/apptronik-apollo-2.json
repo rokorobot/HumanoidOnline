@@ -59,7 +59,22 @@
       "confidence": "LOW"
     }
   ],
-  "images": [],
+  "images": [
+    {
+      "image_url": "/robots/apptronik-apollo-2.webp",
+      "source_url": "https://apptronik.com/apollo/apollo-2",
+      "source_name": "Apptronik",
+      "source_type": "MANUFACTURER",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "UNKNOWN",
+      "usage_basis": "OFFICIAL_MANUFACTURER_MEDIA",
+      "is_official": true,
+      "is_primary": true,
+      "attribution": "© Apptronik",
+      "last_verified_at": "2026-10-31T00:00:00Z"
+    }
+  ],
   "extended_specs": [],
   "spec_caveats": []
 }

@@ -33,6 +33,14 @@ describe("SOCIAL-01 — root social metadata", () => {
     expect(twitter).not.toHaveProperty("title");
     expect(twitter).not.toHaveProperty("description");
   });
+
+  // Bing Webmaster Tools reports "Meta Description too long or too short"
+  // outside 25–160 characters; the root description is inherited site-wide.
+  it("keeps the root meta description within 25–160 characters", () => {
+    const length = String(generateMetadata().description).length;
+    expect(length).toBeGreaterThanOrEqual(25);
+    expect(length).toBeLessThanOrEqual(160);
+  });
 });
 
 describe("SOCIAL-01 — card image", () => {

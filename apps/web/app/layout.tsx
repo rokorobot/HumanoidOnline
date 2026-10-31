@@ -25,7 +25,8 @@ export function generateMetadata(): Metadata {
       template: "%s — HumanoidOnline",
     },
     description:
-      "Compare capabilities, commercial availability, pricing and deployment evidence across the humanoid-robot market. Maturity, obtainability and evidence kept as three independent facts.",
+      // Kept within 25–160 chars: Bing flags longer descriptions as an SEO error.
+      "Compare humanoid robots on capability, commercial availability, pricing and deployment evidence. Maturity, obtainability and evidence kept separate.",
     openGraph: {
       type: "website",
       siteName: "HumanoidOnline",

@@ -1,0 +1,52 @@
+{
+  "robot_slug": "ff-all-new-futurist",
+  "assessed_on": "2026-10-31",
+  "assessed_by": "Claude (Sonnet 5.5) in a session initiated by Robert Konecny. Not human-verified.",
+  "method": "Evaluation against all categories in use_cases.json from the Application Scenarios on https://robotics.ff.com/us/futurist/, recorded in robots/ff-all-new-futurist.json.",
+  "categories": {
+    "warehouse-logistics": {
+      "status": "UNSUPPORTED_POSSIBILITY",
+      "basis": "The Industrial list names 'material handling'; no warehouse or logistics scenario is recorded."
+    },
+    "manufacturing": {
+      "status": "FIT",
+      "sources": [
+        "https://robotics.ff.com/us/futurist/"
+      ],
+      "basis": "Page lists Industrial scenarios including flexible manufacturing and smart assembly. Score NULL, confidence LOW."
+    },
+    "research-education": {
+      "status": "FIT",
+      "sources": [
+        "https://robotics.ff.com/us/futurist/"
+      ],
+      "basis": "Page lists Education scenarios: research, STEM teaching, coding labs, science demos. Score NULL, confidence LOW."
+    },
+    "home": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "events-entertainment": {
+      "status": "FIT",
+      "sources": [
+        "https://robotics.ff.com/us/futurist/"
+      ],
+      "basis": "Page lists Entertainment scenarios: stage performance, robot combat, sports competition, interactive shows. Score NULL, confidence LOW."
+    },
+    "retail-service": {
+      "status": "FIT",
+      "sources": [
+        "https://robotics.ff.com/us/futurist/"
+      ],
+      "basis": "Page lists Commercial scenarios: reception, guided tours, retail, shopping assistance, events, performances. Score NULL, confidence LOW."
+    },
+    "healthcare-rehabilitation": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "security-inspection": {
+      "status": "UNSUPPORTED_POSSIBILITY",
+      "basis": "The Industrial list names 'inspection' generally; no security or inspection scenario is recorded."
+    }
+  }
+}

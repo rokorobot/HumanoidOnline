@@ -1,0 +1,154 @@
+{
+  "slug": "ff-all-new-futurist",
+  "name": "FF All-New Futurist",
+  "manufacturer_slug": "faraday-future",
+  "model_code": null,
+  "summary": "FF All-New Futurist is Faraday Future's newer full-size professional humanoid, sold in two editions: All-New Futurist ($89,900) and All-New Futurist Ultra ($129,900), per FF's own page.",
+  "announced_year": null,
+  "commercial_status": "UNKNOWN",
+  "is_published": false,
+  "specs": {
+    "height_cm": 174.0,
+    "weight_kg": null,
+    "arm_span_cm": null,
+    "reach_cm": null,
+    "payload_kg": null,
+    "walk_speed_ms": null,
+    "runtime_minutes": null,
+    "battery_wh": null,
+    "mobility": null,
+    "degrees_of_freedom": null,
+    "hand_type": null,
+    "hand_dof": null,
+    "autonomy": null,
+    "has_manipulation": null,
+    "has_teleoperation": null,
+    "has_vision": null,
+    "has_language_ui": null,
+    "has_sdk": null,
+    "has_api": null,
+    "ros_support": null,
+    "developer_edition": null,
+    "simulation_support": null
+  },
+  "specs_note": "OWNER-APPROVED 2026-10-31 (Robert Konecny, in thread; PR #231); unpublished, publication is a separate decision. commercial_status left UNKNOWN (the owner has not set a status for this model). RETRIEVAL: page rendered in a real browser and read 2026-10-31 (robots.txt allows); values verbatim from https://robotics.ff.com/us/futurist/. Separate from the catalogued ff-futurist (older page https://robotics.ff.com/us/ff-futurist/, banner 'FF New Futurist - Coming Soon on 6/22'); relationship not stated beyond that, not merged. Page title 'FF All-New Futurist: Full-Size Humanoid Robot'; 'Order Now', 'Start From $89,900'. Specs table: height ≈174 cm both; weight ≈54 kg / ≈58 kg; DOF 31 / 51 ('Can be updated to 71 DOF with advanced Dex Hands'); joint peak torque 320 N·m; battery 1152 Wh dual; endurance over 6 h / over 5 h; compute dual RK3588 / Jetson Thor-U + dual RK3588 · 700 TOPS; LiDAR N/A / Equipped. The page's hero text also says 'up to 51 DOF'. Only height is filled at record level because the other values differ by edition. No shipping or delivery stated.",
+  "official_url": "https://robotics.ff.com/us/futurist/",
+  "commercial_status_evidence": [],
+  "variants": [
+    {
+      "slug": "all-new-futurist",
+      "name": "All-New Futurist",
+      "is_developer": false,
+      "description": "≈54 kg, 31 DOF, articulated hands, dual RK3588, over 6 h endurance, no LiDAR; $89,900 incl. $10,000 valued Skill Package."
+    },
+    {
+      "slug": "all-new-futurist-ultra",
+      "name": "All-New Futurist Ultra",
+      "is_developer": false,
+      "description": "≈58 kg, 51 DOF, dexterous hands, Nvidia Jetson Thor-U + dual RK3588 (700 TOPS), over 5 h endurance, LiDAR; $129,900 incl. $15,000 valued Skill Package."
+    }
+  ],
+  "pricing_offers": [
+    {
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "USD",
+      "price": 89900,
+      "price_min": null,
+      "price_max": null,
+      "billing_period": "ONE_TIME",
+      "region_code": "US",
+      "provider_slug": null,
+      "variant_slug": "all-new-futurist",
+      "note": "All-New Futurist price, specs table.",
+      "evidence": [
+        {
+          "source_url": "https://robotics.ff.com/us/futurist/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "FF All-New Futurist (specs table)",
+          "excerpt": "Price $89,900 | Included $10,000 valued Skill Package",
+          "published_at": null,
+          "observed_at": "2026-10-31",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — page rendered in a real browser and read 2026-10-31 by Claude (Sonnet 5.5) in a session initiated by Robert Konecny (owner go-ahead, FF price fix); robots.txt allows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. All-New Futurist price, specs table."
+        }
+      ]
+    },
+    {
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "USD",
+      "price": 129900,
+      "price_min": null,
+      "price_max": null,
+      "billing_period": "ONE_TIME",
+      "region_code": "US",
+      "provider_slug": null,
+      "variant_slug": "all-new-futurist-ultra",
+      "note": "All-New Futurist Ultra price, specs table.",
+      "evidence": [
+        {
+          "source_url": "https://robotics.ff.com/us/futurist/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "FF All-New Futurist (specs table)",
+          "excerpt": "Price $129,900 | Included $15,000 valued Skill Package",
+          "published_at": null,
+          "observed_at": "2026-10-31",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — page rendered in a real browser and read 2026-10-31 by Claude (Sonnet 5.5) in a session initiated by Robert Konecny (owner go-ahead, FF price fix); robots.txt allows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. All-New Futurist Ultra price, specs table."
+        }
+      ]
+    }
+  ],
+  "availability_offers": [],
+  "deployments": [],
+  "capabilities": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "retail-service",
+      "fit_score": null,
+      "is_primary": true,
+      "commercial_readiness": null,
+      "notes": "Page lists Commercial scenarios: reception, guided tours, retail, shopping assistance, events, performances. Manufacturer positioning only.",
+      "limitations": "No deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only. FF notes that scenario capabilities shown are potential future functionality.",
+      "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "research-education",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "Page lists Education scenarios: research, STEM teaching, coding labs, science demos. Manufacturer positioning only.",
+      "limitations": "No deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only. FF notes that scenario capabilities shown are potential future functionality.",
+      "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "manufacturing",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "Page lists Industrial scenarios including flexible manufacturing and smart assembly. Manufacturer positioning only.",
+      "limitations": "No deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only. FF notes that scenario capabilities shown are potential future functionality.",
+      "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "events-entertainment",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "Page lists Entertainment scenarios: stage performance, robot combat, sports competition, interactive shows. Manufacturer positioning only.",
+      "limitations": "No deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only. FF notes that scenario capabilities shown are potential future functionality.",
+      "confidence": "LOW"
+    }
+  ],
+  "images": [],
+  "extended_specs": [],
+  "spec_caveats": [
+    {
+      "field": "height_cm",
+      "text": "Both editions: '≈ 174 cm'."
+    }
+  ]
+}

@@ -61,6 +61,7 @@ IDEMPOTENCY MODEL (stable-ID, non-destructive reconciliation)
     robots, then robot.product_line_id is set for each listed member. An unknown robot, a robot
     of another manufacturer, or a robot in two lines is refused. A robot not listed keeps its
     line. Skipped by a scoped (`--only`) import.
+  - `--product-lines-only` imports just that file (lines + membership), reading no robot file.
   - Robots are never deleted. Offer retirement is `is_current` true -> false.
   - Scope of the evidence reconciled: PRICING_OFFER / AVAILABILITY_OFFER /
     DEPLOYMENT evidence under the reconciled rows, COMMERCIAL_STATUS evidence of
@@ -1900,6 +1901,48 @@ def run_manufacturers_only(url: str, *, manufacturers_path: Path | None = None,
     return totals
 
 
+class ProductLinesImportAborted(SystemExit):
+    """`--product-lines-only` refused before writing anything."""
+
+
+def run_product_lines_only(url: str, *, product_lines_path: Path | None = None,
+                           apply_publication_state: bool = False, authorize=None) -> Reconciliation:
+    """Import ONLY product_lines.json: upsert the lines and set robot.product_line_id.
+
+    No robot file is read. The robots and manufacturers the file names must already exist
+    (an unknown one is refused). Nothing but `product_line` rows and the `product_line_id`
+    column of the listed member robots is written; one transaction, so a refusal commits nothing.
+    """
+    path = product_lines_path or PRODUCT_LINES_PATH
+    data = _load(path)
+    problems = product_line_problems(data)
+    if problems:
+        raise ProductLinesImportAborted(
+            f"product-lines-only import refused before writing - {len(problems)} problem(s) in "
+            f"{path.name}:\n  " + "\n  ".join(problems))
+    recon = Reconciliation(authorize)
+    with psycopg.connect(url, autocommit=False) as conn:
+        with conn.cursor() as cur:
+            cur.execute("SET search_path TO humanoid, public")
+
+            def manufacturer_id(slug):
+                r = cur.execute("SELECT id FROM manufacturer WHERE slug=%s", (slug,)).fetchone()
+                if not r:
+                    raise ProductLinesImportAborted(
+                        f"unknown manufacturer slug referenced: {slug!r}")
+                return r[0]
+
+            import_product_lines(cur, data, manufacturer_id, recon,
+                                 apply_publication_state=apply_publication_state)
+            recon.finish()
+        conn.commit()
+    print(f"PRODUCT-LINES-ONLY IMPORT OK: {len(data['product_lines'])} product line(s).")
+    print(recon.summary())
+    print("Robots, offers, evidence and every other table were not read or written "
+          "(except robot.product_line_id of the listed members).")
+    return recon
+
+
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description="Import the WS2B verified catalogue")
     ap.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
@@ -1933,6 +1976,14 @@ def main(argv: list[str] | None = None) -> None:
              "--apply-publication-state.",
     )
     ap.add_argument(
+        "--product-lines-only",
+        action="store_true",
+        help="Import ONLY db/catalogue/product_lines.json: upsert the product lines and set "
+             "robot.product_line_id for the listed members. No robot file is read and no "
+             "robot, offer, evidence, manufacturer or child row is reconciled. Cannot be "
+             "combined with --only or --manufacturers-only.",
+    )
+    ap.add_argument(
         "--authorize",
         metavar="PATH",
         help="JSON file of changes the importer may make beyond inserting and updating "
@@ -1943,6 +1994,13 @@ def main(argv: list[str] | None = None) -> None:
              "and an entry that matches nothing aborts the run.",
     )
     args = ap.parse_args(argv)
+    if args.product_lines_only:
+        conflicts = [flag for flag, given in (
+            ("--only", bool(args.only)),
+            ("--manufacturers-only", args.manufacturers_only),
+        ) if given]
+        if conflicts:
+            ap.error("--product-lines-only cannot be combined with " + ", ".join(conflicts))
     if args.manufacturers_only:
         conflicts = [flag for flag, given in (
             ("--only", bool(args.only)),
@@ -1952,6 +2010,11 @@ def main(argv: list[str] | None = None) -> None:
             ap.error("--manufacturers-only cannot be combined with " + ", ".join(conflicts))
     if not args.database_url:
         ap.error("no database URL: pass --database-url or set DATABASE_URL")
+    if args.product_lines_only:
+        run_product_lines_only(normalize_url(args.database_url),
+                               apply_publication_state=args.apply_publication_state,
+                               authorize=args.authorize)
+        return
     if args.manufacturers_only:
         run_manufacturers_only(normalize_url(args.database_url), authorize=args.authorize)
         return

@@ -253,3 +253,108 @@ def test_unpublished_member_robots_are_excluded(env):
         assert len(detail["robots"]) == 6
     finally:
         _sql(dsn, "UPDATE robot SET is_published = TRUE WHERE slug = 'unitree-r1-edu-u6'")
+
+
+# --- --product-lines-only ----------------------------------------------------
+
+def _preflight():
+    spec = importlib.util.spec_from_file_location(
+        "import_preflight", REPO_ROOT / "db" / "import_preflight.py")
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules["import_preflight"] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+@pytest.fixture()
+def catalogue_without_lines(database_url):
+    """A scratch DB holding the catalogue but no product lines (production after 0027)."""
+    url = make_url(get_settings().resolved_database_url)
+    admin = _libpq(url.set(database="postgres"))
+    name = f"ho_dr_l1_po_{uuid.uuid4().hex[:12]}"
+    with psycopg.connect(admin, autocommit=True) as conn:
+        conn.execute(f'CREATE DATABASE "{name}"')
+    dsn = _libpq(url.set(database=name))
+    try:
+        with psycopg.connect(dsn, autocommit=True) as conn:
+            conn.execute((REPO_ROOT / "db" / "schema.sql").read_text(encoding="utf-8"))
+        ic = _importer()
+        with contextlib.redirect_stdout(io.StringIO()):
+            ic.run(dsn)
+        _sql(dsn, "UPDATE robot SET product_line_id = NULL")
+        _sql(dsn, "DELETE FROM product_line")
+        yield dsn, ic
+    finally:
+        with psycopg.connect(admin, autocommit=True) as conn:
+            conn.execute("SELECT pg_terminate_backend(pid) FROM pg_stat_activity"
+                         " WHERE datname = %s AND pid <> pg_backend_pid()", (name,))
+            conn.execute(f'DROP DATABASE IF EXISTS "{name}"')
+
+
+def _snapshot(pf, dsn):
+    with psycopg.connect(dsn) as conn:
+        conn.read_only = True
+        return pf.snapshot(conn)
+
+
+def test_product_lines_only_changes_exactly_lines_and_memberships(catalogue_without_lines):
+    dsn, ic = catalogue_without_lines
+    pf = _preflight()
+    before = _snapshot(pf, dsn)
+    with contextlib.redirect_stdout(io.StringIO()):
+        recon = ic.run_product_lines_only(dsn)
+    after = _snapshot(pf, dsn)
+    changes = pf.diff(before, after)
+    by_kind = sorted((c.table, c.kind) for c in changes)
+    assert by_kind == [("product_line", "ADDED")] * 5 + [("robot", "CHANGED")] * 16
+    # a member robot differs ONLY in product_line; every child table is byte-identical
+    assert all(set(c.detail) == {"product_line"} for c in changes if c.table == "robot")
+    assert recon.counts["product_line"]["inserted"] == 5
+    assert recon.counts["robot_product_line"]["updated"] == 16
+    # nothing else was reconciled or counted
+    assert set(recon.counts) == {"product_line", "robot_product_line"}
+
+
+def test_product_lines_only_second_run_is_a_noop(catalogue_without_lines):
+    dsn, ic = catalogue_without_lines
+    pf = _preflight()
+    with contextlib.redirect_stdout(io.StringIO()):
+        ic.run_product_lines_only(dsn)
+        mid = _snapshot(pf, dsn)
+        recon = ic.run_product_lines_only(dsn)
+    assert pf.diff(mid, _snapshot(pf, dsn)) == []
+    for table in ("product_line", "robot_product_line"):
+        c = recon.counts[table]
+        assert c["inserted"] == c["updated"] == c["removed"] == 0
+
+
+def test_product_lines_only_refuses_bad_data_without_writing(catalogue_without_lines, tmp_path):
+    dsn, ic = catalogue_without_lines
+    data = copy.deepcopy(LINES)
+    data["product_lines"][0]["robots"].append("no-such-robot")
+    bad = tmp_path / "lines.json"
+    bad.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ic.ReconcileRefused, match="unknown robot slug"):
+        ic.run_product_lines_only(dsn, product_lines_path=bad)
+    assert _sql(dsn, "SELECT count(*) FROM product_line") == [(0,)]
+    data = copy.deepcopy(LINES)
+    data["product_lines"][1]["robots"].append("unitree-g1")
+    bad.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ic.ProductLinesImportAborted, match="in two product lines"):
+        ic.run_product_lines_only(dsn, product_lines_path=bad)
+
+
+def test_product_lines_only_is_exclusive_with_only(catalogue_without_lines):
+    _, ic = catalogue_without_lines
+    with pytest.raises(SystemExit) as exc:
+        ic.main(["--database-url", "postgresql://x/x", "--product-lines-only", "--only", "a"])
+    assert exc.value.code == 2
+
+
+def test_expected_manifest_matches_the_lines_file():
+    manifest = json.loads(
+        (REPO_ROOT / "db" / "catalogue" / "product_lines_expected.json").read_text("utf-8"))
+    robots = {(e["match"]["slug"], e["match"]["product_line"])
+              for e in manifest["expected"] if e["table"] == "robot"}
+    assert robots == {(r, k) for k, v in EXPECTED.items() for r in v}
+    assert len([e for e in manifest["expected"] if e["table"] == "product_line"]) == 5

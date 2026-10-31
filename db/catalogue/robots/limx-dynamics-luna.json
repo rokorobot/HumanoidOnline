@@ -31,12 +31,63 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "OWNER-APPROVED 2026-10-31 (Robert Konecny, in thread; PR #222); unpublished, publication is a separate decision. RETRIEVAL: AUTOMATED weekly new-robot scan 2026-10-31 (HO-DATA-STANDING); values verbatim from https://www.limxdynamics.com/en/products/luna. Not human-verified. Page meta: 'LimX Luna is a full-size interactive humanoid robot designed primarily for commercial performance scenarios. Featuring a 160cm humanoid form and 27 degrees of freedom'. Specs from https://www.limxdynamics.com/en/products/luna/spec.",
+  "specs_note": "OWNER-APPROVED 2026-10-31 (Robert Konecny, in thread; PR #222); unpublished, publication is a separate decision. RETRIEVAL: AUTOMATED weekly new-robot scan 2026-10-31 (HO-DATA-STANDING); values verbatim from https://www.limxdynamics.com/en/products/luna. Not human-verified. Page meta: 'LimX Luna is a full-size interactive humanoid robot designed primarily for commercial performance scenarios. Featuring a 160cm humanoid form and 27 degrees of freedom'. Specs from https://www.limxdynamics.com/en/products/luna/spec. PRICE 2026-10-31: RMB 298,000 China retail price and pre-order status from LimX's official launch notice https://www.limxdynamics.com/ja/news/BK000062; no price outside China is stated.",
   "official_url": "https://www.limxdynamics.com/en/products/luna",
   "commercial_status_evidence": [],
   "variants": [],
-  "pricing_offers": [],
-  "availability_offers": [],
+  "pricing_offers": [
+    {
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "CNY",
+      "price": 298000,
+      "price_min": null,
+      "price_max": null,
+      "billing_period": "ONE_TIME",
+      "region_code": "CN",
+      "provider_slug": null,
+      "variant_slug": null,
+      "note": "Maker's China retail price. The same notice gives a limited-time RMB 40,000 discount for the first 100 customers (not recorded as the price). 'Price for markets beyond China will be disclosed soon.'",
+      "evidence": [
+        {
+          "source_url": "https://www.limxdynamics.com/ja/news/BK000062",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "LimX Dynamics Launches All-New Full-Size Humanoid Robot Luna (LimX official news)",
+          "excerpt": "In China, the retail price is set at RMB 298,000. The first 100 customers will receive a limited-time discount of RMB 40,000, available while supplies last. Price for markets beyond China will be disclosed soon.",
+          "published_at": "2026-05-26",
+          "observed_at": "2026-10-31",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — LimX launch news page fetched directly 2026-10-31 by Claude (Sonnet 5.5) in a session initiated by Robert Konecny; robots.txt allows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Official LimX notice; China price only."
+        }
+      ]
+    }
+  ],
+  "availability_offers": [
+    {
+      "transaction_type": "PURCHASE",
+      "availability_status": "PREORDER",
+      "region_code": "CN",
+      "provider_slug": null,
+      "variant_slug": null,
+      "lead_time_days": null,
+      "available_from": null,
+      "note": "LimX: 'LimX Luna is now officially open for global pre-orders.' Delivery date not stated.",
+      "evidence": [
+        {
+          "source_url": "https://www.limxdynamics.com/ja/news/BK000062",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "LimX Dynamics Launches All-New Full-Size Humanoid Robot Luna (LimX official news)",
+          "excerpt": "LimX Luna is now officially open for global pre-orders.",
+          "published_at": "2026-05-26",
+          "observed_at": "2026-10-31",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — LimX launch news page fetched directly 2026-10-31 by Claude (Sonnet 5.5) in a session initiated by Robert Konecny; robots.txt allows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Official LimX notice dated 2026-05-26 (pre-order open)."
+        }
+      ]
+    }
+  ],
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [

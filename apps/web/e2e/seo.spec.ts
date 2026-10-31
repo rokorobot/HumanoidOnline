@@ -27,9 +27,11 @@ test.describe("R22 — per-page metadata (no generic-root inheritance)", () => {
     const title = await page.title();
     expect(title, "must not inherit the generic root title").not.toBe(ROOT_TITLE);
     expect(title).toMatch(/ — HumanoidOnline$/);
-    // The title leads with the entity name (the robot's H1).
+    // The title leads with the entity: maker + model, so it contains the robot's H1
+    // (CID-04, owner decision 2026-10-31: "Unitree Robotics G1 Basic: …", not "G1 Basic by …").
     const h1 = (await page.getByRole("heading", { level: 1 }).textContent())?.trim();
-    expect(h1 && title.startsWith(h1)).toBeTruthy();
+    expect(h1 && title.includes(h1)).toBeTruthy();
+    expect(title).toMatch(/^Unitree/);
   });
 
   test("dynamic use-case route carries its own title", async ({ page }) => {

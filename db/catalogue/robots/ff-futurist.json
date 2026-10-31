@@ -126,7 +126,7 @@
       "is_primary": false,
       "commercial_readiness": null,
       "notes": "Healthcare is listed among the target scenarios. Manufacturer positioning only.",
-      "limitations": "No specifications, deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only.",
+      "limitations": "No clinical validation or regulatory approval is recorded; no specifications, deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only.",
       "confidence": "LOW"
     },
     {

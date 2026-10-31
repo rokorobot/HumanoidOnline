@@ -28,9 +28,13 @@ def queue_digest(proposals: Iterable[str], identity: Iterable[str], source: Iter
 
 
 def summarize(proposals: Iterable[str], identity: Iterable[str], source: Iterable[str],
-              new_proposals: int = 0, new_identity: int = 0) -> dict:
+              new_proposals: int = 0, new_identity: int = 0,
+              items: Iterable[str] = ()) -> dict:
+    """`items` are human-readable labels of the queue (what the owner must decide). They are
+    display only: never part of the digest, so wording changes never re-notify."""
     p, i, s = sorted(set(proposals)), sorted(set(identity)), sorted(set(source))
     return {
+        "items": list(items),
         "complete": True,
         "proposals_awaiting_decision": len(p), "identity_review_items": len(i),
         "source_review_items": len(s), "total": len(p) + len(i) + len(s),
@@ -39,6 +43,12 @@ def summarize(proposals: Iterable[str], identity: Iterable[str], source: Iterabl
         "standing_queue": len(p) + len(i) + len(s) - new_proposals - new_identity,
         "queue_digest": queue_digest(p, i, s),
     }
+
+
+def proposal_label(p) -> str:
+    edition = f" ({p.edition})" if p.edition else ""
+    value = p.value if len(p.value) <= 80 else p.value[:79] + "…"
+    return f"Field proposal — {p.robot_slug}{edition} · {p.target} = {value} [{p.source_url}]"
 
 
 def incomplete(reason: str) -> dict:
@@ -53,9 +63,14 @@ def compute(session: Session, started_at: datetime, source_items: Iterable[str],
         states = [s for s in pr.list_proposals(session) if s.acceptable]
         ids = [s.proposal.digest for s in states]
         new = sum(1 for s in states if s.proposal.created_at >= started_at)
-        identity = [f"{q.kind}:{','.join(sorted(map(str, q.candidate_ids)))}"
-                    for q in review_queue(session)]
-        return summarize(ids, identity, source_items, new, min(new_identity, len(identity)))
+        queue = review_queue(session)
+        identity = [f"{q.kind}:{','.join(sorted(map(str, q.candidate_ids)))}" for q in queue]
+        source_items = list(source_items)
+        items = ([f"Robot identity — {q.kind}: {q.summary}" for q in queue]
+                 + [proposal_label(st.proposal) for st in states]
+                 + [f"Source policy — {x}" for x in sorted(set(source_items))])
+        return summarize(ids, identity, source_items, new, min(new_identity, len(identity)),
+                         items)
     except Exception as exc:  # noqa: BLE001 - informational; an incomplete queue never closes an issue
         return incomplete(type(exc).__name__)
 

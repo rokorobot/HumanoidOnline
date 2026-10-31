@@ -28,6 +28,7 @@ from app.models.robot import Robot
 from app.services.discovery import DiscoveryError
 from app.services.discovery import proposal_review as pr
 from app.services.discovery.fingerprint import fingerprint
+from app.services.discovery.sources import neura_mini_proposals as mini
 
 pytestmark = pytest.mark.usefixtures("no_external_network")
 WHO, WHY = "Robert Konecny", "owner review"
@@ -395,3 +396,15 @@ def test_stage_a_to_f_modules_do_not_reference_review():
         src = (root / rel).read_text(encoding="utf-8")
         assert "proposal_review" not in src and "proposals import" not in src, rel
     assert fingerprint(b"x", "text/plain") and timedelta(0) == timedelta(0)
+
+
+def test_the_review_summary_names_each_proposal_robot_field_and_value(dsession):
+    from app.services.discovery import human_review as hr
+    w = seeded(dsession)
+    states = [s for s in pr.list_proposals(dsession) if s.acceptable]
+    h = hr.compute(dsession, datetime.now(UTC) - timedelta(days=1), [])
+    assert h["complete"] and states
+    labels = [x for x in h["items"] if x.startswith("Field proposal — ")]
+    assert len(labels) == h["proposals_awaiting_decision"] == len(states)
+    assert all(w.slug in x and x.endswith(f"[{mini.MINI_URL}]") for x in labels)
+    assert f"Field proposal — {w.slug} (Standard) · robot_variant = Standard" in labels[0]

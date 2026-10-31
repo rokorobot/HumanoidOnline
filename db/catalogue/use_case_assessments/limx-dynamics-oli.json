@@ -9,12 +9,18 @@
       "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
     },
     "manufacturing": {
-      "status": "NO_BASIS",
-      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+      "status": "FIT",
+      "basis": "LimX's page (meta description, retrieved 2026-10-31) says Oli 'provides a high-performance robotic platform for scientific research, manufacturing, and commercial applications'. Fit on manufacturer positioning only, score NULL, confidence LOW.",
+      "sources": [
+        "https://www.limxdynamics.com/en/products/oli"
+      ]
     },
     "research-education": {
-      "status": "NO_BASIS",
-      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+      "status": "FIT",
+      "basis": "LimX's page (meta description, retrieved 2026-10-31) says Oli 'provides a high-performance robotic platform for scientific research, manufacturing, and commercial applications'. Fit on manufacturer positioning only, score NULL, confidence LOW.",
+      "sources": [
+        "https://www.limxdynamics.com/en/products/oli"
+      ]
     },
     "home": {
       "status": "NO_BASIS",

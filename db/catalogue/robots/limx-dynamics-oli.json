@@ -39,7 +39,26 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "research-education",
+      "fit_score": null,
+      "is_primary": true,
+      "commercial_readiness": null,
+      "notes": "LimX's page (meta description, retrieved 2026-10-31) says Oli 'provides a high-performance robotic platform for scientific research, manufacturing, and commercial applications'. Research is listed first. Manufacturer positioning only (https://www.limxdynamics.com/en/products/oli). Added on owner instruction 2026-10-31. HO-UC-01 evaluation (use_case_assessments/limx-dynamics-oli.json).",
+      "limitations": "Positioning statement only; no deployment, results, availability or pricing are recorded. Associated, not rated.",
+      "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "manufacturing",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "LimX's page (meta description, retrieved 2026-10-31) says Oli 'provides a high-performance robotic platform for scientific research, manufacturing, and commercial applications'. Manufacturing is named as an application; no deployment is stated. Manufacturer positioning only (https://www.limxdynamics.com/en/products/oli). Added on owner instruction 2026-10-31. HO-UC-01 evaluation (use_case_assessments/limx-dynamics-oli.json).",
+      "limitations": "Positioning statement only; no deployment, results, availability or pricing are recorded. Associated, not rated.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [],
   "extended_specs": [
     {

@@ -1,6 +1,6 @@
 # DR-L1 — Product-line pages
 
-**Status:** PROPOSED — 2026-10-31, for owner decision (§5). Implements nothing until approved.
+**Status:** APPROVED — 2026-10-31, Robert Konecny (product owner): L1–L5 approved as recommended (§5).
 **Related:** docs/23 (CITATION-01.2, 01.8, 01.9), docs/24, `aeo-pilot-2026-10-r1` baseline, AGENTS.md rules 2, 6, 7.
 
 ## 1. Problem
@@ -49,7 +49,7 @@ Excluded: Figure 02/03 and Walker S1/S2 (different models).
 - No line-level price, availability or spec stored anywhere.
 - No new comparison semantics.
 
-## 5. Owner decisions
+## 5. Owner decisions — all APPROVED as recommended (2026-10-31)
 
 | ID | Decision | Recommendation |
 |---|---|---|

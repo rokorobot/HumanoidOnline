@@ -5,7 +5,7 @@
   "model_code": null,
   "summary": null,
   "announced_year": null,
-  "commercial_status": "UNKNOWN",
+  "commercial_status": "ANNOUNCED",
   "is_published": false,
   "specs": {
     "height_cm": null,
@@ -33,7 +33,19 @@
   },
   "specs_note": "IDENTITY DRAFT (owner decision pending; not imported). RETRIEVAL: news scan 2026-10-31. No official maker site found (aimoga.com is a domain listed for sale, not the maker's). Only name, maker and news links recorded, no specs. News: https://bernama.com/en/press/news.php?id=2622475 ; https://bernama.com/en/press/news.php?id=2622254 (maker AiMOGA Robotics, Chery group; 'consumer-grade family companion humanoid', unveiled in Wuhu, China, pre-orders announced for 2026-10-21/22). Scope unconfirmed: press reports ~0.9 m, 18 kg, not verified from maker.",
   "official_url": null,
-  "commercial_status_evidence": [],
+  "commercial_status_evidence": [
+    {
+      "source_url": "https://bernama.com/en/press/news.php?id=2622475",
+      "source_type": "NEWS_ARTICLE",
+      "source_title": "AiMOGA Mobo launch (Bernama)",
+      "excerpt": "first consumer-grade family companion humanoid robot",
+      "published_at": "2026-10-19",
+      "observed_at": "2026-10-31",
+      "verified_at": null,
+      "confidence": "MEDIUM",
+      "note": "Owner set ANNOUNCED 2026-10-31. News reports an unveiling and opening of global pre-orders; no shipping stated. No official AiMOGA site found."
+    }
+  ],
   "variants": [],
   "pricing_offers": [],
   "availability_offers": [],

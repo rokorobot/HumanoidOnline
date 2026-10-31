@@ -3,9 +3,9 @@
   "name": "FF Futurist",
   "manufacturer_slug": "faraday-future",
   "model_code": null,
-  "summary": "FF Futurist is described by Faraday Future's FF EAI Robotics as a full-size professional humanoid robot for reception, hospitality, commercial services, manufacturing, healthcare and university research. The maker's page offers pre-order or enquiry and shows two different prices; no specifications are stated.",
+  "summary": "FF Futurist is described by Faraday Future's FF EAI Robotics as a full-size professional humanoid robot, offered in a base and an Ultra configuration. The page lists Ultra at $139,990 (169 cm, ≈69 kg, 28 DOF plus a 6-DOF dexterous hand) and a base price from $84,990; FF's newer 'All-New Futurist' is a separate page.",
   "announced_year": null,
-  "commercial_status": "UNKNOWN",
+  "commercial_status": "ANNOUNCED",
   "is_published": false,
   "specs": {
     "height_cm": null,
@@ -31,35 +31,75 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "OWNER-APPROVED 2026-10-31 (Robert Konecny, in thread, PR #223); unpublished, publication is a separate decision. All values verbatim from https://robotics.ff.com/us/ff-futurist/ (observed 2026-10-31). No specifications are stated in the page markup; all specs null. commercial_status left UNKNOWN: the page offers 'Preorder / Inquire' (recorded as a PREORDER availability offer) but states no status word to map. PRICE CONFLICT KEPT, NOT RESOLVED: the same page states two prices in two places: JSON-LD product offer 'Starting price; skill package additional.' 34990 USD, and the site robotics menu 'FF Futurist - From $84,990'. The same menu lists 'FF Master Ultra - From $34,990', so the 34,990 figure may be misplaced; not inferred, owner to decide. The offer is recorded as a RANGE only because the schema allows one offer per seller/region/type; FF does not publish a range. Two evidence rows carry the two statements.",
+  "specs_note": "OWNER-APPROVED 2026-10-31 (Robert Konecny, in thread, PR #223); unpublished, publication is a separate decision. All values verbatim from https://robotics.ff.com/us/ff-futurist/ (observed 2026-10-31). No specifications are stated in the page markup; all specs null. commercial_status left UNKNOWN: the page offers 'Preorder / Inquire' (recorded as a PREORDER availability offer) but states no status word to map. PRICES RESOLVED 2026-10-31 by reading the rendered page: the page offers two configurations, Futurist (menu 'From $84,990') and Futurist Ultra ($139,990, the only one with a spec column), recorded as variants. The earlier 34,990 USD figure came from the page's JSON-LD markup and is NOT recorded as an offer: it matches the 'FF Master Ultra — From $34,990' menu entry and conflicts with every on-page Futurist price. The page banner says 'FF New Futurist - Coming Soon on 6/22'; FF's current page https://robotics.ff.com/us/futurist/ sells a different 'FF All-New Futurist' (separate identity draft ff-all-new-futurist, not merged). commercial_status ANNOUNCED set by the owner 2026-10-31.",
   "official_url": "https://robotics.ff.com/us/ff-futurist/",
-  "commercial_status_evidence": [],
-  "variants": [],
+  "commercial_status_evidence": [
+    {
+      "source_url": "https://robotics.ff.com/us/ff-futurist/",
+      "source_type": "MANUFACTURER_SITE",
+      "source_title": "FF Futurist - FF EAI Robotics",
+      "excerpt": "Order Now ... FF New Futurist - Coming Soon on 6/22",
+      "published_at": null,
+      "observed_at": "2026-10-31",
+      "verified_at": null,
+      "confidence": "HIGH",
+      "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — page rendered in a real browser and read 2026-10-31 by Claude (Sonnet 5.5) in a session initiated by Robert Konecny (owner go-ahead, FF price fix); robots.txt allows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Owner set ANNOUNCED 2026-10-31. The page offers 'Order Now' and the JSON-LD availability is PreOrder, but states no shipment or delivery; mapped to ANNOUNCED (no hardware shipping stated)."
+    }
+  ],
+  "variants": [
+    {
+      "slug": "futurist",
+      "name": "Futurist",
+      "is_developer": false,
+      "description": "Base configuration. FF's pages show only a 'From $84,990' menu price for it; no specification column is shown on the page."
+    },
+    {
+      "slug": "futurist-ultra",
+      "name": "Futurist Ultra",
+      "is_developer": false,
+      "description": "Ultra configuration, the only one with a specification column on the page: $139,990 including a $20,000 valued Skill Package."
+    }
+  ],
   "pricing_offers": [
     {
       "transaction_type": "PURCHASE",
-      "price_type": "RANGE",
+      "price_type": "PUBLIC",
       "currency": "USD",
-      "price": null,
-      "price_min": 34990,
-      "price_max": 84990,
+      "price": 139990,
+      "price_min": null,
+      "price_max": null,
       "billing_period": "ONE_TIME",
       "region_code": "US",
       "provider_slug": null,
-      "variant_slug": null,
-      "note": "CONFLICT: two different prices stated on the same maker page (34,990 and 84,990 USD, both 'starting'). Not a range published by FF; see specs_note. Skill package additional per the JSON-LD statement.",
+      "variant_slug": "futurist-ultra",
+      "note": "Futurist Ultra price on the 'Choose your Futurist' block.",
       "evidence": [
         {
           "source_url": "https://robotics.ff.com/us/ff-futurist/",
           "source_type": "MANUFACTURER_SITE",
-          "source_title": "FF Futurist - FF EAI Robotics (product markup)",
-          "excerpt": "Starting price; skill package additional. (price 34990.00 USD)",
+          "source_title": "FF Futurist - FF EAI Robotics (Choose your Futurist)",
+          "excerpt": "Futurist Ultra $139,990 includes $20,000 valued Skill Package",
           "published_at": null,
           "observed_at": "2026-10-31",
           "verified_at": null,
-          "confidence": "MEDIUM",
-          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — HO-DATA news scan 2026-10-31 by Claude (Sonnet 5.5) in a session initiated by Robert Konecny; page fetched directly (robots.txt allows). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Price 34,990 USD from the page's JSON-LD product offer (schema.org AggregateOffer, availability PreOrder)."
-        },
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — page rendered in a real browser and read 2026-10-31 by Claude (Sonnet 5.5) in a session initiated by Robert Konecny (owner go-ahead, FF price fix); robots.txt allows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Futurist Ultra price on the 'Choose your Futurist' block."
+        }
+      ]
+    },
+    {
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "USD",
+      "price": 84990,
+      "price_min": null,
+      "price_max": null,
+      "billing_period": "ONE_TIME",
+      "region_code": "US",
+      "provider_slug": null,
+      "variant_slug": "futurist",
+      "note": "Listed as 'From $84,990' in the site's robotics menu; the base configuration's price is not shown elsewhere on the page.",
+      "evidence": [
         {
           "source_url": "https://robotics.ff.com/us/ff-futurist/",
           "source_type": "MANUFACTURER_SITE",
@@ -68,8 +108,8 @@
           "published_at": null,
           "observed_at": "2026-10-31",
           "verified_at": null,
-          "confidence": "MEDIUM",
-          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — HO-DATA news scan 2026-10-31 by Claude (Sonnet 5.5) in a session initiated by Robert Konecny; page fetched directly (robots.txt allows). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Price 'From $84,990' from the robotics menu data embedded in the same page; conflicts with the JSON-LD figure."
+          "confidence": "HIGH",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — page rendered in a real browser and read 2026-10-31 by Claude (Sonnet 5.5) in a session initiated by Robert Konecny (owner go-ahead, FF price fix); robots.txt allows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Listed as 'From $84,990' in the site's robotics menu; the base configuration's price is not shown elsewhere on the page."
         }
       ]
     }
@@ -106,7 +146,7 @@
       "use_case_slug": "retail-service",
       "fit_score": null,
       "is_primary": true,
-      "commercial_readiness": null,
+      "commercial_readiness": "ANNOUNCED",
       "notes": "Reception, hospitality and commercial services are listed as target scenarios; 'Primary scenario: Reception, research, commercial services'. Manufacturer positioning only.",
       "limitations": "No specifications, deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only.",
       "confidence": "LOW"
@@ -115,7 +155,7 @@
       "use_case_slug": "manufacturing",
       "fit_score": null,
       "is_primary": false,
-      "commercial_readiness": null,
+      "commercial_readiness": "ANNOUNCED",
       "notes": "Manufacturing is listed among the target scenarios. Manufacturer positioning only.",
       "limitations": "No specifications, deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only.",
       "confidence": "LOW"
@@ -124,7 +164,7 @@
       "use_case_slug": "healthcare-rehabilitation",
       "fit_score": null,
       "is_primary": false,
-      "commercial_readiness": null,
+      "commercial_readiness": "ANNOUNCED",
       "notes": "Healthcare is listed among the target scenarios. Manufacturer positioning only.",
       "limitations": "No clinical validation or regulatory approval is recorded; no specifications, deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only.",
       "confidence": "LOW"
@@ -133,13 +173,84 @@
       "use_case_slug": "research-education",
       "fit_score": null,
       "is_primary": false,
-      "commercial_readiness": null,
+      "commercial_readiness": "ANNOUNCED",
       "notes": "University research is listed among the target scenarios. Manufacturer positioning only.",
       "limitations": "No specifications, deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only.",
       "confidence": "LOW"
     }
   ],
   "images": [],
-  "extended_specs": [],
+  "extended_specs": [
+    {
+      "key": "standing_dimensions",
+      "value": "169 × 75 × 30 cm",
+      "variant_slug": "futurist-ultra",
+      "source_label": "FF Futurist page — Futurist Ultra specification block: Dimensions (H×W×D)",
+      "source_url": "https://robotics.ff.com/us/ff-futurist/",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-31"
+    },
+    {
+      "key": "joint_breakdown",
+      "value": "28 DOF + 6-DOF Dexterous Hand",
+      "variant_slug": "futurist-ultra",
+      "source_label": "FF Futurist page — Futurist Ultra specification block: DOF",
+      "source_url": "https://robotics.ff.com/us/ff-futurist/",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-31"
+    },
+    {
+      "key": "max_speed",
+      "value": "1.2 m/s",
+      "variant_slug": "futurist-ultra",
+      "source_label": "FF Futurist page — Futurist Ultra specification block: Max Speed",
+      "source_url": "https://robotics.ff.com/us/ff-futurist/",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-31"
+    },
+    {
+      "key": "battery_pack",
+      "value": "0.69 kWh",
+      "variant_slug": "futurist-ultra",
+      "source_label": "FF Futurist page — Futurist Ultra specification block: Battery",
+      "source_url": "https://robotics.ff.com/us/ff-futurist/",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-31"
+    },
+    {
+      "key": "operating_time",
+      "value": "Stand & Talk: 3 h; Walking: 1.5 h",
+      "variant_slug": "futurist-ultra",
+      "source_label": "FF Futurist page — Futurist Ultra specification block: Runtime",
+      "source_url": "https://robotics.ff.com/us/ff-futurist/",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-31"
+    },
+    {
+      "key": "compute_base",
+      "value": "16-core CPU + NVIDIA AGX Orin 64G",
+      "variant_slug": "futurist-ultra",
+      "source_label": "FF Futurist page — Futurist Ultra specification block: Computing",
+      "source_url": "https://robotics.ff.com/us/ff-futurist/",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-31"
+    },
+    {
+      "key": "cameras",
+      "value": "Interactive + 2 Fisheye + 2 RGB-D",
+      "variant_slug": "futurist-ultra",
+      "source_label": "FF Futurist page — Futurist Ultra specification block: Cameras",
+      "source_url": "https://robotics.ff.com/us/ff-futurist/",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-10-31"
+    }
+  ],
   "spec_caveats": []
 }

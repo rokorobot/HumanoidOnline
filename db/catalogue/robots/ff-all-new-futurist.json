@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "IDENTITY DRAFT (owner decision pending; not imported). RETRIEVAL: page rendered in a real browser and read 2026-10-31 (robots.txt allows); values verbatim from https://robotics.ff.com/us/futurist/. Separate from the catalogued ff-futurist (older page https://robotics.ff.com/us/ff-futurist/, banner 'FF New Futurist - Coming Soon on 6/22'); relationship not stated beyond that, not merged. Page title 'FF All-New Futurist: Full-Size Humanoid Robot'; 'Order Now', 'Start From $89,900'. Specs table: height ≈174 cm both; weight ≈54 kg / ≈58 kg; DOF 31 / 51 ('Can be updated to 71 DOF with advanced Dex Hands'); joint peak torque 320 N·m; battery 1152 Wh dual; endurance over 6 h / over 5 h; compute dual RK3588 / Jetson Thor-U + dual RK3588 · 700 TOPS; LiDAR N/A / Equipped. The page's hero text also says 'up to 51 DOF'. Only height is filled at record level because the other values differ by edition. No shipping or delivery stated.",
+  "specs_note": "OWNER-APPROVED 2026-10-31 (Robert Konecny, in thread; PR #231); unpublished, publication is a separate decision. commercial_status left UNKNOWN (the owner has not set a status for this model). RETRIEVAL: page rendered in a real browser and read 2026-10-31 (robots.txt allows); values verbatim from https://robotics.ff.com/us/futurist/. Separate from the catalogued ff-futurist (older page https://robotics.ff.com/us/ff-futurist/, banner 'FF New Futurist - Coming Soon on 6/22'); relationship not stated beyond that, not merged. Page title 'FF All-New Futurist: Full-Size Humanoid Robot'; 'Order Now', 'Start From $89,900'. Specs table: height ≈174 cm both; weight ≈54 kg / ≈58 kg; DOF 31 / 51 ('Can be updated to 71 DOF with advanced Dex Hands'); joint peak torque 320 N·m; battery 1152 Wh dual; endurance over 6 h / over 5 h; compute dual RK3588 / Jetson Thor-U + dual RK3588 · 700 TOPS; LiDAR N/A / Equipped. The page's hero text also says 'up to 51 DOF'. Only height is filled at record level because the other values differ by edition. No shipping or delivery stated.",
   "official_url": "https://robotics.ff.com/us/futurist/",
   "commercial_status_evidence": [],
   "variants": [
@@ -105,7 +105,44 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "retail-service",
+      "fit_score": null,
+      "is_primary": true,
+      "commercial_readiness": null,
+      "notes": "Page lists Commercial scenarios: reception, guided tours, retail, shopping assistance, events, performances. Manufacturer positioning only.",
+      "limitations": "No deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only. FF notes that scenario capabilities shown are potential future functionality.",
+      "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "research-education",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "Page lists Education scenarios: research, STEM teaching, coding labs, science demos. Manufacturer positioning only.",
+      "limitations": "No deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only. FF notes that scenario capabilities shown are potential future functionality.",
+      "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "manufacturing",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "Page lists Industrial scenarios including flexible manufacturing and smart assembly. Manufacturer positioning only.",
+      "limitations": "No deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only. FF notes that scenario capabilities shown are potential future functionality.",
+      "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "events-entertainment",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "Page lists Entertainment scenarios: stage performance, robot combat, sports competition, interactive shows. Manufacturer positioning only.",
+      "limitations": "No deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only. FF notes that scenario capabilities shown are potential future functionality.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [],
   "extended_specs": [],
   "spec_caveats": [

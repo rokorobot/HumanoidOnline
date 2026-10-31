@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "IDENTITY DRAFT (owner decision pending; not imported). RETRIEVAL: AUTOMATED weekly new-robot scan 2026-10-31 (HO-DATA-STANDING); values verbatim from https://www.limxdynamics.com/en/products/luna. Not human-verified. Page meta: 'LimX Luna is a full-size interactive humanoid robot designed primarily for commercial performance scenarios. Featuring a 160cm humanoid form and 27 degrees of freedom'. Specs from https://www.limxdynamics.com/en/products/luna/spec.",
+  "specs_note": "OWNER-APPROVED 2026-10-31 (Robert Konecny, in thread; PR #222); unpublished, publication is a separate decision. RETRIEVAL: AUTOMATED weekly new-robot scan 2026-10-31 (HO-DATA-STANDING); values verbatim from https://www.limxdynamics.com/en/products/luna. Not human-verified. Page meta: 'LimX Luna is a full-size interactive humanoid robot designed primarily for commercial performance scenarios. Featuring a 160cm humanoid form and 27 degrees of freedom'. Specs from https://www.limxdynamics.com/en/products/luna/spec.",
   "official_url": "https://www.limxdynamics.com/en/products/luna",
   "commercial_status_evidence": [],
   "variants": [],
@@ -39,7 +39,17 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "events-entertainment",
+      "fit_score": null,
+      "is_primary": true,
+      "commercial_readiness": null,
+      "notes": "LimX describes Luna as designed primarily for commercial performance scenarios. Manufacturer positioning only.",
+      "limitations": "No deployments or demonstrations are recorded; fit rests on the maker's stated purpose only.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [],
   "extended_specs": [
     {

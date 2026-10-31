@@ -30,6 +30,8 @@
     { "key": "max_speed", "label": "Maximum speed (as stated)", "category": "MOBILITY", "value_type": "TEXT", "unit": null, "sort_order": 72 },
     { "key": "operating_time", "label": "Operating time (as stated)", "category": "OTHER", "value_type": "TEXT", "unit": null, "sort_order": 73 },
     { "key": "motion_endurance", "label": "Motion endurance (as stated)", "category": "OTHER", "value_type": "TEXT", "unit": null, "sort_order": 74 },
-    { "key": "safety_sensors", "label": "Safety human-detection sensors", "category": "SAFETY", "value_type": "TEXT", "unit": null, "sort_order": 75 }
+    { "key": "safety_sensors", "label": "Safety human-detection sensors", "category": "SAFETY", "value_type": "TEXT", "unit": null, "sort_order": 75 },
+    { "key": "standing_dimensions", "label": "Body dimensions (as stated)", "category": "OTHER", "value_type": "TEXT", "unit": null, "sort_order": 76 },
+    { "key": "weight_with_battery", "label": "Weight with battery (as stated)", "category": "OTHER", "value_type": "TEXT", "unit": null, "sort_order": 77 }
   ]
 }

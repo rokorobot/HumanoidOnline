@@ -1,0 +1,40 @@
+{
+  "robot_slug": "ubtech-walker-c1",
+  "assessed_on": "2026-10-31",
+  "assessed_by": "Claude (Sonnet 5.5) in a session initiated by Robert Konecny. Not human-verified.",
+  "method": "Evaluation against all categories in use_cases.json from the manufacturer wording recorded in robots/ubtech-walker-c1.json (https://www.ubtrobot.com/en/humanoid/products/walker-c1).",
+  "categories": {
+    "warehouse-logistics": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "manufacturing": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "research-education": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "home": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "events-entertainment": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "retail-service": {
+      "status": "UNSUPPORTED_POSSIBILITY",
+      "basis": "The page title calls it a 'Humanoid Service Robot', but no service scenario is recorded."
+    },
+    "healthcare-rehabilitation": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "security-inspection": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    }
+  }
+}

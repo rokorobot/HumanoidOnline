@@ -1,7 +1,7 @@
 {
-  "slug": "ubtech-walker-s",
-  "name": "Walker S",
-  "manufacturer_slug": "ubtech-robotics",
+  "slug": "apptronik-apollo-2",
+  "name": "Apollo 2",
+  "manufacturer_slug": "apptronik",
   "model_code": null,
   "summary": null,
   "announced_year": null,
@@ -31,8 +31,8 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "IDENTITY DRAFT (owner decision pending; not imported). RETRIEVAL: AUTOMATED weekly new-robot scan 2026-10-31 (HO-DATA-STANDING); values verbatim from https://www.ubtrobot.com/en/humanoid/products/walker-s. Not human-verified. Page meta description: 'UBTECH Walker S industrial humanoid robot is designed for smart manufacturing and enterprise automation. It can observe the surrounding environment with built-in high-resolution RGBD visual sensors.' Specification values were not retrievable from the static page, so all specs are null. Relationship to catalogued Walker S1/S2/Tienkung is not stated on the page and is not inferred.",
-  "official_url": "https://www.ubtrobot.com/en/humanoid/products/walker-s",
+  "specs_note": "OWNER-APPROVED 2026-10-31 (Robert Konecny, in thread; PR #222); unpublished, publication is a separate decision. RETRIEVAL: AUTOMATED weekly new-robot scan 2026-10-31 (HO-DATA-STANDING); values verbatim from https://apptronik.com/apollo/apollo-2. Not human-verified. Page meta: 'Apollo 2 is a modular humanoid robot platform with bipedal and wheeled mobility, advanced AI, and dexterous manipulation for real-world operations.' Apollo 2 is a separately named page from the catalogued Apollo; whether it supersedes Apollo is not stated and is not inferred. Specs null.",
+  "official_url": "https://apptronik.com/apollo/apollo-2",
   "commercial_status_evidence": [],
   "variants": [],
   "pricing_offers": [],

@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "IDENTITY DRAFT (owner decision pending; not imported). RETRIEVAL: AUTOMATED weekly new-robot scan 2026-10-31 (HO-DATA-STANDING); values verbatim from https://www.limxdynamics.com/en/products/oli. Not human-verified. Page meta: 'LimX Oli is a full-size general-purpose humanoid robot standing 165cm tall with 31 DoF.' Specs from https://www.limxdynamics.com/en/products/oli/spec (Oli / Oli EDU columns identical for these rows). LimX's site does not state whether Oli is the catalogued CL-1 or a different model; NOT inferred, owner to decide.",
+  "specs_note": "OWNER-APPROVED 2026-10-31 (Robert Konecny, in thread; PR #222); unpublished, publication is a separate decision. RETRIEVAL: AUTOMATED weekly new-robot scan 2026-10-31 (HO-DATA-STANDING); values verbatim from https://www.limxdynamics.com/en/products/oli. Not human-verified. Page meta: 'LimX Oli is a full-size general-purpose humanoid robot standing 165cm tall with 31 DoF.' Specs from https://www.limxdynamics.com/en/products/oli/spec (Oli / Oli EDU columns identical for these rows). LimX's site does not state whether Oli is the catalogued CL-1 or a different model; NOT inferred, owner to decide.",
   "official_url": "https://www.limxdynamics.com/en/products/oli",
   "commercial_status_evidence": [],
   "variants": [],

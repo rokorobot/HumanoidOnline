@@ -41,7 +41,7 @@ EXISTING = {"neura-robotics-official", "neura-documents-official", "xpeng-offici
 #: Registered identity only; no adapter until each host's structural review.
 COVERAGE_2026_10_31 = {
     "1x-technologies-official", "apptronik-official", "boston-dynamics-official",
-    "engineered-arts-official", "fourier-official", "galbot-official",
+    "engineered-arts-official", "faraday-future-official", "fourier-official", "galbot-official",
     "hanson-robotics-official", "honda-official", "kepler-robotics-official",
     "limx-dynamics-official",
     "pal-robotics-official", "rainbow-robotics-official", "sanctuary-ai-official",

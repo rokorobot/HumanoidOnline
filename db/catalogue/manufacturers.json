@@ -164,7 +164,7 @@
       "operating_locations": null,
       "website_url": "https://apptronik.com",
       "founded_year": 2016,
-      "description": "Apptronik is an Austin, Texas, company that grew out of the Human Centered Robotics Lab at the University of Texas at Austin. It develops Apollo, a general-purpose humanoid aimed initially at manufacturing and logistics. Announced partners include Mercedes-Benz, GXO Logistics, Jabil and Google DeepMind. In February 2026 Apptronik closed Series A funding totalling more than US$935 million and said a new version of Apollo would debut in 2026.",
+      "description": "Apptronik is an Austin, Texas, company that grew out of the Human Centered Robotics Lab at the University of Texas at Austin. It develops Apollo, a general-purpose humanoid aimed initially at manufacturing and logistics. Announced partners include Mercedes-Benz, GXO Logistics, Jabil and Google DeepMind. In February 2026 Apptronik closed Series A funding totalling more than US$935 million and said a new version of Apollo would debut in 2026. Its site now has a separate Apollo 2 page, described as a modular humanoid robot platform with bipedal and wheeled mobility.",
       "target_markets": ["manufacturing", "logistics"],
       "commercial_model": "Commercial and pilot deployments with industrial partners.",
       "deployment_status": "PILOT",
@@ -198,6 +198,18 @@
           "confidence": "HIGH",
           "claim_fields": ["headquarters_city", "description", "commercial_model", "target_markets", "deployment_status", "deployment_note"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Company press release: Austin, Texas; origin in UT Austin's Human Centered Robotics Lab; partners Mercedes-Benz, GXO Logistics, Jabil, Google DeepMind; 'commercial and pilot deployments'; new Apollo version to debut in 2026. PILOT retained: the release does not separate which engagements are commercial."
+        },
+        {
+          "source_url": "https://apptronik.com/apollo/apollo-2",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Apollo 2 — Apptronik",
+          "excerpt": "Apollo 2 is a modular humanoid robot platform with bipedal and wheeled mobility, advanced AI, and dexterous manipulation for real-world operations.",
+          "published_at": null,
+          "observed_at": "2026-10-31",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": ["description"],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — HO-DATA news scan 2026-10-31 by Claude (Sonnet 5.5) in a session initiated by Robert Konecny; page meta description read directly. Not a MANUAL_BOOTSTRAP reading. Not human-verified. Whether Apollo 2 supersedes Apollo is not stated and not inferred."
         }
       ]
     },

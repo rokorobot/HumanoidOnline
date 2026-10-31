@@ -43,3 +43,10 @@ registers no freshness target and writes no discovery or production rows.
 The 2026-10-25 evidence pass (`HO-DATA-31`, PR #213) found the public first-party evidence for the open cells
 exhausted. Most weekly runs are therefore expected to find nothing. The value of this decision is that new
 manufacturer pages, datasheets and robots are picked up within a week, without anyone having to ask.
+
+## 5. Option A not pursued (owner, 2026-10-31)
+
+The owner declined per-host structural reviews and code adapters (`docs/28` §3, Option A) for the 15 manufacturers
+registered on 2026-10-31. Their information is gathered by this agent run instead. Those sources stay registered,
+disabled and adapter-less until the owner decides otherwise. Respect for each host's blocks and robots.txt continues
+to apply to the agent run (DR-D1 §1 exclusions).

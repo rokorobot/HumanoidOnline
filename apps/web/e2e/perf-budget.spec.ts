@@ -52,7 +52,9 @@ const STATIC: Budget[] = [
   // them in the streamed payload: +3.2 to +4.9 kB per document, measured
   // against production. Owner-approved; no other limit changed.
   // SOCIAL-01: 62 -> 65 (measured 63.8).
-  { path: "/", docKB: 65, jsRawKB: 404 },
+  // SEO-02 (#219): 65 -> 68 (measured 66.5 in CI). WebSite + Organization JSON-LD for Bing's
+  // "No Markup found"; Next repeats the inline script in the streamed payload. Owner-approved.
+  { path: "/", docKB: 68, jsRawKB: 404 },
   // SOCIAL-01: 89 -> 95 (measured 93.6). The largest increase: this route has
   // the longest description, and it is the one repeated per card.
   // A4 promotion batch 1: 95 -> 102 (measured 101.1 in CI). Content, not code: the record gains
@@ -128,7 +130,10 @@ const ROBOTS_FIXED_KB = 22; // measured 20.1
 // HO-RESEARCH-NA-02: 4.35 -> 4.40. The NA-02 batch gives NAO its first price and offers, so its
 // card gains the commercial summary and price terms: measured 209.2kB for 43 cards (4.353/card
 // over the 22kB fixed term), 0.14kB over the 4.35 allowance. Content growth, not a heavier card.
-const ROBOTS_PER_CARD_KB = 4.4;
+// SEO-02 (#219): 4.40 -> 4.70 (measured 221.5 kB for 43 cards, ~0.24 kB/card over). Each rendered
+// robot gets an ItemList entry (name + canonical URL) in the catalogue JSON-LD, repeated in the
+// streamed payload. Owner-approved.
+const ROBOTS_PER_CARD_KB = 4.7;
 const ROBOTS_JS_RAW_KB = 411; // unchanged from the flat budget
 
 test("@perf built-route budget: /robots (scales with rendered cards)", async ({

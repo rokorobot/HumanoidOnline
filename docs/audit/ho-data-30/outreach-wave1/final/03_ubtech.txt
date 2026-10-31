@@ -1,0 +1,33 @@
+To: cooperate@ubtrobot.com
+Cc: ubtsales@ubtrobot.com
+Subject: Walker S1 and Walker S2 specifications for HumanoidOnline
+
+Dear UBTECH team,
+
+I run HumanoidOnline (humanoidonline.com), an independent catalogue of humanoid robots for buyers and researchers. We publish only specifications the manufacturer supports and show anything we cannot source as "unknown" - we never estimate.
+
+We have read the Walker S1 and Walker S2 product pages (English and Chinese), including the annotated specification images, the brochure page and the download centre. The images list components but no numeric specifications. A Walker S1 / S2 datasheet would answer almost everything below; otherwise a short answer per item is very welcome.
+
+Walker S2
+ 1. Height (cm) and weight including battery (kg)
+ 2. Rated payload per arm, arm extended (kg) - your page mentions handling 15 kg within a 0-1.8 m workspace; is that a per-arm or a whole-body figure?
+ 3. Battery runtime during walking or typical work (minutes) and battery energy (Wh)
+ 4. Rated walking speed on flat ground (m/s)
+ 5. Total actuated degrees of freedom, and degrees of freedom per dexterous hand
+ 6. Locomotion type (bipedal legs)
+ 7. SDK, programming API, ROS / ROS 2 support and an official simulation model available to customers (yes/no each)
+ 8. Spoken conversation with users (yes/no) and teleoperation support (yes/no)
+ 9. Arm span, fingertip to fingertip (cm) and single-arm reach, shoulder axis to end-effector tip (cm)
+
+Walker S1
+10. Battery runtime (minutes), battery energy (Wh) and rated walking speed (m/s)
+11. Total degrees of freedom, standard end effector (model) and DoF per hand
+12. SDK, programming API, ROS / ROS 2 support and an official simulation model (yes/no each)
+13. Spoken conversation with users (yes/no) and teleoperation support (yes/no)
+14. Arm span (cm) and single-arm reach (cm)
+
+How we use your answer: please reply from a company address or point to a public page or PDF on your domain, and name the product each value applies to. We will show the values as manufacturer statements with the date of your reply, and we are happy to share the entries with you before they go live.
+
+Thank you very much,
+Robert Konecny
+HumanoidOnline - humanoidonline.com

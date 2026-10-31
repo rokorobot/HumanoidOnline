@@ -1,0 +1,19 @@
+Where: https://maxtronics.com/en/contact-us/ (contact form)
+Subject: NAO6 specification confirmation for HumanoidOnline
+
+Hello Maxtronics team,
+
+I run HumanoidOnline (humanoidonline.com), an independent catalogue of humanoid robots. We publish only manufacturer-supported specifications and show anything we cannot source as "unknown" - we never estimate.
+
+From your NAO6 datasheet and user guide we already list height 57.4 cm, weight 5.48 kg, 25 DoF, 62.5 Wh battery, 60 min active-use runtime and 1 DoF per hand. The following are not stated there:
+
+1. Rated payload per hand / arm (kg)
+2. Rated walking speed on flat ground (m/s)
+3. Hand type as shipped, and whether NAO6 can grasp and manipulate small objects (yes/no)
+4. Teleoperation by a remote operator supported (yes/no)
+5. Arm span, fingertip to fingertip (cm) and single-arm reach (cm)
+
+Please answer from a Maxtronics address or point to a public page or PDF on your domain. We will show the values as manufacturer statements with the date of your reply and can share the entries with you before they go live.
+
+Thank you,
+Robert Konecny - HumanoidOnline (humanoidonline.com)

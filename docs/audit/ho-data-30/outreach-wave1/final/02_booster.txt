@@ -1,0 +1,23 @@
+To: sales@booster.tech
+Subject: Specification confirmation for K1, T1 and T2 on HumanoidOnline
+
+Dear Booster Robotics team,
+
+I run HumanoidOnline (humanoidonline.com), an independent catalogue of humanoid robots for buyers and researchers. We publish only specifications the manufacturer supports and show anything we cannot source as "unknown" - we never estimate.
+
+We have read booster.tech, the K1, T1 and T2 manuals on docs.booster.tech (Chinese and English) and the BoosterRobotics GitHub repositories. The same seven values are missing for every model. A short answer per model and edition, or a link to a public document that states them, would be a great help.
+
+For each of K1 (Educational, Geek, Professional), T1, and T2 (Education, Professional) - please answer per edition where they differ:
+ 1. Rated payload per arm, arm extended (kg) - for T2 your page gives "Maximum Dual-Arm Payload 10 kg*" (posture-dependent); a per-arm rated figure would be ideal
+ 2. Battery energy of the standard pack (Wh) - your documents give voltage and capacity (e.g. T1 48 V / 10.5 Ah, T2 48 V / 10 Ah, K1 2 Ah or 5 Ah by edition) but not Wh, and we do not calculate it ourselves
+ 3. End effector fitted as standard on this edition (model, or "none") - T2 lists E1/E2/E3 and P1/P2/P3 variants; which one does each edition ship with by default?
+ 4. Degrees of freedom per hand of that standard end effector
+ 5. Can the robot grasp and manipulate objects in its standard configuration (yes/no)?
+ 6. Arm span, fingertip to fingertip with arms horizontal (cm)
+ 7. Single-arm reach, from shoulder axis to end-effector tip (cm)
+
+How we use your answer: please reply from a company address or point to a public page or PDF on your domain, and name the model and edition each value applies to. We will show the values as manufacturer statements with the date of your reply, and we are happy to share the entries with you before they go live.
+
+Thank you very much,
+Robert Konecny
+HumanoidOnline - humanoidonline.com

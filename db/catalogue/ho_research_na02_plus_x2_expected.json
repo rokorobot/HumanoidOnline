@@ -1,0 +1,428 @@
+{
+  "_comment": "HO-RESEARCH-NA-02 + AgiBot X2 records (owner approval 2026-10-23, second message): the approved NA-02 manifest (57 changes, unchanged) EXTENDED by exactly 18 rows from #188 that a full import also writes: robots agibot-x2 and agibot-x2-ultra (both unpublished) and their 8 + 8 specification rows. Full import_catalogue.py from main d6a1b6e. EXECUTED in production 2026-10-23 16:57:39Z-16:59:32Z (full import from main d6a1b6e as neondb_owner): rehearsal and post-import preflight PASS 75/75, identity check PASS (ID_CHANGED 0, dangling audit targets 25). Safety branch pre-na02-import-20261023 = br-icy-wave-b1qm2fuk retained. Receipt: PR #200 comments.",
+  "expected": [
+    {
+      "table": "region",
+      "kind": "ADDED",
+      "match": {
+        "code": "NORTH_AMERICA"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "AG"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "AI"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "AW"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "BB"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "BL"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "BM"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "BQ"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "BS"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "BZ"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "CA"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "CR"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "CU"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "CW"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "DM"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "DO"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "GD"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "GL"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "GP"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "GT"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "HN"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "HT"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "JM"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "KN"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "KY"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "LC"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "MF"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "MQ"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "MS"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "MX"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "NI"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "PA"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "PM"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "PR"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "SV"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "SX"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "TC"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "TT"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "US"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "VC"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "VG"
+      }
+    },
+    {
+      "table": "region",
+      "kind": "CHANGED",
+      "match": {
+        "code": "VI"
+      }
+    },
+    {
+      "table": "provider",
+      "kind": "ADDED",
+      "match": {
+        "slug": "robotlab"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "softbank-nao"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "REMOVED",
+      "match": {
+        "robot": "agility-digit",
+        "provider": "agility-raas"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "agility-digit",
+        "provider": "agility-raas"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-educational",
+        "provider": "robotshop-us"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "softbank-nao",
+        "provider": "robotlab",
+        "transaction_type": "PURCHASE"
+      }
+    },
+    {
+      "table": "availability_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "softbank-nao",
+        "provider": "robotlab",
+        "transaction_type": "LEASE"
+      }
+    },
+    {
+      "table": "pricing_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "booster-k1-educational",
+        "provider": "robotshop-us",
+        "price": 15699.0
+      }
+    },
+    {
+      "table": "pricing_offer",
+      "kind": "ADDED",
+      "match": {
+        "robot": "softbank-nao",
+        "provider": "robotlab",
+        "price": 16990.0
+      }
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "source_url": "https://www.agilityrobotics.com/sales"
+      }
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "source_url": "https://www.robotshop.com/products/booster-robotics-k1-educational-humanoid-robot"
+      },
+      "count": 2
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "source_url": "https://www.robotlab.com/store/nao/"
+      },
+      "count": 3
+    },
+    {
+      "table": "robot",
+      "kind": "ADDED",
+      "match": {
+        "slug": "agibot-x2",
+        "is_published": false
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "ADDED",
+      "match": {
+        "slug": "agibot-x2-ultra",
+        "is_published": false
+      }
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "agibot-x2"
+      },
+      "count": 8
+    },
+    {
+      "table": "specification",
+      "kind": "ADDED",
+      "match": {
+        "robot": "agibot-x2-ultra"
+      },
+      "count": 8
+    }
+  ]
+}

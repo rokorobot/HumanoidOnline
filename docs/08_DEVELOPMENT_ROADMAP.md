@@ -1,9 +1,9 @@
 # HumanoidOnline — Development Roadmap
 
 > **Status:** Living delivery roadmap
-> **Current programme:** Governed Catalogue Discovery & Live Operations (§1.1)
+> **Current programme:** Governed Catalogue Discovery & Live Operations (§1.1); HO-DATA Fast Lane (§1.2)
 > **Historical product-delivery programme:** WS0–WS8 (§1, §2–§8); the WS8 exit gate is not formally closed (§8)
-> **Last updated:** 2026-10-02
+> **Last updated:** 2026-10-22 (§1.2 HO-DATA Fast Lane; G5 status row)
 
 This document defines **implementation sequencing and workstream boundaries**: in
 what order we build the product, what each workstream owns, what is already
@@ -107,7 +107,7 @@ accepted claim ≠ publication
 | **G2** | Governed proposal review and claim promotion | 🟡 **IN PROGRESS** — architecture ratified in DR-A5; **G2-1 persistence (0018), G2-2 governed review, and the first G2-3 slice (accepted claims, materialization; 0019) implemented**; **G2-5 scheduled proposal ingestion operational for NEURA 4NE1 Mini only**; **G2-4 4NE1 Mini commercial and interface slice implemented** (`MANUFACTURER_ESTIMATE`, WAITLIST, interface specs; 0020/0021) |
 | **G3** | Source expansion | 🟡 **STARTED**: first expansion source XPENG (humanoid IRON only), under an explicit owner source approval (2026-10-03); every further source needs its own approval. DR-A5's **G2-6** (a second manufacturer) is satisfied in substance by this work |
 | **G4** | Canonical scoped fact resolution (`DR-G4`) | 🟢 **G4-0 to G4-4 COMPLETE (2026-10-04)**: resolver (G4-1), API/consumer integration (G4-2), integrity gate + coverage audit (G4-3) and the catalogue-wide audit with targeted remediation (G4-4; `docs/audit/G4-4A_CATALOGUE_AUDIT_2026-10-04.md`). Originally: architecture, resolution states, projection registry contract and consumer semantics. G4-1 resolver + registry, G4-2 API integration, G4-3 readiness/audit gate, G4-4 catalogue-wide audit are separate phases, each its own PR and owner gate |
-| **G5** | Continuous catalogue freshness & enrichment (Lane B) | 🟢 **G5-1 + G5-1b COMPLETE (2026-10-04)**: read-only enrichment planner, observer SELECT grants, document-host source `neura-documents-official` (`neurarobotics.px.media`, `/plk/` only; owner decision). 🟡 **G5-2 in review**: governed Lane B fetching of planned URLs for non-radar document sources, document discovery, the 4NE1 Mini datasheet extractor (proposals only), NOT_RESTATED / CHANGED_NO_EXTRACTOR reporting. Radar-cadence sources' own pages stay with Lane A. No automatic acceptance, publication or maturity change |
+| **G5** | Continuous catalogue freshness & enrichment (Lane B) | 🟢 **G5-1 + G5-1b COMPLETE (2026-10-04)**: read-only enrichment planner, observer SELECT grants, document-host source `neura-documents-official` (`neurarobotics.px.media`, `/plk/` only; owner decision). 🟢 **G5-2 (#130), G5-3 planner (#133) and G5-4 planner/executor (#139) merged**: governed Lane B fetching of planned URLs for non-radar document sources, document discovery, the 4NE1 Mini datasheet extractor (proposals only), NOT_RESTATED / CHANGED_NO_EXTRACTOR reporting. Radar-cadence sources' own pages stay with Lane A. No automatic acceptance, publication or maturity change |
 
 **NEURA is the first commissioned scheduled source.** Observation runs **Monday and
 Thursday at 06:37 UTC**, governed by a **48-hour source cadence**, through the same
@@ -205,6 +205,92 @@ renumber G2-6.
 
 **Rent / Buy / Lease / RaaS** remain the strategic product programme (§9). They are not
 the immediate next engineering task.
+
+### 1.2 HO-DATA Fast Lane — evidence-based catalogue enrichment, one approval per batch
+
+> **Owner direction:** 2026-10-22. **Status:** operating model and development plan.
+> This section grants no permission to fetch, merge, import or publish. `docs/16`,
+> [`docs/26`](26_DATA_D1_LIVE_AMENDMENT_A3_AGENT_ASSISTED_RESEARCH.md),
+> [`docs/28`](28_DATA_D1_OWNER_AUTHORIZED_SOURCE_AMENDMENT_A4.md),
+> [`DR-A5`](decisions/DR-A5_GOVERNED_CLAIM_PROPOSAL_REVIEW_AND_PROMOTION_BOUNDARY.md) and
+> [`DR-G4`](decisions/DR-G4_CANONICAL_SCOPED_FACT_RESOLUTION.md) continue to govern.
+
+**Operating principle:** standing research authorization → continuous catalogue
+enrichment through authorized research batches → **one owner approval per validated
+production batch**.
+
+**No new infrastructure.** The collection side already exists and is reused as is:
+
+| Need | Existing component | State on `main` |
+|---|---|---|
+| New humanoid models | DATA-D1 discovery + Stage E identity review; G3 source expansion (§1.1) | Operational for approved sources |
+| Missing facts on catalogued robots | G5 Lane B enrichment planner and governed fetch (G5-2 #130, G5-3 #133, G5-4 #139) | Merged; produces G2 proposals only |
+| Agent research of manufacturer documents | `AGENT_ASSISTED_RESEARCH` under a `docs/26` work order; now [`HO-DATA-SR-01`](HO_DATA_SR_01_STANDING_RESEARCH_ORDER.md) | Standing order in force 2026-10-22 → 2027-01-19 |
+| Evidence → catalogue change | G2 review / materialization (DR-A5); promotion manifest `promotion propose / verify` ([design](discovery/CATALOGUE_PROMOTION_AUTOMATION_DESIGN_2026-10-19.md)); stable importer + `db/import_preflight.py` | `propose`/`verify` and the CI manifest gate are operational; the executor is **not activated** (below) |
+
+The Fast Lane adds **no** discovery pipeline, enrichment platform, scheduler, source
+registry, review UI or approval system. The remaining work is to connect existing
+collection outputs to the existing promotion path.
+
+**Standing research — [`HO-DATA-SR-01`](HO_DATA_SR_01_STANDING_RESEARCH_ORDER.md)
+(owner-ratified 2026-10-22, effective through 2027-01-19 inclusive, revocable).** Under
+`docs/26` §2.1 and §6A.9 it authorizes repeated **on-demand** research of public
+manufacturer-controlled documentation without a new work order per batch. Scope: all
+currently published robots, and every model or edition later added to the canonical
+catalogue, published or not; new additions enter research scope automatically. It
+does **not** enable unattended or scheduled crawling, bypass A4 source permissions
+(`docs/28`), approve a catalogue mutation, or publish a robot. Provenance stays
+`AGENT_ASSISTED_RESEARCH`; owner approval never upgrades it to `VERIFIED` or
+`MANUAL_BOOTSTRAP`.
+
+**Routine lane (ROUTINE in the [ACIP](discovery/AUTOMATED_COMMERCIAL_INTELLIGENCE_PIPELINE_2026-10-19.md)
+§5 B2 classification):** an existing robot and exact edition; a previously UNKNOWN
+technical field; an explicit manufacturer statement or exact unit conversion; evidence
+obtained under SR-01 or an authorized source; no conflict, inference, identity
+ambiguity or cross-edition inheritance. Source URL, verbatim excerpt, retrieval date,
+edition and caveats are kept.
+
+**Outside the routine lane** (REVIEW REQUIRED or RESTRICTED; each needs its own scoped
+decision): uncertain identity or edition; conflicting data; corrections to known
+values; commercial status, prices and availability; new sources or monitoring
+permissions; creation, first publication or unpublication of a robot. Updating the
+specifications of a published robot never changes `is_published`.
+
+**Development sequence (each step needs its own authorization; PROPOSE ONLY):**
+
+- **FL-1 — Connect.** Route existing DATA-D1/G3 and G5 outputs, and SR-01 research
+  results, into the governed proposal path (G2 proposals / promotion manifest items).
+  No new collector.
+- **FL-2 — One batch PR.** Generate one PR per batch with the exact robot/edition
+  mapping, supported values, provenance, caveats, promotion manifest and
+  expected-change manifest.
+- **FL-3 — Gate before asking.** Run exact-head CI (including the promotion manifest
+  gate) and a production-clone import rehearsal (Neon branch, `db/import_preflight.py`
+  semantic diff, identity check, idempotent second run) **before** presenting the owner
+  decision. An unexpected sibling change is a STOP.
+- **FL-4 — Approve once, execute fail-closed.** One owner approval, pinned to the exact
+  change set (PR head, manifest digest, rehearsal result), may name merge + scoped
+  production import + live verification (`docs/26` §6.5, §6A.10). Only those named
+  actions run, behind fail-closed gates; drift in head, manifest or production state
+  voids the approval.
+
+**Executor status (inspected 2026-10-22).** Operational: `promotion propose / render /
+verify / decide` and the CI step *Verify catalogue promotion manifests*. **Not
+activated:** `promotion execute` is code only; its workflow and role remain in
+[`discovery/promotion_executor_proposal/`](discovery/promotion_executor_proposal/), not
+`.github/workflows`; no `catalogue_importer` role exists. ACIP decision **D5** gives
+GitHub Actions no production write credential, and the
+[security proposal](discovery/PROMOTION_EXECUTOR_SECURITY_PROPOSAL_2026-10-19.md)
+activation gates 3–5 are open. Until D5 is decided, FL-4 is an operator-run step after
+the owner's approval: `promotion execute` run locally for a manifest (option E3), or a
+scoped `db/import_catalogue.py` import gated by preflight, as PR #191 was.
+
+**Measurement.** One owner approval per batch; zero unapproved row or publication
+changes; every live value traceable to evidence and the approved manifest. Baseline
+(HO-DATA-02A): P0 UNKNOWN 119/258 (46.1%). After batch 1 (PR #191, 12 values): 107/258
+(41.5%; [`HO-DATA-02C`](audit/HO-DATA-02C_RESEARCH_RESULTS_2026-10-22.md)). First
+milestone: P0 UNKNOWN below 30%. Moving a field from NOT_RESEARCHED to
+CHECKED_NOT_STATED is research progress, not a filled cell.
 
 ---
 

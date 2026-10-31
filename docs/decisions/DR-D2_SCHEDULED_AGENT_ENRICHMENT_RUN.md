@@ -47,6 +47,16 @@ manufacturer pages, datasheets and robots are picked up within a week, without a
 ## 5. Option A not pursued (owner, 2026-10-31)
 
 The owner declined per-host structural reviews and code adapters (`docs/28` §3, Option A) for the 15 manufacturers
-registered on 2026-10-31. Their information is gathered by this agent run instead. Those sources stay registered,
+registered on 2026-10-31. Their information is gathered by this agent run instead, and their new models by the new-robot scan (§6). Those sources stay registered,
 disabled and adapter-less until the owner decides otherwise. Respect for each host's blocks and robots.txt continues
 to apply to the agent run (DR-D1 §1 exclusions).
+
+## 6. New-robot scan for manufacturers without adapters (owner, 2026-10-31)
+
+Owner correction: new humanoid models from these manufacturers must also be pushed for approval. A second weekly
+Cloudroom Loop ("HO-DATA new-robot scan", Monday 09:30 Europe/Prague, `29eaca3c-83ad-426a-8362-29eb2099fc88`)
+checks the own site of every catalogue manufacturer without a reviewed adapter. It adds each new model as an identity
+draft (`db/catalogue/identity_drafts/`, never imported) in one "HO-NEW" PR, and flags the owner in Cloudroom. The owner
+approves or declines per model. Approved models move to `robots/` unpublished with their use-case assessment.
+Merge, import and publication remain separate owner acts. The seven manufacturers with adapters stay with the
+"Discovery observation" workflow and its review issue.

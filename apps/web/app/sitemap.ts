@@ -5,6 +5,7 @@ import { siteUrl } from "@/lib/site";
 import {
   lastMod,
   listAllManufacturers,
+  listAllProductLines,
   listAllRobots,
   listAllUseCases,
 } from "@/lib/seo";
@@ -33,10 +34,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // WS8.5 / R23 — enumerate the ENTIRE published canonical set of every public
   // entity type (robots, manufacturers, use cases), paginated via the governed
   // reads. No 100-entity ceiling.
-  const [robots, manufacturers, useCases] = await Promise.all([
+  const [robots, manufacturers, useCases, lines] = await Promise.all([
     listAllRobots(),
     listAllManufacturers(),
     listAllUseCases(),
+    listAllProductLines(),
   ]);
 
   const core: MetadataRoute.Sitemap = [
@@ -69,6 +71,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  // DR-L1: published product lines. A line has no timestamp of its own, so lastModified is
+  // the newest `updated_at` among its published member robots, or omitted when none is known.
+  const updatedBySlug = new Map(robots.map((r) => [r.slug, r.updated_at]));
+  const linePages: MetadataRoute.Sitemap = lines.map((l) => {
+    const stamps = l.robot_slugs
+      .map((s) => updatedBySlug.get(s))
+      .filter((v): v is string => !!v && !Number.isNaN(new Date(v).getTime()))
+      .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+    return {
+      url: `${origin}/lines/${l.slug}`,
+      ...lastMod(stamps[0]),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    };
+  });
+
   // ADR-027: regional research resources appear ONLY once published (closed and
   // preview-only resources must not be discoverable); lastModified is the real
   // latest evidence date, never the render time.
@@ -85,5 +103,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Grouped by entity type. At catalogue scale this is one file; Next's
   // generateSitemaps() is the split-by-type path when the catalogue grows.
-  return [...core, ...robotPages, ...mfrPages, ...useCasePages, ...researchHub, ...researchPages];
+  return [...core, ...robotPages, ...linePages, ...mfrPages, ...useCasePages, ...researchHub, ...researchPages];
 }

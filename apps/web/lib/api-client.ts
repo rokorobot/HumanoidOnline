@@ -24,6 +24,8 @@ import type {
   MarketSnapshot,
   MatchResponse,
   Page,
+  ProductLineDetail,
+  ProductLineListItem,
   RegionListItem,
   RegionScope,
   RequirementRead,
@@ -145,6 +147,19 @@ export function listRobots(
     `/api/robots${buildQuery(params as Record<string, QueryValue>)}`,
     { revalidate: CATALOGUE_REVALIDATE_S },
   );
+}
+
+// DR-L1: published product lines. A line is identity + membership; facts stay on editions.
+export function findProductLine(slug: string): Promise<ProductLineDetail | null> {
+  return getJSONOrNull<ProductLineDetail>(`/api/product-lines/${encodeURIComponent(slug)}`, {
+    revalidate: CATALOGUE_REVALIDATE_S,
+  });
+}
+
+export function listProductLines(): Promise<ProductLineListItem[]> {
+  return getJSON<ProductLineListItem[]>("/api/product-lines", {
+    revalidate: CATALOGUE_REVALIDATE_S,
+  });
 }
 
 // Non-throwing detail read (404 -> null). Detail pages wrap this in React

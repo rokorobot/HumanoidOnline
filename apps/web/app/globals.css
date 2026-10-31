@@ -96,7 +96,7 @@
 .idcrumb { display: flex; gap: var(--ho-sp-3); align-items: center; margin: 0;
   padding: 10px 16px; font-family: var(--ho-font-machine);
   font-size: var(--ho-fs-mono-s); letter-spacing: var(--ho-tracking-label);
-  text-transform: uppercase; color: var(--ho-text-muted); }
+  text-transform: uppercase; color: var(--ho-text-muted); flex-wrap: wrap; }
 .idcrumb a { color: var(--ho-paper-ink); text-decoration: none; }
 .idcrumb a:hover { color: var(--ho-signal); }
 

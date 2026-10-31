@@ -235,6 +235,16 @@ export default async function RobotDetailPage({
             </Link>
             <span aria-hidden="true">/</span>
             <Link href="/robots">Robot Catalogue</Link>
+            {robot.product_line && (
+              <>
+                <span aria-hidden="true">/</span>
+                {/* The whole flex item is the link (like the crumbs above), so it is not a
+                    link inside running text (axe link-in-text-block). */}
+                <Link href={`/lines/${robot.product_line.slug}`} data-testid="product-line-link">
+                  Part of the {robot.product_line.name} line
+                </Link>
+              </>
+            )}
           </p>
           <div className="topbar">
             <div className="corner">

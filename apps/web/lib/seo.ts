@@ -4,9 +4,10 @@
 // and llms.txt remain projections of the governed model, not an independent
 // truth source. The reads already return only is_published canonical entities
 // (AGENT-01.7), so pagination changes coverage completeness, never eligibility.
-import { listManufacturers, listRobots, listUseCases } from "@/lib/api-client";
+import { listManufacturers, listProductLines, listRobots, listUseCases } from "@/lib/api-client";
 import type {
   ManufacturerListItem,
+  ProductLineListItem,
   RobotListItem,
   UseCaseListItem,
 } from "@/lib/types";
@@ -53,6 +54,9 @@ export const listAllManufacturers = (): Promise<ManufacturerListItem[]> =>
 
 export const listAllUseCases = (): Promise<UseCaseListItem[]> =>
   collectAll<UseCaseListItem>((p) => listUseCases(p));
+
+// DR-L1: the product-line list is not paginated (a handful of lines).
+export const listAllProductLines = (): Promise<ProductLineListItem[]> => listProductLines();
 
 // Defensive lastModified for sitemap entries: an invalid/missing timestamp must
 // not emit an Invalid Date (which throws on sitemap serialization) — omit

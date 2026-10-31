@@ -59,7 +59,22 @@
       "confidence": "LOW"
     }
   ],
-  "images": [],
+  "images": [
+    {
+      "image_url": "/robots/limx-dynamics-luna.webp",
+      "source_url": "https://www.limxdynamics.com/en/products/luna",
+      "source_name": "LimX Dynamics",
+      "source_type": "MANUFACTURER",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "UNKNOWN",
+      "usage_basis": "OFFICIAL_MANUFACTURER_MEDIA",
+      "is_official": true,
+      "is_primary": true,
+      "attribution": "© LimX Dynamics",
+      "last_verified_at": "2026-10-31T00:00:00Z"
+    }
+  ],
   "extended_specs": [
     {
       "key": "standing_dimensions",

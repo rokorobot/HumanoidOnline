@@ -25,8 +25,11 @@
       "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
     },
     "retail-service": {
-      "status": "NO_BASIS",
-      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+      "status": "FIT",
+      "basis": "UBTECH lists Walker under its /humanoid/products/ pages (retrieved 2026-10-31); the page text could not be read, so the manufacturer's page itself states no use. Assigned on owner instruction 2026-10-31 (Robert Konecny): retail-service. Score NULL, confidence LOW.",
+      "sources": [
+        "https://www.ubtrobot.com/en/humanoid/products/Walker"
+      ]
     },
     "healthcare-rehabilitation": {
       "status": "NO_BASIS",

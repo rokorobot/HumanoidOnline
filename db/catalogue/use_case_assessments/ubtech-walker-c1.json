@@ -25,8 +25,11 @@
       "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
     },
     "retail-service": {
-      "status": "UNSUPPORTED_POSSIBILITY",
-      "basis": "The page title calls it a 'Humanoid Service Robot', but no service scenario is recorded."
+      "status": "FIT",
+      "basis": "UBTECH's page title for Walker C1 is 'Humanoid Service Robot' (retrieved 2026-10-31); the page text could not be read beyond that. Assigned on owner instruction 2026-10-31 (Robert Konecny): retail-service. Score NULL, confidence LOW.",
+      "sources": [
+        "https://www.ubtrobot.com/en/humanoid/products/walker-c1"
+      ]
     },
     "healthcare-rehabilitation": {
       "status": "NO_BASIS",

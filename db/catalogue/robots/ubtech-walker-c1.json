@@ -39,7 +39,17 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "retail-service",
+      "fit_score": null,
+      "is_primary": true,
+      "commercial_readiness": null,
+      "notes": "UBTECH's page title for Walker C1 is 'Humanoid Service Robot' (retrieved 2026-10-31); the page text could not be read beyond that. Assigned on owner instruction 2026-10-31 (Robert Konecny): retail-service. (https://www.ubtrobot.com/en/humanoid/products/walker-c1). HO-UC-01 evaluation (use_case_assessments/ubtech-walker-c1.json).",
+      "limitations": "Owner-assigned; the manufacturer page text read so far does not itself describe a retail use. No deployment, results, availability or pricing are recorded. Associated, not rated.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [],
   "extended_specs": [],
   "spec_caveats": []

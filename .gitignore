@@ -41,3 +41,4 @@ test-results/
 
 # Local operator working files (discovery review worksheets, caches).
 var/
+.neon

@@ -155,6 +155,43 @@
       ]
     },
     {
+      "slug": "aimoga",
+      "name": "AiMOGA Robotics",
+      "legal_name": null,
+      "country_region_code": null,
+      "headquarters_city": null,
+      "incorporation": null,
+      "operating_locations": null,
+      "website_url": null,
+      "founded_year": null,
+      "description": "AiMOGA Robotics is described in news reports as part of the Chery group. It unveiled Mobo, which it calls a consumer-grade family companion humanoid robot, in Wuhu, China, with global pre-orders announced for October 2026.",
+      "target_markets": [],
+      "commercial_model": null,
+      "deployment_status": null,
+      "deployment_note": null,
+      "is_public_company": null,
+      "ticker": null,
+      "parent_company": null,
+      "parent_listing": null,
+      "parent_relationship": null,
+      "evidence": [
+        {
+          "source_url": "https://bernama.com/en/press/news.php?id=2622475",
+          "source_type": "NEWS_ARTICLE",
+          "source_title": "AiMOGA Mobo launch (Bernama)",
+          "excerpt": "first consumer-grade family companion humanoid robot",
+          "published_at": "2026-10-19",
+          "observed_at": "2026-10-31",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — HO-DATA news scan 2026-10-31 by Claude (Sonnet 5.5) in a session initiated by Robert Konecny; maker added to the list on the owner's 2026-10-31 instruction (PR #223). Not a MANUAL_BOOTSTRAP reading. Not human-verified. No official AiMOGA website was found (aimoga.com is a domain listed for sale). Country, headquarters and website are left unresolved. The Chery group relationship is stated in news only."
+        }
+      ]
+    },
+    {
       "slug": "apptronik",
       "name": "Apptronik",
       "legal_name": "Apptronik, Inc.",
@@ -493,6 +530,43 @@
           "confidence": "MEDIUM",
           "claim_fields": ["operating_locations", "description", "deployment_note"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Secondary news: restructured as a U.S. entity; plans to hire about 20 at a Redwood City location; robots deployed to more than 200 locations worldwide. The article does not name the US entity or its jurisdiction."
+        }
+      ]
+    },
+    {
+      "slug": "faraday-future",
+      "name": "Faraday Future",
+      "legal_name": null,
+      "country_region_code": null,
+      "headquarters_city": null,
+      "incorporation": null,
+      "operating_locations": null,
+      "website_url": "https://www.ff.com",
+      "founded_year": null,
+      "description": "Faraday Future (FF) lists a robotics business, FF EAI Robotics, at robotics.ff.com. Its FF Futurist is described there as a full-size professional humanoid robot for reception, hospitality, commercial services, manufacturing, healthcare and university research, offered for pre-order or enquiry.",
+      "target_markets": [],
+      "commercial_model": null,
+      "deployment_status": null,
+      "deployment_note": null,
+      "is_public_company": null,
+      "ticker": null,
+      "parent_company": null,
+      "parent_listing": null,
+      "parent_relationship": null,
+      "evidence": [
+        {
+          "source_url": "https://robotics.ff.com/us/ff-futurist/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "FF Futurist - FF EAI Robotics",
+          "excerpt": "FF Futurist is a full-size professional humanoid robot for reception, hospitality, commercial services, manufacturing, healthcare, and university research.",
+          "published_at": null,
+          "observed_at": "2026-10-31",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — HO-DATA news scan 2026-10-31 by Claude (Sonnet 5.5) in a session initiated by Robert Konecny; maker added to the list on the owner's 2026-10-31 instruction (PR #223). Not a MANUAL_BOOTSTRAP reading. Not human-verified. robots.txt of robotics.ff.com allows all. Country, headquarters and founding year are not stated on the pages read and are left unresolved (news calls it California-based; not recorded). The page shows conflicting prices; none recorded."
         }
       ]
     },

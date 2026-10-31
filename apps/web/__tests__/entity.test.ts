@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import {
+  buildHomeJsonLd,
   ENTITY,
   buildAboutJsonLd,
   entityFacts,
@@ -201,5 +202,18 @@ describe("formatFoundingDate", () => {
   it("passes an unparseable value through unchanged", () => {
     expect(formatFoundingDate("2026-13")).toBe("2026-13");
     expect(formatFoundingDate("summer 2026")).toBe("summer 2026");
+  });
+});
+
+describe("SEO-02 — home page JSON-LD", () => {
+  it("emits WebSite + Organization with the same @ids as /about", () => {
+    const home = buildHomeJsonLd()["@graph"] as Array<Record<string, unknown>>;
+    expect(home.map((n) => n["@type"])).toEqual(["WebSite", "Organization"]);
+    expect(home[0]["@id"]).toBe(`${ORIGIN}/#website`);
+    expect(home[0].publisher).toEqual({ "@id": `${ORIGIN}/#organization` });
+    const about = buildAboutJsonLd()["@graph"] as Array<Record<string, unknown>>;
+    const aboutOrg = about.find((n) => n["@type"] === "Organization")!;
+    const { founder: _founder, ...aboutOrgSansFounder } = aboutOrg;
+    expect(home[1]).toEqual(aboutOrgSansFounder);
   });
 });

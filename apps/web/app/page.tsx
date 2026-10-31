@@ -8,6 +8,7 @@ import {
   listRobots,
   listUseCases,
 } from "@/lib/api-client";
+import { buildHomeJsonLd } from "@/lib/entity";
 import { formatObservedDate, formatRobotCoverage } from "@/lib/format";
 import { DotMatrix, GraphicMarker } from "@/components/GraphicMarker";
 import { MachineCode } from "@/components/MachineCode";
@@ -40,6 +41,11 @@ export default async function HomePage() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger -- JSON.stringify output is safe, non-user markup
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildHomeJsonLd()) }}
+      />
       <SystemHeader
         title="HUMANOIDONLINE / COMMERCIAL INTELLIGENCE"
         fields={[

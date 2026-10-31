@@ -1,0 +1,26 @@
+Where: https://www.1x.tech/support (contact form). Alternative: press@1x.tech
+Subject / topic: Specification confirmation for NEO and EVE (independent catalogue)
+
+Message:
+
+Hello 1X team,
+
+I run HumanoidOnline (humanoidonline.com), an independent catalogue of humanoid robots. We publish only manufacturer-supported specifications and show anything we cannot source as "unknown" - we never estimate. From 1x.tech we could not find the following. A short answer, or a link to a public page or PDF, would be a great help.
+
+NEO
+1. Total degrees of freedom as one number (your page lists DoF per body part - hands 22x2, arms 7x2, neck 3, spine 2, legs 6x2 - and we do not add these up ourselves)
+2. SDK, programming API, ROS support and an official simulation model available to owners or developers (yes/no each)
+3. Arm span, fingertip to fingertip (cm) and single-arm reach, shoulder to end-effector tip (cm)
+
+EVE
+4. Rated payload per arm (kg), battery runtime (minutes), battery energy (Wh) and rated driving speed (m/s)
+5. Total degrees of freedom, standard end effector (model) and DoF per hand
+6. Cameras / depth sensors fitted (yes/no)
+7. SDK, programming API, ROS support and an official simulation model (yes/no each)
+8. Spoken conversation with users (yes/no)
+9. Arm span (cm) and single-arm reach (cm)
+
+Please answer from a 1X address or point to a public 1X page, and name the product each value applies to. We will show the values as 1X statements with the date of your reply and can share the entries with you before they go live.
+
+Thank you,
+Robert Konecny - HumanoidOnline (humanoidonline.com)

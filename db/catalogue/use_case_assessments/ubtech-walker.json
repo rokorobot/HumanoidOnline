@@ -1,0 +1,43 @@
+{
+  "robot_slug": "ubtech-walker",
+  "assessed_on": "2026-10-31",
+  "assessed_by": "Claude (Sonnet 5.5) in a session initiated by Robert Konecny. Not human-verified.",
+  "method": "Evaluation against all categories in use_cases.json from the manufacturer wording recorded in robots/ubtech-walker.json (https://www.ubtrobot.com/en/humanoid/products/Walker).",
+  "categories": {
+    "warehouse-logistics": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "manufacturing": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "research-education": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "home": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "events-entertainment": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "retail-service": {
+      "status": "FIT",
+      "basis": "UBTECH lists Walker under its /humanoid/products/ pages (retrieved 2026-10-31); the page text could not be read, so the manufacturer's page itself states no use. Assigned on owner instruction 2026-10-31 (Robert Konecny): retail-service. Score NULL, confidence LOW.",
+      "sources": [
+        "https://www.ubtrobot.com/en/humanoid/products/Walker"
+      ]
+    },
+    "healthcare-rehabilitation": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "security-inspection": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    }
+  }
+}

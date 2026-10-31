@@ -1,0 +1,46 @@
+{
+  "robot_slug": "limx-dynamics-oli",
+  "assessed_on": "2026-10-31",
+  "assessed_by": "Claude (Sonnet 5.5) in a session initiated by Robert Konecny. Not human-verified.",
+  "method": "Evaluation against all categories in use_cases.json from the manufacturer wording recorded in robots/limx-dynamics-oli.json (https://www.limxdynamics.com/en/products/oli).",
+  "categories": {
+    "warehouse-logistics": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "manufacturing": {
+      "status": "FIT",
+      "basis": "LimX's page (meta description, retrieved 2026-10-31) says Oli 'provides a high-performance robotic platform for scientific research, manufacturing, and commercial applications'. Fit on manufacturer positioning only, score NULL, confidence LOW.",
+      "sources": [
+        "https://www.limxdynamics.com/en/products/oli"
+      ]
+    },
+    "research-education": {
+      "status": "FIT",
+      "basis": "LimX's page (meta description, retrieved 2026-10-31) says Oli 'provides a high-performance robotic platform for scientific research, manufacturing, and commercial applications'. Fit on manufacturer positioning only, score NULL, confidence LOW.",
+      "sources": [
+        "https://www.limxdynamics.com/en/products/oli"
+      ]
+    },
+    "home": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "events-entertainment": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "retail-service": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "healthcare-rehabilitation": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "security-inspection": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    }
+  }
+}

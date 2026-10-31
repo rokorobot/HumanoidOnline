@@ -43,6 +43,7 @@ COVERAGE_2026_10_31 = {
     "1x-technologies-official", "apptronik-official", "boston-dynamics-official",
     "engineered-arts-official", "fourier-official", "galbot-official",
     "hanson-robotics-official", "honda-official", "kepler-robotics-official",
+    "limx-dynamics-official",
     "pal-robotics-official", "rainbow-robotics-official", "sanctuary-ai-official",
     "softbank-robotics-official", "tesla-official", "ubtech-robotics-official"}
 

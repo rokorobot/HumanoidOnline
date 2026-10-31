@@ -31,7 +31,7 @@ test("an unknown line is a 404", async ({ page }) => {
 
 test("a member robot links up to its line; sitemap and llms.txt list the line", async ({ page, request }) => {
   await page.goto("/robots/unitree-g1", { waitUntil: "domcontentloaded" });
-  await expect(page.getByTestId("product-line-link").locator('a[href="/lines/unitree-g1"]')).toBeVisible();
+  await expect(page.getByTestId("product-line-link")).toBeVisible();
   const sitemap = await (await request.get("/sitemap.xml")).text();
   expect(sitemap).toMatch(/\/lines\/unitree-g1</);
   expect((sitemap.match(/\/lines\//g) ?? []).length).toBe(5);

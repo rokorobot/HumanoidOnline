@@ -238,9 +238,11 @@ export default async function RobotDetailPage({
             {robot.product_line && (
               <>
                 <span aria-hidden="true">/</span>
-                <span data-testid="product-line-link">
-                  Part of the <Link href={`/lines/${robot.product_line.slug}`}>{robot.product_line.name}</Link> line
-                </span>
+                {/* The whole flex item is the link (like the crumbs above), so it is not a
+                    link inside running text (axe link-in-text-block). */}
+                <Link href={`/lines/${robot.product_line.slug}`} data-testid="product-line-link">
+                  Part of the {robot.product_line.name} line
+                </Link>
               </>
             )}
           </p>

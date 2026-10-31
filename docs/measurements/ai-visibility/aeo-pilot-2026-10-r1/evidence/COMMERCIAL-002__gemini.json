@@ -1,0 +1,158 @@
+{
+ "observed_at": "2026-10-31T03:13:29+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "Which humanoid robots are commercially available?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "The commercial landscape for humanoid robots includes models available for direct purchase (primarily for research, education, and light development) alongside high-end enterprise platforms deployed through corporate pilots and commercial leases.\n\nCommercially available humanoid robots span several categories:\n\n1. Consumer, Educational, and Research Humanoids (Direct Purchase)\n\nThese models can typically be ordered directly through manufacturer stores, robotics distributors, or electronics marketplaces. They are widely used by universities, developers, and tech enthusiasts.\n\nUnitree Robotics (G1, R1, and H-Series): Unitree is a major player in volume-produced humanoids. The Unitree G1 (starting around $13,500) and entry-level R1 models offer agile movement, compact builds, and developer configurations. Larger models like the H1 and H2 serve full-size locomotion research.\n\nAgiBot (X2 Series): AgiBot offers models like the X2 via direct purchase options for manufacturing research and performance testing, starting around $24,000 to $28,000.\n\nBooster Robotics (K1 and T1): Targeted at education and competitions, the K1 provides an accessible entry point for learning platforms starting around $6,000 to $12,000.\n\n2. Enterprise and Industrial Humanoids (Pilot & Lease Programs)\n\nMost heavy-duty industrial humanoids are not sold off-the-shelf; instead, they are deployed via commercial agreements, pilot programs, or Robotics-as-a-Service (RaaS) models.\n\nAgility Robotics (Digit): Designed explicitly for logistics and warehouse automation, Digit has seen commercial deployments and pilot testing with major logistics companies like Amazon, typically scaled through enterprise partnerships.\n\nBoston Dynamics (Electric Atlas): Boston Dynamics has allocated its initial commercial fleets of the electric Atlas to strategic corporate partners (such as Hyundai and Google DeepMind) for heavy industrial automation testing.\n\nApptronik (Apollo): Apollo is engineered for industrial and warehouse duty cycles, deployed via targeted enterprise integration programs.\n\nUBTECH Robotics (Walker S Series): Used heavily in automotive manufacturing plants and industrial logistics (such as projects with major global manufacturers), deployed via enterprise contracts.\n\n1X Technologies (NEO): Designed with a focus on home and general-purpose assistance, 1X utilizes pre-order and early-access commercial structures, alongside subscription models (RaaS).\n\n3. Service and Social Humanoids\n\nEngineered Arts (Ameca, RoboThespian): Known for hyper-realistic facial expressions and advanced conversational AI integration, these robots are commercially available for museums, science centers, corporate events, and customer service.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Humanoid Robot Prices: From $4290 to $170000+ [2026 Guide]",
+      "url": "https://robotsourced.com/pricing/humanoid-robots/#:~:text=Unitree%20(Hangzhou%2C%20China)%20%E2%80%94%20Market%20leader%20by,X2%20Humanoid%20Robot.%20%2424%2C240.%203%20kg%20payload.",
+      "description": "Unitree (Hangzhou, China) — Market leader by volume and price. Unitree R1-D \n— $4,290. The cheapest humanoid you can buy, listed on Unitree's own store. \nShares t..."
+     },
+     {
+      "position": 2,
+      "label": "Humanoid Robot Buyer's Guide 2026: Compare Models, Costs",
+      "url": "https://www.roboticscenter.ai/guides/humanoid-robot-buyers-guide-2025#:~:text=Unitree%20B2%2485%2C900.00%20%2B%20Z1%20arm%2420%2C799.00.%20Two%2Darmed%20tasks,Humanoid.%20Unitree%20G1%20EDU%2443%2C900.00%20or%20Unitree%20H1%2D2%24128%2C900.00.",
+      "description": "Unitree B2$85,900.00 + Z1 arm$20,799.00. Two-armed tasks around a building \n(kitchens, cabinets, doors) Wheeled bimanual. RC Mobile Aloha$20,000.00. \nBipedal loco..."
+     },
+     {
+      "position": 3,
+      "label": "Humanoid Robot Prices: Complete 2026 Guide",
+      "url": "https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C",
+      "description": "Table_title: Pricing Guide Table_content: | Robot | Company | Status | Use \nCase | Estimated Price | | --- | --- | --- | --- | --- | | NEO | 1X \nTechnologies | Co..."
+     },
+     {
+      "position": 4,
+      "label": "Humanoid Robot Prices: Complete 2026 Guide",
+      "url": "https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C",
+      "description": "Table_title: Pricing Guide Table_content: | Robot | Company | Status | Use \nCase | Estimated Price | | --- | --- | --- | --- | --- | | NEO | 1X \nTechnologies | Co..."
+     },
+     {
+      "position": 5,
+      "label": "Humanoid Robot Prices: Complete 2026 Guide",
+      "url": "https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C",
+      "description": "Table_title: Pricing Guide Table_content: | Robot | Company | Status | Use \nCase | Estimated Price | | --- | --- | --- | --- | --- | | NEO | 1X \nTechnologies | Co..."
+     },
+     {
+      "position": 6,
+      "label": "Humanoid Robot Prices: Complete 2026 Guide",
+      "url": "https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C",
+      "description": "Table_title: Pricing Guide Table_content: | Robot | Company | Status | Use \nCase | Estimated Price | | --- | --- | --- | --- | --- | | NEO | 1X \nTechnologies | Co..."
+     },
+     {
+      "position": 7,
+      "label": "Humanoid Robot Prices: Complete 2026 Guide",
+      "url": "https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C",
+      "description": "Table_title: Pricing Guide Table_content: | Robot | Company | Status | Use \nCase | Estimated Price | | --- | --- | --- | --- | --- | | NEO | 1X \nTechnologies | Co..."
+     },
+     {
+      "position": 8,
+      "label": "Humanoid Robot Prices: Complete 2026 Guide",
+      "url": "https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C",
+      "description": "Table_title: Pricing Guide Table_content: | Robot | Company | Status | Use \nCase | Estimated Price | | --- | --- | --- | --- | --- | | NEO | 1X \nTechnologies | Co..."
+     },
+     {
+      "position": 9,
+      "label": "Humanoid Robot Prices: Complete 2026 Guide",
+      "url": "https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C",
+      "description": "Table_title: Pricing Guide Table_content: | Robot | Company | Status | Use \nCase | Estimated Price | | --- | --- | --- | --- | --- | | NEO | 1X \nTechnologies | Co..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Humanoid Robot Prices: From $4290 to $170000+ [2026 Guide]",
+      "url": "https://robotsourced.com/pricing/humanoid-robots/#:~:text=Unitree%20(Hangzhou%2C%20China)%20%E2%80%94%20Market%20leader%20by,X2%20Humanoid%20Robot.%20%2424%2C240.%203%20kg%20payload.",
+      "domain": "robotsourced.com",
+      "position": 1,
+      "description": "Unitree (Hangzhou, China) — Market leader by volume and price. Unitree R1-D \n— $4,290. The cheapest humanoid you can buy, listed on Unitree's own store. \nShares t...",
+      "citationPillId": 1
+     },
+     {
+      "label": "Humanoid Robot Buyer's Guide 2026: Compare Models, Costs",
+      "url": "https://www.roboticscenter.ai/guides/humanoid-robot-buyers-guide-2025#:~:text=Unitree%20B2%2485%2C900.00%20%2B%20Z1%20arm%2420%2C799.00.%20Two%2Darmed%20tasks,Humanoid.%20Unitree%20G1%20EDU%2443%2C900.00%20or%20Unitree%20H1%2D2%24128%2C900.00.",
+      "domain": "roboticscenter.ai",
+      "position": 2,
+      "description": "Unitree B2$85,900.00 + Z1 arm$20,799.00. Two-armed tasks around a building \n(kitchens, cabinets, doors) Wheeled bimanual. RC Mobile Aloha$20,000.00. \nBipedal loco...",
+      "citationPillId": 1
+     },
+     {
+      "label": "Humanoid Robot Prices: Complete 2026 Guide",
+      "url": "https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C",
+      "domain": "humanoidindex.org",
+      "position": 3,
+      "description": "Table_title: Pricing Guide Table_content: | Robot | Company | Status | Use \nCase | Estimated Price | | --- | --- | --- | --- | --- | | NEO | 1X \nTechnologies | Co...",
+      "citationPillId": 2
+     },
+     {
+      "label": "Humanoid Robot Prices: Complete 2026 Guide",
+      "url": "https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C",
+      "domain": "humanoidindex.org",
+      "position": 3,
+      "description": "Table_title: Pricing Guide Table_content: | Robot | Company | Status | Use \nCase | Estimated Price | | --- | --- | --- | --- | --- | | NEO | 1X \nTechnologies | Co...",
+      "citationPillId": 3
+     },
+     {
+      "label": "Humanoid Robot Prices: Complete 2026 Guide",
+      "url": "https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C",
+      "domain": "humanoidindex.org",
+      "position": 3,
+      "description": "Table_title: Pricing Guide Table_content: | Robot | Company | Status | Use \nCase | Estimated Price | | --- | --- | --- | --- | --- | | NEO | 1X \nTechnologies | Co...",
+      "citationPillId": 4
+     },
+     {
+      "label": "Humanoid Robot Prices: Complete 2026 Guide",
+      "url": "https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C",
+      "domain": "humanoidindex.org",
+      "position": 3,
+      "description": "Table_title: Pricing Guide Table_content: | Robot | Company | Status | Use \nCase | Estimated Price | | --- | --- | --- | --- | --- | | NEO | 1X \nTechnologies | Co...",
+      "citationPillId": 5
+     },
+     {
+      "label": "Humanoid Robot Prices: Complete 2026 Guide",
+      "url": "https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C",
+      "domain": "humanoidindex.org",
+      "position": 3,
+      "description": "Table_title: Pricing Guide Table_content: | Robot | Company | Status | Use \nCase | Estimated Price | | --- | --- | --- | --- | --- | | NEO | 1X \nTechnologies | Co...",
+      "citationPillId": 6
+     },
+     {
+      "label": "Humanoid Robot Prices: Complete 2026 Guide",
+      "url": "https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C",
+      "domain": "humanoidindex.org",
+      "position": 3,
+      "description": "Table_title: Pricing Guide Table_content: | Robot | Company | Status | Use \nCase | Estimated Price | | --- | --- | --- | --- | --- | | NEO | 1X \nTechnologies | Co...",
+      "citationPillId": 7
+     },
+     {
+      "label": "Humanoid Robot Prices: Complete 2026 Guide",
+      "url": "https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C",
+      "domain": "humanoidindex.org",
+      "position": 3,
+      "description": "Table_title: Pricing Guide Table_content: | Robot | Company | Status | Use \nCase | Estimated Price | | --- | --- | --- | --- | --- | | NEO | 1X \nTechnologies | Co...",
+      "citationPillId": 8
+     }
+    ],
+    "markdown": "The commercial landscape for humanoid robots includes models available for direct purchase (primarily for research, education, and light development) alongside high-end enterprise platforms deployed through corporate pilots and commercial leases.\n\nCommercially available humanoid robots span several categories:\n\n### 1\\. Consumer, Educational, and Research Humanoids (Direct Purchase)\n\nThese models can typically be ordered directly through manufacturer stores, robotics distributors, or electronics marketplaces. They are widely used by universities, developers, and tech enthusiasts.\n\n  * **Unitree Robotics (G1, R1, and H-Series):** Unitree is a major player in volume-produced humanoids. The **Unitree G1** (starting around $13,500) and entry-level **R1** models offer agile movement, compact builds, and developer configurations. Larger models like the **H1** and **H2** serve full-size locomotion research. [Humanoid Robot Prices: From $4290 to $170000+ [2026 Guide]](https://robotsourced.com/pricing/humanoid-robots/#:~:text=Unitree%20\\(Hangzhou%2C%20China\\)%20%E2%80%94%20Market%20leader%20by,X2%20Humanoid%20Robot.%20%2424%2C240.%203%20kg%20payload.)[Humanoid Robot Buyer's Guide 2026: Compare Models, Costs](https://www.roboticscenter.ai/guides/humanoid-robot-buyers-guide-2025#:~:text=Unitree%20B2%2485%2C900.00%20%2B%20Z1%20arm%2420%2C799.00.%20Two%2Darmed%20tasks,Humanoid.%20Unitree%20G1%20EDU%2443%2C900.00%20or%20Unitree%20H1%2D2%24128%2C900.00.)\n\n  * **AgiBot (X2 Series):** AgiBot offers models like the **X2** via direct purchase options for manufacturing research and performance testing, starting around $24,000 to $28,000. [Humanoid Robot Prices: Complete 2026 Guide](https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C)\n\n  * **Booster Robotics (K1 and T1):** Targeted at education and competitions, the **K1** provides an accessible entry point for learning platforms starting around $6,000 to $12,000. [Humanoid Robot Prices: Complete 2026 Guide](https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C)\n\n### 2\\. Enterprise and Industrial Humanoids (Pilot & Lease Programs)\n\nMost heavy-duty industrial humanoids are not sold off-the-shelf; instead, they are deployed via commercial agreements, pilot programs, or Robotics-as-a-Service (RaaS) models.\n\n  * **Agility Robotics (Digit):** Designed explicitly for logistics and warehouse automation, Digit has seen commercial deployments and pilot testing with major logistics companies like Amazon, typically scaled through enterprise partnerships.\n\n  * **Boston Dynamics (Electric Atlas):** Boston Dynamics has allocated its initial commercial fleets of the electric Atlas to strategic corporate partners (such as Hyundai and Google DeepMind) for heavy industrial automation testing. [Humanoid Robot Prices: Complete 2026 Guide](https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C)\n\n  * **Apptronik (Apollo):** Apollo is engineered for industrial and warehouse duty cycles, deployed via targeted enterprise integration programs. [Humanoid Robot Prices: Complete 2026 Guide](https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C)\n\n  * **UBTECH Robotics (Walker S Series):** Used heavily in automotive manufacturing plants and industrial logistics (such as projects with major global manufacturers), deployed via enterprise contracts. [Humanoid Robot Prices: Complete 2026 Guide](https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C)\n\n  * **1X Technologies (NEO):** Designed with a focus on home and general-purpose assistance, 1X utilizes pre-order and early-access commercial structures, alongside subscription models (RaaS). [Humanoid Robot Prices: Complete 2026 Guide](https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C)\n\n### 3\\. Service and Social Humanoids\n\n  * **Engineered Arts (Ameca, RoboThespian):** Known for hyper-realistic facial expressions and advanced conversational AI integration, these robots are commercially available for museums, science centers, corporate events, and customer service. [Humanoid Robot Prices: Complete 2026 Guide](https://humanoidindex.org/pricing#:~:text=Table_title%3A%20Pricing%20Guide%20Table_content%3A%20%7C%20Robot%20%7C,%7C%20Manufacturing%20%7C%20Contact%20for%20pricing%20%7C)"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "8de0f695c62a4ca9bb1d38d2b8cfd38a",
+   "charged_micro": 2400
+  }
+ }
+}

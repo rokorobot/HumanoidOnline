@@ -1,0 +1,74 @@
+{
+ "observed_at": "2026-10-31T03:12:18+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "Which humanoid robots can be purchased in North America?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "The market for commercial humanoid robots available for purchase in North America includes developer-focused platforms, service robots, and industrial systems. While many of the most famous advanced humanoids (such as Tesla's Optimus, Boston Dynamics' Atlas, and Figure AI) are currently deployed through pilot programs or locked into specific corporate partnerships, several models can be bought or pre-ordered by researchers, businesses, and developers in North America.\n\n1. Developer and Research Humanoids (Bipedal)\n\nUnitree G1 & H-Series: Unitree Robotics offers some of the most accessible full-body bipedal humanoid platforms on the market. The Unitree G1 starts around $13,500 to $21,500 base price (with advanced educational/dexterous hand configurations scaling higher), making it a dominant choice for AI and robotics research labs in North America. Their heavier models, like the Unitree H2, are also available through international distributors serving North America.\n\nBooster Robotics (K1 / T1): Compact humanoid models geared toward education and embodied AI development are available starting at lower price tiers (around $6,000+) and ship internationally.\n\n2. Commercial Service and Wheeled Humanoids\n\nUBTECH Robotics: UBTECH offers several models targeting commercial and industrial sectors that can be sourced in North America. These include the Cruzr 1S (an intelligent service robot) and heavy industrial options like the Walker S2.\n\nAiMOGA (Mornine M1): Multilingual, AI-powered service and receptionist humanoid robots retail around $60,000 and are accessible via specialized robotics distributors.\n\n3. Consumer / Home Pre-Orders\n\n1X (NEO): 1X offers the NEO humanoid designed for home environments. It has opened up early-access ownership and pre-order slots for consumer markets, targeting domestic assistance and object manipulation.\n\nHow They Are Purchased\n\nMost of these robots are acquired through:\n\nDirect manufacturer inquiry: For advanced developer units or industrial deployments.\n\nSpecialized B2B robotics marketplaces and distributors: Companies like Robots International or Robotix Market facilitate import, customs clearance, and support for brands like Unitree and UBTECH directly into North America.\n\nAre you looking for a robot for a specific use case, such as software development, academic research, or business automation?",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Humanoid Robots for Sale - Buy for Commercial & General Purpose",
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm#:~:text=*%20UBTECH%20Cruzr%201S%20Intelligent%20Commercial%20Service,Humanoid%20Robot.%20%2421%2C500.00%20%2419%2C995.00.%20Add%20to%20Cart.",
+      "description": "* UBTECH Cruzr 1S Intelligent Commercial Service Wheeled Humanoid Robot. \n$15,999.99 As low as $11,999.99. Add to Cart. * UBTECH Walker S2 Industrial \nHumanoid Ro..."
+     },
+     {
+      "position": 2,
+      "label": "Best Robots You Can Buy in 2026: 30 Real Models",
+      "url": "https://antonrobots.com/robots-you-can-buy/#:~:text=*%201X%20NEO%20%E2%80%93%20Best%20Home%20Humanoid%20Available%20for%20Preorder.",
+      "description": " * 1X NEO – Best Home Humanoid Available for Preorder. "
+     },
+     {
+      "position": 3,
+      "label": "Humanoid Robots for Sale - Buy for Commercial & General Purpose",
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm#:~:text=Humanoid%20robot%20cost%20spans%20the%20widest%20range,support%20across%20every%20brand%20and%20platform%20class.",
+      "description": "Humanoid robot cost spans the widest range in robotics, from accessible \neducation bipeds to full industrial platforms and fleet programs, shaped by \nsize, degree..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Humanoid Robots for Sale - Buy for Commercial & General Purpose",
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm#:~:text=*%20UBTECH%20Cruzr%201S%20Intelligent%20Commercial%20Service,Humanoid%20Robot.%20%2421%2C500.00%20%2419%2C995.00.%20Add%20to%20Cart.",
+      "domain": "robotsinternational.com",
+      "position": 1,
+      "description": "* UBTECH Cruzr 1S Intelligent Commercial Service Wheeled Humanoid Robot. \n$15,999.99 As low as $11,999.99. Add to Cart. * UBTECH Walker S2 Industrial \nHumanoid Ro...",
+      "citationPillId": 1
+     },
+     {
+      "label": "Best Robots You Can Buy in 2026: 30 Real Models",
+      "url": "https://antonrobots.com/robots-you-can-buy/#:~:text=*%201X%20NEO%20%E2%80%93%20Best%20Home%20Humanoid%20Available%20for%20Preorder.",
+      "domain": "antonrobots.com",
+      "position": 2,
+      "description": " * 1X NEO – Best Home Humanoid Available for Preorder. ",
+      "citationPillId": 2
+     },
+     {
+      "label": "Humanoid Robots for Sale - Buy for Commercial & General Purpose",
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm#:~:text=Humanoid%20robot%20cost%20spans%20the%20widest%20range,support%20across%20every%20brand%20and%20platform%20class.",
+      "domain": "robotsinternational.com",
+      "position": 3,
+      "description": "Humanoid robot cost spans the widest range in robotics, from accessible \neducation bipeds to full industrial platforms and fleet programs, shaped by \nsize, degree...",
+      "citationPillId": 3
+     }
+    ],
+    "markdown": "The market for commercial humanoid robots available for purchase in North America includes developer-focused platforms, service robots, and industrial systems. While many of the most famous advanced humanoids (such as Tesla's Optimus, Boston Dynamics' Atlas, and Figure AI) are currently deployed through pilot programs or locked into specific corporate partnerships, several models can be bought or pre-ordered by researchers, businesses, and developers in North America.\n\n### 1\\. Developer and Research Humanoids (Bipedal)\n\n  * **Unitree G1 & H-Series:** Unitree Robotics offers some of the most accessible full-body bipedal humanoid platforms on the market. The **Unitree G1** starts around $13,500 to $21,500 base price (with advanced educational/dexterous hand configurations scaling higher), making it a dominant choice for AI and robotics research labs in North America. Their heavier models, like the **Unitree H2** , are also available through international distributors serving North America.\n\n  * **Booster Robotics (K1 / T1):** Compact humanoid models geared toward education and embodied AI development are available starting at lower price tiers (around $6,000+) and ship internationally.\n\n### 2\\. Commercial Service and Wheeled Humanoids\n\n  * **UBTECH Robotics:** UBTECH offers several models targeting commercial and industrial sectors that can be sourced in North America. These include the **Cruzr 1S** (an intelligent service robot) and heavy industrial options like the **Walker S2**. [Humanoid Robots for Sale - Buy for Commercial & General Purpose](https://www.robotsinternational.com/Humanoid-Robots.htm#:~:text=*%20UBTECH%20Cruzr%201S%20Intelligent%20Commercial%20Service,Humanoid%20Robot.%20%2421%2C500.00%20%2419%2C995.00.%20Add%20to%20Cart.)\n\n  * **AiMOGA (Mornine M1):** Multilingual, AI-powered service and receptionist humanoid robots retail around $60,000 and are accessible via specialized robotics distributors.\n\n### 3\\. Consumer / Home Pre-Orders\n\n  * **1X (NEO):** 1X offers the **NEO** humanoid designed for home environments. It has opened up early-access ownership and pre-order slots for consumer markets, targeting domestic assistance and object manipulation. [Best Robots You Can Buy in 2026: 30 Real Models](https://antonrobots.com/robots-you-can-buy/#:~:text=*%201X%20NEO%20%E2%80%93%20Best%20Home%20Humanoid%20Available%20for%20Preorder.)\n\n### How They Are Purchased\n\nMost of these robots are acquired through:\n\n  1. **Direct manufacturer inquiry:** For advanced developer units or industrial deployments.\n\n  2. **Specialized B2B robotics marketplaces and distributors:** Companies like _Robots International_ or _Robotix Market_ facilitate import, customs clearance, and support for brands like Unitree and UBTECH directly into North America. [Humanoid Robots for Sale - Buy for Commercial & General Purpose](https://www.robotsinternational.com/Humanoid-Robots.htm#:~:text=Humanoid%20robot%20cost%20spans%20the%20widest%20range,support%20across%20every%20brand%20and%20platform%20class.)\n\nAre you looking for a robot for a specific use case, such as software development, academic research, or business automation?"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "fdaeec079b7b47158532f8bbf572652a",
+   "charged_micro": 2400
+  }
+ }
+}

@@ -1,0 +1,124 @@
+{
+ "observed_at": "2026-10-31T03:12:08+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "Which humanoid robots can be purchased in Europe?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "A growing number of humanoid and upper-body humanoid robots can be purchased or ordered for commercial, research, and developer use within Europe. Availability usually depends on whether you are looking for an industrial/home general-purpose robot or an academic research platform.\n\nThe primary humanoid robots available to purchase or order across Europe include:\n\nPollen Robotics Reachy 2 (France)\n\nType: Mobile upper-body humanoid.\nDetails: Based in France, Pollen Robotics builds Reachy 2 explicitly for embodied AI, research, and real-world manipulation. It features 7-DOF bio-inspired arms, an omnidirectional mobile base, and full ROS 2 / Python integration.\nAcquisition: Available directly through Pollen Robotics or specialized global automation distributors.\n\n1X Technologies NEO (Norway / USA)\n\nType: Bipedal general-purpose domestic/commercial humanoid.\nDetails: Originating from Norway, 1X produces the lightweight, safety-focused NEO (such as NEO Beta). It features a soft, wearable exterior, pinch-proof joints, and advanced AI integration.\nAcquisition: Offered via direct reservation and allocation on the 1X Technologies Order Page (though initial rolling rollout phases prioritize specific regions, European availability and deliveries are managed directly through their framework).\n\nUnitree Robotics G1 / H1 Series (China / Global Distributors via Europe)\n\nType: Bipedal AI and research humanoid.\nDetails: Unitree’s G1 humanoid is one of the most accessible and popular bipedal robot platforms on the market for developers, starting at a lower price tier ($9k–$55k+ depending on EDU/Ultimate tiers).\nAcquisition: Readily orderable in Europe through international robotics logistics and professional tech platforms like RobotShop Europe or direct industrial channels.\n\nPAL Robotics (Spain)\n\nType: Bipedal and wheeled research humanoids (e.g., Kangaroo, TALOS).\nDetails: Based in Barcelona, PAL Robotics specializes in highly dynamic bipedal robots and customized research humanoids tailored for European research labs, universities, and EU-funded robotics projects.\nAcquisition: Available via direct quotation and institutional sales through PAL Robotics.\n\nEnchanted Tools Mirokaï (France)\n\nType: Interactive, stylized service humanoid.\nDetails: Designed in France with a unique aesthetic meant for public interaction, healthcare assistance, and welcoming environments.\nAcquisition: Commercial deployment and orders can be coordinated via Enchanted Tools or certified European robotics integrators.\n\nIf you'd like to narrow this down, let me know:\n\nWhat is your primary use case (e.g., academic research, software development, commercial automation, or personal use)?\nWhat is your approximate budget?\n\nI can help you determine which model fits your technical requirements best.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Order NEO",
+      "url": "https://www.1x.tech/order",
+      "description": "Pricing: $499/mo subscription. Height 5'6\", weight 66 lbs, lift carry 55 lbs, max. AI generalist model with built-in LLM, voice/mo...",
+      "redirectLink": "https://www.google.com/goto?url=CAESVAHrOzAV43pjA2woLB4pxYFMk5F2BuuLKvYLMd-IeS7Epus0P2848HXMJ_qqZrx3iPckRDmyAplalZhE4KM2HCxjDz98BEfaCMGY0C_pqQrY1nKn_g"
+     },
+     {
+      "position": 2,
+      "label": "Humanoid robots you can buy in 2026",
+      "url": "https://merarobotics.com/blog/humanoids/list/available-to-buy-2026",
+      "description": "45 models from the MERA Robotics catalogue. How do I buy a humanoid robot through MERA Robotics? Every model page has an “I want t...",
+      "redirectLink": "https://www.google.com/goto?url=CAESfQHrOzAVIex2GxsGXegehXyoHEnn8E5c9IRIpX2RkxzXucRBtvpQy_LdJ5BtHIdzzN2ymPsSL5nFMMMN2qRt3IrH0KVGjbIJqBpIp2hyR73KK-TRBepTullh0RjGm1dCkwyPyJYJORXZxAzXUtAicdjjvfk4Q4ANTO_6L2ea"
+     },
+     {
+      "position": 3,
+      "label": "Reachy 2 - The open-source humanoid for embodied AI | Pollen Robotics",
+      "url": "https://pollen-robotics.com/reachy-2/",
+      "description": "Reachy 2 is an open-source humanoid robot designed for embodied AI and real-world object manipulation, controlled via Python SDK o...",
+      "redirectLink": "https://www.google.com/goto?url=CAESYAHrOzAVBBytW-lhgkLb_xMy2AtIh0CowUFu27Kz7j70k3VVgYKlaQ5jx5WdvAIDf8dCNBWTphDYrG3MOtTW_NjWjhQDRFXKme9x3zZ5UIFIIYRplgOlDUSkBFNbxLvvKA"
+     },
+     {
+      "position": 4,
+      "label": "Professional Humanoid Robots - RobotShop",
+      "url": "https://www.robotshop.com/collections/professional-humanoid-robots",
+      "description": "$8,990.00 to $67,900.00); $11,864.80 to $20,158.47). Additional featured brands include AgiBot, Limx Dynamics, Deep Robotics, DOBO...",
+      "redirectLink": "https://www.google.com/goto?url=CAESfQHrOzAVmJJrQ2ML-pOlHVyQ7Qoqc3DT5BOlYQlhg-Gc7nTfs2XwrMsvjjgyhPRJQlVJDx5o7jfTEawiSkFTjINrH7prwHj1sJH2JnEczfanWW3lKh0lCeUkbHzHEIuMSLroC2m1y4U1JKaSCs7l1LL1G4Odl5ruPotEg1V-"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Reachy 2 - The open-source humanoid for embodied AI | Pollen Robotics",
+      "citationPillId": 1,
+      "url": "https://pollen-robotics.com/reachy-2/",
+      "domain": "pollen-robotics.com",
+      "description": "Reachy 2 is an open-source humanoid robot designed for embodied AI and real-world object manipulation, controlled via Python SDK o...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESYAHrOzAVBBytW-lhgkLb_xMy2AtIh0CowUFu27Kz7j70k3VVgYKlaQ5jx5WdvAIDf8dCNBWTphDYrG3MOtTW_NjWjhQDRFXKme9x3zZ5UIFIIYRplgOlDUSkBFNbxLvvKA"
+     },
+     {
+      "label": "Humanoid robots you can buy in 2026",
+      "citationPillId": 1,
+      "url": "https://merarobotics.com/blog/humanoids/list/available-to-buy-2026",
+      "domain": "merarobotics.com",
+      "description": "45 models from the MERA Robotics catalogue. How do I buy a humanoid robot through MERA Robotics? Every model page has an “I want t...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESfQHrOzAVIex2GxsGXegehXyoHEnn8E5c9IRIpX2RkxzXucRBtvpQy_LdJ5BtHIdzzN2ymPsSL5nFMMMN2qRt3IrH0KVGjbIJqBpIp2hyR73KK-TRBepTullh0RjGm1dCkwyPyJYJORXZxAzXUtAicdjjvfk4Q4ANTO_6L2ea"
+     },
+     {
+      "label": "Order NEO",
+      "citationPillId": 2,
+      "url": "https://www.1x.tech/order",
+      "domain": "1x.tech",
+      "description": "Pricing: $499/mo subscription. Height 5'6\", weight 66 lbs, lift carry 55 lbs, max. AI generalist model with built-in LLM, voice/mo...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESVAHrOzAV43pjA2woLB4pxYFMk5F2BuuLKvYLMd-IeS7Epus0P2848HXMJ_qqZrx3iPckRDmyAplalZhE4KM2HCxjDz98BEfaCMGY0C_pqQrY1nKn_g"
+     },
+     {
+      "label": "Humanoid robots you can buy in 2026",
+      "citationPillId": 2,
+      "url": "https://merarobotics.com/blog/humanoids/list/available-to-buy-2026",
+      "domain": "merarobotics.com",
+      "description": "45 models from the MERA Robotics catalogue. How do I buy a humanoid robot through MERA Robotics? Every model page has an “I want t...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESfQHrOzAVIex2GxsGXegehXyoHEnn8E5c9IRIpX2RkxzXucRBtvpQy_LdJ5BtHIdzzN2ymPsSL5nFMMMN2qRt3IrH0KVGjbIJqBpIp2hyR73KK-TRBepTullh0RjGm1dCkwyPyJYJORXZxAzXUtAicdjjvfk4Q4ANTO_6L2ea"
+     },
+     {
+      "label": "Professional Humanoid Robots - RobotShop",
+      "citationPillId": 3,
+      "url": "https://www.robotshop.com/collections/professional-humanoid-robots",
+      "domain": "robotshop.com",
+      "description": "$8,990.00 to $67,900.00); $11,864.80 to $20,158.47). Additional featured brands include AgiBot, Limx Dynamics, Deep Robotics, DOBO...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAESfQHrOzAVmJJrQ2ML-pOlHVyQ7Qoqc3DT5BOlYQlhg-Gc7nTfs2XwrMsvjjgyhPRJQlVJDx5o7jfTEawiSkFTjINrH7prwHj1sJH2JnEczfanWW3lKh0lCeUkbHzHEIuMSLroC2m1y4U1JKaSCs7l1LL1G4Odl5ruPotEg1V-"
+     },
+     {
+      "label": "Humanoid robots you can buy in 2026",
+      "citationPillId": 4,
+      "url": "https://merarobotics.com/blog/humanoids/list/available-to-buy-2026",
+      "domain": "merarobotics.com",
+      "description": "45 models from the MERA Robotics catalogue. How do I buy a humanoid robot through MERA Robotics? Every model page has an “I want t...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESfQHrOzAVIex2GxsGXegehXyoHEnn8E5c9IRIpX2RkxzXucRBtvpQy_LdJ5BtHIdzzN2ymPsSL5nFMMMN2qRt3IrH0KVGjbIJqBpIp2hyR73KK-TRBepTullh0RjGm1dCkwyPyJYJORXZxAzXUtAicdjjvfk4Q4ANTO_6L2ea"
+     },
+     {
+      "label": "Humanoid robots you can buy in 2026",
+      "citationPillId": 5,
+      "url": "https://merarobotics.com/blog/humanoids/list/available-to-buy-2026",
+      "domain": "merarobotics.com",
+      "description": "45 models from the MERA Robotics catalogue. How do I buy a humanoid robot through MERA Robotics? Every model page has an “I want t...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESfQHrOzAVIex2GxsGXegehXyoHEnn8E5c9IRIpX2RkxzXucRBtvpQy_LdJ5BtHIdzzN2ymPsSL5nFMMMN2qRt3IrH0KVGjbIJqBpIp2hyR73KK-TRBepTullh0RjGm1dCkwyPyJYJORXZxAzXUtAicdjjvfk4Q4ANTO_6L2ea"
+     }
+    ],
+    "markdown": "A growing number of humanoid and upper-body humanoid robots can be purchased or ordered for commercial, research, and developer use within Europe. Availability usually depends on whether you are looking for an industrial/home general-purpose robot or an academic research platform.\n\nThe primary humanoid robots available to purchase or order across Europe include:\n\n  * **Pollen Robotics Reachy 2 (France)**\n    * **Type:** Mobile upper-body humanoid.\n    * **Details:** Based in France, Pollen Robotics builds Reachy 2 explicitly for embodied AI, research, and real-world manipulation. It features 7-DOF bio-inspired arms, an omnidirectional mobile base, and full ROS 2 / Python integration.\n    * **Acquisition:** Available directly through [Pollen Robotics](https://pollen-robotics.com/reachy-2/) or specialized global automation distributors. [Reachy 2 - The open-source humanoid for embodied AI | Pollen Robotics](https://pollen-robotics.com/reachy-2/)[Humanoid robots you can buy in 2026](https://merarobotics.com/blog/humanoids/list/available-to-buy-2026)\n\n  * **1X Technologies NEO (Norway / USA)**\n    * **Type:** Bipedal general-purpose domestic/commercial humanoid.\n    * **Details:** Originating from Norway, 1X produces the lightweight, safety-focused NEO (such as NEO Beta). It features a soft, wearable exterior, pinch-proof joints, and advanced AI integration.\n    * **Acquisition:** Offered via direct reservation and allocation on the [1X Technologies Order Page](https://www.1x.tech/order) (though initial rolling rollout phases prioritize specific regions, European availability and deliveries are managed directly through their framework). [Order NEO](https://www.1x.tech/order)[Humanoid robots you can buy in 2026](https://merarobotics.com/blog/humanoids/list/available-to-buy-2026)\n\n  * **Unitree Robotics G1 / H1 Series (China / Global Distributors via Europe)**\n    * **Type:** Bipedal AI and research humanoid.\n    * **Details:** Unitree’s G1 humanoid is one of the most accessible and popular bipedal robot platforms on the market for developers, starting at a lower price tier ($9k–$55k+ depending on EDU/Ultimate tiers).\n    * **Acquisition:** Readily orderable in Europe through international robotics logistics and professional tech platforms like RobotShop Europe or direct industrial channels. [Professional Humanoid Robots - RobotShop](https://www.robotshop.com/collections/professional-humanoid-robots)\n\n  * **PAL Robotics (Spain)**\n    * **Type:** Bipedal and wheeled research humanoids (e.g., Kangaroo, TALOS).\n    * **Details:** Based in Barcelona, PAL Robotics specializes in highly dynamic bipedal robots and customized research humanoids tailored for European research labs, universities, and EU-funded robotics projects.\n    * **Acquisition:** Available via direct quotation and institutional sales through PAL Robotics. [Humanoid robots you can buy in 2026](https://merarobotics.com/blog/humanoids/list/available-to-buy-2026)\n\n  * **Enchanted Tools Mirokaï (France)**\n    * **Type:** Interactive, stylized service humanoid.\n    * **Details:** Designed in France with a unique aesthetic meant for public interaction, healthcare assistance, and welcoming environments.\n    * **Acquisition:** Commercial deployment and orders can be coordinated via Enchanted Tools or certified European robotics integrators. [Humanoid robots you can buy in 2026](https://merarobotics.com/blog/humanoids/list/available-to-buy-2026)\n\nIf you'd like to narrow this down, let me know:\n\n  * What is your **primary use case** (e.g., academic research, software development, commercial automation, or personal use)?\n  * What is your **approximate budget**?\n\nI can help you determine **which model fits your technical requirements** best."
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "decef4996cb54dbd9c9e245e1deab86e",
+   "charged_micro": 2400
+  }
+ }
+}

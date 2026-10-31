@@ -1,0 +1,204 @@
+{
+ "observed_at": "2026-10-31T03:12:08+00:00",
+ "endpoint": "perplexity.web.answer.fast",
+ "request": {
+  "preset": "fast",
+  "input": "Which humanoid robots can be purchased in Europe?",
+  "max_steps": 1,
+  "max_output_tokens": 512
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "background": false,
+   "completed_at": 1793416329,
+   "created_at": 1793416329,
+   "effort": "fast@2026-10-16.0",
+   "error": null,
+   "frequency_penalty": 0,
+   "id": "resp_035ab483-8626-496f-8b70-f5fedbd67bba",
+   "incomplete_details": null,
+   "instructions": null,
+   "max_output_tokens": 512,
+   "max_tool_calls": null,
+   "metadata": {},
+   "model": "openai/gpt-6-luna",
+   "object": "response",
+   "output": [
+    {
+     "queries": [
+      "Which humanoid robots can be purchased in Europe?"
+     ],
+     "results": [
+      {
+       "id": 1,
+       "last_updated": "2026-10-30",
+       "snippet": "# Professional Humanoid Robots\nThis collection features humanoid robots from manufacturers such as Unitree Robotics, Dobot, LIMX Dynamics, and other professional humanoid robotics brands.\nOffered in multiple configurations, these robots can enable customization and system expansion across diverse use cases.\n## Refine By\n**Unitree Robotics** Unitree G1 Humanoid Robot\nSKU: RB-Unt-100\nSale price€19.789,01 Reviews Only 1 unit left\n2. 1On Demand\n**Booster Robotics** Booster Robotics K1 Educational Humanoid Robot\nSKU: RB-Boo-10\nSale price€15.398,90 Reviews\n3. 1\n**Unitree Robotics** Unitree R1 Humanoid Robot (EU)\nSKU: RB-Unt-166\nSale price€10.164,00 Reviews Only 1 unit left\n4. 1On Demand\n**Unitree Robotics** Unitree G1 EDU Ultimate A (U3) Humanoid Robot (EU)\nSKU: RB-Unt-64\nSale price€54.450,00 Reviews\n5. 1On Demand\n**Unitree Robotics** Unitree G1 EDU Ultimate B (U4) Humanoid Robot (EU)\nSKU: RB-Unt-92\nSale price€64.130,00 Reviews\n6. 1On Demand\n**Unitree Robotics** Unitree G1 EDU Standard (U1) Humanoid Robot (EU)\nSKU: RB-Unt-89\nSale price€38.115,00 Reviews\n7. 1On Demand\n**Unitree Robotics** Unitree R1 EDU (U2) Humanoid Robot (EU)\nSKU: RB-Unt-200\nSale price€18.150,00 Reviews\n8. 1On Demand\n**Unitree Robotics** Unitree R1 EDU (U1) Humanoid Robot (EU)\nSKU: RB-Unt-167\nSale price€15.972,00 Reviews\n9. 1On Demand\n**UBTECH Robotics** UBTECH Walker S2 Industrial Humanoid Robot\nSKU: RB-Ubt-37\nSale price€242.000,00 Reviews\n10. 1On Demand\n**Unitree Robotics** Unitree R1 EDU Pro D (U6) Humanoid Robot (EU)\nSKU: RB-Unt-204\nSale price€33.880,00 Reviews\n11. 1On Demand\n**Unitree Robotics** Unitree R1 EDU Pro A (U3) Humanoid Robot (EU)\nSKU: RB-Unt-201\nSale price€30.976,00 Reviews\n12. 1On Demand\n**Unitree Robotics** Unitree G1 EDU Ultimate D (U6) Humanoid Robot (EU)\nSKU: RB-Unt-131\nSale price€70.059,00 Reviews\n13. 1On Demand\n**Unitree Robotics** Unitree G1 EDU Advanced (U2) Humanoid Robot (EU)\nSKU: RB-Unt-28\nSale price€43.560,00 Reviews\n14. 1On Demand\n**AiMOGA** AiMOGA Mornine Humanoid Service Robot\nSKU: RBD-Aim-02\nSale price€93.170,00 Reviews\n15. 1On Demand\n**AgiBot** AgiBot A2 Ultra Humanoid Robot (EU)\nSKU: RB-Age-06\nSale price€122.143,45 Reviews\n16. 1On Demand\n**AgiBot** AgiBot G2 Wheeled Humanoid Robot (EU)\nSKU: RB-Age-04\nSale price€151.800,55 Reviews\n17. 1On Demand\n**Limx Dynamics** LimX Dynamics TRON 2 EDU Dual-Arm Embodied Robot Fix Platform\nSKU: RB-Lmx-04\nSale price€25.300,00 Reviews\n18. 1On Demand\n**Limx Dynamics** LimX Dynamics TRON 2 EDU 2-in-1 Embodied Robot\nSKU: RB-Lmx-05\nSale price€23.100,00 Reviews\n19. 1Coming soonOn Demand\n**Unitree Robotics** Unitree R1-D Ultra-Fast Deployment Dual-Arm Humanoid Robot\nSKU: RB-Unt-317\n...\n20. 1On Demand\n**DOBOT** DOBOT Atom D EDU Data Collection Humanoid Robot\nSKU: RB-Dot-105\nSale price€55.183,70 Reviews\n21. 1On Demand\n**DOBOT** DOBOT Atom Max Research Humanoid Robot\nSKU: RB-Dot-107\nSale price€76.288,30 Reviews\n22. 1On Demand\n**DOBOT** DOBOT Atom Max EDU Humanoid Robot\nSKU: RB-Dot-109\nSale price€94.254,60 Reviews\n23. 1On Demand\n**Limx Dynamics** Limx Dynamics Oli EDU Humanoid Robot\nSKU: RB-Lmx-03\nSale price€79.200,01 Reviews\n24. 1On Demand\n**PL-Universe Robotics** PL-Universe ProWhite Robot 2.0 (w/ AGV)\nSKU: RB-Pln-02\nSale price€123.200,00 Reviews\n...\n**Limx Dynamics** LimX Dynamics TRON 2 EDU 3-in-1 Embodied Robot\nSKU: RB-Lmx-01\nSale price€35.860,00 Reviews\n...\n**Booster Robotics** Booster Robotics K1 GEEK Humanoid Robot\nSKU: RB-Boo-11\nSale price€11.731,49 Reviews\n27. 1On Demand\n**Booster Robotics** Booster Robotics K1 Professional Humanoid Robot\nSKU: RB-Boo-12\nSale price€19.798,54 Reviews\n...\n**Unitree Robotics** Unitree G1-D Ultimate D Humanoid Robot Platform (Revo2 Basic Hands)\nSKU: RB-Unt-286\nSale price€52.030,00 Reviews\n...\n**Unitree Robotics** Unitree G1-D Ultimate E Humanoid Robot Platform (Revo2 Tactile Hands)\nSKU: RB-Unt-287\nSale price€56.870,00 Reviews\n...\n**Unitree Robotics** Unitree G1-D Ultimate C Humanoid Robot Platform (Dex3 Hands w/ Feedback)\nSKU: RB-Unt-285\nSale price€57.717,00 Reviews",
+       "source": "web",
+       "title": "Professional Humanoid Robots",
+       "url": "https://eu.robotshop.com/collections/professional-humanoid-robots"
+      },
+      {
+       "date": "2026-10-27",
+       "id": 2,
+       "last_updated": "2026-10-29",
+       "snippet": "Robot Humanoide Unitree G1 EDU Ultimate I de Unitree (EU) - RobotShop\n...\n# Robot Humanoide Unitree G1 EDU Ultimate I de Unitree (EU)\n...\nUnitree RoboticsSKU:RB-Unt-373\nNúmero de fabricante: G1-EDU-ULTIMATE-I\n...\nPrecio de oferta €92.290,00\nImpuesto incluido\n...\n## Descripción\n- Robot Humanoide Unitree G1 EDU Ultimate I (EU)\n...\nEl **Robot Humanoide Unitree G1 EDU Ultimate I (EU)** es un robot humanoide bípedo y plataforma de investigación en robótica construida por Unitree Robotics para el desarrollo de AI incorporada y robótica avanzada.\n...\n|•|Robot Humanoide Unitree G1 EDU Ultimate I de Unitree (EU) (69 DOF, Mano Wuji 2 Manos Hábiles de Cinco Dedos)|",
+       "source": "web",
+       "title": "Robot Humanoide Unitree G1 EDU Ultimate I de Unitree (EU)",
+       "url": "https://eu.robotshop.com/es/products/robot-humanoide-unitree-g1-edu-ultimate-i-unitree-eu"
+      },
+      {
+       "date": "2026-10-28",
+       "id": 3,
+       "last_updated": "2026-10-29",
+       "snippet": "Unitree G1 EDU Ultimate E (U7) Humanoid Robot (EU) - RobotShop\n...\n# Unitree G1 EDU Ultimate E (U7) Humanoid Robot (EU)\nSave €0,00\nUnitree RoboticsSKU: RB-Unt-191\nManufacturer #: G1-EDU-U7-EU\nPrice :\nSale price €55.520,85\nTax included\nShipping calculated at checkout.\n...\nThis is an On Demand item and is not normally stocked.\nWe will order it for you along with our next purchase from the supplier.\n...\n## Description\n- Unitree G1 EDU Ultimate E (U7) Humanoid Robot\n...\nThe **Unitree G1 EDU Ultimate E (U7) Humanoid Robot** is a full-size bipedal humanoid platform engineered by Unitree Robotics for research teams and technology developers working on embodied artificial intelligence.",
+       "source": "web",
+       "title": "Unitree G1 EDU Ultimate E (U7) Humanoid Robot (EU)",
+       "url": "https://eu.robotshop.com/products/unitree-g1-edu-ultimate-e-u7-humanoid-robot-eu"
+      },
+      {
+       "id": 4,
+       "last_updated": "2026-10-20",
+       "snippet": "# Humanoid Robots for Research & Development\nDelve into our diverse range of humanoid robots, specially tailored for research and development purposes.\nThese advanced humanoid robots, including models from leading brands like Unitree, DOBOT, and PUDU, provide versatile applications in educational and experimental settings.\n...\n## Refine By\n**Unitree Robotics** Unitree G1 Humanoid Robot\nSKU: RB-Unt-100\nSale price€19.789,01 Reviews\n...\n2. 1On Demand\n**Booster Robotics** Booster Robotics K1 Educational Humanoid Robot\nSKU: RB-Boo-10\nSale price€15.398,90 Reviews\n3. 1On Demand\n**Unitree Robotics** Unitree G1 EDU Ultimate A (U3) Humanoid Robot (EU)\nSKU: RB-Unt-64\nSale price€54.450,00 Reviews\n4. 1\n**Unitree Robotics** Unitree R1 Humanoid Robot (EU)\nSKU: RB-Unt-166\nSale price€10.164,00 Reviews Only 1 unit left\n5. 1On Demand\n**Unitree Robotics** Unitree G1 EDU Ultimate B (U4) Humanoid Robot (EU)\nSKU: RB-Unt-92\nSale price€64.130,00 Reviews\n6. 1On Demand\n**Unitree Robotics** Unitree G1 EDU Standard (U1) Humanoid Robot (EU)\nSKU: RB-Unt-89\nSale price€38.115,00 Reviews\n7. 1On Demand\n**Unitree Robotics** Unitree R1 EDU (U2) Humanoid Robot (EU)\nSKU: RB-Unt-200\nSale price€18.150,00 Reviews\n8. 1On Demand\n**Unitree Robotics** Unitree G1 EDU Plus (U2) Humanoid Robot (EU)\nSKU: RB-Unt-28\nSale price€43.560,00 Reviews\n9. 1On Demand\n**Unitree Robotics** Unitree R1 EDU Pro D (U6) Humanoid Robot (EU)\nSKU: RB-Unt-204\nSale price€33.880,00 Reviews\n10. 1On Demand\n**Unitree Robotics** Unitree R1 EDU (U1) Humanoid Robot (EU)\nSKU: RB-Unt-167\nSale price€15.972,00 Reviews\n11. 1On Demand\n**Unitree Robotics** Unitree G1 EDU Ultimate D (U6) Humanoid Robot (EU)\nSKU: RB-Unt-131\nSale price€70.059,00 Reviews\n12. 1On Demand\n**Unitree Robotics** Unitree R1 EDU Pro A (U3) Humanoid Robot (EU)\nSKU: RB-Unt-201\nSale price€30.976,00 Reviews\n13. 1On Demand\n**AgiBot** AgiBot A2 Ultra Humanoid Robot (EU)\nSKU: RB-Age-06\nSale price€122.143,45 Reviews\n14. 1On Demand\n**AgiBot** AgiBot G2 Wheeled Humanoid Robot (EU)\nSKU: RB-Age-04\nSale price€151.800,55 Reviews\n15. 1Coming soonOn Demand\n**Unitree Robotics** Unitree R1-D Ultra-Fast Deployment Dual-Arm Humanoid Robot\nSKU: RB-Unt-317\nPlease, contact us for pricing Reviews\n...\n16. 1On Demand\n**DOBOT** DOBOT Atom D EDU Data Collection Humanoid Robot\nSKU: RB-Dot-105\nSale price€55.183,70 Reviews\n17. 1On Demand\n**DOBOT** DOBOT Atom Max Research Humanoid Robot\nSKU: RB-Dot-107\nSale price€76.288,30 Reviews\n18. 1On Demand\n**DOBOT** DOBOT Atom Max EDU Humanoid Robot\nSKU: RB-Dot-109\nSale price€94.254,60 Reviews\n19. 1On Demand\n**Limx Dynamics** Limx Dynamics Oli EDU Humanoid Robot\nSKU: RB-Lmx-03\nSale price€79.200,01 Reviews\n...\n**Booster Robotics** Booster Robotics K1 Professional Humanoid Robot\nSKU: RB-Boo-12\nSale price€19.798,54 Reviews\n...\n**Booster Robotics** Booster Robotics K1 GEEK Humanoid Robot\nSKU: RB-Boo-11\nSale price€11.731,49 Reviews\n...\n**Booster Robotics** Booster T1 Humanoid Robot (Standard)\nSKU: RB-Boo-03\nSale price€40.764,90 Reviews Sold out\n...\n**Booster Robotics** Booster T1 Humanoid Robot (Dextrous Hands)\nSKU: RB-Boo-02\nSale price€64.146,50 Reviews Sold out\n...\n**Booster Robotics** Booster T1 Humanoid Robot (Grippers)\nSKU: RB-Boo-01\n...\n**Unitree Robotics** Unitree G1-D Standard A Humanoid Robot Platform (Dex1-1 Grippers)\nSKU: RB-Unt-278\nSale price€31.339,00 Reviews\n...\n**Unitree Robotics** Unitree G1-D Ultimate D Humanoid Robot Platform (Revo2 Basic Hands)\nSKU: RB-Unt-286\nSale price€52.030,00 Reviews\n...\n**Unitree Robotics** Unitree G1-D Ultimate E Humanoid Robot Platform (Revo2 Tactile Hands)\nSKU: RB-Unt-287\nSale price€56.870,00 Reviews\n...\n**Unitree Robotics** Unitree G1-D Ultimate C Humanoid Robot Platform (Dex3 Hands w/ Feedback)\nSKU: RB-Unt-285\nSale price€57.717,00 Reviews\n...\nSKU: RB-Unt-284\n...\n**Unitree Robotics** Unitree G1-D Ultimate A Humanoid Robot Platform (Dex1-1 Grippers)\nSKU: RB-Unt-283",
+       "source": "web",
+       "title": "Humanoid Robots for Research & Development - RobotShop Europe",
+       "url": "https://eu.robotshop.com/collections/humanoid-robots-research-development"
+      },
+      {
+       "date": "2026-10-21",
+       "id": 5,
+       "last_updated": "2026-10-26",
+       "snippet": "Unitree R1 EDU Pro F (U8) Humanoid Robot (EU) - RobotShop\n...\n# Unitree R1 EDU Pro F (U8) Humanoid Robot (EU)\n...\nUnitree RoboticsSKU: RB-Unt-378\nManufacturer #: R1-EDU-U8\nPrice :\nSale price €25.520,00\nTax included\nShipping calculated at checkout.\n...\nThis is an On Demand item and is not normally stocked.\n...\n## Description\n- Unitree R1 EDU Pro F (U8) Humanoid Robot (EU)\n...\nThe **Unitree R1 EDU Pro F (U8) Humanoid Robot (EU)**, developed by Unitree Robotics, is a full-body bipedal research platform built for manipulation and locomotion research in academic and institutional environments.",
+       "source": "web",
+       "title": "Unitree R1 EDU Pro F (U8) Humanoid Robot (EU)",
+       "url": "https://eu.robotshop.com/products/unitree-r1-edu-pro-f-u8-humanoid-robot-eu"
+      },
+      {
+       "date": "2026-10-27",
+       "id": 6,
+       "last_updated": "2026-10-29",
+       "snippet": "Unitree G1 EDU Plus (U2) Humanoid Robot (EU) - RobotShop\n...\n# Unitree G1 EDU Plus (U2) Humanoid Robot (EU)\nSave €0,00\nUnitree RoboticsSKU: RB-Unt-28\nManufacturer #: G1-EDU-U2-EU\nPrice :\nSale price €43.560,00\nTax included\nShipping calculated at checkout.\n...\nThis is an On Demand item and is not normally stocked.\nWe will order it for you along with our next purchase from the supplier.\n...\n## Description\n- Unitree G1 EDU Plus (U2) Humanoid Robot\n...\nThe **Unitree G1 EDU Plus (U2) Humanoid Robot** is a bipedal humanoid platform engineered by Unitree Robotics for embodied AI research and development.",
+       "source": "web",
+       "title": "Unitree G1 EDU Plus (U2) Humanoid Robot (EU)",
+       "url": "https://eu.robotshop.com/products/unitree-g1-edu-plus-u2-humanoid-robot-eu"
+      },
+      {
+       "date": "2026-10-22",
+       "id": 7,
+       "last_updated": "2026-10-27",
+       "snippet": "Unitree G1 EDU Ultimate I Humanoid Robot (EU) - RobotShop\n...\n# Unitree G1 EDU Ultimate I Humanoid Robot (EU)\nSave €0,00\nUnitree RoboticsSKU: RB-Unt-373\nManufacturer #: G1-EDU-ULTIMATE-I\nPrice :\nSale price €92.290,00\nTax included\nShipping calculated at checkout.\n...\nThis is an On Demand item and is not normally stocked.\nWe will order it for you along with our next purchase from the supplier.\n...\n## Description\n- Unitree G1 EDU Ultimate I Humanoid Robot (EU)\n...\nThe **Unitree G1 EDU Ultimate I Humanoid Robot (EU)** is a bipedal humanoid robot and robotics research platform built by Unitree Robotics for embodied AI and advanced robotics development.",
+       "source": "web",
+       "title": "Unitree G1 EDU Ultimate I Humanoid Robot (EU)",
+       "url": "https://eu.robotshop.com/products/unitree-g1-edu-ultimate-i-humanoid-robot-eu"
+      },
+      {
+       "date": "2026-10-21",
+       "id": 8,
+       "last_updated": "2026-10-22",
+       "snippet": "Unitree R1 EDU (U2) Humanoid Robot (EU) - RobotShop\n...\n# Unitree R1 EDU (U2) Humanoid Robot (EU)\nSave €0,00\nUnitree RoboticsSKU: RB-Unt-200\nManufacturer #: R1-EDU-U2\nPrice :\nSale price €18.150,00\nTax included\nShipping calculated at checkout.\n...\nThis is an On Demand item and is not normally stocked.\nWe will order it for you along with our next purchase from the supplier.\n...\n## Description\n- Unitree R1 EDU (U2) Humanoid Robot (EU)\n...\nThe **Unitree R1 EDU (U2) Humanoid Robot (EU)**, developed by Unitree Robotics, is a full-body bipedal humanoid platform designed for advanced research, AI development, and human-robot interaction studies.",
+       "source": "web",
+       "title": "Unitree R1 EDU (U2) Humanoid Robot (EU) - RobotShop Europe",
+       "url": "https://eu.robotshop.com/products/unitree-r1-edu-u2-humanoid-robot-eu"
+      },
+      {
+       "date": "2026-10-21",
+       "id": 9,
+       "last_updated": "2026-10-27",
+       "snippet": "Unitree R1 EDU Pro D (U6) Humanoid Robot (EU) - RobotShop\n...\n# Unitree R1 EDU Pro D (U6) Humanoid Robot (EU)\n...\nUnitree RoboticsSKU: RB-Unt-204\nManufacturer #: R1-EDU-U6\nPrice :\nSale price €33.880,00\nTax included\nShipping calculated at checkout.\n...\nThis is an On Demand item and is not normally stocked.\nWe will order it for you along with our next purchase from the supplier.\n...\n- Unitree R1 EDU Pro D (U6) Humanoid Robot (EU)\n...\n**Unitree R1 EDU Pro D (U6) Humanoid Robot (EU)** is a full-size bipedal humanoid platform from Unitree Robotics, engineered for advanced robotics research, higher education, and applied AI development.",
+       "source": "web",
+       "title": "Unitree R1 EDU Pro D (U6) Humanoid Robot (EU) - RobotShop",
+       "url": "https://eu.robotshop.com/products/unitree-r1-edu-pro-d-u6-humanoid-robot-eu"
+      },
+      {
+       "date": "2026-10-10",
+       "id": 10,
+       "last_updated": "2026-10-27",
+       "snippet": "Booster Robotics K1 GEEK Humanoid Robot - RobotShop\n...\n# Booster Robotics K1 GEEK Humanoid Robot\n...\nBooster RoboticsSKU: RB-Boo-11\nManufacturer #: Booster-K1-Geek-Humanoid\nPrice :\nSale price €11.731,49\nTax included\nShipping calculated at checkout.\n...\nThis is an On Demand item and is not normally stocked.\n...\n- K1 GEEK Robot by Booster Robotics\n- 22‑DoF entry‑level embodied AI humanoid platform, ideal for developers, hobbyists, and rapid prototyping\n...\nThe **Booster Robotics K1 GEEK Humanoid Robot** is a compact, entry-level humanoid platform developed for embodied AI development and hands-on robotics education.\n...\n| |K1 Geek|K1 EDU|K1 PRO|",
+       "source": "web",
+       "title": "Booster Robotics K1 GEEK Humanoid Robot - RobotShop Europe",
+       "url": "https://eu.robotshop.com/products/booster-robotics-k1-geek-humanoid-robot"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "content": [
+      {
+       "annotations": [],
+       "text": "A number of humanoid robots are currently listed for sale in Europe, mostly through specialist robotics suppliers. Prices below are the listed euro prices; many models are **on demand**, rather than in stock.[1][4]\n\n- **Unitree R1** — listed from about **€10,164**; R1 EDU variants are listed from about **€15,972**.[1]\n- **Booster Robotics K1** — GEEK, educational and professional versions are listed at roughly **€11,731–€19,799**.[1][10]\n- **Unitree G1** — standard and EDU versions are listed from about **€19,789**, with higher-spec EDU configurations costing considerably more.[1]\n- **DOBOT Atom** — D EDU, Max Research and Max EDU models are listed at about **€55,184–€94,255**.[1]\n- **LimX Dynamics Oli EDU** — listed at about **€79,200**.[1]\n- **AiMOGA Mornine** — listed at about **€93,170**.[1]\n- **AgiBot A2 Ultra** and **G2 Wheeled** — listed at about **€122,143** and **€151,801**, respectively.[1]\n- **UBTECH Walker S2** — listed at about **€242,000**.[1]\n\nThese are examples, not an exhaustive market list; availability and prices can change, and “listed” does not necessarily mean immediately deliverable. Check the seller for shipping to your country, VAT, lead time, and whether the model is intended for research or education rather than ordinary consumer use.[1]",
+       "type": "output_text"
+      }
+     ],
+     "id": "msg_c04b2531-27b8-4edb-83cc-9de546a10592",
+     "role": "assistant",
+     "status": "completed",
+     "type": "message"
+    }
+   ],
+   "parallel_tool_calls": true,
+   "presence_penalty": 0,
+   "preset": "fast@2026-10-16.0",
+   "previous_response_id": null,
+   "prompt_cache_key": null,
+   "reasoning": null,
+   "safety_identifier": null,
+   "service_tier": "fast",
+   "status": "completed",
+   "store": true,
+   "temperature": 1,
+   "text": {
+    "format": {
+     "type": "text"
+    }
+   },
+   "tool_choice": "auto",
+   "tools": [
+    {
+     "type": "web_search"
+    }
+   ],
+   "top_logprobs": 0,
+   "top_p": 1,
+   "truncation": "",
+   "usage": {
+    "cost": {
+     "cache_creation_cost": 0.00058,
+     "cache_read_cost": 2e-05,
+     "currency": "USD",
+     "input_cost": 0,
+     "output_cost": 0.00017,
+     "tool_calls_cost": 0.001,
+     "tool_calls_cost_details": {
+      "search_web": 0.001
+     },
+     "total_cost": 0.00177
+    },
+    "input_tokens": 6430,
+    "input_tokens_details": {
+     "cache_creation_input_tokens": 4647,
+     "cache_read_input_tokens": 1780,
+     "cached_tokens": 1780
+    },
+    "output_tokens": 347,
+    "output_tokens_details": {
+     "reasoning_tokens": 0
+    },
+    "tool_calls_details": {
+     "search_web": {
+      "cost_usd": 0.001,
+      "invocation": 1
+     }
+    },
+    "total_tokens": 6777
+   },
+   "user": null
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "aceba1097f194ff6bd0abdb749a93923",
+   "charged_micro": 1770
+  }
+ }
+}

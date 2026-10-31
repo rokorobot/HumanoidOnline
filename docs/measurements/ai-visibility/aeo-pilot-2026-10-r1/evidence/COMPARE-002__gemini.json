@@ -1,0 +1,214 @@
+{
+ "observed_at": "2026-10-31T03:14:59+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "Unitree G1 vs Booster K1.",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Both the Unitree G1 and the Booster K1 are compact, highly capable humanoid robots targeted at research, development, and education, but they differ significantly in size, design focus, price point, and performance specs.\n\nKey Specifications Comparison\n\nFeature\nUnitree G1 (Base / EDU)\nBooster K1 (Geek / Edu / Pro)\nHeight\n~130 cm (1.3 m)\n~95 cm\nWeight\n~35 kg\n~19.5 kg\nDegrees of Freedom (DoF)\n23 DoF base (scales up to 29–43+ DoF on EDU versions with dexterous hands)\n22 DoF (Legs: 6x2, Arms: 4x2, Head: 2)\nSensors\nLivox Mid-360 3D LiDAR, Intel RealSense D435i depth camera, mic array\nStereo/depth camera, 9-axis IMU, microphone array, speaker\nOnboard Computing\nHigh-performance CPU (Base) / NVIDIA Jetson Orin up to 100–157 TOPS (EDU)\nConfigurable AI compute ranging from 48 up to 200 TOPS\nBattery Life\nRoughly 2 hours under active use\n~50 minutes to 1 hour 20 minutes (depending on model and load)\nPrice Range\nStarts around $14,000 to over $40,000+ for advanced EDU variants\nGenerally spans roughly $5,999 (Geek entry version) up to higher-tier configurations\n\nCore Differences\n\n1. Size and Form Factor\n\nUnitree G1: Taller and heavier (~1.3m, 35 kg), giving it a more human-like proportion. It features advanced joint torque capabilities and can handle dynamic movements like jumping, spinning, and agile locomotion.\n\nBooster K1: Shorter and much lighter (~95 cm, 19.5 kg). Its compact, portable footprint makes it exceptionally easy to move between classrooms and tight laboratory spaces without requiring rigorous safety rigging.\n\n2. Target Use Cases & Openness\n\nUnitree G1: Well-known for high agility and dynamic movement (running, deep reinforcement learning, and complex manipulation). However, keep in mind that entry-level or base G1 versions can sometimes come with software locks, meaning full secondary development capabilities often require stepping up to higher-priced EDU packages.\n\nBooster K1: Positioned heavily as an accessible developer and STEM education platform. Even entry configurations (like the K1 Geek) offer open-source tools and secondary development support out of the box for Python, ROS, and ROS2, making it popular for university labs on a tighter budget.\n\n3. Hardware & Sensors\n\nUnitree G1: Equipped out-of-the-box with heavy-duty sensing like a 3D LiDAR (Livox Mid-360), making it robust for complex indoor mapping and autonomous navigation.\n\nBooster K1: Relies primarily on vision-based depth/stereo cameras and an IMU for its perception stack, trading away heavy LiDAR sensors to maintain a lighter weight and lower price tag.\n\nWhich one should you choose?\n\nGo with the Unitree G1 if: You need a larger, faster, highly dynamic platform capable of advanced research into bipedal locomotion, heavy manipulation, and complex AI simulation where LiDAR mapping and higher physical payloads are required.\n\nGo with the Booster K1 if: You are looking for a more affordable, highly portable, classroom-friendly desktop-to-floor humanoid robot focused on Python/ROS2 programming, basic machine learning, and human-robot interaction without spending enterprise-level budgets.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Booster Robotics K1 Specs & Price - Humanoid.guide",
+      "url": "https://humanoid.guide/product/k1/",
+      "description": "Booster K1 is a compact humanoid robot designed for education, research, \nand competition. It blends agile motion, powerful onboard AI, and rich \nsensors in a"
+     },
+     {
+      "position": 2,
+      "label": "Unitree G1 - ROBOTS: Your Guide to the World of Robotics",
+      "url": "https://robotsguide.com/robots/unitree-g1#:~:text=Width%2045%20cm%20Height%20130%20cm%20Length,DoF%20x%202%3B%20Waist%3A%201%20DoF)%20Materials.",
+      "description": "Width 45 cm Height 130 cm Length 20 cm Weight 35 kg Speed 7.2 km/h. Livox \nMid-360 3D lidar plus Intel RealSense D435i depth camera. Microphone array. \nDual joint..."
+     },
+     {
+      "position": 3,
+      "label": "Unitree G1 - ROBOTS: Your Guide to the World of Robotics",
+      "url": "https://robotsguide.com/robots/unitree-g1#:~:text=Dual%20joint%20encoders%20(for%20position%2Ftorque%20feedback)%20and,crossed%2Droller%20bearings.%20Base%20model%3A%208%2Dcore%20high%2Dperformance%20CPU.",
+      "description": "Dual joint encoders (for position/torque feedback) and IMU to support \nbalance and motion stabilization. Low inertia high-speed internal rotor \npermanent magnet s..."
+     },
+     {
+      "position": 4,
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Key%20features%20of%20the%20Booster%20K1%20humanoid,Connectivity%3A%20Wi%2DFi%206%2C%20Bluetooth%205.2%2C%20Gigabit%20Ethernet.",
+      "description": "Key features of the Booster K1 humanoid robot. Compact humanoid: 95 cm, \n19.5 kg. 22 DoF: smooth motion, biped locomotion and articulated control. \nTorque-control..."
+     },
+     {
+      "position": 5,
+      "label": "7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=Unitree%20reserves%20secondary%20development%20for%20its%20EDU,student%20projects.%20Its%20limits%20are%20equally%20clear.",
+      "description": "Unitree reserves secondary development for its EDU configurations. The K1 \nis much smaller: 95 cm tall and 19.5 kg, with 22 degrees of freedom and 48 \nTOPS of onb..."
+     },
+     {
+      "position": 6,
+      "label": "Unitree G1 - ROBOTS: Your Guide to the World of Robotics",
+      "url": "https://robotsguide.com/robots/unitree-g1",
+      "description": "The Unitree G1 is a compact humanoid robot designed for AI-powered mobility \nand manipulation. It stands out for its agility, force-controlled dexterous"
+     },
+     {
+      "position": 7,
+      "label": "7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=It%20has%2031%20degrees%20of%20freedom%2C%20two,the%20Unitree%20R1%20better%20than%20the%20G1%3F",
+      "description": " It has 31 degrees of freedom, two hours of stated walking time and a \nhigher upper-body payload. Its price is quote-only, so the G1 EDU remains \nthe safer all-ro..."
+     },
+     {
+      "position": 8,
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Embedded%20AI%20computing%3A%2048%2C%20117%20or%20200,STEM%20education%2C%20research%2C%20embedded%20AI%2C%20demonstrations%2C%20RoboCup.",
+      "description": "Embedded AI computing: 48, 117 or 200 TOPS depending on the version. \nIntegrated sensors: stereo / depth camera, 9-axis IMU, microphone array, \nspeaker. Software ..."
+     },
+     {
+      "position": 9,
+      "label": "7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=It%20has%2031%20degrees%20of%20freedom%2C%20two,the%20Unitree%20R1%20better%20than%20the%20G1%3F",
+      "description": " It has 31 degrees of freedom, two hours of stated walking time and a \nhigher upper-body payload. Its price is quote-only, so the G1 EDU remains \nthe safer all-ro..."
+     },
+     {
+      "position": 10,
+      "label": "7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=The%20standard%20warranty%20is%20also%20only%20three,Source%3A%20Booster%20K1%20specifications%20and%20current%20price.",
+      "description": "The standard warranty is also only three months. Choose the K1 Geek over \nthe G1 if: your priority is affordable, portable humanoid development \nrather than full-..."
+     },
+     {
+      "position": 11,
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Embedded%20AI%20computing%3A%2048%2C%20117%20or%20200,STEM%20education%2C%20research%2C%20embedded%20AI%2C%20demonstrations%2C%20RoboCup.",
+      "description": "Embedded AI computing: 48, 117 or 200 TOPS depending on the version. \nIntegrated sensors: stereo / depth camera, 9-axis IMU, microphone array, \nspeaker. Software ..."
+     },
+     {
+      "position": 12,
+      "label": "7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=The%20standard%20warranty%20is%20also%20only%20three,Source%3A%20Booster%20K1%20specifications%20and%20current%20price.",
+      "description": "The standard warranty is also only three months. Choose the K1 Geek over \nthe G1 if: your priority is affordable, portable humanoid development \nrather than full-..."
+     },
+     {
+      "position": 13,
+      "label": "7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=Unitree%20reserves%20secondary%20development%20for%20its%20EDU,student%20projects.%20Its%20limits%20are%20equally%20clear.",
+      "description": "Unitree reserves secondary development for its EDU configurations. The K1 \nis much smaller: 95 cm tall and 19.5 kg, with 22 degrees of freedom and 48 \nTOPS of onb..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Booster Robotics K1 Specs & Price - Humanoid.guide",
+      "url": "https://humanoid.guide/product/k1/",
+      "domain": "humanoid.guide",
+      "position": 1,
+      "description": "Booster K1 is a compact humanoid robot designed for education, research, \nand competition. It blends agile motion, powerful onboard AI, and rich \nsensors in a",
+      "citationPillId": 1
+     },
+     {
+      "label": "Unitree G1 - ROBOTS: Your Guide to the World of Robotics",
+      "url": "https://robotsguide.com/robots/unitree-g1#:~:text=Width%2045%20cm%20Height%20130%20cm%20Length,DoF%20x%202%3B%20Waist%3A%201%20DoF)%20Materials.",
+      "domain": "robotsguide.com",
+      "position": 2,
+      "description": "Width 45 cm Height 130 cm Length 20 cm Weight 35 kg Speed 7.2 km/h. Livox \nMid-360 3D lidar plus Intel RealSense D435i depth camera. Microphone array. \nDual joint...",
+      "citationPillId": 2
+     },
+     {
+      "label": "Unitree G1 - ROBOTS: Your Guide to the World of Robotics",
+      "url": "https://robotsguide.com/robots/unitree-g1#:~:text=Dual%20joint%20encoders%20(for%20position%2Ftorque%20feedback)%20and,crossed%2Droller%20bearings.%20Base%20model%3A%208%2Dcore%20high%2Dperformance%20CPU.",
+      "domain": "robotsguide.com",
+      "position": 3,
+      "description": "Dual joint encoders (for position/torque feedback) and IMU to support \nbalance and motion stabilization. Low inertia high-speed internal rotor \npermanent magnet s...",
+      "citationPillId": 2
+     },
+     {
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Key%20features%20of%20the%20Booster%20K1%20humanoid,Connectivity%3A%20Wi%2DFi%206%2C%20Bluetooth%205.2%2C%20Gigabit%20Ethernet.",
+      "domain": "generationrobots.com",
+      "position": 4,
+      "description": "Key features of the Booster K1 humanoid robot. Compact humanoid: 95 cm, \n19.5 kg. 22 DoF: smooth motion, biped locomotion and articulated control. \nTorque-control...",
+      "citationPillId": 3
+     },
+     {
+      "label": "7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=Unitree%20reserves%20secondary%20development%20for%20its%20EDU,student%20projects.%20Its%20limits%20are%20equally%20clear.",
+      "domain": "blog.robozaps.com",
+      "position": 5,
+      "description": "Unitree reserves secondary development for its EDU configurations. The K1 \nis much smaller: 95 cm tall and 19.5 kg, with 22 degrees of freedom and 48 \nTOPS of onb...",
+      "citationPillId": 3
+     },
+     {
+      "label": "Unitree G1 - ROBOTS: Your Guide to the World of Robotics",
+      "url": "https://robotsguide.com/robots/unitree-g1",
+      "domain": "robotsguide.com",
+      "position": 6,
+      "description": "The Unitree G1 is a compact humanoid robot designed for AI-powered mobility \nand manipulation. It stands out for its agility, force-controlled dexterous",
+      "citationPillId": 4
+     },
+     {
+      "label": "7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=It%20has%2031%20degrees%20of%20freedom%2C%20two,the%20Unitree%20R1%20better%20than%20the%20G1%3F",
+      "domain": "blog.robozaps.com",
+      "position": 7,
+      "description": " It has 31 degrees of freedom, two hours of stated walking time and a \nhigher upper-body payload. Its price is quote-only, so the G1 EDU remains \nthe safer all-ro...",
+      "citationPillId": 4
+     },
+     {
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Embedded%20AI%20computing%3A%2048%2C%20117%20or%20200,STEM%20education%2C%20research%2C%20embedded%20AI%2C%20demonstrations%2C%20RoboCup.",
+      "domain": "generationrobots.com",
+      "position": 8,
+      "description": "Embedded AI computing: 48, 117 or 200 TOPS depending on the version. \nIntegrated sensors: stereo / depth camera, 9-axis IMU, microphone array, \nspeaker. Software ...",
+      "citationPillId": 5
+     },
+     {
+      "label": "7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=It%20has%2031%20degrees%20of%20freedom%2C%20two,the%20Unitree%20R1%20better%20than%20the%20G1%3F",
+      "domain": "blog.robozaps.com",
+      "position": 7,
+      "description": " It has 31 degrees of freedom, two hours of stated walking time and a \nhigher upper-body payload. Its price is quote-only, so the G1 EDU remains \nthe safer all-ro...",
+      "citationPillId": 5
+     },
+     {
+      "label": "7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=The%20standard%20warranty%20is%20also%20only%20three,Source%3A%20Booster%20K1%20specifications%20and%20current%20price.",
+      "domain": "blog.robozaps.com",
+      "position": 10,
+      "description": "The standard warranty is also only three months. Choose the K1 Geek over \nthe G1 if: your priority is affordable, portable humanoid development \nrather than full-...",
+      "citationPillId": 6
+     },
+     {
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Embedded%20AI%20computing%3A%2048%2C%20117%20or%20200,STEM%20education%2C%20research%2C%20embedded%20AI%2C%20demonstrations%2C%20RoboCup.",
+      "domain": "generationrobots.com",
+      "position": 8,
+      "description": "Embedded AI computing: 48, 117 or 200 TOPS depending on the version. \nIntegrated sensors: stereo / depth camera, 9-axis IMU, microphone array, \nspeaker. Software ...",
+      "citationPillId": 7
+     },
+     {
+      "label": "7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=The%20standard%20warranty%20is%20also%20only%20three,Source%3A%20Booster%20K1%20specifications%20and%20current%20price.",
+      "domain": "blog.robozaps.com",
+      "position": 10,
+      "description": "The standard warranty is also only three months. Choose the K1 Geek over \nthe G1 if: your priority is affordable, portable humanoid development \nrather than full-...",
+      "citationPillId": 8
+     },
+     {
+      "label": "7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=Unitree%20reserves%20secondary%20development%20for%20its%20EDU,student%20projects.%20Its%20limits%20are%20equally%20clear.",
+      "domain": "blog.robozaps.com",
+      "position": 5,
+      "description": "Unitree reserves secondary development for its EDU configurations. The K1 \nis much smaller: 95 cm tall and 19.5 kg, with 22 degrees of freedom and 48 \nTOPS of onb...",
+      "citationPillId": 9
+     }
+    ],
+    "markdown": "Both the **Unitree G1** and the **Booster K1** are compact, highly capable humanoid robots targeted at research, development, and education, but they differ significantly in size, design focus, price point, and performance specs. [Booster Robotics K1 Specs & Price - Humanoid.guide](https://humanoid.guide/product/k1/)\n\n### Key Specifications Comparison\n\nFeature| Unitree G1 (Base / EDU)| Booster K1 (Geek / Edu / Pro)  \n---|---|---  \n**Height**|  ~130 cm (1.3 m)| ~95 cm  \n**Weight**|  ~35 kg| ~19.5 kg  \n**Degrees of Freedom (DoF)**|  23 DoF base (scales up to 29–43+ DoF on EDU versions with dexterous hands)| 22 DoF (Legs: 6x2, Arms: 4x2, Head: 2)  \n**Sensors**|  Livox Mid-360 3D LiDAR, Intel RealSense D435i depth camera, mic array| Stereo/depth camera, 9-axis IMU, microphone array, speaker  \n**Onboard Computing**|  High-performance CPU (Base) / NVIDIA Jetson Orin up to 100–157 TOPS (EDU)| Configurable AI compute ranging from 48 up to 200 TOPS  \n**Battery Life**|  Roughly 2 hours under active use| ~50 minutes to 1 hour 20 minutes (depending on model and load)  \n**Price Range**|  Starts around $14,000 to over $40,000+ for advanced EDU variants| Generally spans roughly $5,999 (Geek entry version) up to higher-tier configurations  \n  \n### Core Differences\n\n#### 1\\. Size and Form Factor\n\n  * **Unitree G1:** Taller and heavier (~1.3m, 35 kg), giving it a more human-like proportion. It features advanced joint torque capabilities and can handle dynamic movements like jumping, spinning, and agile locomotion. [Unitree G1 - ROBOTS: Your Guide to the World of Robotics](https://robotsguide.com/robots/unitree-g1#:~:text=Width%2045%20cm%20Height%20130%20cm%20Length,DoF%20x%202%3B%20Waist%3A%201%20DoF\\)%20Materials.)[Unitree G1 - ROBOTS: Your Guide to the World of Robotics](https://robotsguide.com/robots/unitree-g1#:~:text=Dual%20joint%20encoders%20\\(for%20position%2Ftorque%20feedback\\)%20and,crossed%2Droller%20bearings.%20Base%20model%3A%208%2Dcore%20high%2Dperformance%20CPU.)\n\n  * **Booster K1:** Shorter and much lighter (~95 cm, 19.5 kg). Its compact, portable footprint makes it exceptionally easy to move between classrooms and tight laboratory spaces without requiring rigorous safety rigging. [Booster K1 humanoid robot | Generation Robots](https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Key%20features%20of%20the%20Booster%20K1%20humanoid,Connectivity%3A%20Wi%2DFi%206%2C%20Bluetooth%205.2%2C%20Gigabit%20Ethernet.)[7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog](https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=Unitree%20reserves%20secondary%20development%20for%20its%20EDU,student%20projects.%20Its%20limits%20are%20equally%20clear.)\n\n#### 2\\. Target Use Cases & Openness\n\n  * **Unitree G1:** Well-known for high agility and dynamic movement (running, deep reinforcement learning, and complex manipulation). However, keep in mind that entry-level or base G1 versions can sometimes come with software locks, meaning full secondary development capabilities often require stepping up to higher-priced **EDU** packages. [Unitree G1 - ROBOTS: Your Guide to the World of Robotics](https://robotsguide.com/robots/unitree-g1)[7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog](https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=It%20has%2031%20degrees%20of%20freedom%2C%20two,the%20Unitree%20R1%20better%20than%20the%20G1%3F)\n\n  * **Booster K1:** Positioned heavily as an accessible developer and STEM education platform. Even entry configurations (like the K1 Geek) offer open-source tools and secondary development support out of the box for Python, ROS, and ROS2, making it popular for university labs on a tighter budget. [Booster K1 humanoid robot | Generation Robots](https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Embedded%20AI%20computing%3A%2048%2C%20117%20or%20200,STEM%20education%2C%20research%2C%20embedded%20AI%2C%20demonstrations%2C%20RoboCup.)[7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog](https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=It%20has%2031%20degrees%20of%20freedom%2C%20two,the%20Unitree%20R1%20better%20than%20the%20G1%3F)\n\n#### 3\\. Hardware & Sensors\n\n  * **Unitree G1:** Equipped out-of-the-box with heavy-duty sensing like a 3D LiDAR (Livox Mid-360), making it robust for complex indoor mapping and autonomous navigation. [7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog](https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=The%20standard%20warranty%20is%20also%20only%20three,Source%3A%20Booster%20K1%20specifications%20and%20current%20price.)\n\n  * **Booster K1:** Relies primarily on vision-based depth/stereo cameras and an IMU for its perception stack, trading away heavy LiDAR sensors to maintain a lighter weight and lower price tag. [Booster K1 humanoid robot | Generation Robots](https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Embedded%20AI%20computing%3A%2048%2C%20117%20or%20200,STEM%20education%2C%20research%2C%20embedded%20AI%2C%20demonstrations%2C%20RoboCup.)\n\n### Which one should you choose?\n\n  * **Go with the Unitree G1 if:** You need a larger, faster, highly dynamic platform capable of advanced research into bipedal locomotion, heavy manipulation, and complex AI simulation where LiDAR mapping and higher physical payloads are required. [7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog](https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=The%20standard%20warranty%20is%20also%20only%20three,Source%3A%20Booster%20K1%20specifications%20and%20current%20price.)\n\n  * **Go with the Booster K1 if:** You are looking for a more affordable, highly portable, classroom-friendly desktop-to-floor humanoid robot focused on Python/ROS2 programming, basic machine learning, and human-robot interaction without spending enterprise-level budgets. [7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog](https://blog.robozaps.com/b/unitree-g1-alternatives#:~:text=Unitree%20reserves%20secondary%20development%20for%20its%20EDU,student%20projects.%20Its%20limits%20are%20equally%20clear.)"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "0870a25f6666434ba443956b91374ff1",
+   "charged_micro": 2400
+  }
+ }
+}

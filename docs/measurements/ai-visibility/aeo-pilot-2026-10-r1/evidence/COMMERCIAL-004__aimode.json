@@ -1,0 +1,187 @@
+{
+ "observed_at": "2026-10-31T03:12:19+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "Which humanoid robots can be purchased in North America?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Purchasing a humanoid robot in North America generally falls into two distinct categories: readily available developer/research platforms that can be ordered directly online, and industrial/commercial enterprise models that require direct corporate requests-for-quote (RFQs), pilot programs, or Robot-as-a-Service (RaaS) agreements.\n\n1. Developer & Research Models (Available via E-Commerce)\n\nThese units can be bought directly through global manufacturers or North American robotics distributors like RobotShop Professional Humanoid Robots Catalog:\n\nUnitree G1 — An ultra-compact developer and research bipedal humanoid with 23 degrees of freedom. It is available in base configurations or upgraded EDU variants.\n\nEstimated Price: Starts around $17,900 for the base model; EDU and Ultimate research configurations range from $43,900 to over $83,000.\nWhere to buy: Available on the Unitree G1 Collection on RobotShop or direct from Unitree.\n\nUnitree R1 / R1 EDU — A versatile lower-cost humanoid/bipedal developer platform.\n\nEstimated Price: Starts around $8,990 up to $32,900 for advanced EDU Pro variants.\nWhere to buy: RobotShop Professional Humanoid Robots Catalog.\n\nBooster Robotics K1 Series — Educational and professional humanoid systems designed for research, AI training, and classroom interaction.\n\nEstimated Price: Roughly $11,800 to $20,200 depending on the GEEK, Educational, or Professional tier.\nWhere to buy: RobotShop Professional Humanoid Robots Catalog.\n\n2. Industrial & Commercial Enterprise Models (By Quote / Pilot Only)\n\nIf you are looking for full-sized deployment humanoids meant for logistics, manufacturing, or general labor, direct e-commerce checkout is not available. Enterprises must engage in corporate sales pipelines, volume allocations, or RaaS lease models:\n\nAgility Robotics Digit — Designed specifically for logistics, warehouse tote handling, and cross-docking. Deployed via multi-unit commercial pilots (such as with Amazon).\n\nEstimated Price: Circulates around $250,000 per unit or via RaaS deployment structures.\nOrdering Pathway: Direct corporate RFQ through Agility Robotics.\n\nSanctuary AI Phoenix — A high-dexterity general-purpose humanoid powered by their Carbon AI platform, targeted at retail and light manufacturing.\n\nEstimated Price: Estimated between $150,000 and $300,000 under structured enterprise pilot agreements.\nOrdering Pathway: Enterprise pilot application via Sanctuary AI.\n\nApptronik Apollo & Figure Series (e.g., Figure 03) — Advanced general-purpose commercial humanoids scaling up factory and warehouse integrations.\n\nEstimated Price: Quote-only / unreleased public retail price.\nOrdering Pathway: Enterprise allocation requests through Apptronik or Figure AI.\n\nTesla Optimus — Targeted at high-volume industrial scaling and eventual consumer use, though wider market availability remains constrained to internal manufacturing priorities and future waitlists.\n\nIf you are looking to purchase one, tell me:\n\nAre you buying for academic research/development or industrial automation/business operations?\nWhat is your budget range?\n\nI can help narrow down the ideal platform and connect you with the right procurement channel.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Professional Humanoid Robots - RobotShop",
+      "url": "https://www.robotshop.com/collections/professional-humanoid-robots",
+      "description": "Booster Robotics K1 series (Educational, Professional, GEEK, pricing $11,864.80 to $20,158.47). Systems support application scenar...",
+      "redirectLink": "https://www.google.com/goto?url=CAESfQHrOzAVjeNQPccmDYz5K6jy6ajzyF--dbUeymff9irNVtJcK_3WZ3pQdGtu2kOVynPdJ3h-rYvg3-7RPPxJRyBWGguTc31wKaRpArBaQJa_3sSfDIsEJyP5VDcU1789QN4fOPkV7aCeFlfSjitmgFmSf7_NqU2-x-a-Myqr"
+     },
+     {
+      "position": 2,
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today",
+      "description": "Optimus Gen 3 (Tesla) | In-house manufacturing, future home automation | < $20,000 (Targeted at scale) | Internal scaling priority...",
+      "redirectLink": "https://www.google.com/goto?url=CAESpwEB6zswFZRoWgt3aETmFbnZXqrZXvZUv4v_mf0Lacnn1upaIGikcUr-bWDYo5D4o46W6nAOcJ-_nTG2v-8GMK6ppognpC_ztQ7cCtj8Li4udLnp3sgkb4UOWFDoRdpV-FhkB2ON6NHRgRltHqdqpwcTeQpet8Z_JDQu7ULQyVZqvuDB-0bcOd6mPbHuML4V9VJ4FSAOzvGelxXjUxlGgpPO1-_GfPUpvA"
+     },
+     {
+      "position": 3,
+      "label": "Humanoid Robots for Sale in 2026: Complete Buyers Guide",
+      "url": "https://theresarobotforthat.com/blog/humanoid-robots-for-sale/",
+      "description": "Humanoid robots with a manufacturer-published price run from $4,900 to $90,000 as of August 2026, Apptronik Apollo, Agility carrie...",
+      "redirectLink": "https://www.google.com/goto?url=CAESeQHrOzAVRrby9f9Tjb7cku4H1yB9aw5b4FR7Z-vnuapVXzHGiKAxqHcIgFnr8KMXk6f31fOifaex4FwPq5IuMi612IZRY6HAJi9a_p52lNUnW8iLcq0OES-UF0dAh_ZmWL91gb7VJOCbqu-mJdR1nk0r2TGb0dETLQ0"
+     },
+     {
+      "position": 4,
+      "label": "Unitree G1 Robots - RobotShop",
+      "url": "https://www.robotshop.com/collections/unitree-g1-robots",
+      "description": "G1 EDU Standard U1 ($43,900.00), G1 EDU Advanced U2 ($53,900.00), G1 EDU Ultimate variants A through I ($55,900.00 to $83,900.00),",
+      "redirectLink": "https://www.google.com/goto?url=CAEScgHrOzAVrdNN4rBwWuraPxqNqMSgyBz0SYrKqnma9M7JqDD9ideYq5BeWdDw32m27Y5EBlS5bTN21knp3k4-RDz4HIPaAJwQzaqLNe-eYE3BczYC_ACXghGQsL4JruglmWhVvXFHzPFGU6EthofTPtCk_g"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "citationPillId": 1,
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today",
+      "domain": "keyirobot.com",
+      "description": "Optimus Gen 3 (Tesla) | In-house manufacturing, future home automation | < $20,000 (Targeted at scale) | Internal scaling priority...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESpwEB6zswFZRoWgt3aETmFbnZXqrZXvZUv4v_mf0Lacnn1upaIGikcUr-bWDYo5D4o46W6nAOcJ-_nTG2v-8GMK6ppognpC_ztQ7cCtj8Li4udLnp3sgkb4UOWFDoRdpV-FhkB2ON6NHRgRltHqdqpwcTeQpet8Z_JDQu7ULQyVZqvuDB-0bcOd6mPbHuML4V9VJ4FSAOzvGelxXjUxlGgpPO1-_GfPUpvA"
+     },
+     {
+      "label": "Humanoid Robots for Sale in 2026: Complete Buyers Guide",
+      "citationPillId": 1,
+      "url": "https://theresarobotforthat.com/blog/humanoid-robots-for-sale/",
+      "domain": "theresarobotforthat.com",
+      "description": "Humanoid robots with a manufacturer-published price run from $4,900 to $90,000 as of August 2026, Apptronik Apollo, Agility carrie...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESeQHrOzAVRrby9f9Tjb7cku4H1yB9aw5b4FR7Z-vnuapVXzHGiKAxqHcIgFnr8KMXk6f31fOifaex4FwPq5IuMi612IZRY6HAJi9a_p52lNUnW8iLcq0OES-UF0dAh_ZmWL91gb7VJOCbqu-mJdR1nk0r2TGb0dETLQ0"
+     },
+     {
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "citationPillId": 2,
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today",
+      "domain": "keyirobot.com",
+      "description": "Optimus Gen 3 (Tesla) | In-house manufacturing, future home automation | < $20,000 (Targeted at scale) | Internal scaling priority...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESpwEB6zswFZRoWgt3aETmFbnZXqrZXvZUv4v_mf0Lacnn1upaIGikcUr-bWDYo5D4o46W6nAOcJ-_nTG2v-8GMK6ppognpC_ztQ7cCtj8Li4udLnp3sgkb4UOWFDoRdpV-FhkB2ON6NHRgRltHqdqpwcTeQpet8Z_JDQu7ULQyVZqvuDB-0bcOd6mPbHuML4V9VJ4FSAOzvGelxXjUxlGgpPO1-_GfPUpvA"
+     },
+     {
+      "label": "Professional Humanoid Robots - RobotShop",
+      "citationPillId": 2,
+      "url": "https://www.robotshop.com/collections/professional-humanoid-robots",
+      "domain": "robotshop.com",
+      "description": "Booster Robotics K1 series (Educational, Professional, GEEK, pricing $11,864.80 to $20,158.47). Systems support application scenar...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESfQHrOzAVjeNQPccmDYz5K6jy6ajzyF--dbUeymff9irNVtJcK_3WZ3pQdGtu2kOVynPdJ3h-rYvg3-7RPPxJRyBWGguTc31wKaRpArBaQJa_3sSfDIsEJyP5VDcU1789QN4fOPkV7aCeFlfSjitmgFmSf7_NqU2-x-a-Myqr"
+     },
+     {
+      "label": "Unitree G1 Robots - RobotShop",
+      "citationPillId": 3,
+      "url": "https://www.robotshop.com/collections/unitree-g1-robots",
+      "domain": "robotshop.com",
+      "description": "G1 EDU Standard U1 ($43,900.00), G1 EDU Advanced U2 ($53,900.00), G1 EDU Ultimate variants A through I ($55,900.00 to $83,900.00),",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAEScgHrOzAVrdNN4rBwWuraPxqNqMSgyBz0SYrKqnma9M7JqDD9ideYq5BeWdDw32m27Y5EBlS5bTN21knp3k4-RDz4HIPaAJwQzaqLNe-eYE3BczYC_ACXghGQsL4JruglmWhVvXFHzPFGU6EthofTPtCk_g"
+     },
+     {
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "citationPillId": 3,
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today",
+      "domain": "keyirobot.com",
+      "description": "Optimus Gen 3 (Tesla) | In-house manufacturing, future home automation | < $20,000 (Targeted at scale) | Internal scaling priority...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESpwEB6zswFZRoWgt3aETmFbnZXqrZXvZUv4v_mf0Lacnn1upaIGikcUr-bWDYo5D4o46W6nAOcJ-_nTG2v-8GMK6ppognpC_ztQ7cCtj8Li4udLnp3sgkb4UOWFDoRdpV-FhkB2ON6NHRgRltHqdqpwcTeQpet8Z_JDQu7ULQyVZqvuDB-0bcOd6mPbHuML4V9VJ4FSAOzvGelxXjUxlGgpPO1-_GfPUpvA"
+     },
+     {
+      "label": "Professional Humanoid Robots - RobotShop",
+      "citationPillId": 4,
+      "url": "https://www.robotshop.com/collections/professional-humanoid-robots",
+      "domain": "robotshop.com",
+      "description": "Booster Robotics K1 series (Educational, Professional, GEEK, pricing $11,864.80 to $20,158.47). Systems support application scenar...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESfQHrOzAVjeNQPccmDYz5K6jy6ajzyF--dbUeymff9irNVtJcK_3WZ3pQdGtu2kOVynPdJ3h-rYvg3-7RPPxJRyBWGguTc31wKaRpArBaQJa_3sSfDIsEJyP5VDcU1789QN4fOPkV7aCeFlfSjitmgFmSf7_NqU2-x-a-Myqr"
+     },
+     {
+      "label": "Professional Humanoid Robots - RobotShop",
+      "citationPillId": 5,
+      "url": "https://www.robotshop.com/collections/professional-humanoid-robots",
+      "domain": "robotshop.com",
+      "description": "Booster Robotics K1 series (Educational, Professional, GEEK, pricing $11,864.80 to $20,158.47). Systems support application scenar...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESfQHrOzAVjeNQPccmDYz5K6jy6ajzyF--dbUeymff9irNVtJcK_3WZ3pQdGtu2kOVynPdJ3h-rYvg3-7RPPxJRyBWGguTc31wKaRpArBaQJa_3sSfDIsEJyP5VDcU1789QN4fOPkV7aCeFlfSjitmgFmSf7_NqU2-x-a-Myqr"
+     },
+     {
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "citationPillId": 6,
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today",
+      "domain": "keyirobot.com",
+      "description": "Optimus Gen 3 (Tesla) | In-house manufacturing, future home automation | < $20,000 (Targeted at scale) | Internal scaling priority...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESpwEB6zswFZRoWgt3aETmFbnZXqrZXvZUv4v_mf0Lacnn1upaIGikcUr-bWDYo5D4o46W6nAOcJ-_nTG2v-8GMK6ppognpC_ztQ7cCtj8Li4udLnp3sgkb4UOWFDoRdpV-FhkB2ON6NHRgRltHqdqpwcTeQpet8Z_JDQu7ULQyVZqvuDB-0bcOd6mPbHuML4V9VJ4FSAOzvGelxXjUxlGgpPO1-_GfPUpvA"
+     },
+     {
+      "label": "Humanoid Robots for Sale in 2026: Complete Buyers Guide",
+      "citationPillId": 6,
+      "url": "https://theresarobotforthat.com/blog/humanoid-robots-for-sale/",
+      "domain": "theresarobotforthat.com",
+      "description": "Humanoid robots with a manufacturer-published price run from $4,900 to $90,000 as of August 2026, Apptronik Apollo, Agility carrie...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESeQHrOzAVRrby9f9Tjb7cku4H1yB9aw5b4FR7Z-vnuapVXzHGiKAxqHcIgFnr8KMXk6f31fOifaex4FwPq5IuMi612IZRY6HAJi9a_p52lNUnW8iLcq0OES-UF0dAh_ZmWL91gb7VJOCbqu-mJdR1nk0r2TGb0dETLQ0"
+     },
+     {
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "citationPillId": 7,
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today",
+      "domain": "keyirobot.com",
+      "description": "Optimus Gen 3 (Tesla) | In-house manufacturing, future home automation | < $20,000 (Targeted at scale) | Internal scaling priority...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESpwEB6zswFZRoWgt3aETmFbnZXqrZXvZUv4v_mf0Lacnn1upaIGikcUr-bWDYo5D4o46W6nAOcJ-_nTG2v-8GMK6ppognpC_ztQ7cCtj8Li4udLnp3sgkb4UOWFDoRdpV-FhkB2ON6NHRgRltHqdqpwcTeQpet8Z_JDQu7ULQyVZqvuDB-0bcOd6mPbHuML4V9VJ4FSAOzvGelxXjUxlGgpPO1-_GfPUpvA"
+     },
+     {
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "citationPillId": 8,
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today",
+      "domain": "keyirobot.com",
+      "description": "Optimus Gen 3 (Tesla) | In-house manufacturing, future home automation | < $20,000 (Targeted at scale) | Internal scaling priority...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESpwEB6zswFZRoWgt3aETmFbnZXqrZXvZUv4v_mf0Lacnn1upaIGikcUr-bWDYo5D4o46W6nAOcJ-_nTG2v-8GMK6ppognpC_ztQ7cCtj8Li4udLnp3sgkb4UOWFDoRdpV-FhkB2ON6NHRgRltHqdqpwcTeQpet8Z_JDQu7ULQyVZqvuDB-0bcOd6mPbHuML4V9VJ4FSAOzvGelxXjUxlGgpPO1-_GfPUpvA"
+     },
+     {
+      "label": "Humanoid Robots for Sale in 2026: Complete Buyers Guide",
+      "citationPillId": 9,
+      "url": "https://theresarobotforthat.com/blog/humanoid-robots-for-sale/",
+      "domain": "theresarobotforthat.com",
+      "description": "Humanoid robots with a manufacturer-published price run from $4,900 to $90,000 as of August 2026, Apptronik Apollo, Agility carrie...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESeQHrOzAVRrby9f9Tjb7cku4H1yB9aw5b4FR7Z-vnuapVXzHGiKAxqHcIgFnr8KMXk6f31fOifaex4FwPq5IuMi612IZRY6HAJi9a_p52lNUnW8iLcq0OES-UF0dAh_ZmWL91gb7VJOCbqu-mJdR1nk0r2TGb0dETLQ0"
+     },
+     {
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "citationPillId": 10,
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today",
+      "domain": "keyirobot.com",
+      "description": "Optimus Gen 3 (Tesla) | In-house manufacturing, future home automation | < $20,000 (Targeted at scale) | Internal scaling priority...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESpwEB6zswFZRoWgt3aETmFbnZXqrZXvZUv4v_mf0Lacnn1upaIGikcUr-bWDYo5D4o46W6nAOcJ-_nTG2v-8GMK6ppognpC_ztQ7cCtj8Li4udLnp3sgkb4UOWFDoRdpV-FhkB2ON6NHRgRltHqdqpwcTeQpet8Z_JDQu7ULQyVZqvuDB-0bcOd6mPbHuML4V9VJ4FSAOzvGelxXjUxlGgpPO1-_GfPUpvA"
+     }
+    ],
+    "markdown": "Purchasing a humanoid robot in North America generally falls into two distinct categories: **readily available developer/research platforms** that can be ordered directly online, and **industrial/commercial enterprise models** that require direct corporate requests-for-quote (RFQs), pilot programs, or Robot-as-a-Service (RaaS) agreements. [Every Humanoid Robot for Sale in 2026: Prices & Guide](https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today)[Humanoid Robots for Sale in 2026: Complete Buyers Guide](https://theresarobotforthat.com/blog/humanoid-robots-for-sale/)\n\n1\\. Developer & Research Models (Available via E-Commerce)\n\nThese units can be bought directly through global manufacturers or North American robotics distributors like [RobotShop Professional Humanoid Robots Catalog](https://www.robotshop.com/collections/professional-humanoid-robots): [Every Humanoid Robot for Sale in 2026: Prices & Guide](https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today)[Professional Humanoid Robots - RobotShop](https://www.robotshop.com/collections/professional-humanoid-robots)\n\n  *  _Unitree G1_ — An ultra-compact developer and research bipedal humanoid with 23 degrees of freedom. It is available in base configurations or upgraded EDU variants.\n    * **Estimated Price:** Starts around $17,900 for the base model; EDU and Ultimate research configurations range from $43,900 to over $83,000.\n    * **Where to buy:** Available on the [Unitree G1 Collection on RobotShop](https://www.robotshop.com/collections/unitree-g1-robots) or direct from Unitree. [Unitree G1 Robots - RobotShop](https://www.robotshop.com/collections/unitree-g1-robots)[Every Humanoid Robot for Sale in 2026: Prices & Guide](https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today)\n\n  *  _Unitree R1 / R1 EDU_ — A versatile lower-cost humanoid/bipedal developer platform.\n    * **Estimated Price:** Starts around $8,990 up to $32,900 for advanced EDU Pro variants.\n    * **Where to buy:** RobotShop Professional Humanoid Robots Catalog. [Professional Humanoid Robots - RobotShop](https://www.robotshop.com/collections/professional-humanoid-robots)\n\n  *  _Booster Robotics K1 Series_ — Educational and professional humanoid systems designed for research, AI training, and classroom interaction.\n    * **Estimated Price:** Roughly $11,800 to $20,200 depending on the GEEK, Educational, or Professional tier.\n    * **Where to buy:** RobotShop Professional Humanoid Robots Catalog. [Professional Humanoid Robots - RobotShop](https://www.robotshop.com/collections/professional-humanoid-robots)\n\n* * *\n\n2\\. Industrial & Commercial Enterprise Models (By Quote / Pilot Only)\n\nIf you are looking for full-sized deployment humanoids meant for logistics, manufacturing, or general labor, direct e-commerce checkout is not available. Enterprises must engage in corporate sales pipelines, volume allocations, or RaaS lease models: [Every Humanoid Robot for Sale in 2026: Prices & Guide](https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today)[Humanoid Robots for Sale in 2026: Complete Buyers Guide](https://theresarobotforthat.com/blog/humanoid-robots-for-sale/)\n\n  *  _Agility Robotics Digit_ — Designed specifically for logistics, warehouse tote handling, and cross-docking. Deployed via multi-unit commercial pilots (such as with Amazon).\n    * **Estimated Price:** Circulates around $250,000 per unit or via RaaS deployment structures.\n    * **Ordering Pathway:** Direct corporate RFQ through Agility Robotics. [Every Humanoid Robot for Sale in 2026: Prices & Guide](https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today)\n\n  *  _Sanctuary AI Phoenix_ — A high-dexterity general-purpose humanoid powered by their Carbon AI platform, targeted at retail and light manufacturing.\n    * **Estimated Price:** Estimated between $150,000 and $300,000 under structured enterprise pilot agreements.\n    * **Ordering Pathway:** Enterprise pilot application via Sanctuary AI. [Every Humanoid Robot for Sale in 2026: Prices & Guide](https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today)\n\n  *  _Apptronik Apollo & Figure Series (e.g., Figure 03)_ — Advanced general-purpose commercial humanoids scaling up factory and warehouse integrations.\n    * **Estimated Price:** Quote-only / unreleased public retail price.\n    * **Ordering Pathway:** Enterprise allocation requests through Apptronik or Figure AI. [Humanoid Robots for Sale in 2026: Complete Buyers Guide](https://theresarobotforthat.com/blog/humanoid-robots-for-sale/)\n\n  *  _Tesla Optimus_ — Targeted at high-volume industrial scaling and eventual consumer use, though wider market availability remains constrained to internal manufacturing priorities and future waitlists. [Every Humanoid Robot for Sale in 2026: Prices & Guide](https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today)\n\nIf you are looking to purchase one, tell me:\n\n  * Are you buying for **academic research/development** or **industrial automation/business operations**?\n  * What is your **budget range**?\n\nI can help narrow down the ideal platform and connect you with the right procurement channel."
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "2343e19b53fa4c7a80390c276b2b7b30",
+   "charged_micro": 2400
+  }
+ }
+}

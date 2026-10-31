@@ -1,0 +1,173 @@
+{
+ "observed_at": "2026-10-31T03:15:26+00:00",
+ "endpoint": "cloro.ai-search.chatgpt.scrape",
+ "request": {
+  "prompt": "How many commercial humanoid robots exist?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "model": null,
+    "text": "As of October 2026, approximately 20,000–40,000 humanoid robots have likely been manufactured or shipped worldwide, but the number actually performing productive commercial work is substantially smaller.\n\nThe answer depends on what you mean by commercial.\n\nThe numbers\n\nMeasurement\n\nEstimated number\n\nHumanoid robots shipped in H1 2026\n\n22,000+\n\nHumanoid robots sold for industrial and professional use in 2025\n\n~7,000\n\nEstimated total humanoid robots in existence\n\n~38,000\n\nVerified commercial deployment records\n\nA few hundred\n\nSources:\n\nLeading commercial humanoid manufacturers\n\n1. AgiBot (China)\n\nApproximately 9,700 shipments in H1 2026.\n\nShipment leader\n\n2. Unitree (China)\n\nOne of the largest manufacturers, with thousands of humanoids shipped.\n\n3. UBTECH (China)\n\nDeploying Walker robots in industrial environments.\n\n4. Figure AI (USA)\n\nDeveloping general-purpose humanoids for manufacturing and other workplaces.\n\n5. Agility Robotics (USA)\n\nDigit robots operating in warehouse and logistics environments.\n\nMy assessment\n\nThe humanoid robotics industry is still at a very early commercialization stage:\n\nThousands are being purchased for research, demonstrations and AI training.\n\nIndustrial deployments are growing, particularly in China.\n\nFully autonomous humanoids replacing human workers at scale remain relatively rare.\n\nOne important distinction: 22,000 shipments does not mean 22,000 robots are working commercially.\n\nAre you interested in the number of humanoid robots actually operating in businesses and factories, rather than robots manufactured, sold or used for research? That is a much more useful number for assessing the real commercial market.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "How many humanoid robots are there?",
+      "url": "https://robotscount.com/humanoid",
+      "footnote": false
+     },
+     {
+      "position": 2,
+      "label": "Global Humanoid Robot Shipments Soar Nearly 300% YoY in H1 2026, Driven by Commercial Deployments",
+      "url": "https://counterpointresearch.com/key-takeaways.../insights/global-humanoid-robot-shipments-soar-nearly-300-percent-yoy-in-h1-2026",
+      "footnote": false
+     },
+     {
+      "position": 3,
+      "label": "Humanoid robot sales tally hit 7,000 globally last year",
+      "url": "https://www.reuters.com/technology/humanoid-robot-sales-tally-hit-7000-globally-last-year-2026-09-21/",
+      "footnote": false
+     },
+     {
+      "position": 4,
+      "label": "Humanoids: companies, deployments, incidents",
+      "url": "https://registry.deploy.report/humanoids",
+      "footnote": false
+     },
+     {
+      "position": 5,
+      "label": "Who has the most humanoid robot deployments?",
+      "url": "https://deploy.report/who-has-the-most-humanoid-deployments",
+      "footnote": false
+     },
+     {
+      "position": 6,
+      "label": "",
+      "url": "https://aiwiki.ai/wiki/agibot_a2",
+      "footnote": true
+     },
+     {
+      "position": 7,
+      "label": "",
+      "url": "https://www.roboworks.com.au/store/p/unitree-g1-humanoid-robot-2g469",
+      "footnote": true
+     },
+     {
+      "position": 8,
+      "label": "",
+      "url": "https://en.sedaily.com/international/2026/09/16/chinas-ubtech-opens-plant-making-a-humanoid-robot-every-10",
+      "footnote": true
+     },
+     {
+      "position": 9,
+      "label": "",
+      "url": "https://www.robotatta.com/products/517",
+      "footnote": true
+     },
+     {
+      "position": 10,
+      "label": "",
+      "url": "https://www.blessthisstuff.com/stuff/technology/misc-gadgets/figure-02-humanoid-robot/",
+      "footnote": true
+     }
+    ],
+    "entities": [
+     {
+      "type": "company",
+      "name": "AgiBot"
+     },
+     {
+      "type": "company",
+      "name": "Unitree"
+     },
+     {
+      "type": "company",
+      "name": "UBTECH"
+     },
+     {
+      "type": "company",
+      "name": "Figure AI"
+     },
+     {
+      "type": "company",
+      "name": "Agility Robotics"
+     }
+    ],
+    "map": [],
+    "followUpForm": null,
+    "markdown": "As of October 2026, approximately 20,000–40,000 humanoid robots have likely been manufactured or shipped worldwide, but the number actually performing productive commercial work is substantially smaller.\n\nThe answer depends on what you mean by commercial.\n\n## The numbers\n\n| Measurement | Estimated number |\n| --- | --- |\n| Humanoid robots shipped in H1 2026 | 22,000+ |\n| Humanoid robots sold for industrial and professional use in 2025 | ~7,000 |\n| Estimated total humanoid robots in existence | ~38,000 |\n| Verified commercial deployment records | A few hundred |\n\nSources: [Global Humanoid Robot Shipments Soar Nearly 300% YoY in H1 2026, Driven by Commercial Deployments](https://counterpointresearch.com/key-takeaways.../insights/global-humanoid-robot-shipments-soar-nearly-300-percent-yoy-in-h1-2026)[Humanoid robot sales tally hit 7,000 globally last year](https://www.reuters.com/technology/humanoid-robot-sales-tally-hit-7000-globally-last-year-2026-09-21/)[How many humanoid robots are there?](https://robotscount.com/humanoid)[Humanoids: companies, deployments, incidents](https://registry.deploy.report/humanoids)\n\n## Leading commercial humanoid manufacturers\n\n1. AgiBot (China)\n\nApproximately 9,700 shipments in H1 2026.\n\nShipment leader\n\n2. Unitree (China)\n\nOne of the largest manufacturers, with thousands of humanoids shipped.\n\n3. UBTECH (China)\n\nDeploying Walker robots in industrial environments.\n\n4. Figure AI (USA)\n\nDeveloping general-purpose humanoids for manufacturing and other workplaces.\n\n5. Agility Robotics (USA)\n\nDigit robots operating in warehouse and logistics environments.\n\n[Global Humanoid Robot Shipments Soar Nearly 300% YoY in H1 2026, Driven by Commercial Deployments](https://counterpointresearch.com/key-takeaways.../insights/global-humanoid-robot-shipments-soar-nearly-300-percent-yoy-in-h1-2026)[Humanoid robot sales tally hit 7,000 globally last year](https://www.reuters.com/technology/humanoid-robot-sales-tally-hit-7000-globally-last-year-2026-09-21/)[Who has the most humanoid robot deployments?](https://deploy.report/who-has-the-most-humanoid-deployments)\n\n## My assessment\n\nThe humanoid robotics industry is still at a very early commercialization stage:\n\n- Thousands are being purchased for research, demonstrations and AI training.\n- Industrial deployments are growing, particularly in China.\n- Fully autonomous humanoids replacing human workers at scale remain relatively rare.\n\nOne important distinction: 22,000 shipments does not mean 22,000 robots are working commercially.\n\nAre you interested in the number of humanoid robots actually operating in businesses and factories, rather than robots manufactured, sold or used for research? That is a much more useful number for assessing the real commercial market.",
+    "citationPills": [
+     {
+      "url": "https://counterpointresearch.com/key-takeaways.../insights/global-humanoid-robot-shipments-soar-nearly-300-percent-yoy-in-h1-2026",
+      "label": "Global Humanoid Robot Shipments Soar Nearly 300% YoY in H1 2026, Driven by Commercial Deployments",
+      "domain": "counterpointresearch.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 2
+     },
+     {
+      "url": "https://www.reuters.com/technology/humanoid-robot-sales-tally-hit-7000-globally-last-year-2026-09-21/",
+      "label": "Humanoid robot sales tally hit 7,000 globally last year",
+      "domain": "reuters.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 3
+     },
+     {
+      "url": "https://robotscount.com/humanoid",
+      "label": "How many humanoid robots are there?",
+      "domain": "robotscount.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 1
+     },
+     {
+      "url": "https://registry.deploy.report/humanoids",
+      "label": "Humanoids: companies, deployments, incidents",
+      "domain": "registry.deploy.report",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 4
+     },
+     {
+      "url": "https://counterpointresearch.com/key-takeaways.../insights/global-humanoid-robot-shipments-soar-nearly-300-percent-yoy-in-h1-2026",
+      "label": "Global Humanoid Robot Shipments Soar Nearly 300% YoY in H1 2026, Driven by Commercial Deployments",
+      "domain": "counterpointresearch.com",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 2
+     },
+     {
+      "url": "https://www.reuters.com/technology/humanoid-robot-sales-tally-hit-7000-globally-last-year-2026-09-21/",
+      "label": "Humanoid robot sales tally hit 7,000 globally last year",
+      "domain": "reuters.com",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 3
+     },
+     {
+      "url": "https://deploy.report/who-has-the-most-humanoid-deployments",
+      "label": "Who has the most humanoid robot deployments?",
+      "domain": "deploy.report",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 5
+     }
+    ]
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "6d1f4ea7ce96466eb6e96d940ca66d45",
+   "charged_micro": 2800
+  }
+ }
+}

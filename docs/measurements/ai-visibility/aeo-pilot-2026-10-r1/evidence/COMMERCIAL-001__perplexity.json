@@ -1,0 +1,202 @@
+{
+ "observed_at": "2026-10-31T03:14:05+00:00",
+ "endpoint": "perplexity.web.answer.fast",
+ "request": {
+  "preset": "fast",
+  "input": "How much does the Unitree G1 cost?",
+  "max_steps": 1,
+  "max_output_tokens": 512
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "background": false,
+   "completed_at": 1793416445,
+   "created_at": 1793416445,
+   "effort": "fast@2026-10-16.0",
+   "error": null,
+   "frequency_penalty": 0,
+   "id": "resp_850fb375-f597-4069-a6ef-3e52b97790e6",
+   "incomplete_details": null,
+   "instructions": null,
+   "max_output_tokens": 512,
+   "max_tool_calls": null,
+   "metadata": {},
+   "model": "openai/gpt-6-luna",
+   "object": "response",
+   "output": [
+    {
+     "queries": [
+      "How much does the Unitree G1 cost?"
+     ],
+     "results": [
+      {
+       "id": 1,
+       "last_updated": "2026-10-30",
+       "snippet": "Unitree G1\nHumanoid agent AI avatar\nPrice from $13.5K\nWatch Video →\n...\n- Price(Tax and Shipping cost excluded)\nUS $13.5K\nContact sales",
+       "source": "web",
+       "title": "Humanoid robot G1_Humanoid Robot Functions_Humanoid Robot ...",
+       "url": "https://www.unitree.com/mobile/g1/"
+      },
+      {
+       "date": "2024-06-05",
+       "id": 2,
+       "last_updated": "2026-10-28",
+       "snippet": "Unitree G1\nFrom $13,500.00 USD\n...\n$229.00 USD\n1. Unitree G1\n# Unitree G1\n$13,500.00 USD\nShipping costs between $300 and $1200\nDelivery details available upon request\nCustomer is responsible for all applicable customs duties, taxes, and import clearance in accordance with local regulations.\nPlease Note: This product does not support secondary development.\nFor customization needs, please select the EDU edition.\nPlease contact our sales team (sales_global@unitree.cc) to purchase the EDU edition.",
+       "source": "web",
+       "title": "Unitree G1 – UnitreeRobotics",
+       "url": "https://shop.unitree.com/products/unitree-g1"
+      },
+      {
+       "id": 3,
+       "last_updated": "2026-10-12",
+       "snippet": "Unitree G1\nHumanoid agent AI avatar\nPrice from $13.5K\n...\n### Robot world model, let’s create it together\n- Price(Tax and Shipping cost excluded)\nUS $13.5K",
+       "source": "web",
+       "title": "Humanoid robot G1_Humanoid Robot Functions_Humanoid Robot ...",
+       "url": "https://www.unitree.com/g1/?_bhlid=c3bfed6470b6916001a5d15c414b1b939379cef0"
+      },
+      {
+       "id": 4,
+       "last_updated": "2026-10-27",
+       "snippet": "Unitree Go1\nFrom $2,700.00 USD\nUnitree Go2\n...\nUnitree G1\nFrom $13,500.00 USD\n...\n## Unitree H1\n### Unitree G1\nUnlock unlimited sports potential (Extra large joint movement space angle, 23~43 joints).\nForce control of dexterous hands, manipulation of all things.\nImitation & reinforcement learning driven.\nRobot world model, let’s create it together.",
+       "source": "web",
+       "title": "Unitree Robotics",
+       "url": "https://shop.unitree.com/"
+      },
+      {
+       "date": "2026-10-29",
+       "id": 5,
+       "last_updated": "2026-10-29",
+       "snippet": "# Unitree G1\n75/ 100€11,610\nCompact 1.32 m bipedal humanoid from Unitree, sold at an entry price for researchers, educators and developers; hands and SDK access require the EDU version.\nAvailability: Shipping\nSold on Unitree's official store at US$13,500 and on sale since 2024.\nMaker's page ↗Announced price: US$13,500 (maker)\nLowest price in 30 days\nBest price €11,610 at Unitree (official)\n...\n- **Announced price**\nUS$13,500\n...\nAt €11610, it sits below the typical price for the category — strong value.\n...\nLowest price in 30 days\n- BestUnitree (official)\n€11,610 →",
+       "source": "web",
+       "title": "Unitree G1 by Unitree",
+       "url": "https://compare-robots.com/items/unitree-g1"
+      },
+      {
+       "date": "2026-03-10",
+       "id": 6,
+       "last_updated": "2026-10-18",
+       "snippet": "# Unitree G1 Price 2026: From $13,500, EDU Cost & Full Specs\nUnitree G1 price, verified July 2026: $13,500 direct (backordered) or $17,990 from US dealers, but the base model cannot be programmed.\nThe developer-grade G1 EDU is quote-only; resellers list $43,900-$73,900.\n...\n## TL;DR\nThe Unitree G1 costs $13,500 direct from Unitree (backordered) or $17,990 from US dealers, but that base model cannot be programmed and has no advertised upgrade path.\nDevelopers need the G1 EDU: quote-only from Unitree, listed at $43,900-$73,900 by US resellers.\n...\n## Key takeaways\n- $13,500 buys the base G1 direct from Unitree (backordered); US dealers list it at $17,990.\n...\n## How much is a Unitree G1, and can you buy one?\n**The Unitree G1 costs $13,500 direct from Unitree's own store, and yes, anyone can order one — but that base model cannot be programmed, and as of July 20, 2026 it ships on backorder.** The $16,000 you'll see across most of the internet is the 2024 launch price; Unitree cut it in late 2025.\nUS dealers list the same base robot at $17,990 with domestic support, though availability fluctuates week to week.\nThe version researchers actually build on, the G1 EDU, has no public price from Unitree at all: it's quote-only, and US resellers list its configurations from $43,900 to $73,900.\n...\n|Channel|Price (checked July 20, 2026)|Notes|\n|--|--|--|\n|Unitree direct (shop.unitree.com)|$13,500|Base G1 only; backordered; excludes tax and shipping ($300–$1,200); no secondary development|\n|US authorized dealer (RoboStore)|$17,990|Base G1 with US-based service; availability fluctuates (in stock at our July 20 check, showing sold out two days later); same no-programming limit|\n|G1 EDU (the developer version)|Quote-only from Unitree; $43,900–$73,900 at US resellers|SDK access, optional Jetson compute and dexterous hands|\n|G1-D / G1-Comp / Boxing editions|~$38,800–$66,300 / $48,900 / unpriced|2026 additions: data-acquisition, sports-competition and combat-entertainment variants|\n...\n## The full price ladder, and how it got here\nThe EDU ladder is defined by resellers rather than Unitree.\nRoboStore, which describes itself as Unitree's official North American partner, lists eight EDU configurations (prices checked July 20, 2026; availability fluctuates):\n|EDU tier|Price (live, July 20, 2026)|What the tier adds|\n|--|--|--|\n|U1 Standard|$43,900|Full SDK access; reseller-advertised Jetson Orin compute|\n|U2 Plus|$53,900|Dummy hands|\n|U3 / U4 Ultimate A–B|$65,900 / $67,900|Dex3-1 three-finger hands (U4 adds tactile arrays)|\n|U5 / U6 Ultimate C–D|$67,900 / $73,900|Inspire five-finger hands (U6 adds tactile; 40 DoF total)|\n...\n## What owning one actually costs\n|Item|Cost (July 2026)|Source|\n|--|--|--|\n|Shipping (direct from Hangzhou)|$300–$1,200, air freight|Unitree shop; price row \"excludes tax and shipping\"|\n|Spare 9,000 mAh battery (~2h runtime)|$700 Unitree / $800 RoboStore|Live listings|\n|Spare remote controller|$450|RoboStore, live|\n|Dex3-1 hands (EDU upgrade)|$6,500, or $7,800 with tactile|RoboStore, live|\n|Inspire five-finger hand pair|$19,000|RoboStore, live|\n...\n## Frequently asked questions\n- **How much does the Unitree G1 cost in 2026?**\n$13,500 direct from Unitree's store (backordered, excluding tax and shipping) or $17,990 from US dealers for the base model.\nThe developer-grade G1 EDU is quote-only from Unitree; US resellers list its configurations at $43,900 to $73,900.\nThe $16,000 figure still circulating is the 2024 launch price.\n...\n- **How much is the Unitree G1 EDU?**\nUnitree publishes no EDU price - it is quote-only.\nUS resellers list eight configurations from $43,900 (U1 Standard) to $73,900 (U6 with tactile five-finger hands).\nNo configuration sells at the commonly quoted flat \"$40,000\".",
+       "source": "web",
+       "title": "Unitree G1 Price 2026: From $13,500, EDU Cost & Full Specs - Blog",
+       "url": "https://blog.robozaps.com/b/unitree-g1-review"
+      },
+      {
+       "id": 7,
+       "last_updated": "2026-10-27",
+       "snippet": "# Unitree G1: price and versions in Europe\nBelow: every G1 version we sell with its end-user price (excl. VAT), the official specifications and how to choose.\n**23** Versions **from € 19,809** excl. VAT **Italy** Unitree Italy distribution chain\nUnitree Go2Unitree R1Unitree R1-DUnitree A2Unitree B2Unitree Z1 and D1Unitree AS2Unitree H2Unitree G1-D\n## Unitree G1 versions and prices\nEnd-user prices excluding VAT, shipping and duty to Italy included.\nEach order is confirmed with an updated quote.\n|Version|Price (excl. VAT)| |\n|--|--|--|\n|G1 Basic (G1 Air)|from € 19,809|Details →|\n|G1 Pro|from € 31,548|Details →|\n|G1 EDU Standard (G1-U1)|from € 38,005|Details →|\n|G1 EDU Professional H|from € 39,325|Details →|\n|G1 EDU Professional G|from € 41,233|Details →|\n|G1-COMP|from € 42,407|Details →|\n|G1 EDU Plus (G1-U2)|from € 46,809|Details →|\n|G1 E|from € 46,809|Details →|\n|G1 EDU Ultimate H|from € 48,129|Details →|\n|G1 EDU Professional E (G1-U10)|from € 49,743|Details →|\n|G1 EDU Ultimate G|from € 50,037|Details →|\n|G1 EDU Professional A (G1-U9)|from € 52,678|Details →|\n|G1 EDU Professional F|from € 54,586|Details →|\n|G1 EDU Professional B (G1-U4 37 DoF)|from € 55,613|Details →|\n|G1 EDU Ultimate E (G1-U7)|from € 58,548|Details →|\n|G1 EDU Boxing|from € 58,548|Details →|\n|G1 EDU Ultimate A (G1-U3)|from € 61,482|Details →|\n|G1 EDU Ultimate F (G1-U8)|from € 63,390|Details →|\n|G1 EDU Ultimate B (G1-U4)|from € 64,417|Details →|\n|G1 EDU Ultimate C (G1-U5)|from € 64,417|Details →|\n|G1 EDU Ultimate D (G1-U6)|from € 70,286|Details →|\n|G1 EDU Professional I|from € 82,025|Details →|\n|G1 EDU Ultimate I|from € 90,829|Details →|\n|G1+ (G1 Plus)|on request|Details →|\n...\n## Frequently asked questions\nHow much does the Unitree G1 cost?\nEnd-user prices for the Unitree G1 start from € 19,809 excluding VAT and go up to € 90,829 depending on the version.\nPrices include shipping and duty to Italy; every order is confirmed with an updated quote.",
+       "source": "web",
+       "title": "Unitree G1 price: Basic, Pro, EDU U1-U10, Ultimate",
+       "url": "https://abrarobotics.com/en/g1-en.html"
+      },
+      {
+       "date": "2024-06-05",
+       "id": 8,
+       "last_updated": "2026-10-28",
+       "snippet": "Unitree G1\nFrom $13,500.00 USD\n...\n$229.00 USD\n1. Unitree G1\n# Unitree G1\n$13,500.00 USD\nShipping costs between $300 and $1200\nDelivery details available upon request\nCustomer is responsible for all applicable customs duties, taxes, and import clearance in accordance with local regulations.\nPlease Note: This product does not support secondary development.\nFor customization needs, please select the EDU edition.\nPlease contact our sales team (sales_global@unitree.cc) to purchase the EDU edition.",
+       "source": "web",
+       "title": "Unitree G1",
+       "url": "https://shop.unitree.com/products/unitree-g1?variant=47398038208745"
+      },
+      {
+       "date": "2026-04-11",
+       "id": 9,
+       "last_updated": "2026-10-29",
+       "snippet": "# Unitree G1\nThe **Unitree G1** is a compact, general-purpose humanoid robot developed by Unitree Robotics, a Chinese robotics company headquartered in Hangzhou, Zhejiang.\nUnveiled on May 13, 2024, at the IEEE International Conference on Robotics and Automation (ICRA) in Yokohama, Japan, the G1 sells from a base price of $16,000, making it one of the most affordable production humanoid robots in the world ^[16]^.\n...\n|Unitree G1| |\n|--|--|\n|**Price**|From $16,000 USD (base)|\n...\n## Background\n### Development history\nAt launch, the G1's base price of $16,000 (excluding tax and shipping) was roughly one-sixth the cost of the H1 ($90,000 to $150,000) and a fraction of the price of competing platforms from Boston Dynamics, Agility Robotics, and Figure AI, which typically cost $150,000 to $300,000 or are not sold to external buyers at all ^[16]^^[26]^.\n...\nIn 2025, the company introduced the G1 EDU line, a series of developer-focused configurations with enhanced computing, expanded degrees of freedom, and full software development kit support.\nBy 2026, Unitree offered 16 distinct G1 configurations spanning prices from approximately $17,990 to $73,900, covering everything from basic demonstration units to fully equipped research platforms ^[22]^.\n...\n## Product variants\n### G1 Standard (Base)\nThe entry-level G1, priced from approximately $16,000 to $17,990, is a pre-configured platform with 23 DOF, basic grippers, and pre-loaded walking, dancing, and self-righting behaviors ^[22]^.\nIt does not include the full development SDK and is intended for demonstrations, exhibitions, human-robot interaction studies, and light task prototyping.\nThe standard model includes an 8-month manufacturer warranty.\n### G1 EDU\nThe EDU line targets researchers, educators, and developers who need full programmatic control of the robot.\nAll EDU models include an NVIDIA Jetson Orin module (100 TOPS), complete ROS 2 and Python/C++ SDKs, technical documentation, and an 18-month warranty ^[27]^.\nEDU configurations range from the U1 Standard ($43,900) through various Plus and Ultimate tiers up to approximately $73,900 for the most advanced configuration.\n...\n|Model|Price (approx.)|Total DOF|Key additions|\n|--|--|--|--|\n|G1 EDU Standard (U1)|$43,900|23|Jetson Orin, full SDK, ROS 2|\n|G1 EDU Plus (U2)|$53,900|29|Extra waist and wrist DOF|\n|G1 EDU Ultimate A (U3)|$65,900|43|Dex3-1 three-finger hands|\n|G1 EDU Ultimate D (U5)|$73,900|41|Dex5-1 five-finger hands with up to 94 tactile sensors|\n## Expanded article table\n### Comparison of G1 variants with Unitree H1\n|Feature|Unitree G1 (Base)|Unitree G1 EDU Ultimate|Unitree H1|Unitree H1-2|\n|--|--|--|--|--|\n|Height|132 cm|132 cm|180 cm|178 cm|\n|Weight|35 kg|35 kg|47 kg|70 kg|\n|Total DOF|23|43|19|27|\n|Max speed|~2 m/s|~2 m/s|3.3 m/s|<2 m/s|\n|Max knee torque|90 N.m|120 N.m|360 N.m|360 N.m|\n|Dexterous hands|No|Yes (Dex3-1 or Dex5-1)|No|Optional|\n|Jetson Orin|No|Yes (100 TOPS)|Optional|Optional|\n|Price|~$16,000|~$65,900-$73,900|~$90,000|~$128,900|\n|Primary audience|Demos, education|Research, development|Industrial research|Advanced research|\n...\n## Competitive landscape\n### How does the Unitree G1 compare to other humanoid robots?\n|Feature|Unitree G1|Tesla Optimus|Boston Dynamics Atlas (Electric)|Figure 02|Agility Digit|\n|--|--|--|--|--|--|\n|Price|From $16,000|Not yet sold|Not for sale|Enterprise only|Lease only (~$250,000)|",
+       "source": "web",
+       "title": "Unitree G1 - AI Wiki",
+       "url": "https://aiwiki.ai/wiki/unitree_g1"
+      },
+      {
+       "date": "2026-06-26",
+       "id": 10,
+       "last_updated": "2026-10-02",
+       "snippet": "# Unitree G1 Humanoid Robot Review: Price, Teardown, and Why Automakers Are Investing\n## How Much Does the G1 Cost?\nThe basic model with fixed hands is advertised for $17,900, but that price does not include the full software development kit (SDK) needed to make it perform serious autonomous tasks.\nYou can kind of only push it, walk it, and maybe make it do backflips.\nGeneric robo-maid\nIf you want to write your own behaviors and ask it to do anything (like vacuum the house or shake you a martini) you’ll need to upgrade to an EDU model starting around $44,000 or probably to one of the models with dexterous hands, priced from $65,900 to $73,900.",
+       "source": "web",
+       "title": "Unitree G1 Humanoid Robot Review: Price, Teardown, and ...",
+       "url": "https://www.motortrend.com/news/first-humanoid-robot-teardown-analysis"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "content": [
+      {
+       "annotations": [],
+       "text": "The base Unitree G1 is listed at **US$13,500**. That price excludes shipping, taxes, and customs charges; shipping is listed at **US$300–$1,200**. The base model also does not support secondary development—contact Unitree for EDU pricing if you need a development version.[1][2]",
+       "type": "output_text"
+      }
+     ],
+     "id": "msg_2393addf-6ec7-4c74-848d-52019595bfc7",
+     "role": "assistant",
+     "status": "completed",
+     "type": "message"
+    }
+   ],
+   "parallel_tool_calls": true,
+   "presence_penalty": 0,
+   "preset": "fast@2026-10-16.0",
+   "previous_response_id": null,
+   "prompt_cache_key": null,
+   "reasoning": null,
+   "safety_identifier": null,
+   "service_tier": "fast",
+   "status": "completed",
+   "store": true,
+   "temperature": 1,
+   "text": {
+    "format": {
+     "type": "text"
+    }
+   },
+   "tool_choice": "auto",
+   "tools": [
+    {
+     "type": "web_search"
+    }
+   ],
+   "top_logprobs": 0,
+   "top_p": 1,
+   "truncation": "",
+   "usage": {
+    "cost": {
+     "cache_creation_cost": 0.0005,
+     "cache_read_cost": 2e-05,
+     "currency": "USD",
+     "input_cost": 0,
+     "output_cost": 4e-05,
+     "tool_calls_cost": 0.001,
+     "tool_calls_cost_details": {
+      "search_web": 0.001
+     },
+     "total_cost": 0.00156
+    },
+    "input_tokens": 5783,
+    "input_tokens_details": {
+     "cache_creation_input_tokens": 4000,
+     "cache_read_input_tokens": 1780,
+     "cached_tokens": 1780
+    },
+    "output_tokens": 74,
+    "output_tokens_details": {
+     "reasoning_tokens": 0
+    },
+    "tool_calls_details": {
+     "search_web": {
+      "cost_usd": 0.001,
+      "invocation": 1
+     }
+    },
+    "total_tokens": 5857
+   },
+   "user": null
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "75d73b4c79a943adadc61a02f268a88d",
+   "charged_micro": 1560
+  }
+ }
+}

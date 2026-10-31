@@ -1,0 +1,352 @@
+{
+ "observed_at": "2026-10-31T03:12:56+00:00",
+ "endpoint": "cloro.ai-search.chatgpt.scrape",
+ "request": {
+  "prompt": "Which humanoid robots are commercially available?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "model": null,
+    "text": "As of October 2026, there are several commercially available humanoid robots, ranging from relatively affordable research platforms to full-size industrial robots designed for factories, warehouses and service environments.\n\nThe important distinction is that commercially available does not necessarily mean fully autonomous or ready to replace a human worker. Some can be purchased directly, others are sold through enterprise contracts, and some are only available for pilot projects.\n\n1. Humanoid robots available to buy\n\nThese are among the most interesting options where actual purchasing or commercial ordering is possible.\n\n1. Unitree G1\n\nAvailable to order\n\nManufacturer: Unitree Robotics (China)\n\nPrice: from approximately $13,500\n\nHeight: approximately 1.27 m\n\nApplications: research, education, manipulation, AI development.\n\nOne of the most accessible full-body humanoid platforms.\n\nManufacturer website\n\n2. Unitree R1\n\nCommercial offering\n\nManufacturer: Unitree Robotics\n\nAdvertised starting price: approximately $4,900\n\nHeight: approximately 1.23 m\n\nApplications: education, research and robotics development.\n\nMore affordable, but less capable than the G1.\n\nManufacturer website\n\n3. Unitree H2\n\nCommercial offering\n\nManufacturer: Unitree Robotics\n\nAdvertised price: approximately $29,900\n\nHeight: approximately 1.8 m\n\nApplications: research, industrial development and advanced robotics.\n\n4. Fourier GR-1\n\nCommercial offering\n\nManufacturer: Fourier Intelligence (China)\n\nPrice: varies by configuration; approximately $150,000 reported.\n\nHeight: approximately 1.65–1.75 m, depending on configuration.\n\nApplications: research, healthcare robotics and human-robot interaction.\n\nManufacturer website\n\n5. AgiBot A2\n\nCommercial deployment\n\nManufacturer: AgiBot (China)\n\nApplications: reception, customer interaction and service tasks.\n\nCommercial production and deployment are underway.\n\nPricing generally requires a commercial enquiry.\n\nManufacturer website\n\n2. Industrial humanoid robots available to businesses\n\nThese are particularly relevant for manufacturing, logistics and material handling. They are generally sold through enterprise agreements rather than conventional online shops.\n\n6. Digit\n\nCommercially deployed\n\nManufacturer: Agility Robotics (USA)\n\nHeight: approximately 1.75 m\n\nApplications: warehouse logistics, tote handling and material movement.\n\nCustomers include GXO and other industrial operators.\n\nAvailable through enterprise commercial arrangements.\n\nManufacturer website\n\n7. Walker S2\n\nCommercial production\n\nManufacturer: UBTECH Robotics (China)\n\nApplications: factory operations, logistics and manufacturing.\n\nNotable feature: autonomous battery-swapping capability.\n\nPrimarily enterprise procurement.\n\nManufacturer website\n\n8. Apollo\n\nManufacturer: Apptronik (USA)\n\nHeight: approximately 1.73 m\n\nApplications: manufacturing, warehouse work and material handling.\n\nCommercial pilots and customer partnerships, rather than general retail availability.\n\nManufacturer website\n\n9. Figure 02 / Figure 03\n\nManufacturer: Figure AI (USA)\n\nApplications: industrial assembly, material handling and general-purpose manipulation.\n\nDemonstrated in BMW manufacturing operations.\n\nCustomer pilots and production ramp-up; not a generally orderable retail product.\n\nManufacturer website\n\n10. 4NE-1\n\nCommercial programme\n\nManufacturer: NEURA Robotics (Germany)\n\nApplications: industrial assistance, manufacturing and human-robot collaboration.\n\nParticularly interesting for the European market.\n\nReservations and commercial procurement programmes; confirm delivery status and configuration.\n\nManufacturer website\n\n3. Other commercially offered humanoids\n\nRobot\n\nManufacturer\n\nMain application\n\nAmeca\n\nEngineered Arts\n\nEntertainment, research, reception\n\nTALOS\n\nPAL Robotics\n\nResearch, industrial development\n\nBooster T1\n\nBooster Robotics\n\nEducation, research, robotics competitions\n\nPhoenix\n\nSanctuary AI\n\nIndustrial manipulation\n\nLingxi X2\n\nAgiBot\n\nResearch, interaction\n\nWalker S1\n\nUBTECH\n\nManufacturing and logistics\n\nAvailability varies considerably: some are sold as complete robots, others are offered as research platforms or through restricted commercial programmes.\n\n4. High-profile robots not generally available to purchase\n\nThese are often presented as commercially available, but there are important restrictions.\n\nOptimus — Tesla\n\nNot generally for sale\n\nIntended for manufacturing and eventually domestic tasks.\n\nPrimarily deployed within Tesla's own operations.\n\nNo established general customer purchasing programme.\n\nTesla\n\nAtlas — Boston Dynamics\n\nRestricted enterprise access\n\nDesigned for advanced industrial applications.\n\nInitial deployment programme with Hyundai and selected partners.\n\nNot a conventional off-the-shelf purchase.\n\nBoston Dynamics\n\nNEO — 1X Technologies\n\nEarly-access programme\n\nDesigned specifically for household assistance.\n\nIntended for domestic chores and interaction.\n\nPre-orders and early-access arrangements; not yet equivalent to a mature autonomous household worker.\n\n1X Technologies\n\nSources for the market overview: Humanoid Index – robots available to order ; Fraunhofer IPA – Humanoid Hardware Value Chain ; Stanford AI Index 2026 .\n\n5. Quick comparison: which should you consider?\n\nObjective\n\nRobots worth investigating\n\nLowest-cost entry\n\nUnitree R1\n\nResearch and development\n\nUnitree G1\n\nFull-size development platform\n\nUnitree H2\n\nFactory automation\n\nDigit, Walker S2\n\nAdvanced manipulation\n\nFigure 02/03\n\nEuropean industrial applications\n\nNEURA 4NE-1\n\nHuman interaction\n\nAgiBot A2, Ameca\n\nDomestic assistance\n\n1X NEO\n\n6. My assessment\n\nThe market currently falls into three broad categories:\n\nAffordable development platforms: Unitree is particularly interesting because it makes humanoid hardware accessible to universities, developers and smaller robotics companies.\n\nIndustrial working robots: Agility Digit, UBTECH Walker and Figure are among the most interesting platforms for industrial deployment.\n\nGeneral-purpose humanoids: Tesla Optimus, 1X NEO and Figure represent the ambition to develop robots capable of working in environments designed for humans, but their commercial maturity varies substantially.\n\nOne important consideration: purchasing a humanoid robot does not automatically provide autonomous task execution. Software, training, integration, safety systems and ongoing support can be just as important as the hardware.\n\nWhat I would investigate next\n\nIf the objective is to identify a robot that can actually be purchased and put to work, I would narrow the comparison to these five:\n\nUnitree G1\n\nUnitree H2\n\nAgility Digit\n\nUBTECH Walker S2\n\nNEURA 4NE-1\n\nI can also prepare a detailed comparison of the commercially available humanoid robots, including purchase prices, payload, walking speed, battery life, degrees of freedom, manipulation capabilities, autonomy and availability from European suppliers, with particular attention to the German market.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Manufacturer website",
+      "url": "https://www.unitree.com/",
+      "footnote": true
+     },
+     {
+      "position": 2,
+      "label": "",
+      "url": "https://www.toneart-shop.de/robots/unitree-g1.html",
+      "footnote": true
+     },
+     {
+      "position": 3,
+      "label": "",
+      "url": "https://robostore.com/products/unitree-r1-basic-humanoid-robot",
+      "footnote": true
+     },
+     {
+      "position": 4,
+      "label": "Manufacturer website",
+      "url": "https://www.fftai.com/",
+      "footnote": true
+     },
+     {
+      "position": 5,
+      "label": "",
+      "url": "https://www.mybotshop.de/Unitree-H2-Humanoid-Robot",
+      "footnote": true
+     },
+     {
+      "position": 6,
+      "label": "Manufacturer website",
+      "url": "https://www.agibot.com/",
+      "footnote": true
+     },
+     {
+      "position": 7,
+      "label": "",
+      "url": "https://www.core77.com/posts/125020/Humanoid-Robot-Design-Iterations-Continue-Heres-the-GR-1",
+      "footnote": true
+     },
+     {
+      "position": 8,
+      "label": "",
+      "url": "https://aiwiki.ai/wiki/agibot_a2",
+      "footnote": true
+     },
+     {
+      "position": 9,
+      "label": "Manufacturer website",
+      "url": "https://agilityrobotics.com/",
+      "footnote": true
+     },
+     {
+      "position": 10,
+      "label": "Manufacturer website",
+      "url": "https://www.ubtrobot.com/",
+      "footnote": true
+     },
+     {
+      "position": 11,
+      "label": "",
+      "url": "https://www.robotatta.com/products/517",
+      "footnote": true
+     },
+     {
+      "position": 12,
+      "label": "Manufacturer website",
+      "url": "https://apptronik.com/",
+      "footnote": true
+     },
+     {
+      "position": 13,
+      "label": "",
+      "url": "https://www.gongboshi-robot.com/sale-54576777-new-ubtech-walker-s2-industrial-humanoid-robot-intelligent-warehouse-robot.html",
+      "footnote": true
+     },
+     {
+      "position": 14,
+      "label": "Manufacturer website",
+      "url": "https://www.figure.ai/",
+      "footnote": true
+     },
+     {
+      "position": 15,
+      "label": "",
+      "url": "https://apptronik.com/product-page",
+      "footnote": true
+     },
+     {
+      "position": 16,
+      "label": "",
+      "url": "https://www.blessthisstuff.com/stuff/technology/misc-gadgets/figure-02-humanoid-robot/",
+      "footnote": true
+     },
+     {
+      "position": 17,
+      "label": "Manufacturer website",
+      "url": "https://neura-robotics.com/",
+      "footnote": true
+     },
+     {
+      "position": 18,
+      "label": "",
+      "url": "https://www.latinsatelital.com/Neura-Robotics-4NE-1.htm",
+      "footnote": true
+     },
+     {
+      "position": 19,
+      "label": "Tesla",
+      "url": "https://www.tesla.com/",
+      "footnote": true
+     },
+     {
+      "position": 20,
+      "label": "Boston Dynamics",
+      "url": "https://bostondynamics.com/",
+      "footnote": true
+     },
+     {
+      "position": 21,
+      "label": "",
+      "url": "https://humanoidindex.org/robots/optimus-gen-3",
+      "footnote": true
+     },
+     {
+      "position": 22,
+      "label": "1X Technologies",
+      "url": "https://www.1x.tech/",
+      "footnote": true
+     },
+     {
+      "position": 23,
+      "label": "",
+      "url": "https://robotsguide.com/robots/atlas/",
+      "footnote": true
+     },
+     {
+      "position": 24,
+      "label": "Stanford AI Index 2026",
+      "url": "https://hai.stanford.edu/assets/files/ai_index_report_2026_chapter_2_technical.pdf",
+      "footnote": true
+     },
+     {
+      "position": 25,
+      "label": "Fraunhofer IPA – Humanoid Hardware Value Chain",
+      "url": "https://www.ipa.fraunhofer.de/content/dam/ipa/de/documents/Publikationen/Studien/260219_Humanoid_Value_Chain_final.pdf",
+      "footnote": true
+     },
+     {
+      "position": 26,
+      "label": "Humanoid Index – robots available to order",
+      "url": "https://humanoid.observer/index/",
+      "footnote": true
+     },
+     {
+      "position": 27,
+      "label": "",
+      "url": "https://www.mt.co.kr/world/2025/11/03/2025110307440659699",
+      "footnote": true
+     },
+     {
+      "position": 28,
+      "label": "",
+      "url": "https://augustadynamics.com/en/resources/humanoid-robot-companies",
+      "footnote": true
+     },
+     {
+      "position": 29,
+      "label": "",
+      "url": "https://deploy.report/explainers/leading-humanoid-robot-makers",
+      "footnote": true
+     },
+     {
+      "position": 30,
+      "label": "",
+      "url": "https://gappai.de/review/humanoid-intelligence-report-q3-2026",
+      "footnote": true
+     },
+     {
+      "position": 31,
+      "label": "",
+      "url": "https://humanoidapplications.com/robot/",
+      "footnote": true
+     },
+     {
+      "position": 32,
+      "label": "",
+      "url": "https://physicalaiguide.com/guides/humanoid-robots-2026-availability/",
+      "footnote": true
+     },
+     {
+      "position": 33,
+      "label": "",
+      "url": "https://physicalailab.io/en/humanoid-robot-companies-2026/",
+      "footnote": true
+     },
+     {
+      "position": 34,
+      "label": "",
+      "url": "https://roboter-zentrale.de/markt",
+      "footnote": true
+     },
+     {
+      "position": 35,
+      "label": "",
+      "url": "https://roboticsprogress.com/humanoids",
+      "footnote": true
+     },
+     {
+      "position": 36,
+      "label": "",
+      "url": "https://theresarobotforthat.com/blog/humanoid-robots-for-sale/",
+      "footnote": true
+     },
+     {
+      "position": 37,
+      "label": "",
+      "url": "https://up.partners/wp-content/uploads/2026/04/The-Kinetic-Age-2026.pdf",
+      "footnote": true
+     },
+     {
+      "position": 38,
+      "label": "",
+      "url": "https://www.layer3labs.io/robotics/humanoid-robot-companies",
+      "footnote": true
+     },
+     {
+      "position": 39,
+      "label": "",
+      "url": "https://www.uscc.gov/sites/default/files/2024-10/Humanoid_Robots.pdf",
+      "footnote": true
+     },
+     {
+      "position": 40,
+      "label": "",
+      "url": "https://www.xrstager.com/en/humanoid-robots-in-service-and-the-household-a-reality-check",
+      "footnote": true
+     }
+    ],
+    "entities": [
+     {
+      "type": "product",
+      "name": "Unitree G1"
+     },
+     {
+      "type": "product",
+      "name": "Unitree R1"
+     },
+     {
+      "type": "product",
+      "name": "Unitree H2"
+     },
+     {
+      "type": "product",
+      "name": "Fourier GR-1"
+     },
+     {
+      "type": "product",
+      "name": "AgiBot A2"
+     },
+     {
+      "type": "product",
+      "name": "Digit"
+     },
+     {
+      "type": "product",
+      "name": "Walker S2"
+     },
+     {
+      "type": "product",
+      "name": "Apollo"
+     },
+     {
+      "type": "product",
+      "name": "Figure 02 / Figure 03"
+     },
+     {
+      "type": "product",
+      "name": "4NE-1"
+     },
+     {
+      "type": "product",
+      "name": "Ameca"
+     },
+     {
+      "type": "product",
+      "name": "TALOS"
+     },
+     {
+      "type": "product",
+      "name": "Booster T1"
+     },
+     {
+      "type": "product",
+      "name": "Phoenix"
+     },
+     {
+      "type": "product",
+      "name": "Lingxi X2"
+     },
+     {
+      "type": "product",
+      "name": "Walker S1"
+     },
+     {
+      "type": "product",
+      "name": "Optimus"
+     },
+     {
+      "type": "product",
+      "name": "Atlas"
+     },
+     {
+      "type": "product",
+      "name": "NEO"
+     }
+    ],
+    "map": [],
+    "followUpForm": null,
+    "markdown": "As of October 2026, there are several commercially available humanoid robots, ranging from relatively affordable research platforms to full-size industrial robots designed for factories, warehouses and service environments.\n\nThe important distinction is that commercially available does not necessarily mean fully autonomous or ready to replace a human worker. Some can be purchased directly, others are sold through enterprise contracts, and some are only available for pilot projects.\n\n## 1. Humanoid robots available to buy\n\nThese are among the most interesting options where actual purchasing or commercial ordering is possible.\n\n1. Unitree G1\n\nAvailable to order\n\n- Manufacturer: Unitree Robotics (China)\n- Price: from approximately $13,500\n- Height: approximately 1.27 m\n- Applications: research, education, manipulation, AI development.\n- One of the most accessible full-body humanoid platforms.\n\n  [Manufacturer website](https://www.unitree.com/?utm_source=chatgpt.com)\n\n2. Unitree R1\n\nCommercial offering\n\n- Manufacturer: Unitree Robotics\n- Advertised starting price: approximately $4,900\n- Height: approximately 1.23 m\n- Applications: education, research and robotics development.\n- More affordable, but less capable than the G1.\n\n  [Manufacturer website](https://www.unitree.com/?utm_source=chatgpt.com)\n\n3. Unitree H2\n\nCommercial offering\n\n- Manufacturer: Unitree Robotics\n- Advertised price: approximately $29,900\n- Height: approximately 1.8 m\n- Applications: research, industrial development and advanced robotics.\n\n4. Fourier GR-1\n\nCommercial offering\n\n- Manufacturer: Fourier Intelligence (China)\n- Price: varies by configuration; approximately $150,000 reported.\n- Height: approximately 1.65–1.75 m, depending on configuration.\n- Applications: research, healthcare robotics and human-robot interaction.\n\n  [Manufacturer website](https://www.fftai.com/?utm_source=chatgpt.com)\n\n5. AgiBot A2\n\nCommercial deployment\n\n- Manufacturer: AgiBot (China)\n- Applications: reception, customer interaction and service tasks.\n- Commercial production and deployment are underway.\n- Pricing generally requires a commercial enquiry.\n\n  [Manufacturer website](https://www.agibot.com/?utm_source=chatgpt.com)\n\n## 2. Industrial humanoid robots available to businesses\n\nThese are particularly relevant for manufacturing, logistics and material handling. They are generally sold through enterprise agreements rather than conventional online shops.\n\n6. Digit\n\nCommercially deployed\n\n- Manufacturer: Agility Robotics (USA)\n- Height: approximately 1.75 m\n- Applications: warehouse logistics, tote handling and material movement.\n- Customers include GXO and other industrial operators.\n- Available through enterprise commercial arrangements.\n\n  [Manufacturer website](https://agilityrobotics.com/?utm_source=chatgpt.com)\n\n7. Walker S2\n\nCommercial production\n\n- Manufacturer: UBTECH Robotics (China)\n- Applications: factory operations, logistics and manufacturing.\n- Notable feature: autonomous battery-swapping capability.\n- Primarily enterprise procurement.\n\n  [Manufacturer website](https://www.ubtrobot.com/?utm_source=chatgpt.com)\n\n8. Apollo\n\n- Manufacturer: Apptronik (USA)\n- Height: approximately 1.73 m\n- Applications: manufacturing, warehouse work and material handling.\n- Commercial pilots and customer partnerships, rather than general retail availability.\n\n  [Manufacturer website](https://apptronik.com/?utm_source=chatgpt.com)\n\n9. Figure 02 / Figure 03\n\n- Manufacturer: Figure AI (USA)\n- Applications: industrial assembly, material handling and general-purpose manipulation.\n- Demonstrated in BMW manufacturing operations.\n- Customer pilots and production ramp-up; not a generally orderable retail product.\n\n  [Manufacturer website](https://www.figure.ai/?utm_source=chatgpt.com)\n\n10. 4NE-1\n\nCommercial programme\n\n- Manufacturer: NEURA Robotics (Germany)\n- Applications: industrial assistance, manufacturing and human-robot collaboration.\n- Particularly interesting for the European market.\n- Reservations and commercial procurement programmes; confirm delivery status and configuration.\n\n  [Manufacturer website](https://neura-robotics.com/?utm_source=chatgpt.com)\n\n## 3. Other commercially offered humanoids\n\n| Robot | Manufacturer | Main application |\n| --- | --- | --- |\n| Ameca | Engineered Arts | Entertainment, research, reception |\n| TALOS | PAL Robotics | Research, industrial development |\n| Booster T1 | Booster Robotics | Education, research, robotics competitions |\n| Phoenix | Sanctuary AI | Industrial manipulation |\n| Lingxi X2 | AgiBot | Research, interaction |\n| Walker S1 | UBTECH | Manufacturing and logistics |\n\nAvailability varies considerably: some are sold as complete robots, others are offered as research platforms or through restricted commercial programmes.\n\n## 4. High-profile robots not generally available to purchase\n\nThese are often presented as commercially available, but there are important restrictions.\n\nOptimus — Tesla\n\nNot generally for sale\n\n- Intended for manufacturing and eventually domestic tasks.\n- Primarily deployed within Tesla's own operations.\n- No established general customer purchasing programme.\n\n  [Tesla](https://www.tesla.com/?utm_source=chatgpt.com)\n\nAtlas — Boston Dynamics\n\nRestricted enterprise access\n\n- Designed for advanced industrial applications.\n- Initial deployment programme with Hyundai and selected partners.\n- Not a conventional off-the-shelf purchase.\n\n  [Boston Dynamics](https://bostondynamics.com/?utm_source=chatgpt.com)\n\nNEO — 1X Technologies\n\nEarly-access programme\n\n- Designed specifically for household assistance.\n- Intended for domestic chores and interaction.\n- Pre-orders and early-access arrangements; not yet equivalent to a mature autonomous household worker.\n\n  [1X Technologies](https://www.1x.tech/?utm_source=chatgpt.com)\n\nSources for the market overview: [Humanoid Index – robots available to order](https://humanoid.observer/index/?utm_source=chatgpt.com); [Fraunhofer IPA – Humanoid Hardware Value Chain](https://www.ipa.fraunhofer.de/content/dam/ipa/de/documents/Publikationen/Studien/260219_Humanoid_Value_Chain_final.pdf?utm_source=chatgpt.com); [Stanford AI Index 2026](https://hai.stanford.edu/assets/files/ai_index_report_2026_chapter_2_technical.pdf?utm_source=chatgpt.com).\n\n## 5. Quick comparison: which should you consider?\n\n| Objective | Robots worth investigating |\n| --- | --- |\n| Lowest-cost entry | Unitree R1 |\n| Research and development | Unitree G1 |\n| Full-size development platform | Unitree H2 |\n| Factory automation | Digit, Walker S2 |\n| Advanced manipulation | Figure 02/03 |\n| European industrial applications | NEURA 4NE-1 |\n| Human interaction | AgiBot A2, Ameca |\n| Domestic assistance | 1X NEO |\n\n## 6. My assessment\n\nThe market currently falls into three broad categories:\n\n- Affordable development platforms: Unitree is particularly interesting because it makes humanoid hardware accessible to universities, developers and smaller robotics companies.\n- Industrial working robots: Agility Digit, UBTECH Walker and Figure are among the most interesting platforms for industrial deployment.\n- General-purpose humanoids: Tesla Optimus, 1X NEO and Figure represent the ambition to develop robots capable of working in environments designed for humans, but their commercial maturity varies substantially.\n\nOne important consideration: purchasing a humanoid robot does not automatically provide autonomous task execution. Software, training, integration, safety systems and ongoing support can be just as important as the hardware.\n\n## What I would investigate next\n\nIf the objective is to identify a robot that can actually be purchased and put to work, I would narrow the comparison to these five:\n\n1. Unitree G1\n2. Unitree H2\n3. Agility Digit\n4. UBTECH Walker S2\n5. NEURA 4NE-1\n\nI can also prepare a detailed comparison of the commercially available humanoid robots, including purchase prices, payload, walking speed, battery life, degrees of freedom, manipulation capabilities, autonomy and availability from European suppliers, with particular attention to the German market.",
+    "citationPills": []
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "92be51b40ee54b52b1e834b9a22d8afb",
+   "charged_micro": 2800
+  }
+ }
+}

@@ -1,0 +1,74 @@
+{
+ "observed_at": "2026-10-31T03:15:29+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "How many commercial humanoid robots exist?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "When looking at how many commercial humanoid robots exist, it helps to break the answer down into production volume (shipments), distinct manufacturer models, and active deployment types.\n\n1. Shipment and Production Numbers\n\nMarket tracking data indicates rapid commercial scaling:\n\nGlobal Shipments: According to data from International Data Corporation (IDC), robot manufacturers shipped close to 25,000 humanoid robots worldwide in the first half of 2026 alone, driven largely by manufacturing output in China (which accounts for the vast majority of global production volume).\n\nReal-World Work vs. Research: While thousands of units are built, approximately 70% of those units currently go to research labs, universities, exhibitions, and developer showrooms. Roughly 30% are deployed into actual commercial or industrial work environments (such as automotive manufacturing, warehousing, and logistics).\n\n2. Commercial Models & Platforms\n\nDozens of companies worldwide have active commercial, industrial-grade, or pilot-ready humanoid platforms. Prominent market players include:\n\nUnited States: Figure AI (Figure series), Agility Robotics (Digit), Boston Dynamics (Atlas), Apptronik (Apollo), and Tesla (Optimus).\n\nChina: AgiBot (Zhiyuan Robotics), Unitree, UBTECH (Walker series), and Xiaomi (CyberOne).\n\nEurope: 1X Technologies (backed by OpenAI), NEURA Robotics, and Agile Robots.\n\nWhile hundreds of conceptual or prototype humanoid models have been showcased globally, only a couple of dozen distinct companies have successfully transitioned from prototypes to scaled commercial manufacturing, structured leases, or factory trials.\n\nAre you looking into a specific company's robots, or interested in how they are being used in industries like warehousing and manufacturing?",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Humanoid robots are starting real jobs, but most employers have years to \nprepare",
+      "url": "https://www.hcamag.com/ca/specialization/transformation/humanoid-robots-are-starting-real-jobs-but-most-employers-have-years-to-prepare/594972#:~:text=Most%20of%20this%20year's%20robots%20went%20to,labs%2C%20schools%2C%20exhibitions%20and%20government%20data%2Dcollection%20centres.",
+      "description": "Most of this year's robots went to labs and showrooms Robot makers shipped \nclose to 25,000 humanoids worldwide in the first half of 2026, up 432% on a \nyear earl..."
+     },
+     {
+      "position": 2,
+      "label": "Top 8 Humanoid Robot Companies to Watch in 2026 - EVST",
+      "url": "https://www.evsint.com/top-8-humanoid-robot-companies-2026/",
+      "description": "The top 8 humanoid robot companies for 2026: Figure AI, Agility, Tesla, \nBoston Dynamics, Apptronik, 1X, Unitree, AgiBot — ranked by deployment, \nhardware,"
+     },
+     {
+      "position": 3,
+      "label": "Top 8 Humanoid Robot Companies to Watch in 2026 - EVST",
+      "url": "https://www.evsint.com/top-8-humanoid-robot-companies-2026/",
+      "description": "The top 8 humanoid robot companies for 2026: Figure AI, Agility, Tesla, \nBoston Dynamics, Apptronik, 1X, Unitree, AgiBot — ranked by deployment, \nhardware,"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Humanoid robots are starting real jobs, but most employers have years to \nprepare",
+      "url": "https://www.hcamag.com/ca/specialization/transformation/humanoid-robots-are-starting-real-jobs-but-most-employers-have-years-to-prepare/594972#:~:text=Most%20of%20this%20year's%20robots%20went%20to,labs%2C%20schools%2C%20exhibitions%20and%20government%20data%2Dcollection%20centres.",
+      "domain": "hcamag.com",
+      "position": 1,
+      "description": "Most of this year's robots went to labs and showrooms Robot makers shipped \nclose to 25,000 humanoids worldwide in the first half of 2026, up 432% on a \nyear earl...",
+      "citationPillId": 1
+     },
+     {
+      "label": "Top 8 Humanoid Robot Companies to Watch in 2026 - EVST",
+      "url": "https://www.evsint.com/top-8-humanoid-robot-companies-2026/",
+      "domain": "evsint.com",
+      "position": 2,
+      "description": "The top 8 humanoid robot companies for 2026: Figure AI, Agility, Tesla, \nBoston Dynamics, Apptronik, 1X, Unitree, AgiBot — ranked by deployment, \nhardware,",
+      "citationPillId": 2
+     },
+     {
+      "label": "Top 8 Humanoid Robot Companies to Watch in 2026 - EVST",
+      "url": "https://www.evsint.com/top-8-humanoid-robot-companies-2026/",
+      "domain": "evsint.com",
+      "position": 2,
+      "description": "The top 8 humanoid robot companies for 2026: Figure AI, Agility, Tesla, \nBoston Dynamics, Apptronik, 1X, Unitree, AgiBot — ranked by deployment, \nhardware,",
+      "citationPillId": 3
+     }
+    ],
+    "markdown": "When looking at how many commercial humanoid robots exist, it helps to break the answer down into **production volume (shipments)** , **distinct manufacturer models** , and **active deployment types**.\n\n### 1\\. Shipment and Production Numbers\n\nMarket tracking data indicates rapid commercial scaling:\n\n  * **Global Shipments:** According to data from International Data Corporation (IDC), robot manufacturers shipped close to **25,000 humanoid robots worldwide** in the first half of 2026 alone, driven largely by manufacturing output in China (which accounts for the vast majority of global production volume).\n\n  * **Real-World Work vs. Research:** While thousands of units are built, approximately 70% of those units currently go to research labs, universities, exhibitions, and developer showrooms. Roughly **30% are deployed into actual commercial or industrial work environments** (such as automotive manufacturing, warehousing, and logistics). [Humanoid robots are starting real jobs, but most employers have years to prepare](https://www.hcamag.com/ca/specialization/transformation/humanoid-robots-are-starting-real-jobs-but-most-employers-have-years-to-prepare/594972#:~:text=Most%20of%20this%20year's%20robots%20went%20to,labs%2C%20schools%2C%20exhibitions%20and%20government%20data%2Dcollection%20centres.)\n\n### 2\\. Commercial Models & Platforms\n\nDozens of companies worldwide have active commercial, industrial-grade, or pilot-ready humanoid platforms. Prominent market players include:\n\n  * **United States:** Figure AI (Figure series), Agility Robotics (Digit), Boston Dynamics (Atlas), Apptronik (Apollo), and Tesla (Optimus). [Top 8 Humanoid Robot Companies to Watch in 2026 - EVST](https://www.evsint.com/top-8-humanoid-robot-companies-2026/)\n\n  * **China:** AgiBot (Zhiyuan Robotics), Unitree, UBTECH (Walker series), and Xiaomi (CyberOne). [Top 8 Humanoid Robot Companies to Watch in 2026 - EVST](https://www.evsint.com/top-8-humanoid-robot-companies-2026/)\n\n  * **Europe:** 1X Technologies (backed by OpenAI), NEURA Robotics, and Agile Robots.\n\nWhile hundreds of conceptual or prototype humanoid models have been showcased globally, only a couple of dozen distinct companies have successfully transitioned from prototypes to scaled commercial manufacturing, structured leases, or factory trials.\n\nAre you looking into a specific company's robots, or interested in how they are being used in industries like warehousing and manufacturing?"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "b8ed6a75b21a42e5b0cdfabd8e834a05",
+   "charged_micro": 2400
+  }
+ }
+}

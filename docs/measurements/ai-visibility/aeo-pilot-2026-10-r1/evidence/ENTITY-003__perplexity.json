@@ -1,0 +1,203 @@
+{
+ "observed_at": "2026-10-31T03:11:37+00:00",
+ "endpoint": "perplexity.web.answer.fast",
+ "request": {
+  "preset": "fast",
+  "input": "How tall is the Unitree G1?",
+  "max_steps": 1,
+  "max_output_tokens": 512
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "background": false,
+   "completed_at": 1793416297,
+   "created_at": 1793416297,
+   "effort": "fast@2026-10-16.0",
+   "error": null,
+   "frequency_penalty": 0,
+   "id": "resp_8e732d90-9cfd-4a6a-899b-19c264de3848",
+   "incomplete_details": null,
+   "instructions": null,
+   "max_output_tokens": 512,
+   "max_tool_calls": null,
+   "metadata": {},
+   "model": "openai/gpt-6-luna",
+   "object": "response",
+   "output": [
+    {
+     "queries": [
+      "How tall is the Unitree G1?"
+     ],
+     "results": [
+      {
+       "id": 1,
+       "last_updated": "2026-10-30",
+       "snippet": "Mechanical Dimensions\n- Model\nG1\nG1 EDU\n- Height, Width and Thickness（Stand）\n1320x450x200mm\n1320x450x200mm\n- Height, Width and Thickness（Fold）\n690x450x300mm\n690x450x300mm\n- Weight (With Battery)\n...\n- Total Degrees of Freedom（Joint Freedom）",
+       "source": "web",
+       "title": "Humanoid robot G1_Humanoid Robot Functions_Humanoid Robot ...",
+       "url": "https://www.unitree.com/mobile/g1/"
+      },
+      {
+       "id": 2,
+       "last_updated": "2026-10-30",
+       "snippet": "The Unitree G1 is a compact bipedal humanoid built for research, education and content work.\nIt stands about 1.27 m, weighs roughly 35 kg with its quick-release battery, and ships with 23 degrees of freedom — rising to 4\n...\nThe Unitree G1 is a compact bipedal humanoid built for research, education and content work.\n## What is the Unitree G1 Humanoid Robot?\nIt stands about 1.27 m, weighs roughly 35 kg with its quick-release battery, and ships with 23 degrees of freedom — rising to 43 once dexterous hands and the upgraded waist and arms are fitted.\n...\n## Key specs\n|Height, width and thickness (standing)|1270x450x200mm|\n|--|--|\n|Height, width and thickness (folded)|690x450x300mm|\n...\n## How the Unitree G1 Humanoid Robot compares\n|Specification|Unitree G1|Unitree H2|UBTech Walker|\n|--|--|--|--|\n|Best for|Affordable, portable humanoid R&D|Full-size locomotion & manipulation research|Turnkey full-size service humanoid|\n|Purchase price|$23,700|$68,900|$960,000|\n|Height|1.32 m|~1.80 m|1.45 m|\n...\n## Which Unitree G1 Humanoid Robot is right for you?\n### G1 Basic Humanoid Robot\nHeight, width and thickness (standing): 1270x450x200mm\n- Height, width and thickness (standing): 1270x450x200mm\n- Height, width and thickness (folded): 690x450x300mm\n...\n## About the Unitree G1 Humanoid Robot.\n...\n2. ### What are the key specifications?\nThe G1 stands about 1.32 m tall and weighs roughly 35 kg with battery.\nIt has 23 degrees of freedom standard (6 per leg, 5 per arm, 1 waist), expandable to as many as 43 DOF on EDU configurations with optional waist, wrist, and the three-fingered Dex3-1 dexterous hand.",
+       "source": "web",
+       "title": "Unitree G1 Humanoid Robot | Prices & Configurations - RobotLAB",
+       "url": "https://www.robotlab.com/store/unitree-g1-robot/"
+      },
+      {
+       "id": 3,
+       "last_updated": "2026-09-22",
+       "snippet": "# Unitree Robotics Biorobots at World Robotics Congress 2024\n### G1 humanoid Biorobot that can incorporate AI to continuously refine skills\nSince its release in May this year, the Unitree G1 humanoid robot has gained a lot of attention for its excellent performance and flexible posture.\nG1 is about 127cm tall and weighs about 35kg, with a trotting speed of over 2m/s.",
+       "source": "web",
+       "title": "Unitree Robotics Biorobots at World Robotics Congress 2024",
+       "url": "https://www.unitree.com/news1/"
+      },
+      {
+       "date": "2026-10-29",
+       "id": 4,
+       "last_updated": "2026-10-29",
+       "snippet": "### Purchase options and add-ons\n- Sleek\n& Durable Design: Standing at 132cm tall and weighing only approx. 35kg, the G1 is constructed with aerospace-grade aluminum alloy and carbon fiber.\nIt features a full joint hollow internal wiring system, dual encoders, and a localized air-cooling system, ensuring high operational precision, stability, and resistance to impact from falls.\n- High Flexibility & Safe Movement: Boasting 23 joint degrees of freedom (6 per leg, 5 per arm), it offers an extensive range of motion.\n...\n- Smart Interaction & Connectivity: Powered by an 8-core high-performance CPU and equipped with a depth camera and 3D LiDAR.\n...\n|--|--|\n|Item Dimensions L x W x H|18\"L x 8\"W x 52\"H|\n|Number of Pieces|1|\n|Size|50 inches|\n|Item Dimensions|18 x 8 x 52 inches|\n...\nHeight, width and thickness (standing): 1270x450x200mm Height, width and thickness (folded): 690x450x300mm Weight with battery: approx. 35kg Total freedom (joint motor): 23 Freedom of one leg: 6 Waist Freedom: 1 Freedom of one arm: 5 Single-handed freedom: Dexterous hand and double-freedom wrist optional Maximum knee torque: 90N.m Maximum arm load: 2kg Calf + \nthigh length: 0.6m Arm arm span: approx. 0.45m Extra large joint movement space Lumbar Z-axis joint: ±155° Knee joint: 0~165° Hip joint: P±154°, R-30~+170°, Y±158°” Full joint hollow internal alignment: Yes Joint encoder: dual encoder Heat dissipation system: localized air-cooled heat dissipation Power supply: 13 series battery Base Computing Power: 8-core high performance CPU Sensor: Depth camera + 3D LIDAR WiFi 6, Bluetooth 5.2: Yes Smart battery (quick release) 1pc Charger 1pc Handheld remote control 1 s\n...\n## About this Item\n- Sleek & Dur\nable Design: Standing at 132cm tall and weighing only approx. 35kg, the G1 is constructed with aerospace-grade aluminum alloy and carbon fiber.\nIt features a full joint hollow internal wiring system, dual encoders, and a localized air-cooling system, ensuring high operational precision, stability, and resistance to impact from falls.\n...\nHeight, width and thickness (standing): 1270x450x200mm Height, width and thickness (folded): 690x4",
+       "source": "web",
+       "title": "Unitree G1 Pro Humanoid Robot（No Secondary Development）",
+       "url": "https://www.amazon.com/Unitree-G1-Humanoid-Secondary-Development%EF%BC%89/dp/B0HHP2BJPM"
+      },
+      {
+       "date": "2025-03-05",
+       "id": 5,
+       "last_updated": "2026-10-30",
+       "snippet": "# Watch Unitree G1 humanoid robot kick baton mid-spin in 720° turn, master combat moves\n## Agile robot advances\n### More from Innovation\nDesigned for challenging, repetitive tasks in homes, factories, and hospitals, G1 aligns with Unitree’s vision of humanoid robots as practical work and life companions.\nStanding at just 4.33 feet tall (1.32 meters) and weighing 77 lbs (35 kg), the G1 folds compactly to 27 x 17.7 x 11.8 inches for easy storage.",
+       "source": "web",
+       "title": "Watch Unitree G1 humanoid robot kick baton mid-spin ...",
+       "url": "https://interestingengineering.com/innovation/china-humanoid-robot-kick-mid-spin"
+      },
+      {
+       "date": "2026-06-26",
+       "id": 6,
+       "last_updated": "2026-10-02",
+       "snippet": "# Unitree G1 Humanoid Robot Review: Price, Teardown, and Why Automakers Are Investing\n## The First Affordable Commercial Humanoid Robot\nUniTree offered a range of research and industrial quadruped robots from 2017 to 2020 before offering the Go1 and Go2 consumer-grade models starting in 2021, priced in the $1,600–$3,000 range.\nThe G1 biped humanoid robot is a natural extension of this product.\nIt stands 4 feet 2 inches tall, weighs just under 80 pounds, can walk at about 4.5 mph, climb stairs, perceive its environment with available lidar and RGB cameras, and perform backflips.",
+       "source": "web",
+       "title": "Unitree G1 Humanoid Robot Review: Price, Teardown, and ...",
+       "url": "https://www.motortrend.com/news/first-humanoid-robot-teardown-analysis"
+      },
+      {
+       "date": "2021-06-09",
+       "id": 7,
+       "last_updated": "2026-06-25",
+       "snippet": "## History\nOn May 13, 2024, Unitree followed up with the G1, a smaller humanoid platform introduced as an \"AI avatar.\"\nMeasuring approximately 127 centimeters tall and weighing 35 kilograms, the G1 features articulated limbs with 23 to 43 degrees of freedom, depending on the configuration.\n...\n## Specs\nWebsite\nunitree.com/g1\nWidth45 cmHeight130 cmLength20 cmWeight35 kgSpeed7.2 km/h\nSensors\nLivox Mid-360 3D lidar plus Intel RealSense D435i depth camera.\nMicrophone array.\nDual joint encoders (for position/torque feedback) and IMU to support balance and motion stabilization.",
+       "source": "web",
+       "title": "Unitree G1 - ROBOTS: Your Guide to the World of Robotics",
+       "url": "https://robotsguide.com/robots/unitree-g1"
+      },
+      {
+       "date": "2026-10-10",
+       "id": 8,
+       "last_updated": "2026-10-16",
+       "snippet": "# Unitree G1 EDU U2 Humanoid Robot Rental (w/ On-Site Service)\n## Description\n- **RENTAL (RobotShop staff operate the robot on site)**\n...\nThe **Unitree G1 EDU U2 Humanoid Robot Rental (w/ On-Site Service)** is a bipedal humanoid platform built for dynamic, expressive performance.\nIts 29 degrees of freedom — including 7-DOF arms, a 3-DOF waist, and 6-DOF legs — give it extra-large joint movement angles for an impressive range of motion, from intricate arm movements to full-body routines.\nStanding 1,320 mm tall (folds to 690 mm for transport), it makes for an imposing on-site presence.\n...\nStanding Height\n1,320 mm\n...\nModel: **G1-EDU-U2-Rent**\n**Height, Width and Thickness (Stand)**\n|•|1320 x 450 x 200 mm|\n|--|--|\n**Height, Width and Thickness (Fold)**\n|•|690 x 450 x 300 mm|\n...\nComparison\n| |G1 EDU U2|G1 Basic|\n|--|--|--|\n|Height, Width and Thickness (Stand)|1320 x 450 x 200 mm|1320 x 450 x 200 mm|\n|Height, Width and Thickness (Fold)|690 x 450 x 300 mm|690 x 450 x 300 mm|",
+       "source": "web",
+       "title": "Unitree G1 EDU U2 Humanoid Robot Rental (w/ On-Site ...",
+       "url": "https://ca.robotshop.com/products/unitree-g1-edu-u2-humanoid-robot-rental-w-on-site-service"
+      },
+      {
+       "date": "2025-10-15",
+       "id": 9,
+       "last_updated": "2026-10-13",
+       "snippet": "# \"Everybody was Kung Fu Fighting\" – including the humanoid robot Unitree G1\nChinese robotics company Unitree Robotics has taught its humanoid robot G1 some new Kung Fu techniques, such as backflips, spins, rolls, and various martial arts moves like punches and kicks.\nApparently, further progress has been made in the robot's embodied intelligence.\nContinue after ad\nIn the video, Unitree shows how the humanoid G1 robot, standing 1.65 m tall, performs complex martial arts movements.\nThe robotics company emphasizes that all sequences in the video are played back at normal speed.",
+       "source": "web",
+       "title": "\"Everybody was Kung Fu Fighting\" – including the humanoid robot Unitree G1",
+       "url": "https://www.heise.de/en/news/Everybody-was-Kung-Fu-Fighting-including-the-humanoid-robot-Unitree-G1-10767023.html"
+      },
+      {
+       "date": "2024-05-27",
+       "id": 10,
+       "last_updated": "2026-10-30",
+       "snippet": "# You, Too, Can Own a Short King Humanoid Robot\nSo, is this humanoid robot … useful?\nIs it a toy?\nA big limitation in the real world is its height, a diminutive 4'2\" tall, which will make many tasks difficult.\n...\nThe video also warns: “Some of the sample functions of this video are still being developed and tested.”\nIt's a bit confusing to see the robot do tasks in front of what your brain *assumes* is a kitchen countertop, but since the robot is only 4 feet tall, a normal countertop of around 3 feet high would be roughly elbow-height for this thing.\nIt's doing these tasks while standing at a sit-down table.",
+       "source": "web",
+       "title": "You, Too, Can Own a Short King Humanoid Robot - WIRED",
+       "url": "https://www.wired.com/story/unitree-g1-humanoid-robot/"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "content": [
+      {
+       "annotations": [],
+       "text": "The Unitree G1 is about **1.32 m (4 ft 4 in) tall** when standing; Unitree lists its standing height as 1,320 mm.[1]",
+       "type": "output_text"
+      }
+     ],
+     "id": "msg_56775523-cb41-4139-8b7c-e42c22c3624a",
+     "role": "assistant",
+     "status": "completed",
+     "type": "message"
+    }
+   ],
+   "parallel_tool_calls": true,
+   "presence_penalty": 0,
+   "preset": "fast@2026-10-16.0",
+   "previous_response_id": null,
+   "prompt_cache_key": null,
+   "reasoning": null,
+   "safety_identifier": null,
+   "service_tier": "fast",
+   "status": "completed",
+   "store": true,
+   "temperature": 1,
+   "text": {
+    "format": {
+     "type": "text"
+    }
+   },
+   "tool_choice": "auto",
+   "tools": [
+    {
+     "type": "web_search"
+    }
+   ],
+   "top_logprobs": 0,
+   "top_p": 1,
+   "truncation": "",
+   "usage": {
+    "cost": {
+     "cache_creation_cost": 0.00034,
+     "cache_read_cost": 2e-05,
+     "currency": "USD",
+     "input_cost": 0,
+     "output_cost": 2e-05,
+     "tool_calls_cost": 0.001,
+     "tool_calls_cost_details": {
+      "search_web": 0.001
+     },
+     "total_cost": 0.00138
+    },
+    "input_tokens": 4541,
+    "input_tokens_details": {
+     "cache_creation_input_tokens": 2758,
+     "cache_read_input_tokens": 1780,
+     "cached_tokens": 1780
+    },
+    "output_tokens": 43,
+    "output_tokens_details": {
+     "reasoning_tokens": 0
+    },
+    "tool_calls_details": {
+     "search_web": {
+      "cost_usd": 0.001,
+      "invocation": 1
+     }
+    },
+    "total_tokens": 4584
+   },
+   "user": null
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "d5b5100e511d4325add91a571d72c7b4",
+   "charged_micro": 1380
+  }
+ }
+}

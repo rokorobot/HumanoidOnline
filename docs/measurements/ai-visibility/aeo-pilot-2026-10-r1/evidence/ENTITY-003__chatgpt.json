@@ -1,0 +1,47 @@
+{
+ "observed_at": "2026-10-31T03:11:37+00:00",
+ "endpoint": "cloro.ai-search.chatgpt.scrape",
+ "request": {
+  "prompt": "How tall is the Unitree G1?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "model": null,
+    "text": "The Unitree G1 is approximately 132 cm (1.32 metres or 4 feet 4 inches) tall when standing.\n\nHeight: 132 cm\n\nWeight: Approximately 35 kg\n\nWidth: 45 cm\n\nFolded height: 69 cm\n\nSource: Unitree's official G1 specifications .",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Unitree's official G1 specifications",
+      "url": "https://www.unitree.com/g1/?hsa_acc=8764137937&hsa_ad=714613051606&hsa_cam=21740723702&hsa_grp=174679395984&hsa_kw=&hsa_mt=&hsa_net=adwords&hsa_src=ytv&hsa_tgt=&hsa_ver=3",
+      "footnote": true
+     }
+    ],
+    "entities": [
+     {
+      "type": "product",
+      "name": "Unitree G1"
+     }
+    ],
+    "map": [],
+    "followUpForm": null,
+    "markdown": "The Unitree G1 is approximately 132 cm (1.32 metres or 4 feet 4 inches) tall when standing.\n\n- Height: 132 cm\n- Weight: Approximately 35 kg\n- Width: 45 cm\n- Folded height: 69 cm\n\nSource: [Unitree's official G1 specifications](https://www.unitree.com/g1/?hsa_acc=8764137937&hsa_ad=714613051606&hsa_cam=21740723702&hsa_grp=174679395984&hsa_kw=&hsa_mt=&hsa_net=adwords&hsa_src=ytv&hsa_tgt=&hsa_ver=3&utm_source=chatgpt.com).",
+    "citationPills": []
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "952c3fae94ca42728990043ae006c778",
+   "charged_micro": 2800,
+   "hint": "review"
+  }
+ }
+}

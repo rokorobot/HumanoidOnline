@@ -1,0 +1,100 @@
+{
+ "observed_at": "2026-10-31T03:11:37+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "How tall is the Unitree G1?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "The Unitree G1 humanoid robot stands approximately 1.27 to 1.32 meters (about 4 feet 2 inches to 4 feet 4 inches) tall when fully standing.\n\nFor quick reference, here are a few other key physical dimensions of the robot:\n\nWeight: Roughly 35 kg (77 lbs)\n\nStanding Dimensions (H × W × D): 1320×450×200 mm1320 \\times 450 \\times 200\\text{ mm}1320×450×200 mm\n\nFolded Dimensions (for storage/transport): 690×450×300 mm690 \\times 450 \\times 300\\text{ mm}690×450×300 mm",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Unitree G1 Humanoid Robot",
+      "url": "https://www.humanoid-network.com/humanoid-robots/unitree-g1/#:~:text=35%20kg%20%7C%20Approx.%2035%20kg%2B%20%7C,%E2%80%93%20%7C%207%20(optional%20dexterous%20hand)%20%7C",
+      "description": "35 kg | Approx. 35 kg+ | | Height | ~127–132 cm | ~132 cm | Table_title: \nDegrees of Freedom (DoF) Table_content: | Parameter | G1 | G1 EDU | | --- | \n--- | --- |..."
+     },
+     {
+      "position": 2,
+      "label": "Unitree G1 - ROBOTS: Your Guide to the World of Robotics",
+      "url": "https://robotsguide.com/robots/unitree-g1#:~:text=2024.%20unitree.com%2Fg1.%20Width%2045%20cm%20Height%20130,DoF%20x%202%3B%20Waist%3A%201%20DoF)%20Materials.",
+      "description": "2024. unitree.com/g1. Width 45 cm Height 130 cm Length 20 cm Weight 35 kg \nSpeed 7.2 km/h. Livox Mid-360 3D lidar plus Intel RealSense D435i depth \ncamera. Microp..."
+     },
+     {
+      "position": 3,
+      "label": "Unitree G1 Humanoid Robot",
+      "url": "https://www.humanoid-network.com/humanoid-robots/unitree-g1/#:~:text=Table_title%3A%20Mechanical%20Design%20%26%20Dimensions%20Table_content%3A%20%7C,battery)%20%7C%20Approx.%2035%20kg%20%7C%20Approx.",
+      "description": "Table_title: Mechanical Design & Dimensions Table_content: | Parameter | G1 \n| G1 EDU | | --- | --- | --- | | Standing Dimensions (H×W×D) | 1320 × 450 × \n200 mm |..."
+     },
+     {
+      "position": 4,
+      "label": "Unitree G1 Humanoid Robot",
+      "url": "https://www.humanoid-network.com/humanoid-robots/unitree-g1/",
+      "description": "Technical Hardware Specifications (G1 / G1 EDU) ; Mechanical Design & \nDimensions. Parameter, G1 · Standing Dimensions (H×W×D) · 1320 × 450 × 200 \nmm. Folded"
+     },
+     {
+      "position": 5,
+      "label": "Unitree G1 Specs, Price & Status - 9S Robotics",
+      "url": "https://9srobotics.com/en/robots/unitree-g1/#:~:text=%E2%80%A23D%20perception%3A%20Intel%20RealSense%20D435%20depth%20camera,autonomous%20steps%20at%20%2D47.4%C2%B0C%20in%20Altay%2C%20Xinjiang.",
+      "description": "•3D perception: Intel RealSense D435 depth camera + Livox MID-360 360° \nLiDAR. •Walking/running speed exceeding 2 m/s with 1.4m standing long jump. \n•Quick-releas..."
+     },
+     {
+      "position": 6,
+      "label": "Unitree G1 Humanoid Robot | Prices & Configurations - RobotLAB",
+      "url": "https://www.robotlab.com/store/unitree-g1-robot/",
+      "description": "Unitree G1 Humanoid Robot ; Height, width and thickness (folded), \n690x450x300mm ; Weight with battery, approx. 35kg ; Total freedom (joint \nmotor), 23 ; Freedom ..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Unitree G1 Humanoid Robot",
+      "url": "https://www.humanoid-network.com/humanoid-robots/unitree-g1/#:~:text=35%20kg%20%7C%20Approx.%2035%20kg%2B%20%7C,%E2%80%93%20%7C%207%20(optional%20dexterous%20hand)%20%7C",
+      "domain": "humanoid-network.com",
+      "position": 1,
+      "description": "35 kg | Approx. 35 kg+ | | Height | ~127–132 cm | ~132 cm | Table_title: \nDegrees of Freedom (DoF) Table_content: | Parameter | G1 | G1 EDU | | --- | \n--- | --- |...",
+      "citationPillId": 1
+     },
+     {
+      "label": "Unitree G1 - ROBOTS: Your Guide to the World of Robotics",
+      "url": "https://robotsguide.com/robots/unitree-g1#:~:text=2024.%20unitree.com%2Fg1.%20Width%2045%20cm%20Height%20130,DoF%20x%202%3B%20Waist%3A%201%20DoF)%20Materials.",
+      "domain": "robotsguide.com",
+      "position": 2,
+      "description": "2024. unitree.com/g1. Width 45 cm Height 130 cm Length 20 cm Weight 35 kg \nSpeed 7.2 km/h. Livox Mid-360 3D lidar plus Intel RealSense D435i depth \ncamera. Microp...",
+      "citationPillId": 2
+     },
+     {
+      "label": "Unitree G1 Humanoid Robot",
+      "url": "https://www.humanoid-network.com/humanoid-robots/unitree-g1/#:~:text=Table_title%3A%20Mechanical%20Design%20%26%20Dimensions%20Table_content%3A%20%7C,battery)%20%7C%20Approx.%2035%20kg%20%7C%20Approx.",
+      "domain": "humanoid-network.com",
+      "position": 3,
+      "description": "Table_title: Mechanical Design & Dimensions Table_content: | Parameter | G1 \n| G1 EDU | | --- | --- | --- | | Standing Dimensions (H×W×D) | 1320 × 450 × \n200 mm |...",
+      "citationPillId": 3
+     },
+     {
+      "label": "Unitree G1 Specs, Price & Status - 9S Robotics",
+      "url": "https://9srobotics.com/en/robots/unitree-g1/#:~:text=%E2%80%A23D%20perception%3A%20Intel%20RealSense%20D435%20depth%20camera,autonomous%20steps%20at%20%2D47.4%C2%B0C%20in%20Altay%2C%20Xinjiang.",
+      "domain": "9srobotics.com",
+      "position": 5,
+      "description": "•3D perception: Intel RealSense D435 depth camera + Livox MID-360 360° \nLiDAR. •Walking/running speed exceeding 2 m/s with 1.4m standing long jump. \n•Quick-releas...",
+      "citationPillId": 4
+     }
+    ],
+    "markdown": "The **Unitree G1** humanoid robot stands approximately **1.27 to 1.32 meters** (about 4 feet 2 inches to 4 feet 4 inches) tall when fully standing. [Unitree G1 Humanoid Robot](https://www.humanoid-network.com/humanoid-robots/unitree-g1/#:~:text=35%20kg%20%7C%20Approx.%2035%20kg%2B%20%7C,%E2%80%93%20%7C%207%20\\(optional%20dexterous%20hand\\)%20%7C)\n\nFor quick reference, here are a few other key physical dimensions of the robot:\n\n  * **Weight:** Roughly 35 kg (77 lbs) [Unitree G1 - ROBOTS: Your Guide to the World of Robotics](https://robotsguide.com/robots/unitree-g1#:~:text=2024.%20unitree.com%2Fg1.%20Width%2045%20cm%20Height%20130,DoF%20x%202%3B%20Waist%3A%201%20DoF\\)%20Materials.)\n\n  * **Standing Dimensions (H × W × D):** 1320×450×200 mm1320 \\times 450 \\times 200\\text{ mm}1320×450×200 mm [Unitree G1 Humanoid Robot](https://www.humanoid-network.com/humanoid-robots/unitree-g1/#:~:text=Table_title%3A%20Mechanical%20Design%20%26%20Dimensions%20Table_content%3A%20%7C,battery\\)%20%7C%20Approx.%2035%20kg%20%7C%20Approx.)\n\n  * **Folded Dimensions (for storage/transport):** 690×450×300 mm690 \\times 450 \\times 300\\text{ mm}690×450×300 mm [Unitree G1 Specs, Price & Status - 9S Robotics](https://9srobotics.com/en/robots/unitree-g1/#:~:text=%E2%80%A23D%20perception%3A%20Intel%20RealSense%20D435%20depth%20camera,autonomous%20steps%20at%20%2D47.4%C2%B0C%20in%20Altay%2C%20Xinjiang.)"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "a0c2c5aae4b8413784a79509c2daf557",
+   "charged_micro": 2400
+  }
+ }
+}

@@ -1,0 +1,99 @@
+{
+ "observed_at": "2026-10-31T03:14:46+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "Which humanoid robots are suitable for research?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Several humanoid platforms stand out for academic and lab research, balancing developer access (ROS/SDK support), onboard compute, and budget:\n\nUnitree G1 / G1 Edu\n\nOverview: Currently one of the most widely adopted human-scale humanoid robots in university labs. The Edu version comes equipped with robust compute (like NVIDIA Jetson Orin), LiDAR/RealSense sensors, and deep software/SDK accessibility for locomotion and reinforcement learning research.\nEstimated Price: ~$43,900 USD / ~€38,000\n\nFourier GR-1\n\nOverview: Developed by Fourier Intelligence, this adult-sized bipedal robot (1.65 m) features high degrees of freedom and strong joint torque capabilities. It is heavily targeted toward biomechanics, rehabilitation, movement control, and general-purpose artificial intelligence manipulation research.\nEstimated Price: High-tier research pricing (approx. $125,000+ USD)\n\nPAL Robotics TALOS & REEM-C\n\nOverview: A veteran in European academic research labs. TALOS is torque-controlled and built for advanced industrial/bipedal manipulation research, while REEM-C is a classic open-source ROS-based bipedal platform optimized for human-robot interaction.\nEstimated Price: Institutional/Request-based pricing.\n\nUnitree H2 Edu\n\nOverview: A larger, full adult-size option (1.82 m) from Unitree designed for labs requiring human-scale vertical reach, heavier payload handling, and whole-body manipulation testing.\nEstimated Price: ~$66,800 USD\n\nIf you'd like to narrow this down, tell me:\n\nWhat is your approximate budget?\nWhat specific research focus do you have (e.g., locomotion/bipedal walking, AI manipulation, or human-robot interaction)?\n\nI can help suggest the ideal platform and compute stack for your lab.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Fourier Intelligence GR-1 Specs & Price | Humanoid.guide",
+      "url": "https://humanoid.guide/product/gr-1/",
+      "description": "Fourier Intelligence, Shanghai, China (Prototype, $125,000 USD). Physical Specs: Height 165 cm, weight 55 kg, 25-27 overall max sp...",
+      "redirectLink": "https://www.google.com/goto?url=CAESXwHrOzAVLWZ_O5h8IOKcFmmip2gMu3-RL25SsteXJ_FRzdlNnZfFcz9jypkugUWs2_ofZGDYmddSHbczxtaMWvbuzQj_UsI_Ms3NwsPlVpqYXtlRyLUTaCgiY5CoI6Xb"
+     },
+     {
+      "position": 2,
+      "label": "Unitree G1 EDU Standard (U1) Humanoid Robot (EU) - RobotShop",
+      "url": "https://eu.robotshop.com/products/unitree-g1-edu-standard-u1-humanoid-robot-eu",
+      "description": "LiDAR, Intel RealSense D435i - 9000 mAh quick-release battery (2h runtime, 3 kg payload, 35+ kg weight) - 120 N.m peak knee torque...",
+      "redirectLink": "https://www.google.com/goto?url=CAESiQEB6zswFZ-CIWSc8QiV7hdHhM4_XQf6zPe72GPCseugw_SPmxbPR_PU6xcTnzFDHGAlDHfBDJvg0CNw-DxYwzSsDavoGcro9QULH7uXHMz-1wdCdheHB0h-Is6SxiGz-kDqXp6m-kk5L-7rrCGRZ4cty2k_XLttzNakGurPUbpisNnaVzxRqmihXw"
+     },
+     {
+      "position": 3,
+      "label": "Best Humanoid Robots for STEM Programs and Schools",
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education",
+      "description": "The lowest-cost humanoid with full SDK access. Best for human-scale research: Unitree H2 Edu, $66,800. Full adult size at 1.82 m w...",
+      "redirectLink": "https://www.google.com/goto?url=CAESiQEB6zswFWr1IT_up0l-z5lIcsDr7krMcCj255JgcDb_nLS5JtcYQdJf-C_VqKu7ZyRaoH_X5yCMpgaGMFaGDiny4bBo_2R2niBOx4uqY-yKyT9czG8qpc4CsYnEhdrPvjcsdOakXn7EUiI-O-DNmka4i2CXgrX7V5nEXZg48ngd_u5GqkrISUvMKA"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Best Humanoid Robots for STEM Programs and Schools",
+      "citationPillId": 1,
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education",
+      "domain": "globaldronehq.com",
+      "description": "The lowest-cost humanoid with full SDK access. Best for human-scale research: Unitree H2 Edu, $66,800. Full adult size at 1.82 m w...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESiQEB6zswFWr1IT_up0l-z5lIcsDr7krMcCj255JgcDb_nLS5JtcYQdJf-C_VqKu7ZyRaoH_X5yCMpgaGMFaGDiny4bBo_2R2niBOx4uqY-yKyT9czG8qpc4CsYnEhdrPvjcsdOakXn7EUiI-O-DNmka4i2CXgrX7V5nEXZg48ngd_u5GqkrISUvMKA"
+     },
+     {
+      "label": "Unitree G1 EDU Standard (U1) Humanoid Robot (EU) - RobotShop",
+      "citationPillId": 2,
+      "url": "https://eu.robotshop.com/products/unitree-g1-edu-standard-u1-humanoid-robot-eu",
+      "domain": "eu.robotshop.com",
+      "description": "LiDAR, Intel RealSense D435i - 9000 mAh quick-release battery (2h runtime, 3 kg payload, 35+ kg weight) - 120 N.m peak knee torque...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESiQEB6zswFZ-CIWSc8QiV7hdHhM4_XQf6zPe72GPCseugw_SPmxbPR_PU6xcTnzFDHGAlDHfBDJvg0CNw-DxYwzSsDavoGcro9QULH7uXHMz-1wdCdheHB0h-Is6SxiGz-kDqXp6m-kk5L-7rrCGRZ4cty2k_XLttzNakGurPUbpisNnaVzxRqmihXw"
+     },
+     {
+      "label": "Best Humanoid Robots for STEM Programs and Schools",
+      "citationPillId": 2,
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education",
+      "domain": "globaldronehq.com",
+      "description": "The lowest-cost humanoid with full SDK access. Best for human-scale research: Unitree H2 Edu, $66,800. Full adult size at 1.82 m w...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESiQEB6zswFWr1IT_up0l-z5lIcsDr7krMcCj255JgcDb_nLS5JtcYQdJf-C_VqKu7ZyRaoH_X5yCMpgaGMFaGDiny4bBo_2R2niBOx4uqY-yKyT9czG8qpc4CsYnEhdrPvjcsdOakXn7EUiI-O-DNmka4i2CXgrX7V5nEXZg48ngd_u5GqkrISUvMKA"
+     },
+     {
+      "label": "Fourier Intelligence GR-1 Specs & Price | Humanoid.guide",
+      "citationPillId": 3,
+      "url": "https://humanoid.guide/product/gr-1/",
+      "domain": "humanoid.guide",
+      "description": "Fourier Intelligence, Shanghai, China (Prototype, $125,000 USD). Physical Specs: Height 165 cm, weight 55 kg, 25-27 overall max sp...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESXwHrOzAVLWZ_O5h8IOKcFmmip2gMu3-RL25SsteXJ_FRzdlNnZfFcz9jypkugUWs2_ofZGDYmddSHbczxtaMWvbuzQj_UsI_Ms3NwsPlVpqYXtlRyLUTaCgiY5CoI6Xb"
+     },
+     {
+      "label": "Best Humanoid Robots for STEM Programs and Schools",
+      "citationPillId": 4,
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education",
+      "domain": "globaldronehq.com",
+      "description": "The lowest-cost humanoid with full SDK access. Best for human-scale research: Unitree H2 Edu, $66,800. Full adult size at 1.82 m w...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESiQEB6zswFWr1IT_up0l-z5lIcsDr7krMcCj255JgcDb_nLS5JtcYQdJf-C_VqKu7ZyRaoH_X5yCMpgaGMFaGDiny4bBo_2R2niBOx4uqY-yKyT9czG8qpc4CsYnEhdrPvjcsdOakXn7EUiI-O-DNmka4i2CXgrX7V5nEXZg48ngd_u5GqkrISUvMKA"
+     }
+    ],
+    "markdown": "Several humanoid platforms stand out for academic and lab research, balancing developer access (ROS/SDK support), onboard compute, and budget: [Best Humanoid Robots for STEM Programs and Schools](https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education)\n\n  * **Unitree G1 / G1 Edu**\n    * **Overview:** Currently one of the most widely adopted human-scale humanoid robots in university labs. The Edu version comes equipped with robust compute (like NVIDIA Jetson Orin), LiDAR/RealSense sensors, and deep software/SDK accessibility for locomotion and reinforcement learning research.\n    * **Estimated Price:** ~$43,900 USD / ~€38,000 [Unitree G1 EDU Standard (U1) Humanoid Robot (EU) - RobotShop](https://eu.robotshop.com/products/unitree-g1-edu-standard-u1-humanoid-robot-eu)[Best Humanoid Robots for STEM Programs and Schools](https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education)\n\n  * **Fourier GR-1**\n    * **Overview:** Developed by Fourier Intelligence, this adult-sized bipedal robot (1.65 m) features high degrees of freedom and strong joint torque capabilities. It is heavily targeted toward biomechanics, rehabilitation, movement control, and general-purpose artificial intelligence manipulation research.\n    * **Estimated Price:** High-tier research pricing (approx. $125,000+ USD) [Fourier Intelligence GR-1 Specs & Price | Humanoid.guide](https://humanoid.guide/product/gr-1/)\n\n  * **PAL Robotics TALOS & REEM-C**\n    * **Overview:** A veteran in European academic research labs. TALOS is torque-controlled and built for advanced industrial/bipedal manipulation research, while REEM-C is a classic open-source ROS-based bipedal platform optimized for human-robot interaction.\n    * **Estimated Price:** Institutional/Request-based pricing.\n\n  * **Unitree H2 Edu**\n    * **Overview:** A larger, full adult-size option (1.82 m) from Unitree designed for labs requiring human-scale vertical reach, heavier payload handling, and whole-body manipulation testing.\n    * **Estimated Price:** ~$66,800 USD [Best Humanoid Robots for STEM Programs and Schools](https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education)\n\nIf you'd like to narrow this down, tell me:\n\n  * What is your **approximate budget**?\n  * What specific **research focus** do you have (e.g., locomotion/bipedal walking, AI manipulation, or human-robot interaction)?\n\nI can help suggest the **ideal platform and compute stack** for your lab."
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "0dd6900557b54e219b360e78064a60a7",
+   "charged_micro": 2400
+  }
+ }
+}

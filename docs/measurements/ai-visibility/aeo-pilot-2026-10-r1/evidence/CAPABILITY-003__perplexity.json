@@ -1,0 +1,297 @@
+{
+ "observed_at": "2026-10-31T03:14:54+00:00",
+ "endpoint": "perplexity.web.answer.fast",
+ "request": {
+  "preset": "fast",
+  "input": "Which humanoid robots are suitable for research?",
+  "max_steps": 1,
+  "max_output_tokens": 512
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": "treg: this answer is 38 KB; to keep it whole send it to a file (> a.json 2> a.err) and read the parts you need with jq (start with jq 'keys' a.json)\n",
+ "response": {
+  "result": {
+   "background": false,
+   "completed_at": 1793416494,
+   "created_at": 1793416494,
+   "effort": "fast@2026-10-16.0",
+   "error": null,
+   "frequency_penalty": 0,
+   "id": "resp_8d2ab80f-1fa3-4c5d-9143-d982cd68b13d",
+   "incomplete_details": null,
+   "instructions": null,
+   "max_output_tokens": 512,
+   "max_tool_calls": null,
+   "metadata": {},
+   "model": "openai/gpt-6-luna",
+   "object": "response",
+   "output": [
+    {
+     "queries": [
+      "Which humanoid robots are suitable for research?"
+     ],
+     "results": [
+      {
+       "date": "2026-04-12",
+       "id": 1,
+       "last_updated": "2026-10-26",
+       "snippet": "What works: bipedal walking on flat surfaces is reliable across the platforms you can buy.\nBasic pick-and-place of known objects in a structured setup works on platforms with capable arms.\nTeleoperation, a human operator controlling the humanoid remotely, works and is the main way teams collect training data for autonomous behaviour.\n...\nIf you are buying a humanoid in 2026, you are buying a research platform, a data-collection tool or a demonstrator, not an autonomous worker.\n...\n1. **Does your research specifically require bipedal locomotion combined with manipulation?** If your manipulation tasks can be done on a tabletop, a robot arm will collect better data faster, for a fraction of the price of a humanoid.\n...\n|Platform|Price|Height / weight|DoF|Development access|Best for|\n|--|--|--|--|--|--|\n|**Unitree G1**|Base $21,600.00; EDU from $43,900.00|132 cm / ≈35 kg|23 (base), up to 43 (EDU)|EDU only|Research, teleoperation data, learning-based control|\n|**Unitree H1**|$99,900.00|≈180 cm / ≈47 kg|5 per leg, 4 per arm|Yes|Full-size locomotion research|\n|**Unitree H1-2**|$128,900.00|≈178 cm / ≈70 kg|27|Yes|Full-size loco-manipulation|\n|**Unitree H2**|From $40,900.00|182 cm / ≈70 kg|31|EDU only|Full-size research (EDU), demos and reception (base)|\n|**Booster T1**|Request a Quote|≈118 cm / ≈30 kg|23 to 41|Yes|Locomotion and RoboCup research|\n|**Booster K1**|From $11,998.00|≈95 cm / ≈19.5 kg|22|Yes|Education, competitions, first projects|\n|**Unitree R1**|$6,370.00|≈123 cm / ≈29 kg|20 to 40|EDU only|Entry-level demos and teaching|\n|**AGIBOT X2**|From $27,999.00|131 cm|Varies by model|X2 Ultra|Interaction, performances, education|\n...\nThe Unitree G1 is the humanoid most research labs start with.\nUnitree sells it in two versions that look the same but are very different purchases.\n...\nFor labs starting humanoid research on a reasonable budget, the G1 EDU is the default choice in 2026.\n...\nThe Booster T1 (Request a Quote) is a 1.2 m, 30 kg humanoid that Booster Robotics calls the 2025 RoboCup \"AdultSize\" champion model.\nIt is open to development, and Booster publishes its SDK, robot models and RL training and deployment code on GitHub.\nChoose it for dynamic locomotion, soccer and RL research.\n...\n|Your Need|Best Form Factor|Recommended Platform|\n|--|--|--|\n|Tabletop manipulation research|**Robot arm**|OpenArm$5,400.00 or Franka FR3|\n| … | … | … |\n|Bipedal locomotion research|**Humanoid**|Unitree G1 EDU$43,900.00 or Booster T1Request a Quote|\n|Loco-manipulation research|**Humanoid**|Unitree G1 EDU$43,900.00 or Unitree H1-2$128,900.00|\n...\n**Teleoperation data collection:** This is the primary use case for humanoid purchases in 2026.\nResearch labs buy humanoids to collect whole-body manipulation demonstrations by teleoperation, then train autonomous policies from that data.\nThe Unitree G1 is the most popular platform for this work because of its price and open software.\n...\n**Locomotion and gait research:** University labs studying bipedal locomotion, balance and terrain use humanoids to test algorithms trained in simulation.\nThe sim-to-real gap for locomotion is significant, so physical hardware is essential for validating RL-trained gaits.\nUnitree and Booster both publish open RL pipelines that go from simulation to the real robot.\n...\nYes, in its EDU configuration.\nIt has the largest community of any humanoid, open SDK, ROS 2, RL and teleoperation code, and EDU configurations take dexterous hands for up to 43 degrees of freedom.\nThe main limitations are its compact size (132 cm), light arm load (about 2 to 3 kg) and roughly 2-hour battery.",
+       "source": "web",
+       "title": "Humanoid Robot Comparison 2026: Full Spec Breakdown",
+       "url": "https://www.roboticscenter.ai/guides/humanoid-robot-buyers-guide-2025"
+      },
+      {
+       "id": 2,
+       "last_updated": "2026-10-28",
+       "snippet": "### Research and experimental models\nRobotics companies and universities develop research and experimental models to test new capabilities, such as dynamic balancing, obstacle negotiation, and fine motor skills.\nThey influence future commercial robots but are rarely available for purchase.\n- **Example:** Boston Dynamics’ Atlas, known for agility and parkour-like movement; Tesla Optimus prototypes for industrial applications.\n- **Common roles:** R&D in mobility, AI decision-making, and human–robot collaboration scenarios.\n...\n|**Robot**|**Description**|**Applications**|**Notable details**|\n|--|--|--|--|\n|**Unitree H1**|Affordable full-size humanoid with high walking speed, responsive balance, and full sensor suite; modular design for upgrades|Light assembly, inspections, research, and public demos|$90,000 price; 5.4 km/h walking speed; advanced stability under contact|",
+       "source": "web",
+       "title": "Humanoid robots in 2026: Types, prices, and what’s next",
+       "url": "https://standardbots.com/guides/humanoid-robot"
+      },
+      {
+       "date": "2026-03-10",
+       "id": 3,
+       "last_updated": "2026-10-27",
+       "snippet": "Researchers need the quote-only G1 EDU for secondary development.\n...\n38. 30. Rainbow Robotics RB-Y1 — Research Dual-Arm Platform\n39. 31. AgiBot X1 — Best Open-Source Research Humanoid\n...\n|2|Atlas (Electric)|190 cm|90 kg|Not published|Auto mfg, R&D|In production (2026 booked out)|\n...\n- **Research & education:** Unitree G1 EDU is the default lab platform; AgiBot X1 and Tiangong 3.0 for open-source depth; Booster T1 for competition; LimX Oli for a full-size biped on a budget; Unitree R1 or Booster K1 ($5,999) for classrooms.",
+       "source": "web",
+       "title": "38 Best Humanoid Robots in 2026 (Evidence-Ranked) - Blog",
+       "url": "https://blog.robozaps.com/b/best-humanoid-robots"
+      },
+      {
+       "date": "2026-07-02",
+       "id": 4,
+       "last_updated": "2026-10-13",
+       "snippet": "- Compact 132 cm body suited to laboratories and demonstrations\n- G1 EDU configuration available for secondary development and research\n...\nThe Unitree H2 brings Unitree’s cost-focused approach to a taller, more human-proportioned platform.\nIt offers more physical presence than the G1 while remaining far less expensive than many quote-only enterprise humanoids.\n- Full-size humanoid body at approximately 180 cm\n- Published price from $29,900\n- Dynamic walking and whole-body movement\n- Suitable for commercial demonstrations, research and development\n- Application readiness depends on configuration and software integration\n...\nThe RobotEra L7 is a dynamic bipedal humanoid developed for logistics, manufacturing and advanced mobility research.\nIts public demonstrations emphasise running speed, balance and whole-body coordination.\n...\nL7 is best for teams researching fast locomotion or evaluating humanoids for dynamic, time-sensitive movement.\n...\nThe LimX Dynamics Oli is a full-size humanoid platform for embodied-AI research and secondary development.\nLimX positions it as an accessible bridge between compact teaching robots and costly enterprise humanoids.\n...\nThe Kuavo 5 is a full-size industrial humanoid developed by Leju Robotics for factories, logistics and embodied-AI research.\n...\n## 22. Tiangong 3.0 – Best Open Research Platform at Full Scale\nThe Tiangong humanoid is developed by the Beijing Humanoid Robot Innovation Center as a full-size platform for research, industrial trials and open ecosystem development.\nThe programme is notable for combining state-backed development with open-source releases.\n- Full-size bipedal research platform\n- Open-source components and developer resources\n- Strong running and terrain-navigation demonstrations\n- Intended for research and industrial adoption\n- Procurement outside China may be limited\n...\n## 23. EngineAI SE01 – Best Affordable Full-Size Research Humanoid\nThe EngineAI SE01 is a full-size humanoid designed for natural walking, research and commercial development.\nEngineAI has emphasised gait quality and a comparatively accessible launch price.\n- Human-scale body and natural walking motion\n- Developed for research and commercial experimentation\n- Lower announced price than many full-size competitors\n...\n## 24. Booster Robotics T1 – Best for Robotics Education and Competition\nThe Booster T1 is a compact humanoid built for robotics research, education and competitions such as RoboCup.\nIt combines a manageable size with dynamic movement and a developer-oriented software environment.\n- Designed for universities, labs and competitions\n- Compact form reduces testing risk and space requirements\n- Dynamic walking, recovery and sports-oriented movement\n...\n## 31. Rainbow Robotics RB-Y1 – Best Dual-Arm Research Platform\nThe Rainbow Robotics RB-Y1 is a wheeled mobile manipulator with two arms, a lifting torso and research-grade control.\nIt gives laboratories a stable platform for bimanual manipulation without the added complexity of balancing on two legs.\n- Dual seven-axis arms for bimanual research\n- Wheeled base and vertically adjustable torso\n- Designed for universities and advanced robotics labs\n- Commercially available through research procurement\n...\nRB-Y1 is best for teams studying manipulation, teleoperation and AI control where bipedal walking is unnecessary.\n## 32. AgiBot X1 – Best Open-Source Compact Research Humanoid\nThe AgiBot X1 is a smaller humanoid platform aimed at universities, developers and embodied-AI research.\nIts open technical approach makes it more accessible for experimentation than AgiBot’s service-focused full-size machines.\n- Compact platform for academic development\n- Open-source research orientation\n- Part of the AgiBot hardware and dataset ecosystem\n- Suitable for locomotion and manipulation experiments\n...\n## 40. Unitree H1 – Best for Dynamic Full-Size Research\nThe Unitree H1 is a full-size humanoid known for fast running, dynamic balance and strong whole-body demonstrations.\nIt predates the H2 but remains relevant to universities and robotics teams focused on locomotion.\n...\n## 48. PAL Robotics TALOS – Best Advanced Academic Humanoid\nThe PAL Robotics TALOS is a torque-controlled full-size humanoid created for advanced research in locomotion, manipulation and human-robot collaboration.\nIt is used by leading laboratories rather than mass-market buyers.\n...\n- Designed for dynamic movement and heavy manipulation research\n...\nThe iCub3 is an open research humanoid developed by the Italian Institute of Technology for cognition, telepresence, manipulation and human-robot interaction.",
+       "source": "web",
+       "title": "50 Best Humanoid Robots (2026)",
+       "url": "https://antonrobots.com/best-humanoid-robots/"
+      },
+      {
+       "id": 5,
+       "last_updated": "2026-09-02",
+       "snippet": "This paper presents a comprehensive review of leading platforms including Tesla\nOptimus (Gen 2), Figure 03, Unitree G1/H1, Boston Dynam-ics Electric Atlas, and Fourier GR-1/GR-2.\n...\nFigure 03 represents a significant step toward scalable, general-purpose humanoid robotics, designed to operate in everyday environments while enabling end-to-end visuomotor learning [36, 37].\n...\nUnitree Robotics offers two complementary humanoid plat-forms: the compact G1 [41] and the full-size H1 [42], tar-geting distinct segments of humanoid research and deploy-ment.\nThe G1 is a compact, manipulation-oriented humanoid\n(∼132 cm tall, ∼35 kg), configurable with 23–43 degrees\nof freedom and arm payloads up to roughly 2–3 kg, an open SDK supporting ROS2 and high-level programming, making it well suited for education, AI-driven manipulation research, and imitation/reinforcement-learning-based develop-ment environments.\n...\nTogether, G1 and H1 exemplify\nUnitree’s strategy of offering a low-cost, research-friendly platform (G1) side-by-side with a high-power, industry-ready platform (H1), covering a broad spectrum of humanoid ex-perimentation from algorithm and perception research to real-world automation scenarios[43, 44, 45].\n...\nTogether, these platforms illustrate the diversity of contem-porary humanoid robotics, spanning AI-driven general-purpose systems targeting large-scale deployment (Tesla Optimus and\nFigure 03), compact open research platforms (Unitree G1),\n…\n...\nUnitree G1’s compact stature (1.32m, 35kg) prioritizes safety in research environments, while Electric Atlas (1.9m, 90kg) emphasizes industrial strength.\n...\nUnitree G1 is designed as an open and accessible humanoid research platform.\nIts ROS2-based software architecture ex-poses low-level control interfaces, sensor streams, and devel-opment tools to researchers, facilitating experimentation with reinforcement learning, imitation learning, and custom control algorithms [55].\nThe platform’s openness has led to growing adoption within academia and has accelerated community-driven software development.\nAs a result, G1 is increasingly used as a benchmark platform for humanoid robotics research.\n...\nH1 offer a promising balance between performance and ac-cessibility for research and development.",
+       "source": "web",
+       "title": "Humanoid Robots 2026: A Comprehensive Review of Technical ...",
+       "url": "https://pdfs.semanticscholar.org/acc8/74124be62935479797903af900cacfd3c118.pdf"
+      },
+      {
+       "date": "2026-01-20",
+       "id": 6,
+       "last_updated": "2026-10-14",
+       "snippet": "UBTECH\n### UBtech Walker X Humanoid Robot (Includes Lifting Frame)\nOpen full-size research platform for physical AI, embodied AI, and humanoid robotics development.\n- 31 degrees of freedom\n- 2070 TOPS AI compute\n- Up to 400 Nm\n- ROS 2, SDK & URDF\n...\n### Unitree H2\nFull-size humanoid for research, embodied AI, and advanced prototypes.\nThe H2-EDU version managed by Terra combines 31 degrees of freedom with high joint performance and open development access.\n- 31 degrees of freedom\n...\n### Unitree R1 EDU\nLightweight and compact developer humanoid for research, education, and AI development with open secondary development and modular hand and compute options.\n...\n### DOBOT ATOM Max\nFull-size humanoid for embodied AI, research, and industrial pilot applications with high manipulation precision, dexterous hands, and powerful edge AI.\n- 41 DoF incl. hands\n- ±0.05 mm repeatability\n- 3.5 kg rated load per arm\n- 1,500 TOPS AI module\n...\nRESEARCH Im Sortiment\nUBTECH\n### UBTECH Walker X\nFull-size research humanoid for bipedal locomotion, embodied AI, and manipulation research with open joint and sensor interfaces as well as ROS2 SDK.\n- up to 42 DoF\n- over 3.5 h operation\n- up to 550 TOPS\n- Open ROS2 platform\n...\n### Unitree G1 EDU\nCompact developer humanoid for research, education, and Embodied AI.\nCompared to the G1 Basic, the EDU series offers open development access, more DoFs, and optional dexterous hands.\n...\n### DOBOT ATOM-D Education\nHumanoid EDU and research platform for Embodied AI, data collection, and teleoperation with two 7-DoF arms, dexterous hands, and mobile base.\n- 16 body DoF\n...\n- ±0.05 mm repeatability\n- VR Quest + data toolchain\n...\n### UBTECH Yanshee\nCompact open-source educational humanoid for STEM, programming, robotics, and AI projects in schools, universities, and applied research.",
+       "source": "web",
+       "title": "Robot Comparison: Humanoid Robots",
+       "url": "https://terra-robotics.de/en/pages/robotervergleich-humanoide-roboter"
+      },
+      {
+       "id": 7,
+       "last_updated": "2026-08-13",
+       "snippet": "This article addresses the gap by proposing a cost-effective design for a humanoid robot (Dbot) capable of performing specific functions such as talking, moving, shaking hands, and communicating with humans, which can be utilized in activities aiming classroom teaching.\n...\nAmong the ten robots listed in the table, NAO, Pepper, and iCub stand out as humanoid platforms designed for advanced learning, human-robot interaction, and cognitive research.\nNAO, widely adopted in schools and research labs, offers speech, facial recognition, and multi-language support, making it suitable for teaching programming, AI, and social interaction.\nPepper extrends these capabilities with emotion recognition and a built-in tablet, often used in social robotics, therapy, and inclusive education.\niCub, the most advanced in the list, is primarily used in research on embodied cognition, developmental learning, and neuroscience due to its full-body sensory and motor systems.\n...\nOpen-source mobile robots like SMARTmBOT and RealAnt support ROS2 and reinforcement learning, making them ideal for undergraduate robotics and AI experimentation.\n...\nBecause NAO has only 66 cm height with 25 \nDOF, Pepper is a semi-humanoid robot with 17 DOF is suitable for classroom teaching purposes, but the cost is so high ($50K), other low-cost educational robots like\nBee-Bot, Thymio II, SMARTmBOT, and RealAnt don’t have a human-like shape and height, and also their scope is different.\nThese robots are only for learning programming in robotics and learning the robotics technology in classroom or lab, however, cannot be used for the purpose of classroom teaching.\nDbot, on the other hand, is designed to be used for the purpose of classroom teaching since it has a 31 DOF humanoid body that ensures human-like gestures.",
+       "source": "web",
+       "title": "Towards Affordable and Lightweight Humanoid Robots: A Task ...",
+       "url": "https://www.ijmerr.com/2025/IJMERR-V14N6-645.pdf"
+      },
+      {
+       "date": "2002-04-08",
+       "id": 8,
+       "last_updated": "2026-10-27",
+       "snippet": "# Humanoid robot\nThe design may be aimed at functional purposes, such as interacting with human tools and environments and working alongside humans, for experimental purposes, such as the study of bipedal locomotion,^[2]^ or for other purposes.\n...\n|1995|Hadaly|Developed in Waseda University to study human-robot communication and has three subsystems: a head-eye subsystem, a voice control system for listening and speaking in Japanese, and a motion-control subsystem to use the arms to point toward campus destinations.^[64]^|\n...\n|2006|Nao|A small o\npen source programmable humanoid robot developed by Aldebaran Robotics, in France.\nWidely used by worldwide universities as a research platform and educational tool.^[74]^|\n...\nThe first robot developed by PAL Robotics, it was also used as a walking, manipulation, speech and vision development platform.^[75]^|\n|2006|iCub|A biped humanoid open source robot for cognition research.^[76]^|",
+       "source": "web",
+       "title": "Humanoid robot - Wikipedia",
+       "url": "https://en.wikipedia.org/wiki/Humanoid_robot"
+      },
+      {
+       "id": 9,
+       "last_updated": "2026-07-14",
+       "snippet": "Research platforms, such as Atlas, H1, and CL-1, prioritize advancing technical boundaries over immediate commercializa-tion, focusing on breakthroughs in locomotion algorithms and whole-body control.",
+       "source": "web",
+       "title": "[PDF] A comprehensive review on humanoid robots: perspectives from ...",
+       "url": "https://www.fitee.zjujournals.com/rc-pub/front/front-article/download/152530728/lowqualitypdf/A%20comprehensive%20review%20on%20humanoid%20robots:%20perspectives%20from%20academia%20and%20industry.pdf"
+      },
+      {
+       "date": "2025-01-01",
+       "id": 10,
+       "last_updated": "2026-01-14",
+       "snippet": "|Robot|Payload (kg)|Weight (kg)|Cost|DoF|Status|Primary application|\n|--|--|--|--|--|--|--|\n|Honda ASIMO^43,44^|~ 2–10|48–54|N/A (R&D only)|34|Discontinued|Demonstrations of upright bipedal locomotion, basic gestures|\n|KAIST HUBO^45^|~ 3–15|45–80|N/A (research)|42|Research platform|Early humanoid research, bipedal walking, interaction demos|\n|Boston dynamics atlas^72^|11|86–150|N/A (not sold; R&D only)|50|In-lab R&D platform|Dynamic locomotion & mobile manipulation research (parkour, S&R demos)|\n...\n|Unitree G1 (H1)|3 (30)|~ 35 (~ 47)|$21–$66 k ($94–$150 k)|29 (19)|In-store|AI and robotics research; education|",
+       "source": "web",
+       "title": "Table 2.",
+       "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12783740/table/Tab2/"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "queries": [
+      "Unitree G1 EDU research ROS2 official",
+      "PAL Robotics TALOS iCub research official",
+      "Booster Robotics T1 research SDK official"
+     ],
+     "results": [
+      {
+       "date": "2025-01-27",
+       "id": 11,
+       "last_updated": "2026-10-08",
+       "snippet": "Join the growing community that uses our reliable and cutting-edge humanoid and mobile robots.\nWe help you find the best robotic solution to boost your research!\n...\nGet the robotic platform you need to boost your project, and use our engineering services to have the right tools in your research or team with us through collaborative projects to push robotics together!\n...\n##### Education\nTransforming educational experiences with personalised learning\nApplications\n## We all speak the same language: ROS\nInstall your own packages, drives and controllers and speed up your developments with open-source libraries for simulation, control and perception.\n...\n### Related Robots\nTALOS\nTALOS, the advanced humanoid robot designed to boost your research\n##### TALOS\nLegged Robots\nTALOS, the advanced humanoid robot designed to boost your research",
+       "source": "web",
+       "title": "Robot for Research | Advanced Humanoid & Mobile ...",
+       "url": "https://pal-robotics.com/areas/research/"
+      },
+      {
+       "date": "2025-08-05",
+       "id": 12,
+       "last_updated": "2026-10-27",
+       "snippet": "### TALOS, the advanced humanoid robot designed to boost your research\nTALOS\n## Your 1.75 meter pal in research\nA walking biped robot capable of lifting objects up to 6 kg with one arm fully extended.\nIt is completely configurable, thanks to being fully developed in ROS.\n...\nUsed globally in top labs driving robotics, AI, and human-centered tech\n...\nTALOS is fully torque-controllable thanks to the torque sensor feedback in all joints, which enables powerful sensing and multi-contact motions.\n...\nTALOS’ EtherCAT communication network allows to run control loops at 2 kHz, and up to 5 kHz, which enables TALOS to have highly reactive and dynamic motions.\n...\n|Height|175 cm|\n|--|--|\n|**Weight**|95 kg|\n|Arm Payload|6 Kg (arm stretched)|\n|Battery autonomy|1,5h (walking) / 3h (stand-by)|\n...\n|OS|Ubuntu LTS, Real Time OS|\n**OPEN SOURCE**\nSimulation model available at: http://wiki.ros.org/Robots/TALOS\n**PREMIUM SOFTWARE**\nSpeed your research with extra software: from Whole-Body Control to navigation, HRI skills or teleoperation.\n## Whole Body Control\nA controller written in the ros_control framework developed by PAL Robotics that allows the user to solve a problem consisting of tasks and constraints ordered by priority.\n...\nVia ros_control, you have access to the encoders, IMU, torque sensors at a joint level, Force/Torque sensors on the wrists and ankles and temperature sensors of the robots.",
+       "source": "web",
+       "title": "TALOS | High-Performance Humanoid Robot - PAL Robotics",
+       "url": "https://pal-robotics.com/robot/talos/"
+      },
+      {
+       "id": 13,
+       "last_updated": "2026-10-21",
+       "snippet": "# Developer Guide\n## BoosterOS Python SDK\nSDK OverviewIntroduces the boosteros Python SDK for connecting to real or virtual K1/T1 robots to read data and send control commands.Quick StartShows how to pip install boosteros, run a first connectivity check, and read image, joint, and IMU data.BoosterRobot Client ReferenceFull BoosterRobot client\nAPI reference: initialization, state access, sensor subscriptions, motion control, and advanced tasks.Vision and SpeechAPI reference for the brain's extended vision Detection and Speech capabilities.Common Data TypesSummarizes the data structures used across the SDK: perception, joints, metadata, task subscriptions, and trajectories.FAQ and Debugging ToolsCollects FAQs, sample code extraction, update/backup mechanisms, and gain-tuning debugging tips.General Robot Development ProtocolDescribes the abstract Robot base class as a unified interface and type annotations for cross-model code.\n## Booster Robotics C++ SDK\nSDK OverviewIntroduces the SDK's positioning, service tiers, and scope, covering both high-level RPC and low-level DDS interfaces.Quick StartCovers requirements, SDK installation, building the examples, and running your first minimal C++ program.SDK Architecture and Communication ModelExplains the initialization order, the RPC and Topic communication models\n, and return-code conventions.RPC Business InterfacesOverview of high-level RPC interfaces: motion, device info, AI/LUI, vision, camera, audio, and lighting modules.Low-Level TopicsExplains publishing/subscribing to real-time messages over DDS to read sensor data and control motors directly.C++ Controller WrappersIntroduces\nthe MoveController and ArmController high-level controllers for movement, turning, and arm control.C++ API ReferenceCovers the core headers, building an external application, RPC error codes, topic templates, and IDL messages.C++ Example IndexIndexes the high-level and low-level C++ examples under example/ in the release package, with build instructions.ChangelogThis page records changes by SDK package version.\nMinimum firmware refers to the required robot-side version and is independent of the SDK package version.\n## Booster Agent Developer Guide\n...\n## Open Source Resources\nRoboCup Demo User GuideDeployment and match operation guide for the official RoboCup 5v5 soccer Demo.booster_gym User GuideAn Isaac Gym-based RL framework for T1, covering training, simulation validation, and model export.booster_train User GuideAn Isaac Lab-based training project that uses BeyondMimic to train and export K1 motion policies.booster_deploy User GuideA lightweight deployment framework that runs control policies uniformly on real robots, MuJoCo, and Webots.booster_assets User GuideA base resource library providing K1/T1 robot models, motion data, and local development helper packages.",
+       "source": "web",
+       "title": "Developer Guide | Booster Studio Docs",
+       "url": "https://docs.booster.tech/developer-guide"
+      },
+      {
+       "id": 14,
+       "last_updated": "2026-10-26",
+       "snippet": "TALOS archivos - PAL Robotics\n...\n# TALOS\n### TALOS research: torque-controlled locomotion for humanoids in unknown environments\nIn recent research the team at PAL Robotics and our French partners, TOWARD and Dynamograde lab, using a new framework,…",
+       "source": "web",
+       "title": "TALOS archivos - PAL Robotics",
+       "url": "https://pal-robotics.com/blog/tag/talos/"
+      },
+      {
+       "id": 15,
+       "last_updated": "2026-10-22",
+       "snippet": "# Overview\n## Product Overview ​\nBooster T1 is a humanoid robot development platform designed for developers and other users, featuring lightweight, flexible, and durable.\n### Product Composition ​\nThe T1 robot consists of head, torso, arms, and legs, with a total of 23 DoFs, allowing for flexible movement and posture control.\n- The head has 2 DoFs, including Yaw Joint and Pitch Joint.\n...\n- Each arm has 4 DoFs, including Shoulder Pitch Joint, Shoulder Roll Joint, Shoulder Yaw Joint, and Elbow Joint.\n...\n### What It Can Do ​\nOut of the box, T1 can walk and comes with multiple built-in Agents, covering motion, interaction, entertainment, and teaching scenarios:\n#### Motion Capabilities ​\n- **Omnidirectional Walking**: supports forward, backward, and lateral walking, as well as rotation and complex walking.\n...\n#### Built-in Agents ​\n- **Booster**: supports predefined movements such as waving, handshaking, and self-rising.\n...\n- **Hi Chat**: supports voice dialogue, with the robot responding to commands through speech and actions; you can create custom personas and deploy them to a bound robot.\n- **Teach**: supports arm and head teaching as well as motion editing.",
+       "source": "web",
+       "title": "Overview | Booster Studio Docs",
+       "url": "https://docs.booster.tech/docs/product-manual/t1/getting-started/overview/"
+      },
+      {
+       "id": 16,
+       "last_updated": "2026-10-29",
+       "snippet": "Official Open Source - Unitree Robotics\n- UnifoLM-WLA-1.0 Unitree General-Purpose Humanoid Foundation Model\n...\n- UnifoLM-VLA-0: A Vision-Language-Action (VLA) Framework under UnifoLM Family\n...\nUnitree_il_lerobot is an open-source embodied intelligence/imitation learning framework based on LeRobot, developed by Unitree.\nIt supports mainstream imitation learning algorithms (DP, ACT, etc.) and is adapted for Unitree's humanoid robot G1, robotic arm Z1, and dexterous hand Dex3 hardware.\n...\nunitree_mujoco is a simulator developed based on Unitree sdk2 and mujoco.\nUsers can easily integrate the control programs developed with Unitree_sdk2, unitree_ros2, and unitree_sdk2_python into this simulator, enabling a seamless transition from simulation to physical development.\n...\nThis is a reinforcement learning implementation warehouse based on Unitree Technology's robots, supporting Unitree Technology's Go2, H1, H1_2, and G1.\n- unitree_ros\nunitree_ros is a ROS simulation package for Unitree robots.\nIt contains the urdf files of all Unitree robots.\nYou can obtain information such as the mass inertia moment limit of the Unitree robot through this package.\nAt the same time, the unitree_controller and unitree_gazebo packages allow you to quickly Build the simulation verification program in the Gazebo simulator.\n- unitree_legged_sdk\nunitree_legged_sdk is an SDK package used to develop Aliengo, A1, and Go1 robots in real environments.\nYou can control the movement of a single joint of the robot based on the low-level development interface, or you can control the robot to move at a specific speed based on the high-level development interface.\n...\n- unitree_ros2\nunitree_ros2 is a function package used to develop Go2 and B2 robots in the ros2 environment.\nThe interface types provided are consistent with unitree_sdk2.\n- Motor SDK\n...\n- Unitree 4D Lidar L1 SDK\n...\n- unitree_sdk2_python\nPython interface for unitree_sdk2, used to develop Go2, B2, H1, G1 robots in real environments.",
+       "source": "web",
+       "title": "Official Open Source - Unitree Robotics",
+       "url": "https://www.unitree.com/mobile/opensource/"
+      },
+      {
+       "date": "2025-09-25",
+       "id": 17,
+       "last_updated": "2026-10-27",
+       "snippet": "We offer a wide range of robots that are used in logistics, stock-taking, inventory tracking, social engagement, collaboration or research projects worldwide.\n...\nTALOS\nTALOS, the advanced humanoid robot designed to boost your research\n##### TALOS\nLegged Robots\nTALOS, the advanced humanoid robot designed to boost your research",
+       "source": "web",
+       "title": "Our Robots",
+       "url": "https://pal-robotics.com/robots/"
+      },
+      {
+       "date": "2026-07-06",
+       "id": 18,
+       "last_updated": "2026-10-12",
+       "snippet": "# UT Austin Villa Humanoid Soccer\nUT Austin Villa is the RoboCup team of The University of Texas at Austin, led by\nProf. Peter Stone and Prof. Joydeep Biswas.\n...\nToday the team competes in the Humanoid Soccer League with the Booster T1 humanoid robot, supported by Booster Robotics.\n...\n- Robot **Booster T1**\n- League **Humanoid Soccer · Large Robot Division**\n...\n## Resources\n**robocup_demo** Booster Robotics' open-source RoboCup demo stack for the T1 — perception, locomotion, and game play reference code.\ngithub.com/BoosterRobotics **booster_robotics_sdk** Official SDK for the Booster T1 humanoid robot.\ngithub.com/BoosterRobotics\n- Nao (SPL)\n- 3D Simulation",
+       "source": "web",
+       "title": "UT Austin Villa — RoboCup Humanoid Soccer",
+       "url": "https://www.cs.utexas.edu/~AustinVilla/humanoid/"
+      },
+      {
+       "id": 19,
+       "last_updated": "2026-10-09",
+       "snippet": "# Booster Gym: An End-to-End Reinforcement Learning Framework for Humanoid Robot Locomotion\n...\n###### Abstract\nThis library is made available as a community resource, with detailed descriptions of its design and experimental results.\nWe validate the framework on the Booster T1 robot, demonstrating that the trained policies seamlessly transfer to the physical platform, enabling capabilities such as omnidirectional walking, disturbance resistance, and terrain adaptability.\nWe hope this work provides a convenient tool for the robotics community, accelerating the development of humanoid robots.\nThe code can be found in https://github.com/BoosterRobotics/booster_gym.\n## I Introduction\nWe validate the proposed framework on the Booster T1 humanoid robot, demonstrating successful policy transfer from simulation to hardware.\nThe trained policies enable the robot to execute tasks such as omnidirectional walking, disturbance resistance, and terrain adaptation.\n...\n## III Method\n### III-D Deployment\nAdditionally, we introduce the Booster Robotics SDK, a developer-focused toolkit that abstracts hardware interfaces, allowing external programs to interact with the robot through a unified API.\nThe SDK is built on the Data Distribution Service (DDS) middleware, providing a Publisher-Subscriber communication model for efficient data exchange.\nIt offers low-level motor control interfaces and access to sensor data, such as IMU measurements and joint encoder readings, enabling precise and direct interaction of the robot’s hardware.",
+       "source": "web",
+       "title": "[2506.15132] Booster Gym: An End-to-End Reinforcement Learning ...",
+       "url": "https://ar5iv.labs.arxiv.org/html/2506.15132"
+      },
+      {
+       "date": "2023-12-30",
+       "id": 20,
+       "last_updated": "2026-10-29",
+       "snippet": "TALOS research: torque-controlled locomotion for humanoids in unknown environments - PAL Robotics\n...\n# TALOS research: torque-controlled locomotion for humanoids in unknown environments\nIn recent research the team at PAL Robotics and our French partners, TOWARD and Dynamograde lab, using a new framework, enabled the biped robot, TALOS to navigate and climb up to 15cm stairs without prior knowledge of the environment for the first time.\n...\n## TALOS navigating with limited knowledge of the environment and limited instructions\nPierre Fernbach, Software Engineer at PAL Robotics’ French partner, TOWARD explained this project and its importance for the progress and development of humanoid robots, telling us, *“This project was the first time we have used this approach on life-sized robots, such as PAL Robotics’ humanoid biped, TALOS.\n...\nThe robot base state is then re-constructed using the IMU and the kinematics odometry, and an elevation map is constructed.\nThen a contact planner is used to compute a path in the measured environment.\nFrom the contact sequence, a trajectory is computed for the next few seconds of the walk using a model predictive controller.\nFinally, the joint torques are computed using inverse dynamics and sent to the robot’s actuators.\nWith this framework, the biped robot, TALOS, for the first time was able to climb 15cm stairs without prior knowledge of the environment.\n...\n## Impact of research including contributing to greater autonomy of humanoid robots\nOur goal is to give general tasks to humanoid robots such as TALOS and not tell the robot exactly how to do them.”*\nPierre added, *“We have a software architecture with blocks that are connected together with ROS for solving challenges such as these – where humanoids are given general tasks and not told how to do them.\nHowever, if a customer has a specific need we can adapt this software architecture for them.\nThe customer can also replace any of the blocks in order to experiment with their own methodology.”*\nThis figure is the final “autonomous” version used at the end of the project.\n...\n## TALOS locomotion integrated with ROS to be run fully onboard the robot\nPierre told us, *“The project is now complete and the software is operational, however, we will of course continue working on it to make a second version.\nThe walking work will also be applied to our new biped robot Kangaroo in the future.”*\nPierre concluded, *“With this project, we have worked on the implementation of an architecture for TALOS locomotion in unknown environments, that is able to be fully integrated with ROS, and can be run fully onboard the robot.”*",
+       "source": "web",
+       "title": "TALOS research: torque-controlled locomotion for humanoids in ...",
+       "url": "https://pal-robotics.com/blog/talos-research-torque-controlled-locomotion-for-humanoids-in-unknown-environments/"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "content": [
+      {
+       "annotations": [],
+       "text": "Several humanoids are suitable for research, but the best choice depends on the work:\n\n- **Unitree G1 EDU** — A strong general-purpose option for labs studying locomotion, manipulation, imitation learning, or reinforcement learning. Its development tools and simulation resources support experimentation, though access to the research features depends on getting the EDU configuration.[16]\n- **Booster T1** — A good fit for bipedal locomotion, reinforcement learning, and RoboCup-style research. Its developer SDK provides access to robot data and control, and its tools support simulation-to-robot workflows.[13][15][19]\n- **PAL Robotics TALOS** — Suited to advanced full-size research in torque-controlled locomotion, whole-body control, and manipulation. It offers ROS-based configuration and joint torque sensing, but is a larger, more specialized platform.[11][12]\n- **iCub** — Worth considering for embodied cognition, developmental learning, and perception research; it is designed specifically as an open research humanoid.[7][8]\n\n**Quick recommendation:** Start with the G1 EDU for a versatile lab platform, choose the T1 for locomotion or competition-focused work, and consider TALOS for advanced full-scale control research. If you share your research topic, budget, and whether you need a full-size biped, the options can be narrowed further.",
+       "type": "output_text"
+      }
+     ],
+     "id": "msg_2f62c0f7-5dc6-49f8-a588-3e378064782e",
+     "role": "assistant",
+     "status": "completed",
+     "type": "message"
+    }
+   ],
+   "parallel_tool_calls": true,
+   "presence_penalty": 0,
+   "preset": "fast@2026-10-16.0",
+   "previous_response_id": null,
+   "prompt_cache_key": null,
+   "reasoning": null,
+   "safety_identifier": null,
+   "service_tier": "fast",
+   "status": "completed",
+   "store": true,
+   "temperature": 1,
+   "text": {
+    "format": {
+     "type": "text"
+    }
+   },
+   "tool_choice": "auto",
+   "tools": [
+    {
+     "type": "web_search"
+    }
+   ],
+   "top_logprobs": 0,
+   "top_p": 1,
+   "truncation": "",
+   "usage": {
+    "cost": {
+     "cache_creation_cost": 0.00157,
+     "cache_read_cost": 3e-05,
+     "currency": "USD",
+     "input_cost": 1e-05,
+     "output_cost": 0.00017,
+     "tool_calls_cost": 0.002,
+     "tool_calls_cost_details": {
+      "search_web": 0.002
+     },
+     "total_cost": 0.00378
+    },
+    "input_tokens": 16133,
+    "input_tokens_details": {
+     "cache_creation_input_tokens": 12567,
+     "cache_read_input_tokens": 3488,
+     "cached_tokens": 3488
+    },
+    "output_tokens": 346,
+    "output_tokens_details": {
+     "reasoning_tokens": 0
+    },
+    "tool_calls_details": {
+     "search_web": {
+      "cost_usd": 0.002,
+      "invocation": 2
+     }
+    },
+    "total_tokens": 16479
+   },
+   "user": null
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "41982d2b99244ed884aefa6a87a65ed5",
+   "charged_micro": 3780
+  }
+ }
+}

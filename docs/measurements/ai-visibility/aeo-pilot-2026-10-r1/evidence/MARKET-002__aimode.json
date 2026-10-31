@@ -1,0 +1,124 @@
+{
+ "observed_at": "2026-10-31T03:15:38+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "How many commercial humanoid robots exist?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "While traditional industrial robots have surpassed an operational global stock of 5 million units, commercial humanoid robots (bipedal or full-size humanoids over 140 cm designed for professional work rather than R&D or entertainment) represent a much smaller, emerging market.\n\nAccording to data released by the\n\nInternational Federation of Robotics (IFR)\n\nin their\n\nWorld Robotics report\n\n, roughly 7,000 full-size commercial humanoid units were sold globally in a single recent annual tracking period.\n\nKey Market Breakdown\n\nAnnual Sales & Deployment: While media hype surrounds humanoids, they still constitute a tiny fraction of the broader robotics sector. Total global sales for full-size commercial humanoids sit around 7,000 units annually, with early deployments heavily concentrated in pilot programs, logistics handling, and controlled manufacturing environments.\n\nGrowth Trajectory: According to market tracking by\n\nIDC on Humanoid Robotics Commercialization Trends\n\n, global shipments are accelerating rapidly with a projected compound annual growth rate (CAGR) near 95%, expecting cumulative shipments to eclipse 510,000 units by 2030.\n\nAdoption Hurdles: Widespread scaling is still constrained by high maintenance/training costs, evolving safety standards, and the fact that many deployments still rely partially on human teleoperation rather than full autonomy.\n\nIf you're looking into specific aspects of the market, I can provide details on:\n\nTop manufacturers leading commercial humanoid production\nPrimary industries adopting humanoids (e.g., automotive logistics, warehousing)\nCost vs. ROI models for deploying humanoids right now",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Global Sales of Professional Service Robots Surge 24%",
+      "url": "https://ifr.org/ifr-press-releases/news/global-sales-of-professional-service-robots-surge-24-percent",
+      "description": "Humanoid robots, which are designed to resemble humans and operate in human-centric environments, are gaining massive attention fo...",
+      "redirectLink": "https://www.google.com/goto?url=CAESnwEB6zswFcX3Z0w4VLdRjBBhWD3CtvmURCnhaN31DbaRCBujodO_wrJCfqkXlaQr_z1T2iaoR9zE7KBI4lLCu-8oD2GmhvFUdzmn0rSne8a0r4u6myJkjjzyEcycnHI9Xnkd8qS4AtwgBszsBZOM1P_lieutYCEcosOWeVZp4gh96is1im158uSq4nxAlAkiwggAcG1ncqICJFTPhvjW5DI"
+     },
+     {
+      "position": 2,
+      "label": "Five Million Robots now Operate in Factories Globally",
+      "url": "https://ifr.org/ifr-press-releases/news/five-million-robots-now-operate-in-factories-globally",
+      "description": "The global operational stock of industrial robots surged 9% to a record 5 million units in 2025. This was driven by an 11% jump in...",
+      "redirectLink": "https://www.google.com/goto?url=CAESmAEB6zswFUE3cPteG-qgL4xXJt3t4ygbkJ4bXTX3B5I4n5EecJQNFjqid67kqKLR4ZlyxL4DcUkqMJ7r3ZJQ1S4U9NUZc3ovgX4mZ458SR4oGQ1p-5GqxloOcrebLbkzAlTL6Yk1TId8wgyn5lIg-F3hhTK2MXHt6KT8ujQnXY4313E2G9X6xwvf2MJzfVYWTsvBsK02lDQ94g"
+     },
+     {
+      "position": 3,
+      "label": "Humanoid Robotics Commercialization Trends 2026 - IDC",
+      "url": "https://www.idc.com/resource-center/blog/humanoid-robotics-commercialization-2026/",
+      "description": "global shipments of humanoid robots are expected to exceed 510,000 units by 2030, representing a compound annual growth rate (CAGR...",
+      "redirectLink": "https://www.google.com/goto?url=CAESjQEB6zswFTg53XUS1e1hIhPRK76z6HOIpA6aNi5lNMxMxhmJIl72u1gH6GkVLXIqnG-aXcTLCIK4AOF5YEMq9Soy1yyQnHplULmixLxipUq0NPC0pOfs_yLkS4ns43o54vV0FRgP_yt9RlIYIjMM7F6RjnParU8bbch_YNRkBqwEUo1xs2e9fU2ocrvD_60"
+     },
+     {
+      "position": 4,
+      "label": "Five million robots now work in factories as humanoid hype is ...",
+      "url": "https://www.euronews.com/2026/09/29/five-million-robots-now-work-in-factories-as-humanoid-hype-faces-reality-check",
+      "description": "Humanoids remain a tiny market beside established industrial robots. Only about 7,000 were sold worldwide last year for industrial...",
+      "redirectLink": "https://www.google.com/goto?url=CAESrQEB6zswFU8DhUgCtG7QCdRb84j_lA6PppRWFT8I5iP-JtZScG2Wl0WadaBMrGy2isIpcrcJoK1isIW_pQfkd4pKxa09UoKBuM-o0nk9yVBcvl2GmXvnaYjourGBn1bEVL5bKZAClcZKlrRVymZu_EdqsvlwrD54_koutD9f2niSnESISTm3rFLZLOk5BBj8Krkc5-eZ9ZpLOf-8-GtkYXbVNzyIQ-rl8q3mn18FMQ"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Global Sales of Professional Service Robots Surge 24%",
+      "citationPillId": 1,
+      "url": "https://ifr.org/ifr-press-releases/news/global-sales-of-professional-service-robots-surge-24-percent",
+      "domain": "ifr.org",
+      "description": "Humanoid robots, which are designed to resemble humans and operate in human-centric environments, are gaining massive attention fo...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESnwEB6zswFcX3Z0w4VLdRjBBhWD3CtvmURCnhaN31DbaRCBujodO_wrJCfqkXlaQr_z1T2iaoR9zE7KBI4lLCu-8oD2GmhvFUdzmn0rSne8a0r4u6myJkjjzyEcycnHI9Xnkd8qS4AtwgBszsBZOM1P_lieutYCEcosOWeVZp4gh96is1im158uSq4nxAlAkiwggAcG1ncqICJFTPhvjW5DI"
+     },
+     {
+      "label": "Five Million Robots now Operate in Factories Globally",
+      "citationPillId": 1,
+      "url": "https://ifr.org/ifr-press-releases/news/five-million-robots-now-operate-in-factories-globally",
+      "domain": "ifr.org",
+      "description": "The global operational stock of industrial robots surged 9% to a record 5 million units in 2025. This was driven by an 11% jump in...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESmAEB6zswFUE3cPteG-qgL4xXJt3t4ygbkJ4bXTX3B5I4n5EecJQNFjqid67kqKLR4ZlyxL4DcUkqMJ7r3ZJQ1S4U9NUZc3ovgX4mZ458SR4oGQ1p-5GqxloOcrebLbkzAlTL6Yk1TId8wgyn5lIg-F3hhTK2MXHt6KT8ujQnXY4313E2G9X6xwvf2MJzfVYWTsvBsK02lDQ94g"
+     },
+     {
+      "label": "Global Sales of Professional Service Robots Surge 24%",
+      "citationPillId": 2,
+      "url": "https://ifr.org/ifr-press-releases/news/global-sales-of-professional-service-robots-surge-24-percent",
+      "domain": "ifr.org",
+      "description": "Humanoid robots, which are designed to resemble humans and operate in human-centric environments, are gaining massive attention fo...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESnwEB6zswFcX3Z0w4VLdRjBBhWD3CtvmURCnhaN31DbaRCBujodO_wrJCfqkXlaQr_z1T2iaoR9zE7KBI4lLCu-8oD2GmhvFUdzmn0rSne8a0r4u6myJkjjzyEcycnHI9Xnkd8qS4AtwgBszsBZOM1P_lieutYCEcosOWeVZp4gh96is1im158uSq4nxAlAkiwggAcG1ncqICJFTPhvjW5DI"
+     },
+     {
+      "label": "Five million robots now work in factories as humanoid hype is ...",
+      "citationPillId": 3,
+      "url": "https://www.euronews.com/2026/09/29/five-million-robots-now-work-in-factories-as-humanoid-hype-faces-reality-check",
+      "domain": "euronews.com",
+      "description": "Humanoids remain a tiny market beside established industrial robots. Only about 7,000 were sold worldwide last year for industrial...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAESrQEB6zswFU8DhUgCtG7QCdRb84j_lA6PppRWFT8I5iP-JtZScG2Wl0WadaBMrGy2isIpcrcJoK1isIW_pQfkd4pKxa09UoKBuM-o0nk9yVBcvl2GmXvnaYjourGBn1bEVL5bKZAClcZKlrRVymZu_EdqsvlwrD54_koutD9f2niSnESISTm3rFLZLOk5BBj8Krkc5-eZ9ZpLOf-8-GtkYXbVNzyIQ-rl8q3mn18FMQ"
+     },
+     {
+      "label": "Global Sales of Professional Service Robots Surge 24%",
+      "citationPillId": 3,
+      "url": "https://ifr.org/ifr-press-releases/news/global-sales-of-professional-service-robots-surge-24-percent",
+      "domain": "ifr.org",
+      "description": "Humanoid robots, which are designed to resemble humans and operate in human-centric environments, are gaining massive attention fo...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESnwEB6zswFcX3Z0w4VLdRjBBhWD3CtvmURCnhaN31DbaRCBujodO_wrJCfqkXlaQr_z1T2iaoR9zE7KBI4lLCu-8oD2GmhvFUdzmn0rSne8a0r4u6myJkjjzyEcycnHI9Xnkd8qS4AtwgBszsBZOM1P_lieutYCEcosOWeVZp4gh96is1im158uSq4nxAlAkiwggAcG1ncqICJFTPhvjW5DI"
+     },
+     {
+      "label": "Humanoid Robotics Commercialization Trends 2026 - IDC",
+      "citationPillId": 4,
+      "url": "https://www.idc.com/resource-center/blog/humanoid-robotics-commercialization-2026/",
+      "domain": "idc.com",
+      "description": "global shipments of humanoid robots are expected to exceed 510,000 units by 2030, representing a compound annual growth rate (CAGR...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESjQEB6zswFTg53XUS1e1hIhPRK76z6HOIpA6aNi5lNMxMxhmJIl72u1gH6GkVLXIqnG-aXcTLCIK4AOF5YEMq9Soy1yyQnHplULmixLxipUq0NPC0pOfs_yLkS4ns43o54vV0FRgP_yt9RlIYIjMM7F6RjnParU8bbch_YNRkBqwEUo1xs2e9fU2ocrvD_60"
+     },
+     {
+      "label": "Global Sales of Professional Service Robots Surge 24%",
+      "citationPillId": 5,
+      "url": "https://ifr.org/ifr-press-releases/news/global-sales-of-professional-service-robots-surge-24-percent",
+      "domain": "ifr.org",
+      "description": "Humanoid robots, which are designed to resemble humans and operate in human-centric environments, are gaining massive attention fo...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESnwEB6zswFcX3Z0w4VLdRjBBhWD3CtvmURCnhaN31DbaRCBujodO_wrJCfqkXlaQr_z1T2iaoR9zE7KBI4lLCu-8oD2GmhvFUdzmn0rSne8a0r4u6myJkjjzyEcycnHI9Xnkd8qS4AtwgBszsBZOM1P_lieutYCEcosOWeVZp4gh96is1im158uSq4nxAlAkiwggAcG1ncqICJFTPhvjW5DI"
+     }
+    ],
+    "markdown": "While traditional industrial robots have surpassed an operational global stock of 5 million units, **commercial humanoid robots** (bipedal or full-size humanoids over 140 cm designed for professional work rather than R&D or entertainment) represent a much smaller, emerging market. [Global Sales of Professional Service Robots Surge 24%](https://ifr.org/ifr-press-releases/news/global-sales-of-professional-service-robots-surge-24-percent)[Five Million Robots now Operate in Factories Globally](https://ifr.org/ifr-press-releases/news/five-million-robots-now-operate-in-factories-globally)\n\nAccording to data released by the \n\n[International Federation of Robotics (IFR)](https://ifr.org/ifr-press-releases/news/global-sales-of-professional-service-robots-surge-24-percent)\n\nin their \n\n[World Robotics report](https://ifr.org/worldrobotics/report-2025)\n\n, roughly **7,000 full-size commercial humanoid units** were sold globally in a single recent annual tracking period. [Global Sales of Professional Service Robots Surge 24%](https://ifr.org/ifr-press-releases/news/global-sales-of-professional-service-robots-surge-24-percent)\n\nKey Market Breakdown\n\n  * **Annual Sales & Deployment:** While media hype surrounds humanoids, they still constitute a tiny fraction of the broader robotics sector. Total global sales for full-size commercial humanoids sit around 7,000 units annually, with early deployments heavily concentrated in pilot programs, logistics handling, and controlled manufacturing environments. [Five million robots now work in factories as humanoid hype is](https://www.euronews.com/2026/09/29/five-million-robots-now-work-in-factories-as-humanoid-hype-faces-reality-check)[Global Sales of Professional Service Robots Surge 24%](https://ifr.org/ifr-press-releases/news/global-sales-of-professional-service-robots-surge-24-percent)\n\n  * **Growth Trajectory:** According to market tracking by \n\n[IDC on Humanoid Robotics Commercialization Trends](https://www.idc.com/resource-center/blog/humanoid-robotics-commercialization-2026/)\n\n, global shipments are accelerating rapidly with a projected compound annual growth rate (CAGR) near 95%, expecting cumulative shipments to eclipse 510,000 units by 2030. [Humanoid Robotics Commercialization Trends 2026 - IDC](https://www.idc.com/resource-center/blog/humanoid-robotics-commercialization-2026/)\n\n  * **Adoption Hurdles:** Widespread scaling is still constrained by high maintenance/training costs, evolving safety standards, and the fact that many deployments still rely partially on human teleoperation rather than full autonomy. [Global Sales of Professional Service Robots Surge 24%](https://ifr.org/ifr-press-releases/news/global-sales-of-professional-service-robots-surge-24-percent)\n\nIf you're looking into specific aspects of the market, I can provide details on:\n\n  * **Top manufacturers** leading commercial humanoid production\n  * **Primary industries** adopting humanoids (e.g., automotive logistics, warehousing)\n  * **Cost vs. ROI** models for deploying humanoids right now"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "13e1bd0bc1b84d33b5cb6b104c8710e5",
+   "charged_micro": 2400
+  }
+ }
+}

@@ -1,0 +1,102 @@
+{
+ "observed_at": "2026-10-31T03:16:55+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "How much does the Unitree G1 cost?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "The cost of the Unitree G1 humanoid robot varies significantly depending on the model version, configuration, and where you buy it from:\n\nBase Model (Direct from Unitree): Officially starts at $13,500 USD on Unitree's store. However, this consumer/demonstration version cannot be custom-programmed.\n\nUS Resellers and Street Prices: Through domestic distributors, base or upgraded consumer models with local support typically range from $17,990 to nearly $20,000 USD.\n\nG1 EDU Versions (Research Models): The versions meant for developers and researchers—which include full software development kits (SDKs), higher computing power (NVIDIA Orin NX), and options for advanced multi-DOF robotic hands—are quote-only through Unitree's sales team. Reseller configurations for these range anywhere from $43,900 to over $73,000 USD depending on the specific hands and degree-of-freedom upgrades chosen.\n\nAre you looking at the G1 for general interest, or for a specific research/development project?",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Humanoid Robot - Unitree Shop",
+      "url": "https://shop.unitree.com/collections/humanoid-robot",
+      "description": "Unitree G1 · $13,500.00 USD ; Unitree R1 · $4,900.00 USD ; Unitree H2. \n$29,900.00 USD ; Unitree H2 Plus. $100,000.00 USD ; Unitree H1（Contact us \nfor the real pr..."
+     },
+     {
+      "position": 2,
+      "label": "Unitree G1 | QUADRUPED.DE, 23.000,00 €",
+      "url": "https://www.quadruped.de/Unitree-G1_1#:~:text=Not%20programmable.%20%7C%2023%20%7C%20%7C%20G1,bracket%2C%2018%2Dmonth%20warranty.%20NX%20computing%20module%20optional.",
+      "description": "Not programmable. | 23 | | G1 Pro | 29 DOF | – | – | Entertainment version \nfor tourism, events and content creation. 120 N·m knee, 3 kg arm payload, \nultra-wide-..."
+     },
+     {
+      "position": 3,
+      "label": "Unitree G1 Price 2026: From $13,500, EDU Cost & Full Specs - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-review#:~:text=*%20The%20Unitree%20G1%20costs%20%2413%2C500%20direct,support%2C%20though%20availability%20fluctuates%20week%20to%20week.",
+      "description": "* The Unitree G1 costs $13,500 direct from Unitree's own store, and yes, \nanyone can order one — but that base model cannot be programmed, and as of \nJuly 20, 202..."
+     },
+     {
+      "position": 4,
+      "label": "Unitree G1 Price and Specs: The Complete 2026 Profile",
+      "url": "https://theresarobotforthat.com/blog/unitree-g1-price/#:~:text=Widely%20cited%20street%20prices%20sit%20around%20%2416%2C000,exceed%20%2467%2C000%20(Ars%20Technica%2C%20Jul%2010%202026).",
+      "description": " Widely cited street prices sit around $16,000 and a basic configuration \nwith fixed hands was advertised at $17,900. The SDK-enabled EDU edition has \nno publishe..."
+     },
+     {
+      "position": 5,
+      "label": "Unitree G1 Price 2026: From $13,500, EDU Cost & Full Specs - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-review#:~:text=The%20%2416%2C000%20you'll%20see%20across%20most%20of,list%20its%20configurations%20from%20%2443%2C900%20to%20%2473%2C900.",
+      "description": "The $16,000 you'll see across most of the internet is the 2024 launch \nprice; Unitree cut it in late 2025. US dealers list the same base robot at \n$17,990 with do..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Humanoid Robot - Unitree Shop",
+      "url": "https://shop.unitree.com/collections/humanoid-robot",
+      "domain": "shop.unitree.com",
+      "position": 1,
+      "description": "Unitree G1 · $13,500.00 USD ; Unitree R1 · $4,900.00 USD ; Unitree H2. \n$29,900.00 USD ; Unitree H2 Plus. $100,000.00 USD ; Unitree H1（Contact us \nfor the real pr...",
+      "citationPillId": 1
+     },
+     {
+      "label": "Unitree G1 | QUADRUPED.DE, 23.000,00 €",
+      "url": "https://www.quadruped.de/Unitree-G1_1#:~:text=Not%20programmable.%20%7C%2023%20%7C%20%7C%20G1,bracket%2C%2018%2Dmonth%20warranty.%20NX%20computing%20module%20optional.",
+      "domain": "quadruped.de",
+      "position": 2,
+      "description": "Not programmable. | 23 | | G1 Pro | 29 DOF | – | – | Entertainment version \nfor tourism, events and content creation. 120 N·m knee, 3 kg arm payload, \nultra-wide-...",
+      "citationPillId": 1
+     },
+     {
+      "label": "Unitree G1 Price 2026: From $13,500, EDU Cost & Full Specs - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-review#:~:text=*%20The%20Unitree%20G1%20costs%20%2413%2C500%20direct,support%2C%20though%20availability%20fluctuates%20week%20to%20week.",
+      "domain": "blog.robozaps.com",
+      "position": 3,
+      "description": "* The Unitree G1 costs $13,500 direct from Unitree's own store, and yes, \nanyone can order one — but that base model cannot be programmed, and as of \nJuly 20, 202...",
+      "citationPillId": 2
+     },
+     {
+      "label": "Unitree G1 Price and Specs: The Complete 2026 Profile",
+      "url": "https://theresarobotforthat.com/blog/unitree-g1-price/#:~:text=Widely%20cited%20street%20prices%20sit%20around%20%2416%2C000,exceed%20%2467%2C000%20(Ars%20Technica%2C%20Jul%2010%202026).",
+      "domain": "theresarobotforthat.com",
+      "position": 4,
+      "description": " Widely cited street prices sit around $16,000 and a basic configuration \nwith fixed hands was advertised at $17,900. The SDK-enabled EDU edition has \nno publishe...",
+      "citationPillId": 3
+     },
+     {
+      "label": "Unitree G1 Price 2026: From $13,500, EDU Cost & Full Specs - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-review#:~:text=The%20%2416%2C000%20you'll%20see%20across%20most%20of,list%20its%20configurations%20from%20%2443%2C900%20to%20%2473%2C900.",
+      "domain": "blog.robozaps.com",
+      "position": 5,
+      "description": "The $16,000 you'll see across most of the internet is the 2024 launch \nprice; Unitree cut it in late 2025. US dealers list the same base robot at \n$17,990 with do...",
+      "citationPillId": 3
+     }
+    ],
+    "markdown": "The cost of the **Unitree G1** humanoid robot varies significantly depending on the model version, configuration, and where you buy it from:\n\n  * **Base Model (Direct from Unitree):** Officially starts at **$13,500 USD** on Unitree's store. However, this consumer/demonstration version cannot be custom-programmed. [Humanoid Robot - Unitree Shop](https://shop.unitree.com/collections/humanoid-robot)[Unitree G1 | QUADRUPED.DE, 23.000,00 €](https://www.quadruped.de/Unitree-G1_1#:~:text=Not%20programmable.%20%7C%2023%20%7C%20%7C%20G1,bracket%2C%2018%2Dmonth%20warranty.%20NX%20computing%20module%20optional.)\n\n  * **US Resellers and Street Prices:** Through domestic distributors, base or upgraded consumer models with local support typically range from **$17,990 to nearly $20,000 USD**. [Unitree G1 Price 2026: From $13,500, EDU Cost & Full Specs - Blog](https://blog.robozaps.com/b/unitree-g1-review#:~:text=*%20The%20Unitree%20G1%20costs%20%2413%2C500%20direct,support%2C%20though%20availability%20fluctuates%20week%20to%20week.)\n\n  * **G1 EDU Versions (Research Models):** The versions meant for developers and researchers—which include full software development kits (SDKs), higher computing power (NVIDIA Orin NX), and options for advanced multi-DOF robotic hands—are quote-only through Unitree's sales team. Reseller configurations for these range anywhere from **$43,900 to over $73,000 USD** depending on the specific hands and degree-of-freedom upgrades chosen. [Unitree G1 Price and Specs: The Complete 2026 Profile](https://theresarobotforthat.com/blog/unitree-g1-price/#:~:text=Widely%20cited%20street%20prices%20sit%20around%20%2416%2C000,exceed%20%2467%2C000%20\\(Ars%20Technica%2C%20Jul%2010%202026\\).)[Unitree G1 Price 2026: From $13,500, EDU Cost & Full Specs - Blog](https://blog.robozaps.com/b/unitree-g1-review#:~:text=The%20%2416%2C000%20you'll%20see%20across%20most%20of,list%20its%20configurations%20from%20%2443%2C900%20to%20%2473%2C900.)\n\nAre you looking at the G1 for general interest, or for a specific research/development project?"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "9652278b8c764da988831eac954330fd",
+   "charged_micro": 2400
+  }
+ }
+}

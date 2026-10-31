@@ -1,0 +1,298 @@
+{
+ "observed_at": "2026-10-31T03:12:08+00:00",
+ "endpoint": "cloro.ai-search.chatgpt.scrape",
+ "request": {
+  "prompt": "Which humanoid robots can be purchased in Europe?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "model": null,
+    "text": "As of October 2026, several humanoid robots can be purchased through European distributors, including in Germany. The market has moved beyond experimental prototypes: you can now order walking, programmable humanoid robots for research, education, demonstrations and, in some cases, personal use.\n\nThe available models range from approximately €4,000 to over €200,000.\n\nHere are the most interesting options.\n\n1. Humanoid robots currently available in Europe\n\nIndicative European retail prices. Prices depend on configuration, VAT, shipping and availability.\n\n1. Unitree R1\n\n€4,500–10,500\n\nEntry-level option\n\nCompact, lightweight humanoid\n\nWalking, running and basic movements\n\nSuitable for experimentation and education\n\nAvailable through European robotics retailers\n\nAlso available in EDU configurations.\n\n2. Unitree G1\n\n€18,000–30,000\n\nStrong all-round choice\n\nApproximately 127–132 cm tall\n\nDynamic walking and sophisticated movements\n\nAI and computer vision capabilities\n\nProgrammable through development interfaces\n\nEDU versions offer more development possibilities\n\nOne of the most accessible serious humanoid development platforms.\n\n3. Booster K1\n\n€9,000–20,000\n\nCompact humanoid research platform\n\nDesigned for robotics education and development\n\nWalking, movement and AI experimentation\n\nDifferent hardware configurations available\n\n4. Noetix Bumi\n\n€5,000–8,000\n\nSmall humanoid form factor\n\nEducational and research applications\n\nMore affordable entry into humanoid robotics\n\nNot a general-purpose household assistant\n\n5. Fourier GR-1\n\n€38,000–112,000\n\nFull-size humanoid, approximately 165 cm\n\nHuman-like body proportions\n\nResearch into manipulation and human interaction\n\nMore advanced research platform\n\n6. Fourier GR-2\n\n€75,000–200,000+\n\nAdvanced full-size humanoid\n\nMore sophisticated manipulation capabilities\n\nResearch, development and human-robot interaction\n\nPrimarily aimed at institutional and commercial buyers\n\n7. Unitree H1 / H2\n\n€50,000–120,000+\n\nFull-size humanoid platforms\n\nAdvanced dynamic locomotion\n\nIndustrial and research applications\n\nMore substantial hardware than the G1\n\nPrices are indicative ranges rather than guaranteed quotations. European listings include configurations with very different sensors, hands, software and development capabilities.\n\n2. More advanced and specialised humanoids\n\nThese are also worth investigating, although purchasing often requires a direct commercial enquiry.\n\nNEURA 4NE1\n\n€20,000–100,000+\n\nGerman manufacturer. Industrial and service robotics, human interaction and cognitive AI.\n\nManufacturer website\n\nAGIBOT X2\n\n€22,000–55,000\n\nCompact humanoid designed for service, interaction and robotics development.\n\nManufacturer website\n\nAmeca\n\nPrice on request\n\nHighly expressive face, realistic gestures and human interaction. Particularly interesting for exhibitions and public-facing applications.\n\nManufacturer website\n\nBooster T2\n\n€30,000–130,000+\n\nAdvanced research and development platform with more sophisticated manipulation options.\n\nManufacturer website\n\n3. Where can you buy them in Europe?\n\nThese are some useful purchasing channels:\n\nRetailer / distributor\n\nMain offering\n\nRobotShop EU\n\nUnitree humanoids\n\nRBTX\n\nUnitree, Fourier, AGIBOT, Booster and others\n\nTerra Robotics\n\nUnitree and other robotics platforms\n\nFunduino\n\nRobotics and humanoid development platforms\n\nReichelt\n\nSelected humanoid robots\n\nSonny Robotics\n\nSeveral humanoid platforms\n\nFor Germany, I would start with RobotShop EU, RBTX, Terra Robotics and Reichelt.\n\nFurther market comparisons: Robot Distribution humanoid catalogue .\n\n4. Which would I choose?\n\nIntended application\n\nMy recommendation\n\nAffordable humanoid experimentation\n\nUnitree R1\n\nSerious robotics development\n\nUnitree G1 EDU\n\nUniversity or research laboratory\n\nUnitree G1 / Fourier GR-2\n\nHuman interaction and exhibitions\n\nAmeca\n\nIndustrial automation research\n\nNEURA 4NE1 / Unitree H1\n\nAdvanced manipulation research\n\nFourier GR-2\n\nOne important distinction: Most commercially available humanoids are still robotics development platforms. They cannot yet reliably perform all the tasks of a human assistant, such as cooking, cleaning, doing laundry or independently managing a household.\n\n5. Let me narrow this down\n\nThere is a significant difference between buying a humanoid for personal use and purchasing one for industrial or research applications.\n\nI can then put together a shortlist of actual purchasable robots, with prices, specifications, European suppliers and direct ordering links.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Humanoide Roboter kaufen: Händler in Deutschland",
+      "url": "https://roboter-zentrale.de/humanoide-kaufen",
+      "footnote": false
+     },
+     {
+      "position": 2,
+      "label": "Humanoid Robots",
+      "url": "https://rbtx.pt/pt-PT/components/humanoid",
+      "footnote": false
+     },
+     {
+      "position": 3,
+      "label": "Unitree Humanoids",
+      "url": "https://eu.robotshop.com/collections/unitree-humanoids",
+      "footnote": false
+     },
+     {
+      "position": 4,
+      "label": "Humanoid research robot for labs and universities",
+      "url": "https://robot-distribution.com/en/solutions/humanoid-research-robots",
+      "footnote": false
+     },
+     {
+      "position": 5,
+      "label": "",
+      "url": "https://robostore.com/products/unitree-r1-basic-humanoid-robot",
+      "footnote": true
+     },
+     {
+      "position": 6,
+      "label": "",
+      "url": "https://www.elektor.de/products/unitree-g1-humanoid-robot",
+      "footnote": true
+     },
+     {
+      "position": 7,
+      "label": "",
+      "url": "https://www.reichelt.com/ie/en/shop/product/booster_robotics_k1_basic_-_humanoid_robot_100_tops-412369",
+      "footnote": true
+     },
+     {
+      "position": 8,
+      "label": "",
+      "url": "https://embodiedglobal.com/en/article/noetix-robotics-bumi-1400-humanoid-robot-children-education-2026",
+      "footnote": true
+     },
+     {
+      "position": 9,
+      "label": "",
+      "url": "https://www.core77.com/posts/125020/Humanoid-Robot-Design-Iterations-Continue-Heres-the-GR-1",
+      "footnote": true
+     },
+     {
+      "position": 10,
+      "label": "",
+      "url": "https://sonnyrobotics.com/products/fourier-gr-2",
+      "footnote": true
+     },
+     {
+      "position": 11,
+      "label": "Manufacturer website",
+      "url": "https://neura-robotics.com/",
+      "footnote": true
+     },
+     {
+      "position": 12,
+      "label": "",
+      "url": "https://www.toneart-shop.de/unitree-h1.html",
+      "footnote": true
+     },
+     {
+      "position": 13,
+      "label": "Manufacturer website",
+      "url": "https://www.agibot.com/",
+      "footnote": true
+     },
+     {
+      "position": 14,
+      "label": "Manufacturer website",
+      "url": "https://engineeredarts.com/",
+      "footnote": true
+     },
+     {
+      "position": 15,
+      "label": "",
+      "url": "https://www.latinsatelital.com/Neura-Robotics-4NE-1.htm",
+      "footnote": true
+     },
+     {
+      "position": 16,
+      "label": "",
+      "url": "https://robob2b.ru/catalog/roboty-gumanoidy/robot-gumanoid-agibot-x2/",
+      "footnote": true
+     },
+     {
+      "position": 17,
+      "label": "Terra Robotics",
+      "url": "https://www.terra-robotics.com/",
+      "footnote": true
+     },
+     {
+      "position": 18,
+      "label": "RBTX",
+      "url": "https://www.rbtx.com/",
+      "footnote": true
+     },
+     {
+      "position": 19,
+      "label": "RobotShop EU",
+      "url": "https://eu.robotshop.com/",
+      "footnote": true
+     },
+     {
+      "position": 20,
+      "label": "Manufacturer website",
+      "url": "https://www.booster.tech/",
+      "footnote": true
+     },
+     {
+      "position": 21,
+      "label": "",
+      "url": "https://www.australiasatellite.com/Engineered-Arts-Ameca.htm",
+      "footnote": true
+     },
+     {
+      "position": 22,
+      "label": "",
+      "url": "https://www.booster.tech/cn/booster-t2/",
+      "footnote": true
+     },
+     {
+      "position": 23,
+      "label": "Funduino",
+      "url": "https://www.funduinoshop.com/",
+      "footnote": true
+     },
+     {
+      "position": 24,
+      "label": "Reichelt",
+      "url": "https://www.reichelt.de/",
+      "footnote": true
+     },
+     {
+      "position": 25,
+      "label": "Robot Distribution humanoid catalogue",
+      "url": "https://robot-distribution.com/en/robots/humanoids",
+      "footnote": true
+     },
+     {
+      "position": 26,
+      "label": "Sonny Robotics",
+      "url": "https://www.sonnyrobotics.com/",
+      "footnote": true
+     }
+    ],
+    "entities": [
+     {
+      "type": "product",
+      "name": "Unitree R1"
+     },
+     {
+      "type": "product",
+      "name": "Unitree G1"
+     },
+     {
+      "type": "product",
+      "name": "Booster K1"
+     },
+     {
+      "type": "product",
+      "name": "Noetix Bumi"
+     },
+     {
+      "type": "product",
+      "name": "Fourier GR-1"
+     },
+     {
+      "type": "product",
+      "name": "Fourier GR-2"
+     },
+     {
+      "type": "product",
+      "name": "Unitree H1 / H2"
+     },
+     {
+      "type": "product",
+      "name": "NEURA 4NE1"
+     },
+     {
+      "type": "product",
+      "name": "AGIBOT X2"
+     },
+     {
+      "type": "product",
+      "name": "Ameca"
+     },
+     {
+      "type": "product",
+      "name": "Booster T2"
+     }
+    ],
+    "map": [],
+    "followUpForm": {
+     "questions": [
+      {
+       "label": "What is your intended budget?",
+       "type": "radio",
+       "options": [],
+       "name": "budget"
+      },
+      {
+       "label": "What would you like the robot to do?",
+       "type": "radio",
+       "options": [],
+       "name": "purpose"
+      },
+      {
+       "label": "Preferred size",
+       "type": "radio",
+       "options": [],
+       "name": "size"
+      },
+      {
+       "label": "Purchase country",
+       "type": "radio",
+       "options": [],
+       "name": "country"
+      }
+     ],
+     "submitLabel": "Find suitable robots",
+     "followUpPrompt": "Please shortlist humanoid robots I can actually purchase. Budget: {budget}. Purpose: {purpose}. Preferred size: {size}. Country: {country}. Include current prices, European suppliers, specifications and direct purchase links."
+    },
+    "markdown": "As of October 2026, several humanoid robots can be purchased through European distributors, including in Germany. The market has moved beyond experimental prototypes: you can now order walking, programmable humanoid robots for research, education, demonstrations and, in some cases, personal use.\n\nThe available models range from approximately €4,000 to over €200,000.\n\nHere are the most interesting options.\n\n## 1. Humanoid robots currently available in Europe\n\nIndicative European retail prices. Prices depend on configuration, VAT, shipping and availability.\n\n![Unitree R1 Basic Humanoid Robot | RoboStore](https://images.openai.com/static-rsc-4/IpOGPEbvr6eXgNbt7YZW408ZLjY0vk-8S1YxL1O_rT3JMnkS-4QuN5-3OhvD3149WNG5n9-woLoItDryVml3l6O-uvS_ir_wYsfRXK7aXbH09ZFg_zFNWC_lmQZXMK8R6SRwhsgLhewrAhjbYhLXgYiCIkMGsR79qFPfzlp9mx8?purpose=inline)\n\n1. Unitree R1\n\n# €4,500–10,500\n\nEntry-level option\n\n- Compact, lightweight humanoid\n- Walking, running and basic movements\n- Suitable for experimentation and education\n- Available through European robotics retailers\n\nAlso available in EDU configurations.\n\n![Unitree G1 Humanoider Roboter – Elektor](https://images.openai.com/static-rsc-4/j_0Y6il_9bQbIKtt1Ww10kBxH0vV87UQrfOBeI1luLFGYh-LrutLaMqEYyG-aCaFSfO8hyn2CKP2MCuc62BXLNiNfBBgm28Bi_xCUUweA72rrWhF9Kg6epfr_l5JzJBd_0EIa5ykoznzqq8d67bDEcQu8kAtvk-qUriwPI62tLA?purpose=inline)\n\n2. Unitree G1\n\n# €18,000–30,000\n\nStrong all-round choice\n\n- Approximately 127–132 cm tall\n- Dynamic walking and sophisticated movements\n- AI and computer vision capabilities\n- Programmable through development interfaces\n- EDU versions offer more development possibilities\n\nOne of the most accessible serious humanoid development platforms.\n\n![BOOSTER ROBOTICS Booster Robotics K1 BASIC - Humanoid robot, 100 TOPS | Humanoids / Bipedal at very favourable prices | reichelt elektronik](https://images.openai.com/static-rsc-4/q0B4UMrttdYfrbWstxT6tcBwIK6hXW6WwazmO5PXb97xPuvLfhPteaJe_v_OqFwZl3RheonMycFGS_WwQI8f00Y2qVYuRWx8TaNnsBDCumQu4bXkkpSgGyeboeuZhC6-H1Qh462j1cv4fx7A8SlviC3asPpgDAsRCYsdQx5AGjY?purpose=inline)\n\n3. Booster K1\n\n# €9,000–20,000\n\n- Compact humanoid research platform\n- Designed for robotics education and development\n- Walking, movement and AI experimentation\n- Different hardware configurations available\n\n![Noetix Robotics Launches Bumi: $1,400 Humanoid Robot for Children's Education](https://images.openai.com/static-rsc-4/GvA3CBtlDzeH1xyn7v-pFm8G0FbdSMBrJOUVKex8rOFZktWykI8_3msMV3Q1Io5sGO5eSaWB2yunOdgfc8qR9faZsmZ_H-zUOM01vkqcGkMq9plUGq28M2XHbA4zzb178wfPJKx0V1ASd_O6Z6W1j9HSRU6B6nBh_UYzGkeXA90?purpose=inline)\n\n4. Noetix Bumi\n\n# €5,000–8,000\n\n- Small humanoid form factor\n- Educational and research applications\n- More affordable entry into humanoid robotics\n- Not a general-purpose household assistant\n\n![Humanoid Robot Design Iterations Continue: Here's the GR-1  - Core77](https://images.openai.com/static-rsc-4/CNAKukao6nxjYjDbDYElYnIpEwFIaIWzz8A0ffecNNNzjp8jyvknawqIL4tyIHEwt1erjXAlivg41DVP1fL-Gxnivlsh_EsiqnjnFWeXB7xikcSwk7eSYFh9yrcjLOpYWEPejcsnjOqmQ8puHkuSkdeH_8szF0GL09MQJH4wEN4?purpose=inline)\n\n5. Fourier GR-1\n\n# €38,000–112,000\n\n- Full-size humanoid, approximately 165 cm\n- Human-like body proportions\n- Research into manipulation and human interaction\n- More advanced research platform\n\n![Fourier GR-2 Humanoid Robot](https://images.openai.com/static-rsc-4/hscYQYUOCFtjnIsOE9PlkwyhTGaC40de8nUroXf4UA4PoRwawGgVhFj67V-0a7gN41wQ3Gtuadwv6tQMsPqCwvoUxCvyhpOQMkq4h0lRFz_UAb67ycQNCx4OxZzim16_IfdREQXHRzNnEv-Zmcf2ZaGTzq4tBphHpSqf9wFFo1M?purpose=inline)\n\n6. Fourier GR-2\n\n# €75,000–200,000+\n\n- Advanced full-size humanoid\n- More sophisticated manipulation capabilities\n- Research, development and human-robot interaction\n- Primarily aimed at institutional and commercial buyers\n\n![Unitree H1 | 0 % Leasing & Finanzierung | TONEART-Shop](https://images.openai.com/static-rsc-4/3TVQXECaSgXWIIKqIf_CWgL7zGFYrkCCekC1UXZPBRt1DN7PdHOWqh1ac3IsoWTXc7uev4FGUeVbzQAuVZW1NOynYcmZQJU568QGvz4znO1QqYOh1YtZ05JIuAgTNJX7GOyC313q-fOapyEfQCKorF95jc-lclkWJSGABkRH3NU?purpose=inline)\n\n7. Unitree H1 / H2\n\n# €50,000–120,000+\n\n- Full-size humanoid platforms\n- Advanced dynamic locomotion\n- Industrial and research applications\n- More substantial hardware than the G1\n\nPrices are indicative ranges rather than guaranteed quotations. European listings include configurations with very different sensors, hands, software and development capabilities.\n\n## 2. More advanced and specialised humanoids\n\nThese are also worth investigating, although purchasing often requires a direct commercial enquiry.\n\n![Neura Robotics 4NE-1 Humanoid Robot - Latin Satelital](https://images.openai.com/static-rsc-4/85EIbT8CwOvLKRt-MNWOUemvvrkeCUovpmj123sjxUFz194tCDlObMpAAym-i0aoAfQMjIn_ulcBmBKJuDnkH6roUU4JgZzYfoDS-dPjjgsWDWtVpD9N_jKz_710kLfN8fiWyJ1UieOyq9UG66LG5CN6j2cJEkVcoCwChWc-jIQ?purpose=inline)\n\nNEURA 4NE1\n\n## €20,000–100,000+\n\nGerman manufacturer. Industrial and service robotics, human interaction and cognitive AI.\n\n[Manufacturer website](https://neura-robotics.com/?utm_source=chatgpt.com)\n\n![Робот-гуманоид AGIBOT X2 — характеристики и описание, список поставщиков и интеграторов на RoboB2B](https://images.openai.com/static-rsc-4/AmHNQ6Maff052V5tKEj9JeQYf3A1wlEKHQvPJmU3rJRRoqpur3efrslmLGpglVzEsTxROyX1jK1MQNwyeusJEjWyHySGHgS9wQanRoyBvwe8GYLiBbwy_vRJsjb5KFNta8xthkZIq0p8TOiyCs_OETe0ZtgfqiaH-7Heb6cLJ5U?purpose=inline)\n\nAGIBOT X2\n\n## €22,000–55,000\n\nCompact humanoid designed for service, interaction and robotics development.\n\n[Manufacturer website](https://www.agibot.com/?utm_source=chatgpt.com)\n\n![Ameca: Exploring the Cutting-Edge of Humanoid Robotics and AI - Australia Satellite](https://images.openai.com/static-rsc-4/vgdLvwTjFdhLfT9VtWwhDJHct7PpODIeIu8bpXdffHYOnq_rELo0Qry6Nqf0xOjVc5ip9VUWbe4OqkuBCrs3ULGbMMHIw8fL_XDAdgj5LQpKWPySJ0eB0Nr14Y6wriF6CnGo8TBpdNNBLJ1vz058Fd9ecwgeYXxv1EumaZgSMEI?purpose=inline)\n\nAmeca\n\n## Price on request\n\nHighly expressive face, realistic gestures and human interaction. Particularly interesting for exhibitions and public-facing applications.\n\n[Manufacturer website](https://engineeredarts.com/?utm_source=chatgpt.com)\n\n![Booster T2 | 具身开发旗舰平台](https://images.openai.com/static-rsc-4/q68E0ZmOgaot042iQsqUjYKF-3m_72Ju9UqbjxoY86XapwZkqtu5-GsO-FnSauvrYWiBVk0fMVc4qWQHf-dGc4edXk6itO1xsCJGcKa1lEWl2a2XsUmLwlWOZdFoGfDdKMz1sH6i6ABYIN1WLfPXXwn9w32FKrTccfIAVLwmNik?purpose=inline)\n\nBooster T2\n\n## €30,000–130,000+\n\nAdvanced research and development platform with more sophisticated manipulation options.\n\n[Manufacturer website](https://www.booster.tech/?utm_source=chatgpt.com)\n\n## 3. Where can you buy them in Europe?\n\nThese are some useful purchasing channels:\n\n| Retailer / distributor | Main offering |\n| --- | --- |\n| [RobotShop EU](https://eu.robotshop.com/?utm_source=chatgpt.com) | Unitree humanoids |\n| [RBTX](https://www.rbtx.com/?utm_source=chatgpt.com) | Unitree, Fourier, AGIBOT, Booster and others |\n| [Terra Robotics](https://www.terra-robotics.com/?utm_source=chatgpt.com) | Unitree and other robotics platforms |\n| [Funduino](https://www.funduinoshop.com/?utm_source=chatgpt.com) | Robotics and humanoid development platforms |\n| [Reichelt](https://www.reichelt.de/?utm_source=chatgpt.com) | Selected humanoid robots |\n| [Sonny Robotics](https://www.sonnyrobotics.com/?utm_source=chatgpt.com) | Several humanoid platforms |\n\nFor Germany, I would start with RobotShop EU, RBTX, Terra Robotics and Reichelt.\n\nFurther market comparisons: [Robot Distribution humanoid catalogue](https://robot-distribution.com/en/robots/humanoids?utm_source=chatgpt.com). [Humanoid Robots](https://rbtx.pt/pt-PT/components/humanoid)[Humanoid research robot for labs and universities](https://robot-distribution.com/en/solutions/humanoid-research-robots)[Unitree Humanoids](https://eu.robotshop.com/collections/unitree-humanoids)[Humanoide Roboter kaufen: Händler in Deutschland](https://roboter-zentrale.de/humanoide-kaufen)\n\n## 4. Which would I choose?\n\n| Intended application | My recommendation |\n| --- | --- |\n| Affordable humanoid experimentation | Unitree R1 |\n| Serious robotics development | Unitree G1 EDU |\n| University or research laboratory | Unitree G1 / Fourier GR-2 |\n| Human interaction and exhibitions | Ameca |\n| Industrial automation research | NEURA 4NE1 / Unitree H1 |\n| Advanced manipulation research | Fourier GR-2 |\n\nOne important distinction: Most commercially available humanoids are still robotics development platforms. They cannot yet reliably perform all the tasks of a human assistant, such as cooking, cleaning, doing laundry or independently managing a household.\n\n## 5. Let me narrow this down\n\nThere is a significant difference between buying a humanoid for personal use and purchasing one for industrial or research applications.\n\nI can then put together a shortlist of actual purchasable robots, with prices, specifications, European suppliers and direct ordering links.",
+    "citationPills": [
+     {
+      "url": "https://rbtx.pt/pt-PT/components/humanoid",
+      "label": "Humanoid Robots",
+      "domain": "rbtx.pt",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 2
+     },
+     {
+      "url": "https://robot-distribution.com/en/solutions/humanoid-research-robots",
+      "label": "Humanoid research robot for labs and universities",
+      "domain": "robot-distribution.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 4
+     },
+     {
+      "url": "https://eu.robotshop.com/collections/unitree-humanoids",
+      "label": "Unitree Humanoids",
+      "domain": "eu.robotshop.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 3
+     },
+     {
+      "url": "https://roboter-zentrale.de/humanoide-kaufen",
+      "label": "Humanoide Roboter kaufen: Händler in Deutschland",
+      "domain": "roboter-zentrale.de",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 1
+     }
+    ]
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "1f920850955b4b6e945320f6508cc24f",
+   "charged_micro": 2800
+  }
+ }
+}

@@ -1,0 +1,75 @@
+{
+ "observed_at": "2026-10-31T03:14:09+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "Which humanoid robots have SDK access?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Several humanoid and bipedal robot platforms provide software development kits (SDKs), application programming interfaces (APIs), or open-source frameworks for developers, researchers, and engineers.\n\nKey humanoid robots with developer access include:\n\n1. Unitree Robotics (H1 & G1 Series)\n\nSDK Details: Unitree provides robust developer tools, notably unitree_sdk2 and ROS/ROS2 integration packages (unitree_ros2). They also offer simulation support through MuJoCo (unitree_mujoco).\n\nAccess Level: Allows developers to work with high-level control (point-to-point motion) as well as low-level joint/motor communication protocols, making it popular for academic research and machine learning (imitation learning frameworks like LeRobot).\n\n2. PAL Robotics (TALOS & REEM-C)\n\nSDK Details: PAL Robotics designs its research humanoids to run natively on ROS (Robot Operating System) and ROS 2.\n\nAccess Level They Provide: Full source code and simulation models (Gazebo), giving researchers deep control over kinematics, motion planning (MoveIt), computer vision, and balance algorithms.\n\n3. UBTECH Robotics (Walker Series)\n\nSDK Details: UBTECH provides SDKs targeted at institutional research partners and enterprise developers working with their Walker line of full-size humanoids.\n\nAccess Level: Focuses on human-robot interaction, navigation, and task execution APIs.\n\n4. Open-Source Ecosystems & Reference Platforms (NVIDIA Isaac GR00T)\n\nRather than a single robot, companies building humanoids often plug into standardized developer stacks:\n\nNVIDIA Isaac Sim / GR00T: A comprehensive platform and reference workflow used by various emerging humanoid developers (such as Agile Robots' Agile ONE) to train general-purpose foundation models, test behaviors in simulation, and deploy via the Jetson Thor edge computing architecture.\n\nROS / ROS 2: The de facto standard middleware framework used across almost all open-access humanoid hardware for controlling actuators, processing camera/depth feeds, and executing Simultaneous Localization and Mapping (SLAM).\n\nNote: Many advanced commercial humanoid companies (such as Figure AI or Boston Dynamics with Atlas) tightly control their software stacks in-house or restrict SDK access to select enterprise partners.\n\nAre you looking for an SDK to use for academic research, simulation, or a specific commercial hardware platform?",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Official Open Source - Unitree Robotics",
+      "url": "https://www.unitree.com/mobile/opensource#:~:text=unitree_sdk2.%20unitree_sdk2%20is%20an%20SDK%20package%20used,encapsulates%20the%20motor%20communication%20protocol%20into%20SDK.",
+      "description": "unitree_sdk2. unitree_sdk2 is an SDK package used to develop Go2, B2, and \nH1 robots in real environments. Its functional positioning is similar to \nthe unitree_l..."
+     },
+     {
+      "position": 2,
+      "label": "Official Open Source - Unitree Robotics",
+      "url": "https://www.unitree.com/mobile/opensource#:~:text=unitree_sdk2.%20unitree_sdk2%20is%20an%20SDK%20package%20used,encapsulates%20the%20motor%20communication%20protocol%20into%20SDK.",
+      "description": "unitree_sdk2. unitree_sdk2 is an SDK package used to develop Go2, B2, and \nH1 robots in real environments. Its functional positioning is similar to \nthe unitree_l..."
+     },
+     {
+      "position": 3,
+      "label": "Official Open Source - Unitree Robotics",
+      "url": "https://www.unitree.com/mobile/opensource#:~:text=unitree_ros2%20is%20a%20function%20package%20used%20to,docking%20cost%20of%20using%20the%20motor%20protocol.",
+      "description": "unitree_ros2 is a function package used to develop Go2 and B2 robots in the \nros2 environment. The interface types provided are consistent with \nunitree_sdk2. Mot..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Official Open Source - Unitree Robotics",
+      "url": "https://www.unitree.com/mobile/opensource#:~:text=unitree_sdk2.%20unitree_sdk2%20is%20an%20SDK%20package%20used,encapsulates%20the%20motor%20communication%20protocol%20into%20SDK.",
+      "domain": "unitree.com",
+      "position": 1,
+      "description": "unitree_sdk2. unitree_sdk2 is an SDK package used to develop Go2, B2, and \nH1 robots in real environments. Its functional positioning is similar to \nthe unitree_l...",
+      "citationPillId": 1
+     },
+     {
+      "label": "Official Open Source - Unitree Robotics",
+      "url": "https://www.unitree.com/mobile/opensource#:~:text=unitree_sdk2.%20unitree_sdk2%20is%20an%20SDK%20package%20used,encapsulates%20the%20motor%20communication%20protocol%20into%20SDK.",
+      "domain": "unitree.com",
+      "position": 1,
+      "description": "unitree_sdk2. unitree_sdk2 is an SDK package used to develop Go2, B2, and \nH1 robots in real environments. Its functional positioning is similar to \nthe unitree_l...",
+      "citationPillId": 2
+     },
+     {
+      "label": "Official Open Source - Unitree Robotics",
+      "url": "https://www.unitree.com/mobile/opensource#:~:text=unitree_ros2%20is%20a%20function%20package%20used%20to,docking%20cost%20of%20using%20the%20motor%20protocol.",
+      "domain": "unitree.com",
+      "position": 3,
+      "description": "unitree_ros2 is a function package used to develop Go2 and B2 robots in the \nros2 environment. The interface types provided are consistent with \nunitree_sdk2. Mot...",
+      "citationPillId": 3
+     }
+    ],
+    "markdown": "Several humanoid and bipedal robot platforms provide software development kits (SDKs), application programming interfaces (APIs), or open-source frameworks for developers, researchers, and engineers. [Official Open Source - Unitree Robotics](https://www.unitree.com/mobile/opensource#:~:text=unitree_sdk2.%20unitree_sdk2%20is%20an%20SDK%20package%20used,encapsulates%20the%20motor%20communication%20protocol%20into%20SDK.)\n\nKey humanoid robots with developer access include:\n\n### 1\\. Unitree Robotics (H1 & G1 Series)\n\n  * **SDK Details:** Unitree provides robust developer tools, notably `unitree_sdk2` and ROS/ROS2 integration packages (`unitree_ros2`). They also offer simulation support through MuJoCo (`unitree_mujoco`). [Official Open Source - Unitree Robotics](https://www.unitree.com/mobile/opensource#:~:text=unitree_sdk2.%20unitree_sdk2%20is%20an%20SDK%20package%20used,encapsulates%20the%20motor%20communication%20protocol%20into%20SDK.)\n\n  * **Access Level:** Allows developers to work with high-level control (point-to-point motion) as well as low-level joint/motor communication protocols, making it popular for academic research and machine learning (imitation learning frameworks like LeRobot). [Official Open Source - Unitree Robotics](https://www.unitree.com/mobile/opensource#:~:text=unitree_ros2%20is%20a%20function%20package%20used%20to,docking%20cost%20of%20using%20the%20motor%20protocol.)\n\n### 2\\. PAL Robotics (TALOS & REEM-C)\n\n  * **SDK Details:** PAL Robotics designs its research humanoids to run natively on **ROS (Robot Operating System)** and ROS 2.\n\n  * **Access Level They Provide:** Full source code and simulation models (Gazebo), giving researchers deep control over kinematics, motion planning (MoveIt), computer vision, and balance algorithms.\n\n### 3\\. UBTECH Robotics (Walker Series)\n\n  * **SDK Details:** UBTECH provides SDKs targeted at institutional research partners and enterprise developers working with their Walker line of full-size humanoids.\n\n  * **Access Level:** Focuses on human-robot interaction, navigation, and task execution APIs.\n\n### 4\\. Open-Source Ecosystems & Reference Platforms (NVIDIA Isaac GR00T)\n\nRather than a single robot, companies building humanoids often plug into standardized developer stacks:\n\n  * **NVIDIA Isaac Sim / GR00T:** A comprehensive platform and reference workflow used by various emerging humanoid developers (such as Agile Robots' Agile ONE) to train general-purpose foundation models, test behaviors in simulation, and deploy via the Jetson Thor edge computing architecture.\n\n  * **ROS / ROS 2:** The de facto standard middleware framework used across almost all open-access humanoid hardware for controlling actuators, processing camera/depth feeds, and executing Simultaneous Localization and Mapping (SLAM).\n\n_Note: Many advanced commercial humanoid companies (such as Figure AI or Boston Dynamics with Atlas) tightly control their software stacks in-house or restrict SDK access to select enterprise partners._\n\nAre you looking for an SDK to use for academic research, simulation, or a specific commercial hardware platform?"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "f51e9cd51ead4500b3f892bcd0df58fa",
+   "charged_micro": 2400,
+   "hint": "feedback"
+  }
+ }
+}

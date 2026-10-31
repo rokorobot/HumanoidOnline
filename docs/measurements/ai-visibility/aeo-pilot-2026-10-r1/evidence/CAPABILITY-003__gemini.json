@@ -1,0 +1,158 @@
+{
+ "observed_at": "2026-10-31T03:14:43+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "Which humanoid robots are suitable for research?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Choosing a humanoid robot for academic or corporate research depends heavily on your lab's focus (e.g., bipedal locomotion, AI/imitation learning, or dexterous manipulation), budget, and required software integration (such as ROS 2 or simulation suites like Isaac Lab and MuJoCo).\n\nSeveral key platforms stand out as industry standards for research:\n\n1. Unitree G1 & H-Series (Edu Tiers)\n\nBest For: AI development, machine learning, bipedal locomotion, and general university lab research.\n\nWhy it’s suited for research: Unitree has become a dominant fixture in university labs due to its relatively accessible price point and open developer ecosystem. The G1 Edu variants feature an onboard NVIDIA Jetson Orin module, full SDK access for high- and low-level control, and direct support for ROS 2. For labs focusing on full-size human scaling, the Unitree H-series (like the H1 and H2 Edu) offers higher power, heavier payload capacities, and robust stability for dynamic movement studies.\n\n2. Boston Dynamics Atlas (Electric)\n\nBest For: Advanced state-of-the-art mobility, whole-body control, and complex manipulation.\n\nWhy it’s suited for research: The fully electric Atlas platform boasts high degrees of freedom (around 56 DoF) and unmatched hydraulic/electric agility. While typically deployed in select partner institutions and high-end industrial/research environments rather than standard open-market purchase, it represents the gold standard for testing acrobatic movement, dynamic balance, and complex spatial interaction.\n\n3. AgiBot X2 (Ultra/Edu Configurations)\n\nBest For: Human-robot interaction, autonomous navigation, and no-code/low-code AI toolchains.\n\nWhy it’s suited for research: AgiBot platforms come equipped with robust sensor arrays and software environments like LinkCraft (for teleoperation-based motion capture) and LinkSoul. They are heavily utilized in research settings exploring cognitive architectures, human-intent tracking, and campus-navigation assistance.\n\nKey Factors to Consider When Selecting a Research Robot:\n\nSDK & Software Openness: Ensure the robot provides low-level joint control (torque/impedance control) rather than just high-level app commands if your lab studies locomotion physics.\n\nSimulation Support: Platforms that natively bridge with modern physics simulators (like NVIDIA Isaac Lab, MuJoCo, or Gazebo) save hundreds of hours when testing reinforcement learning algorithms safely.\n\nCompute Power: Onboard AI processing units (such as NVIDIA Orin modules) are essential if you plan to run vision-language models or heavy neural networks directly on the hardware.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Best Humanoid Robots for STEM Programs & Schools (2026 Guide)",
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=%7C%20Unitree%20SDK2%20in%20C%2B%2B%20and%20Python%2C,research%20%7C%20%7C%20AgiBot%20X2%20%7C%20No%2Dcode.",
+      "description": "| Unitree SDK2 in C++ and Python, ROS 2, MuJoCo, Isaac Lab, XR \nteleoperation | University research | | Unitree H2 | App and remote only. | \nUnitree app | Full-si..."
+     },
+     {
+      "position": 2,
+      "label": "i>Humanoid Robots 2026: A Comprehensive Review of Technical",
+      "url": "https://www.researchgate.net/publication/408983653_iHumanoid_Robots_2026_A_Comprehensive_Review_of_Technical_Foundations_Market_Dynamics_and_Research_Challengesi#:~:text=open%20SDK%20supporting%20ROS2%20and%20high%2Dlevel%20programming%2C,and%20a%20peak%20torque%20density%20of%20%E2%88%BC189.",
+      "description": "open SDK supporting ROS2 and high-level programming, making it well suited \nfor education, AI-driven manipulation. research, and \nimitation/reinforcement-learning..."
+     },
+     {
+      "position": 3,
+      "label": "Best Humanoid Robots for STEM Programs & Schools (2026 Guide)",
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=*%20Best%20for%20university%20research%20labs%3A%20Unitree,size%20at%201.82%20m%20with%20development%20access.",
+      "description": "* Best for university research labs: Unitree G1 Edu Standard, $43,900. \nNVIDIA Jetson Orin compute, ROS support and the largest open-source \ncommunity of any huma..."
+     },
+     {
+      "position": 4,
+      "label": "Best Humanoid Robots for STEM Programs & Schools (2026 Guide)",
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=%7C%20Unitree%20app%20%7C%20Showcases%20and%20outreach,Unitree%20H2%20%7C%20App%20and%20remote%20only.",
+      "description": "| Unitree app | Showcases and outreach | | Unitree G1 Edu tiers | Full SDK \nwith low-level joint control on an onboard NVIDIA Jetson Orin. Edu Pro and \nUltimate a..."
+     },
+     {
+      "position": 5,
+      "label": "i>Humanoid Robots 2026: A Comprehensive Review of Technical",
+      "url": "https://www.researchgate.net/publication/408983653_iHumanoid_Robots_2026_A_Comprehensive_Review_of_Technical_Foundations_Market_Dynamics_and_Research_Challengesi#:~:text=energy%2Def%EF%AC%81cient%20deployment%20%5B46%2C%2047%5D.%20Standing%20approximately.%201.9,to%202.3%20m%2C%20and%20is%20capable%20of.",
+      "description": " energy-efﬁcient deployment [46, 47]. Standing approximately. 1.9 m tall \nand weighing around 90 kg, Electric Atlas integrates. 56 degrees of \nfreedom, articulate..."
+     },
+     {
+      "position": 6,
+      "label": "Best Humanoid Robots for STEM Programs & Schools (2026 Guide)",
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=%7C%20Unitree%20app%20%7C%20Full%2Dsize%20demonstrations%20%7C,%7C%20Teachers%20who%20do%20not%20code%20%7C",
+      "description": "| Unitree app | Full-size demonstrations | | Unitree H2 Edu | Full SDK on a \ndedicated Intel Core i7 development PC, with optional NVIDIA Jetson AGX \nThor compute..."
+     },
+     {
+      "position": 7,
+      "label": "i>Humanoid Robots 2026: A Comprehensive Review of Technical",
+      "url": "https://www.researchgate.net/publication/408983653_iHumanoid_Robots_2026_A_Comprehensive_Review_of_Technical_Foundations_Market_Dynamics_and_Research_Challengesi#:~:text=open%20SDK%20supporting%20ROS2%20and%20high%2Dlevel%20programming%2C,and%20a%20peak%20torque%20density%20of%20%E2%88%BC189.",
+      "description": "open SDK supporting ROS2 and high-level programming, making it well suited \nfor education, AI-driven manipulation. research, and \nimitation/reinforcement-learning..."
+     },
+     {
+      "position": 8,
+      "label": "Best Humanoid Robots for STEM Programs & Schools (2026 Guide)",
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=Pro%20configurations%20add%20LiDAR%20and%20hands.%20%7C,Unitree%20H2%20%7C%20App%20and%20remote%20only.",
+      "description": "Pro configurations add LiDAR and hands. | Same, plus on-robot AI inference \n| AI and perception courses | | Unitree G1, G1 Pro | App and remote only. | \nUnitree a..."
+     },
+     {
+      "position": 9,
+      "label": "Best Humanoid Robots for STEM Programs & Schools (2026 Guide)",
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=%7C%20Unitree%20SDK2%20in%20C%2B%2B%20and%20Python%2C,G1%20Pro%20%7C%20App%20and%20remote%20only.",
+      "description": "| Unitree SDK2 in C++ and Python, ROS 2, simulation | High school and intro \ncollege coding | | R1 Edu Smart and R1 Edu Pro | Everything in Edu \nStandard, plus an..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Best Humanoid Robots for STEM Programs & Schools (2026 Guide)",
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=%7C%20Unitree%20SDK2%20in%20C%2B%2B%20and%20Python%2C,research%20%7C%20%7C%20AgiBot%20X2%20%7C%20No%2Dcode.",
+      "domain": "globaldronehq.com",
+      "position": 1,
+      "description": "| Unitree SDK2 in C++ and Python, ROS 2, MuJoCo, Isaac Lab, XR \nteleoperation | University research | | Unitree H2 | App and remote only. | \nUnitree app | Full-si...",
+      "citationPillId": 1
+     },
+     {
+      "label": "i>Humanoid Robots 2026: A Comprehensive Review of Technical",
+      "url": "https://www.researchgate.net/publication/408983653_iHumanoid_Robots_2026_A_Comprehensive_Review_of_Technical_Foundations_Market_Dynamics_and_Research_Challengesi#:~:text=open%20SDK%20supporting%20ROS2%20and%20high%2Dlevel%20programming%2C,and%20a%20peak%20torque%20density%20of%20%E2%88%BC189.",
+      "domain": "researchgate.net",
+      "position": 2,
+      "description": "open SDK supporting ROS2 and high-level programming, making it well suited \nfor education, AI-driven manipulation. research, and \nimitation/reinforcement-learning...",
+      "citationPillId": 2
+     },
+     {
+      "label": "Best Humanoid Robots for STEM Programs & Schools (2026 Guide)",
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=*%20Best%20for%20university%20research%20labs%3A%20Unitree,size%20at%201.82%20m%20with%20development%20access.",
+      "domain": "globaldronehq.com",
+      "position": 3,
+      "description": "* Best for university research labs: Unitree G1 Edu Standard, $43,900. \nNVIDIA Jetson Orin compute, ROS support and the largest open-source \ncommunity of any huma...",
+      "citationPillId": 3
+     },
+     {
+      "label": "Best Humanoid Robots for STEM Programs & Schools (2026 Guide)",
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=%7C%20Unitree%20app%20%7C%20Showcases%20and%20outreach,Unitree%20H2%20%7C%20App%20and%20remote%20only.",
+      "domain": "globaldronehq.com",
+      "position": 4,
+      "description": "| Unitree app | Showcases and outreach | | Unitree G1 Edu tiers | Full SDK \nwith low-level joint control on an onboard NVIDIA Jetson Orin. Edu Pro and \nUltimate a...",
+      "citationPillId": 3
+     },
+     {
+      "label": "i>Humanoid Robots 2026: A Comprehensive Review of Technical",
+      "url": "https://www.researchgate.net/publication/408983653_iHumanoid_Robots_2026_A_Comprehensive_Review_of_Technical_Foundations_Market_Dynamics_and_Research_Challengesi#:~:text=energy%2Def%EF%AC%81cient%20deployment%20%5B46%2C%2047%5D.%20Standing%20approximately.%201.9,to%202.3%20m%2C%20and%20is%20capable%20of.",
+      "domain": "researchgate.net",
+      "position": 5,
+      "description": " energy-efﬁcient deployment [46, 47]. Standing approximately. 1.9 m tall \nand weighing around 90 kg, Electric Atlas integrates. 56 degrees of \nfreedom, articulate...",
+      "citationPillId": 4
+     },
+     {
+      "label": "Best Humanoid Robots for STEM Programs & Schools (2026 Guide)",
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=%7C%20Unitree%20app%20%7C%20Full%2Dsize%20demonstrations%20%7C,%7C%20Teachers%20who%20do%20not%20code%20%7C",
+      "domain": "globaldronehq.com",
+      "position": 6,
+      "description": "| Unitree app | Full-size demonstrations | | Unitree H2 Edu | Full SDK on a \ndedicated Intel Core i7 development PC, with optional NVIDIA Jetson AGX \nThor compute...",
+      "citationPillId": 5
+     },
+     {
+      "label": "i>Humanoid Robots 2026: A Comprehensive Review of Technical",
+      "url": "https://www.researchgate.net/publication/408983653_iHumanoid_Robots_2026_A_Comprehensive_Review_of_Technical_Foundations_Market_Dynamics_and_Research_Challengesi#:~:text=open%20SDK%20supporting%20ROS2%20and%20high%2Dlevel%20programming%2C,and%20a%20peak%20torque%20density%20of%20%E2%88%BC189.",
+      "domain": "researchgate.net",
+      "position": 2,
+      "description": "open SDK supporting ROS2 and high-level programming, making it well suited \nfor education, AI-driven manipulation. research, and \nimitation/reinforcement-learning...",
+      "citationPillId": 6
+     },
+     {
+      "label": "Best Humanoid Robots for STEM Programs & Schools (2026 Guide)",
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=Pro%20configurations%20add%20LiDAR%20and%20hands.%20%7C,Unitree%20H2%20%7C%20App%20and%20remote%20only.",
+      "domain": "globaldronehq.com",
+      "position": 8,
+      "description": "Pro configurations add LiDAR and hands. | Same, plus on-robot AI inference \n| AI and perception courses | | Unitree G1, G1 Pro | App and remote only. | \nUnitree a...",
+      "citationPillId": 7
+     },
+     {
+      "label": "Best Humanoid Robots for STEM Programs & Schools (2026 Guide)",
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=%7C%20Unitree%20SDK2%20in%20C%2B%2B%20and%20Python%2C,G1%20Pro%20%7C%20App%20and%20remote%20only.",
+      "domain": "globaldronehq.com",
+      "position": 9,
+      "description": "| Unitree SDK2 in C++ and Python, ROS 2, simulation | High school and intro \ncollege coding | | R1 Edu Smart and R1 Edu Pro | Everything in Edu \nStandard, plus an...",
+      "citationPillId": 8
+     }
+    ],
+    "markdown": "Choosing a humanoid robot for academic or corporate research depends heavily on your lab's focus (e.g., bipedal locomotion, AI/imitation learning, or dexterous manipulation), budget, and required software integration (such as ROS 2 or simulation suites like Isaac Lab and MuJoCo). [Best Humanoid Robots for STEM Programs & Schools (2026 Guide)](https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=%7C%20Unitree%20SDK2%20in%20C%2B%2B%20and%20Python%2C,research%20%7C%20%7C%20AgiBot%20X2%20%7C%20No%2Dcode.)\n\nSeveral key platforms stand out as industry standards for research:\n\n### 1\\. Unitree G1 & H-Series (Edu Tiers)\n\n  * **Best For:** AI development, machine learning, bipedal locomotion, and general university lab research. [i>Humanoid Robots 2026: A Comprehensive Review of Technical](https://www.researchgate.net/publication/408983653_iHumanoid_Robots_2026_A_Comprehensive_Review_of_Technical_Foundations_Market_Dynamics_and_Research_Challengesi#:~:text=open%20SDK%20supporting%20ROS2%20and%20high%2Dlevel%20programming%2C,and%20a%20peak%20torque%20density%20of%20%E2%88%BC189.)\n\n  * **Why it’s suited for research:** Unitree has become a dominant fixture in university labs due to its relatively accessible price point and open developer ecosystem. The **G1 Edu** variants feature an onboard NVIDIA Jetson Orin module, full SDK access for high- and low-level control, and direct support for ROS 2. For labs focusing on full-size human scaling, the **Unitree H-series** (like the H1 and H2 Edu) offers higher power, heavier payload capacities, and robust stability for dynamic movement studies. [Best Humanoid Robots for STEM Programs & Schools (2026 Guide)](https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=*%20Best%20for%20university%20research%20labs%3A%20Unitree,size%20at%201.82%20m%20with%20development%20access.)[Best Humanoid Robots for STEM Programs & Schools (2026 Guide)](https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=%7C%20Unitree%20app%20%7C%20Showcases%20and%20outreach,Unitree%20H2%20%7C%20App%20and%20remote%20only.)\n\n### 2\\. Boston Dynamics Atlas (Electric)\n\n  * **Best For:** Advanced state-of-the-art mobility, whole-body control, and complex manipulation. [i>Humanoid Robots 2026: A Comprehensive Review of Technical](https://www.researchgate.net/publication/408983653_iHumanoid_Robots_2026_A_Comprehensive_Review_of_Technical_Foundations_Market_Dynamics_and_Research_Challengesi#:~:text=energy%2Def%EF%AC%81cient%20deployment%20%5B46%2C%2047%5D.%20Standing%20approximately.%201.9,to%202.3%20m%2C%20and%20is%20capable%20of.)\n\n  * **Why it’s suited for research:** The fully electric Atlas platform boasts high degrees of freedom (around 56 DoF) and unmatched hydraulic/electric agility. While typically deployed in select partner institutions and high-end industrial/research environments rather than standard open-market purchase, it represents the gold standard for testing acrobatic movement, dynamic balance, and complex spatial interaction.\n\n### 3\\. AgiBot X2 (Ultra/Edu Configurations)\n\n  * **Best For:** Human-robot interaction, autonomous navigation, and no-code/low-code AI toolchains. [Best Humanoid Robots for STEM Programs & Schools (2026 Guide)](https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=%7C%20Unitree%20app%20%7C%20Full%2Dsize%20demonstrations%20%7C,%7C%20Teachers%20who%20do%20not%20code%20%7C)\n\n  * **Why it’s suited for research:** AgiBot platforms come equipped with robust sensor arrays and software environments like LinkCraft (for teleoperation-based motion capture) and LinkSoul. They are heavily utilized in research settings exploring cognitive architectures, human-intent tracking, and campus-navigation assistance.\n\n### Key Factors to Consider When Selecting a Research Robot:\n\n  * **SDK & Software Openness:** Ensure the robot provides low-level joint control (torque/impedance control) rather than just high-level app commands if your lab studies locomotion physics. [i>Humanoid Robots 2026: A Comprehensive Review of Technical](https://www.researchgate.net/publication/408983653_iHumanoid_Robots_2026_A_Comprehensive_Review_of_Technical_Foundations_Market_Dynamics_and_Research_Challengesi#:~:text=open%20SDK%20supporting%20ROS2%20and%20high%2Dlevel%20programming%2C,and%20a%20peak%20torque%20density%20of%20%E2%88%BC189.)\n\n  * **Simulation Support:** Platforms that natively bridge with modern physics simulators (like NVIDIA Isaac Lab, MuJoCo, or Gazebo) save hundreds of hours when testing reinforcement learning algorithms safely. [Best Humanoid Robots for STEM Programs & Schools (2026 Guide)](https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=Pro%20configurations%20add%20LiDAR%20and%20hands.%20%7C,Unitree%20H2%20%7C%20App%20and%20remote%20only.)\n\n  * **Compute Power:** Onboard AI processing units (such as NVIDIA Orin modules) are essential if you plan to run vision-language models or heavy neural networks directly on the hardware. [Best Humanoid Robots for STEM Programs & Schools (2026 Guide)](https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education#:~:text=%7C%20Unitree%20SDK2%20in%20C%2B%2B%20and%20Python%2C,G1%20Pro%20%7C%20App%20and%20remote%20only.)"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "c38e9d58b5db4a2887930aaf7230c364",
+   "charged_micro": 2400
+  }
+ }
+}

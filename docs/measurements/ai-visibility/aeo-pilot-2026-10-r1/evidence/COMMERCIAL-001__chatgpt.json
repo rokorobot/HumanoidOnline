@@ -1,0 +1,155 @@
+{
+ "observed_at": "2026-10-31T03:13:46+00:00",
+ "endpoint": "cloro.ai-search.chatgpt.scrape",
+ "request": {
+  "prompt": "How much does the Unitree G1 cost?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "model": null,
+    "text": "The Unitree G1 starts at $13,500 USD (approximately €11,600).\n\nHowever, the final price depends on the version and where you buy it.\n\nPrices (October 2026)\n\nVersion\n\nApproximate price\n\nG1 Standard (official price)\n\n$13,500\n\nG1 Basic (Germany)\n\n€23,000–€27,370\n\nG1 EDU\n\n€31,500+\n\nG1 EDU with advanced hands\n\n€40,000–€60,000+\n\nSources:\n\n6\n\nImportant additional costs\n\nShipping: $300–$1,200.\n\nImport duties and German VAT (19%) may apply when importing directly.\n\nAdditional computing hardware and dexterous hands can increase the price.\n\nThe EDU version supports secondary development and research applications.\n\nThe official manufacturer price excludes taxes and shipping.\n\nOfficial purchase: Unitree G1 official store .\n\nMy recommendation: If you're buying one in Germany, budget around €25,000–€35,000 for a standard setup, or considerably more for an EDU research configuration.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Unitree G1",
+      "url": "https://shop.unitree.com/zh-gb/products/unitree-g1",
+      "footnote": false
+     },
+     {
+      "position": 2,
+      "label": "Humanoide Roboter kaufen: Händler in Deutschland",
+      "url": "https://roboter-zentrale.de/humanoide-kaufen",
+      "footnote": false
+     },
+     {
+      "position": 3,
+      "label": "Unitree G1 kaufen – humanoider Roboter",
+      "url": "https://www.uxsystems.de/product/unitree-g1/",
+      "footnote": false
+     },
+     {
+      "position": 4,
+      "label": "Humanoid robot G1\\_Humanoid Robot Functions\\_Humanoid Robot Price",
+      "url": "https://www.unitree.com/g1/",
+      "footnote": false
+     },
+     {
+      "position": 5,
+      "label": "Unitree G1 official store",
+      "url": "https://shop.unitree.com/products/unitree-g1",
+      "footnote": true
+     },
+     {
+      "position": 6,
+      "label": "",
+      "url": "https://www.usrobotstore.com/products/unitree-g1",
+      "footnote": true
+     },
+     {
+      "position": 7,
+      "label": "",
+      "url": "https://evolt.si/en/products/humanoid-robot-unitree-g1",
+      "footnote": true
+     },
+     {
+      "position": 8,
+      "label": "",
+      "url": "https://w-technika.sk/cs/products/unitree-unitree-g1",
+      "footnote": true
+     },
+     {
+      "position": 9,
+      "label": "",
+      "url": "https://robostore.com/products/unitree-g1-robotic-humanoid",
+      "footnote": true
+     },
+     {
+      "position": 10,
+      "label": "",
+      "url": "https://www.svet-robotu.cz/products/unitree-g1-edu-standard-edition-intelligent-ai-interactive-bionic-humanoid-bipedal-robot",
+      "footnote": true
+     },
+     {
+      "position": 11,
+      "label": "",
+      "url": "https://robostore.com/products/unitree-g1-edu-ultimate-robotic-humanoid",
+      "footnote": true
+     }
+    ],
+    "entities": [
+     {
+      "type": "product",
+      "name": "Unitree G1"
+     }
+    ],
+    "map": [],
+    "followUpForm": null,
+    "markdown": "The Unitree G1 starts at $13,500 USD (approximately €11,600).\n\nHowever, the final price depends on the version and where you buy it.\n\n## Prices (October 2026)\n\n| Version | Approximate price |\n| --- | --- |\n| G1 Standard (official price) | $13,500 |\n| G1 Basic (Germany) | €23,000–€27,370 |\n| G1 EDU | €31,500+ |\n| G1 EDU with advanced hands | €40,000–€60,000+ |\n\nSources: [Humanoid robot G1\\_Humanoid Robot Functions\\_Humanoid Robot Price](https://www.unitree.com/g1/)[Unitree G1](https://shop.unitree.com/zh-gb/products/unitree-g1)[Unitree G1 kaufen – humanoider Roboter](https://www.uxsystems.de/product/unitree-g1/)[Humanoide Roboter kaufen: Händler in Deutschland](https://roboter-zentrale.de/humanoide-kaufen)\n\n6\n\n## Important additional costs\n\n- Shipping: $300–$1,200.\n- Import duties and German VAT (19%) may apply when importing directly.\n- Additional computing hardware and dexterous hands can increase the price.\n- The EDU version supports secondary development and research applications.\n\nThe official manufacturer price excludes taxes and shipping. [Unitree G1](https://shop.unitree.com/zh-gb/products/unitree-g1)[Humanoid robot G1\\_Humanoid Robot Functions\\_Humanoid Robot Price](https://www.unitree.com/g1/)\n\nOfficial purchase: [Unitree G1 official store](https://shop.unitree.com/products/unitree-g1?utm_source=chatgpt.com).\n\nMy recommendation: If you're buying one in Germany, budget around €25,000–€35,000 for a standard setup, or considerably more for an EDU research configuration.",
+    "citationPills": [
+     {
+      "url": "https://www.unitree.com/g1/",
+      "label": "Humanoid robot G1_Humanoid Robot Functions_Humanoid Robot Price",
+      "domain": "unitree.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 4
+     },
+     {
+      "url": "https://shop.unitree.com/zh-gb/products/unitree-g1",
+      "label": "Unitree G1",
+      "domain": "shop.unitree.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 1
+     },
+     {
+      "url": "https://www.uxsystems.de/product/unitree-g1/",
+      "label": "Unitree G1 kaufen – humanoider Roboter",
+      "domain": "uxsystems.de",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 3
+     },
+     {
+      "url": "https://roboter-zentrale.de/humanoide-kaufen",
+      "label": "Humanoide Roboter kaufen: Händler in Deutschland",
+      "domain": "roboter-zentrale.de",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 2
+     },
+     {
+      "url": "https://shop.unitree.com/zh-gb/products/unitree-g1",
+      "label": "Unitree G1",
+      "domain": "shop.unitree.com",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 1
+     },
+     {
+      "url": "https://www.unitree.com/g1/",
+      "label": "Humanoid robot G1_Humanoid Robot Functions_Humanoid Robot Price",
+      "domain": "unitree.com",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 4
+     }
+    ]
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "8893988f443c4b08ab8b67a8bcdf005a",
+   "charged_micro": 2800
+  }
+ }
+}

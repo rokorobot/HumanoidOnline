@@ -1,0 +1,256 @@
+{
+ "observed_at": "2026-10-31T03:14:07+00:00",
+ "endpoint": "cloro.ai-search.chatgpt.scrape",
+ "request": {
+  "prompt": "Which humanoid robots have SDK access?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "model": null,
+    "text": "As of October 2026, several humanoid robots offer developer SDKs, APIs, or ROS 2 interfaces that allow external developers to program robot behavior, control joints, integrate sensors, build AI applications, and experiment with locomotion and manipulation.\n\nThe important distinction is between public SDK access, commercial developer access, and restricted enterprise access.\n\nHumanoid robots with developer SDK access\n\n1. Public or relatively open developer access\n\nUnitree G1\n\nPublic SDK\n\nC++ and Python SDKs.\n\nLow-level joint control and high-level motion interfaces.\n\nROS 2 integration.\n\nSimulation and reinforcement-learning workflows.\n\nParticularly suitable for AI and robotics development.\n\nDocumentation: Unitree developer portal · GitHub SDK\n\nUnitree H1\n\nPublic SDK\n\nC++ and Python interfaces.\n\nLow-level motor and motion control.\n\nROS 2 / DDS integration.\n\nLocomotion and reinforcement-learning development.\n\nOfficial SDK documentation\n\nReachy 2\n\nOpen source\n\nPython SDK.\n\nROS 2 Humble.\n\nOpen-source software and hardware.\n\nManipulation, perception and teleoperation.\n\nDeveloper documentation\n\nLimX Dynamics TRON1\n\nPublic developer repositories and low-level SDK resources.\n\nC++ and Python development.\n\nSimulation and reinforcement-learning tools.\n\nROS integration.\n\nDeveloper ecosystem overview\n\n2. Other robots with documented SDK or development interfaces\n\nRobot\n\nDeveloper access\n\nMain interfaces\n\nUnitree H2\n\nPublic documentation\n\nSDK, C++, ROS-related tools\n\nUnitree R1\n\nPublic documentation\n\nSDK development guide\n\nUnitree G1-D\n\nDeveloper documentation\n\nSDK\n\nUnitree H1-2\n\nSDK / research tooling\n\nC++, ROS 2\n\nCASBOT 2\n\nPublic ROS 2 SDK\n\nC++, Python, ROS 2\n\nPAL TALOS\n\nROS 2 development ecosystem\n\nROS 2, MoveIt 2\n\nLeju Kuavo\n\nOpen-source development resources\n\nROS, simulation, control\n\nSources:\n\n3. Commercial robots with more restricted developer access\n\nThese are worth investigating, but having a developer program or integration interface does not necessarily mean anyone can download a complete SDK.\n\nAgility Digit – Commercial and enterprise integration.\n\nFigure 02 – Primarily controlled through Figure's own software ecosystem.\n\nApptronik Apollo – Commercial development and integration.\n\nFourier GR-1 – Research and development configurations.\n\nTesla Optimus – No generally available public developer SDK established.\n\nFor these, I would request written confirmation of API availability, documentation, and hardware-level access before purchasing.\n\nWhich should you choose?\n\nMy shortlist would be:\n\nDevelopment objective\n\nBest candidates\n\nFull robot programming\n\nUnitree G1, H1\n\nPython and AI integration\n\nReachy 2, Unitree G1\n\nLow-level motor control\n\nUnitree G1, H1\n\nROS 2 development\n\nReachy 2, Unitree, TALOS\n\nReinforcement learning\n\nUnitree G1, H1, LimX\n\nIndustrial deployment\n\nDigit, Apollo\n\nOpen-source experimentation\n\nReachy 2, CASBOT 2\n\nImportant: What does SDK access actually mean?\n\nBefore selecting a robot, I would verify that its SDK provides:\n\nJoint-level control: Direct access to individual motors and actuators.\n\nWhole-body control: Ability to control arms, legs, torso and balance together.\n\nSensor access: Cameras, depth sensors, IMUs, force/torque sensors.\n\nPython/C++ APIs: Ability to develop custom applications.\n\nROS 2 support: Integration with external robotics software.\n\nAI integration: Ability to deploy custom perception, LLM and VLA models.\n\nSimulation: URDF/MJCF models and support for MuJoCo, Isaac Sim or Gazebo.\n\nCommercial licensing: Permission to deploy your own software on purchased hardware.\n\nMy strongest recommendation is the Unitree G1 EDU. It offers a particularly interesting combination of physical hardware access, SDK availability, ROS 2 and AI research capabilities.\n\nOne question that would help narrow this down:\n\nAre you looking for a humanoid robot that you can program with your own AI software (for example, connecting an LLM or VLA model and giving the robot completely custom behaviors), or do you primarily want low-level hardware and motor-control access?",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Unitree developer portal",
+      "url": "https://support.unitree.com/home/en/developer/",
+      "footnote": false
+     },
+     {
+      "position": 2,
+      "label": "Developer ecosystem overview",
+      "url": "https://botlandscape.com/topics/software.html",
+      "footnote": false
+     },
+     {
+      "position": 3,
+      "label": "ROS2 Support in Humanoid Robots: A Developer's Guide (2026)",
+      "url": "https://biorobot.ai/en/blog/ros2-support-guide-humanoid-robots",
+      "footnote": false
+     },
+     {
+      "position": 4,
+      "label": "GitHub",
+      "url": "https://github.com/CasbotRobotics/casbot2-ros2-sdk",
+      "footnote": false
+     },
+     {
+      "position": 5,
+      "label": "GitHub SDK",
+      "url": "https://github.com/unitreerobotics",
+      "footnote": true
+     },
+     {
+      "position": 6,
+      "label": "",
+      "url": "https://www.roboworks.com.au/store/p/unitree-g1-humanoid-robot-2g469",
+      "footnote": true
+     },
+     {
+      "position": 7,
+      "label": "Developer documentation",
+      "url": "https://cornerstoneofhope.mashreqdevelopments.com/?_=%2Freachy-2%2F%23aU4iOhb7bFvlafZww2vsQW5YOT4MojBa9mn3",
+      "footnote": true
+     },
+     {
+      "position": 8,
+      "label": "",
+      "url": "https://evolt.si/products/humanoidni-robot-unitree-h1",
+      "footnote": true
+     },
+     {
+      "position": 9,
+      "label": "",
+      "url": "https://docs.pollen-robotics.com/",
+      "footnote": true
+     },
+     {
+      "position": 10,
+      "label": "",
+      "url": "https://www.usrobotstore.com/products/limix-dynamics-tron-1-multi-modal-biped-robot",
+      "footnote": true
+     },
+     {
+      "position": 11,
+      "label": "",
+      "url": "https://developer.nvidia.com/isaac",
+      "footnote": true
+     },
+     {
+      "position": 12,
+      "label": "",
+      "url": "https://developer.nvidia.com/isaac/ros",
+      "footnote": true
+     },
+     {
+      "position": 13,
+      "label": "",
+      "url": "https://humanoidversus.com/lists/open-source-humanoid-robots",
+      "footnote": true
+     },
+     {
+      "position": 14,
+      "label": "",
+      "url": "https://manush.si/developers/docs/getting-started-introduction",
+      "footnote": true
+     },
+     {
+      "position": 15,
+      "label": "",
+      "url": "https://support.unitree.com/home/",
+      "footnote": true
+     },
+     {
+      "position": 16,
+      "label": "",
+      "url": "https://support.unitree.com/home/en/G1_developer/dexterous_hand",
+      "footnote": true
+     },
+     {
+      "position": 17,
+      "label": "",
+      "url": "https://support.unitree.com/home/en/H1_developer/Remote_control_data",
+      "footnote": true
+     },
+     {
+      "position": 18,
+      "label": "",
+      "url": "https://support.unitree.com/home/en/Z1_developer/use",
+      "footnote": true
+     },
+     {
+      "position": 19,
+      "label": "",
+      "url": "https://webuildhumanoids.com/guides/humanoid-development-tools",
+      "footnote": true
+     },
+     {
+      "position": 20,
+      "label": "",
+      "url": "https://webuildhumanoids.com/robots",
+      "footnote": true
+     },
+     {
+      "position": 21,
+      "label": "",
+      "url": "https://webuildhumanoids.com/topics/ros-2",
+      "footnote": true
+     },
+     {
+      "position": 22,
+      "label": "",
+      "url": "https://www.robotshop.com/products/unitree-g1-edu-standard-u1-humanoid-robot-us?qd=f0faa0e0e9e67737b73124c192f8373d",
+      "footnote": true
+     },
+     {
+      "position": 23,
+      "label": "",
+      "url": "https://www.unitree.com/mobile/opensource/",
+      "footnote": true
+     }
+    ],
+    "entities": [
+     {
+      "type": "product",
+      "name": "Unitree G1"
+     },
+     {
+      "type": "product",
+      "name": "Unitree H1"
+     },
+     {
+      "type": "product",
+      "name": "Reachy 2"
+     },
+     {
+      "type": "product",
+      "name": "LimX Dynamics TRON1"
+     },
+     {
+      "type": "product",
+      "name": "CASBOT 2"
+     },
+     {
+      "type": "product",
+      "name": "PAL TALOS"
+     },
+     {
+      "type": "product",
+      "name": "Leju Kuavo"
+     },
+     {
+      "type": "product",
+      "name": "Agility Digit"
+     },
+     {
+      "type": "product",
+      "name": "Figure 02"
+     },
+     {
+      "type": "product",
+      "name": "Apptronik Apollo"
+     },
+     {
+      "type": "product",
+      "name": "Fourier GR-1"
+     },
+     {
+      "type": "product",
+      "name": "Tesla Optimus"
+     }
+    ],
+    "map": [],
+    "followUpForm": null,
+    "markdown": "As of October 2026, several humanoid robots offer developer SDKs, APIs, or ROS 2 interfaces that allow external developers to program robot behavior, control joints, integrate sensors, build AI applications, and experiment with locomotion and manipulation.\n\nThe important distinction is between public SDK access, commercial developer access, and restricted enterprise access.\n\n## Humanoid robots with developer SDK access\n\n### 1. Public or relatively open developer access\n\nUnitree G1\n\nPublic SDK\n\n- C++ and Python SDKs.\n- Low-level joint control and high-level motion interfaces.\n- ROS 2 integration.\n- Simulation and reinforcement-learning workflows.\n- Particularly suitable for AI and robotics development.\n\nDocumentation: [Unitree developer portal](https://support.unitree.com/home/en/developer/?utm_source=chatgpt.com) · [GitHub SDK](https://github.com/unitreerobotics?utm_source=chatgpt.com)\n\nUnitree H1\n\nPublic SDK\n\n- C++ and Python interfaces.\n- Low-level motor and motion control.\n- ROS 2 / DDS integration.\n- Locomotion and reinforcement-learning development.\n\n[Official SDK documentation](https://support.unitree.com/home/en/developer/?utm_source=chatgpt.com)\n\nReachy 2\n\nOpen source\n\n- Python SDK.\n- ROS 2 Humble.\n- Open-source software and hardware.\n- Manipulation, perception and teleoperation.\n\n[Developer documentation](https://cornerstoneofhope.mashreqdevelopments.com/?_=%2Freachy-2%2F%23aU4iOhb7bFvlafZww2vsQW5YOT4MojBa9mn3&utm_source=chatgpt.com)\n\nLimX Dynamics TRON1\n\n- Public developer repositories and low-level SDK resources.\n- C++ and Python development.\n- Simulation and reinforcement-learning tools.\n- ROS integration.\n\n[Developer ecosystem overview](https://botlandscape.com/topics/software.html?utm_source=chatgpt.com)\n\n### 2. Other robots with documented SDK or development interfaces\n\n| Robot | Developer access | Main interfaces |\n| --- | --- | --- |\n| Unitree H2 | Public documentation | SDK, C++, ROS-related tools |\n| Unitree R1 | Public documentation | SDK development guide |\n| Unitree G1-D | Developer documentation | SDK |\n| Unitree H1-2 | SDK / research tooling | C++, ROS 2 |\n| CASBOT 2 | Public ROS 2 SDK | C++, Python, ROS 2 |\n| PAL TALOS | ROS 2 development ecosystem | ROS 2, MoveIt 2 |\n| Leju Kuavo | Open-source development resources | ROS, simulation, control |\n\nSources: [宇树科技 文档中心](https://support.unitree.com/home/en/developer/)[GitHub](https://github.com/CasbotRobotics/casbot2-ros2-sdk)[ROS2 Support in Humanoid Robots: A Developer's Guide (2026)](https://biorobot.ai/en/blog/ros2-support-guide-humanoid-robots)[Robot developer ecosystems, SDKs, and simulation](https://botlandscape.com/topics/software.html)\n\n### 3. Commercial robots with more restricted developer access\n\nThese are worth investigating, but having a developer program or integration interface does not necessarily mean anyone can download a complete SDK.\n\n- Agility Digit – Commercial and enterprise integration.\n- Figure 02 – Primarily controlled through Figure's own software ecosystem.\n- Apptronik Apollo – Commercial development and integration.\n- Fourier GR-1 – Research and development configurations.\n- Tesla Optimus – No generally available public developer SDK established.\n\nFor these, I would request written confirmation of API availability, documentation, and hardware-level access before purchasing.\n\n## Which should you choose?\n\nMy shortlist would be:\n\n| Development objective | Best candidates |\n| --- | --- |\n| Full robot programming | Unitree G1, H1 |\n| Python and AI integration | Reachy 2, Unitree G1 |\n| Low-level motor control | Unitree G1, H1 |\n| ROS 2 development | Reachy 2, Unitree, TALOS |\n| Reinforcement learning | Unitree G1, H1, LimX |\n| Industrial deployment | Digit, Apollo |\n| Open-source experimentation | Reachy 2, CASBOT 2 |\n\n## Important: What does SDK access actually mean?\n\nBefore selecting a robot, I would verify that its SDK provides:\n\n1. Joint-level control: Direct access to individual motors and actuators.\n2. Whole-body control: Ability to control arms, legs, torso and balance together.\n3. Sensor access: Cameras, depth sensors, IMUs, force/torque sensors.\n4. Python/C++ APIs: Ability to develop custom applications.\n5. ROS 2 support: Integration with external robotics software.\n6. AI integration: Ability to deploy custom perception, LLM and VLA models.\n7. Simulation: URDF/MJCF models and support for MuJoCo, Isaac Sim or Gazebo.\n8. Commercial licensing: Permission to deploy your own software on purchased hardware.\n\nMy strongest recommendation is the Unitree G1 EDU. It offers a particularly interesting combination of physical hardware access, SDK availability, ROS 2 and AI research capabilities.\n\nOne question that would help narrow this down:\n\nAre you looking for a humanoid robot that you can program with your own AI software (for example, connecting an LLM or VLA model and giving the robot completely custom behaviors), or do you primarily want low-level hardware and motor-control access?",
+    "citationPills": [
+     {
+      "url": "https://support.unitree.com/home/en/developer/",
+      "label": "宇树科技 文档中心",
+      "domain": "support.unitree.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 1
+     },
+     {
+      "url": "https://github.com/CasbotRobotics/casbot2-ros2-sdk",
+      "label": "GitHub",
+      "domain": "github.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 4
+     },
+     {
+      "url": "https://biorobot.ai/en/blog/ros2-support-guide-humanoid-robots",
+      "label": "ROS2 Support in Humanoid Robots: A Developer's Guide (2026)",
+      "domain": "biorobot.ai",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 3
+     },
+     {
+      "url": "https://botlandscape.com/topics/software.html",
+      "label": "Robot developer ecosystems, SDKs, and simulation",
+      "domain": "botlandscape.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 2
+     }
+    ]
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "8d36cc03e1b94c7296b105f35a9c2ce4",
+   "charged_micro": 2800,
+   "hint": "review"
+  }
+ }
+}

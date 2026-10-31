@@ -1,0 +1,88 @@
+{
+ "observed_at": "2026-10-31T03:12:32+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "Which humanoid robots can be purchased in Asia?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Several humanoid and bipedal robots developed by Asian tech companies are commercially available for purchase, primarily targeting research institutions, software developers, and industrial automation markets.\n\nProminent humanoid robots manufactured and sold in Asia include:\n\n1. Unitree Robotics (China)\n\nUnitree is one of the most prominent suppliers of accessible bipedal robots globally, offering models widely used for AI development and research:\n\nUnitree G1: A compact humanoid robot (roughly 1.3 meters tall) that stands as one of the most cost-effective humanoid platforms on the market, starting around $16,000 to $17,900. Higher-tier educational configurations (EDU versions) feature advanced multi-finger dexterous hands and higher-end processing.\n\nUnitree H1 / H2 Series: Full-sized humanoid robots built for heavier industrial payloads, robust mobility, and advanced AI integration.\n\n2. Booster Robotics (China)\n\nBooster K1: An agile, compact bipedal humanoid robot aimed at education, developer prototyping, and research, typically ranging from roughly $11,000 to $20,000 depending on the software tier.\n\n3. UBTECH Robotics (China)\n\nWalker & Cruzr Series: UBTECH manufactures commercial service humanoids (such as the Cruzr series) as well as industrial-grade bipedal systems (Walker S series) utilized in automotive manufacturing lines. They also produce specialized bionic humanoid models for interactive environments.\n\n4. Fourier Intelligence (China)\n\nGR-2: A general-purpose, human-sized humanoid robot designed for advanced movement, rehabilitation research, and complex manipulation tasks.\n\n5. Kawada Robotics (Japan)\n\nNextage: A well-established Japanese dual-arm humanoid robot designed primarily for precision industrial assembly, electronics manufacturing, and factory collaboration.\n\nAre you looking for a humanoid robot for a specific application like academic research, software development, or industrial automation?",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Unitree Humanoid Robots - RoboStore",
+      "url": "https://robostore.com/collections/humanoid-robots",
+      "description": "Shop Unitree humanoid robots at RoboStore — G1, R1 and H1 models for \neducation, research, AI development, and advanced automation."
+     },
+     {
+      "position": 2,
+      "label": "Unitree Humanoid Robots - RoboStore",
+      "url": "https://robostore.com/collections/humanoid-robots",
+      "description": "Shop Unitree humanoid robots at RoboStore — G1, R1 and H1 models for \neducation, research, AI development, and advanced automation."
+     },
+     {
+      "position": 3,
+      "label": "Humanoid Robots for Sale - Top 3D Shop",
+      "url": "https://top3dshop.com/robots/humanoid-robots/#:~:text=In%20contrast%2C%20the%20Unitree%20H1%20(under%20%2490%2C000),Core%20i5%2Fi7%20processor%20for%20high%2Dspeed%20AI%20performance.",
+      "description": "In contrast, the Unitree H1 (under $90,000) justifies its higher price with \nLivox MID-360 LiDAR for 360° sensing and superior environmental perception. \n* Proces..."
+     },
+     {
+      "position": 4,
+      "label": "Humanoid Robots for Sale - Top 3D Shop",
+      "url": "https://top3dshop.com/robots/humanoid-robots/#:~:text=For%20example%2C%20both%20the%20Unitree%20G1%20(%2416%2C000),power%20supports%20real%2Dtime%20decision%2Dmaking%20and%20complex%20tasks.",
+      "description": "For example, both the Unitree G1 ($16,000) and H1 (under $90,000) use \nNVIDIA Orin NX processors (up to 100 trillion operations per second), but \nthe H1 includes ..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Unitree Humanoid Robots - RoboStore",
+      "url": "https://robostore.com/collections/humanoid-robots",
+      "domain": "robostore.com",
+      "position": 1,
+      "description": "Shop Unitree humanoid robots at RoboStore — G1, R1 and H1 models for \neducation, research, AI development, and advanced automation.",
+      "citationPillId": 1
+     },
+     {
+      "label": "Unitree Humanoid Robots - RoboStore",
+      "url": "https://robostore.com/collections/humanoid-robots",
+      "domain": "robostore.com",
+      "position": 1,
+      "description": "Shop Unitree humanoid robots at RoboStore — G1, R1 and H1 models for \neducation, research, AI development, and advanced automation.",
+      "citationPillId": 2
+     },
+     {
+      "label": "Humanoid Robots for Sale - Top 3D Shop",
+      "url": "https://top3dshop.com/robots/humanoid-robots/#:~:text=In%20contrast%2C%20the%20Unitree%20H1%20(under%20%2490%2C000),Core%20i5%2Fi7%20processor%20for%20high%2Dspeed%20AI%20performance.",
+      "domain": "top3dshop.com",
+      "position": 3,
+      "description": "In contrast, the Unitree H1 (under $90,000) justifies its higher price with \nLivox MID-360 LiDAR for 360° sensing and superior environmental perception. \n* Proces...",
+      "citationPillId": 3
+     },
+     {
+      "label": "Humanoid Robots for Sale - Top 3D Shop",
+      "url": "https://top3dshop.com/robots/humanoid-robots/#:~:text=For%20example%2C%20both%20the%20Unitree%20G1%20(%2416%2C000),power%20supports%20real%2Dtime%20decision%2Dmaking%20and%20complex%20tasks.",
+      "domain": "top3dshop.com",
+      "position": 4,
+      "description": "For example, both the Unitree G1 ($16,000) and H1 (under $90,000) use \nNVIDIA Orin NX processors (up to 100 trillion operations per second), but \nthe H1 includes ...",
+      "citationPillId": 4
+     }
+    ],
+    "markdown": "Several humanoid and bipedal robots developed by Asian tech companies are commercially available for purchase, primarily targeting research institutions, software developers, and industrial automation markets. [Unitree Humanoid Robots - RoboStore](https://robostore.com/collections/humanoid-robots)\n\nProminent humanoid robots manufactured and sold in Asia include:\n\n### 1\\. Unitree Robotics (China)\n\nUnitree is one of the most prominent suppliers of accessible bipedal robots globally, offering models widely used for AI development and research: [Unitree Humanoid Robots - RoboStore](https://robostore.com/collections/humanoid-robots)\n\n  * **Unitree G1:** A compact humanoid robot (roughly 1.3 meters tall) that stands as one of the most cost-effective humanoid platforms on the market, starting around $16,000 to $17,900. Higher-tier educational configurations (EDU versions) feature advanced multi-finger dexterous hands and higher-end processing. [Humanoid Robots for Sale - Top 3D Shop](https://top3dshop.com/robots/humanoid-robots/#:~:text=In%20contrast%2C%20the%20Unitree%20H1%20\\(under%20%2490%2C000\\),Core%20i5%2Fi7%20processor%20for%20high%2Dspeed%20AI%20performance.)\n\n  * **Unitree H1 / H2 Series:** Full-sized humanoid robots built for heavier industrial payloads, robust mobility, and advanced AI integration. [Humanoid Robots for Sale - Top 3D Shop](https://top3dshop.com/robots/humanoid-robots/#:~:text=For%20example%2C%20both%20the%20Unitree%20G1%20\\(%2416%2C000\\),power%20supports%20real%2Dtime%20decision%2Dmaking%20and%20complex%20tasks.)\n\n### 2\\. Booster Robotics (China)\n\n  * **Booster K1:** An agile, compact bipedal humanoid robot aimed at education, developer prototyping, and research, typically ranging from roughly $11,000 to $20,000 depending on the software tier.\n\n### 3\\. UBTECH Robotics (China)\n\n  * **Walker & Cruzr Series:** UBTECH manufactures commercial service humanoids (such as the Cruzr series) as well as industrial-grade bipedal systems (Walker S series) utilized in automotive manufacturing lines. They also produce specialized bionic humanoid models for interactive environments.\n\n### 4\\. Fourier Intelligence (China)\n\n  * **GR-2:** A general-purpose, human-sized humanoid robot designed for advanced movement, rehabilitation research, and complex manipulation tasks.\n\n### 5\\. Kawada Robotics (Japan)\n\n  * **Nextage:** A well-established Japanese dual-arm humanoid robot designed primarily for precision industrial assembly, electronics manufacturing, and factory collaboration.\n\nAre you looking for a humanoid robot for a specific application like academic research, software development, or industrial automation?"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "78801a848ddd429cbd187cbea63053e3",
+   "charged_micro": 2400
+  }
+ }
+}

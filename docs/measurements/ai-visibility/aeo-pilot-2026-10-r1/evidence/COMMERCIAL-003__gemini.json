@@ -1,0 +1,150 @@
+{
+ "observed_at": "2026-10-31T03:12:08+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "Which humanoid robots can be purchased in Europe?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Several humanoid and bipedal robots can be purchased or ordered for delivery in Europe, primarily targeted at research, development, industrial testing, and early-adopter tech markets.\n\nThe major commercial options available to buyers in Europe include:\n\n1. Unitree Robotics (China)\n\nUnitree models are widely accessible in Europe through specialized robotics distributors (such as regional robotics centers and European tech marketplaces like RBTX).\n\nUnitree G1: A compact, highly agile bipedal humanoid designed primarily for research and development. It is one of the most cost-effective humanoids on the market, with base versions typically landing around €16,000 to €23,000 depending on the exact tier (Basic vs. EDU).\n\nUnitree H1 & H2: Full-sized humanoid platforms built for heavy-duty research and developer applications, with prices scaling from roughly €42,000 to over €90,000.\n\n2. Booster Robotics\n\nBooster K1 & T Series: Available via European automation marketplaces. These developer-focused bipedal and humanoid platforms range from roughly €10,500 (for basic educational tiers powered by Qualcomm or Nvidia chips) up to higher-end tactile models.\n\n3. AGIBOT\n\nAGIBOT X and A Series: AGIBOT models (like the X2 and A3 series) are increasingly available for order through European robotics channels for industrial R&D and commercial automation, with prices varying from roughly €20,000 for baseline units up to higher-tier enterprise specs.\n\n4. European Manufacturers (Pre-orders & Direct Sales)\n\n1X Technologies (Norway): Known for their humanoid robots like NEO, 1X takes pre-orders for European delivery, focusing heavily on safe human-robot interaction and neural network-driven movement.\n\nNEURA Robotics (Germany): Offers models like 4NE1, targeted at industrial and service use cases, available through direct enterprise engagement and pre-order channels.\n\nPollen Robotics (France): Offers Reachy 2, an upper-body humanoid/manipulator robot widely used in research laboratories across Europe, priced around $70,000.\n\nImportant Considerations for Buyers in Europe:\n\nResearch vs. Commercial Use: The vast majority of commercially available humanoids are shipped as Developer/EDU platforms. They require programming knowledge (typically via ROS2 and SDKs) and are meant for software testing, AI training, and academic research rather than out-of-the-box home assistance.\n\nEnterprise-Only Models: High-profile commercial robots like Boston Dynamics' Atlas, Figure AI's models, or Agility Robotics' Digit are generally not available for direct public purchase. Instead, they are restricted to custom enterprise contracts, fleet testing, or Robot-as-a-Service (RaaS) models.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Humanoid Robots | RBTX Marketplace",
+      "url": "https://rbtx.de/en-GB/components/humanoid#:~:text=ROBOTERA%20Q5%20%7C%20Humanoid%20Robot%20%7C%2044DOFRobotera%E2%82%AC68%2C644.64.,%7C%20Humanoid%20Robot%20%7C%2027%20DOFUnitree%E2%82%AC120%2C000.%20NEW.",
+      "description": "ROBOTERA Q5 | Humanoid Robot | 44DOFRobotera€68,644.64. NEW. UniX AI Wanda \n2.0 | Humanoid Robot | 18 DOFUniX AI€68,644.64. NEW. Unitree G1 Basic \nModels | Humano..."
+     },
+     {
+      "position": 2,
+      "label": "Humanoid Robot UK Buyers Guide 2026: Prices, Import Costs",
+      "url": "https://robotautotrader.com/blog/humanoid-robot-uk-buyers-guide-2026#:~:text=Most%20other%20high%2Dprofile%20platforms%20are%20enterprise%2Donly%20or,degrees%20of%20freedom%20in%20the%20standard%20configuration.",
+      "description": "Most other high-profile platforms are enterprise-only or not yet \ncommercially available. What is the cheapest humanoid robot in the UK? The \nUnitree G1, at appro..."
+     },
+     {
+      "position": 3,
+      "label": "Humanoid Robots | RBTX Marketplace",
+      "url": "https://rbtx.de/en-GB/components/humanoid#:~:text=%E2%82%AC13%2C619.96.%20NEW.%20Magiclab%20G1%20%7C%20Humanoid%20Robot,G1%20Basic%20Models%20%7C%20Humanoid%20RobotUnitree%E2%82%AC23%2C000.%20NEW.",
+      "description": "€13,619.96. NEW. Magiclab G1 | Humanoid Robot | 42 DOFMagicLab Robot \nTechnology (Wuxi) Co., Ltd. €105,132.93. NEW. RBTX NOETIX N2 | Humanoid \nRobotNOETIX Robotic..."
+     },
+     {
+      "position": 4,
+      "label": "Humanoid Robots | RBTX Marketplace",
+      "url": "https://rbtx.de/en-GB/components/humanoid#:~:text=Unitree%20G1%20EDU%20%7C%20U1%2DU14%20%7C%20Humanoid,Unitree%20R1%20Base%20%7C%20Humanoid%20RobotUnitree%E2%82%AC8%2C400.%20NEW.",
+      "description": "Unitree G1 EDU | U1-U14 | Humanoid Development PlatformsUnitree€31,500. \nNEW. Unitree G1 | Special Versions | Boxing or FootballUnitree€46,000. NEW. \nUnitree H1 |..."
+     },
+     {
+      "position": 5,
+      "label": "Humanoid Robots | RBTX Marketplace",
+      "url": "https://rbtx.de/en-GB/components/humanoid#:~:text=Booster%20K1%20Geek%20%7C%20Qualcomm%20QCS%208550,%7C%20Wheeled%20Humanoid%20Robot%20Dobot%20Robotics%E2%82%AC74%2C500.%20NEW.",
+      "description": "Booster K1 Geek | Qualcomm QCS 8550 | 48 TopsBooster Robotics€10,499. NEW. \nBooster K1 Pro EDU | NVIDIA Jetson AGX Orin 32GB | 200 TOPS Booster \nRobotics€14,999. ..."
+     },
+     {
+      "position": 6,
+      "label": "Humanoid Robots | RBTX Marketplace",
+      "url": "https://rbtx.de/en-GB/components/humanoid#:~:text=Booster%20K1%20Geek%20%7C%20Qualcomm%20QCS%208550,%7C%20Wheeled%20Humanoid%20Robot%20Dobot%20Robotics%E2%82%AC74%2C500.%20NEW.",
+      "description": "Booster K1 Geek | Qualcomm QCS 8550 | 48 TopsBooster Robotics€10,499. NEW. \nBooster K1 Pro EDU | NVIDIA Jetson AGX Orin 32GB | 200 TOPS Booster \nRobotics€14,999. ..."
+     },
+     {
+      "position": 7,
+      "label": "Humanoid Robot UK Buyers Guide 2026: Prices, Import Costs",
+      "url": "https://robotautotrader.com/blog/humanoid-robot-uk-buyers-guide-2026#:~:text=Spot%20is%20available%20for%20purchase%20with%20full,yet%20established%20at%20the%20time%20of%20writing.",
+      "description": "Spot is available for purchase with full local support, service contracts, \nand payload integrations. Atlas is not for sale to any external \norganisation at any p..."
+     },
+     {
+      "position": 8,
+      "label": "Humanoid Robot UK Buyers Guide 2026: Prices, Import Costs",
+      "url": "https://robotautotrader.com/blog/humanoid-robot-uk-buyers-guide-2026#:~:text=Table_title%3A%20UK%20Humanoid%20Robot%20Prices%202026%3A%20Landed,public%20pricing%20%7C%20Enterprise%20contract%20only%20%7C",
+      "description": "Table_title: UK Humanoid Robot Prices 2026: Landed Costs Table_content: | \nModel | Manufacturer | US List Price | UK Landed (est.) | Availability | | \n--- | --- |..."
+     },
+     {
+      "position": 9,
+      "label": "Humanoid Robot UK Buyers Guide 2026: Prices, Import Costs",
+      "url": "https://robotautotrader.com/blog/humanoid-robot-uk-buyers-guide-2026#:~:text=Humanoid%20Robot%20UK%20Buyers%20Guide%202026%3A%20Prices%2C,price%20to%20estimate%20your%20UK%20landed%20cost.",
+      "description": "Humanoid Robot UK Buyers Guide 2026: Prices, Import Costs & Where to Buy * \n> Quick Answer: UK buyers can purchase the Unitree G1 for around £16,000 \nlanded, or t..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Humanoid Robots | RBTX Marketplace",
+      "url": "https://rbtx.de/en-GB/components/humanoid#:~:text=ROBOTERA%20Q5%20%7C%20Humanoid%20Robot%20%7C%2044DOFRobotera%E2%82%AC68%2C644.64.,%7C%20Humanoid%20Robot%20%7C%2027%20DOFUnitree%E2%82%AC120%2C000.%20NEW.",
+      "domain": "rbtx.de",
+      "position": 1,
+      "description": "ROBOTERA Q5 | Humanoid Robot | 44DOFRobotera€68,644.64. NEW. UniX AI Wanda \n2.0 | Humanoid Robot | 18 DOFUniX AI€68,644.64. NEW. Unitree G1 Basic \nModels | Humano...",
+      "citationPillId": 1
+     },
+     {
+      "label": "Humanoid Robot UK Buyers Guide 2026: Prices, Import Costs",
+      "url": "https://robotautotrader.com/blog/humanoid-robot-uk-buyers-guide-2026#:~:text=Most%20other%20high%2Dprofile%20platforms%20are%20enterprise%2Donly%20or,degrees%20of%20freedom%20in%20the%20standard%20configuration.",
+      "domain": "robotautotrader.com",
+      "position": 2,
+      "description": "Most other high-profile platforms are enterprise-only or not yet \ncommercially available. What is the cheapest humanoid robot in the UK? The \nUnitree G1, at appro...",
+      "citationPillId": 2
+     },
+     {
+      "label": "Humanoid Robots | RBTX Marketplace",
+      "url": "https://rbtx.de/en-GB/components/humanoid#:~:text=%E2%82%AC13%2C619.96.%20NEW.%20Magiclab%20G1%20%7C%20Humanoid%20Robot,G1%20Basic%20Models%20%7C%20Humanoid%20RobotUnitree%E2%82%AC23%2C000.%20NEW.",
+      "domain": "rbtx.de",
+      "position": 3,
+      "description": "€13,619.96. NEW. Magiclab G1 | Humanoid Robot | 42 DOFMagicLab Robot \nTechnology (Wuxi) Co., Ltd. €105,132.93. NEW. RBTX NOETIX N2 | Humanoid \nRobotNOETIX Robotic...",
+      "citationPillId": 2
+     },
+     {
+      "label": "Humanoid Robots | RBTX Marketplace",
+      "url": "https://rbtx.de/en-GB/components/humanoid#:~:text=Unitree%20G1%20EDU%20%7C%20U1%2DU14%20%7C%20Humanoid,Unitree%20R1%20Base%20%7C%20Humanoid%20RobotUnitree%E2%82%AC8%2C400.%20NEW.",
+      "domain": "rbtx.de",
+      "position": 4,
+      "description": "Unitree G1 EDU | U1-U14 | Humanoid Development PlatformsUnitree€31,500. \nNEW. Unitree G1 | Special Versions | Boxing or FootballUnitree€46,000. NEW. \nUnitree H1 |...",
+      "citationPillId": 3
+     },
+     {
+      "label": "Humanoid Robots | RBTX Marketplace",
+      "url": "https://rbtx.de/en-GB/components/humanoid#:~:text=Booster%20K1%20Geek%20%7C%20Qualcomm%20QCS%208550,%7C%20Wheeled%20Humanoid%20Robot%20Dobot%20Robotics%E2%82%AC74%2C500.%20NEW.",
+      "domain": "rbtx.de",
+      "position": 5,
+      "description": "Booster K1 Geek | Qualcomm QCS 8550 | 48 TopsBooster Robotics€10,499. NEW. \nBooster K1 Pro EDU | NVIDIA Jetson AGX Orin 32GB | 200 TOPS Booster \nRobotics€14,999. ...",
+      "citationPillId": 4
+     },
+     {
+      "label": "Humanoid Robot UK Buyers Guide 2026: Prices, Import Costs",
+      "url": "https://robotautotrader.com/blog/humanoid-robot-uk-buyers-guide-2026#:~:text=Spot%20is%20available%20for%20purchase%20with%20full,yet%20established%20at%20the%20time%20of%20writing.",
+      "domain": "robotautotrader.com",
+      "position": 7,
+      "description": "Spot is available for purchase with full local support, service contracts, \nand payload integrations. Atlas is not for sale to any external \norganisation at any p...",
+      "citationPillId": 5
+     },
+     {
+      "label": "Humanoid Robot UK Buyers Guide 2026: Prices, Import Costs",
+      "url": "https://robotautotrader.com/blog/humanoid-robot-uk-buyers-guide-2026#:~:text=Table_title%3A%20UK%20Humanoid%20Robot%20Prices%202026%3A%20Landed,public%20pricing%20%7C%20Enterprise%20contract%20only%20%7C",
+      "domain": "robotautotrader.com",
+      "position": 8,
+      "description": "Table_title: UK Humanoid Robot Prices 2026: Landed Costs Table_content: | \nModel | Manufacturer | US List Price | UK Landed (est.) | Availability | | \n--- | --- |...",
+      "citationPillId": 6
+     },
+     {
+      "label": "Humanoid Robot UK Buyers Guide 2026: Prices, Import Costs",
+      "url": "https://robotautotrader.com/blog/humanoid-robot-uk-buyers-guide-2026#:~:text=Humanoid%20Robot%20UK%20Buyers%20Guide%202026%3A%20Prices%2C,price%20to%20estimate%20your%20UK%20landed%20cost.",
+      "domain": "robotautotrader.com",
+      "position": 9,
+      "description": "Humanoid Robot UK Buyers Guide 2026: Prices, Import Costs & Where to Buy * \n> Quick Answer: UK buyers can purchase the Unitree G1 for around £16,000 \nlanded, or t...",
+      "citationPillId": 6
+     }
+    ],
+    "markdown": "Several humanoid and bipedal robots can be purchased or ordered for delivery in Europe, primarily targeted at research, development, industrial testing, and early-adopter tech markets.\n\nThe major commercial options available to buyers in Europe include:\n\n### 1\\. Unitree Robotics (China)\n\nUnitree models are widely accessible in Europe through specialized robotics distributors (such as regional robotics centers and European tech marketplaces like RBTX). [Humanoid Robots | RBTX Marketplace](https://rbtx.de/en-GB/components/humanoid#:~:text=ROBOTERA%20Q5%20%7C%20Humanoid%20Robot%20%7C%2044DOFRobotera%E2%82%AC68%2C644.64.,%7C%20Humanoid%20Robot%20%7C%2027%20DOFUnitree%E2%82%AC120%2C000.%20NEW.)\n\n  * **Unitree G1:** A compact, highly agile bipedal humanoid designed primarily for research and development. It is one of the most cost-effective humanoids on the market, with base versions typically landing around €16,000 to €23,000 depending on the exact tier (Basic vs. EDU). [Humanoid Robot UK Buyers Guide 2026: Prices, Import Costs](https://robotautotrader.com/blog/humanoid-robot-uk-buyers-guide-2026#:~:text=Most%20other%20high%2Dprofile%20platforms%20are%20enterprise%2Donly%20or,degrees%20of%20freedom%20in%20the%20standard%20configuration.)[Humanoid Robots | RBTX Marketplace](https://rbtx.de/en-GB/components/humanoid#:~:text=%E2%82%AC13%2C619.96.%20NEW.%20Magiclab%20G1%20%7C%20Humanoid%20Robot,G1%20Basic%20Models%20%7C%20Humanoid%20RobotUnitree%E2%82%AC23%2C000.%20NEW.)\n\n  * **Unitree H1 & H2:** Full-sized humanoid platforms built for heavy-duty research and developer applications, with prices scaling from roughly €42,000 to over €90,000. [Humanoid Robots | RBTX Marketplace](https://rbtx.de/en-GB/components/humanoid#:~:text=Unitree%20G1%20EDU%20%7C%20U1%2DU14%20%7C%20Humanoid,Unitree%20R1%20Base%20%7C%20Humanoid%20RobotUnitree%E2%82%AC8%2C400.%20NEW.)\n\n### 2\\. Booster Robotics\n\n  * **Booster K1 & T Series:** Available via European automation marketplaces. These developer-focused bipedal and humanoid platforms range from roughly €10,500 (for basic educational tiers powered by Qualcomm or Nvidia chips) up to higher-end tactile models. [Humanoid Robots | RBTX Marketplace](https://rbtx.de/en-GB/components/humanoid#:~:text=Booster%20K1%20Geek%20%7C%20Qualcomm%20QCS%208550,%7C%20Wheeled%20Humanoid%20Robot%20Dobot%20Robotics%E2%82%AC74%2C500.%20NEW.)\n\n### 3\\. AGIBOT\n\n  * **AGIBOT X and A Series:** AGIBOT models (like the X2 and A3 series) are increasingly available for order through European robotics channels for industrial R&D and commercial automation, with prices varying from roughly €20,000 for baseline units up to higher-tier enterprise specs.\n\n### 4\\. European Manufacturers (Pre-orders & Direct Sales)\n\n  * **1X Technologies (Norway):** Known for their humanoid robots like **NEO** , 1X takes pre-orders for European delivery, focusing heavily on safe human-robot interaction and neural network-driven movement. [Humanoid Robot UK Buyers Guide 2026: Prices, Import Costs](https://robotautotrader.com/blog/humanoid-robot-uk-buyers-guide-2026#:~:text=Spot%20is%20available%20for%20purchase%20with%20full,yet%20established%20at%20the%20time%20of%20writing.)\n\n  * **NEURA Robotics (Germany):** Offers models like **4NE1** , targeted at industrial and service use cases, available through direct enterprise engagement and pre-order channels.\n\n  * **Pollen Robotics (France):** Offers **Reachy 2** , an upper-body humanoid/manipulator robot widely used in research laboratories across Europe, priced around $70,000.\n\n### Important Considerations for Buyers in Europe:\n\n  * **Research vs. Commercial Use:** The vast majority of commercially available humanoids are shipped as **Developer/EDU platforms**. They require programming knowledge (typically via ROS2 and SDKs) and are meant for software testing, AI training, and academic research rather than out-of-the-box home assistance.\n\n  * **Enterprise-Only Models:** High-profile commercial robots like Boston Dynamics' Atlas, Figure AI's models, or Agility Robotics' Digit are generally **not** available for direct public purchase. Instead, they are restricted to custom enterprise contracts, fleet testing, or Robot-as-a-Service (RaaS) models. [Humanoid Robot UK Buyers Guide 2026: Prices, Import Costs](https://robotautotrader.com/blog/humanoid-robot-uk-buyers-guide-2026#:~:text=Table_title%3A%20UK%20Humanoid%20Robot%20Prices%202026%3A%20Landed,public%20pricing%20%7C%20Enterprise%20contract%20only%20%7C)[Humanoid Robot UK Buyers Guide 2026: Prices, Import Costs](https://robotautotrader.com/blog/humanoid-robot-uk-buyers-guide-2026#:~:text=Humanoid%20Robot%20UK%20Buyers%20Guide%202026%3A%20Prices%2C,price%20to%20estimate%20your%20UK%20landed%20cost.)"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "3d1d1602dbfd4690859161e0fc3d7e66",
+   "charged_micro": 2400
+  }
+ }
+}

@@ -1,0 +1,59 @@
+{
+ "observed_at": "2026-10-31T03:13:59+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "How much does the Unitree G1 cost?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "The base price for the Unitree G1 humanoid robot starts at $13,500 USD on the official Unitree G1 Store.\n\nHere are a few additional cost and purchasing details to keep in mind:\n\nShipping Costs: International or domestic shipping typically ranges from $300 to $1,200 USD.\n\nImport & Taxes: Customers are generally responsible for local customs, duties, and taxes.\n\nEditions: The standard base model does not support secondary development. If you require an EDU edition for developer customization, you have to contact Unitree directly for a custom quote.\n\nWould you like me to share the technical specifications (like joints, weight, and battery life) for the Unitree G1, or compare it to other models like the Unitree H1?",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Unitree G1 – UnitreeRobotics",
+      "url": "https://shop.unitree.com/products/unitree-g1",
+      "description": "Backordered, shipping $300-$1,200, customer handles customs/duties/taxes. Features 23-43 joints, force control, imitation/reinforc...",
+      "redirectLink": "https://www.google.com/goto?url=CAESZwHrOzAVed58Gr3fBw7tlNOBQJhX5kfkZdDkdHsXv_l-yUw8chIisfwLNIkhBLGksGfSVMZh-Tvb5iyPdX5jbO_EYQBVlQoP9t2Fx-VCaA2F24EJZL8rlYCMxjkMFnUBp5rdssz6stI"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Unitree G1 – UnitreeRobotics",
+      "citationPillId": 1,
+      "url": "https://shop.unitree.com/products/unitree-g1",
+      "domain": "shop.unitree.com",
+      "description": "Backordered, shipping $300-$1,200, customer handles customs/duties/taxes. Features 23-43 joints, force control, imitation/reinforc...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESZwHrOzAVed58Gr3fBw7tlNOBQJhX5kfkZdDkdHsXv_l-yUw8chIisfwLNIkhBLGksGfSVMZh-Tvb5iyPdX5jbO_EYQBVlQoP9t2Fx-VCaA2F24EJZL8rlYCMxjkMFnUBp5rdssz6stI"
+     },
+     {
+      "label": "Unitree G1 – UnitreeRobotics",
+      "citationPillId": 2,
+      "url": "https://shop.unitree.com/products/unitree-g1",
+      "domain": "shop.unitree.com",
+      "description": "Backordered, shipping $300-$1,200, customer handles customs/duties/taxes. Features 23-43 joints, force control, imitation/reinforc...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESZwHrOzAVed58Gr3fBw7tlNOBQJhX5kfkZdDkdHsXv_l-yUw8chIisfwLNIkhBLGksGfSVMZh-Tvb5iyPdX5jbO_EYQBVlQoP9t2Fx-VCaA2F24EJZL8rlYCMxjkMFnUBp5rdssz6stI"
+     }
+    ],
+    "markdown": "The base price for the **Unitree G1** humanoid robot starts at **$13,500 USD** on the official [Unitree G1 Store](https://shop.unitree.com/products/unitree-g1?srsltid=AYCX9vJhNcSDhHwoLTQkcXhn-_4AbjU8VtdzI2rb8wBCQmHMFo8a-xTS). [Unitree G1 – UnitreeRobotics](https://shop.unitree.com/products/unitree-g1)\n\nHere are a few additional cost and purchasing details to keep in mind:\n\n  * Shipping Costs: International or domestic shipping typically ranges from $300 to $1,200 USD.\n\n  * Import & Taxes: Customers are generally responsible for local customs, duties, and taxes.\n\n  * Editions: The standard base model does not support secondary development. If you require an EDU edition for developer customization, you have to contact Unitree directly for a custom quote. [Unitree G1 – UnitreeRobotics](https://shop.unitree.com/products/unitree-g1)\n\nWould you like me to share the **technical specifications** (like joints, weight, and battery life) for the **Unitree G1** , or compare it to other models like the **Unitree H1**?"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "eccb6257266f407daf8c28ddd1cf3a0a",
+   "charged_micro": 2400,
+   "hint": "feedback"
+  }
+ }
+}

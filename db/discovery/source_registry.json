@@ -58,6 +58,13 @@
       "decision": "2026-10-31 owner instruction (A4): register for recurring discovery monitoring and catalogue enrichment of the published robots; OWNER_AUTHORIZED basis to be recorded by source authorize-owner; not publisher consent; host to be confirmed by the structural review"
     },
     {
+      "key": "faraday-future-official",
+      "name": "Faraday Future (FF EAI Robotics)",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://robotics.ff.com/",
+      "decision": "2026-10-31 owner instruction in thread (PR #223): add Faraday Future to the manufacturer list; registered for discovery monitoring, DISABLED until authorized; OWNER_AUTHORIZED basis to be recorded by source authorize-owner; not publisher consent; host to be confirmed by the structural review"
+    },
+    {
       "key": "figure-ai-official",
       "name": "Figure AI",
       "source_class": "MANUFACTURER",

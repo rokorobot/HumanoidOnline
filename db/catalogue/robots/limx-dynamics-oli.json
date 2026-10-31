@@ -31,12 +31,70 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "OWNER-APPROVED 2026-10-31 (Robert Konecny, in thread; PR #222); unpublished, publication is a separate decision. RETRIEVAL: AUTOMATED weekly new-robot scan 2026-10-31 (HO-DATA-STANDING); values verbatim from https://www.limxdynamics.com/en/products/oli. Not human-verified. Page meta: 'LimX Oli is a full-size general-purpose humanoid robot standing 165cm tall with 31 DoF.' Specs from https://www.limxdynamics.com/en/products/oli/spec (Oli / Oli EDU columns identical for these rows). LimX's site does not state whether Oli is the catalogued CL-1 or a different model; NOT inferred, owner to decide.",
+  "specs_note": "OWNER-APPROVED 2026-10-31 (Robert Konecny, in thread; PR #222); unpublished, publication is a separate decision. RETRIEVAL: AUTOMATED weekly new-robot scan 2026-10-31 (HO-DATA-STANDING); values verbatim from https://www.limxdynamics.com/en/products/oli. Not human-verified. Page meta: 'LimX Oli is a full-size general-purpose humanoid robot standing 165cm tall with 31 DoF.' Specs from https://www.limxdynamics.com/en/products/oli/spec (Oli / Oli EDU columns identical for these rows). LimX's site does not state whether Oli is the catalogued CL-1 or a different model; NOT inferred, owner to decide. SELLER OFFER 2026-10-31: Knoxlabs (approved provider) lists the Oli EDU supplier configuration at USD 72,000 excluding US freight/customs, at https://www.knoxlabs.com/products/limx-oli-full-size-humanoid-robot. Its spec block gives edition-dependent ranges only (e.g. 31-43 DoF, 165-175 cm), so no spec values were taken from it.",
   "official_url": "https://www.limxdynamics.com/en/products/oli",
   "commercial_status_evidence": [],
   "variants": [],
-  "pricing_offers": [],
-  "availability_offers": [],
+  "pricing_offers": [
+    {
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "USD",
+      "price": 72000,
+      "price_min": null,
+      "price_max": null,
+      "billing_period": "ONE_TIME",
+      "region_code": "US",
+      "provider_slug": "knoxlabs",
+      "variant_slug": null,
+      "price_basis": "Third-party reseller price; excludes US freight and customs ($4,200 per robot, charged separately); payment in full required before supplier shipment",
+      "shipping_terms": "US freight and customs: $4,200 per robot, charged separately at checkout",
+      "edition_confirmed": false,
+      "edition_note": "Knoxlabs identifies the 'Oli EDU supplier configuration, SKU Oli_Edu_GL' and says the exact bill of materials is confirmed before fulfillment. LimX lists Lite, EDU and Super editions; this record's edition match is unconfirmed.",
+      "note": "Knoxlabs checkout listing (schema.org Offer, NewCondition) for the Oli EDU supplier configuration.",
+      "evidence": [
+        {
+          "source_url": "https://www.knoxlabs.com/products/limx-oli-full-size-humanoid-robot",
+          "source_type": "OTHER",
+          "source_title": "LimX Oli Full-Size Humanoid Robot — Knoxlabs",
+          "excerpt": "price 72000.0 USD; Oli EDU supplier configuration, SKU Oli_Edu_GL; US freight and customs: $4,200 per robot, charged separately at checkout.",
+          "published_at": null,
+          "observed_at": "2026-10-31",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — seller-page enrichment, fetched directly 2026-10-31 by Claude (Sonnet 5.5) in a session initiated by Robert Konecny; provider Knoxlabs approved by the owner 2026-10-31. Third-party US reseller, not the manufacturer. Not human-verified. Price from the page's schema.org Offer and ordering text (observed 2026-10-31)."
+        }
+      ]
+    }
+  ],
+  "availability_offers": [
+    {
+      "transaction_type": "PURCHASE",
+      "availability_status": "AVAILABLE",
+      "region_code": "US",
+      "provider_slug": "knoxlabs",
+      "variant_slug": null,
+      "lead_time_days": null,
+      "available_from": null,
+      "seller_wording": "Available to order from the supplier. Availability and dispatch timing are reconfirmed after order; no immediate shipment is promised.",
+      "note": "Orderable at Knoxlabs; no dispatch time promised.",
+      "edition_confirmed": false,
+      "edition_note": "Same edition caveat as the price offer.",
+      "evidence": [
+        {
+          "source_url": "https://www.knoxlabs.com/products/limx-oli-full-size-humanoid-robot",
+          "source_type": "OTHER",
+          "source_title": "LimX Oli Full-Size Humanoid Robot — Knoxlabs",
+          "excerpt": "Available to order from the supplier. Availability and dispatch timing are reconfirmed after order; no immediate shipment is promised.",
+          "published_at": null,
+          "observed_at": "2026-10-31",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — seller-page enrichment, fetched directly 2026-10-31 by Claude (Sonnet 5.5) in a session initiated by Robert Konecny; provider Knoxlabs approved by the owner 2026-10-31. Third-party US reseller, not the manufacturer. Not human-verified. Seller wording, observed 2026-10-31."
+        }
+      ]
+    }
+  ],
   "deployments": [],
   "capabilities": [],
   "use_case_fits": [

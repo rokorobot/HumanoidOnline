@@ -8,15 +8,15 @@
   "commercial_status": "UNKNOWN",
   "is_published": false,
   "specs": {
-    "height_cm": null,
-    "weight_kg": null,
+    "height_cm": 145.0,
+    "weight_kg": 77.0,
     "arm_span_cm": null,
     "reach_cm": null,
     "payload_kg": null,
     "walk_speed_ms": null,
     "runtime_minutes": null,
     "battery_wh": null,
-    "mobility": null,
+    "mobility": "BIPEDAL",
     "degrees_of_freedom": null,
     "hand_type": null,
     "hand_dof": null,
@@ -31,11 +31,52 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "OWNER-APPROVED 2026-10-31 (Robert Konecny, in thread; PR #222); unpublished, publication is a separate decision. RETRIEVAL: AUTOMATED weekly new-robot scan 2026-10-31 (HO-DATA-STANDING); values verbatim from https://www.ubtrobot.com/en/humanoid/products/walker-x. Not human-verified. Page meta description: 'UBTECH Walker X is a next-generation humanoid robot designed for AI research, smart services, and human-robot interaction. Discover advanced mobility, intelligent perception, and real-world applications.' Specification values were not retrievable from the static page, so all specs are null. Relationship to catalogued Walker S1/S2/Tienkung is not stated on the page and is not inferred.",
+  "specs_note": "OWNER-APPROVED 2026-10-31 (Robert Konecny, in thread; PR #222); unpublished, publication is a separate decision. RETRIEVAL: AUTOMATED weekly new-robot scan 2026-10-31 (HO-DATA-STANDING); values verbatim from https://www.ubtrobot.com/en/humanoid/products/walker-x. Not human-verified. Page meta description: 'UBTECH Walker X is a next-generation humanoid robot designed for AI research, smart services, and human-robot interaction. Discover advanced mobility, intelligent perception, and real-world applications.' Specification values were not retrievable from the static page, so all specs are null. Relationship to catalogued Walker S1/S2/Tienkung is not stated on the page and is not inferred. SELLER ENRICHMENT 2026-10-31: height, weight, mobility and a US price from the RobotLAB listing https://www.robotlab.com/store/walker-humanoid-service-robot/ ('Model / platform: Walker X (research edition)'); the seller says it is its research-edition offering, so the edition match to UBTECH's Walker X page is unconfirmed. The RobotLAB page contradicts itself on price: $250,000 in 'Starting at', the spec table and the comparison table, but $960,000 in two prose passages; both recorded, $250,000 used as the offer price (structured fields), owner to confirm.",
   "official_url": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
   "commercial_status_evidence": [],
   "variants": [],
-  "pricing_offers": [],
+  "pricing_offers": [
+    {
+      "transaction_type": "PURCHASE",
+      "price_type": "PUBLIC",
+      "currency": "USD",
+      "price": 250000,
+      "price_min": null,
+      "price_max": null,
+      "billing_period": "ONE_TIME",
+      "region_code": "US",
+      "provider_slug": "robotlab",
+      "variant_slug": null,
+      "price_basis": "Third-party reseller price; research edition incl. transport case, software suite, training and 1-year warranty",
+      "edition_confirmed": false,
+      "edition_note": "Seller labels it 'Walker X (research edition)'; match to UBTECH's Walker X not confirmed. Seller page also states $960,000 in prose; see evidence.",
+      "note": "RobotLAB lists 'Starting at $250,000' (also 'Purchase Price' in its spec table). The same page's prose twice states $960,000; unresolved conflict.",
+      "evidence": [
+        {
+          "source_url": "https://www.robotlab.com/store/walker-humanoid-service-robot/",
+          "source_type": "OTHER",
+          "source_title": "Walker Humanoid Service Robot For Research — RobotLAB",
+          "excerpt": "Starting at $250,000 ... Purchase Price $250,000",
+          "published_at": null,
+          "observed_at": "2026-10-31",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — seller-page enrichment, fetched directly 2026-10-31 by Claude (Sonnet 5.5) in a session initiated by Robert Konecny, under the owner's 2026-10-31 statement that seller pages are valid enrichment sources. robots.txt allows. Seller is a third-party US reseller/integrator, not the manufacturer. Not human-verified. Structured price fields (hero 'Starting at', spec table 'Purchase Price', comparison table)."
+        },
+        {
+          "source_url": "https://www.robotlab.com/store/walker-humanoid-service-robot/",
+          "source_type": "OTHER",
+          "source_title": "Walker Humanoid Service Robot For Research — RobotLAB",
+          "excerpt": "The $960,000 RobotLAB price reflects a research-grade platform ...",
+          "published_at": null,
+          "observed_at": "2026-10-31",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — seller-page enrichment, fetched directly 2026-10-31 by Claude (Sonnet 5.5) in a session initiated by Robert Konecny, under the owner's 2026-10-31 statement that seller pages are valid enrichment sources. robots.txt allows. Seller is a third-party US reseller/integrator, not the manufacturer. Not human-verified. Conflicting prose statement in the same page's FAQ; recorded, not used as the offer price."
+        }
+      ]
+    }
+  ],
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
@@ -52,5 +93,22 @@
   ],
   "images": [],
   "extended_specs": [],
-  "spec_caveats": []
+  "spec_caveats": [
+    {
+      "field": "height_cm",
+      "text": "RobotLAB states 1.45 m for its 'Walker X (research edition)' listing (seller page https://www.robotlab.com/store/walker-humanoid-service-robot/); not stated on UBTECH's own page."
+    },
+    {
+      "field": "weight_kg",
+      "text": "RobotLAB states 77 kg for the same listing; seller figure, not manufacturer-stated."
+    },
+    {
+      "field": "mobility",
+      "text": "RobotLAB describes it as a 'Full-size bipedal humanoid robot'."
+    },
+    {
+      "field": "degrees_of_freedom",
+      "text": "Left null: RobotLAB lists 36 DoF but adds 'per RobotLAB page; manufacturer lists higher on current Walker X'."
+    }
+  ]
 }

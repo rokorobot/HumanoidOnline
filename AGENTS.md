@@ -10,7 +10,7 @@ These rules are binding for any autonomous or semi-autonomous coding agent worki
 
 3. **Do not remove dormant Phase 3–5 structures** (`provider`, `transaction_type` values, offer views, lead-routing tables, dormant fields) merely because MVP v0.1 does not use them. They are deliberate.
 
-4. **Do not introduce infrastructure not required by the Product Contract.** No microservices, Kubernetes, Elasticsearch, event buses, vector databases, or new services "for later."
+4. **Do not introduce infrastructure not required by the Product Contract.** No microservices, Kubernetes, Elasticsearch, event buses, vector databases, or new services "for later." **Owner exception (2026-10-31):** Neon (project `twilight-hall-29504020`, branch `production`) with its AI Gateway is approved infrastructure for model calls. LLM use remains limited by rule 8 and the Product Contract: it may interpret input, never score.
 
 5. **Every implementation task lands with tests.** Matching-engine work: pytest against fixtures. API work: endpoint tests. UI work: at least the journey it serves (see `docs/05_ACCEPTANCE_CRITERIA.md`).
 

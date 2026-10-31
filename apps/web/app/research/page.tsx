@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Research",
     description:
-      "HumanoidOnline Research Resources: snapshot-dated, evidence-linked analysis generated from the humanoid-robot catalogue, starting with humanoid availability by region.",
+      "Snapshot-dated, evidence-linked research from the HumanoidOnline humanoid-robot catalogue, starting with humanoid availability by region.",
     alternates: { canonical: absoluteUrl(RESEARCH_HUB_PATH) },
   };
 }

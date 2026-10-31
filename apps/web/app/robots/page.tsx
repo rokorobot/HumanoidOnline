@@ -15,6 +15,7 @@ import {
   type RawSearchParams,
 } from "@/lib/search-params";
 import { cataloguePolicy } from "@/lib/index-policy";
+import { buildCatalogueJsonLd } from "@/lib/jsonld";
 import { resolveAppEnv } from "@/lib/site";
 import { CompareBar } from "@/components/CompareBar";
 import { FilterPanel } from "@/components/FilterPanel";
@@ -108,8 +109,19 @@ export default async function RobotsPage({
   // Counted from the same derived state the API call uses, never from the raw URL.
   const activeFilterCount = countActiveFilters(cq.effective);
 
+  // SEO-02: structured data only on the canonical (unfiltered) catalogue; every
+  // filtered/sorted variant is noindex and must not claim to be /robots.
+  const jsonLd = Object.keys(sp).length === 0 ? buildCatalogueJsonLd(page.items) : null;
+
   return (
     <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger -- JSON.stringify output is safe, non-user markup
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       <SystemHeader
         title="HUMANOID MARKET INDEX"
         fields={[

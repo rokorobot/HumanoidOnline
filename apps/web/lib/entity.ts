@@ -104,20 +104,14 @@ export function formatHeadquarters(hq: EntityHeadquarters): string {
   return `${hq.locality}, ${hq.country}`;
 }
 
-/** Organization / Person / WebSite / AboutPage graph for /about. */
-export function buildAboutJsonLd(entity: EntityProfile = ENTITY): Record<string, unknown> {
+/** The Organization node, shared by the home and /about graphs (same `@id`). */
+function buildOrganizationNode(entity: EntityProfile): Record<string, unknown> {
   const origin = siteUrl();
-  const homeUrl = `${origin}/`;
-  const aboutUrl = absoluteUrl("/about");
-  const orgId = `${origin}/#organization`;
-  const siteId = `${origin}/#website`;
-  const founderId = `${aboutUrl}#founder`;
-
   const organization: Record<string, unknown> = {
     "@type": "Organization",
-    "@id": orgId,
+    "@id": `${origin}/#organization`,
     name: entity.name,
-    url: homeUrl,
+    url: `${origin}/`,
     description: entity.description,
     parentOrganization: {
       "@type": "Organization",
@@ -148,6 +142,37 @@ export function buildAboutJsonLd(entity: EntityProfile = ENTITY): Record<string,
   }
   const orgSameAs = nonEmpty(entity.sameAs);
   if (orgSameAs.length > 0) organization.sameAs = orgSameAs;
+  return organization;
+}
+
+function buildWebSiteNode(entity: EntityProfile): Record<string, unknown> {
+  const origin = siteUrl();
+  return {
+    "@type": "WebSite",
+    "@id": `${origin}/#website`,
+    url: `${origin}/`,
+    name: entity.name,
+    description: entity.description,
+    publisher: { "@id": `${origin}/#organization` },
+  };
+}
+
+/** WebSite / Organization graph for the home page — same nodes as /about. */
+export function buildHomeJsonLd(entity: EntityProfile = ENTITY): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [buildWebSiteNode(entity), buildOrganizationNode(entity)],
+  };
+}
+
+/** Organization / Person / WebSite / AboutPage graph for /about. */
+export function buildAboutJsonLd(entity: EntityProfile = ENTITY): Record<string, unknown> {
+  const origin = siteUrl();
+  const aboutUrl = absoluteUrl("/about");
+  const orgId = `${origin}/#organization`;
+  const siteId = `${origin}/#website`;
+  const founderId = `${aboutUrl}#founder`;
+  const organization = buildOrganizationNode(entity);
 
   const graph: Array<Record<string, unknown>> = [];
 
@@ -175,13 +200,7 @@ export function buildAboutJsonLd(entity: EntityProfile = ENTITY): Record<string,
       about: { "@id": orgId },
       mainEntity: { "@id": orgId },
     },
-    {
-      "@type": "WebSite",
-      "@id": siteId,
-      url: homeUrl,
-      name: entity.name,
-      publisher: { "@id": orgId },
-    },
+    buildWebSiteNode(entity),
     organization,
   );
 

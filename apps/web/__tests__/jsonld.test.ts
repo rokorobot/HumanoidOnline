@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { buildRobotJsonLd } from "@/lib/jsonld";
-import type { RobotDetail } from "@/lib/types";
+import { buildCatalogueJsonLd, buildRobotJsonLd } from "@/lib/jsonld";
+import type { RobotDetail, RobotListItem } from "@/lib/types";
 
 // WS8.2 / R8: the canonical origin is no longer defaulted to production
 // (gap B4), so this suite states the origin it is asserting against instead of
@@ -88,5 +88,25 @@ describe("buildRobotJsonLd", () => {
     expect(product.image).toEqual([`${ORIGIN}/robots/test-bot.jpg`]);
     const noImg = graphOf(robot({ images: [] }));
     expect(noImg.product.image).toBeUndefined();
+  });
+});
+
+describe("SEO-02 — catalogue JSON-LD", () => {
+  it("lists the rendered robots by canonical URL with a breadcrumb", () => {
+    const items = [
+      { slug: "a-bot", name: "A Bot" },
+      { slug: "b-bot", name: "B Bot" },
+    ] as RobotListItem[];
+    const [page, list, crumbs] = buildCatalogueJsonLd(items)["@graph"] as Array<Record<string, unknown>>;
+    expect(page).toMatchObject({ "@type": "CollectionPage", url: `${ORIGIN}/robots` });
+    expect(list).toMatchObject({
+      "@type": "ItemList",
+      numberOfItems: 2,
+      itemListElement: [
+        { "@type": "ListItem", position: 1, url: `${ORIGIN}/robots/a-bot`, name: "A Bot" },
+        { "@type": "ListItem", position: 2, url: `${ORIGIN}/robots/b-bot`, name: "B Bot" },
+      ],
+    });
+    expect(crumbs["@type"]).toBe("BreadcrumbList");
   });
 });

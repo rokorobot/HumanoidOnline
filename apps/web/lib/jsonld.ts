@@ -13,7 +13,7 @@
 // The is_published boundary (AGENT-01.7) is enforced upstream at the fetch layer
 // (the public read returns only published robots); this builder just maps.
 import { absoluteUrl } from "@/lib/site";
-import type { RobotDetail } from "@/lib/types";
+import type { RobotDetail, RobotListItem } from "@/lib/types";
 
 interface PropertyValue {
   "@type": "PropertyValue";
@@ -121,5 +121,46 @@ export function buildRobotJsonLd(robot: RobotDetail): Record<string, unknown> {
   return {
     "@context": "https://schema.org",
     "@graph": [product, organization],
+  };
+}
+
+/**
+ * SEO-02 — CollectionPage + ItemList + BreadcrumbList for the bare /robots
+ * catalogue. Lists only the robots the page actually renders, by name and
+ * canonical URL; no commercial facts are asserted here.
+ */
+export function buildCatalogueJsonLd(items: RobotListItem[]): Record<string, unknown> {
+  const url = absoluteUrl("/robots");
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": url,
+        url,
+        name: "Robot Catalogue",
+        breadcrumb: { "@id": `${url}#breadcrumb` },
+        mainEntity: { "@id": `${url}#list` },
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${url}#list`,
+        numberOfItems: items.length,
+        itemListElement: items.map((r, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          url: absoluteUrl(`/robots/${r.slug}`),
+          name: r.name,
+        })),
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${url}#breadcrumb`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
+          { "@type": "ListItem", position: 2, name: "Robot Catalogue", item: url },
+        ],
+      },
+    ],
   };
 }

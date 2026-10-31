@@ -39,7 +39,7 @@ export function generateMetadata(): Metadata {
   return {
     title: "About",
     description:
-      "HumanoidOnline is a humanoid-robot market intelligence platform comparing robots by capabilities, commercial availability, pricing and deployment evidence. Maturity, obtainability and evidence are different facts. Unknown stays unknown.",
+      "Humanoid-robot market intelligence: robots compared by capability, availability, pricing and deployment evidence. Unknown stays unknown.",
     alternates: { canonical: absoluteUrl("/about") },
   };
 }

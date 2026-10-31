@@ -2,6 +2,13 @@
   "_comment": "Version-controlled IDENTITY of every registered discovery source (docs/28 A4). `discovery source sync` registers a missing entry DISABLED with ToS and robots UNKNOWN, and reports drift on an existing one; it never edits an existing row, never reviews, authorizes, enables or schedules, and never fetches. Approval, access basis, enablement and cadence live only in the database and are set by their own attributed commands. `decision` is a human-readable reference to the owner decision behind the registration, not an authorization.",
   "sources": [
     {
+      "key": "1x-technologies-official",
+      "name": "1X Technologies",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://www.1x.tech/",
+      "decision": "2026-10-31 owner instruction (A4): register for recurring discovery monitoring and catalogue enrichment of the published robots; OWNER_AUTHORIZED basis to be recorded by source authorize-owner; not publisher consent; host to be confirmed by the structural review"
+    },
+    {
       "key": "agibot-official",
       "name": "AgiBot",
       "source_class": "MANUFACTURER",
@@ -23,6 +30,13 @@
       "decision": "2026-10-05 approved Czech distributor reference source (manual capture); 2026-10-18 owner instruction (A4) supersedes the manual-only limit: recurring monitoring authorized as a business decision; OWNER_AUTHORIZED basis; not publisher consent"
     },
     {
+      "key": "apptronik-official",
+      "name": "Apptronik",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://apptronik.com/",
+      "decision": "2026-10-31 owner instruction (A4): register for recurring discovery monitoring and catalogue enrichment of the published robots; OWNER_AUTHORIZED basis to be recorded by source authorize-owner; not publisher consent; host to be confirmed by the structural review"
+    },
+    {
       "key": "booster-robotics-official",
       "name": "Booster Robotics",
       "source_class": "MANUFACTURER",
@@ -30,11 +44,60 @@
       "decision": "2026-10-18 owner instruction (A4): recurring discovery monitoring authorized as a business decision; OWNER_AUTHORIZED basis; not publisher consent"
     },
     {
+      "key": "boston-dynamics-official",
+      "name": "Boston Dynamics",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://bostondynamics.com/",
+      "decision": "2026-10-31 owner instruction (A4): register for recurring discovery monitoring and catalogue enrichment of the published robots; OWNER_AUTHORIZED basis to be recorded by source authorize-owner; not publisher consent; host to be confirmed by the structural review"
+    },
+    {
+      "key": "engineered-arts-official",
+      "name": "Engineered Arts",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://engineeredarts.com/",
+      "decision": "2026-10-31 owner instruction (A4): register for recurring discovery monitoring and catalogue enrichment of the published robots; OWNER_AUTHORIZED basis to be recorded by source authorize-owner; not publisher consent; host to be confirmed by the structural review"
+    },
+    {
       "key": "figure-ai-official",
       "name": "Figure AI",
       "source_class": "MANUFACTURER",
       "homepage_url": "https://www.figure.ai/",
       "decision": "2026-10-18 owner instruction (A4): recurring discovery monitoring authorized as a business decision; OWNER_AUTHORIZED basis; not publisher consent"
+    },
+    {
+      "key": "fourier-official",
+      "name": "Fourier",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://www.fftai.com/",
+      "decision": "2026-10-31 owner instruction (A4): register for recurring discovery monitoring and catalogue enrichment of the published robots; OWNER_AUTHORIZED basis to be recorded by source authorize-owner; not publisher consent; host to be confirmed by the structural review"
+    },
+    {
+      "key": "galbot-official",
+      "name": "Galbot",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://www.galbot.com/",
+      "decision": "2026-10-31 owner instruction (A4): register for recurring discovery monitoring and catalogue enrichment of the published robots; OWNER_AUTHORIZED basis to be recorded by source authorize-owner; not publisher consent; host to be confirmed by the structural review"
+    },
+    {
+      "key": "hanson-robotics-official",
+      "name": "Hanson Robotics",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://www.hansonrobotics.com/",
+      "decision": "2026-10-31 owner instruction (A4): register for recurring discovery monitoring and catalogue enrichment of the published robots; OWNER_AUTHORIZED basis to be recorded by source authorize-owner; not publisher consent; host to be confirmed by the structural review"
+    },
+    {
+      "key": "honda-official",
+      "name": "Honda",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://global.honda/",
+      "decision": "2026-10-31 owner instruction (A4): register for recurring discovery monitoring and catalogue enrichment of the published robots; OWNER_AUTHORIZED basis to be recorded by source authorize-owner; not publisher consent; host to be confirmed by the structural review"
+    },
+    {
+      "key": "kepler-robotics-official",
+      "name": "Kepler Robotics",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://www.gotokepler.com/",
+      "decision": "2026-10-31 owner instruction (A4): register for recurring discovery monitoring and catalogue enrichment of the published robots; OWNER_AUTHORIZED basis to be recorded by source authorize-owner; not publisher consent; host to be confirmed by the structural review"
     },
     {
       "key": "neura-documents-official",
@@ -49,6 +112,48 @@
       "source_class": "MANUFACTURER",
       "homepage_url": "https://neura-robotics.com/",
       "decision": "2026-09-26 owner ToS reading: ALLOWED (DR-A4; SOURCE_PERMISSION)"
+    },
+    {
+      "key": "pal-robotics-official",
+      "name": "PAL Robotics",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://pal-robotics.com/",
+      "decision": "2026-10-31 owner instruction (A4): register for recurring discovery monitoring and catalogue enrichment of the published robots; OWNER_AUTHORIZED basis to be recorded by source authorize-owner; not publisher consent; host to be confirmed by the structural review"
+    },
+    {
+      "key": "rainbow-robotics-official",
+      "name": "Rainbow Robotics",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://www.rainbow-robotics.com/",
+      "decision": "2026-10-31 owner instruction (A4): register for recurring discovery monitoring and catalogue enrichment of the published robots; OWNER_AUTHORIZED basis to be recorded by source authorize-owner; not publisher consent; host to be confirmed by the structural review"
+    },
+    {
+      "key": "sanctuary-ai-official",
+      "name": "Sanctuary AI",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://sanctuary.ai/",
+      "decision": "2026-10-31 owner instruction (A4): register for recurring discovery monitoring and catalogue enrichment of the published robots; OWNER_AUTHORIZED basis to be recorded by source authorize-owner; not publisher consent; host to be confirmed by the structural review"
+    },
+    {
+      "key": "softbank-robotics-official",
+      "name": "SoftBank Robotics",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://www.softbankrobotics.com/",
+      "decision": "2026-10-31 owner instruction (A4): register for recurring discovery monitoring and catalogue enrichment of the published robots; OWNER_AUTHORIZED basis to be recorded by source authorize-owner; not publisher consent; host to be confirmed by the structural review"
+    },
+    {
+      "key": "tesla-official",
+      "name": "Tesla",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://www.tesla.com/",
+      "decision": "2026-10-31 owner instruction (A4): register for recurring discovery monitoring and catalogue enrichment of the published robots; OWNER_AUTHORIZED basis to be recorded by source authorize-owner; not publisher consent; host to be confirmed by the structural review"
+    },
+    {
+      "key": "ubtech-robotics-official",
+      "name": "UBTECH Robotics",
+      "source_class": "MANUFACTURER",
+      "homepage_url": "https://www.ubtrobot.com/",
+      "decision": "2026-10-31 owner instruction (A4): register for recurring discovery monitoring and catalogue enrichment of the published robots; OWNER_AUTHORIZED basis to be recorded by source authorize-owner; not publisher consent; host to be confirmed by the structural review"
     },
     {
       "key": "unitree-robotics-official",

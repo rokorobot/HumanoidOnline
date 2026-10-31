@@ -37,14 +37,23 @@ A4_SOURCES = {"unitree-robotics-official", "booster-robotics-official", "agibot-
               "agility-robotics-official", "figure-ai-official", "alza-cz"}
 #: Registered and running before A4, on SOURCE_PERMISSION (owner ToS ALLOWED).
 EXISTING = {"neura-robotics-official", "neura-documents-official", "xpeng-official"}
+#: The owner's 2026-10-31 instruction: every manufacturer of a published robot is a source.
+#: Registered identity only; no adapter until each host's structural review.
+COVERAGE_2026_10_31 = {
+    "1x-technologies-official", "apptronik-official", "boston-dynamics-official",
+    "engineered-arts-official", "fourier-official", "galbot-official",
+    "hanson-robotics-official", "honda-official", "kepler-robotics-official",
+    "pal-robotics-official", "rainbow-robotics-official", "sanctuary-ai-official",
+    "softbank-robotics-official", "tesla-official", "ubtech-robotics-official"}
 
 
 # ---------------------------------------------------------------- manifest (pure) --
 
 
-def test_manifest_lists_exactly_the_nine_registered_sources():
+def test_manifest_lists_exactly_the_registered_sources():
     entries = load_manifest()
-    assert {e["key"] for e in entries} == A4_SOURCES | EXISTING
+    assert {e["key"] for e in entries} == A4_SOURCES | EXISTING | COVERAGE_2026_10_31
+    assert not COVERAGE_2026_10_31 & set(ADAPTERS)
     assert [e["key"] for e in entries] == sorted(e["key"] for e in entries)
 
 

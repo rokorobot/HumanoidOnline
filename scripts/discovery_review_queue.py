@@ -28,6 +28,8 @@ from dataclasses import dataclass
 TITLE = "Discovery review queue"
 MARKER = "<!-- humanoidonline-discovery-review-queue -->"
 DIGEST_RE = re.compile(r"<!-- queue-digest: ([0-9a-f]{64}) -->")
+ITEMS_HEADING = "### What needs your decision"
+MAX_ITEMS = 50
 NOOP, CREATE, UPDATE, REOPEN, CLOSE = "NOOP", "CREATE", "UPDATE", "REOPEN", "CLOSE"
 
 
@@ -55,6 +57,15 @@ def workflow_fails(code: str) -> bool:
     return code not in ("0", "4")
 
 
+def render_items(items: list[str]) -> list[str]:
+    """Each label in a code span: text scraped from manufacturer pages can never mention a user,
+    link, or inject markdown into the issue."""
+    shown = [f"- `{' '.join(x.replace('`', "'").split())}`" for x in items[:MAX_ITEMS]]
+    if len(items) > MAX_ITEMS:
+        shown.append(f"- … and {len(items) - MAX_ITEMS} more (see the CLI below)")
+    return ["", ITEMS_HEADING, "", *shown] if shown else []
+
+
 def render_body(hr: dict, run_url: str) -> str:
     new = hr["new_this_cycle"]
     return "\n".join([
@@ -68,7 +79,8 @@ def render_body(hr: dict, run_url: str) -> str:
         f"- New in the latest meaningful run: {new['total']} "
         f"(proposals {new['proposals']}, identity {new['identity_items']})",
         f"- Queue digest: `{hr['queue_digest'][:16]}`",
-        f"- Latest meaningful run: {run_url}", "",
+        f"- Latest meaningful run: {run_url}",
+        *render_items(hr.get("items") or []), "",
         "Review with `python -m app.cli.discovery proposals list` and "
         "`python -m app.cli.discovery review`. Decisions are made by a human only."])
 
@@ -96,6 +108,10 @@ def decide(report: dict | None, issues: list[dict], run_url: str, code: str) -> 
                           comment="New actionable review items. " + run_url)
         old = DIGEST_RE.search(issue.get("body") or "")
         if old and old.group(1) == hr["queue_digest"]:
+            if hr.get("items") and ITEMS_HEADING not in (issue.get("body") or ""):
+                # one-time upgrade of an issue written before items were listed; no comment
+                return Action(UPDATE, "queue unchanged; adding the item list",
+                              number=issue["number"], body=body)
             return Action(NOOP, "queue digest unchanged", number=issue["number"])
         comment = (f"{hr['new_this_cycle']['total']} new review item(s). {run_url}"
                    if hr["new_this_cycle"]["total"] > 0 else None)

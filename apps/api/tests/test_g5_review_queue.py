@@ -194,3 +194,40 @@ def test_nothing_in_the_review_path_can_change_publication():
         src = path.read_text(encoding="utf-8")
         assert not re.search(r"is_published\s*=[^=]|SET\s+is_published|INSERT |UPDATE |DELETE ",
                              src), path
+
+
+# ------------------------------------------------------------------ item list in the issue
+
+
+def test_items_are_listed_in_the_issue_and_never_change_the_digest():
+    with_items = hr.summarize(("p1",), ("AWAITING_TRACE:c1",), (), 0, 1,
+                              ["Robot identity — AWAITING_TRACE: AgiBot / Lingxi X3 <x>"])
+    assert with_items["queue_digest"] == summary(("p1",), ("AWAITING_TRACE:c1",))["queue_digest"]
+    body = rq.decide(report(with_items), [], RUN, "4").body
+    assert rq.ITEMS_HEADING in body
+    assert "- `Robot identity — AWAITING_TRACE: AgiBot / Lingxi X3 <x>`" in body
+
+
+def test_scraped_item_text_is_neutralised_and_the_list_is_capped():
+    lines = rq.render_items(["evil `@owner` [x](http://e)\n## h"] + ["i"] * rq.MAX_ITEMS)
+    assert lines[3] == "- `evil '@owner' [x](http://e) ## h`"
+    assert lines[-1].startswith("- … and 1 more") and len(lines) == 3 + rq.MAX_ITEMS + 1
+    assert rq.render_items([]) == []
+
+
+def test_an_old_count_only_issue_is_upgraded_once_without_a_comment():
+    h = hr.summarize(("p1",), (), (), items=["Field proposal — x · height = 1 m [u]"])
+    old = {"number": 7, "state": "OPEN", "title": rq.TITLE,
+           "body": rq.render_body({**h, "items": []}, RUN)}
+    a = rq.decide(report(h), [old], RUN, "0")
+    assert a.kind == rq.UPDATE and a.comment is None and rq.ITEMS_HEADING in a.body
+    assert rq.decide(report(h), [issue(h)], RUN, "0").kind == rq.NOOP
+
+
+def test_proposal_labels_name_robot_field_value_and_source():
+    from types import SimpleNamespace as P
+    p = P(robot_slug="4ne1-mini", edition="Pro", target="specs.height_m", value="1.0" * 40,
+          source_url="https://neura-robotics.com/x")
+    label = hr.proposal_label(p)
+    assert label.startswith("Field proposal — 4ne1-mini (Pro) · specs.height_m = ")
+    assert "…" in label and label.endswith("[https://neura-robotics.com/x]")

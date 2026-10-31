@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 
 import { findManufacturer, findRobot, listRegions } from "@/lib/api-client";
+import { robotTitle } from "@/lib/robot-meta";
 import { providerLabel, providerNamesFrom, type ProviderNames } from "@/lib/providers";
 import { buildRobotJsonLd } from "@/lib/jsonld";
 import { absoluteUrl } from "@/lib/site";
@@ -151,7 +152,7 @@ export async function generateMetadata({
   // (docs/23 §10, CIT-K).
   const canonical = absoluteUrl(`/robots/${robot.slug}`);
   return {
-    title: `${robot.name} by ${robot.manufacturer.name} — Specs, Status & Evidence`,
+    title: robotTitle(robot),
     description:
       robot.summary ??
       `${robot.name} by ${robot.manufacturer.name} — capabilities, commercial status and evidence on HumanoidOnline.`,

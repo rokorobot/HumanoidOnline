@@ -23,6 +23,7 @@ from app.schemas.robot import (
     DeploymentRead,
     ExtendedSpec,
     PricingOfferRead,
+    ProductLineRef,
     RobotDetail,
     RobotImagePrimary,
     RobotImageRead,
@@ -754,6 +755,12 @@ def serialize_detail(
             slug=robot.manufacturer.slug,
             name=robot.manufacturer.name,
             country=_country_code(robot.manufacturer),
+        ),
+        # Only a published line is exposed; an unpublished one reads as no line.
+        product_line=(
+            ProductLineRef(slug=robot.product_line.slug, name=robot.product_line.name)
+            if robot.product_line is not None and robot.product_line.is_published
+            else None
         ),
         commercial_status=robot.commercial_status,
         summary=robot.summary,

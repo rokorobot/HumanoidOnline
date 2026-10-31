@@ -47,7 +47,7 @@ GRANT SELECT ON
     discovery_evidence_excerpt, promotion_audit, freshness_target, freshness_observation,
     candidate_identity_decision, discovery_claim_proposal, discovery_proposal_observation,
     discovery_proposal_decision, accepted_claim, claim_retraction, catalogue_write_audit,
-    catalogue_freshness
+    catalogue_freshness, product_line
 TO catalogue_promoter_routine;
 
 GRANT INSERT ON specification, evidence_source TO catalogue_promoter_routine;

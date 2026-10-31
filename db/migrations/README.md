@@ -354,3 +354,7 @@ canonical set from these files on every CI run and fails on any drift.
   ignored; every write path covered). Feeds `latest_catalogue_updated_at` in
   `/api/market-snapshot`. One-time bootstrap from stored `updated_at` values; no other
   row changes.
+- `0027_product_line.sql` — DR-L1 governed product lines: `product_line` table (slug,
+  manufacturer, name, source_url, observed_at, is_published; no commercial facts) and nullable
+  `robot.product_line_id`. Additive and idempotent; membership is loaded by the catalogue importer
+  from `db/catalogue/product_lines.json`.

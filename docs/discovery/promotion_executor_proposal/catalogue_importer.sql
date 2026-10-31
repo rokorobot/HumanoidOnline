@@ -53,12 +53,12 @@ GRANT SELECT ON
     discovery_evidence_excerpt, promotion_audit, freshness_target, freshness_observation,
     candidate_identity_decision, discovery_claim_proposal, discovery_proposal_observation,
     discovery_proposal_decision, accepted_claim, claim_retraction, catalogue_write_audit,
-    catalogue_freshness
+    catalogue_freshness, product_line
 TO catalogue_importer;
 
 -- Shared entities: reconciled by natural key, never deleted by the importer.
 GRANT INSERT, UPDATE ON
-    region, manufacturer, provider, capability, use_case, spec_definition, robot
+    region, manufacturer, provider, capability, use_case, spec_definition, robot, product_line
 TO catalogue_importer;
 
 -- A robot's child rows and their evidence.

@@ -383,10 +383,31 @@ COMMENT ON TABLE provider IS
 -- SECTION 2 — KNOWLEDGE LAYER: ROBOTS & VARIANTS
 -- =============================================================================
 
+-- Product line = the set of editions a manufacturer presents together (DR-L1). Membership is
+-- governed, sourced data (robot.product_line_id), never derived from names. No commercial or
+-- spec fact lives here: price, availability and specs stay on the edition (robot) records.
+CREATE TABLE product_line (
+    id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    slug             TEXT NOT NULL UNIQUE,            -- /lines/unitree-g1
+    manufacturer_id  UUID NOT NULL REFERENCES manufacturer(id) ON DELETE RESTRICT,
+    name             TEXT NOT NULL,
+    source_url       TEXT NOT NULL CHECK (btrim(source_url) <> ''),  -- maker page listing the editions together
+    observed_at      DATE NOT NULL,                   -- when that page was read
+    is_published     BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+COMMENT ON TABLE product_line IS
+    'Editions of one product presented together by the manufacturer (DR-L1). Membership is '
+    'robot.product_line_id; the line stores no price, availability or spec.';
+
 CREATE TABLE robot (
     id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     slug                  TEXT NOT NULL UNIQUE,        -- /robots/unitree-g1
     manufacturer_id       UUID NOT NULL REFERENCES manufacturer(id) ON DELETE RESTRICT,
+    -- Governed line membership (DR-L1); NULL = not in a published line. Must share the robot's
+    -- manufacturer (checked by the catalogue importer).
+    product_line_id       UUID REFERENCES product_line(id) ON DELETE SET NULL,
     name                  TEXT NOT NULL,
     model_code            TEXT,
     summary               TEXT,                        -- hero one-liner
@@ -1006,6 +1027,7 @@ CREATE TABLE event_log (
 CREATE INDEX idx_robot_search_vector ON robot USING GIN (search_vector);
 CREATE INDEX idx_robot_name_trgm     ON robot USING GIN (name gin_trgm_ops);
 CREATE INDEX idx_robot_manufacturer  ON robot (manufacturer_id);
+CREATE INDEX idx_robot_product_line   ON robot (product_line_id) WHERE product_line_id IS NOT NULL;
 CREATE INDEX idx_robot_status        ON robot (commercial_status);
 CREATE INDEX idx_robot_published     ON robot (is_published) WHERE is_published;
 -- common numeric filters
@@ -1087,7 +1109,7 @@ DECLARE t TEXT;
 BEGIN
     FOR t IN
         SELECT unnest(ARRAY[
-            'manufacturer','provider','robot','specification','pricing_offer',
+            'manufacturer','provider','product_line','robot','specification','pricing_offer',
             'availability_offer','deployment','commercial_lead'
         ])
     LOOP

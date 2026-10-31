@@ -57,6 +57,10 @@ IDEMPOTENCY MODEL (stable-ID, non-destructive reconciliation)
     insert/update; removing a variant that still has a dependent specification,
     pricing_offer or availability_offer not itself being removed is refused.
     A `remove` for a deployment is refused (D2).
+  - Product lines (db/catalogue/product_lines.json, DR-L1) are upserted by slug after the
+    robots, then robot.product_line_id is set for each listed member. An unknown robot, a robot
+    of another manufacturer, or a robot in two lines is refused. A robot not listed keeps its
+    line. Skipped by a scoped (`--only`) import.
   - Robots are never deleted. Offer retirement is `is_current` true -> false.
   - Scope of the evidence reconciled: PRICING_OFFER / AVAILABILITY_OFFER /
     DEPLOYMENT evidence under the reconciled rows, COMMERCIAL_STATUS evidence of
@@ -110,6 +114,7 @@ from psycopg.types.json import Json
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CATALOGUE_DIR = REPO_ROOT / "db" / "catalogue"
 ROBOTS_DIR = CATALOGUE_DIR / "robots"
+PRODUCT_LINES_PATH = CATALOGUE_DIR / "product_lines.json"
 
 # Robot columns fed from a robot JSON's flat "specs" object (plus a few top-level
 # fields handled separately). Kept explicit for readability (AGENTS.md rule 10).
@@ -183,7 +188,7 @@ AUTH_ACTIONS = ("remove", "update_evidence", "clear")
 #: Reported in this order; shared entities first, then the robot and its children.
 SUMMARY_TABLES = (
     "region", "manufacturer", "provider", "capability", "use_case", "spec_definition",
-    "robot", "robot_variant", "specification", "pricing_offer", "availability_offer",
+    "product_line", "robot", "robot_product_line", "robot_variant", "specification", "pricing_offer", "availability_offer",
     "deployment", "robot_image", "robot_capability", "use_case_fit", "evidence_source",
 )
 OUTCOMES = ("unchanged", "updated", "inserted", "removed", "preserved")
@@ -942,6 +947,68 @@ def import_manufacturers(cur, data: dict, region_id, recon: Reconciliation | Non
     return totals
 
 
+# --------------------------------------------------------------------------- #
+# Product lines (DR-L1): governed robot -> line membership
+# --------------------------------------------------------------------------- #
+def product_line_problems(data: dict) -> list[str]:
+    """Ambiguity in product_lines.json itself, found before any connection is opened."""
+    problems: list[str] = []
+    seen_lines: set[str] = set()
+    robot_line: dict[str, str] = {}
+    for line in data["product_lines"]:
+        slug = line.get("slug")
+        for field in ("slug", "manufacturer_slug", "name", "source_url", "observed_at"):
+            if not line.get(field):
+                problems.append(f"product line {slug!r}: {field} is required")
+        if slug in seen_lines:
+            problems.append(f"product line {slug!r} is listed twice")
+        seen_lines.add(slug)
+        for robot in line.get("robots") or []:
+            if robot in robot_line:
+                problems.append(f"robot {robot!r} is in two product lines: "
+                                f"{robot_line[robot]!r} and {slug!r}")
+            robot_line.setdefault(robot, slug)
+    return problems
+
+
+def import_product_lines(cur, data: dict, manufacturer_id, recon: Reconciliation, *,
+                         apply_publication_state: bool = False) -> None:
+    """Upsert product lines by slug, then set robot.product_line_id for each member.
+
+    Runs after the robots exist. Membership only ever sets a robot's line (a change to another
+    line is an in-place update); a robot absent from the file keeps its line, like any omitted
+    record. An unknown robot or a manufacturer mismatch is refused. `is_published` follows the
+    robot rule: written on first insert, preserved afterwards unless publication state is applied.
+    """
+    problems = product_line_problems(data)
+    if problems:
+        raise ReconcileRefused(
+            "IMPORT REFUSED - nothing was written:\n  " + "\n  ".join(problems))
+    preserved = () if apply_publication_state else ("is_published",)
+    for line in data["product_lines"]:
+        line_mid = manufacturer_id(line["manufacturer_slug"])
+        line_id = _upsert_entity(
+            cur, recon, "product_line", "slug",
+            ["slug", "manufacturer_id", "name", "source_url", "observed_at", "is_published"],
+            [line["slug"], line_mid, line["name"], line["source_url"], line["observed_at"],
+             line.get("is_published", False)],
+            skip=preserved)
+        for robot_slug in line.get("robots") or []:
+            row = cur.execute("SELECT id, manufacturer_id, product_line_id FROM robot "
+                              "WHERE slug = %s", (robot_slug,)).fetchone()
+            if row is None:
+                recon.refuse(f"product line {line['slug']}: unknown robot slug {robot_slug!r}")
+            elif row[1] != line_mid:
+                recon.refuse(f"product line {line['slug']}: robot {robot_slug!r} belongs to a "
+                             f"different manufacturer than the line ({line['manufacturer_slug']})")
+            elif row[2] == line_id:
+                recon.count("robot_product_line", "unchanged")
+            else:
+                cur.execute("UPDATE robot SET product_line_id = %s WHERE id = %s",
+                            (line_id, row[0]))
+                recon.count("robot_product_line", "updated")
+
+
 def import_providers(cur, data: dict, region_id, manufacturer_id,
                      recon: Reconciliation | None = None) -> None:
     recon = recon or Reconciliation()
@@ -1616,8 +1683,11 @@ def run(url: str, *, apply_publication_state: bool = False,
     loaded = [_load(p) for p in robot_files]
     # Ambiguity in the JSON itself (a natural key given twice) aborts before anything
     # is written, and before a connection is opened.
+    product_lines = None if only is not None else _load(PRODUCT_LINES_PATH)
     problems = manufacturer_key_problems(manufacturers) + [
         line for robot in loaded for line in incoming_problems(robot)]
+    if product_lines is not None:
+        problems += product_line_problems(product_lines)
     if problems:
         raise ReconcileRefused(
             "IMPORT REFUSED - nothing was written:\n  " + "\n  ".join(problems))
@@ -1718,6 +1788,11 @@ def run(url: str, *, apply_publication_state: bool = False,
                              capability_id, use_case_id, spec_definition, collisions,
                              apply_publication_state=apply_publication_state, recon=recon)
                 n_robots += 1
+
+            # Product lines need every robot present; a scoped import leaves them alone.
+            if product_lines is not None:
+                import_product_lines(cur, product_lines, manufacturer_id, recon,
+                                     apply_publication_state=apply_publication_state)
 
             # Refusals and unused authorizations abort here, inside the transaction:
             # nothing above is committed.

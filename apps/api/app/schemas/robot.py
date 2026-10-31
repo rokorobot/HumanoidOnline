@@ -261,6 +261,11 @@ class RobotImageRead(BaseModel):
     representative_note: str | None = None
 
 
+class ProductLineRef(BaseModel):
+    slug: str
+    name: str
+
+
 class RobotDetail(BaseModel):
     id: str
     slug: str
@@ -271,6 +276,8 @@ class RobotDetail(BaseModel):
     #: the website and the agent surface can only ever report one value.
     model_code: str | None = None
     manufacturer: ManufacturerRef
+    #: The published product line this edition belongs to (DR-L1); null when none.
+    product_line: ProductLineRef | None = None
     commercial_status: str
     summary: str | None = None
     description: str | None = None

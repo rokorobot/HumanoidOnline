@@ -1,0 +1,71 @@
+{
+  "_comment": "DR-L1 product lines: governed membership of editions. source_url is the manufacturer page that presents the editions together (read 2026-10-31). No price, availability or spec lives here.",
+  "product_lines": [
+    {
+      "slug": "unitree-g1",
+      "name": "Unitree G1",
+      "manufacturer_slug": "unitree",
+      "source_url": "https://www.unitree.com/g1/",
+      "observed_at": "2026-10-31",
+      "is_published": true,
+      "robots": [
+        "unitree-g1",
+        "unitree-g1-edu-plus-u2"
+      ]
+    },
+    {
+      "slug": "unitree-h2",
+      "name": "Unitree H2",
+      "manufacturer_slug": "unitree",
+      "source_url": "https://www.unitree.com/H2",
+      "observed_at": "2026-10-31",
+      "is_published": true,
+      "robots": [
+        "unitree-h2",
+        "unitree-h2-edu"
+      ]
+    },
+    {
+      "slug": "unitree-r1",
+      "name": "Unitree R1",
+      "manufacturer_slug": "unitree",
+      "source_url": "https://www.unitree.com/R1",
+      "observed_at": "2026-10-31",
+      "is_published": true,
+      "robots": [
+        "unitree-r1",
+        "unitree-r1-edu-u1",
+        "unitree-r1-edu-u2",
+        "unitree-r1-edu-u3",
+        "unitree-r1-edu-u4",
+        "unitree-r1-edu-u5",
+        "unitree-r1-edu-u6"
+      ]
+    },
+    {
+      "slug": "booster-k1",
+      "name": "Booster K1",
+      "manufacturer_slug": "booster-robotics",
+      "source_url": "https://www.booster.tech/booster-k1?target=en",
+      "observed_at": "2026-10-31",
+      "is_published": true,
+      "robots": [
+        "booster-k1-educational",
+        "booster-k1-geek",
+        "booster-k1-professional"
+      ]
+    },
+    {
+      "slug": "booster-t2",
+      "name": "Booster T2",
+      "manufacturer_slug": "booster-robotics",
+      "source_url": "https://www.booster.tech/booster-t2",
+      "observed_at": "2026-10-31",
+      "is_published": true,
+      "robots": [
+        "booster-t2-education",
+        "booster-t2-professional"
+      ]
+    }
+  ]
+}

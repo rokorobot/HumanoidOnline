@@ -36,6 +36,10 @@ class Robot(Base):
     manufacturer_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("manufacturer.id", ondelete="RESTRICT"), nullable=False
     )
+    #: Governed line membership (DR-L1); NULL = not in a line.
+    product_line_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("product_line.id", ondelete="SET NULL")
+    )
     name: Mapped[str] = mapped_column(Text, nullable=False)
     model_code: Mapped[str | None] = mapped_column(Text)
     summary: Mapped[str | None] = mapped_column(Text)
@@ -103,6 +107,9 @@ class Robot(Base):
 
     manufacturer: Mapped[Manufacturer] = relationship(  # noqa: F821
         "Manufacturer", back_populates="robots", lazy="selectin"
+    )
+    product_line: Mapped[ProductLine | None] = relationship(  # noqa: F821
+        "ProductLine", lazy="selectin"
     )
     variants: Mapped[list[RobotVariant]] = relationship(
         "RobotVariant", back_populates="robot", cascade="all, delete-orphan"

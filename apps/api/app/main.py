@@ -30,6 +30,7 @@ from app.routers import (
     discovery_review,
     health,
     manufacturers,
+    product_lines,
     regions,
     research,
     robots,
@@ -87,6 +88,7 @@ app.include_router(health.router)
 app.include_router(robots.router)
 app.include_router(manufacturers.router)
 app.include_router(use_cases.router)
+app.include_router(product_lines.router)
 app.include_router(regions.router)
 app.include_router(research.router)
 app.include_router(stats.router)

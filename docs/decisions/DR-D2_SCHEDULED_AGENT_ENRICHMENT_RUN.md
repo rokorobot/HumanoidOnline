@@ -2,7 +2,8 @@
 
 | | |
 |---|---|
-| **Status** | **DECIDED — 2026-10-31, product owner (in chat: "approved option B")** |
+| **Status** | **DECIDED — 2026-10-31, product owner (in chat: "approved option B"; schedule: "approved weekly run")** |
+| **Schedule** | Weekly, Monday 09:00 Europe/Prague (Cloudroom Loop `2c691cc8-ce87-4136-b0ac-d7022be0595f`) |
 | **Builds on** | DR-D1 (`HO-DATA-STANDING 2026-10-22` standing research order and the HO-DATA Fast Lane) |
 | **Unchanged** | `docs/26` §2.2, §6 and §7; `docs/16` LIVE.2/LIVE.3; AGENTS.md rules 1–11 |
 | **Schema** | None. No new service, workflow or repository tooling. |

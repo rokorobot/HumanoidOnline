@@ -1,0 +1,48 @@
+name: IndexNow
+
+# Daily: submit sitemap URLs changed in the last 26 h to IndexNow (Bing, Yandex, Seznam,
+# Naver). Manual run with "all" submits every sitemap URL. No secrets: the key is public.
+on:
+  schedule:
+    - cron: '20 6 * * *'
+  workflow_dispatch:
+    inputs:
+      all:
+        description: Submit every sitemap URL
+        type: boolean
+        default: false
+  pull_request:
+    paths:
+      - scripts/indexnow.py
+      - scripts/test_indexnow.py
+      - .github/workflows/indexnow.yml
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s scripts -p 'test_indexnow.py' -v
+
+  submit:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+      - run: python scripts/indexnow.py ${{ inputs.all && '--all' || '' }}

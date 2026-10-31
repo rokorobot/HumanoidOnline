@@ -101,6 +101,7 @@ Full detail. Response `200` (abbreviated):
 {
   "id": "uuid", "slug": "digit", "name": "Digit",
   "manufacturer": { "slug": "agility-robotics", "name": "Agility Robotics", "country": "US" },
+  "product_line": null,
   "commercial_status": "RAAS_DEPLOYMENT",
   "status_history": [ { "status": "PILOT", "effective_at": "2024-06-01" } ],
   "specs": { "height_cm": 175.0, "payload_kg": 16.0, "runtime_minutes": null, "...": "..." },
@@ -125,6 +126,7 @@ Full detail. Response `200` (abbreviated):
 }
 ```
 `404` for unknown slug.
+`product_line` (additive, DR-L1) is `{slug, name}` when the robot belongs to a **published** product line, else `null`.
 
 ### `GET /api/robots/compare?ids=slug1,slug2[,slug3,slug4]`
 2–4 robots; returns the detail shape above for each plus a `rows` array of normalized comparison rows grouped by `commercial | physical | manipulation | intelligence | developer | deployment`. `422` if <2 or >4 valid slugs.
@@ -142,6 +144,13 @@ Profile fields: `legal_name`, `country` (headquarters), `headquarters_city`, `in
 
 ### `GET /api/use-cases` — index with `robot_count` per use case.
 ### `GET /api/use-cases/{slug}` — detail + `suitable_robots: [{slug, name, fit_score, commercial_readiness, limitations}]` ordered by `fit_score` desc.
+
+## 3a. Product lines (DR-L1)
+
+A product line groups the editions a manufacturer presents together (e.g. Unitree G1 → G1, G1 EDU Plus U2). Membership is governed catalogue data with a source; **the line carries no price, availability or spec** — those stay on the edition records.
+
+### `GET /api/product-lines` — published lines, no pagination: `[{slug, name, manufacturer: {slug, name, country}, source_url, observed_at, robot_slugs: []}]`. `robot_slugs` lists **published** member robots only, in name order.
+### `GET /api/product-lines/{slug}` — the same line fields plus `robots: [RobotDetail]`: full robot detail objects (identical to `GET /api/robots/{slug}`, including `product_line`) for the published members. `404` for an unknown or unpublished line.
 
 ## 3b. Regions (supporting read)
 

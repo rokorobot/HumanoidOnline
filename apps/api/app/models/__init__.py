@@ -54,6 +54,7 @@ from app.models.evidence import EvidenceSource
 from app.models.freshness import FreshnessObservation, FreshnessTarget
 from app.models.manufacturer import Manufacturer, Provider
 from app.models.match_result import MatchResult
+from app.models.product_line import ProductLine
 from app.models.region import Region
 from app.models.robot import Robot, RobotStatusHistory, RobotVariant
 from app.models.robot_image import RobotImage
@@ -95,6 +96,7 @@ __all__ = [
     "PromotionAudit",
     "Provider",
     "Region",
+    "ProductLine",
     "Robot",
     "RobotCapability",
     "RobotImage",

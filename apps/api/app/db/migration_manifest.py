@@ -101,4 +101,7 @@ MIGRATIONS: dict[str, str] = {
     "0026_catalogue_freshness": (
         "b9a78ba46a2ed85948ec893d7dac8a8667a9cf601df4b620a9dd90022e84dbe0"
     ),
+    "0027_product_line": (
+        "2c89a1a9ade09bdcd05c3a41cfc044baac40de4a471b06570c616865c081b376"
+    ),
 }

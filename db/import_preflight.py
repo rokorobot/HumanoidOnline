@@ -95,13 +95,15 @@ REDACTED_TABLES = frozenset({"commercial_lead", "commercial_lead_robot",
                              "commercial_lead_provider", "buyer_requirement", "match_result"})
 #: Natural keys: a removed + added pair with the same key is one CHANGED row. A tuple is a
 #: composite key over the resolved field names.
-NATURAL_KEY = {"robot": "slug", "provider": "slug", "manufacturer": "slug", "region": "code",
+NATURAL_KEY = {"robot": "slug", "product_line": "slug", "provider": "slug",
+               "manufacturer": "slug", "region": "code",
                "capability": "slug", "use_case": "slug", "spec_definition": "key",
                "discovery_source": "key",                       # discovery_source.key (UNIQUE)
                "catalogue_write_audit": "audit_seq",            # identity column (UNIQUE)
                "freshness_target": ("robot", "url"),            # uq_freshness_target_robot_url
                "discovery_candidate": ("source", "external_ref")}  # uq_candidate_source_ref
-CATEGORY = {"robot": "robot", "provider": "provider", "pricing_offer": "pricing_offer",
+CATEGORY = {"robot": "robot", "product_line": "product_line", "provider": "provider",
+            "pricing_offer": "pricing_offer",
             "availability_offer": "availability_offer", "evidence_source": "evidence_source",
             "robot_variant": "variant", "discovery_source": "source",
             "freshness_target": "freshness_config", "crawl_run": "acquisition_run",
@@ -113,7 +115,7 @@ DROP = {"id", "created_at", "updated_at", "search_vector"}
 LABEL_TABLES = {  # table -> expression naming a row by its natural key
     "robot": "slug", "provider": "slug", "region": "code", "manufacturer": "slug",
     "capability": "slug", "use_case": "slug", "spec_definition": "key",
-    "discovery_source": "key",
+    "discovery_source": "key", "product_line": "slug",
 }
 
 

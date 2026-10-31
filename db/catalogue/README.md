@@ -28,6 +28,9 @@ db/catalogue/
   manufacturers.json     <- OEM company profiles (+ MANUFACTURER evidence, each row's
                             claim_fields naming the profile fields it supports;
                             field meanings in docs/03 §8)
+  product_lines.json     <- DR-L1 product lines: slug, manufacturer, name, source_url (maker page
+                            listing the editions together), observed_at, and member robot slugs.
+                            Identity and membership only; no price/spec lives on a line.
   robots/<slug>.json     <- one file per robot, with every commercial fact + its evidence
 db/import_catalogue.py   <- self-contained UPSERT importer (PEP 723 uv script);
                             --manufacturers-only imports manufacturer profiles and

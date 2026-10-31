@@ -1,0 +1,183 @@
+{
+  "_comment": "DR-L1 product lines: expected business changes for `import_catalogue.py --product-lines-only` on a production clone that already holds migration 0027 and the catalogue. 5 product_line rows ADDED and 16 robot rows CHANGED (product_line_id NULL -> line slug, nothing else). No offers, evidence, specs, images, publication or other table.",
+  "expected": [
+    {
+      "table": "product_line",
+      "kind": "ADDED",
+      "match": {
+        "slug": "unitree-g1",
+        "manufacturer": "unitree",
+        "source_url": "https://www.unitree.com/g1/",
+        "is_published": true
+      }
+    },
+    {
+      "table": "product_line",
+      "kind": "ADDED",
+      "match": {
+        "slug": "unitree-h2",
+        "manufacturer": "unitree",
+        "source_url": "https://www.unitree.com/H2",
+        "is_published": true
+      }
+    },
+    {
+      "table": "product_line",
+      "kind": "ADDED",
+      "match": {
+        "slug": "unitree-r1",
+        "manufacturer": "unitree",
+        "source_url": "https://www.unitree.com/R1",
+        "is_published": true
+      }
+    },
+    {
+      "table": "product_line",
+      "kind": "ADDED",
+      "match": {
+        "slug": "booster-k1",
+        "manufacturer": "booster-robotics",
+        "source_url": "https://www.booster.tech/booster-k1?target=en",
+        "is_published": true
+      }
+    },
+    {
+      "table": "product_line",
+      "kind": "ADDED",
+      "match": {
+        "slug": "booster-t2",
+        "manufacturer": "booster-robotics",
+        "source_url": "https://www.booster.tech/booster-t2",
+        "is_published": true
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-g1",
+        "product_line": "unitree-g1"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-g1-edu-plus-u2",
+        "product_line": "unitree-g1"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-h2",
+        "product_line": "unitree-h2"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-h2-edu",
+        "product_line": "unitree-h2"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-r1",
+        "product_line": "unitree-r1"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-r1-edu-u1",
+        "product_line": "unitree-r1"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-r1-edu-u2",
+        "product_line": "unitree-r1"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-r1-edu-u3",
+        "product_line": "unitree-r1"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-r1-edu-u4",
+        "product_line": "unitree-r1"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-r1-edu-u5",
+        "product_line": "unitree-r1"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree-r1-edu-u6",
+        "product_line": "unitree-r1"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "booster-k1-educational",
+        "product_line": "booster-k1"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "booster-k1-geek",
+        "product_line": "booster-k1"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "booster-k1-professional",
+        "product_line": "booster-k1"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "booster-t2-education",
+        "product_line": "booster-t2"
+      }
+    },
+    {
+      "table": "robot",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "booster-t2-professional",
+        "product_line": "booster-t2"
+      }
+    }
+  ]
+}

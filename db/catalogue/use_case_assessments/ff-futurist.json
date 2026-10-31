@@ -1,0 +1,52 @@
+{
+  "robot_slug": "ff-futurist",
+  "assessed_on": "2026-10-31",
+  "assessed_by": "Claude (Sonnet 5.5) in a session initiated by Robert Konecny. Not human-verified.",
+  "method": "Evaluation against all categories in use_cases.json from the manufacturer information recorded in robots/ff-futurist.json (page https://robotics.ff.com/us/ff-futurist/).",
+  "categories": {
+    "warehouse-logistics": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category."
+    },
+    "manufacturing": {
+      "status": "FIT",
+      "sources": [
+        "https://robotics.ff.com/us/ff-futurist/"
+      ],
+      "basis": "Manufacturing is listed among the target scenarios. Score NULL, confidence LOW."
+    },
+    "research-education": {
+      "status": "FIT",
+      "sources": [
+        "https://robotics.ff.com/us/ff-futurist/"
+      ],
+      "basis": "University research is listed among the target scenarios. Score NULL, confidence LOW."
+    },
+    "home": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "events-entertainment": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "retail-service": {
+      "status": "FIT",
+      "sources": [
+        "https://robotics.ff.com/us/ff-futurist/"
+      ],
+      "basis": "Reception, hospitality and commercial services are listed as target scenarios; 'Primary scenario: Reception, research, commercial services'. Score NULL, confidence LOW."
+    },
+    "healthcare-rehabilitation": {
+      "status": "FIT",
+      "sources": [
+        "https://robotics.ff.com/us/ff-futurist/"
+      ],
+      "basis": "Healthcare is listed among the target scenarios. Score NULL, confidence LOW."
+    },
+    "security-inspection": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    }
+  }
+}

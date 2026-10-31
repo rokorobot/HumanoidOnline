@@ -235,6 +235,14 @@ export default async function RobotDetailPage({
             </Link>
             <span aria-hidden="true">/</span>
             <Link href="/robots">Robot Catalogue</Link>
+            {robot.product_line && (
+              <>
+                <span aria-hidden="true">/</span>
+                <span data-testid="product-line-link">
+                  Part of the <Link href={`/lines/${robot.product_line.slug}`}>{robot.product_line.name}</Link> line
+                </span>
+              </>
+            )}
           </p>
           <div className="topbar">
             <div className="corner">

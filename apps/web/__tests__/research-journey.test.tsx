@@ -17,6 +17,7 @@ import { projection } from "./research-fixture";
 vi.mock("@/lib/seo", () => ({
   listAllRobots: async () => [],
   listAllManufacturers: async () => [],
+  listAllProductLines: async () => [],
   listAllUseCases: async () => [],
   lastMod: () => ({}),
 }));

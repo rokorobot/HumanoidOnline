@@ -13,7 +13,7 @@
 // The is_published boundary (AGENT-01.7) is enforced upstream at the fetch layer
 // (the public read returns only published robots); this builder just maps.
 import { absoluteUrl } from "@/lib/site";
-import type { RobotDetail, RobotListItem } from "@/lib/types";
+import type { ProductLineDetail, RobotDetail, RobotListItem } from "@/lib/types";
 
 interface PropertyValue {
   "@type": "PropertyValue";
@@ -160,6 +160,42 @@ export function buildCatalogueJsonLd(items: RobotListItem[]): Record<string, unk
           { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
           { "@type": "ListItem", position: 2, name: "Robot Catalogue", item: url },
         ],
+      },
+    ],
+  };
+}
+
+/**
+ * DR-L1 — schema.org `ProductGroup` for a product-line page. Mapped 1:1 from the governed
+ * line read: name, brand (the manufacturer) and one `hasVariant` Product per published
+ * edition, by canonical URL and name. The group asserts NO offers and no specs: price,
+ * availability and specs belong to the edition pages (AGENT-01.3, DR-L1 §4).
+ */
+export function buildProductLineJsonLd(line: ProductLineDetail): Record<string, unknown> {
+  const url = absoluteUrl(`/lines/${line.slug}`);
+  const mfrUrl = absoluteUrl(`/manufacturers/${line.manufacturer.slug}`);
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "ProductGroup",
+        "@id": url,
+        url,
+        name: line.name,
+        category: "Humanoid robot",
+        brand: { "@type": "Brand", name: line.manufacturer.name },
+        manufacturer: { "@id": mfrUrl },
+        productGroupID: line.slug,
+        hasVariant: line.robots.map((r) => {
+          const robotUrl = absoluteUrl(`/robots/${r.slug}`);
+          return { "@type": "Product", "@id": robotUrl, url: robotUrl, name: r.name };
+        }),
+      },
+      {
+        "@type": "Organization",
+        "@id": mfrUrl,
+        name: line.manufacturer.name,
+        url: mfrUrl,
       },
     ],
   };

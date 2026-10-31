@@ -20,3 +20,10 @@ export function robotTitle(robot: Pick<RobotDetail, "name" | "manufacturer" | "p
     ? `${name}: Price, Specs & Availability`
     : `${name}: Specs, Status & Evidence`;
 }
+
+/** DR-L1 — product-line page title. Names "price" only when some edition holds a published price. */
+export function lineTitle(line: { name: string; robots: Array<Pick<RobotDetail, "pricing_offers">> }): string {
+  return line.robots.some((r) => hasPublishedPrice(r.pricing_offers ?? []))
+    ? `${line.name}: Price, Specs & Editions`
+    : `${line.name}: Specs & Editions`;
+}

@@ -261,6 +261,8 @@ export interface RobotDetail {
   slug: string;
   name: string;
   manufacturer: ManufacturerRef;
+  // The published product line this edition belongs to (DR-L1); null when none.
+  product_line?: ProductLineRef | null;
   commercial_status: string;
   summary?: string | null;
   description?: string | null;
@@ -513,4 +515,26 @@ export interface DiscoveryCandidateReview {
   trace_state: string;
   discovered_at: string;
   last_seen_at: string;
+}
+
+// DR-L1 product lines: identity and provenance only; every fact lives on the editions.
+export interface ProductLineRef {
+  slug: string;
+  name: string;
+}
+
+export interface ProductLineListItem extends ProductLineRef {
+  manufacturer: ManufacturerRef;
+  source_url: string;
+  observed_at: string;
+  // Published member robots only.
+  robot_slugs: string[];
+}
+
+export interface ProductLineDetail extends ProductLineRef {
+  manufacturer: ManufacturerRef;
+  source_url: string;
+  observed_at: string;
+  // Full RobotDetail per published member, as GET /api/robots/{slug}.
+  robots: RobotDetail[];
 }

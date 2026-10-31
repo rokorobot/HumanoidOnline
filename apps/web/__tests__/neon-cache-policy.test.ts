@@ -75,6 +75,19 @@ describe("api-client — catalogue-static reads use Next's Data Cache", () => {
     expect(lastInit(fetchMock2).next).toEqual({ revalidate: 300 });
   });
 
+  it("listProductLines / findProductLine revalidate", async () => {
+    const fetchMock = mockFetchOnce([]);
+    const { listProductLines } = await import("@/lib/api-client");
+    await listProductLines();
+    expect(lastInit(fetchMock).next).toEqual({ revalidate: 300 });
+
+    vi.resetModules();
+    const fetchMock2 = mockFetchOnce({ slug: "unitree-g1" });
+    const { findProductLine } = await import("@/lib/api-client");
+    await findProductLine("unitree-g1");
+    expect(lastInit(fetchMock2).next).toEqual({ revalidate: 300 });
+  });
+
   it("listUseCases / findUseCase revalidate", async () => {
     const fetchMock = mockFetchOnce({ items: [], total: 0, limit: 24, offset: 0 });
     const { listUseCases } = await import("@/lib/api-client");
@@ -270,6 +283,7 @@ describe("llms.txt — no longer forces max-age=0/must-revalidate", () => {
       listRobots: vi.fn(async () => ({ items: [], total: 0 })),
       listManufacturers: vi.fn(async () => ({ items: [], total: 0 })),
       listUseCases: vi.fn(async () => ({ items: [], total: 0 })),
+      listProductLines: vi.fn(async () => []),
     }));
   });
 
@@ -302,6 +316,7 @@ describe("sitemap.xml — no longer forces a fresh full-catalogue read per hit",
       listRobots: vi.fn(async () => ({ items: [], total: 0 })),
       listManufacturers: vi.fn(async () => ({ items: [], total: 0 })),
       listUseCases: vi.fn(async () => ({ items: [], total: 0 })),
+      listProductLines: vi.fn(async () => []),
     }));
     const mod = await import("@/app/sitemap");
     expect((mod as { dynamic?: string }).dynamic).toBe("force-dynamic");
@@ -328,6 +343,7 @@ describe("page segment config — untouched by Phase 1 (caching lives in lib/api
     "app/compare/page.tsx",
     "app/use-cases/page.tsx",
     "app/use-cases/[slug]/page.tsx",
+    "app/lines/[slug]/page.tsx",
     "app/find-a-humanoid/page.tsx",
     "app/matches/[id]/page.tsx",
     "app/discovery-review/page.tsx",

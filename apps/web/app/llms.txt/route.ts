@@ -1,6 +1,6 @@
 import { HUB_REGIONS, RESEARCH_HUB_PATH, liveResearchRegions, researchPath } from "@/lib/research";
 import { siteUrl } from "@/lib/site";
-import { listAllManufacturers, listAllRobots, listAllUseCases } from "@/lib/seo";
+import { listAllManufacturers, listAllProductLines, listAllRobots, listAllUseCases } from "@/lib/seo";
 
 // AGENT-01 (A6): `/llms.txt` — a concise, LLM-friendly description of the site.
 // CANONICAL-ONLY: built from the governed reads, so it lists only is_published
@@ -32,11 +32,12 @@ export async function GET(): Promise<Response> {
 
   // WS8.5 / R23 — enumerate the ENTIRE published canonical set of every public
   // entity type, paginated via the governed reads (no 100-entity ceiling).
-  const [robots, manufacturers, useCases, liveRegions] = await Promise.all([
+  const [robots, manufacturers, useCases, liveRegions, productLines] = await Promise.all([
     listAllRobots(),
     listAllManufacturers(),
     listAllUseCases(),
     liveResearchRegions(),
+    listAllProductLines(),
   ]);
 
   const regionName = (slug: string) => HUB_REGIONS.find((r) => r.slug === slug)?.name ?? slug;
@@ -81,6 +82,14 @@ export async function GET(): Promise<Response> {
       (r) => `- ${r.name} (${r.manufacturer.name}): ${origin}/robots/${r.slug}`,
     ),
     "",
+    // DR-L1: only when at least one published line exists (an empty heading would announce nothing).
+    ...(productLines.length === 0
+      ? []
+      : [
+          "## Product lines (published, canonical)",
+          ...productLines.map((l) => `- ${l.name} (${l.manufacturer.name}): ${origin}/lines/${l.slug}`),
+          "",
+        ]),
     "## Manufacturers (published, canonical)",
     ...manufacturers.map((m) => `- ${m.name}: ${origin}/manufacturers/${m.slug}`),
     "",

@@ -18,6 +18,7 @@ vi.mock("@/lib/seo", () => ({
     { slug: "published-bot", name: "Published Bot", manufacturer: { slug: "acme", name: "Acme Robotics" } },
   ],
   listAllManufacturers: async () => [{ slug: "acme", name: "Acme Robotics" }],
+  listAllProductLines: async () => [],
   listAllUseCases: async () => [{ slug: "warehouse", name: "Warehouse" }],
   lastMod: () => ({}),
 }));

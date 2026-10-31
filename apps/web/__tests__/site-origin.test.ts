@@ -157,6 +157,7 @@ describe("every machine surface derives from the one resolver", () => {
         items: [{ slug: "warehouse-logistics", name: "Warehouse & Logistics" }],
         total: 1,
       })),
+      listProductLines: vi.fn(async () => []),
     }));
   });
 

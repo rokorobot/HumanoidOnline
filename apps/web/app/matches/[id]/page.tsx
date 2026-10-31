@@ -12,11 +12,13 @@ import { SectionIndex } from "@/components/SectionIndex";
 import { SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 import { getMatches, listRegions } from "@/lib/api-client";
+import { MATCH_RESULT_ROBOTS } from "@/lib/index-policy";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Match results",
+  robots: MATCH_RESULT_ROBOTS,
 };
 
 export default async function MatchesPage({

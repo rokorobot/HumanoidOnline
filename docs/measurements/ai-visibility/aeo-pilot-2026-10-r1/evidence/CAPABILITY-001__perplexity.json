@@ -1,0 +1,204 @@
+{
+ "observed_at": "2026-10-31T03:14:40+00:00",
+ "endpoint": "perplexity.web.answer.fast",
+ "request": {
+  "preset": "fast",
+  "input": "Which humanoid robots have SDK access?",
+  "max_steps": 1,
+  "max_output_tokens": 512
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "background": false,
+   "completed_at": 1793416481,
+   "created_at": 1793416481,
+   "effort": "fast@2026-10-16.0",
+   "error": null,
+   "frequency_penalty": 0,
+   "id": "resp_1dde6a61-25e0-49bc-b809-d1390d34fecd",
+   "incomplete_details": null,
+   "instructions": null,
+   "max_output_tokens": 512,
+   "max_tool_calls": null,
+   "metadata": {},
+   "model": "openai/gpt-6-luna",
+   "object": "response",
+   "output": [
+    {
+     "queries": [
+      "Which humanoid robots have SDK access?"
+     ],
+     "results": [
+      {
+       "date": "2010-09-16",
+       "id": 1,
+       "last_updated": "2026-10-26",
+       "snippet": "108 robots have a public SDK, grouped by status.\nAn open SDK does not mean open hardware or open-source firmware; check project licenses.\n...\nRequire a recorded public SDK.\nGroup by commercial, preorder, pilot, prototype, concept or discontinued status, then sort by name.\nSDK and documentation links use recorded official sources; a public API or SDK does not establish a license for hardware designs or firmware.\n...\n**Robots with a public SDK**\n|Robot|Status|SDK / documentation|Price|Price kind / evidence|Record updated|\n|--|--|--|--|--|--|\n|AgiBot A3|StatusCommercial|SDK / documentationSDK / documentation link not recorded|PriceUnknown|Price kind / evidenceUnknown|Record updatedOct 17, 2026|\n...\n|DexForce W1 Pro|StatusCommercial|SDK / documentation- W1 series humanoid robot user manual, version 0.4.5 ↗|PriceUnknown|Price kind / evi\n...\n|HighTorque Xiaohai|StatusCommercial|SDK / documentationSDK / documentation link not recorded|PriceUnknown|Price kind / evidenceUnknown|Record updatedOct 15, 2026|\n...\n|ROBOTIS AI Worker (FFW)|StatusCommercial|SDK / documentationSDK / documentation link not recorded|PriceUnknown|Price kind / evidenceUnknown|Record updatedOct 24, 2026|\n...\n**Robots with a public SDK**\n|Robot|Status|SDK / documentation|Price|Price kind / evidence|Record updated|\n|--|--|--|--|--|--|\n|Leju ROBAN 2|StatusPilot|SDK / do\n…\nnoid Tiangong 3.0|StatusPilot|SDK / documentationSDK / documentation link not recorded|PriceUnknown|Price kind / evidenceUnknown|Record updatedOct 19, 2026|\n|Zhejiang Humanoid Navigator 2|StatusPilot|SDK / documentation- Zhejiang Humanoid official GitHub organization ↗|PriceUnknown|Price kind / evidenceUnknown|Record updatedOct 17, 2026|\n...\n|Berkeley Humanoid Lite|StatusPrototype|SDK / documentationSDK / documentation link not recorded|PriceUnknown|Price kind / evidenceUnknown|Record updatedOct 15, 2026|\n|Britannia University Mia-1|StatusPrototype|SDK / documentation- MIA-1 Open Source Humanoid Robot repository ↗|PriceUnknown\n...\n|Stanford ToddlerBot 2.0|StatusPrototype|SDK / documentationSDK / documentation link not recorded|PriceUnknown|Price kind / evidenceUnknown|Record updatedOct 18, 2026|\n|X-Humanoid Tiangong Omni|StatusPrototype|SDK / documentationSDK / documentation link not recorded|PriceUnknown|Price kind / evidenceUnknown|Record updatedOct 17, 2026|\n...\nDoes an open SDK mean the robot is fully open source?\nNo. The openSdk field records a public SDK or API.\nHardware designs, firmware and other software need their own published licenses; those licenses are not implied by this field.\n...\nSDK access and purchase availability are separate.\nEach robot retains its current status and any official order path o\nn its product page.",
+       "source": "web",
+       "title": "Open-Source Humanoid Robots: Public SDKs Compared",
+       "url": "https://humanoidversus.com/lists/open-source-humanoid-robots"
+      },
+      {
+       "date": "2026-10-22",
+       "id": 2,
+       "last_updated": "2026-10-20",
+       "snippet": "# Unitree G1 EDU Professional I Humanoid Robot (EU)\n## Description\n- Unitree G1 EDU Professional I Humanoid Robot (EU)\n...\n- Includes manual controller and 54V 5A charger, backed by SDK access for secondary development\n...\nOpen access to its software development kit and compatibility with ROS-based workflows position it as a flexible research platform for custom perception and control research.\n...\nProvides open access to a software development kit so teams can write custom control code and test new behaviors.\nSimulation and reinforcement learning tooling support sim-to-real workflows before deploying to the physical robot.\n...\nDevelopment teams use the open computing stack and secondary development access to prototype new perception, control, and manipulation behaviors made possible by its dexterous hand, with the platform evolving through ongoing software updates.\nCompatible with ROS-based workflows and the Unitree SDK, it supports everything from custom perception pipelines to full sim-to-real manipulation policy transfer.\n...\n|•|Secondary development supported (SDK access)|\n|--|--|\n...\n| |G1 EDU Professional I|G1 Basic|\n|--|--|--|\n|Secondary Development (SDK Access)|Supported|Not supported|",
+       "source": "web",
+       "title": "Unitree G1 EDU Professional I Humanoid Robot (EU)",
+       "url": "https://eu.robotshop.com/products/unitree-g1-edu-professional-i-humanoid-robot-eu"
+      },
+      {
+       "date": "2026-06-01",
+       "id": 3,
+       "last_updated": "2026-10-26",
+       "snippet": "JAKA positions the system as an open development platform as much as a finished robot, with SDK access, voice control, a mobile app, and a handheld remote included.",
+       "source": "web",
+       "title": "Welcome, JAKA π!",
+       "url": "https://humanoid.guide/welcome-jaka-%CF%80/"
+      },
+      {
+       "date": "2026-09-04",
+       "id": 4,
+       "last_updated": "2026-10-14",
+       "snippet": "|Robot Kit|Brain|DOF / Servos|Programming|Best For|Buy|\n|--|--|--|--|--|--|\n|🥇 Hiwonder TonyPi Pro|Raspberry Pi 5 (8GB)|20 DOF · bus servos|Python · OpenCV|Best Overall|View →|\n|🏅 Hiwonder TonyPi Standard|Raspberry Pi 5 (4GB)|16+ DOF · bus servos|Python · Blockly|Best Value AI Humanoid|View →|\n|🚀 Unitree G1|8-core CPU · LiDAR|23 DOF · 90 N·m knee|App / OTA (no SDK)|Best Full-Size Humanoid|View →|\n|🧠 Hiwonder AiNex ROS|Raspberry Pi 5 (8GB)|24 bus servos|ROS · Python|Best for ROS & Research|View →|\n|⚙️ Hiwonder Tonybot|ESP32 + ESP32-S3 cam|17 DOF · bus servos|Arduino · Scratch · Python|Best ESP32 / Arduino Humanoid|View →|\n|🛡️ XiaoR Geek XR-MRT|Onboard controller · BT|18 DOF · metal servos|Graphical (app + PC)|Best DIY / Custom Armor Build|View →|\n...\nLook for a published SDK or GitHub repo, step-by-step assembly guides, and, critically, **replacement servos and brackets you can actually buy**.\nClosed platforms with no secondary development support will stop being fun the moment you outgrow the app.\n...\nBe clear-eyed about two things, though: this sits *far* above every other pick here on price, and **the version sold on Amazon explicitly does not support secondary development**.\nIf you need SDK or API access you want the G1 EDU instead.\n...\n**❌ Cons:** Costs many times more than any kit here; the Amazon SKU has no SDK/programming access; complex maneuvers are locked; ~2 h runtime.\n...\n|Programming|Python · OpenCV|ROS · Python ⭐|App only (no SDK)|Arduino · Scratch · Python|Arduino IDE|\n...\nNot in the developer sense.\nThe G1 listing sold on Amazon states plainly that **secondary development is not supported**.\nYou get app and remote control, voice interaction, a library of official motions and OTA updates, but no SDK or API access, and some complex maneuvers are locked for safety.\nIf you want to write your own controllers, run reinforcement-learning policies or integrate the robot into a research stack, you need the **G1 EDU** version, which Unitree sells separately.",
+       "source": "web",
+       "title": "Best Humanoid Robot Kits in 2026 (Tested Picks & Buying Guide)",
+       "url": "https://microcontrollerslab.com/best-humanoid-robot-kits-buying-guide/"
+      },
+      {
+       "date": "2026-10-07",
+       "id": 5,
+       "last_updated": "2026-10-28",
+       "snippet": "Unitree Robotics and Booster Robotics document development resources for their respective platforms.\n...\nConsider: Development access and interfaces vary by model and version.\nRBTX and Unitree Robotics describe access for the G1 EDU, not for every G1 version as a whole.\n...\nGénération Robots lists Choregraphe and Python and C++ SDKs for NAO V6.\n...\nDevelopment access depends on the version.\nUnitree Robotics describes DDS or ROS 2 access for the G1 EDU; you can’t automatically assume the same applies to every G1 version.\nAsk for written confirmation of the version, approved interfaces and SDK access for the device on offer.\n...\n- Unitree Robotics describes development access via DDS or ROS 2 for the G1 EDU.\n- Don’t assume ROS 2 access or optional hands are available on every G1 version without confirmation.\nCheck the equipment and approvals for the specific offer.\n### Booster Robotics\nThe T1 is a development platform for locomotion and, depending on the version, grasping experiments.\n- Booster Robotics provides SDK and ROS 2 resources.\n...\n### Maxtronics / NAO V6\nA compact platform for laboratory interaction and programming projects; Génération Robots lists Choregraphe and Python and C++ SDKs.\n...\n### Unitree G1 with force-controlled hands, SDK/API currently unavailable\nThe stated hand configuration may be relevant for grasping experiments, but the product name confirms that SDK/API access isn’t available for this version.\n...\nNo. Unitree Robotics describes DDS or ROS 2 access and a separate development computer for the G1 EDU.",
+       "source": "web",
+       "title": "Choosing a humanoid robot for R&D: SDKs and safety - Joybuy",
+       "url": "https://www.joybuy.de/blog/humanoid-robot-rd-guide/xCr6HZfb"
+      },
+      {
+       "id": 6,
+       "last_updated": "2026-10-14",
+       "snippet": "### Unitree G1\nHumanoid Robots\nCompact humanoid with separate G1 and G1 EDU configurations\nROS\nPaidView details\n...\n### Figure 02\nHumanoid Robots\nCommercial humanoid already working in BMW plants\nPaid\nBeta / limited access · Contact the vendor for pricing\n### Boston Dynamics Atlas\nHumanoid Robots\nIndustrial humanoid for material handling with autonomous battery swapping\nPaid\n...\n### AGIBOT X1\nHumanoid Robots\nOpen-source humanoid research platform with documented inference software\nOpen sourcePublic API / SDKROS\nPaid\nNot specified · Contact the vendor for pricing\n### AGIBOT A2-W\nHumanoid Robots\nWheeled dual-arm manipulation platform for flexible manufacturing\nPublic API / SDK\nPaid\nNot specified · Contact the vendor for pricing\n### AGIBOT A3\nHumanoid Robots\nFull-size humanoid for stage performance and research\nPublic API / SDK\nPaid\nNot specified · Contact the vendor for pricing\n### Unitree R1-A-D\nHumanoid Robots\nMobile dual-arm platform with separate A5-D and A7-D configurations\nPublic API / SDK\nPaidView details\n...\n### Unitree G1-D\nHumanoid Robots\nDual-arm data-collection platform with stationary and mobile variants\nPublic API / SDK\nPaid\nContact the vendor for pricing\n### Unitree H2-D\nHumanoid Robots\nIndustrial dual-arm platform with distinct Standard and Flagship bases\nPublic API / SDK\nPaid\nContact the vendor for pricing\n...\n### Microduck\nHumanoid Robots\n25 cm open-source biped for reinforcement-learning experiments\nOpen sourcePublic API / SDKROS\nPaidView details\n...\nROS\n...\n### NEURA 4NE-1\nHumanoid Robots\nNEURA 4NE-1 is a cognitive humanoid robot from NEURA Robotics, designed for human-like movement and AI-powered perception.\nPublic API / SDK\nPaidView details",
+       "source": "web",
+       "title": "Best Humanoid Robots & Automation Tools — RoboFacet",
+       "url": "https://robofacet.com/categories/humanoid-robots"
+      },
+      {
+       "date": "2026-04-07",
+       "id": 7,
+       "last_updated": "2026-10-19",
+       "snippet": "|Platform|Price|Height / Weight|Total DOF|Focus|Open-Source Level|\n|--|--|--|--|--|--|\n|Unitree G1|$21,600.00|127cm / 35kg|23 (base) / 43 (EDU)|Research + commercial|SDK open, hardware closed|\n|Unitree H1|$99,900.00|180cm / 47kg|25|Research + industrial|SDK open, hardware closed|\n|Reachy 2 (Pollen)|$70,000|140cm / 40kg|21 (upper body)|HRI + bimanual manipulation|Software Apache 2.0, partial hardware|\n|Berkeley Humanoid|$8K-12K (BOM)|100cm / 12kg|12|Locomotion RL research|Fully open (CAD + code + BOM)|\n|1X NEO Beta|$50,000+|165cm / 30kg|30+|Home assistant, safety|Limited access program|\n|Apptronik Apollo|N/A (lease)|173cm / 73kg|30+|Industrial logistics|Closed (commercial partner program)|\n|Figure 02|N/A (lease)|170cm / 60kg|40+|General-purpose, warehouse|Closed (BMW partnership)|\n...\nThe Python SDK is well-documented, ROS2 support is available through community packages, and the growing HuggingFace LeRobot community has published walking policies, manipulation pipelines, and teleoperation setups specifically for the G1.\n...\nThe Berkeley Humanoid (Zhuang et al., 2024) is a completely open-source design from UC Berkeley's Hybrid Robotics Lab.\nThe full hardware design files, CAD models, bill of materials, and walking controller code are published.\n...\nReachy 2 ($70,000) occupies the upper end of the open-source humanoid space.\nIt is a commercial product with fully open-source software (Apache 2.0 license) and partially open hardware.\nIts 17 DOF arms, human-like kinematics, and native ROS2 stack make it particularly well-suited for research on human-robot interaction and bimanual manipulation.\n...\nReachy 2's teleoperation SDK is the most polished among open-source humanoids, with VR-based control that requires minimal setup.\n...\nThe NEO Beta program gives select research partners access to the hardware and a data collection SDK.\n...\nAccess is through a commercial partnership program with Apptronik, which includes deployment support.\n...\nHardware access is limited to strategic partners (BMW is the anchor deployment partner), but Figure's published results provide useful benchmarks for what current humanoid manipulation can achieve.\n...\n|Platform|Simulation|RL Training|Teleoperation|Community|Data Collection Rating|\n|--|--|--|--|--|--|\n|Unitree G1|Isaac Lab, MuJoCo|Isaac Lab policies available|Python SDK + custom glove|5K+ Discord|Good (tabletop manipulation)|\n|Unitree H1|Isaac Lab, MuJoCo|Whole-body locomotion|Same as G1|3K+ Discord|Good (human-height tasks)|\n|Reachy 2|Gazebo + custom sim|Limited RL support|Native VR teleoperation|1K+ commercial|Excellent (best teleop SDK)|\n|Berkeley Humanoid|MuJoCo (official)|Whole-body control|Custom builds only|200-500 academic|Limited (locomotion focus)|\n|1X NEO Beta|MuJoCo (partner access)|In-house RL stack|SDK for partner labs|500+ (invite-only)|Good (safety-focused tasks)|\n...\nBest teleoperation SDK, most natural arm kinematics, and the Apache 2.0 software license means no commercial restrictions on your research outputs.",
+       "source": "web",
+       "title": "Open-Source Humanoid Robots in 2025: A Practical Guide",
+       "url": "https://www.roboticscenter.ai/blog/open-source-humanoid-robots-2025"
+      },
+      {
+       "date": "2026-10-10",
+       "id": 8,
+       "last_updated": "2026-10-28",
+       "snippet": "- Secondary development support with open SDK access\n...\nAs the entry point into the G1 EDU lineup, this configuration unlocks secondary development and SDK access on top of the same core hardware as the base G1, giving developers a foundation to build and test their own control software.\n...\n**Secondary Development:** Supported (SDK access)\n...\nOpen SDK & Simulation Tools\nSecondary development access lets engineering teams write custom control code and test behaviors in simulation before moving to hardware.\nCompanion repositories support the full pipeline from training through sim-to-real transfer.\n...\nCompatible with ROS-based workflows and the Unitree SDK, it supports everything from custom perception pipelines to full sim-to-real policy transfer.\n...\n|•|Secondary development supported (SDK access)|\n...\n| |G1 EDU U1|G1 Basic|\n|--|--|--|\n...\n|High Computing Module|NVIDIA Jetson Orin NX, 100 TOPS|Not available|\n...\n|Battery Life|About 2 hours|About 2 hours|\n...\n|Secondary Development (SDK Access)|Supported|Not supported|",
+       "source": "web",
+       "title": "Unitree G1 EDU Standard (U1) Humanoid Robot (EU)",
+       "url": "https://eu.robotshop.com/products/unitree-g1-edu-standard-u1-humanoid-robot-eu"
+      },
+      {
+       "date": "2026-10-06",
+       "id": 9,
+       "last_updated": "2026-10-23",
+       "snippet": "Unitree Robotics describes the R1 as a more compact platform and documents development features for R1-EDU models.\n...\nFor research projects, the documented R1-EDU and G1-EDU models are particularly relevant.\nDevelopment features should not automatically be assumed to apply to other models in the same ranges.\n- For the R1 EDU, Unitree Robotics documents topics including SDK, DDS and ROS2.\nThe RBTX marketplace lists open APIs, ROS, Python, C++ and Linux for its G1-EDU offer.\n- The RBTX marketplace describes its G1 Base as operable by remote control only, and points to the EDU for ROS-based autonomy.\nFor every model, check the development access actually included and the relevant documentation.\n...\n### AGIBOT X2 Ultra humanoid robot\nThe X2 Ultra may be worth considering for trials involving your own software and navigation, provided the development access offered meets your project requirements.\nThe product description mentions autonomous navigation and scope for further development.\nAsk for confirmation of the interfaces, access rights and equipment included with the model you order.\n...\n### Booster Robotics K1 Edu humanoid robot\nThe K1-Edu model is an option for development trials, provided its interfaces are suited to the tasks you have planned.\n...\n### Unitree R1 Edu, blue and white\nIf you’re planning a research setup based on the R1, it’s worth checking this EDU model against your planned software trials.\nUnitree Robotics documents SDK, DDS and ROS2 topics for the R1 EDU.\nCheck which of these features, and which hardware, are included in the configuration offered here.\n...\nThis R1 model may be of interest for movement and perception trials if its development access meets the needs of your test plan.\n...\n### Booster Robotics K1 Geek humanoid robot\nThe Geek model may suit experiments involving your own software, provided its development features support the data and tools you need.\nThe product name specifies 22 degrees of freedom and 48 TOPS.\nAsk for details of the APIs, SDKs and access available on this specific model.",
+       "source": "web",
+       "title": "Humanoid robots for research: buy or hire with support?",
+       "url": "https://www.joybuy.de/blog/humanoid-robots-research-buy-hire/2NaGOARk"
+      },
+      {
+       "id": 10,
+       "last_updated": "2026-09-22",
+       "snippet": "|Model|DOF|Camera| |Warranty|SDK Access|\n|--|--|--|--|--|--|\n|R1 Air|20|Monocular| |6 months|No|\n|R1 Basic|26|Binocular| |8 months|No|\n|R1 EDU Standard|26|Binocular| |Extended|Full SDK + ROS 2|\n|R1 EDU Smart|26 + AI enhanced|Binocular| |Extended|Full SDK + ROS 2|\n|R1 EDU Pro|26 + NVIDIA Jetson|Binocular| |Extended|Full SDK + ROS 2 + Jetson Orin|\n...\n|Specification|Value|\n|--|--|\n|SDK|Open SDK (EDU variants only)|\n...\nThe R1 EDU variants provide a Linux-based open SDK and ROS 2 interfaces.\nThe open SDK enables developers to write custom control policies, implement new locomotion algorithms, and deploy novel manipulation behaviors without being limited to Unitree's pre-packaged capabilities.\n...\nThe standard R1 and R1 Air are explicitly closed systems with no secondary development support, a distinction that Unitree's documentation and authorized dealer listings emphasize clearly.\n...\n**Does the Unitree R1 have an SDK for custom development?** The standard R1 and R1 Air are closed systems with no secondary development support — they cannot be programmed with custom software.\nThe R1 EDU variants ($10,000 and above) include a full Linux-based open SDK, ROS 2 interfaces (for integration with the standard robotics research software ecosystem), and optionally the NVIDIA Jetson Orin module for dedicated AI compute.\nBuyers who need to develop custom locomotion algorithms, reinforcement learning policies, or manipulation behaviors must purchase an EDU variant.",
+       "source": "web",
+       "title": "Unitree R1 Humanoid Robot: Specs, Price & Uses",
+       "url": "https://www.robotsasia.com/Unitree-R1.htm"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "content": [
+      {
+       "annotations": [],
+       "text": "“SDK access” varies by model and configuration, so it’s not a yes/no property of a robot brand. Examples with documented development access include:\n\n- **Unitree G1 EDU** — SDK and secondary-development support; the standard G1 does not necessarily include it.[2][5]\n- **Unitree R1 EDU** — SDK, DDS, and ROS 2 are documented for EDU variants; don’t assume those apply to the standard R1.[9][10]\n- **Booster Robotics T1 and K1-Edu** — SDK/ROS 2 resources are reported for the T1, while K1-Edu is marketed for development; confirm the interfaces included in the exact version.[5][9]\n- **Reachy 2** — software development and teleoperation tools, including a ROS 2 stack.[7]\n- **NAO V6** — Choregraphe and Python/C++ SDKs are listed.[5]\n- **JAKA π** — SDK access is advertised as part of its development platform.[3]\n- **Other listed platforms** include AgiBot X1/A2-W/A3, Unitree H1, and selected research or prototype robots; access and maturity vary.[1][6][7]\n\nA broad catalog reports 108 humanoid robots with public SDKs, but that includes prototypes and platforms whose SDK links or documentation may not be fully recorded.[1] Check the specific model, edition, and included access before buying—an advertised SDK does not imply open-source hardware or firmware.[1]",
+       "type": "output_text"
+      }
+     ],
+     "id": "msg_7ad240ec-6214-47f5-b58a-253d17406f2b",
+     "role": "assistant",
+     "status": "completed",
+     "type": "message"
+    }
+   ],
+   "parallel_tool_calls": true,
+   "presence_penalty": 0,
+   "preset": "fast@2026-10-16.0",
+   "previous_response_id": null,
+   "prompt_cache_key": null,
+   "reasoning": null,
+   "safety_identifier": null,
+   "service_tier": "fast",
+   "status": "completed",
+   "store": true,
+   "temperature": 1,
+   "text": {
+    "format": {
+     "type": "text"
+    }
+   },
+   "tool_choice": "auto",
+   "tools": [
+    {
+     "type": "web_search"
+    }
+   ],
+   "top_logprobs": 0,
+   "top_p": 1,
+   "truncation": "",
+   "usage": {
+    "cost": {
+     "cache_creation_cost": 0.00057,
+     "cache_read_cost": 2e-05,
+     "currency": "USD",
+     "input_cost": 0,
+     "output_cost": 0.00016,
+     "tool_calls_cost": 0.001,
+     "tool_calls_cost_details": {
+      "search_web": 0.001
+     },
+     "total_cost": 0.00175
+    },
+    "input_tokens": 6366,
+    "input_tokens_details": {
+     "cache_creation_input_tokens": 4583,
+     "cache_read_input_tokens": 1780,
+     "cached_tokens": 1780
+    },
+    "output_tokens": 319,
+    "output_tokens_details": {
+     "reasoning_tokens": 0
+    },
+    "tool_calls_details": {
+     "search_web": {
+      "cost_usd": 0.001,
+      "invocation": 1
+     }
+    },
+    "total_tokens": 6685
+   },
+   "user": null
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "b05f2ec7724c46469510c7da0dd2b0f3",
+   "charged_micro": 1750
+  }
+ }
+}

@@ -1,0 +1,201 @@
+{
+ "observed_at": "2026-10-31T03:13:43+00:00",
+ "endpoint": "perplexity.web.answer.fast",
+ "request": {
+  "preset": "fast",
+  "input": "Which humanoid robots are commercially available?",
+  "max_steps": 1,
+  "max_output_tokens": 512
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "background": false,
+   "completed_at": 1793416423,
+   "created_at": 1793416423,
+   "effort": "fast@2026-10-16.0",
+   "error": null,
+   "frequency_penalty": 0,
+   "id": "resp_6fc49a30-59fd-48c3-a121-10695539ac6c",
+   "incomplete_details": null,
+   "instructions": null,
+   "max_output_tokens": 512,
+   "max_tool_calls": null,
+   "metadata": {},
+   "model": "openai/gpt-6-luna",
+   "object": "response",
+   "output": [
+    {
+     "queries": [
+      "Which humanoid robots are commercially available?"
+     ],
+     "results": [
+      {
+       "id": 1,
+       "last_updated": "2026-10-04",
+       "snippet": "# Humanoid robots\nAs of Jul 2026, 7 humanoid models are commercially available; the rest are in pilot, prototype, or research stage.\n...\nOutside the four established platforms with documented commercial-deployment anchors (Figure 02 at BMW Spartanburg's 30,000 vehicles; Apptronik Apollo across Mercedes + GXO + Jabil; Agility Digit at GXO Flowery Branch's 100,000-tote scaled-throughput; 1X NEO at consumer-shipping state with explicit teleoperation disclosure), the rest of the cohort operates at announcement-and-pilot tier where marketing demo reels do not translate to shipped capability without primary-source verification.\n...\nVerified pricing across the humanoid cohort is documented at deploy.report/humanoids on the consumer surface, with per-entity pricing pages for Tesla Optimus, Boston Dynamics Atlas, Unitree G1 + R1 + H1, Fourier GR-3, Sanctuary Phoenix, Mentee Robotics MenteeBot, UBTech Walker S2, AgiBot Yuanzheng A2, PAL TALOS, and the broader cohort.",
+       "source": "web",
+       "title": "Humanoid robots, DEPLOY explainers",
+       "url": "https://deploy.report/explainers/humanoid-robots"
+      },
+      {
+       "id": 2,
+       "last_updated": "2026-10-24",
+       "snippet": "# Humanoid Robots — the definitive guide for business leaders.\n## Humanoids you can deploy today — through RobotLAB.\nAvailable now in the store, with deployment, training, and service included.\n...\nAvailability\nRaaS available (1)\n...\n### Unitree H2\nUnitree Robotics (China)\n**Status:** Commercial — Shipping commercially **Price:** $29,900 base **Size:** 182 cm / 70 kg **Battery:** 0.972 kWh, ~3 hrs **DoF:** 31 (hands optional) **AI:** Open platform **Best fit:** Research, education, light commercial.\n...\n|Digit|Agility Robotics|USA|Commercial|175 cm|64 kg|28 (30+ next)|Up to 8 hrs|Yes (2:1 ratio)|16 kg|Agility Arc platform|~$250K / $2-4K/mo|Warehouse logistics|Walking|\n...\n|Unitree H2|Unitree Robotics|China|Commercial|182 cm|70 kg|31|~3 hrs|No|N/D|Open platform|$29,900|Research, education|Walking|\n|Unitree G1|Unitree Robotics|China|Commercial|127-132 cm|35 kg|23/43 EDU|~2 hrs|No|N/D|Open dev platform|$16K-$25K|Education, research|Walking|\n|Fourier GR-2|Fourier Intelligence|China|Shipping|175 cm|63 kg|53|~2 hrs|Detachable|3 kg/arm|Rehab expertise expanding|$100K-$150K|Rehabilitation, research|Walking|\n|Walker S2|UBTECH Robotics|China|Commercial|176 cm|70 kg|N/D|2-4 hrs|Auto hot-swap <3 min|N/D|Industrial AI|$180K / $5K/mo|Industrial inspection, logistics|Walking|\n...\nSome humanoid robots are shipping commercially in 2026, but broad deployment is still early.\nRobots like Agility Digit, Unitree H2, and UBTECH Walker S2 are in active commercial use.\nMost others are in pilot or pre-commercial stages.",
+       "source": "web",
+       "title": "Humanoid Robots — Prices & Use Cases - RobotLAB",
+       "url": "https://www.robotlab.com/capabilities/humanoid-robots/"
+      },
+      {
+       "date": "2026-09-30",
+       "id": 3,
+       "last_updated": "2026-10-30",
+       "snippet": "Manufacturing Digital ranks the Top 10 humanoid robots moving into commercial deployments\nFrom Tesla’s Optimus to Hexagon’s AEON, humanoid robots are moving into commercial deployments across manufacturing to improve safety and efficiency\n...\n1X Technologies has priced its humanoid robot at US$20,000 for full ownership or a US$499 monthly subscription.\n...\nUnitree's G1 stands at 1.32m tall, weighs around 35kg and costs US$13,500 on the company’s official website.\n...\nOptimus is Tesla’s maiden humanoid robot and is currently being trialled at the company’s own facilities on manufacturing tasks.\n...\nDigit is Agility Robotics’ bipedal humanoid robot that is designed to support companies within the logistics and warehousing industry.\nIt began commercial operations at a GXO Logistics facility in June 2024 becoming the first humanoid robot in a live, commercial workplace.\n...\nAfter a lengthy testing process by the company, Figure 03 has now been deployed in a commercial setting.\n...\n## 1. Atlas\n...\nOfficially unveiled at CES 2026, Atlas is Boston Dynamics’ fully electric and product-ready humanoid robot.\nIt is the first commercial version under the company’s portfolio after its predecessor was disbanded in April 2024.\n...\nAccording to Boston Dynamics, Atlas has taken its first steps into a customer facility with Hyundai for testing on real world tasks.",
+       "source": "web",
+       "title": "Top 10: Humanoid Robots",
+       "url": "https://manufacturingdigital.com/top10/top-10-humanoid-robots"
+      },
+      {
+       "date": "2026-03-10",
+       "id": 4,
+       "last_updated": "2026-10-18",
+       "snippet": "- **14 robots commercially available** today (available for purchase or pre-order with confirmed pricing)\n...\n|Robot|Company|Price (USD)|Tier|Status|Country|\n|--|--|--|--|--|--|\n|Unitree R1|Unitree Robotics|$4,900|Consumer|Pre-order|China|\n|Unitree G1|Unitree Robotics|$13,500|Consumer|Available|China|\n|1X NEO|1X Technologies|$20,000|Consumer|Pre-order|Norway|\n|AgiBot X1|AgiBot|<$20,000|Consumer|Available|China|\n|Figure 03|Figure AI|~$20,000 (target)|Consumer|Announced|USA|\n...\n|Tesla Optimus|Tesla|$25,000 (target)|Consumer|Announced|USA|\n|Apptronik Apollo|Apptronik|<$50,000 (target)|Commercial|Pre-order|USA|\n|Fauna Sprout|Fauna Robotics|$50,000|Commercial|Available|USA|\n|Figure 02|Figure AI|$50,000-$100,000 (est.)|Commercial|Pre-order|USA|\n|Unitree H1|Unitree Robotics|Contact for pricing|Commercial|Available|China|\n|Astribot S1|Astribot|Quote-only (~¥500k reported)|Commercial|Available|China|\n|NEURA 4NE1|NEURA Robotics|$105,000|Industrial|Pre-order|Germany|\n|Ameca|Engineered Arts|$120,000|Entertainment|Available|UK|\n|Sanctuary Phoenix|Sanctuary AI|$100,000+ (est.)|Industrial|Prototype|Canada|\n|Fourier GR-1|Fourier Intelligence|$150,000|Healthcare|Available|China|\n|Agility Digit|Agility Robotics|$250,000|Industrial|Available|USA|\n|Boston Dynamics Atlas|Boston Dynamics|$150,000+ (est.)|Industrial|Pre-order|USA|\n...\n|Robot|Customer|Sector|Status|Location|\n...\n|Agility Digit|Amazon|Warehouse/Logistics|Active pilot|USA|\n|Agility Digit|GXO Logistics (Spanx)|Warehouse/Logistics|Active (RaaS)|Flowery Branch, GA|\n|Figure 02|BMW|Automotive Manufacturing|Active pilot|Spartanburg, SC|\n|Apptronik Apollo|Mercedes-Benz|Automotive Manufacturing|Active pilot|Germany|\n|Fourier GR-1|Hospitals|Healthcare/Rehab|Active (reported)|China|\n|Sanctuary Phoenix|Microsoft (Hannover Messe)|Demo/Exhibition|Demo|Germany|",
+       "source": "web",
+       "title": "Humanoid Robot Industry Report 2026 | RoboZaps Blog",
+       "url": "https://blog.robozaps.com/b/humanoid-robot-industry-report-2026"
+      },
+      {
+       "id": 5,
+       "last_updated": "2026-10-30",
+       "snippet": "Humanoid robots have moved from labs into factories, showrooms, stages and police patrols, with mass produced bipedal and wheeled platforms from Unitree, AgiBot, UBTECH, EngineAI and Pudu now shipping by the thousand.\nExplore every humanoid robot type and brand, price and cost information, and find humanoid robots for sale with purchasing details available on this page.\n- AiMOGA Mornine M1 Multilingual AI Powered Humanoid Robot\n$59,950.00\n- UBTECH Cruzr 1S Intelligent Commercial Service Wheeled Humanoid Robot\n$15,999.99 As low as $11,999.99\n- UBTECH Walker S2 Industrial Humanoid Robot\n$145,000.00\n- Free Shipping\nMagicLab MagicBot Z1 Standard Edition Humanoid Robot\n$39,800.00\n...\nGalbot S1 Heavy Duty Wheeled Humanoid Robot\n$175,000.00\n- MagicLab MagicBot G1 Standard Edition Humanoid Robot\n$119,800.00\n- Unitree G1 Basic Humanoid Robot\n$19,995.00\n...\nUnitree H2 Humanoid Robot\n$37,500.00\n- Unitree R1 Basic Humanoid Robot (R1 Basic)\n$9,990.00\n- Unitree G1 Edu Plus Humanoid Robot with Fake Hands (G1EDU-U2)\n$50,950.00\n- Unitree G1 Ultimate A Humanoid Robot with 3 Finger Hands (G1EDU-U3)\n$61,995.00\n- Unitree G1 Ultimate B Humanoid Robot with 3 Finger Hands with Tactile Sensor (G1EDU-U4)\n$67,900.00 Special Price $64,500.00\n- Unitree G1 Ultimate C Humanoid Robot with 5 Finger Hands (G1EDU-U5)\n$56,900.00 As low as $56,331.00\n...\nUnitree G1 Edu Pro B U10 Humanoid Robot (G1EDU-U10)\n$53,750.00\n- Unitree G1 Edu Pro A U9 Humanoid Robot (G1EDU-U9)\n$53,750.00\n...\nUnitree's line runs from the world's most popular humanoid, the G1, through the ultra accessible R1 and pioneering H1 to the flagship H2 with up to 2,070 TOPS of NVIDIA Thor computing.\n...\nUBTECH's humanoids are led by the mass produced Walker S2 and UWORLD U1, while EngineAI contributes the most natural gait in robotics across the PM01, SE01 and flagship T800, alongside athletic specialists from Booster Robotics and Noetix, including the N2 Athlete, BUMI and E1, and platforms from Kepler, Fourier, Dobot, RobotEra and Deep Robotics.\n...\nThe industrial AgiBot G2 series runs documented production shifts with force controlled sub millimeter arms, Unitree's wheeled line including the G1-D bridges research and service, the semi humanoid PUDU D7 sorts and carries through eight hour shifts, and AiMOGA's Mornine, the first humanoid with full EU certification, works dealership floors in more than 30 countries.\n...\nHumanoid robots are available for purchase worldwide, from single education units to industrial fleet programs, with every brand and platform browsable through the humanoid robot catalog on Robots International.",
+       "source": "web",
+       "title": "Humanoid Robots for Sale - Buy for Commercial & General Purpose ...",
+       "url": "https://www.robotsinternational.com/Humanoid-Robots.htm"
+      },
+      {
+       "date": "2026-02-24",
+       "id": 6,
+       "last_updated": "2026-10-18",
+       "snippet": "Ten flagships now carry the commercially available label, including AGIBOT A3, Booster K1, Dexmate Vega, MagicBot Gen1, Robosen K1 Pro, UBTECH Walker S2 and Unitree H2.\nThat label is deliberately model-specific.\nIt does not mean every configuration is in stock, that delivery is immediate in every country, or that a buyer can deploy it without integration work.\n...\n## Frequently asked questions\nTen flagships have source-backed commercial availability, including AGIBOT A3, Booster K1, Dexmate Vega, MagicBot Gen1, Robosen K1 Pro, UBTECH Walker S2 and Unitree H2.",
+       "source": "web",
+       "title": "53 Humanoid Robot Companies Compared (2026 Directory)",
+       "url": "https://blog.robozaps.com/b/humanoid-robot-companies"
+      },
+      {
+       "id": 7,
+       "last_updated": "2026-10-17",
+       "snippet": "Many humanoid robots are announced, demonstrated, or in pilot — far fewer are buyable today.\nThis page filters the catalog to platforms with active commercial procurement channels.\n...\n### Apollo\nApollo is a bipedal humanoid robot from Apptronik aimed at automating tasks in industrial and commercial environments.\n...\n### ASIMO\nASIMO is Honda’s humanoid biped robot developed for robotics R&D and public demonstrations, with autonomous walking/running and voice/face interaction.\n...\nCart is a wheeled service robot from Macco Robotics for autonomous food and beverage delivery in hospitality venues.\n...\nDex is a mobile humanoid service robot from Richtech Robotics for commercial customer-facing environments.\n...\nHUBO FX-1 is an early HUBO humanoid robot platform from KAIST used for biped locomotion and human-carrying mobility research.\n...\nKIME is a humanoid hospitality service robot from Macco Robotics that autonomously dispenses beverages and can serve some food items in commercial venues.\n...\nMesmer is a hyper-realistic humanoid robot from Engineered Arts focused on lifelike facial expression and human-robot interaction.\n...\nmyBuddy is Elephant Robotics’ dual-arm, semi-humanoid desktop robot launched in 2022 for research and education.\n...\n### NEURA 4NE1\nNEURA 4NE1 is a full-size humanoid robot platform from NEURA Robotics aimed at industrial and logistics tasks, with NVIDIA Thor compute and a reservation-based rollout.\n...\nPromobot V.4 is an autonomous humanoid service robot for customer-facing tasks in public and commercial spaces.\n...\nTesla Bot (Optimus) is a humanoid biped robot Tesla is developing to perform repetitive or unsafe tasks in human environments.\n...\n### Which humanoid robots can I buy today?\nThe shortest list: Unitree platforms (G1, H1) for research/education; Fourier GR-1 for research; some Chinese platforms via direct order.\nMost flagship US platforms (Atlas, Figure 03, Apollo) are deployment-partner-only as of mid-2026.",
+       "source": "web",
+       "title": "Commercially Available Humanoid Robots — Catalog 2026",
+       "url": "https://www.humanoidhub.ai/humanoid-robots/commercially-available"
+      },
+      {
+       "date": "2026-03-10",
+       "id": 8,
+       "last_updated": "2026-10-27",
+       "snippet": "- 1X NEO is the leading home candidate, but it remains a preorder product and may use scheduled remote Expert Mode for unknown tasks.\n- Tesla Optimus is not commercialized and has no current official public price or complete product specification sheet.\n...\n|#|Robot|Height|Weight|Price|Best For|Status (Jul 2026)|\n|--|--|--|--|--|--|--|\n|1|Agility Digit|175 cm|~65 kg|RaaS (no list price)|Warehouse logistics|Deployed; SPAC pending|\n|2|Atlas (Electric)|190 cm|90 kg|Not published|Auto mfg, R&D|In production (2026 booked out)|\n|3|Figure 03|~173 cm*|~61 kg*|Not published|Manufacturing, logistics|Fleet production; first BMW demonstration|\n|4|UBTECH Walker S2|176 cm†|~73 kg†|Enterprise|Industrial, 24/7 shifts|Mass production|\n...\nFigure 02 completed a documented BMW program; Figure 03 completed its first BMW parts-sequencing demonstration in June 2026.\nWalker S-series robots have industrial deployments reported by UBTECH.\n...\n98 platforms tracked, 13 purchasable today.",
+       "source": "web",
+       "title": "38 Best Humanoid Robots in 2026 (Evidence-Ranked) - Blog",
+       "url": "https://blog.robozaps.com/b/best-humanoid-robots"
+      },
+      {
+       "id": 9,
+       "last_updated": "2026-10-21",
+       "snippet": "Below is every humanoid Robofy tracks, with honest readiness, pricing and ROI signals so you can tell a deployable pilot from a research bench.\n...\nNAO 6\nBipedal humanoid for education, therapy, and reception in K-12 and university settings.\n...\nAgility Robotics\nDigit\nBipedal logistics workhorse — 100K+ totes moved, most deployed humanoid globally\n$250K–$250KDetails\n...\nAgiBot\nA2\nDeployed service humanoid — front-of-house reception & retail guidance in Chinese venues\n$96K–$182KDetails\n...\nA2 Lite\nEntertainment humanoid — choreographed reception and performance in hotels and exhibitions\n...\nPioneer K2\nIndustrial humanoid — material handling and logistics assembly with 30 kg dual-arm payload.\n...\nTORA-DOUBLE ONE\nWheeled humanoid with dexterous tactile hands for warehouse and factory logistics\n...\nApptronik\nApollo\nAmong the most commercially mature humanoid robots available in 2026, with real factory deployments, but walking speed and fine manipulation remain bottlenecks.\n$50K–$80KDetails\n...\nwalker S2\n1.76m industrial humanoid—quality inspection and material handling for automotive factory floors.\n...\nSE01\nFull-size humanoid with natural gait for research and service tasks.\n...\nG1\nMost affordable full-size humanoid shipping at production scale, but still a research platform masquerading as a consumer product.\n...\nH1\n...\nOP3\nMiniature bipedal research platform for locomotion and HRI labs — not yet commercial.\n...\nLightning",
+       "source": "web",
+       "title": "Humanoid Robots - Robofy",
+       "url": "https://robofy.world/explorer/humanoid-robots"
+      },
+      {
+       "date": "2026-06-17",
+       "id": 10,
+       "last_updated": "2026-09-10",
+       "snippet": "The Unitree G1, at around $16,000, is available online, while Agility Robotics' Digit, costing about $250,000, targets industrial clients like Amazon.\n1X's Neo Gamma is opening pre-orders for home use at $20,000 or $499/month, with 2026 shipping.\nOther models like Figure O3 and Agibot A2 serve enterprise or industrial roles.\nNotably, Tesla Optimus and Boston Dynamics Atlas remain unavailable for purchase.\n...\nThe Unitree G1 is one of the few humanoid robots that can easily be ordered by anyone today.\nJust head over to the online store, hand over around $16,000 (depending on optional extras) and you could become the first person in your street to own your own walking, talking humanoid.\n...\nMost of the humanoid robots that are available today aren’t as easily accessible as the G1, and purchases are negotiated through enterprise procurement channels rather than websites.\nThis is true of Agility Robotics Digit.\nBelieved to be obtainable for around $250,000, it’s a significant step up investment-wise, and customers are mostly manufacturers with big budgets and big plans for humanoid workplace automation, including Amazon and Toyota.\n...\nNeo Gamma, from 1X, has been available to companies running enterprise deployments for a while, but pre-orders have just opened up for individual private purchasers.\nNeo Gamma, standing at 5ft 5in tall and weighing 30kg, is among the first commercially available humanoids designed specifically for the home.\n...\nIt can be leased for $499 a month, similar to the price of many family car leases, or bought outright for $20,000.\n...\nFigure AI’s general-purpose humanoid is another model that’s apparently available to buy, although this is through enterprise partnership and piloting channels rather than retail.\nHowever, if you’ve got $20,000 to $30,000 (depending on options) to spend, you might be able to get hold of one.\n...\nAgibot, from Shanghai-based Zhiyuan Robotics, can be purchased directly from its website today.\nThe Lite model is listed for $44,000 and while there are no prices given for the more capable X2 and Ultra models, they’re reported to cost in the region of $100,000 to $190,000, depending on the variant chosen.\n...\nAlthough mainly aimed at enterprise and research institutions, UK-based Engineered Arts is one of the few manufacturers with an AI-driven, autonomous general-purpose humanoid that anyone can buy.\nProviding they have £100,000 to £250,000 spare to spend on their Ameca model.\n...\nBoston Dynamics’ electric Atlas is one of the most advanced humanoid platforms in the world, but it is not available to ordinary customers.\nIts early production is focused on internal testing and enterprise partnership programs.\n...\nBut for now, Optimus is not something you can buy.",
+       "source": "web",
+       "title": "The Humanoid Robots You Can Actually Buy Right Now",
+       "url": "https://www.forbes.com/sites/bernardmarr/2026/06/17/the-humanoid-robots-you-can-actually-buy-right-now/"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "content": [
+      {
+       "annotations": [],
+       "text": "“Commercially available” covers different things: some robots can be ordered directly, while others are sold only to enterprise customers or offered through deployment contracts. As of October 2026, the clearest examples are:\n\n- **Unitree G1 and H1** — available for purchase, mainly for research, education, and development; the G1 is one of the easiest to order directly.[1][2][10]\n- **Agility Robotics Digit** — commercially deployed for warehouse and logistics work, typically through enterprise arrangements rather than ordinary retail sales.[1][2][10]\n- **UBTECH Walker S2** — offered for industrial customers, including inspection and logistics applications.[2][5]\n- **Fourier GR-1 / GR-2** — listed as commercially available or shipping, with research and rehabilitation uses.[2][4]\n- **Engineered Arts Ameca** — available by purchase for specialist, entertainment, and human-interaction applications.[4][10]\n- **1X NEO** — accepting consumer orders or preorders, with availability and fulfillment dependent on the rollout.[1][3][10]\n- **Apptronik Apollo** — available through enterprise pilots and deployment partnerships, not as a typical retail product.[1][7][10]\n\nAvailability changes quickly, and “available” does not necessarily mean immediate delivery or a ready-to-use robot. **Tesla Optimus and Boston Dynamics Atlas are not generally available for purchase**; both remain focused on internal testing or partner deployments.[8][10]",
+       "type": "output_text"
+      }
+     ],
+     "id": "msg_efea6dae-19c6-48d4-abcd-0b99112dfe0a",
+     "role": "assistant",
+     "status": "completed",
+     "type": "message"
+    }
+   ],
+   "parallel_tool_calls": true,
+   "presence_penalty": 0,
+   "preset": "fast@2026-10-16.0",
+   "previous_response_id": null,
+   "prompt_cache_key": null,
+   "reasoning": null,
+   "safety_identifier": null,
+   "service_tier": "fast",
+   "status": "completed",
+   "store": true,
+   "temperature": 1,
+   "text": {
+    "format": {
+     "type": "text"
+    }
+   },
+   "tool_choice": "auto",
+   "tools": [
+    {
+     "type": "web_search"
+    }
+   ],
+   "top_logprobs": 0,
+   "top_p": 1,
+   "truncation": "",
+   "usage": {
+    "cost": {
+     "cache_creation_cost": 0.00057,
+     "cache_read_cost": 2e-05,
+     "currency": "USD",
+     "input_cost": 0,
+     "output_cost": 0.00016,
+     "tool_calls_cost": 0.001,
+     "tool_calls_cost_details": {
+      "search_web": 0.001
+     },
+     "total_cost": 0.00175
+    },
+    "input_tokens": 6311,
+    "input_tokens_details": {
+     "cache_creation_input_tokens": 4528,
+     "cache_read_input_tokens": 1780,
+     "cached_tokens": 1780
+    },
+    "output_tokens": 312,
+    "output_tokens_details": {
+     "reasoning_tokens": 0
+    },
+    "tool_calls_details": {
+     "search_web": {
+      "cost_usd": 0.001,
+      "invocation": 1
+     }
+    },
+    "total_tokens": 6623
+   },
+   "user": null
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "b36e3564a01847fb99b2dbb5af71b9ac",
+   "charged_micro": 1750
+  }
+ }
+}

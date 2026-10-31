@@ -1,0 +1,298 @@
+{
+ "observed_at": "2026-10-31T03:12:29+00:00",
+ "endpoint": "cloro.ai-search.chatgpt.scrape",
+ "request": {
+  "prompt": "Which humanoid robots can be purchased in Asia?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "model": null,
+    "text": "As of October 2026, there are several humanoid robots that can actually be purchased in Asia, particularly from Chinese manufacturers. China currently has the strongest selection, ranging from relatively affordable developer robots to full-size industrial humanoids.\n\nBelow is a shortlist of the most interesting commercially available models.\n\n1. Humanoid robots available for purchase\n\nPrices are indicative USD prices, not guaranteed quotations for every Asian country.\n\n1. Unitree R1\n\nEntry-level price\n\n$4,900–5,900\n\nManufacturer: Unitree, China\n\nHeight: approximately 121 cm\n\nIntended for: education, development, demonstrations and research.\n\nOne of the least expensive full-body humanoids.\n\nPurchase: Unitree official shop .\n\n2. Unitree G1\n\nStrong all-round choice\n\n$13,500–73,900\n\nManufacturer: Unitree, China\n\nHeight: approximately 132 cm\n\nIntended for: AI development, robotics research and manipulation.\n\nMultiple configurations, including EDU versions.\n\nPurchase: Unitree official shop .\n\n3. EngineAI PM01\n\n~$12,000–13,700\n\nManufacturer: EngineAI, China\n\nHeight: approximately 138 cm\n\nIntended for: research, AI development and demonstrations.\n\nA relatively affordable developer platform.\n\nPurchase: EngineAI .\n\n4. Booster T1\n\n$29,800–50,925\n\nManufacturer: Booster Robotics, China\n\nHeight: approximately 118 cm\n\nIntended for: robotics competitions, research and development.\n\nParticularly interesting for education and robotics laboratories.\n\nPurchase: Booster Robotics .\n\n5. AGIBOT A2\n\n~$44,560\n\nManufacturer: AGIBOT, China\n\nHeight: approximately 169 cm\n\nIntended for: service, commercial applications and embodied AI.\n\nA full-size humanoid with a more commercial orientation.\n\nPurchase: AGIBOT official store .\n\n6. AGIBOT X2\n\n~$25,600\n\nManufacturer: AGIBOT, China\n\nHeight: approximately 131 cm\n\nIntended for: research, interaction, demonstrations and development.\n\nCompact alternative to the A2.\n\nPurchase: AGIBOT official store .\n\n7. EngineAI T800\n\n~$27,000–40,500+\n\nManufacturer: EngineAI, China\n\nHeight: approximately 173 cm\n\nIntended for: industrial applications and advanced robotics.\n\nA full-size humanoid platform.\n\nPurchase: EngineAI .\n\n8. Kepler Forerunner K2\n\n~$37,200\n\nManufacturer: Kepler Robotics, China\n\nHeight: approximately 175 cm\n\nIntended for: industrial automation and material handling.\n\nA particularly interesting full-size industrial option.\n\nPurchase: Kepler Robotics .\n\nPrice and availability references: Actual ordering conditions and configurations should be confirmed with manufacturers.\n\n2. Other manufacturers worth investigating\n\nThese companies also have humanoid platforms, although availability is generally more dependent on commercial quotations, research partnerships or enterprise orders.\n\nManufacturer\n\nRobot\n\nMain application\n\nFourier Intelligence\n\nGR-1 / GR-2\n\nResearch, healthcare, service\n\nUBTECH\n\nWalker S2\n\nFactory automation\n\nLimX Dynamics\n\nOli / Tron\n\nResearch and industrial robotics\n\nNoetix Robotics\n\nN2\n\nResearch and education\n\nRobotEra\n\nStar1 / Q5\n\nResearch and industrial AI\n\nLeju Robotics\n\nKuavo\n\nIndustrial and research applications\n\n3. Which ones would I shortlist?\n\nDepending on the intended application:\n\nApplication\n\nMy shortlist\n\nLowest purchase cost\n\nUnitree R1\n\nRobotics development\n\nUnitree G1\n\nAI and research\n\nEngineAI PM01\n\nEducation and competitions\n\nBooster T1\n\nFull-size humanoid\n\nAGIBOT A2\n\nIndustrial automation\n\nKepler K2 / UBTECH Walker\n\n4. A few questions to narrow down the best options\n\nAsia is a large market, and shipping, local distributors, customs and after-sales support can make a significant difference.\n\nWhat is your intended application?\n\nI can then narrow this down to actual suppliers, manufacturer contacts, purchasing channels and realistic delivered prices rather than just robots that have been announced or demonstrated.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Which humanoid robot can you actually buy?",
+      "url": "https://humanoid.observer/",
+      "footnote": false
+     },
+     {
+      "position": 2,
+      "label": "Chinese humanoid robots: 128 models, prices in ¥ and $, evidence",
+      "url": "https://robopear.com/humanoids/china/",
+      "footnote": false
+     },
+     {
+      "position": 3,
+      "label": "Humanoid robot prices: 26 models from $599.99, checked 29 Oct 2026",
+      "url": "https://robopear.com/humanoids/prices/",
+      "footnote": false
+     },
+     {
+      "position": 4,
+      "label": "Humanoid Robot Price Index",
+      "url": "https://robolupa.com/analysis/humanoid-robot-price-index/",
+      "footnote": false
+     },
+     {
+      "position": 5,
+      "label": "Humanoid Robots — Buy from OEMs (China, USA, UK, AU) 2026",
+      "url": "https://www.botsales.com/humanoids",
+      "footnote": false
+     },
+     {
+      "position": 6,
+      "label": "Humanoid robots: buy, rent or RaaS",
+      "url": "https://robot-distribution.com/en/robots/humanoids",
+      "footnote": false
+     },
+     {
+      "position": 7,
+      "label": "2.7 ROBOTICS AND AUTONOMOUS MOTION | TECHNICAL PERFORMANCE",
+      "url": "https://hai.stanford.edu/assets/files/ai_index_report_2026_chapter_2_technical.pdf",
+      "footnote": false
+     },
+     {
+      "position": 8,
+      "label": "",
+      "url": "https://robostore.com/products/unitree-r1-basic-humanoid-robot",
+      "footnote": true
+     },
+     {
+      "position": 9,
+      "label": "Unitree official shop",
+      "url": "https://shop.unitree.com/",
+      "footnote": true
+     },
+     {
+      "position": 10,
+      "label": "",
+      "url": "https://botland.store/walking-robots/27433-humanoid-robot-unitree-g1-5907085525600.html",
+      "footnote": true
+     },
+     {
+      "position": 11,
+      "label": "",
+      "url": "https://www.engineai.com.cn/product-pm01",
+      "footnote": true
+     },
+     {
+      "position": 12,
+      "label": "EngineAI",
+      "url": "https://en.engineai.com.cn/",
+      "footnote": true
+     },
+     {
+      "position": 13,
+      "label": "",
+      "url": "https://www.asiasatellite.co/Booster-T1-Basic-Humanoid-Robot.htm",
+      "footnote": true
+     },
+     {
+      "position": 14,
+      "label": "Booster Robotics",
+      "url": "https://www.booster.tech/",
+      "footnote": true
+     },
+     {
+      "position": 15,
+      "label": "",
+      "url": "https://www.gongboshi-robot.com/sale-54461591-agibot-a2-ultra-full-size-humanoid-robot-with-40-dof-169cm-height-and-dexterous-hand-for-advanced-ai.html",
+      "footnote": true
+     },
+     {
+      "position": 16,
+      "label": "AGIBOT official store",
+      "url": "https://store.agibot.com/",
+      "footnote": true
+     },
+     {
+      "position": 17,
+      "label": "",
+      "url": "https://www.robotsinternational.com/Agibot-X2-Full-Stack-Open-Source-Humanoid-Robot.htm",
+      "footnote": true
+     },
+     {
+      "position": 18,
+      "label": "",
+      "url": "https://www.humanoid.press/database/www-humanoid-press-database-engineai-t800/",
+      "footnote": true
+     },
+     {
+      "position": 19,
+      "label": "Kepler Robotics",
+      "url": "https://www.keplerbot.com/",
+      "footnote": true
+     },
+     {
+      "position": 20,
+      "label": "",
+      "url": "https://omg.rocks/humanoid-robots-are-here-which-ones-are-leading-the-way",
+      "footnote": true
+     }
+    ],
+    "entities": [
+     {
+      "type": "product",
+      "name": "Unitree R1"
+     },
+     {
+      "type": "product",
+      "name": "Unitree G1"
+     },
+     {
+      "type": "product",
+      "name": "EngineAI PM01"
+     },
+     {
+      "type": "product",
+      "name": "Booster T1"
+     },
+     {
+      "type": "product",
+      "name": "AGIBOT A2"
+     },
+     {
+      "type": "product",
+      "name": "AGIBOT X2"
+     },
+     {
+      "type": "product",
+      "name": "EngineAI T800"
+     },
+     {
+      "type": "product",
+      "name": "Kepler Forerunner K2"
+     },
+     {
+      "type": "company",
+      "name": "Fourier Intelligence"
+     },
+     {
+      "type": "company",
+      "name": "UBTECH"
+     },
+     {
+      "type": "company",
+      "name": "LimX Dynamics"
+     },
+     {
+      "type": "company",
+      "name": "Noetix Robotics"
+     },
+     {
+      "type": "company",
+      "name": "RobotEra"
+     },
+     {
+      "type": "company",
+      "name": "Leju Robotics"
+     }
+    ],
+    "map": [],
+    "followUpForm": {
+     "questions": [
+      {
+       "label": "1. Intended application",
+       "type": "radio",
+       "options": [],
+       "name": "purpose"
+      },
+      {
+       "label": "2. Approximate budget per robot",
+       "type": "radio",
+       "options": [],
+       "name": "budget"
+      },
+      {
+       "label": "3. Preferred purchasing region",
+       "type": "radio",
+       "options": [],
+       "name": "region"
+      },
+      {
+       "label": "4. Buyer type",
+       "type": "radio",
+       "options": [],
+       "name": "buyer"
+      }
+     ],
+     "submitLabel": "Find suitable robots and suppliers",
+     "followUpPrompt": "Please shortlist humanoid robots available to purchase in Asia with manufacturer and distributor contacts, prices and availability. Application: {purpose}. Budget: {budget}. Region: {region}. Buyer: {buyer}."
+    },
+    "markdown": "As of October 2026, there are several humanoid robots that can actually be purchased in Asia, particularly from Chinese manufacturers. China currently has the strongest selection, ranging from relatively affordable developer robots to full-size industrial humanoids.\n\nBelow is a shortlist of the most interesting commercially available models.\n\n## 1. Humanoid robots available for purchase\n\nPrices are indicative USD prices, not guaranteed quotations for every Asian country.\n\n1. Unitree R1\n\nEntry-level price\n\n# $4,900–5,900\n\n- Manufacturer: Unitree, China\n- Height: approximately 121 cm\n- Intended for: education, development, demonstrations and research.\n- One of the least expensive full-body humanoids.\n- Purchase: [Unitree official shop](https://shop.unitree.com/?utm_source=chatgpt.com).\n\n2. Unitree G1\n\nStrong all-round choice\n\n# $13,500–73,900\n\n- Manufacturer: Unitree, China\n- Height: approximately 132 cm\n- Intended for: AI development, robotics research and manipulation.\n- Multiple configurations, including EDU versions.\n- Purchase: [Unitree official shop](https://shop.unitree.com/?utm_source=chatgpt.com).\n\n3. EngineAI PM01\n\n# ~$12,000–13,700\n\n- Manufacturer: EngineAI, China\n- Height: approximately 138 cm\n- Intended for: research, AI development and demonstrations.\n- A relatively affordable developer platform.\n- Purchase: [EngineAI](https://en.engineai.com.cn/?utm_source=chatgpt.com).\n\n4. Booster T1\n\n# $29,800–50,925\n\n- Manufacturer: Booster Robotics, China\n- Height: approximately 118 cm\n- Intended for: robotics competitions, research and development.\n- Particularly interesting for education and robotics laboratories.\n- Purchase: [Booster Robotics](https://www.booster.tech/?utm_source=chatgpt.com).\n\n5. AGIBOT A2\n\n# ~$44,560\n\n- Manufacturer: AGIBOT, China\n- Height: approximately 169 cm\n- Intended for: service, commercial applications and embodied AI.\n- A full-size humanoid with a more commercial orientation.\n- Purchase: [AGIBOT official store](https://store.agibot.com/?utm_source=chatgpt.com).\n\n6. AGIBOT X2\n\n# ~$25,600\n\n- Manufacturer: AGIBOT, China\n- Height: approximately 131 cm\n- Intended for: research, interaction, demonstrations and development.\n- Compact alternative to the A2.\n- Purchase: [AGIBOT official store](https://store.agibot.com/?utm_source=chatgpt.com).\n\n7. EngineAI T800\n\n# ~$27,000–40,500+\n\n- Manufacturer: EngineAI, China\n- Height: approximately 173 cm\n- Intended for: industrial applications and advanced robotics.\n- A full-size humanoid platform.\n- Purchase: [EngineAI](https://en.engineai.com.cn/?utm_source=chatgpt.com).\n\n8. Kepler Forerunner K2\n\n# ~$37,200\n\n- Manufacturer: Kepler Robotics, China\n- Height: approximately 175 cm\n- Intended for: industrial automation and material handling.\n- A particularly interesting full-size industrial option.\n- Purchase: [Kepler Robotics](https://www.keplerbot.com/?utm_source=chatgpt.com).\n\nPrice and availability references: [Which humanoid robot can you actually buy?](https://humanoid.observer/)[Humanoid Robot Price Index](https://robolupa.com/analysis/humanoid-robot-price-index/)[Humanoid robot prices: 26 models from $599.99, checked 29 Oct 2026](https://robopear.com/humanoids/prices/)[Chinese humanoid robots: 128 models, prices in ¥ and $, evidence](https://robopear.com/humanoids/china/) Actual ordering conditions and configurations should be confirmed with manufacturers.\n\n## 2. Other manufacturers worth investigating\n\nThese companies also have humanoid platforms, although availability is generally more dependent on commercial quotations, research partnerships or enterprise orders.\n\n| Manufacturer | Robot | Main application |\n| --- | --- | --- |\n| Fourier Intelligence | GR-1 / GR-2 | Research, healthcare, service |\n| UBTECH | Walker S2 | Factory automation |\n| LimX Dynamics | Oli / Tron | Research and industrial robotics |\n| Noetix Robotics | N2 | Research and education |\n| RobotEra | Star1 / Q5 | Research and industrial AI |\n| Leju Robotics | Kuavo | Industrial and research applications |\n\n[Humanoid robots: buy, rent or RaaS](https://robot-distribution.com/en/robots/humanoids)[Humanoid Robots — Buy from OEMs (China, USA, UK, AU) 2026](https://www.botsales.com/humanoids)[2.7 ROBOTICS AND AUTONOMOUS MOTION | TECHNICAL PERFORMANCE](https://hai.stanford.edu/assets/files/ai_index_report_2026_chapter_2_technical.pdf)\n\n## 3. Which ones would I shortlist?\n\nDepending on the intended application:\n\n| Application | My shortlist |\n| --- | --- |\n| Lowest purchase cost | Unitree R1 |\n| Robotics development | Unitree G1 |\n| AI and research | EngineAI PM01 |\n| Education and competitions | Booster T1 |\n| Full-size humanoid | AGIBOT A2 |\n| Industrial automation | Kepler K2 / UBTECH Walker |\n\n## 4. A few questions to narrow down the best options\n\nAsia is a large market, and shipping, local distributors, customs and after-sales support can make a significant difference.\n\nWhat is your intended application?\n\nI can then narrow this down to actual suppliers, manufacturer contacts, purchasing channels and realistic delivered prices rather than just robots that have been announced or demonstrated.",
+    "citationPills": [
+     {
+      "url": "https://humanoid.observer/",
+      "label": "Which humanoid robot can you actually buy?",
+      "domain": "humanoid.observer",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 1
+     },
+     {
+      "url": "https://robolupa.com/analysis/humanoid-robot-price-index/",
+      "label": "Humanoid Robot Price Index",
+      "domain": "robolupa.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 4
+     },
+     {
+      "url": "https://robopear.com/humanoids/prices/",
+      "label": "Humanoid robot prices: 26 models from $599.99, checked 29 Oct 2026",
+      "domain": "robopear.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 3
+     },
+     {
+      "url": "https://robopear.com/humanoids/china/",
+      "label": "Chinese humanoid robots: 128 models, prices in ¥ and $, evidence",
+      "domain": "robopear.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 2
+     },
+     {
+      "url": "https://robot-distribution.com/en/robots/humanoids",
+      "label": "Humanoid robots: buy, rent or RaaS",
+      "domain": "robot-distribution.com",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 6
+     },
+     {
+      "url": "https://www.botsales.com/humanoids",
+      "label": "Humanoid Robots — Buy from OEMs (China, USA, UK, AU) 2026",
+      "domain": "botsales.com",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 5
+     },
+     {
+      "url": "https://hai.stanford.edu/assets/files/ai_index_report_2026_chapter_2_technical.pdf",
+      "label": "2.7 ROBOTICS AND AUTONOMOUS MOTION | TECHNICAL PERFORMANCE",
+      "domain": "hai.stanford.edu",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 7
+     }
+    ]
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "a22452c399fc457095b0e27e4a488d39",
+   "charged_micro": 2800
+  }
+ }
+}

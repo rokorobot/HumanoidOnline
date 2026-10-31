@@ -1,0 +1,151 @@
+{
+ "observed_at": "2026-10-31T03:13:38+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "Which humanoid robots are commercially available?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "The commercial landscape for humanoid robots features a mix of developer/research models available for direct purchase, and heavy-duty industrial platforms deployed via enterprise lease or commercial pilot programs.\n\nCommercially available humanoid platforms span several key models:\n\n1. Directly Purchasable (Consumer / Developer / R&D)\n\nUnitree G1: Widely accessible starting at roughly $13,500. Unitree’s agentic bipedal robot features force-controlled joints and AI-driven movement, targeted heavily at research, developer communities, and light service tasks.\n\nUnitree R1 / H2 Series: Bionic and bipedal lower/upper-body iterations ranging from $4,900 for base robotic arms/torsos up to $29,900 for advanced bipedal configurations (like the H2).\n\nEngineered Arts Ameca: Known for hyper-realistic facial expressions and social interaction capabilities, available globally primarily for research, entertainment, and public-facing venue deployments.\n\n2. Enterprise Fleet & Industrial Deployment (B2B / Renter Programs)\n\nAgility Robotics Digit: Utilized via commercial fleet programs and enterprise agreements (with major logistics partners like GXO Logistics, Mercado Libre, and Schaeffler). Rather than over-the-counter retail, Digit is deployed directly into warehouses and manufacturing floors via tailored commercial pilot and scale agreements.\n\nTesla Optimus (Gen 2): Targeted toward high-volume industrial automation within Tesla's own facilities first, with broader external commercial availability and projected enterprise pricing scaling toward $30,000.\n\nApptronik Apollo: Focused on heavy manufacturing and logistics, deployed via commercial partnerships rather than public e-commerce.\n\nFigure AI (Figure 03) & 1X (NEO): Moving rapidly through commercial pilot scaling for logistics and home/industrial autonomy, utilizing lease-based or partnership deployment models.\n\nIf you're looking to acquire one, tell me:\n\nAre you looking for a developer/research unit (like Unitree) or an industrial/logistics solution?\nWhat is your budget range and intended application?\n\nI can help you narrow down the best path or contact process.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Unitree G1 – UnitreeRobotics",
+      "url": "https://shop.unitree.com/products/unitree-g1",
+      "description": "Product Catalog: Unitree Go1 ($2,700), Go2 ($1,600), B2/B2-W/A2/B1 ($100,000), As2 ($3,100), Aliengo ($50,000), Z1 ($15,999), 4D L...",
+      "redirectLink": "https://www.google.com/goto?url=CAESZwHrOzAVisPvnBKu1w_p7EJJi9Kckcsb-ZcnG7GdkPkaFM6c73i-7H2FigcybihHMtE2mo-J9k0OUlK4DzTpIarj0RGtUq3GiP4HDGzo9LbnHVoSq4Fj9n12-q1S95ZzWoX0YXgeYKw"
+     },
+     {
+      "position": 2,
+      "label": "Top 12 Humanoid Robots of 2026 - Humanoid Robotics Technology",
+      "url": "https://humanoidroboticstechnology.com/articles/top-12-humanoid-robots-of-2026/",
+      "description": "Humanoid Robots of 2026: Tesla Optimus Gen 2 (industrial/home, $30,000); 1X NEO (household autonomy, 4h battery); Boston Dynamics ...",
+      "redirectLink": "https://www.google.com/goto?url=CAESigEB6zswFYikFuL6PaiYo0epBTkG5-he6lZgtfNyMyYd66J3CSYGRTR9UWTPVzzesL1ln_f2vcNFw9p7Odl8T_4uhcNu2ql69u0yeUUM2Et8d6PPTzcFJVPmGPfNZti5eLEX9qERwsTwFbhEZ1TtBh5TiSykx3rkrauyB7d4VjqvLZ5tRFc6-3lXDmI"
+     },
+     {
+      "position": 3,
+      "label": "Agility Robotics Highlights Commercial Momentum and ...",
+      "url": "https://markets.businessinsider.com/news/stocks/agility-robotics-highlights-commercial-momentum-and-growing-enterprise-demand-for-digit-humanoid-robot-1036665457",
+      "description": "In a separate announcement today, GXO announced a new commercial agreement to deploy Digit at two additional U.S. facilities in St...",
+      "redirectLink": "https://www.google.com/goto?url=CAES3QEB6zswFX_PU-VNGlP_54wOe2c0oYk2ZOBvHUn30TBRoPRfD3FJ1rNRXU_iViBkHNM-upWlAhPa1GdpnzBytCtvIVlvAPbHkkmu_ADlG3NqvVFCCewxnhKWKsE-GgHm5PYjhkF6IZHOXfiHA0AOH5zPeMuMDoFIhzqLxTQKfa7S2LLB8YDSngvJUk7FgfqNfQWC8d5e9zXu3J0LumGUANTdlIqrDDPlSkt8rq-DqvXekBY0qz3KbkjYEucbE_pNDsNlfSxQ-nyUso0HVDjmwc1pK17q2mwKOLAUptJq9w"
+     },
+     {
+      "position": 4,
+      "label": "Humanoid Robots for Sale",
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm",
+      "description": "Athletic robustness. Flip capable balance translates into stumble surviving reliability. Touch grade manipulation. Force and tacti...",
+      "redirectLink": "https://www.google.com/goto?url=CAEScgHrOzAVg7xysgu-E7z5Vls8Fj5SLOFAthsDooYmiq41A9oc-bxd3IB8rhlOmLfRvWL0AVHMEKhw9sicf4qsslcisecxDxZtkNmcWfA6uKpn-cCC9U0kBau8d9o38bqszMxON5Td7DDBp6nSoBXqBakurw"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Unitree G1 – UnitreeRobotics",
+      "citationPillId": 1,
+      "url": "https://shop.unitree.com/products/unitree-g1",
+      "domain": "shop.unitree.com",
+      "description": "Product Catalog: Unitree Go1 ($2,700), Go2 ($1,600), B2/B2-W/A2/B1 ($100,000), As2 ($3,100), Aliengo ($50,000), Z1 ($15,999), 4D L...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESZwHrOzAVisPvnBKu1w_p7EJJi9Kckcsb-ZcnG7GdkPkaFM6c73i-7H2FigcybihHMtE2mo-J9k0OUlK4DzTpIarj0RGtUq3GiP4HDGzo9LbnHVoSq4Fj9n12-q1S95ZzWoX0YXgeYKw"
+     },
+     {
+      "label": "Humanoid Robots for Sale",
+      "citationPillId": 1,
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm",
+      "domain": "robotsinternational.com",
+      "description": "Athletic robustness. Flip capable balance translates into stumble surviving reliability. Touch grade manipulation. Force and tacti...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAEScgHrOzAVg7xysgu-E7z5Vls8Fj5SLOFAthsDooYmiq41A9oc-bxd3IB8rhlOmLfRvWL0AVHMEKhw9sicf4qsslcisecxDxZtkNmcWfA6uKpn-cCC9U0kBau8d9o38bqszMxON5Td7DDBp6nSoBXqBakurw"
+     },
+     {
+      "label": "Agility Robotics Highlights Commercial Momentum and ...",
+      "citationPillId": 1,
+      "url": "https://markets.businessinsider.com/news/stocks/agility-robotics-highlights-commercial-momentum-and-growing-enterprise-demand-for-digit-humanoid-robot-1036665457",
+      "domain": "markets.businessinsider.com",
+      "description": "In a separate announcement today, GXO announced a new commercial agreement to deploy Digit at two additional U.S. facilities in St...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAES3QEB6zswFX_PU-VNGlP_54wOe2c0oYk2ZOBvHUn30TBRoPRfD3FJ1rNRXU_iViBkHNM-upWlAhPa1GdpnzBytCtvIVlvAPbHkkmu_ADlG3NqvVFCCewxnhKWKsE-GgHm5PYjhkF6IZHOXfiHA0AOH5zPeMuMDoFIhzqLxTQKfa7S2LLB8YDSngvJUk7FgfqNfQWC8d5e9zXu3J0LumGUANTdlIqrDDPlSkt8rq-DqvXekBY0qz3KbkjYEucbE_pNDsNlfSxQ-nyUso0HVDjmwc1pK17q2mwKOLAUptJq9w"
+     },
+     {
+      "label": "Humanoid Robots for Sale",
+      "citationPillId": 2,
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm",
+      "domain": "robotsinternational.com",
+      "description": "Athletic robustness. Flip capable balance translates into stumble surviving reliability. Touch grade manipulation. Force and tacti...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAEScgHrOzAVg7xysgu-E7z5Vls8Fj5SLOFAthsDooYmiq41A9oc-bxd3IB8rhlOmLfRvWL0AVHMEKhw9sicf4qsslcisecxDxZtkNmcWfA6uKpn-cCC9U0kBau8d9o38bqszMxON5Td7DDBp6nSoBXqBakurw"
+     },
+     {
+      "label": "Unitree G1 – UnitreeRobotics",
+      "citationPillId": 2,
+      "url": "https://shop.unitree.com/products/unitree-g1",
+      "domain": "shop.unitree.com",
+      "description": "Product Catalog: Unitree Go1 ($2,700), Go2 ($1,600), B2/B2-W/A2/B1 ($100,000), As2 ($3,100), Aliengo ($50,000), Z1 ($15,999), 4D L...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESZwHrOzAVisPvnBKu1w_p7EJJi9Kckcsb-ZcnG7GdkPkaFM6c73i-7H2FigcybihHMtE2mo-J9k0OUlK4DzTpIarj0RGtUq3GiP4HDGzo9LbnHVoSq4Fj9n12-q1S95ZzWoX0YXgeYKw"
+     },
+     {
+      "label": "Unitree G1 – UnitreeRobotics",
+      "citationPillId": 3,
+      "url": "https://shop.unitree.com/products/unitree-g1",
+      "domain": "shop.unitree.com",
+      "description": "Product Catalog: Unitree Go1 ($2,700), Go2 ($1,600), B2/B2-W/A2/B1 ($100,000), As2 ($3,100), Aliengo ($50,000), Z1 ($15,999), 4D L...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESZwHrOzAVisPvnBKu1w_p7EJJi9Kckcsb-ZcnG7GdkPkaFM6c73i-7H2FigcybihHMtE2mo-J9k0OUlK4DzTpIarj0RGtUq3GiP4HDGzo9LbnHVoSq4Fj9n12-q1S95ZzWoX0YXgeYKw"
+     },
+     {
+      "label": "Humanoid Robots for Sale",
+      "citationPillId": 3,
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm",
+      "domain": "robotsinternational.com",
+      "description": "Athletic robustness. Flip capable balance translates into stumble surviving reliability. Touch grade manipulation. Force and tacti...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAEScgHrOzAVg7xysgu-E7z5Vls8Fj5SLOFAthsDooYmiq41A9oc-bxd3IB8rhlOmLfRvWL0AVHMEKhw9sicf4qsslcisecxDxZtkNmcWfA6uKpn-cCC9U0kBau8d9o38bqszMxON5Td7DDBp6nSoBXqBakurw"
+     },
+     {
+      "label": "Top 12 Humanoid Robots of 2026 - Humanoid Robotics Technology",
+      "citationPillId": 4,
+      "url": "https://humanoidroboticstechnology.com/articles/top-12-humanoid-robots-of-2026/",
+      "domain": "humanoidroboticstechnology.com",
+      "description": "Humanoid Robots of 2026: Tesla Optimus Gen 2 (industrial/home, $30,000); 1X NEO (household autonomy, 4h battery); Boston Dynamics ...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESigEB6zswFYikFuL6PaiYo0epBTkG5-he6lZgtfNyMyYd66J3CSYGRTR9UWTPVzzesL1ln_f2vcNFw9p7Odl8T_4uhcNu2ql69u0yeUUM2Et8d6PPTzcFJVPmGPfNZti5eLEX9qERwsTwFbhEZ1TtBh5TiSykx3rkrauyB7d4VjqvLZ5tRFc6-3lXDmI"
+     },
+     {
+      "label": "Agility Robotics Highlights Commercial Momentum and ...",
+      "citationPillId": 5,
+      "url": "https://markets.businessinsider.com/news/stocks/agility-robotics-highlights-commercial-momentum-and-growing-enterprise-demand-for-digit-humanoid-robot-1036665457",
+      "domain": "markets.businessinsider.com",
+      "description": "In a separate announcement today, GXO announced a new commercial agreement to deploy Digit at two additional U.S. facilities in St...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAES3QEB6zswFX_PU-VNGlP_54wOe2c0oYk2ZOBvHUn30TBRoPRfD3FJ1rNRXU_iViBkHNM-upWlAhPa1GdpnzBytCtvIVlvAPbHkkmu_ADlG3NqvVFCCewxnhKWKsE-GgHm5PYjhkF6IZHOXfiHA0AOH5zPeMuMDoFIhzqLxTQKfa7S2LLB8YDSngvJUk7FgfqNfQWC8d5e9zXu3J0LumGUANTdlIqrDDPlSkt8rq-DqvXekBY0qz3KbkjYEucbE_pNDsNlfSxQ-nyUso0HVDjmwc1pK17q2mwKOLAUptJq9w"
+     },
+     {
+      "label": "Top 12 Humanoid Robots of 2026 - Humanoid Robotics Technology",
+      "citationPillId": 5,
+      "url": "https://humanoidroboticstechnology.com/articles/top-12-humanoid-robots-of-2026/",
+      "domain": "humanoidroboticstechnology.com",
+      "description": "Humanoid Robots of 2026: Tesla Optimus Gen 2 (industrial/home, $30,000); 1X NEO (household autonomy, 4h battery); Boston Dynamics ...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESigEB6zswFYikFuL6PaiYo0epBTkG5-he6lZgtfNyMyYd66J3CSYGRTR9UWTPVzzesL1ln_f2vcNFw9p7Odl8T_4uhcNu2ql69u0yeUUM2Et8d6PPTzcFJVPmGPfNZti5eLEX9qERwsTwFbhEZ1TtBh5TiSykx3rkrauyB7d4VjqvLZ5tRFc6-3lXDmI"
+     }
+    ],
+    "markdown": "The commercial landscape for humanoid robots features a mix of developer/research models available for direct purchase, and heavy-duty industrial platforms deployed via enterprise lease or commercial pilot programs. [Unitree G1 – UnitreeRobotics](https://shop.unitree.com/products/unitree-g1)[Humanoid Robots for Sale](https://www.robotsinternational.com/Humanoid-Robots.htm)[Agility Robotics Highlights Commercial Momentum and](https://markets.businessinsider.com/news/stocks/agility-robotics-highlights-commercial-momentum-and-growing-enterprise-demand-for-digit-humanoid-robot-1036665457)\n\nCommercially available humanoid platforms span several key models:\n\n1\\. Directly Purchasable (Consumer / Developer / R&D)\n\n  * **[Unitree G1](https://shop.unitree.com/products/unitree-g1) :** Widely accessible starting at roughly $13,500. Unitree’s agentic bipedal robot features force-controlled joints and AI-driven movement, targeted heavily at research, developer communities, and light service tasks. [Humanoid Robots for Sale](https://www.robotsinternational.com/Humanoid-Robots.htm)[Unitree G1 – UnitreeRobotics](https://shop.unitree.com/products/unitree-g1)\n\n  * **[Unitree R1 / H2 Series](https://shop.unitree.com/products/unitree-g1) :** Bionic and bipedal lower/upper-body iterations ranging from $4,900 for base robotic arms/torsos up to $29,900 for advanced bipedal configurations (like the H2). [Unitree G1 – UnitreeRobotics](https://shop.unitree.com/products/unitree-g1?srsltid=AYCX9vJH3Wg178ACkMaH98Vaw1BPXrVS3Tt6719rD1ucKUqp0QmakpuU)[Humanoid Robots for Sale](https://www.robotsinternational.com/Humanoid-Robots.htm)\n\n  * **Engineered Arts Ameca:** Known for hyper-realistic facial expressions and social interaction capabilities, available globally primarily for research, entertainment, and public-facing venue deployments. [Top 12 Humanoid Robots of 2026 - Humanoid Robotics Technology](https://humanoidroboticstechnology.com/articles/top-12-humanoid-robots-of-2026/)\n\n2\\. Enterprise Fleet & Industrial Deployment (B2B / Renter Programs)\n\n  * **Agility Robotics Digit:** Utilized via commercial fleet programs and enterprise agreements (with major logistics partners like GXO Logistics, Mercado Libre, and Schaeffler). Rather than over-the-counter retail, Digit is deployed directly into warehouses and manufacturing floors via tailored commercial pilot and scale agreements.\n\n  * **Tesla Optimus (Gen 2):** Targeted toward high-volume industrial automation within Tesla's own facilities first, with broader external commercial availability and projected enterprise pricing scaling toward $30,000.\n\n  * **Apptronik Apollo:** Focused on heavy manufacturing and logistics, deployed via commercial partnerships rather than public e-commerce.\n\n  * **Figure AI (Figure 03) & 1X (NEO):** Moving rapidly through commercial pilot scaling for logistics and home/industrial autonomy, utilizing lease-based or partnership deployment models. [Agility Robotics Highlights Commercial Momentum and](https://markets.businessinsider.com/news/stocks/agility-robotics-highlights-commercial-momentum-and-growing-enterprise-demand-for-digit-humanoid-robot-1036665457)[Top 12 Humanoid Robots of 2026 - Humanoid Robotics Technology](https://humanoidroboticstechnology.com/articles/top-12-humanoid-robots-of-2026/)\n\nIf you're looking to acquire one, tell me:\n\n  * Are you looking for a **developer/research unit** (like Unitree) or an **industrial/logistics solution**?\n  * What is your **budget range** and intended **application**?\n\nI can help you narrow down the best path or contact process."
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "2e0ef7caacce4dbe8f37c6c7de2c5c78",
+   "charged_micro": 2400
+  }
+ }
+}

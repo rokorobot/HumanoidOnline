@@ -1,0 +1,275 @@
+{
+ "observed_at": "2026-10-31T03:15:16+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "Unitree G1 vs Booster K1.",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "The Unitree G1 and the Booster K1 are both compact, cutting-edge humanoid robots designed for research, AI development, and general robotics exploration, but they target slightly different form factors, scale, and performance metrics.\n\nKey Comparison\n\nHeight & Form Factor\n\nUnitree G1: Stands taller at roughly 1.32 m (4'2\") and folds down for transport.\nBooster K1: Significantly smaller and lighter, standing at 95 cm (under 3'3\").\n\nWeight\n\nUnitree G1: Weighs about 35 kg (75 lbs).\nBooster K1: Weighs a much lighter 19.5 kg.\n\nDegrees of Freedom (DoF)\n\nUnitree G1: Highly modular, ranging from 23 up to 43 DoF depending on whether you opt for advanced waist joints and multi-fingered dexterous hands.\nBooster K1: Fixed at 22 DoF (12 in the legs, 8 in the arms, and 2 in the head).\n\nPayload & Power\n\nUnitree G1: Offers up to a 3 kg arm payload, knee joint torque up to 120 N⋅m, and roughly 2 hours of active movement runtime.\nBooster K1: Geared towards lighter tasks with a smaller magnetic battery providing around a 70-minute runtime.\n\nComputing & Sensors\n\nUnitree G1: Equipped with Intel depth sensing, a Livox 360 Lidar, and NVIDIA Jetson Orin NX (approx. 100 TOPS) on EDU variants.\nBooster K1: Scalable compute options ranging from Qualcomm QCS8550 (48 TOPS) up to a beefy NVIDIA Jetson AGX Orin (200 TOPS) on Pro versions, paired with stereo depth cameras and a 9-axis IMU.\n\nIf you're deciding between them, let me know if this is for higher education/research, competitive robotics (like RoboCup), or general AI integration, and I can set up a task to track new spec updates or pricing shifts for both models.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Unitree G1",
+      "url": "https://www.unitree.com/g1",
+      "description": "G1 G1 EDU Height, Width and Thickness（Stand） 1320x450x200mm 1320x450x200mm Height, Width and Thickness（Fold） 690x450x300mm 690x450...",
+      "redirectLink": "https://www.google.com/goto?url=CAESVQHrOzAVzkeb3Xl6ixI7KJw5UFgDLJkcPpYl7pXZWI9czTFvfHbZGUixCtljwRqOwzbYQFyyjw44D7_4bJwVpDXfn3VLAb1JYYWAJulX-LTaiZLn_VQ"
+     },
+     {
+      "position": 2,
+      "label": "Booster K1 | Introductory Embodied Development Platform",
+      "url": "https://www.booster.tech/booster-k1/",
+      "description": "Physical Specifications: Height 95 cm; weight 19.5 kg; 22 degrees of freedom; walking speed 2 m/s; turning speed 1.5 rad/s; 5Ah ma...",
+      "redirectLink": "https://www.google.com/goto?url=CAESXwHrOzAVVZb6zJxMW01FbYfuR11v3eEv1ggimqkmK7QQs0Yr7r3NS4Ysd3WvDjIUYh5JoSAlRcTaL2uYkWB4D1p2Pd5Qg4S_N7gIcjG6ehdqPpcCQ9pBQNQ-z9imMY2C"
+     },
+     {
+      "position": 3,
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html",
+      "description": "Physical Specs: Height 95 cm, weight 19.5 kg, CE certified. Kinematics: 22 degrees of freedom (legs 12, arms 8, head 2), torque-co...",
+      "redirectLink": "https://www.google.com/goto?url=CAEShAEB6zswFZLZHKptbFzN5yonvUw9qE8eljh5vgYyoHiPkoTu-YoNExhbYcZquXtdMLkP5Kwp9KHjGHt5tSE7ehlPu45aghOqTqyKGWS4EzLIOOajttgVTjHq0gyqP_bmVVmAhw7BoFCR0buBrmk9RzKOszmtA81aYXcNkFAQGmivUB-FYHQ"
+     },
+     {
+      "position": 4,
+      "label": "G1 humanoid robot | Unitree Robotics",
+      "url": "https://www.generationrobots.com/en/404241-g1-humanoid-robot.html",
+      "description": "Overview: Unitree G1 compact electric humanoid research robot (approx. 1.30 m, 35 kg, travel speed up to 2 m/s, arm payload 3 kg, ...",
+      "redirectLink": "https://www.google.com/goto?url=CAESfAHrOzAV8Eq8ScQkXg4sFIdbSc-MQ7A2fvezV1B1WHa44OF3w2-dWwRnDtYAVClKB1SWT54xK7eA1qF1j8Kd01P0-ggtuHEpyWG4cmPB5FvHg3yFq_8VNTQaZTq8Y3ueZYuSFIziVpxXWFzjNLje35mt-YzSFCHejkAaxQw"
+     },
+     {
+      "position": 5,
+      "label": "Unitree G1 Humanoid Robot Explained",
+      "url": "https://www.youtube.com/watch?v=Om_Jr14FPKU&t=30",
+      "description": "Unitree G1 Humanoid Robot Explained | Configurations, Hands, Programming & Use Cases and we have everything from the basic all the...",
+      "redirectLink": "https://www.google.com/goto?url=CAESawHrOzAV1qFVz9DRnnG8IXldiI2XR9KkplWFrfttiiTR2pYzEyjowSbZId6VMz-M6yhU8o3DDDV2Z112OC-AO2m4CqDOz_8pp2QxwKATfg5nCD4nduXDBwAIcbXCsK3Wcpzj06e7deAQH2mW"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Booster K1 | Introductory Embodied Development Platform",
+      "citationPillId": 1,
+      "url": "https://www.booster.tech/booster-k1/",
+      "domain": "booster.tech",
+      "description": "Physical Specifications: Height 95 cm; weight 19.5 kg; 22 degrees of freedom; walking speed 2 m/s; turning speed 1.5 rad/s; 5Ah ma...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESXwHrOzAVVZb6zJxMW01FbYfuR11v3eEv1ggimqkmK7QQs0Yr7r3NS4Ysd3WvDjIUYh5JoSAlRcTaL2uYkWB4D1p2Pd5Qg4S_N7gIcjG6ehdqPpcCQ9pBQNQ-z9imMY2C"
+     },
+     {
+      "label": "G1 humanoid robot | Unitree Robotics",
+      "citationPillId": 1,
+      "url": "https://www.generationrobots.com/en/404241-g1-humanoid-robot.html",
+      "domain": "generationrobots.com",
+      "description": "Overview: Unitree G1 compact electric humanoid research robot (approx. 1.30 m, 35 kg, travel speed up to 2 m/s, arm payload 3 kg, ...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAESfAHrOzAV8Eq8ScQkXg4sFIdbSc-MQ7A2fvezV1B1WHa44OF3w2-dWwRnDtYAVClKB1SWT54xK7eA1qF1j8Kd01P0-ggtuHEpyWG4cmPB5FvHg3yFq_8VNTQaZTq8Y3ueZYuSFIziVpxXWFzjNLje35mt-YzSFCHejkAaxQw"
+     },
+     {
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "citationPillId": 1,
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html",
+      "domain": "generationrobots.com",
+      "description": "Physical Specs: Height 95 cm, weight 19.5 kg, CE certified. Kinematics: 22 degrees of freedom (legs 12, arms 8, head 2), torque-co...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAEShAEB6zswFZLZHKptbFzN5yonvUw9qE8eljh5vgYyoHiPkoTu-YoNExhbYcZquXtdMLkP5Kwp9KHjGHt5tSE7ehlPu45aghOqTqyKGWS4EzLIOOajttgVTjHq0gyqP_bmVVmAhw7BoFCR0buBrmk9RzKOszmtA81aYXcNkFAQGmivUB-FYHQ"
+     },
+     {
+      "label": "Unitree G1",
+      "citationPillId": 2,
+      "url": "https://www.unitree.com/g1",
+      "domain": "unitree.com",
+      "description": "G1 G1 EDU Height, Width and Thickness（Stand） 1320x450x200mm 1320x450x200mm Height, Width and Thickness（Fold） 690x450x300mm 690x450...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESVQHrOzAVzkeb3Xl6ixI7KJw5UFgDLJkcPpYl7pXZWI9czTFvfHbZGUixCtljwRqOwzbYQFyyjw44D7_4bJwVpDXfn3VLAb1JYYWAJulX-LTaiZLn_VQ"
+     },
+     {
+      "label": "Unitree G1 Humanoid Robot Explained",
+      "citationPillId": 2,
+      "url": "https://www.youtube.com/watch?v=Om_Jr14FPKU&t=30",
+      "domain": "youtube.com",
+      "description": "Unitree G1 Humanoid Robot Explained | Configurations, Hands, Programming & Use Cases and we have everything from the basic all the...",
+      "position": 5,
+      "redirectLink": "https://www.google.com/goto?url=CAESawHrOzAV1qFVz9DRnnG8IXldiI2XR9KkplWFrfttiiTR2pYzEyjowSbZId6VMz-M6yhU8o3DDDV2Z112OC-AO2m4CqDOz_8pp2QxwKATfg5nCD4nduXDBwAIcbXCsK3Wcpzj06e7deAQH2mW"
+     },
+     {
+      "label": "Booster K1 | Introductory Embodied Development Platform",
+      "citationPillId": 2,
+      "url": "https://www.booster.tech/booster-k1/",
+      "domain": "booster.tech",
+      "description": "Physical Specifications: Height 95 cm; weight 19.5 kg; 22 degrees of freedom; walking speed 2 m/s; turning speed 1.5 rad/s; 5Ah ma...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESXwHrOzAVVZb6zJxMW01FbYfuR11v3eEv1ggimqkmK7QQs0Yr7r3NS4Ysd3WvDjIUYh5JoSAlRcTaL2uYkWB4D1p2Pd5Qg4S_N7gIcjG6ehdqPpcCQ9pBQNQ-z9imMY2C"
+     },
+     {
+      "label": "Unitree G1",
+      "citationPillId": 3,
+      "url": "https://www.unitree.com/g1",
+      "domain": "unitree.com",
+      "description": "G1 G1 EDU Height, Width and Thickness（Stand） 1320x450x200mm 1320x450x200mm Height, Width and Thickness（Fold） 690x450x300mm 690x450...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESVQHrOzAVzkeb3Xl6ixI7KJw5UFgDLJkcPpYl7pXZWI9czTFvfHbZGUixCtljwRqOwzbYQFyyjw44D7_4bJwVpDXfn3VLAb1JYYWAJulX-LTaiZLn_VQ"
+     },
+     {
+      "label": "Unitree G1 Humanoid Robot Explained",
+      "citationPillId": 3,
+      "url": "https://www.youtube.com/watch?v=Om_Jr14FPKU&t=30",
+      "domain": "youtube.com",
+      "description": "Unitree G1 Humanoid Robot Explained | Configurations, Hands, Programming & Use Cases and we have everything from the basic all the...",
+      "position": 5,
+      "redirectLink": "https://www.google.com/goto?url=CAESawHrOzAV1qFVz9DRnnG8IXldiI2XR9KkplWFrfttiiTR2pYzEyjowSbZId6VMz-M6yhU8o3DDDV2Z112OC-AO2m4CqDOz_8pp2QxwKATfg5nCD4nduXDBwAIcbXCsK3Wcpzj06e7deAQH2mW"
+     },
+     {
+      "label": "Booster K1 | Introductory Embodied Development Platform",
+      "citationPillId": 3,
+      "url": "https://www.booster.tech/booster-k1/",
+      "domain": "booster.tech",
+      "description": "Physical Specifications: Height 95 cm; weight 19.5 kg; 22 degrees of freedom; walking speed 2 m/s; turning speed 1.5 rad/s; 5Ah ma...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESXwHrOzAVVZb6zJxMW01FbYfuR11v3eEv1ggimqkmK7QQs0Yr7r3NS4Ysd3WvDjIUYh5JoSAlRcTaL2uYkWB4D1p2Pd5Qg4S_N7gIcjG6ehdqPpcCQ9pBQNQ-z9imMY2C"
+     },
+     {
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "citationPillId": 4,
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html",
+      "domain": "generationrobots.com",
+      "description": "Physical Specs: Height 95 cm, weight 19.5 kg, CE certified. Kinematics: 22 degrees of freedom (legs 12, arms 8, head 2), torque-co...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAEShAEB6zswFZLZHKptbFzN5yonvUw9qE8eljh5vgYyoHiPkoTu-YoNExhbYcZquXtdMLkP5Kwp9KHjGHt5tSE7ehlPu45aghOqTqyKGWS4EzLIOOajttgVTjHq0gyqP_bmVVmAhw7BoFCR0buBrmk9RzKOszmtA81aYXcNkFAQGmivUB-FYHQ"
+     },
+     {
+      "label": "Unitree G1",
+      "citationPillId": 4,
+      "url": "https://www.unitree.com/g1",
+      "domain": "unitree.com",
+      "description": "G1 G1 EDU Height, Width and Thickness（Stand） 1320x450x200mm 1320x450x200mm Height, Width and Thickness（Fold） 690x450x300mm 690x450...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESVQHrOzAVzkeb3Xl6ixI7KJw5UFgDLJkcPpYl7pXZWI9czTFvfHbZGUixCtljwRqOwzbYQFyyjw44D7_4bJwVpDXfn3VLAb1JYYWAJulX-LTaiZLn_VQ"
+     },
+     {
+      "label": "G1 humanoid robot | Unitree Robotics",
+      "citationPillId": 4,
+      "url": "https://www.generationrobots.com/en/404241-g1-humanoid-robot.html",
+      "domain": "generationrobots.com",
+      "description": "Overview: Unitree G1 compact electric humanoid research robot (approx. 1.30 m, 35 kg, travel speed up to 2 m/s, arm payload 3 kg, ...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAESfAHrOzAV8Eq8ScQkXg4sFIdbSc-MQ7A2fvezV1B1WHa44OF3w2-dWwRnDtYAVClKB1SWT54xK7eA1qF1j8Kd01P0-ggtuHEpyWG4cmPB5FvHg3yFq_8VNTQaZTq8Y3ueZYuSFIziVpxXWFzjNLje35mt-YzSFCHejkAaxQw"
+     },
+     {
+      "label": "Booster K1 | Introductory Embodied Development Platform",
+      "citationPillId": 4,
+      "url": "https://www.booster.tech/booster-k1/",
+      "domain": "booster.tech",
+      "description": "Physical Specifications: Height 95 cm; weight 19.5 kg; 22 degrees of freedom; walking speed 2 m/s; turning speed 1.5 rad/s; 5Ah ma...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESXwHrOzAVVZb6zJxMW01FbYfuR11v3eEv1ggimqkmK7QQs0Yr7r3NS4Ysd3WvDjIUYh5JoSAlRcTaL2uYkWB4D1p2Pd5Qg4S_N7gIcjG6ehdqPpcCQ9pBQNQ-z9imMY2C"
+     },
+     {
+      "label": "G1 humanoid robot | Unitree Robotics",
+      "citationPillId": 5,
+      "url": "https://www.generationrobots.com/en/404241-g1-humanoid-robot.html",
+      "domain": "generationrobots.com",
+      "description": "Overview: Unitree G1 compact electric humanoid research robot (approx. 1.30 m, 35 kg, travel speed up to 2 m/s, arm payload 3 kg, ...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAESfAHrOzAV8Eq8ScQkXg4sFIdbSc-MQ7A2fvezV1B1WHa44OF3w2-dWwRnDtYAVClKB1SWT54xK7eA1qF1j8Kd01P0-ggtuHEpyWG4cmPB5FvHg3yFq_8VNTQaZTq8Y3ueZYuSFIziVpxXWFzjNLje35mt-YzSFCHejkAaxQw"
+     },
+     {
+      "label": "Unitree G1",
+      "citationPillId": 5,
+      "url": "https://www.unitree.com/g1",
+      "domain": "unitree.com",
+      "description": "G1 G1 EDU Height, Width and Thickness（Stand） 1320x450x200mm 1320x450x200mm Height, Width and Thickness（Fold） 690x450x300mm 690x450...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESVQHrOzAVzkeb3Xl6ixI7KJw5UFgDLJkcPpYl7pXZWI9czTFvfHbZGUixCtljwRqOwzbYQFyyjw44D7_4bJwVpDXfn3VLAb1JYYWAJulX-LTaiZLn_VQ"
+     },
+     {
+      "label": "Unitree G1 Humanoid Robot Explained",
+      "citationPillId": 5,
+      "url": "https://www.youtube.com/watch?v=Om_Jr14FPKU&t=30",
+      "domain": "youtube.com",
+      "description": "Unitree G1 Humanoid Robot Explained | Configurations, Hands, Programming & Use Cases and we have everything from the basic all the...",
+      "position": 5,
+      "redirectLink": "https://www.google.com/goto?url=CAESawHrOzAV1qFVz9DRnnG8IXldiI2XR9KkplWFrfttiiTR2pYzEyjowSbZId6VMz-M6yhU8o3DDDV2Z112OC-AO2m4CqDOz_8pp2QxwKATfg5nCD4nduXDBwAIcbXCsK3Wcpzj06e7deAQH2mW"
+     },
+     {
+      "label": "Booster K1 | Introductory Embodied Development Platform",
+      "citationPillId": 5,
+      "url": "https://www.booster.tech/booster-k1/",
+      "domain": "booster.tech",
+      "description": "Physical Specifications: Height 95 cm; weight 19.5 kg; 22 degrees of freedom; walking speed 2 m/s; turning speed 1.5 rad/s; 5Ah ma...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESXwHrOzAVVZb6zJxMW01FbYfuR11v3eEv1ggimqkmK7QQs0Yr7r3NS4Ysd3WvDjIUYh5JoSAlRcTaL2uYkWB4D1p2Pd5Qg4S_N7gIcjG6ehdqPpcCQ9pBQNQ-z9imMY2C"
+     },
+     {
+      "label": "Booster K1 | Introductory Embodied Development Platform",
+      "citationPillId": 6,
+      "url": "https://www.booster.tech/booster-k1/",
+      "domain": "booster.tech",
+      "description": "Physical Specifications: Height 95 cm; weight 19.5 kg; 22 degrees of freedom; walking speed 2 m/s; turning speed 1.5 rad/s; 5Ah ma...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESXwHrOzAVVZb6zJxMW01FbYfuR11v3eEv1ggimqkmK7QQs0Yr7r3NS4Ysd3WvDjIUYh5JoSAlRcTaL2uYkWB4D1p2Pd5Qg4S_N7gIcjG6ehdqPpcCQ9pBQNQ-z9imMY2C"
+     },
+     {
+      "label": "Unitree G1 Humanoid Robot Explained",
+      "citationPillId": 6,
+      "url": "https://www.youtube.com/watch?v=Om_Jr14FPKU&t=30",
+      "domain": "youtube.com",
+      "description": "Unitree G1 Humanoid Robot Explained | Configurations, Hands, Programming & Use Cases and we have everything from the basic all the...",
+      "position": 5,
+      "redirectLink": "https://www.google.com/goto?url=CAESawHrOzAV1qFVz9DRnnG8IXldiI2XR9KkplWFrfttiiTR2pYzEyjowSbZId6VMz-M6yhU8o3DDDV2Z112OC-AO2m4CqDOz_8pp2QxwKATfg5nCD4nduXDBwAIcbXCsK3Wcpzj06e7deAQH2mW"
+     },
+     {
+      "label": "G1 humanoid robot | Unitree Robotics",
+      "citationPillId": 6,
+      "url": "https://www.generationrobots.com/en/404241-g1-humanoid-robot.html",
+      "domain": "generationrobots.com",
+      "description": "Overview: Unitree G1 compact electric humanoid research robot (approx. 1.30 m, 35 kg, travel speed up to 2 m/s, arm payload 3 kg, ...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAESfAHrOzAV8Eq8ScQkXg4sFIdbSc-MQ7A2fvezV1B1WHa44OF3w2-dWwRnDtYAVClKB1SWT54xK7eA1qF1j8Kd01P0-ggtuHEpyWG4cmPB5FvHg3yFq_8VNTQaZTq8Y3ueZYuSFIziVpxXWFzjNLje35mt-YzSFCHejkAaxQw"
+     },
+     {
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "citationPillId": 6,
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html",
+      "domain": "generationrobots.com",
+      "description": "Physical Specs: Height 95 cm, weight 19.5 kg, CE certified. Kinematics: 22 degrees of freedom (legs 12, arms 8, head 2), torque-co...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAEShAEB6zswFZLZHKptbFzN5yonvUw9qE8eljh5vgYyoHiPkoTu-YoNExhbYcZquXtdMLkP5Kwp9KHjGHt5tSE7ehlPu45aghOqTqyKGWS4EzLIOOajttgVTjHq0gyqP_bmVVmAhw7BoFCR0buBrmk9RzKOszmtA81aYXcNkFAQGmivUB-FYHQ"
+     },
+     {
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "citationPillId": 7,
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html",
+      "domain": "generationrobots.com",
+      "description": "Physical Specs: Height 95 cm, weight 19.5 kg, CE certified. Kinematics: 22 degrees of freedom (legs 12, arms 8, head 2), torque-co...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAEShAEB6zswFZLZHKptbFzN5yonvUw9qE8eljh5vgYyoHiPkoTu-YoNExhbYcZquXtdMLkP5Kwp9KHjGHt5tSE7ehlPu45aghOqTqyKGWS4EzLIOOajttgVTjHq0gyqP_bmVVmAhw7BoFCR0buBrmk9RzKOszmtA81aYXcNkFAQGmivUB-FYHQ"
+     },
+     {
+      "label": "G1 humanoid robot | Unitree Robotics",
+      "citationPillId": 7,
+      "url": "https://www.generationrobots.com/en/404241-g1-humanoid-robot.html",
+      "domain": "generationrobots.com",
+      "description": "Overview: Unitree G1 compact electric humanoid research robot (approx. 1.30 m, 35 kg, travel speed up to 2 m/s, arm payload 3 kg, ...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAESfAHrOzAV8Eq8ScQkXg4sFIdbSc-MQ7A2fvezV1B1WHa44OF3w2-dWwRnDtYAVClKB1SWT54xK7eA1qF1j8Kd01P0-ggtuHEpyWG4cmPB5FvHg3yFq_8VNTQaZTq8Y3ueZYuSFIziVpxXWFzjNLje35mt-YzSFCHejkAaxQw"
+     }
+    ],
+    "markdown": "The **Unitree G1** and the **Booster K1** are both compact, cutting-edge humanoid robots designed for research, AI development, and general robotics exploration, but they target slightly different form factors, scale, and performance metrics. [Booster K1 | Introductory Embodied Development Platform](https://www.booster.tech/booster-k1/)[G1 humanoid robot | Unitree Robotics](https://www.generationrobots.com/en/404241-g1-humanoid-robot.html)[Booster K1 humanoid robot | Generation Robots](https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html)\n\nKey Comparison\n\n  * **Height & Form Factor**\n    * **Unitree G1** : Stands taller at roughly 1.32 m (4'2\") and folds down for transport.\n    * **Booster K1** : Significantly smaller and lighter, standing at 95 cm (under 3'3\"). [Unitree G1](https://www.unitree.com/g1)[Unitree G1 Humanoid Robot Explained](https://www.youtube.com/watch?v=Om_Jr14FPKU&t=30)[Booster K1 | Introductory Embodied Development Platform](https://www.booster.tech/booster-k1/)\n\n  * **Weight**\n    * **Unitree G1** : Weighs about 35 kg (75 lbs).\n    * **Booster K1** : Weighs a much lighter 19.5 kg. [Unitree G1](https://www.unitree.com/g1)[Unitree G1 Humanoid Robot Explained](https://www.youtube.com/watch?v=Om_Jr14FPKU&t=30)[Booster K1 | Introductory Embodied Development Platform](https://www.booster.tech/booster-k1/)\n\n  * **Degrees of Freedom (DoF)**\n    * **Unitree G1** : Highly modular, ranging from 23 up to 43 DoF depending on whether you opt for advanced waist joints and multi-fingered dexterous hands.\n    * **Booster K1** : Fixed at 22 DoF (12 in the legs, 8 in the arms, and 2 in the head). [Booster K1 humanoid robot | Generation Robots](https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html)[Unitree G1](https://www.unitree.com/g1)[G1 humanoid robot | Unitree Robotics](https://www.generationrobots.com/en/404241-g1-humanoid-robot.html)[Booster K1 | Introductory Embodied Development Platform](https://www.booster.tech/booster-k1/)\n\n  * **Payload & Power**\n    * **Unitree G1** : Offers up to a 3 kg arm payload, knee joint torque up to 120 N⋅m, and roughly 2 hours of active movement runtime.\n    * **Booster K1** : Geared towards lighter tasks with a smaller magnetic battery providing around a 70-minute runtime. [G1 humanoid robot | Unitree Robotics](https://www.generationrobots.com/en/404241-g1-humanoid-robot.html)[Unitree G1](https://www.unitree.com/g1)[Unitree G1 Humanoid Robot Explained](https://www.youtube.com/watch?v=Om_Jr14FPKU&t=30)[Booster K1 | Introductory Embodied Development Platform](https://www.booster.tech/booster-k1/)\n\n  * **Computing & Sensors**\n    * **Unitree G1** : Equipped with Intel depth sensing, a Livox 360 Lidar, and NVIDIA Jetson Orin NX (approx. 100 TOPS) on EDU variants.\n    * **Booster K1** : Scalable compute options ranging from Qualcomm QCS8550 (48 TOPS) up to a beefy NVIDIA Jetson AGX Orin (200 TOPS) on Pro versions, paired with stereo depth cameras and a 9-axis IMU. [Booster K1 | Introductory Embodied Development Platform](https://www.booster.tech/booster-k1/)[Unitree G1 Humanoid Robot Explained](https://www.youtube.com/watch?v=Om_Jr14FPKU&t=30)[G1 humanoid robot | Unitree Robotics](https://www.generationrobots.com/en/404241-g1-humanoid-robot.html)[Booster K1 humanoid robot | Generation Robots](https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html)\n\nIf you're deciding between them, let me know if this is for **higher education/research** , **competitive robotics (like RoboCup)** , or **general AI integration** , and I can set up a **task** to track new spec updates or pricing shifts for both models. [Booster K1 humanoid robot | Generation Robots](https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html)[G1 humanoid robot | Unitree Robotics](https://www.generationrobots.com/en/404241-g1-humanoid-robot.html)"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "8d7cfcbc436d4e40a9c32a9c5d75493f",
+   "charged_micro": 2400
+  }
+ }
+}

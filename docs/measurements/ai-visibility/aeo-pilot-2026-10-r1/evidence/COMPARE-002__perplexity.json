@@ -1,0 +1,203 @@
+{
+ "observed_at": "2026-10-31T03:15:25+00:00",
+ "endpoint": "perplexity.web.answer.fast",
+ "request": {
+  "preset": "fast",
+  "input": "Unitree G1 vs Booster K1.",
+  "max_steps": 1,
+  "max_output_tokens": 512
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "background": false,
+   "completed_at": 1793416525,
+   "created_at": 1793416525,
+   "effort": "fast@2026-10-16.0",
+   "error": null,
+   "frequency_penalty": 0,
+   "id": "resp_7d3dc4cb-f82b-4b5b-98fe-e1e4f1f9da1a",
+   "incomplete_details": null,
+   "instructions": null,
+   "max_output_tokens": 512,
+   "max_tool_calls": null,
+   "metadata": {},
+   "model": "openai/gpt-6-luna",
+   "object": "response",
+   "output": [
+    {
+     "queries": [
+      "Unitree G1 vs Booster K1."
+     ],
+     "results": [
+      {
+       "date": "2026-10-11",
+       "id": 1,
+       "last_updated": "2026-10-30",
+       "snippet": "The **Unitree G1** costs **$13,500** on Unitree's own store, and almost nobody pays that.\nThe figure excludes tax and shipping, it buys the edition you are not allowed to program, and for an American buyer it is the start of a bill that reaches about **$20,000** once a 40% import duty, freight and a customs broker are added - Unitree.\n...\n|**G1** (Basic)|The standard 23-joint robot, no hands, no programming|**$13,500** (tax and shipping excluded)|Unitree store, dealers|\n...\n|Booster K1|95 cm, 19.5 kg|Fully programmable on every tier|**$5,999** (dealer)|**EUR 8,925** (dealer)|\n...\n|Unitree G1|132 cm, 35 kg|Remote-controlled demos; no programming|**$17,990** (dealer)|**EUR 15,462** (import)|\n...\nThe most important difference between these robots is not size or price but whether you are allowed to **write code** for them.\nThe G1 Basic, the R1 and R1 Air and the H2 Basic are sealed: Unitree sells them as demonstration machines without secondary development, so you get the moves Unitree ships and nothing else.\nBooster's K1 and T2, and every EDU edition, open the robot to your own software.\nIf you want to program a walking humanoid on the smallest budget, the G1 Basic is the wrong purchase at any price, and a Booster K1 or an R1 EDU is the right one.",
+       "source": "web",
+       "title": "Unitree G1 Price in 2026: Every Edition and Seller",
+       "url": "https://humanoidstore.co/blog/unitree-g1-price"
+      },
+      {
+       "date": "2026-10-18",
+       "id": 2,
+       "last_updated": "2026-10-26",
+       "snippet": "- **Entry level:** the Unitree R1 ($6,370.00) and Booster K1 (From $11,998.00) are among the least expensive humanoids we sell.\nBoth stand 1.25 m or less and suit teaching, demos and first projects.\n- **The research default:** a Unitree G1 EDU configuration.\nOnly EDU-class G1s are open to secondary development; the base G1 ($21,600.00) is not.\n...\n### Unitree G1 (132 cm, the research default)\n|Model|Price|Class|\n|--|--|--|\n|G1|$21,600.00|Base G1, 23 DoF, no secondary development|\n|G1 Pro|$27,990.00|G1 configuration|\n...\n|Model|Price|Class|\n|--|--|--|\n|Booster K1|From $11,998.00|95 cm, 22 DoF; education and competitions|",
+       "source": "web",
+       "title": "How Much Does a Humanoid Robot Cost? 2026 Price Guide",
+       "url": "https://www.roboticscenter.ai/guides/research-humanoid-cost"
+      },
+      {
+       "date": "2026-03-31",
+       "id": 3,
+       "last_updated": "2026-10-26",
+       "snippet": "Unitree's G1 is sold at published store prices (current store price for the base configuration: $21,600.00), which positions the G1 as the \"research and development\" humanoid, affordable enough for university labs, startups, and pilot programs.\n...\nStrengths: published store pricing (base configuration: $21,600.00); strong locomotion (derived from Unitree's quadruped expertise); active open-source community; good ROS2 support.\nWeaknesses: manipulation capabilities lag behind more expensive platforms; dexterous hands are optional and still maturing; enterprise support is minimal (email-based, Shenzhen time zone); documentation is improving but still partially Chinese-language.\n...\nBooster Robotics' K1 is RCSV's preferred mid-range humanoid for research and pilot deployments.\nIt combines capable locomotion with the strongest software ecosystem support among mid-range platforms.\nThe K1 occupies the practical middle ground: significantly more capable than the Unitree G1, significantly less expensive than Figure 02 or Apollo.\nStrengths: best software ecosystem in its price range; strong teleoperation support (compatible with RCSV's data collection pipeline); good balance of locomotion and manipulation; responsive engineering team (San Francisco Bay Area based).\nWeaknesses: smaller installed base than Unitree or Figure; fewer third-party integrations; relatively new company with less proven long-term support track record.\n...\n|Specification|Figure 02|NEO (1X)|Unitree G1|Booster K1|Digit (Agility)|Apollo (Apptronik)|\n|--|--|--|--|--|--|--|\n|Height|~170 cm|~165 cm|127 cm|~160 cm|175 cm|172 cm|\n|Weight|~60 kg|~30 kg|35 kg|~55 kg|65 kg|73 kg|\n|Arm DOF (per arm)|7|7|7|7|4|7|\n|Arm Payload (per arm)|~5 kg|~3 kg|3 kg|~5 kg|16 kg|11 kg|\n|Hand DOF|16|12|6 (optional)|12|Suction/parallel|6|\n|Walking Speed|~1.2 m/s|~1.0 m/s|2.0 m/s|~1.5 m/s|1.5 m/s|~1.2 m/s|\n|Battery Life|~3 hr|~4 hr|2 hr|~3 hr|~4 hr|~4 hr|\n|Onboard Compute|Custom (undisclosed)|NVIDIA Orin|NVIDIA Orin|NVIDIA Orin|Custom|NVIDIA Orin|\n|Price (est.)|$100K+|$50K+|Basic: $21,600.00|From $11,998.00|$75K+|$80K+|\n|Availability|Enterprise only|Waitlist|Ordering now|Ordering now|Amazon partnership|Enterprise only|\n...\n|Unitree G1 (Base)|$21,600.00|Quote|3 months|Research labs, university courses, early prototyping|\n|Unitree G1 (Edu Standard)|$43,900.00|Quote|3 months|Manipulation research, data collection|\n|Booster K1|From $11,998.00|Quote|6 months|Pilot deployments, enterprise evaluation, data campaigns|",
+       "source": "web",
+       "title": "Humanoid Robots in 2026: The Complete Market Overview",
+       "url": "https://www.roboticscenter.ai/blog/humanoid-robot-2026"
+      },
+      {
+       "id": 4,
+       "last_updated": "2026-10-30",
+       "snippet": "We present SONIC-K1, to our knowledge the first open-weights whole-body motion tracker for the Booster K1 humanoid,\nobtained by adapting the SONIC framework to this smaller robot.\n...\nSONIC [1] pushed this approach to 700 h of motion data and 128 GPUs.\nThe code is open, but it is built for the Unitree G1, and most labs cannot afford to train it at that scale.\nOur lab works with the Booster K1 [2], a 22-DoF humanoid that is noticeably smaller than the G1, and we wanted a SONIC-style tracker for it on the hardware we have.\n...\nSONIC [1] trains a single tracker for the Unitree G1 on 700 h of motion data.\nIt uses per-modality encoders, a quantized motion token and a shared decoder.",
+       "source": "web",
+       "title": "SONIC-K1: Porting a Universal Humanoid Motion Tracker to a Small Humanoid on a Single GPU",
+       "url": "https://arxiv.org/html/2610.39327v1"
+      },
+      {
+       "id": 5,
+       "last_updated": "2026-10-28",
+       "snippet": "The Booster K1 is a 95 cm, 19.5 kg bipedal humanoid built for people who want to write the control code themselves.\n...\nThe K1's only real competitor at this end of the market is the **Unitree G1**, and they are less alike than the price bracket suggests.\nThe G1 is bigger — 1.32 m, around 35 kg — with far more degrees of freedom, optional dexterous hands, and a much larger public software ecosystem.\nIt is also the most widely owned research humanoid in the world, which cuts both ways: the ecosystem is deeper, and on 29 August 2026 two vulnerabilities were disclosed in the G1 EDU allowing root-level remote code execution, one of them over Bluetooth.\n...\nNo comparable audit of the K1 has been published, which is not the same as the K1 being safer.\nThe K1's case against it is size, price and durability.\nAt 95 cm and 19.5 kg it is a machine a student can carry, drop and reset alone.\nIt is cheaper at entry.\nAnd it has the RoboCup evidence, which the G1 does not have in the same form.\n...\n|This robot Booster Robotics Booster K1|Unitree Robotics Unitree R1|Unitree Robotics Unitree G1|Unitree Robotics Unitree H1| |\n|--|--|--|--|--|\n|Price (US)|$4,999 – $12,500|$4,900 – $5,900|$13,500 – $73,900|~$90,000|\n|Availability|Backorder / waitlist at most distributors — several US retailers show out of stock with special-order reservation, and 2-4 week lead times are quoted|On the market|On the market|On the market|\n|Height|95 cm|1.23 m|1.32 m standing|~1.80 m|\n|Payload|Unknown|Unknown|Arm ~2 kg|Not rated for H1|\n|DoF|22|20|23|~19|\n|Buyer|Enterprise|Individuals|Individuals|Enterprise|\n|Made in|China|China|China|China|\n...\nBooster K1 or Unitree G1?+\nThe G1 is bigger (1.32 m, about 35 kg), has more degrees of freedom, offers dexterous hands and has the largest public software ecosystem in the category.\nThe K1 is smaller, cheaper at entry, easier for one person to handle, and has the stronger independent competition record.\nNote also the root-level vulnerabilities disclosed in the G1 EDU on 29 August 2026 — no equivalent audit of the K1 has been published either way.",
+       "source": "web",
+       "title": "Booster K1 Robot: Price, Specs & Editions (2026)",
+       "url": "https://humanoza.com/robots/booster-k1"
+      },
+      {
+       "date": "2026-07-17",
+       "id": 6,
+       "last_updated": "2026-10-19",
+       "snippet": "Booster T2 is the best direct cross-brand alternative to the Unitree G1.\nBooster K1 Geek is the budget development pick, R1 is the cheapest Unitree, PM01 favors openness, and H2 is the strongest full-size upgrade.\nFor most labs, the programmable G1 EDU remains the safer all-round buy.\n...\n- Booster K1 Geek starts at $5,999 and supports secondary development, making it the strongest budget developer option.\n...\nFor most serious labs, however, the Unitree G1 EDU is still the best all-round choice.\nIt is buyable, widely used and backed by a mature developer ecosystem.\nThe catch is that the $13,500 base model is not the programmable version.\n...\n|Robot|Price|Height / weight|DOF|Runtime|Best for|Main trade-off versus G1|\n|--|--|--|--|--|--|--|\n|Unitree G1|$13,500 base; EDU roughly $44K+|132 cm / 35 kg|23 base; up to 43 EDU|About 2 hours|Best all-round research platform|Base model is not programmable|\n| … | … | … | … | … | … | … |\n|Booster K1 Geek|From $5,999|95 cm / 19.5 kg|22|About 30 minutes walking|Budget development and teaching|Smaller, slower and less manipulator-focused|\n...\nAt $5,999, the Booster K1 Geek is a more honest budget development option than the cheap base versions of the G1 or R1.\nBooster explicitly supports secondary development and offers open-source tools; Unitree reserves secondary development for its EDU configurations.\nThe K1 is much smaller: 95 cm tall and 19.5 kg, with 22 degrees of freedom and 48 TOPS of onboard AI compute in the Geek edition.\n...\n|Programmable hardware below $10K|Booster K1 Geek|$5,999 entry price with secondary development support|",
+       "source": "web",
+       "title": "7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog",
+       "url": "https://blog.robozaps.com/b/unitree-g1-alternatives"
+      },
+      {
+       "date": "2025-11-20",
+       "id": 7,
+       "last_updated": "2026-10-19",
+       "snippet": "**Which version:** Same 95 cm, 22-DOF robot, and all three run your code.\nBooster's spec: the GEEK has 48 TOPS and about 30 minutes of walking; the EDU 117 TOPS and the Professional 200 TOPS, about 80 minutes each.\n...\n|K1 GEEK48 TOPS · 2 Ah battery, about 30 minutes of walking · Booster's warranty: 3 months|Price on requestQuote desk|Request a quote →|\n|K1 EDU117 TOPS · 5 Ah battery, about 80 minutes of walking · Booster's warranty: 1 yearClassroom pick|Price on requestQuote desk|Request a quote →|\n|K1 Professional200 TOPS · 5 Ah battery, about 80 minutes of walking · Booster's warranty: 1 yearMost compute|Price on requestQuote desk|Request a quote →|\n...\n|Unitree G1 Basic127 cm · demonstration unit, no SDK · ships from a US dealer within North America|$17,990Cart checkOct 5, 2026|Order|\n...\nThe body is the same: 95 cm, 19.5 kg, 22 DOF.\n...\n| |GEEK|EDU|Professional|\n|--|--|--|--|\n|AI compute|48 TOPS (dense)|117 TOPS|200 TOPS|\n|Battery|2 Ah|5 Ah|5 Ah|\n|Walking time|About 30 min|About 80 min|About 80 min|\n...\n|Booster's warranty|3 months|1 year|1 year|\n...\nAll three: about 95 cm and 19.5 kg; 22 DOF (6 per leg, 4 per arm, 2 in the head); dual-encoder joints with 60 N·m peak torque; a stereo depth camera, a 9-axis IMU, a three-microphone array and a speaker; Bluetooth 5.2 and Gigabit Ethernet.\n...\n### Booster K1 or Unitree G1?\n| |Booster K1|Unitree G1|\n|--|--|--|\n|Price|On request (quote only on BotInfo)|$17,990 (Basic, no SDK, Oct 5, 2026); EDU on sale from $32,900 in the US dealer's cart, Oct 18, 2026|\n|Runs your code|Every version|EDU builds only|\n|Height and weight|About 95 cm, 19.5 kg|127 cm, 35 kg|\n|Runtime per charge|About 30 to 80 min walking|About 2 hours standing|\nThe G1 is bigger and runs longer per charge; the K1 is smaller and runs your code in every version.",
+       "source": "web",
+       "title": "Booster K1 (2026): GEEK vs EDU vs Professional, Specs & Quotes",
+       "url": "https://botinfo.ai/articles/booster-k1-robot"
+      },
+      {
+       "date": "2025-02-13",
+       "id": 8,
+       "last_updated": "2026-10-18",
+       "snippet": "|Booster K1|From $5,999 (Geek Edition)|Listed on Booster's own site; Edu and Pro configurations quote-only|Official, excl. tax and shipping|\n|Unitree G1|$13,500|Available now (base; EDU quote-only)|Official, excl. tax and shipping|\n...\nThe Unitree G1 lists at $13,500 direct from Unitree's official store, excluding tax and shipping.\nThe base model does not support secondary development; the programmable G1 EDU is quote-only.",
+       "source": "web",
+       "title": "Humanoid Robot Price in 2026: List Prices, Quotes & Total Cost",
+       "url": "https://blog.robozaps.com/b/humanoid-robot-price"
+      },
+      {
+       "date": "2026-02-24",
+       "id": 9,
+       "last_updated": "2026-10-18",
+       "snippet": "|Booster K1|From $5,999|Three 22-DoF tiers: Geek, Education and Professional.\nAll list a stereo depth camera and development support, but compute, battery and warranty vary.\nThe starting tier is not named.|Sales inquiry rather than instant checkout.|\n|Unitree G1|G1 $13,500; G1 EDU quote-only|Base has 23 DoF, a depth camera, 3D LiDAR and about two hours of battery, but no high-compute module, dexterous hands or secondary-development access.|Official Unitree store listing; currently backordered; shipping, tax and duties are extra.|\n...\n|Booster K1|Family advertised from $5,999; exact tier not stated|Geek / Education / Professional all list secondary development|Compute rises from 48 to 117 to 200 TOPS; the listed battery rises from 2Ah to 5Ah and the warranty from 3 months to 1 year on the two higher tiers.|\n|Unitree G1|G1 $13,500; 23 DoF; no high-compute module|G1 EDU, quote-only; up to 43 DoF with optional compute and hands|The advertised base price is a mobility chassis, not the research configuration shown in many manipulation demonstrations.|\n...\nBooster advertises K1 from $5,999.\nIts three 22-DoF configurations are Geek, Education and Professional, and all three list secondary-development support.\n...\nUnitree lists the base G1 at $13,500 before tax and shipping.\nIt has 23 DoF, a depth camera, 3D LiDAR and about two hours of listed battery life.\nThe G1 EDU price is not public.\nBase G1 does not include dexterous hands, a high-compute module or secondary-development support in Unitree's own matrix.\nEDU can expand the body to as many as 43 DoF and add compute and hand options.\n...\n|Entry embodied-AI development|Booster K1 (from $5,999)|Every named tier lists secondary-development support.|Starting price is not mapped to a tier; obtain the exact compute and battery quote.|\n|Unitree ecosystem with more sensors|Unitree G1 ($13,500)|Depth camera and 3D LiDAR add perception beyond the cheaper R1 tiers.|Research compute, hands and secondary development require G1 EDU.|",
+       "source": "web",
+       "title": "8 Cheapest Humanoid Robots (2026 Prices & Configs) - Blog",
+       "url": "https://blog.robozaps.com/b/cheapest-humanoid-robots-2026"
+      },
+      {
+       "id": 10,
+       "last_updated": "2026-09-04",
+       "snippet": "The Booster K1 is a smaller, more affordable humanoid robot unveiled in October 2025.\nIt targets the education, STEM learning, and entry-level developer markets as a complement to the research-focused T1.\n...\n| Company | Robot | Height | DOF | AI Compute | Starting Price | Units Shipped (2025) |\n|---------|-------|--------|-----|-----------|----------------|---------------------|\n| Booster Robotics | T1 | 118 cm | 23-41 | 200 TOPS | ~$29,800 | 700+ |\n| [Unitree](https://aiwiki.ai/wiki/unitree) | G1 | 127 cm | 23-43 | 100 TOPS | ~$16,000 | 5,500+ (all humanoids) |\n| Booster Robotics | K1 | 95 cm | 22 | 48-200 TOPS | $4,999 | Included in 700+ total |\n...\nThe T1's most direct competitor is the Unitree G1.\nThe T1 holds advantages in AI computing power (200 vs. 100 TOPS), lighter weight (30 vs. 35+ kg), higher knee torque (130 vs. 120 N*m), integrated audio hardware (six-microphone array), and faster stand-up time (under one second).\nThe G1 counters with significantly higher walking speed (up to 2 m/s vs. 0.5+ m/s) and a substantially lower starting price ($16,000 vs. $29,800).\nUnitree's volume lead is significant; the company reported shipping 5,500 humanoid units in 2025 and has targeted 20,000 units for 2026.[1][6][19]\nBooster's K1 competes against both Unitree's R1 and SoftBank Robotics' [NAO](https://aiwiki.ai/wiki/softbank_robotics_nao) in the education and entry-level segment.",
+       "source": "web",
+       "title": "raw",
+       "url": "https://aiwiki.ai/wiki/booster_robotics/raw"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "content": [
+      {
+       "annotations": [],
+       "text": "**Short version:** The **Booster K1** is the smaller, lower-cost choice for hands-on coding and teaching; the **Unitree G1** is a larger, more capable platform with a broader research ecosystem—but the base G1 is not programmable, so compare the K1 with a **G1 EDU** if you plan to develop your own software.[1][5][6]\n\n| | Booster K1 | Unitree G1 |\n|---|---|---|\n| Size and weight | About 95 cm, 19.5 kg[5][7] | About 127–132 cm, 35 kg[5][7] |\n| Degrees of freedom | 22[7] | 23 in base version; higher on some EDU configurations[6][9] |\n| Software access | Secondary development supported across K1 tiers[7][9] | Base model is demo-focused; secondary development is for EDU configurations[1][6] |\n| Price signal | K1 Geek advertised from about $5,999; higher tiers may be quote-only[6][8] | Base G1 listed at $13,500 by some sources; EDU costs more and is often quote-only[1][8] |\n| Best fit | Education, competitions, and budget-conscious development | Research that benefits from a larger robot, optional hands, and a more established ecosystem[5][6] |\n\n**Practical pick:** Choose the **K1** for an affordable, portable robot you can program. Choose the **G1 EDU** when the larger body, manipulation options, or Unitree ecosystem justify the higher cost; don’t assume the cheaper base G1 offers the same development access.[1][5][6] Pricing and included features vary by edition and seller, so confirm the exact configuration before comparing quotes.",
+       "type": "output_text"
+      }
+     ],
+     "id": "msg_d2e0c393-db7b-4d1a-80c7-783f291a8dd1",
+     "role": "assistant",
+     "status": "completed",
+     "type": "message"
+    }
+   ],
+   "parallel_tool_calls": true,
+   "presence_penalty": 0,
+   "preset": "fast@2026-10-16.0",
+   "previous_response_id": null,
+   "prompt_cache_key": null,
+   "reasoning": null,
+   "safety_identifier": null,
+   "service_tier": "fast",
+   "status": "completed",
+   "store": true,
+   "temperature": 1,
+   "text": {
+    "format": {
+     "type": "text"
+    }
+   },
+   "tool_choice": "auto",
+   "tools": [
+    {
+     "type": "web_search"
+    }
+   ],
+   "top_logprobs": 0,
+   "top_p": 1,
+   "truncation": "",
+   "usage": {
+    "cost": {
+     "cache_creation_cost": 0.00057,
+     "cache_read_cost": 2e-05,
+     "currency": "USD",
+     "input_cost": 0,
+     "output_cost": 0.00019,
+     "tool_calls_cost": 0.001,
+     "tool_calls_cost_details": {
+      "search_web": 0.001
+     },
+     "total_cost": 0.00178
+    },
+    "input_tokens": 6339,
+    "input_tokens_details": {
+     "cache_creation_input_tokens": 4556,
+     "cache_read_input_tokens": 1780,
+     "cached_tokens": 1780
+    },
+    "output_tokens": 375,
+    "output_tokens_details": {
+     "reasoning_tokens": 0
+    },
+    "tool_calls_details": {
+     "search_web": {
+      "cost_usd": 0.001,
+      "invocation": 1
+     }
+    },
+    "total_tokens": 6714
+   },
+   "user": null
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "7a2945071e114197865a584788e82676",
+   "charged_micro": 1780
+  }
+ }
+}

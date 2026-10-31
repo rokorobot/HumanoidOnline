@@ -1,0 +1,198 @@
+{
+ "observed_at": "2026-10-31T03:12:52+00:00",
+ "endpoint": "perplexity.web.answer.fast",
+ "request": {
+  "preset": "fast",
+  "input": "Which humanoid robots can be purchased in Asia?",
+  "max_steps": 1,
+  "max_output_tokens": 512
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "background": false,
+   "completed_at": 1793416372,
+   "created_at": 1793416372,
+   "effort": "fast@2026-10-16.0",
+   "error": null,
+   "frequency_penalty": 0,
+   "id": "resp_e14c9af6-c1ab-460d-901f-1121c15f238b",
+   "incomplete_details": null,
+   "instructions": null,
+   "max_output_tokens": 512,
+   "max_tool_calls": null,
+   "metadata": {},
+   "model": "openai/gpt-6-luna",
+   "object": "response",
+   "output": [
+    {
+     "queries": [
+      "Which humanoid robots can be purchased in Asia?"
+     ],
+     "results": [
+      {
+       "id": 1,
+       "last_updated": "2026-10-30",
+       "snippet": "# UBTECH Walker\nThe UBTECH Walker is a family of full-size bipedal humanoid robots spanning the mass-produced Walker S2 industrial flagship, the factory-proven Walker S1 and Walker S, the Walker C reception humanoid, the Walker X commercial platform, and the Walker Tienkung research editions.\nThis guide compares every Walker model, their specifications and applications, and what buyers should know before purchasing.\n- UBTECH Walker S2 Industrial Humanoid Robot + Free Delivery Anywhere in Asia\nUS$145,000.00\n- UBTECH Walker C1 Humanoid Service Robot\nUS$51,995.00\n- UBTECH Walker S1 Industrial Humanoid Robot\nUS$37,500.00\n- UBTech Walker Tienkung Embodied Intelligence Humanoid Robot\nUS$99,995.00\n- UBTECH Walker C Commercial Reception Humanoid Robot\nUS$99,999.99\n- UBTECH Walker S Industrial Humanoid Robot\n- UBTECH Walker S3 — Coming Soon\n- UBTECH Walker X Commercial Humanoid Robot\n- UBTECH Walker Humanoid Robot\n- UBTech Walker Tienkung Voice and Vision Humanoid Robot\nUS$65,000.00",
+       "source": "web",
+       "title": "UBTECH Walker for Sale – S2, S1, X, C & Tienkung Guide ...",
+       "url": "https://www.robotsasia.com/UBTECH-Walker.htm"
+      },
+      {
+       "id": 2,
+       "last_updated": "2026-10-30",
+       "snippet": "AiMOGA Mornine M1 Multilingual AI Powered Humanoid Robot\nAED 226,669.92\n...\n- Free Shipping\nUBTECH Cruzr 1S Intelligent Commercial Service Wheeled Humanoid Robot\nAED 60,522.64 As low as AED 45,391.98\n...\nGalbot S1 Heavy Duty Wheeled Humanoid Robot\nAED 661,966.76\n...\n- Free Shipping\nUnitree H2 Humanoid Robot\nAED 141,786.86\n- Free Shipping\nUnitree R1 Basic Humanoid Robot (R1 Basic)\nAED 37,788.85\n- EngineAI T800 Basic Full-Size General-Purpose Humanoid Robot\nAED 153,198.02\n...\nRobotEra Q5 Wheeled Humanoid Service Robot w\nAED 238,308.03\n- Unitree Superman Humanoid Robot\nAED 208,046.70\n- Unitree H2 Plus Humanoid Robot\n...\nUBTECH U1 Ultra Hyper-Bionic Female Humanoid Robot\nAED 605,037.62\n- UBTECH U1 PRO Hyper-Bionic Male Humanoid Robot\nAED 132,393.35",
+       "source": "web",
+       "title": "Asia",
+       "url": "https://www.robotsmiddleeast.com/Asia.htm"
+      },
+      {
+       "id": 3,
+       "last_updated": "2026-10-30",
+       "snippet": "- UBTECH Walker S2 Industrial Humanoid Robot + Free Delivery Anywhere in Asia\nUS$145,000.00\n...\nAsia Pacific dominated the humanoid robot market with a market share of 42.60% in 2025, reaching USD 1.91 billion.\n...\n|Platform|Price (USD)|Availability|\n|--|--|--|\n|AgiBot G2|Enterprise quote|Via Minth Group Europe; store.agibot.com|\n|UBTECH Walker S2|~$68,000–120,000|Enterprise procurement|\n|Agility Digit|~$250,000|Enterprise procurement|\n...\nSeveral humanoid robots are commercially available for purchase in 2026.\nThe **AgiBot X2** is available in France via JoyBuy from €17,889, and globally via store.agibot.com.\n**Unitree G1** is available globally from $16,000 through Unitree's website and authorized resellers.\n**AgiBot A2 Series** and **G2 industrial** models are available through store.agibot.com and Minth Group in Europe.\n**Boston Dynamics Spot** (quadruped, not bipedal) is available from $74,500 via Boston Dynamics.\nSeveral premium platforms — including Tesla Optimus, Figure 02, and Boston Dynamics Atlas NG — are not yet commercially available for external purchase.",
+       "source": "web",
+       "title": "Humanoid Robots: Complete Guide & Industry Overview ...",
+       "url": "https://www.robotsasia.com/Humanoid-Robots.htm"
+      },
+      {
+       "id": 4,
+       "last_updated": "2026-10-30",
+       "snippet": "# Asia\nDiscover the latest robots in Asia, including humanoid, quadruped, industrial, and educational robots.\nExplore AI-powered solutions for research, automation, education, and innovation across Asian industries.\n- AiMOGA Mornine M1 Multilingual AI Powered Humanoid Robot\nUS$59,950.00\n- Guo Xing Firefighting Robot (RXR-M40D-880T)\nUS$27,895.00\n- UBTECH Cruzr 1S Intelligent Commercial Service Wheeled Humanoid Robot\nUS$15,999.99 As low as US$11,999.99\n- Free Shipping\nGalbot S1 Heavy Duty Wheeled Humanoid Robot\nUS$175,000.00\n...\n- Unitree H2 Humanoid Robot\nUS$37,500.00\n- Unitree R1 Basic Humanoid Robot (R1 Basic)\nUS$9,990.00\n- EngineAI T800 Basic Full-Size General-Purpose Humanoid Robot\nUS$40,500.00\n...\n- RobotEra Q5 Wheeled Humanoid Service Robot w\nUS$63,000.00\n- Unitree Superman Humanoid Robot\nUS$55,000.00\n- Unitree H2 Plus Humanoid Robot\n- PUDU Bellabot Pro Premium Delivery & Advertising Robot\nUS$15,995.00\n- UBTECH U1 Ultra Hyper-Bionic Female Humanoid Robot\nUS$159,950.00\n- UBTECH U1 PRO Hyper-Bionic Male Humanoid Robot\nUS$35,000.00",
+       "source": "web",
+       "title": "Robots Asia | Humanoid, Quadruped & Industrial Robotics Solutions | Robots Asia",
+       "url": "https://www.robotsasia.com/Asia.htm"
+      },
+      {
+       "id": 5,
+       "last_updated": "2026-10-30",
+       "snippet": "Noetix Robotics for Sale – Bumi, N2, E1 & Hobbs W1 Guide | Robots International\n...\nNoetix Robotics is the Beijing humanoid maker behind the Bumi — the world's most affordable humanoid robot — the backflipping, marathon-medaling N2 Athlete, the E1 embodied-intelligence platform, and the Hobbs W1 bionic service robot.\n...\n- Noetix BUMI PRO Compact Humanoid Robot\n$4,995.00\n- Noetix BUMI Standard Humanoid Robot\n$5,995.00\n- Noetix BUMI EDU MAX Humanoid Robot\n$14,995.00\n- Noetix BUMI EDU PRO Humanoid Robot\n$8,995.00\n- Noetix BUMI EDU Air Humanoid Robot\n$9,995.00\n...\n- Noetix N2 EDU Athlete Intelligence Humanoid Robot\n...\n- Noetix E1 EDU Embodied Intelligence Humanoid Robot\n$30,925.04\n- Noetix HOBBS W1 Wheeled Humanoid Bionic Robot\n$73,500.00\n...\nThe company has identified North America, Europe, the Middle East, Southeast Asia, and Japan/South Korea as target international markets.\n...\nNoetix co-founder Zhang Shipu confirmed in March 2026 that the company has identified five core international markets: North America, Europe, the Middle East, Southeast Asia, and Japan and South Korea.",
+       "source": "web",
+       "title": "Noetix Robotics for Sale – Bumi, N2, E1 & Hobbs W1 Guide",
+       "url": "https://www.robotsinternational.com/Noetix.htm"
+      },
+      {
+       "date": "2026-10-22",
+       "id": 6,
+       "last_updated": "2026-10-23",
+       "snippet": "- 2/2 Matches all\nUnitree G1 Humanoid Agent AI Avatar Robot Artificial Intelligence Research Robots for Education and Business Applications\n$16,000\nMin. order: 1 piece\nPMSP INDUSTRIAL GROUP LTD\n1 yrUK\n- 2/2 Matches all\nPrice China Hot Selling Life Size Humanoid Robot\n$4,600-5,500\nMin. order: 1 piece\nZigong Co-Creation Culture & Arts Co., Ltd.\n11 yrsCN\n...\nNew Style Unitree G1 Humanoid AI Avatar Robot Artificial Intelligence Research Robots for Education and Business Applications\n$16,000\nMin. order: 1 piece\nWuxi Benefit Technology Co., Ltd.\n2 yrsCN5.0/5.0\n...\nFor Unitree G1 Edu Version AI Avatar Humanoid Robot Remote & Voice Controlled for Education and Entertainment\n$38,800-50,800\nMin. order: 1 piece\nHangzhou Sino Technology Co., Ltd.\n7 yrsCN5.0/5.0\n...\nFor Unitree G1 Edu Version AI Avatar Humanoid Robot Remote & Voice Controlled for Education and Entertainment\n$16,000-53,400\nMin. order: 1 piece\n...\nTonyPi Hiwonder AI Intelligent Visual Humanoid Robot Powered by Raspberry Pi\n$569.99-659.99\nMin. order: 1 set\nDelivery by Dec 20\n1 sold\nShenzhen Hiwonder Technology Co., Ltd.\nManufacturer\n...\nChina Robots Humanoids Smart Intelligent UBTECH New Humanoid Robot Walker S1 Factory Handling Automatic Industrial Robot arm\n$66,666-99,999\nMin. order: 1 piece\nXiangjing (shanghai) Mechanical And Electrical Tech Co., Ltd.\n...\nCustomizable Intelligent Humanoid Robot Performance Dancing Reception Voice AI Bionic Robot From China\n$25,000\nMin. order: 1 piece\nDelivery by Dec 27\nShandong Baidian Energy Technology Co., Ltd.\n...\nGuangzhou Aobo Robot Technology Co., Ltd.\n...\nUnitree G1 EDU Humanoid Robot Agent More Flexible Artificial Intelligence Robots Programmable Dexterous Manipulation\n$16,000-53,400\n...\nUnitree G1 Edu Advanced-U2 Smart Robot Artificial Intelligence Ai Robot Humanoid Robot manufacturing\n...\nSilver Humanoid Robot G1 (Basic Model) and G1edu-U2 for Exhibition Event Performance New and Used Condition Available\n...\nRegionally, Asia-Pacific dominates the market, accounting for over 38% of global revenue, with China leading in manufacturing capabilities.",
+       "source": "web",
+       "title": "idol robot: AI-Powered Humanoid Robots for Sale - Accio",
+       "url": "https://www.accio.com/plp/idol-robot"
+      },
+      {
+       "id": 7,
+       "last_updated": "2026-10-27",
+       "snippet": "Observatory**182** bodies on file**44** orderableupdated **2026-09-04**\n...\n# 44 you can buy. 182 on file.\nFiltered to what is actually orderable by default.\nSwitch the first filter to see every humanoid we track, including the ones nobody can have.\n...\n· Commercial **WALK-MAN** Istituto Italiano di Tecnologia · 185 cm · Retired **Honda P2** Honda · 182 cm · Retired **HRP-5P** AIST (National Institute of Advanced Industrial Science and Technology) · 182 cm · Research **4NE-1\n...\n$449List price preorder **41** **UBTech Alpha series** UBTech Robotics · CN · 40 cm $499Street price in stock **41** **LimX TRON 1** LimX Dynamics · CN · 85 cm $15,000Street price in stock **40** **Weave Isaac\n1** Weave Robotics · US · 167 cm $7,999List price preorder **40** **Hiwonder Tonybot** Hiwonder · CN $459Street price in stock **39** **Reachy 2** Pollen Robotics · FR $70,000 to $75,000List price in\nstock **39** **ROBOTIS MINI** Robotis · KR · 27 cm $539Street price in stock **38** **PNDbotics Adam** PNDbotics · CN · 160 cm No public priceOn request in stock **37** **Qinglong (OpenLoong)** Humanoid Robots\n(Shanghai) Co · CN · 185 cm No public priceUnconfirmed in stock **36** **Fourier GR-1** Fourier · CN · 165 cm No public priceUnconfirmed in stock **35** **ROBOTIS OP3** Robotis · KR · 51 cm No public priceUnconfirmed\nin stock **35** **Robotera Q5** Robotera · CN $63,000Street price in stock **34** **Tiangong 1.0** X-Humanoid (Beijing Humanoid Robot Innovation Center) · CN · 163 cm No public priceUnconfirmed in stock **33**\n**AgiBot Lingxi X1** AgiBot · CN · 130 cm No public priceUnconfirmed in stock **32** **Leju Kuavo** Leju Robotics · CN No public priceUnconfirmed in stock **31** **Kondo KHR-3HV** Kondo Kagaku · JP\n· 40 cm $1,500Street price in stock **27** **Rainbow Robotics RB-Y1** Rainbow Robotics · KR No public priceUnconfirmed in stock **25** **Robotera Star1** Robotera · CN · 171 cm No public priceUnconfirmed in stock **25** **Tiangong\n2.0** X-Humanoid (Beijing Humanoid Robot Innovation Center) · CN No public priceUnconfirmed in stock **25** **EngineAI T800** EngineAI · CN $40,500 to $80,800Street price in stock **24** **LimX Oli** LimX Dynamics ·\n...\n28** **HRP-2 Promet** AIST (National Institute of Advanced Industrial Science and Technology) · JP · 154 cm No public priceUnconfirmed discontinued **27** **Robotera L7** Robotera · CN · 171 cm No public priceUnconfirmed enterprise only **27** **AgiBot\nGenie G2** AgiBot · CN $130,000Street price enterprise only **26** **Digit (v1 to v3)** Agility Robotics · US $250,000Estimate enterprise only **26** **iCub** Istituto Italiano di Tecnologia · IT · 104 cm No public priceUnconfirmed\nenterprise only **26** **Optimus Gen 2** Tesla · US · 173 cm No public priceUnconfirmed not for sale **26** **Poppy Humanoid** Inria · FR · 83 cm No public priceUnconfirmed not for sale **26** **Pudu D9** Pudu Robotics\n· CN · 170 cm No public priceUnconfirmed not for sale **26** **WABIAN-2R** Waseda University · JP · 150 cm No public priceUnconfirmed not for sale **26** **Apollo** Apptronik · US · 173 cm No public priceOn request not",
+       "source": "web",
+       "title": "Every humanoid robot you can buy",
+       "url": "https://humanoid.observer/robots/"
+      },
+      {
+       "id": 8,
+       "last_updated": "2026-10-30",
+       "snippet": "# RobotEra Humanoid Robots\nRobotEra humanoid robots are full-stack embodied AI platforms combining dynamic locomotion, dexterous hands, multimodal perception, and general-purpose robot intelligence.\nBuilt by RobotEra (Tsinghua-backed), these humanoids bridge research and real-world robotics.\n- RobotEra Q5 Wheeled Humanoid Service Robot w\nUS$63,000.00\n- RobotEra L7 Bipedal Humanoid Robot w\nUS$99,999.95\n- RobotEra M7 Upper Body Wheeled Humanoid Robot\nUS$99,999.99\n- RobotEra Star1 Humanoid Robot\nOut of stock",
+       "source": "web",
+       "title": "RobotEra Humanoid Robots",
+       "url": "https://www.robotsasia.com/RobotEra-Humanoid-Robots.htm"
+      },
+      {
+       "id": 9,
+       "last_updated": "2026-10-30",
+       "snippet": "LimX Dynamics is a Shenzhen-based, AI-first robotics company focused on full-size general-purpose humanoid robots, multi-form embodied robots, and embodied AI software systems.\n...\n- LimX Oli EDU Full-Size General Purpose Open Source Humanoid Robot\nUS$72,000.00\nAdd to Cart\n- LimX Tron 1 Standard Edition Multi-Modal Biped Robot\n...\n- LimX Oli Lite Full-Size General Purpose Humanoid Robot\n...\n- LimX Oli Super Full-Size General Purpose Humanoid Robot\n...\n- LimX Luna Humanoid Robot\n...\nLimX’s current public hardware lineup centers on three visible products: LimX Oli, TRON 2, and TRON 1.\nThe official website labels Oli as a “Full-Size General-Purpose Humanoid Robot,” TRON 2 as a “Multi-Form Embodied Robot,” and TRON 1 as a “Multi-Modal Biped Robot.”\n...\nYou can start through LimX Dynamics’ official website, where products such as Oli, TRON 2, and TRON 1 are shown with Buy Now or Order Consultation paths.\nPublic list pricing is limited in the reviewed sources.\n...\nIts current public lineup includes LimX Oli, TRON 2, TRON 1, LimX COSA, VGM, DreamActor, and FluxVLA Engine.",
+       "source": "web",
+       "title": "LimX Dynamics: Humanoid Robots, Oli & TRON Platforms",
+       "url": "https://www.robotsasia.com/LimX.htm"
+      },
+      {
+       "date": "2026-10-14",
+       "id": 10,
+       "last_updated": "2026-10-14",
+       "snippet": "Bipedal humanoid devices that used to cost hundreds of thousands of yuan and only appeared on exhibition stages are now being put on shelves on e-commerce platforms in batches, and products priced at the ten-thousand-yuan level have broken the public's price expectation for humanoid robots.\n...\nSince the second half of 2025, the situation has begun to undergo fundamental changes.\nMany domestic manufacturers have successively released mass-produced models that support spot goods or scheduled delivery, and humanoid robots have officially entered the sales stage for individual consumers.\n...\nChinese manufacturers account for more than 97% of the share, and Agibot and Unitree together account for three-quarters of the global shipment.\n...\n>\nSongyan Power's \"Bumi\" is priced at 9,998 yuan, bringing bipedal humanoid robots into the range below 10,000 yuan for the first time; Unitree Robotics' Unitree R1 was reduced from 39,900 yuan to a starting price of 29,900 yuan for spot sale, and it topped the humanoid robot sales list on JD.com just one week later;\nUbtech's U1 series covers a price range from 119,800 yuan to 990,000 yuan, taking the \"emotional companionship\" route; Agibot Lingxi X2 Youth Edition is priced at 98,000 yuan, and the accelerated evolution Booster K1 Education Edition is 66,900 yuan; even industrial-grade products are exploring the lowest price range.\nStardust Intelligence's T1 has a starting price as low as 89,900 yuan, claiming to be the \"Chinese version of Figure\".\nAmong them, Unitree Robotics is the landmark player in this round of price cuts for consumer-grade humanoid robots.\nIts R1 humanoid robot was originally priced at 39,900 yuan, and was lowered to a starting price of 29,900 yuan in June 2026.\nThis robot focuses on lightweight bipedal walking and basic obstacle avoidance, supports secondary development for developers, can complete standing up, walking, jumping, following and basic gesture interaction, and is oriented at individual players, university laboratories and science and innovation enthusiasts.\n...\nIt is worth mentioning that **when manufacturers turn their sights to the C-end, the industry begins to replicate the gameplay of consumer electronics**: dividing basic version, youth version and developer version, launching online pre-sales, deposit-locking orders, offline experience stores, opening official stores on Douyin, Tmall and JD.com, and directly selling to individual consumers.\n...\nQiyuan Robotics opened its first global store on Huaihai Middle Road in Shanghai, and the first batch of delivered Q1 and T1 are priced from 19,999 yuan.",
+       "source": "web",
+       "title": "Is the 10,000-Yuan Level Humanoid Robot Merely a \"Cyber Toy\"? Unveiling the Truth Behind Affordable Humanoid Robotics",
+       "url": "https://eu.36kr.com/en/p/4025501512503432"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "content": [
+      {
+       "annotations": [],
+       "text": "Several humanoid robots can be ordered in Asia, particularly from Chinese manufacturers. Availability ranges from consumer and education models to costly enterprise systems; “available” may mean preorder, quote-based procurement, or reseller listing—not necessarily immediate local stock.\n\nExamples with published prices include:\n\n- **Unitree R1** — listed at about **US$9,990** by an Asia-focused seller; Chinese reporting also gives a domestic starting price of **¥29,900**.[4][10]\n- **Unitree G1** — around **US$16,000** through sellers listing it for sale.[3][6]\n- **Noetix BUMI** — consumer/education models listed at roughly **US$4,995–14,995**.[5]\n- **UBTECH Walker** — industrial and service models listed from about **US$37,500**, with some variants priced much higher.[1]\n- **EngineAI T800** — listed from about **US$40,500**.[4]\n- **RobotEra Q5** — wheeled humanoid service robot listed at about **US$63,000**.[8]\n- **LimX Oli** — full-size humanoid with an order/consultation route; public pricing is limited, though one reseller lists an education version at **US$72,000**.[9]\n- **AiMOGA Mornine M1**, **Galbot S1**, and **UBTECH Cruzr** — also appear on Asia-focused seller listings, with Cruzr a wheeled service robot rather than a biped.[2][4]\n\nTreat marketplace and reseller prices as indicative: verify the seller, regional delivery, import duties, warranty, support, and whether the robot is actually in stock before ordering. Some listings may be enterprise-only or quote-based.",
+       "type": "output_text"
+      }
+     ],
+     "id": "msg_12948bf5-949c-4d68-afff-0b7ecae0a11d",
+     "role": "assistant",
+     "status": "completed",
+     "type": "message"
+    }
+   ],
+   "parallel_tool_calls": true,
+   "presence_penalty": 0,
+   "preset": "fast@2026-10-16.0",
+   "previous_response_id": null,
+   "prompt_cache_key": null,
+   "reasoning": null,
+   "safety_identifier": null,
+   "service_tier": "fast",
+   "status": "completed",
+   "store": true,
+   "temperature": 1,
+   "text": {
+    "format": {
+     "type": "text"
+    }
+   },
+   "tool_choice": "auto",
+   "tools": [
+    {
+     "type": "web_search"
+    }
+   ],
+   "top_logprobs": 0,
+   "top_p": 1,
+   "truncation": "",
+   "usage": {
+    "cost": {
+     "cache_creation_cost": 0.00054,
+     "cache_read_cost": 2e-05,
+     "currency": "USD",
+     "input_cost": 0,
+     "output_cost": 0.00019,
+     "tool_calls_cost": 0.001,
+     "tool_calls_cost_details": {
+      "search_web": 0.001
+     },
+     "total_cost": 0.00175
+    },
+    "input_tokens": 6091,
+    "input_tokens_details": {
+     "cache_creation_input_tokens": 4308,
+     "cache_read_input_tokens": 1780,
+     "cached_tokens": 1780
+    },
+    "output_tokens": 373,
+    "output_tokens_details": {
+     "reasoning_tokens": 0
+    },
+    "tool_calls_details": {
+     "search_web": {
+      "cost_usd": 0.001,
+      "invocation": 1
+     }
+    },
+    "total_tokens": 6464
+   },
+   "user": null
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "1839a868a0bc4175a5f10db1d41175bd",
+   "charged_micro": 1750
+  }
+ }
+}

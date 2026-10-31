@@ -1,0 +1,165 @@
+{
+ "observed_at": "2026-10-31T03:14:33+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "Which humanoid robots have SDK access?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Several commercially and educationally available humanoid and bipedal research robots offer developer access through formal Software Development Kits (SDKs), APIs, and integration with the Robot Operating System (ROS/ROS 2).\n\n1. Unitree G1 (and H1)\n\nAccess Level: High / Developer-Friendly\n\nSoftware Support: Unitree SDK2, C++, Python bindings, and ROS 2 compatibility.\n\nDetails: Unitree’s affordable G1 humanoid is heavily targeted at the research and education community. It provides low-level joint/torque control access and high-level state estimation via their DDS-based SDK2 framework. Community wrappers (such as unitree_cpp) also optimize Python-to-C++ real-time performance for on-board computers like the NVIDIA Jetson Orin.\n\n2. PAL Robotics (TALOS & REEM-C)\n\nAccess Level: Full Research Access\n\nSoftware Support: ROS / ROS 2 (Humble, Iron, etc.), MoveIt!, Gazebo simulation.\n\nDetails: PAL Robotics builds research-grade humanoids like TALOS (full torque-controlled humanoid) and legacy bipedal platforms like REEM-C. Their systems are natively designed around an open ROS/ROS 2 architecture, making them standard platforms for academic and industrial labs.\n\n3. Agility Robotics (Digit)\n\nAccess Level: Controlled / Partner & Developer Program\n\nSoftware Support: Digit API, ROS/ROS 2 integration interfaces.\n\nDetails: While primarily deployed for heavy logistics (such as warehouse automation with GXO/Amazon), Agility provides structured developer access and simulation environments for academic and enterprise research partners via specific integration pipelines.\n\n4. Booster Robotics / Other Modular Lab Humanoids (e.g., K1, T1)\n\nAccess Level: Research & Lab Access\n\nSoftware Support: ROS 2, Python/C++ APIs, and virtual simulation environments.\n\nDetails: Compact and modular humanoid kits distributed for lab environments (often sourced via robotics distributors like Generation Robots) typically bundle API/SDK access, Docker containers, and full ROS 2 navigation stacks.\n\nNotable Exceptions (Closed Ecosystems)\n\nTesla Optimus: Currently features a vertically integrated, closed software ecosystem. As of 2026, Tesla has not released an open developer SDK or third-party accessory program; software updates are deployed strictly over-the-air (OTA) by Tesla.\n\nFigure AI & Boston Dynamics (Atlas): While heavily relied upon for cutting-edge commercial and research showcases, low-level SDK access for general public or independent developer deployment remains restricted to direct corporate partnerships.\n\nIf you are looking for a platform for a specific use case (such as academic research, industrial manipulation, or home hobbyist programming), let me know and I can narrow down the best hardware and budget match.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "GitHub - HansZ8/unitree_cpp: Free your Unitree G1 from cable connection · GitHub",
+      "url": "https://github.com/HansZ8/unitree_cpp",
+      "description": "HansZ8/unitree_cpp is a Python binding for Unitree SDK2 ・ reducing control cost from 3871.039 to 40.045 ・ includes important fixes...",
+      "redirectLink": "https://www.google.com/goto?url=CAESYAHrOzAVkfcNrHytuxds0glYPc_-DConphXsKhUSHaHF57ED5_fzbKC2Pm6sfLAf4uB_eqqk5Eojzbzjqmlm9QEA9Z63YbBz27GLLh39o19SJE8m_TFvDsu22h3ZPs9csg"
+     },
+     {
+      "position": 2,
+      "label": "Choosing a humanoid robot for R&D: SDKs and safety - Joybuy",
+      "url": "https://www.joybuy.de/blog/humanoid-robot-rd-guide/xCr6HZfb",
+      "description": "ROS, Python, C++, Linux, open APIs and 43 degrees of freedom. Confirm development access, safety documentation, support and delive...",
+      "redirectLink": "https://www.google.com/goto?url=CAESdgHrOzAV6QWeIS462YPJjhpdjRG7ORcmekVVfFA6LFEvRlNYVIgsl7_cwogcJ8PCQATZonW3XI9ctYXaTUM0_yPWCgnAz6Lp672zZuRfs6sC_Zfvh8nJftx0J7qFDZ3FWjdsld0KKqwG9jckvUeeBZg0jTQXUe4"
+     },
+     {
+      "position": 3,
+      "label": "Project ROS Control for ROS2 | PAL Robotics",
+      "url": "https://pal-robotics.com/projects/ros_control-for-ros2/",
+      "description": "real and simulated robots. PAL Robotics Role: Provided Nominal Hardware. Robots Involved: TIAGo, TIAGo++, TALOS, REEM-C, and TIAGo...",
+      "redirectLink": "https://www.google.com/goto?url=CAEScgHrOzAVUrkr3Y-wp2j1Y-ooeRfyCEfxCkoGhvdxLjqo1_30hJbZYgfoMz6QTfe2rEQMCuyV4uedHUf79nh3yPtiiCLk-Np5M68rnRmf2A89mlenR25qMfaHF0yYf9DwLnzbXDtE9aI_31cQUId2Imyuuw"
+     },
+     {
+      "position": 4,
+      "label": "Tesla Optimus Modules: What Can You Add? (2026)",
+      "url": "https://optimusk.blog/blog/tesla-optimus-modules/",
+      "description": "No official SDK has been announced as of March 2026. Unitree G1 ships with full ROS2 SDK, enabling custom software development fro...",
+      "redirectLink": "https://www.google.com/goto?url=CAESbAHrOzAV1TNoI4zPt8CqRBi8BxnoQuFThcnwRZnLrLq1OsVZHem9T_iX0Edny2J5bpoCuqZKAxMn6GjLgQuJAqk3z7V0Me5pDXNICzjFAqC4GSWaGZZImi8T09DeCsi1Hx_Sr87YDmbRWgBwtQ"
+     },
+     {
+      "position": 5,
+      "label": "What kinds of PAI dev kits are available for humanoid robotics?",
+      "url": "https://www.eeworldonline.com/what-kinds-of-pai-dev-kits-are-available-for-humanoid-robotics/",
+      "description": "A semi-humanoid robot designed for advanced, real-world industrial tasks, such as logistics, assembly, and inspection;",
+      "redirectLink": "https://www.google.com/goto?url=CAESmAEB6zswFTRByx67a_K7x7Xe74cishKjGxXSytSSK5-K_gDjis7PzH4_978h4rNd7mSZ-Kn6Oluspg_wyp8RDWHnD-NN0lKJfeTlSOFtGmvYPE2Muk7BtXQJY1e6sYQqg61oP-7DR9XiF9177-QHwOnQP_KD7RGklWT3s74v9yXczVhYPKsHwQfLz6iOurSwDA5DWhSDB6NvLw"
+     },
+     {
+      "position": 6,
+      "label": "grantgib/digit_ros2: ROS2 workspace for controlling Digit via ...",
+      "url": "https://github.com/grantgib/digit_ros2",
+      "description": "This section is for how to run the Ford-Agility Robotics ROS2 Interface for package delivery.",
+      "redirectLink": "https://www.google.com/goto?url=CAESYQHrOzAVEQ8LuSNSK_FG5eGWf9qto5rVBwiWFR3l26eWAV0k3x8L67Z5jD73uuQGy4hfHElNroDwywvXH05DQ10VWZKZC_GQCSpmdEm7fMMTnLRDUIuZCf2tpB1RoCNtde8"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Choosing a humanoid robot for R&D: SDKs and safety - Joybuy",
+      "citationPillId": 1,
+      "url": "https://www.joybuy.de/blog/humanoid-robot-rd-guide/xCr6HZfb",
+      "domain": "joybuy.de",
+      "description": "ROS, Python, C++, Linux, open APIs and 43 degrees of freedom. Confirm development access, safety documentation, support and delive...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESdgHrOzAV6QWeIS462YPJjhpdjRG7ORcmekVVfFA6LFEvRlNYVIgsl7_cwogcJ8PCQATZonW3XI9ctYXaTUM0_yPWCgnAz6Lp672zZuRfs6sC_Zfvh8nJftx0J7qFDZ3FWjdsld0KKqwG9jckvUeeBZg0jTQXUe4"
+     },
+     {
+      "label": "GitHub - HansZ8/unitree_cpp: Free your Unitree G1 from cable connection · GitHub",
+      "citationPillId": 2,
+      "url": "https://github.com/HansZ8/unitree_cpp",
+      "domain": "github.com",
+      "description": "HansZ8/unitree_cpp is a Python binding for Unitree SDK2 ・ reducing control cost from 3871.039 to 40.045 ・ includes important fixes...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESYAHrOzAVkfcNrHytuxds0glYPc_-DConphXsKhUSHaHF57ED5_fzbKC2Pm6sfLAf4uB_eqqk5Eojzbzjqmlm9QEA9Z63YbBz27GLLh39o19SJE8m_TFvDsu22h3ZPs9csg"
+     },
+     {
+      "label": "Choosing a humanoid robot for R&D: SDKs and safety - Joybuy",
+      "citationPillId": 2,
+      "url": "https://www.joybuy.de/blog/humanoid-robot-rd-guide/xCr6HZfb",
+      "domain": "joybuy.de",
+      "description": "ROS, Python, C++, Linux, open APIs and 43 degrees of freedom. Confirm development access, safety documentation, support and delive...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESdgHrOzAV6QWeIS462YPJjhpdjRG7ORcmekVVfFA6LFEvRlNYVIgsl7_cwogcJ8PCQATZonW3XI9ctYXaTUM0_yPWCgnAz6Lp672zZuRfs6sC_Zfvh8nJftx0J7qFDZ3FWjdsld0KKqwG9jckvUeeBZg0jTQXUe4"
+     },
+     {
+      "label": "Tesla Optimus Modules: What Can You Add? (2026)",
+      "citationPillId": 2,
+      "url": "https://optimusk.blog/blog/tesla-optimus-modules/",
+      "domain": "optimusk.blog",
+      "description": "No official SDK has been announced as of March 2026. Unitree G1 ships with full ROS2 SDK, enabling custom software development fro...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAESbAHrOzAV1TNoI4zPt8CqRBi8BxnoQuFThcnwRZnLrLq1OsVZHem9T_iX0Edny2J5bpoCuqZKAxMn6GjLgQuJAqk3z7V0Me5pDXNICzjFAqC4GSWaGZZImi8T09DeCsi1Hx_Sr87YDmbRWgBwtQ"
+     },
+     {
+      "label": "Project ROS Control for ROS2 | PAL Robotics",
+      "citationPillId": 3,
+      "url": "https://pal-robotics.com/projects/ros_control-for-ros2/",
+      "domain": "pal-robotics.com",
+      "description": "real and simulated robots. PAL Robotics Role: Provided Nominal Hardware. Robots Involved: TIAGo, TIAGo++, TALOS, REEM-C, and TIAGo...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAEScgHrOzAVUrkr3Y-wp2j1Y-ooeRfyCEfxCkoGhvdxLjqo1_30hJbZYgfoMz6QTfe2rEQMCuyV4uedHUf79nh3yPtiiCLk-Np5M68rnRmf2A89mlenR25qMfaHF0yYf9DwLnzbXDtE9aI_31cQUId2Imyuuw"
+     },
+     {
+      "label": "Choosing a humanoid robot for R&D: SDKs and safety - Joybuy",
+      "citationPillId": 3,
+      "url": "https://www.joybuy.de/blog/humanoid-robot-rd-guide/xCr6HZfb",
+      "domain": "joybuy.de",
+      "description": "ROS, Python, C++, Linux, open APIs and 43 degrees of freedom. Confirm development access, safety documentation, support and delive...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESdgHrOzAV6QWeIS462YPJjhpdjRG7ORcmekVVfFA6LFEvRlNYVIgsl7_cwogcJ8PCQATZonW3XI9ctYXaTUM0_yPWCgnAz6Lp672zZuRfs6sC_Zfvh8nJftx0J7qFDZ3FWjdsld0KKqwG9jckvUeeBZg0jTQXUe4"
+     },
+     {
+      "label": "What kinds of PAI dev kits are available for humanoid robotics?",
+      "citationPillId": 4,
+      "url": "https://www.eeworldonline.com/what-kinds-of-pai-dev-kits-are-available-for-humanoid-robotics/",
+      "domain": "eeworldonline.com",
+      "description": "A semi-humanoid robot designed for advanced, real-world industrial tasks, such as logistics, assembly, and inspection;",
+      "position": 5,
+      "redirectLink": "https://www.google.com/goto?url=CAESmAEB6zswFTRByx67a_K7x7Xe74cishKjGxXSytSSK5-K_gDjis7PzH4_978h4rNd7mSZ-Kn6Oluspg_wyp8RDWHnD-NN0lKJfeTlSOFtGmvYPE2Muk7BtXQJY1e6sYQqg61oP-7DR9XiF9177-QHwOnQP_KD7RGklWT3s74v9yXczVhYPKsHwQfLz6iOurSwDA5DWhSDB6NvLw"
+     },
+     {
+      "label": "grantgib/digit_ros2: ROS2 workspace for controlling Digit via ...",
+      "citationPillId": 4,
+      "url": "https://github.com/grantgib/digit_ros2",
+      "domain": "github.com",
+      "description": "This section is for how to run the Ford-Agility Robotics ROS2 Interface for package delivery.",
+      "position": 6,
+      "redirectLink": "https://www.google.com/goto?url=CAESYQHrOzAVEQ8LuSNSK_FG5eGWf9qto5rVBwiWFR3l26eWAV0k3x8L67Z5jD73uuQGy4hfHElNroDwywvXH05DQ10VWZKZC_GQCSpmdEm7fMMTnLRDUIuZCf2tpB1RoCNtde8"
+     },
+     {
+      "label": "Choosing a humanoid robot for R&D: SDKs and safety - Joybuy",
+      "citationPillId": 5,
+      "url": "https://www.joybuy.de/blog/humanoid-robot-rd-guide/xCr6HZfb",
+      "domain": "joybuy.de",
+      "description": "ROS, Python, C++, Linux, open APIs and 43 degrees of freedom. Confirm development access, safety documentation, support and delive...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESdgHrOzAV6QWeIS462YPJjhpdjRG7ORcmekVVfFA6LFEvRlNYVIgsl7_cwogcJ8PCQATZonW3XI9ctYXaTUM0_yPWCgnAz6Lp672zZuRfs6sC_Zfvh8nJftx0J7qFDZ3FWjdsld0KKqwG9jckvUeeBZg0jTQXUe4"
+     },
+     {
+      "label": "Tesla Optimus Modules: What Can You Add? (2026)",
+      "citationPillId": 6,
+      "url": "https://optimusk.blog/blog/tesla-optimus-modules/",
+      "domain": "optimusk.blog",
+      "description": "No official SDK has been announced as of March 2026. Unitree G1 ships with full ROS2 SDK, enabling custom software development fro...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAESbAHrOzAV1TNoI4zPt8CqRBi8BxnoQuFThcnwRZnLrLq1OsVZHem9T_iX0Edny2J5bpoCuqZKAxMn6GjLgQuJAqk3z7V0Me5pDXNICzjFAqC4GSWaGZZImi8T09DeCsi1Hx_Sr87YDmbRWgBwtQ"
+     }
+    ],
+    "markdown": "Several commercially and educationally available humanoid and bipedal research robots offer developer access through formal Software Development Kits (SDKs), APIs, and integration with the Robot Operating System (ROS/ROS 2). [Choosing a humanoid robot for R&D: SDKs and safety - Joybuy](https://www.joybuy.de/blog/humanoid-robot-rd-guide/xCr6HZfb)\n\n1\\. Unitree G1 (and H1)\n\n  * **Access Level:** High / Developer-Friendly\n\n  * **Software Support:** Unitree SDK2, C++, Python bindings, and ROS 2 compatibility.\n\n  * **Details:** Unitree’s affordable G1 humanoid is heavily targeted at the research and education community. It provides low-level joint/torque control access and high-level state estimation via their DDS-based SDK2 framework. Community wrappers (such as `unitree_cpp`) also optimize Python-to-C++ real-time performance for on-board computers like the NVIDIA Jetson Orin. [GitHub - HansZ8/unitree_cpp: Free your Unitree G1 from cable connection · GitHub](https://github.com/HansZ8/unitree_cpp)[Choosing a humanoid robot for R&D: SDKs and safety - Joybuy](https://www.joybuy.de/blog/humanoid-robot-rd-guide/xCr6HZfb)[Tesla Optimus Modules: What Can You Add? (2026)](https://optimusk.blog/blog/tesla-optimus-modules/)\n\n2\\. PAL Robotics (TALOS & REEM-C)\n\n  * **Access Level:** Full Research Access\n\n  * **Software Support:** ROS / ROS 2 (Humble, Iron, etc.), MoveIt!, Gazebo simulation.\n\n  * **Details:** PAL Robotics builds research-grade humanoids like **TALOS** (full torque-controlled humanoid) and legacy bipedal platforms like **REEM-C**. Their systems are natively designed around an open ROS/ROS 2 architecture, making them standard platforms for academic and industrial labs. [Project ROS Control for ROS2 | PAL Robotics](https://pal-robotics.com/projects/ros_control-for-ros2/)[Choosing a humanoid robot for R&D: SDKs and safety - Joybuy](https://www.joybuy.de/blog/humanoid-robot-rd-guide/xCr6HZfb)\n\n3\\. Agility Robotics (Digit)\n\n  * **Access Level:** Controlled / Partner & Developer Program\n\n  * **Software Support:** Digit API, ROS/ROS 2 integration interfaces.\n\n  * **Details:** While primarily deployed for heavy logistics (such as warehouse automation with GXO/Amazon), Agility provides structured developer access and simulation environments for academic and enterprise research partners via specific integration pipelines. [What kinds of PAI dev kits are available for humanoid robotics?](https://www.eeworldonline.com/what-kinds-of-pai-dev-kits-are-available-for-humanoid-robotics/)[grantgib/digit_ros2: ROS2 workspace for controlling Digit via](https://github.com/grantgib/digit_ros2)\n\n4\\. Booster Robotics / Other Modular Lab Humanoids (e.g., K1, T1)\n\n  * **Access Level:** Research & Lab Access\n\n  * **Software Support:** ROS 2, Python/C++ APIs, and virtual simulation environments.\n\n  * **Details:** Compact and modular humanoid kits distributed for lab environments (often sourced via robotics distributors like Generation Robots) typically bundle API/SDK access, Docker containers, and full ROS 2 navigation stacks. [Choosing a humanoid robot for R&D: SDKs and safety - Joybuy](https://www.joybuy.de/blog/humanoid-robot-rd-guide/xCr6HZfb)\n\n* * *\n\nNotable Exceptions (Closed Ecosystems)\n\n  * **Tesla Optimus:** Currently features a vertically integrated, closed software ecosystem. As of 2026, Tesla has not released an open developer SDK or third-party accessory program; software updates are deployed strictly over-the-air (OTA) by Tesla. [Tesla Optimus Modules: What Can You Add? (2026)](https://optimusk.blog/blog/tesla-optimus-modules/)\n\n  * **Figure AI & Boston Dynamics (Atlas):** While heavily relied upon for cutting-edge commercial and research showcases, low-level SDK access for general public or independent developer deployment remains restricted to direct corporate partnerships.\n\nIf you are looking for a platform for a **specific use case** (such as academic research, industrial manipulation, or home hobbyist programming), let me know and I can narrow down the best hardware and budget match."
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "f57d1793a27243bca6e7f8f148a59122",
+   "charged_micro": 2400
+  }
+ }
+}

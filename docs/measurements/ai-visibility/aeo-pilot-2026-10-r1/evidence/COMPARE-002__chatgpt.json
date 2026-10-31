@@ -1,0 +1,362 @@
+{
+ "observed_at": "2026-10-31T03:14:57+00:00",
+ "endpoint": "cloro.ai-search.chatgpt.scrape",
+ "request": {
+  "prompt": "Unitree G1 vs Booster K1.",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "model": null,
+    "text": "Unitree G1 vs Booster K1\n\nHumanoid robot comparison · Research, development, education and real-world deployment\n\nUnitree G1\n\nFull-size general-purpose humanoid\n\nBooster K1\n\nCompact humanoid for robotics development\n\nThe key distinction: the Unitree G1 is aimed at advanced general-purpose humanoid robotics, while the Booster K1 is oriented more toward accessible robotics development, education and experimentation.\n\n1. Technical specifications\n\nSpecification\n\nUnitree G1\n\nBooster K1\n\nHeight\n\n132 cm\n\n95 cm\n\nWeight\n\n35 kg\n\n19.5 kg\n\nDegrees of freedom\n\n23–43\n\n22\n\nMaximum joint torque\n\nUp to 120 Nm*\n\n60 Nm peak\n\nWalking speed\n\nUp to 2 m/s\n\nUp to 2 m/s\n\nBattery runtime\n\nApprox. 2 hours\n\n20–80 min*\n\nDepth camera\n\nYes\n\nYes\n\n3D LiDAR\n\nYes, depending on configuration\n\nNot listed\n\nAI computing\n\nOptional Jetson Orin on EDU\n\n48–200 TOPS, depending on edition\n\nDeveloper access\n\nPrimarily EDU\n\nGeek, Education, Professional\n\n*Torque figures refer to different configurations and should not be interpreted as directly equivalent. Battery life depends heavily on activity and configuration.\n\nSources: Unitree specifications and Booster's official product documentation.\n\n2. Mobility and physical capabilities\n\nUnitree G1\n\nMore powerful joints.\n\nLarger body and longer reach.\n\nImpressive dynamic movements.\n\nBetter potential for manipulation research, especially with G1 EDU and dexterous hands.\n\nBooster K1\n\nCompact and lightweight.\n\nDesigned for repeated movement and falls.\n\nStrong humanoid soccer competition platform.\n\nSupports omnidirectional walking and autonomous fall recovery.\n\n3. Software and AI development\n\nThis is particularly important if you intend to program the robots yourself.\n\nCapability\n\nUnitree G1\n\nBooster K1\n\nROS 2\n\nYes, especially EDU\n\nDevelopment interfaces available\n\nPython\n\nSDK support\n\nSDK support\n\nC++\n\nSDK support\n\nSDK support\n\nReinforcement learning\n\nStrong ecosystem\n\nSupported\n\nSimulation\n\nMuJoCo, Isaac Lab\n\nMuJoCo, Isaac Lab\n\nLow-level control\n\nEDU versions\n\nDeveloper editions\n\nComputer vision\n\nDepth camera + LiDAR\n\nStereo depth camera\n\nA few important distinctions:\n\nUnitree G1 EDU: Particularly interesting for reinforcement learning, whole-body control, manipulation and advanced robotics research.\n\nBooster K1: Attractive for robotics education, robot soccer, locomotion research and embodied AI development.\n\nThe standard G1 and G1 EDU are not equivalent in software access. Make sure you compare the correct versions before purchasing.\n\n4. Price comparison\n\nIndicative European online listings found during this search:\n\nUnitree G1 Basic\n\n23.000,00 €\n\nTerra Robotics + weitere · Listed price\n\nView G1 listing\n\nUnitree G1 EDU\n\n31.500,00 €\n\nTerra Robotics + weitere · Listed price\n\nView G1 EDU listing\n\nBooster K1 Basic\n\n11.250,00 €\n\nreichelt.de + weitere · Listed price\n\nView K1 listing\n\nBooster K1 Geek\n\n6.999,00 €\n\njoybuy.de + weitere · Listed price\n\nView K1 Geek listing\n\nThese are reseller listings, not standardized manufacturer prices. Check VAT, shipping, configuration, warranty and software access before comparing.\n\n5. Which one would I choose?\n\nMy pick\n\nUnitree G1 EDU\n\nIf the goal is advanced humanoid robotics, AI research, reinforcement learning, manipulation and experimenting with future applications, I would choose the G1 EDU.\n\nBooster K1 is a compelling alternative if the priorities are:\n\nLower acquisition cost.\n\nEasier physical handling.\n\nEducation and robotics competitions.\n\nLocomotion and embodied AI experimentation.\n\n6. One important question\n\nWhat do you actually want to do with the humanoid?\n\nThe application matters enormously: the best robot for reinforcement learning may not be the best robot for manipulation or autonomous real-world tasks.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "G1\nHUMANOID AGENT AI AVATAR\nwww.unitree.com",
+      "url": "https://hsl.robocup.org/wp-content/uploads/2026/03/large_Beihang_RoboCup_Team-specs-697c597e6df3a.pdf",
+      "footnote": false
+     },
+     {
+      "position": 2,
+      "label": "Robot Tutorial",
+      "url": "https://www.docs.quadruped.de/projects/g1/html/index.html",
+      "footnote": false
+     },
+     {
+      "position": 3,
+      "label": "Booster K1",
+      "url": "https://www.booster.tech/booster-k1/",
+      "footnote": false
+     },
+     {
+      "position": 4,
+      "label": "Booster K1",
+      "url": "https://www.booster.tech/booster-k1?target=en",
+      "footnote": false
+     },
+     {
+      "position": 5,
+      "label": "Booster K1 vs Unitree G1: Specs, Price & Differences",
+      "url": "https://humanoidversus.com/compare/booster-k1-vs-unitree-g1",
+      "footnote": false
+     },
+     {
+      "position": 6,
+      "label": "Overview",
+      "url": "https://docs.booster.tech/docs/product-manual/k1/getting-started/overview/",
+      "footnote": false
+     },
+     {
+      "position": 7,
+      "label": "",
+      "url": "https://www.usrobotstore.com/products/booster-k1-humanoid-robot",
+      "footnote": true
+     },
+     {
+      "position": 8,
+      "label": "",
+      "url": "https://www.toneart-shop.de/robots/unitree-g1.html",
+      "footnote": true
+     },
+     {
+      "position": 9,
+      "label": "",
+      "url": "https://epocanegocios.globo.com/tecnologia/noticia/2025/03/empresa-chinesa-mostra-robo-humanoide-fazendo-movimentos-de-kung-fu.ghtml",
+      "footnote": true
+     },
+     {
+      "position": 10,
+      "label": "",
+      "url": "https://www.skai.gr/news/technology/kina-dieksixthi-o-protos-agonas-podosfairou-merompot-texnitis-noimosynis",
+      "footnote": true
+     },
+     {
+      "position": 11,
+      "label": "View G1 listing",
+      "url": "https://chatgpt.com/?hints=search&q=Unitree+G1+basic+Humanoider+Roboter",
+      "footnote": true
+     },
+     {
+      "position": 12,
+      "label": "View G1 EDU listing",
+      "url": "https://chatgpt.com/?hints=search&q=Unitree+G1+EDU+humanoider+Roboter",
+      "footnote": true
+     },
+     {
+      "position": 13,
+      "label": "View K1 listing",
+      "url": "https://chatgpt.com/?hints=search&q=Booster+Robotics+K1+basic+Humanoider+Roboter",
+      "footnote": true
+     },
+     {
+      "position": 14,
+      "label": "View K1 Geek listing",
+      "url": "https://chatgpt.com/?hints=search&q=Booster+Robotics+k1+geek+humanoider+Roboter",
+      "footnote": true
+     },
+     {
+      "position": 15,
+      "label": "",
+      "url": "https://docs.bipedal.de/projects/k1/html/index.html",
+      "footnote": true
+     },
+     {
+      "position": 16,
+      "label": "",
+      "url": "https://ironvektor.com/robot/g1/",
+      "footnote": true
+     },
+     {
+      "position": 17,
+      "label": "",
+      "url": "https://reliablerobotics.ai/wp-content/uploads/2025/03/G1-Brochure.pdf",
+      "footnote": true
+     },
+     {
+      "position": 18,
+      "label": "",
+      "url": "https://reliablerobotics.ai/wp-content/uploads/2025/03/G1-User-Manual_compressed.pdf",
+      "footnote": true
+     },
+     {
+      "position": 19,
+      "label": "",
+      "url": "https://uelectronics.com/wp-content/uploads/2025/02/Unitree-G1-Robot-Humanoide-Especificaciones.pdf",
+      "footnote": true
+     },
+     {
+      "position": 20,
+      "label": "",
+      "url": "https://unirobots.org/en/humanoid-robots/booster-k1",
+      "footnote": true
+     },
+     {
+      "position": 21,
+      "label": "",
+      "url": "https://unitreeturkiye.com.tr/en/products/g1",
+      "footnote": true
+     },
+     {
+      "position": 22,
+      "label": "",
+      "url": "https://www.ui44.com/compare/booster-k1/unitree-g1/booster-t1",
+      "footnote": true
+     },
+     {
+      "position": 23,
+      "label": "",
+      "url": "https://www.wahsin.com/wp-wahsin/wp-content/uploads/2025/10/Unitree-G1-ws.pdf",
+      "footnote": true
+     }
+    ],
+    "entities": [
+     {
+      "type": "product",
+      "name": "Unitree G1"
+     },
+     {
+      "type": "product",
+      "name": "Booster K1"
+     }
+    ],
+    "map": [],
+    "followUpForm": {
+     "questions": [
+      {
+       "label": "Primary application",
+       "type": "radio",
+       "options": [
+        {
+         "label": "AI development and autonomous behavior",
+         "value": "AI development and autonomous behavior",
+         "selected": true
+        },
+        {
+         "label": "Reinforcement learning and robotics research",
+         "value": "Reinforcement learning and robotics research",
+         "selected": false
+        },
+        {
+         "label": "Manipulation and interaction with objects",
+         "value": "Manipulation and interaction with objects",
+         "selected": false
+        },
+        {
+         "label": "Education and experimentation",
+         "value": "Education and experimentation",
+         "selected": false
+        },
+        {
+         "label": "Commercial applications and real-world tasks",
+         "value": "Commercial applications and real-world tasks",
+         "selected": false
+        },
+        {
+         "label": "Robot soccer and competitions",
+         "value": "Robot soccer and competitions",
+         "selected": false
+        }
+       ],
+       "name": "goal"
+      },
+      {
+       "label": "Budget",
+       "type": "radio",
+       "options": [
+        {
+         "label": "Under €10,000",
+         "value": "Under €10,000",
+         "selected": false
+        },
+        {
+         "label": "€10,000–€20,000",
+         "value": "€10,000–€20,000",
+         "selected": true
+        },
+        {
+         "label": "€20,000–€35,000",
+         "value": "€20,000–€35,000",
+         "selected": false
+        },
+        {
+         "label": "Above €35,000",
+         "value": "Above €35,000",
+         "selected": false
+        }
+       ],
+       "name": "budget"
+      },
+      {
+       "label": "Technical experience",
+       "type": "radio",
+       "options": [
+        {
+         "label": "Beginner",
+         "value": "Beginner",
+         "selected": false
+        },
+        {
+         "label": "Intermediate (Python, Linux)",
+         "value": "Intermediate (Python, Linux)",
+         "selected": false
+        },
+        {
+         "label": "Advanced (ROS 2, Python, AI)",
+         "value": "Advanced development (ROS 2, Python, AI)",
+         "selected": true
+        }
+       ],
+       "name": "experience"
+      }
+     ],
+     "submitLabel": "Compare for my application",
+     "followUpPrompt": "Recommend between Unitree G1 and Booster K1 for my situation. Application: {goal}. Budget: {budget}. Experience: {experience}. Include exact configuration and trade-offs."
+    },
+    "markdown": "# Unitree G1 vs Booster K1\n\nHumanoid robot comparison · Research, development, education and real-world deployment\n\nUnitree G1\n\nFull-size general-purpose humanoid\n\nBooster K1\n\nCompact humanoid for robotics development\n\nThe key distinction: the Unitree G1 is aimed at advanced general-purpose humanoid robotics, while the Booster K1 is oriented more toward accessible robotics development, education and experimentation.\n\n## 1. Technical specifications\n\n| Specification | Unitree G1 | Booster K1 |\n| --- | --- | --- |\n| Height | 132 cm | 95 cm |\n| Weight | 35 kg | 19.5 kg |\n| Degrees of freedom | 23–43 | 22 |\n| Maximum joint torque | Up to 120 Nm\\* | 60 Nm peak |\n| Walking speed | Up to 2 m/s | Up to 2 m/s |\n| Battery runtime | Approx. 2 hours | 20–80 min\\* |\n| Depth camera | Yes | Yes |\n| 3D LiDAR | Yes, depending on configuration | Not listed |\n| AI computing | Optional Jetson Orin on EDU | 48–200 TOPS, depending on edition |\n| Developer access | Primarily EDU | Geek, Education, Professional |\n\n\\*Torque figures refer to different configurations and should not be interpreted as directly equivalent. Battery life depends heavily on activity and configuration.\n\nSources: Unitree specifications and Booster's official product documentation. [G1\nHUMANOID AGENT AI AVATAR\nwww.unitree.com](https://hsl.robocup.org/wp-content/uploads/2026/03/large_Beihang_RoboCup_Team-specs-697c597e6df3a.pdf)[Robot Tutorial](https://www.docs.quadruped.de/projects/g1/html/index.html)[Booster K1](https://www.booster.tech/booster-k1/)[Booster K1](https://www.booster.tech/booster-k1?target=en)\n\n## 2. Mobility and physical capabilities\n\nUnitree G1\n\n- More powerful joints.\n- Larger body and longer reach.\n- Impressive dynamic movements.\n- Better potential for manipulation research, especially with G1 EDU and dexterous hands.\n\nBooster K1\n\n- Compact and lightweight.\n- Designed for repeated movement and falls.\n- Strong humanoid soccer competition platform.\n- Supports omnidirectional walking and autonomous fall recovery.\n\n[Booster K1](https://www.booster.tech/booster-k1?target=en)[Robot Tutorial](https://www.docs.quadruped.de/projects/g1/html/index.html)[Booster K1](https://www.booster.tech/booster-k1/)\n\n## 3. Software and AI development\n\nThis is particularly important if you intend to program the robots yourself.\n\n| Capability | Unitree G1 | Booster K1 |\n| --- | --- | --- |\n| ROS 2 | Yes, especially EDU | Development interfaces available |\n| Python | SDK support | SDK support |\n| C++ | SDK support | SDK support |\n| Reinforcement learning | Strong ecosystem | Supported |\n| Simulation | MuJoCo, Isaac Lab | MuJoCo, Isaac Lab |\n| Low-level control | EDU versions | Developer editions |\n| Computer vision | Depth camera + LiDAR | Stereo depth camera |\n\nA few important distinctions:\n\n- Unitree G1 EDU: Particularly interesting for reinforcement learning, whole-body control, manipulation and advanced robotics research.\n- Booster K1: Attractive for robotics education, robot soccer, locomotion research and embodied AI development.\n\nThe standard G1 and G1 EDU are not equivalent in software access. Make sure you compare the correct versions before purchasing.\n\n[Booster K1 vs Unitree G1: Specs, Price & Differences](https://humanoidversus.com/compare/booster-k1-vs-unitree-g1)[Overview](https://docs.booster.tech/docs/product-manual/k1/getting-started/overview/)[Booster K1](https://www.booster.tech/booster-k1?target=en)[Robot Tutorial](https://www.docs.quadruped.de/projects/g1/html/index.html)\n\n## 4. Price comparison\n\nIndicative European online listings found during this search:\n\nUnitree G1 Basic\n\n# 23.000,00 €\n\nTerra Robotics + weitere · Listed price\n\n[View G1 listing](https://chatgpt.com/?hints=search&q=Unitree+G1+basic+Humanoider+Roboter&utm_source=chatgpt.com)\n\nUnitree G1 EDU\n\n# 31.500,00 €\n\nTerra Robotics + weitere · Listed price\n\n[View G1 EDU listing](https://chatgpt.com/?hints=search&q=Unitree+G1+EDU+humanoider+Roboter&utm_source=chatgpt.com)\n\nBooster K1 Basic\n\n# 11.250,00 €\n\nreichelt.de + weitere · Listed price\n\n[View K1 listing](https://chatgpt.com/?hints=search&q=Booster+Robotics+K1+basic+Humanoider+Roboter&utm_source=chatgpt.com)\n\nBooster K1 Geek\n\n# 6.999,00 €\n\njoybuy.de + weitere · Listed price\n\n[View K1 Geek listing](https://chatgpt.com/?hints=search&q=Booster+Robotics+k1+geek+humanoider+Roboter&utm_source=chatgpt.com)\n\nThese are reseller listings, not standardized manufacturer prices. Check VAT, shipping, configuration, warranty and software access before comparing.\n\n## 5. Which one would I choose?\n\nMy pick\n\nUnitree G1 EDU\n\nIf the goal is advanced humanoid robotics, AI research, reinforcement learning, manipulation and experimenting with future applications, I would choose the G1 EDU.\n\nBooster K1 is a compelling alternative if the priorities are:\n\n- Lower acquisition cost.\n- Easier physical handling.\n- Education and robotics competitions.\n- Locomotion and embodied AI experimentation.\n\n## 6. One important question\n\nWhat do you actually want to do with the humanoid?\n\nThe application matters enormously: the best robot for reinforcement learning may not be the best robot for manipulation or autonomous real-world tasks.",
+    "citationPills": [
+     {
+      "url": "https://hsl.robocup.org/wp-content/uploads/2026/03/large_Beihang_RoboCup_Team-specs-697c597e6df3a.pdf",
+      "label": "G1\nHUMANOID AGENT AI AVATAR\nwww.unitree.com",
+      "domain": "hsl.robocup.org",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 1
+     },
+     {
+      "url": "https://www.docs.quadruped.de/projects/g1/html/index.html",
+      "label": "Robot Tutorial",
+      "domain": "docs.quadruped.de",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 2
+     },
+     {
+      "url": "https://www.booster.tech/booster-k1/",
+      "label": "Booster K1",
+      "domain": "booster.tech",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 3
+     },
+     {
+      "url": "https://www.booster.tech/booster-k1?target=en",
+      "label": "Booster K1",
+      "domain": "booster.tech",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 4
+     },
+     {
+      "url": "https://www.booster.tech/booster-k1?target=en",
+      "label": "Booster K1",
+      "domain": "booster.tech",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 4
+     },
+     {
+      "url": "https://www.docs.quadruped.de/projects/g1/html/index.html",
+      "label": "Robot Tutorial",
+      "domain": "docs.quadruped.de",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 2
+     },
+     {
+      "url": "https://www.booster.tech/booster-k1/",
+      "label": "Booster K1",
+      "domain": "booster.tech",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 3
+     },
+     {
+      "url": "https://humanoidversus.com/compare/booster-k1-vs-unitree-g1",
+      "label": "Booster K1 vs Unitree G1: Specs, Price & Differences",
+      "domain": "humanoidversus.com",
+      "type": "groupedWebpage",
+      "citationPillId": 2,
+      "position": 5
+     },
+     {
+      "url": "https://docs.booster.tech/docs/product-manual/k1/getting-started/overview/",
+      "label": "Overview",
+      "domain": "docs.booster.tech",
+      "type": "groupedWebpage",
+      "citationPillId": 2,
+      "position": 6
+     },
+     {
+      "url": "https://www.booster.tech/booster-k1?target=en",
+      "label": "Booster K1",
+      "domain": "booster.tech",
+      "type": "groupedWebpage",
+      "citationPillId": 2,
+      "position": 4
+     },
+     {
+      "url": "https://www.docs.quadruped.de/projects/g1/html/index.html",
+      "label": "Robot Tutorial",
+      "domain": "docs.quadruped.de",
+      "type": "groupedWebpage",
+      "citationPillId": 2,
+      "position": 2
+     }
+    ]
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "12a6094141a943cf8c85109ed113130a",
+   "charged_micro": 2800
+  }
+ }
+}

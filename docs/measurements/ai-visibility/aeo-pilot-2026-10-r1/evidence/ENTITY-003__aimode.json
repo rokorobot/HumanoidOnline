@@ -1,0 +1,90 @@
+{
+ "observed_at": "2026-10-31T03:11:37+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "How tall is the Unitree G1?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "According to Unitree's official specifications, the Unitree G1 (and G1 EDU) standing dimensions are:\n\nStanding Height: 1.32 m (1320 mm / approx. 4.3 ft)\n\nFolded Height: 0.69 m (690 mm / approx. 2.26 ft) when packed down for transport\n\nWould you like to know more about the Unitree G1's weight, payload capacity, or degrees of freedom?",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Unitree G1 humanoid robot - Génération Robots",
+      "url": "https://www.generationrobots.com/en/404241-g1-humanoid-robot.html",
+      "description": "approx. 1.30 m tall, weighing around 35 kg. Foldable structure: the robot can be folded to make transport easier. From 23 to 43 de...",
+      "redirectLink": "https://www.google.com/goto?url=CAESfAHrOzAVqhz4Ai8jDbQxNEIO6UVF34p-8VEvMkkDLj5foCsgFlLgeqNpBr4glNkk9oxy4Ndd-7R8J51sr3Y_LdU91U-f_y3wB6v8LhgEubTVm0dtip0yvm2M4lZxya6CFUy6pMtPEkqh7ELfuJjuyvq67L6U9k5Sis4MuWM"
+     },
+     {
+      "position": 2,
+      "label": "Unitree G1 Humanoid Robot | Prices & Configurations",
+      "url": "https://www.robotlab.com/store/unitree-g1-robot/",
+      "description": "The G1 stands about 1.32 m tall and weighs roughly 35 kg with battery. It has 23 degrees of freedom standard (6 per leg, 5 per arm...",
+      "redirectLink": "https://www.google.com/goto?url=CAESawHrOzAVCQyKyGG85lRiEO0E06UKT5SR4qKGlefEsoicOvLf8oCUYw7EXF1k4V0eGUrNYIYdwck1cbLcu0Ul1qq9rQK8E9LecNO7k3oTyNlGjeUtQWnR0PhZzgULqrjJ3DjC_7lIdZ5ZH4fl"
+     },
+     {
+      "position": 3,
+      "label": "Unitree G1",
+      "url": "https://www.unitree.com/g1",
+      "description": "Height, Width and Thickness(Stand) Weight (With Battery) About 35kg About 35kg+ Total Degrees of Freedom(Joint Freedom) 23 23 - 43...",
+      "redirectLink": "https://www.google.com/goto?url=CAESVQHrOzAVxthBoe7s1gg-pobirmT9BGue7egcRsK_DE5a6Nk_ICWUdKeKSgtqenaQxl-IuHOkCx0rzN5ByZMyWmLZZe9DNbnHb5KvYZ3UHTAFU-HnyA0"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Unitree G1",
+      "citationPillId": 1,
+      "url": "https://www.unitree.com/g1",
+      "domain": "unitree.com",
+      "description": "Height, Width and Thickness(Stand) Weight (With Battery) About 35kg About 35kg+ Total Degrees of Freedom(Joint Freedom) 23 23 - 43...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESVQHrOzAVxthBoe7s1gg-pobirmT9BGue7egcRsK_DE5a6Nk_ICWUdKeKSgtqenaQxl-IuHOkCx0rzN5ByZMyWmLZZe9DNbnHb5KvYZ3UHTAFU-HnyA0"
+     },
+     {
+      "label": "Unitree G1 humanoid robot - Génération Robots",
+      "citationPillId": 2,
+      "url": "https://www.generationrobots.com/en/404241-g1-humanoid-robot.html",
+      "domain": "generationrobots.com",
+      "description": "approx. 1.30 m tall, weighing around 35 kg. Foldable structure: the robot can be folded to make transport easier. From 23 to 43 de...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESfAHrOzAVqhz4Ai8jDbQxNEIO6UVF34p-8VEvMkkDLj5foCsgFlLgeqNpBr4glNkk9oxy4Ndd-7R8J51sr3Y_LdU91U-f_y3wB6v8LhgEubTVm0dtip0yvm2M4lZxya6CFUy6pMtPEkqh7ELfuJjuyvq67L6U9k5Sis4MuWM"
+     },
+     {
+      "label": "Unitree G1 Humanoid Robot | Prices & Configurations",
+      "citationPillId": 2,
+      "url": "https://www.robotlab.com/store/unitree-g1-robot/",
+      "domain": "robotlab.com",
+      "description": "The G1 stands about 1.32 m tall and weighs roughly 35 kg with battery. It has 23 degrees of freedom standard (6 per leg, 5 per arm...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESawHrOzAVCQyKyGG85lRiEO0E06UKT5SR4qKGlefEsoicOvLf8oCUYw7EXF1k4V0eGUrNYIYdwck1cbLcu0Ul1qq9rQK8E9LecNO7k3oTyNlGjeUtQWnR0PhZzgULqrjJ3DjC_7lIdZ5ZH4fl"
+     },
+     {
+      "label": "Unitree G1",
+      "citationPillId": 2,
+      "url": "https://www.unitree.com/g1",
+      "domain": "unitree.com",
+      "description": "Height, Width and Thickness(Stand) Weight (With Battery) About 35kg About 35kg+ Total Degrees of Freedom(Joint Freedom) 23 23 - 43...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESVQHrOzAVxthBoe7s1gg-pobirmT9BGue7egcRsK_DE5a6Nk_ICWUdKeKSgtqenaQxl-IuHOkCx0rzN5ByZMyWmLZZe9DNbnHb5KvYZ3UHTAFU-HnyA0"
+     }
+    ],
+    "markdown": "According to [Unitree](https://www.unitree.com/g1)'s official specifications, the **Unitree G1** (and G1 EDU) standing dimensions are: [Unitree G1](https://www.unitree.com/g1)\n\n  * **Standing Height:** 1.32 m (1320 mm / approx. 4.3 ft)\n\n  * **Folded Height:** 0.69 m (690 mm / approx. 2.26 ft) when packed down for transport [Unitree G1 humanoid robot - Génération Robots](https://www.generationrobots.com/en/404241-g1-humanoid-robot.html)[Unitree G1 Humanoid Robot | Prices & Configurations](https://www.robotlab.com/store/unitree-g1-robot/)[Unitree G1](https://www.unitree.com/g1)\n\nWould you like to know more about the **Unitree G1's weight, payload capacity, or degrees of freedom**?"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "ceacac8098184bfa9d0e072d6f5af2f2",
+   "charged_micro": 2400
+  }
+ }
+}

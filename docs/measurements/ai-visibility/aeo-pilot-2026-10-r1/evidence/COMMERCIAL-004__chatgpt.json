@@ -1,0 +1,455 @@
+{
+ "observed_at": "2026-10-31T03:12:12+00:00",
+ "endpoint": "cloro.ai-search.chatgpt.scrape",
+ "request": {
+  "prompt": "Which humanoid robots can be purchased in North America?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "model": null,
+    "text": "As of October 2026, several manufacturers offer humanoid robots for purchase in North America, primarily in the United States. They range from relatively affordable research robots costing around $5,000 to industrial platforms costing well over $100,000.\n\nThe most important distinction is between robots that you can actually order and robots that are only available through enterprise partnerships or pilot programs.\n\n1. Humanoid robots available for purchase\n\nThese are the most interesting options currently on the market.\n\n1. Unitree R1\n\nAvailable to order\n\n$8,990+\n\nIndicative US dealer pricing\n\nCompact humanoid, approximately 1.2 m tall.\n\nWalking, movement and AI development.\n\nBasic and EDU configurations.\n\nPrimarily a research and development platform.\n\nWebsite: Unitree Robotics\n\n2. Unitree G1\n\nAvailable to order\n\n$17,990+\n\nIndicative US dealer pricing\n\nApproximately 1.3 m tall.\n\n23–43 degrees of freedom, depending on configuration.\n\nAdvanced walking, manipulation and balance.\n\nEDU versions offer more extensive development capabilities.\n\nProbably one of the strongest options for independent robotics development.\n\nWebsite: Unitree Robotics\n\n3. Unitree H2\n\nDealer availability\n\n$39,900+\n\nIndicative US dealer pricing\n\nFull-size humanoid, approximately 1.8 m tall.\n\nMore human-like proportions.\n\nDesigned for advanced robotics and AI research.\n\nMore substantial physical platform than the R1 or G1.\n\nWebsite: Unitree Robotics\n\n4. 1X NEO\n\nPreorder\n\n$20,000\n\nOr $499/month, according to advertised ordering terms\n\nDesigned specifically for household environments.\n\nApproximately 1.65 m tall.\n\nIntended for household chores and assistance.\n\nMore consumer-oriented than the Unitree platforms.\n\nHuman assistance/teleoperation is part of its development approach.\n\nWebsite: 1X Technologies\n\n5. Booster K1\n\nDealer inquiry\n\n~$6,000+\n\nAdvertised starting price; availability varies\n\nCompact bipedal robot.\n\nDesigned for research, education and robotics development.\n\nSmaller and less expensive than full-size humanoids.\n\nWebsite: Booster Robotics\n\n2. Other humanoid robots available through commercial suppliers\n\nThese are worth investigating, especially for commercial or research applications.\n\nFourier GR-1\n\n$100,000–$150,000\n\nFull-size humanoid.\n\nResearch, rehabilitation and manipulation applications.\n\nCommercial availability generally requires a sales inquiry.\n\nFourier Intelligence\n\nAgiBot A2\n\nPrice on request\n\nGeneral-purpose service and industrial applications.\n\nHuman interaction and manipulation.\n\nPrimarily commercial sales channels.\n\nAgiBot\n\nEngineAI T800\n\nDealer quotation\n\nFull-size bipedal humanoid.\n\nDesigned for industrial and research applications.\n\nSome North American reseller listings exist.\n\nEngineAI\n\nDobot Atom\n\nApproximately $27,500–$80,000 depending on configuration and listing\n\nResearch and industrial development.\n\nHuman-like upper and lower body.\n\nAvailable through specialist robotics suppliers.\n\nDobot\n\n3. Famous humanoid robots that are NOT generally available for purchase\n\nThese are often confused with commercially available products.\n\nRobot\n\nManufacturer\n\nAvailability\n\nOptimus\n\nTesla\n\nInternal development and deployment\n\nFigure 03\n\nFigure AI\n\nEnterprise partnerships\n\nAtlas\n\nBoston Dynamics\n\nNot general retail\n\nDigit\n\nAgility Robotics\n\nEnterprise sales\n\nApollo\n\nApptronik\n\nCommercial partnerships\n\n4. Important North American purchasing consideration\n\nThere is an additional complication for US buyers in 2026.\n\nThe FCC introduced restrictions on new equipment authorizations for certain foreign-produced advanced robotics on July 28, 2026. Existing models with qualifying pre-cutoff authorizations can still be sold and imported. This is why the Unitree R1, G1 and H2 are particularly interesting: they have qualifying pre-cutoff FCC records.\n\nBefore purchasing any other imported humanoid, request written confirmation of its FCC authorization and import eligibility. Canadian requirements should also be checked separately.\n\n5. My recommendations\n\nDepending on what you intend to accomplish:\n\nIntended application\n\nMy recommendation\n\nAffordable humanoid experimentation\n\nUnitree R1\n\nSerious AI and robotics development\n\nUnitree G1 EDU\n\nFull-size humanoid research\n\nUnitree H2\n\nHousehold assistant\n\n1X NEO\n\nCommercial robotics research\n\nFourier GR-1\n\nIndustrial automation\n\nAgiBot A2 or enterprise platforms\n\nOne question that would help narrow this down\n\nWhat is your primary intended application for the humanoid robot?\n\nI can then narrow this down to actual purchasable robots, including suppliers, specifications, pricing and delivery options.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Buy a Humanoid Robot or Robot Dog in the US: Oct 2026 Prices",
+      "url": "https://botinfo.ai/",
+      "footnote": false
+     },
+     {
+      "position": 2,
+      "label": "Which Humanoid Robots Can You Legally Buy in the US? (October 2026)",
+      "url": "https://botinfo.ai/articles/which-humanoid-robots-can-you-legally-buy-us",
+      "footnote": false
+     },
+     {
+      "position": 3,
+      "label": "Humanoid Robot for Home: Every One on Sale in the US (2026)",
+      "url": "https://robotsforthat.com/guides/humanoid-robot-for-home/",
+      "footnote": false
+     },
+     {
+      "position": 4,
+      "label": "Humanoid Home Robots in 2026: Which Ones Can You Buy?",
+      "url": "https://novaverum.com/blog/humanoid-home-robots.html",
+      "footnote": false
+     },
+     {
+      "position": 5,
+      "label": "Humanoid Robots — Buy from OEMs (China, USA, UK, AU) 2026",
+      "url": "https://www.botsales.com/humanoids",
+      "footnote": false
+     },
+     {
+      "position": 6,
+      "label": "Where to buy a humanoid robot (and where not to). Offbrand Human",
+      "url": "https://www.offbrandhuman.com/blog/where-to-buy-humanoid-robot",
+      "footnote": false
+     },
+     {
+      "position": 7,
+      "label": "Humanoid Robot Directory",
+      "url": "https://humanoidapplications.com/robot/",
+      "footnote": false
+     },
+     {
+      "position": 8,
+      "label": "Humanoid Robot Teleoperation & Data Collection",
+      "url": "https://www.robopilots.ai/robots/humanoids",
+      "footnote": false
+     },
+     {
+      "position": 9,
+      "label": "Humanoza — Humanoid Robot Reviews, Specs & Price Ranges (2026)",
+      "url": "https://humanoza.com/",
+      "footnote": false
+     },
+     {
+      "position": 10,
+      "label": "Where to Buy Humanoid Robot in the US: Full 2026 Guide",
+      "url": "https://www.zmprobots.com/blog/where-to-buy-humanoid-robot-us/",
+      "footnote": false
+     },
+     {
+      "position": 11,
+      "label": "Humanoid Robot Prices 2026: What You Can Actually Buy",
+      "url": "https://roboticaguide.com/humanoid-robot-prices-2026/",
+      "footnote": false
+     },
+     {
+      "position": 12,
+      "label": "Unitree Robotics",
+      "url": "https://www.unitree.com/",
+      "footnote": true
+     },
+     {
+      "position": 13,
+      "label": "",
+      "url": "https://robostore.com/products/unitree-r1-basic-humanoid-robot",
+      "footnote": true
+     },
+     {
+      "position": 14,
+      "label": "",
+      "url": "https://www.speedydrone.ca/collections/unitree-g1",
+      "footnote": true
+     },
+     {
+      "position": 15,
+      "label": "1X Technologies",
+      "url": "https://www.1x.tech/",
+      "footnote": true
+     },
+     {
+      "position": 16,
+      "label": "",
+      "url": "https://www.mt.co.kr/world/2025/11/03/2025110307440659699",
+      "footnote": true
+     },
+     {
+      "position": 17,
+      "label": "",
+      "url": "https://robostore.com/products/unitree-h2-destiny-awakening-humanoid",
+      "footnote": true
+     },
+     {
+      "position": 18,
+      "label": "Booster Robotics",
+      "url": "https://www.booster.tech/",
+      "footnote": true
+     },
+     {
+      "position": 19,
+      "label": "",
+      "url": "https://www.usrobotstore.com/products/booster-k1-humanoid-robot",
+      "footnote": true
+     },
+     {
+      "position": 20,
+      "label": "Fourier Intelligence",
+      "url": "https://www.fftai.com/",
+      "footnote": true
+     },
+     {
+      "position": 21,
+      "label": "AgiBot",
+      "url": "https://www.agibot.com/",
+      "footnote": true
+     },
+     {
+      "position": 22,
+      "label": "",
+      "url": "https://aiwiki.ai/wiki/agibot_a2",
+      "footnote": true
+     },
+     {
+      "position": 23,
+      "label": "",
+      "url": "https://www.core77.com/posts/125020/Humanoid-Robot-Design-Iterations-Continue-Heres-the-GR-1",
+      "footnote": true
+     },
+     {
+      "position": 24,
+      "label": "Dobot",
+      "url": "https://www.dobot-robots.com/",
+      "footnote": true
+     },
+     {
+      "position": 25,
+      "label": "EngineAI",
+      "url": "https://www.engineai.com.cn/",
+      "footnote": true
+     },
+     {
+      "position": 26,
+      "label": "",
+      "url": "https://www.humanoid.press/database/www-humanoid-press-database-engineai-t800/",
+      "footnote": true
+     },
+     {
+      "position": 27,
+      "label": "",
+      "url": "https://funduinoshop.com/en/robotics/dobot-robot-arms/dobot-atom/dobot-atom-humanoid-robot",
+      "footnote": true
+     }
+    ],
+    "entities": [
+     {
+      "type": "product",
+      "name": "Unitree R1"
+     },
+     {
+      "type": "product",
+      "name": "Unitree G1"
+     },
+     {
+      "type": "product",
+      "name": "Unitree H2"
+     },
+     {
+      "type": "product",
+      "name": "1X NEO"
+     },
+     {
+      "type": "product",
+      "name": "Booster K1"
+     },
+     {
+      "type": "product",
+      "name": "Fourier GR-1"
+     },
+     {
+      "type": "product",
+      "name": "AgiBot A2"
+     },
+     {
+      "type": "product",
+      "name": "EngineAI T800"
+     },
+     {
+      "type": "product",
+      "name": "Dobot Atom"
+     },
+     {
+      "type": "product",
+      "name": "Optimus"
+     },
+     {
+      "type": "product",
+      "name": "Figure 03"
+     },
+     {
+      "type": "product",
+      "name": "Atlas"
+     },
+     {
+      "type": "product",
+      "name": "Digit"
+     },
+     {
+      "type": "product",
+      "name": "Apollo"
+     }
+    ],
+    "map": [],
+    "followUpForm": {
+     "questions": [
+      {
+       "label": "1. Intended application",
+       "type": "radio",
+       "options": [],
+       "name": "purpose"
+      },
+      {
+       "label": "2. Approximate budget",
+       "type": "radio",
+       "options": [],
+       "name": "budget"
+      },
+      {
+       "label": "3. Preferred purchasing region",
+       "type": "radio",
+       "options": [],
+       "name": "region"
+      }
+     ],
+     "submitLabel": "Find suitable robots",
+     "followUpPrompt": "Please shortlist humanoid robots I can actually purchase. Application: {purpose}. Budget: {budget}. Region: {region}. Include purchase links, availability, specifications and total estimated cost."
+    },
+    "markdown": "As of October 2026, several manufacturers offer humanoid robots for purchase in North America, primarily in the United States. They range from relatively affordable research robots costing around $5,000 to industrial platforms costing well over $100,000.\n\nThe most important distinction is between robots that you can actually order and robots that are only available through enterprise partnerships or pilot programs.\n\n## 1. Humanoid robots available for purchase\n\nThese are the most interesting options currently on the market.\n\n1. Unitree R1\n\nAvailable to order\n\n# $8,990+\n\nIndicative US dealer pricing\n\n- Compact humanoid, approximately 1.2 m tall.\n- Walking, movement and AI development.\n- Basic and EDU configurations.\n- Primarily a research and development platform.\n\nWebsite: [Unitree Robotics](https://www.unitree.com/?utm_source=chatgpt.com)\n\n[Which Humanoid Robots Can You Legally Buy in the US? (October 2026)](https://botinfo.ai/articles/which-humanoid-robots-can-you-legally-buy-us)[Buy a Humanoid Robot or Robot Dog in the US: Oct 2026 Prices](https://botinfo.ai/)\n\n2. Unitree G1\n\nAvailable to order\n\n# $17,990+\n\nIndicative US dealer pricing\n\n- Approximately 1.3 m tall.\n- 23–43 degrees of freedom, depending on configuration.\n- Advanced walking, manipulation and balance.\n- EDU versions offer more extensive development capabilities.\n\nProbably one of the strongest options for independent robotics development.\n\nWebsite: [Unitree Robotics](https://www.unitree.com/?utm_source=chatgpt.com)\n\n[Which Humanoid Robots Can You Legally Buy in the US? (October 2026)](https://botinfo.ai/articles/which-humanoid-robots-can-you-legally-buy-us)[Buy a Humanoid Robot or Robot Dog in the US: Oct 2026 Prices](https://botinfo.ai/)\n\n3. Unitree H2\n\nDealer availability\n\n# $39,900+\n\nIndicative US dealer pricing\n\n- Full-size humanoid, approximately 1.8 m tall.\n- More human-like proportions.\n- Designed for advanced robotics and AI research.\n- More substantial physical platform than the R1 or G1.\n\nWebsite: [Unitree Robotics](https://www.unitree.com/?utm_source=chatgpt.com)\n\n[Which Humanoid Robots Can You Legally Buy in the US? (October 2026)](https://botinfo.ai/articles/which-humanoid-robots-can-you-legally-buy-us)[Buy a Humanoid Robot or Robot Dog in the US: Oct 2026 Prices](https://botinfo.ai/)\n\n4. 1X NEO\n\nPreorder\n\n# $20,000\n\nOr $499/month, according to advertised ordering terms\n\n- Designed specifically for household environments.\n- Approximately 1.65 m tall.\n- Intended for household chores and assistance.\n- More consumer-oriented than the Unitree platforms.\n- Human assistance/teleoperation is part of its development approach.\n\nWebsite: [1X Technologies](https://www.1x.tech/?utm_source=chatgpt.com)\n\n[Humanoid Home Robots in 2026: Which Ones Can You Buy?](https://novaverum.com/blog/humanoid-home-robots.html)[Humanoid Robot for Home: Every One on Sale in the US (2026)](https://robotsforthat.com/guides/humanoid-robot-for-home/)\n\n5. Booster K1\n\nDealer inquiry\n\n# ~$6,000+\n\nAdvertised starting price; availability varies\n\n- Compact bipedal robot.\n- Designed for research, education and robotics development.\n- Smaller and less expensive than full-size humanoids.\n\nWebsite: [Booster Robotics](https://www.booster.tech/?utm_source=chatgpt.com)\n\n[Where to buy a humanoid robot (and where not to). Offbrand Human](https://www.offbrandhuman.com/blog/where-to-buy-humanoid-robot)[Humanoid Robots — Buy from OEMs (China, USA, UK, AU) 2026](https://www.botsales.com/humanoids)\n\n## 2. Other humanoid robots available through commercial suppliers\n\nThese are worth investigating, especially for commercial or research applications.\n\nFourier GR-1\n\n## $100,000–$150,000\n\n- Full-size humanoid.\n- Research, rehabilitation and manipulation applications.\n- Commercial availability generally requires a sales inquiry.\n\n[Fourier Intelligence](https://www.fftai.com/?utm_source=chatgpt.com)\n\n[Humanoid Robot Directory](https://humanoidapplications.com/robot/)[Humanoid Robot Teleoperation & Data Collection](https://www.robopilots.ai/robots/humanoids)\n\nAgiBot A2\n\nPrice on request\n\n- General-purpose service and industrial applications.\n- Human interaction and manipulation.\n- Primarily commercial sales channels.\n\n[AgiBot](https://www.agibot.com/?utm_source=chatgpt.com)\n\n[Humanoid Robot Directory](https://humanoidapplications.com/robot/)[Humanoid Robots — Buy from OEMs (China, USA, UK, AU) 2026](https://www.botsales.com/humanoids)\n\nEngineAI T800\n\nDealer quotation\n\n- Full-size bipedal humanoid.\n- Designed for industrial and research applications.\n- Some North American reseller listings exist.\n\n[EngineAI](https://www.engineai.com.cn/?utm_source=chatgpt.com)\n\n[Humanoid Robot Teleoperation & Data Collection](https://www.robopilots.ai/robots/humanoids)[Humanoid Robots — Buy from OEMs (China, USA, UK, AU) 2026](https://www.botsales.com/humanoids)\n\nDobot Atom\n\nApproximately $27,500–$80,000 depending on configuration and listing\n\n- Research and industrial development.\n- Human-like upper and lower body.\n- Available through specialist robotics suppliers.\n\n[Dobot](https://www.dobot-robots.com/?utm_source=chatgpt.com)\n\n[Humanoza — Humanoid Robot Reviews, Specs & Price Ranges (2026)](https://humanoza.com/)\n\n## 3. Famous humanoid robots that are NOT generally available for purchase\n\nThese are often confused with commercially available products.\n\n| Robot | Manufacturer | Availability |\n| --- | --- | --- |\n| Optimus | Tesla | Internal development and deployment |\n| Figure 03 | Figure AI | Enterprise partnerships |\n| Atlas | Boston Dynamics | Not general retail |\n| Digit | Agility Robotics | Enterprise sales |\n| Apollo | Apptronik | Commercial partnerships |\n\n[Humanoid Robot Directory](https://humanoidapplications.com/robot/)[Where to Buy Humanoid Robot in the US: Full 2026 Guide](https://www.zmprobots.com/blog/where-to-buy-humanoid-robot-us/)[Humanoid Robot Prices 2026: What You Can Actually Buy](https://roboticaguide.com/humanoid-robot-prices-2026/)\n\n## 4. Important North American purchasing consideration\n\nThere is an additional complication for US buyers in 2026.\n\nThe FCC introduced restrictions on new equipment authorizations for certain foreign-produced advanced robotics on July 28, 2026. Existing models with qualifying pre-cutoff authorizations can still be sold and imported. This is why the Unitree R1, G1 and H2 are particularly interesting: they have qualifying pre-cutoff FCC records.\n\nBefore purchasing any other imported humanoid, request written confirmation of its FCC authorization and import eligibility. Canadian requirements should also be checked separately. [Which Humanoid Robots Can You Legally Buy in the US? (October 2026)](https://botinfo.ai/articles/which-humanoid-robots-can-you-legally-buy-us)[Buy a Humanoid Robot or Robot Dog in the US: Oct 2026 Prices](https://botinfo.ai/)\n\n## 5. My recommendations\n\nDepending on what you intend to accomplish:\n\n| Intended application | My recommendation |\n| --- | --- |\n| Affordable humanoid experimentation | Unitree R1 |\n| Serious AI and robotics development | Unitree G1 EDU |\n| Full-size humanoid research | Unitree H2 |\n| Household assistant | 1X NEO |\n| Commercial robotics research | Fourier GR-1 |\n| Industrial automation | AgiBot A2 or enterprise platforms |\n\n## One question that would help narrow this down\n\nWhat is your primary intended application for the humanoid robot?\n\nI can then narrow this down to actual purchasable robots, including suppliers, specifications, pricing and delivery options.",
+    "citationPills": [
+     {
+      "url": "https://botinfo.ai/articles/which-humanoid-robots-can-you-legally-buy-us",
+      "label": "Which Humanoid Robots Can You Legally Buy in the US? (October 2026)",
+      "domain": "botinfo.ai",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 2
+     },
+     {
+      "url": "https://botinfo.ai/",
+      "label": "Buy a Humanoid Robot or Robot Dog in the US: Oct 2026 Prices",
+      "domain": "botinfo.ai",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 1
+     },
+     {
+      "url": "https://botinfo.ai/articles/which-humanoid-robots-can-you-legally-buy-us",
+      "label": "Which Humanoid Robots Can You Legally Buy in the US? (October 2026)",
+      "domain": "botinfo.ai",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 2
+     },
+     {
+      "url": "https://botinfo.ai/",
+      "label": "Buy a Humanoid Robot or Robot Dog in the US: Oct 2026 Prices",
+      "domain": "botinfo.ai",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 1
+     },
+     {
+      "url": "https://botinfo.ai/articles/which-humanoid-robots-can-you-legally-buy-us",
+      "label": "Which Humanoid Robots Can You Legally Buy in the US? (October 2026)",
+      "domain": "botinfo.ai",
+      "type": "groupedWebpage",
+      "citationPillId": 2,
+      "position": 2
+     },
+     {
+      "url": "https://botinfo.ai/",
+      "label": "Buy a Humanoid Robot or Robot Dog in the US: Oct 2026 Prices",
+      "domain": "botinfo.ai",
+      "type": "groupedWebpage",
+      "citationPillId": 2,
+      "position": 1
+     },
+     {
+      "url": "https://novaverum.com/blog/humanoid-home-robots.html",
+      "label": "Humanoid Home Robots in 2026: Which Ones Can You Buy?",
+      "domain": "novaverum.com",
+      "type": "groupedWebpage",
+      "citationPillId": 3,
+      "position": 4
+     },
+     {
+      "url": "https://robotsforthat.com/guides/humanoid-robot-for-home/",
+      "label": "Humanoid Robot for Home: Every One on Sale in the US (2026)",
+      "domain": "robotsforthat.com",
+      "type": "groupedWebpage",
+      "citationPillId": 3,
+      "position": 3
+     },
+     {
+      "url": "https://www.offbrandhuman.com/blog/where-to-buy-humanoid-robot",
+      "label": "Where to buy a humanoid robot (and where not to). Offbrand Human",
+      "domain": "offbrandhuman.com",
+      "type": "groupedWebpage",
+      "citationPillId": 4,
+      "position": 6
+     },
+     {
+      "url": "https://www.botsales.com/humanoids",
+      "label": "Humanoid Robots — Buy from OEMs (China, USA, UK, AU) 2026",
+      "domain": "botsales.com",
+      "type": "groupedWebpage",
+      "citationPillId": 4,
+      "position": 5
+     },
+     {
+      "url": "https://humanoidapplications.com/robot/",
+      "label": "Humanoid Robot Directory",
+      "domain": "humanoidapplications.com",
+      "type": "groupedWebpage",
+      "citationPillId": 5,
+      "position": 7
+     },
+     {
+      "url": "https://www.robopilots.ai/robots/humanoids",
+      "label": "Humanoid Robot Teleoperation & Data Collection",
+      "domain": "robopilots.ai",
+      "type": "groupedWebpage",
+      "citationPillId": 5,
+      "position": 8
+     },
+     {
+      "url": "https://humanoidapplications.com/robot/",
+      "label": "Humanoid Robot Directory",
+      "domain": "humanoidapplications.com",
+      "type": "groupedWebpage",
+      "citationPillId": 6,
+      "position": 7
+     },
+     {
+      "url": "https://www.botsales.com/humanoids",
+      "label": "Humanoid Robots — Buy from OEMs (China, USA, UK, AU) 2026",
+      "domain": "botsales.com",
+      "type": "groupedWebpage",
+      "citationPillId": 6,
+      "position": 5
+     },
+     {
+      "url": "https://www.robopilots.ai/robots/humanoids",
+      "label": "Humanoid Robot Teleoperation & Data Collection",
+      "domain": "robopilots.ai",
+      "type": "groupedWebpage",
+      "citationPillId": 7,
+      "position": 8
+     },
+     {
+      "url": "https://www.botsales.com/humanoids",
+      "label": "Humanoid Robots — Buy from OEMs (China, USA, UK, AU) 2026",
+      "domain": "botsales.com",
+      "type": "groupedWebpage",
+      "citationPillId": 7,
+      "position": 5
+     },
+     {
+      "url": "https://humanoza.com/",
+      "label": "Humanoza — Humanoid Robot Reviews, Specs & Price Ranges (2026)",
+      "domain": "humanoza.com",
+      "type": "groupedWebpage",
+      "citationPillId": 8,
+      "position": 9
+     },
+     {
+      "url": "https://humanoidapplications.com/robot/",
+      "label": "Humanoid Robot Directory",
+      "domain": "humanoidapplications.com",
+      "type": "groupedWebpage",
+      "citationPillId": 9,
+      "position": 7
+     },
+     {
+      "url": "https://www.zmprobots.com/blog/where-to-buy-humanoid-robot-us/",
+      "label": "Where to Buy Humanoid Robot in the US: Full 2026 Guide",
+      "domain": "zmprobots.com",
+      "type": "groupedWebpage",
+      "citationPillId": 9,
+      "position": 10
+     },
+     {
+      "url": "https://roboticaguide.com/humanoid-robot-prices-2026/",
+      "label": "Humanoid Robot Prices 2026: What You Can Actually Buy",
+      "domain": "roboticaguide.com",
+      "type": "groupedWebpage",
+      "citationPillId": 9,
+      "position": 11
+     },
+     {
+      "url": "https://botinfo.ai/articles/which-humanoid-robots-can-you-legally-buy-us",
+      "label": "Which Humanoid Robots Can You Legally Buy in the US? (October 2026)",
+      "domain": "botinfo.ai",
+      "type": "groupedWebpage",
+      "citationPillId": 10,
+      "position": 2
+     },
+     {
+      "url": "https://botinfo.ai/",
+      "label": "Buy a Humanoid Robot or Robot Dog in the US: Oct 2026 Prices",
+      "domain": "botinfo.ai",
+      "type": "groupedWebpage",
+      "citationPillId": 10,
+      "position": 1
+     }
+    ]
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "e1a898994e3646e093050ce4109d71df",
+   "charged_micro": 2800,
+   "hint": "feedback"
+  }
+ }
+}

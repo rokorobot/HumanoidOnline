@@ -1,0 +1,115 @@
+{
+ "observed_at": "2026-10-31T03:12:42+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "Which humanoid robots can be purchased in Asia?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "The commercial market for humanoid robots based in Asia—particularly in China—has rapidly shifted from research prototypes to commercially available units for developers, enterprises, and high-end consumer applications.\n\nSeveral notable humanoid robots can be purchased or ordered directly through manufacturers or commercial distributors:\n\nUnitree G1 & H1 / H2 Series (Unitree Robotics - China)\n\nOverview: Unitree offers some of the most competitively priced general-purpose and locomotion-focused humanoids globally. The agile Unitree G1 human-sized robot is listed commercially starting around $13,500 USD. Their heavier-duty research models like the H1 and H2 range from roughly $29,900 to $90,000+ USD.\nAvailability: Available directly via the Unitree Robot Store.\n\nUBTECH Walker Series / Walker S2 (UBTECH - China)\n\nOverview: UBTECH's industrial-grade humanoid line (such as the Walker S2) is heavily deployed in smart factories, logistics, and automotive/aviation manufacturing lines (including partnerships with brands like Airbus). They also offer service-oriented models.\nAvailability: Marketed toward enterprise buyers and industrial fleets, and accessible commercially via international robotics distributors like Robots International (custom quotes required).\n\nUBTECH UWorld U1 (UBTECH - China)\n\nOverview: An ultra-realistic, social/bionic humanoid featuring soft silicone skin, real hair, and conversational emotional AI capable of recognizing numerous emotional states.\nAvailability: Sold in tiered packages ranging from a Light tier ($17,600) up to an Ultra custom tier ($145,000).\n\nDroidup Moya (Droidup - China)\n\nOverview: A lightweight bionic humanoid (~32 kg, 1.65 m tall) equipped with heated skin (32-36°C) to mimic body temperature, advanced facial expressions, and a high-accuracy walking gait.\nAvailability: Targeted at hospitality, corporate reception, and high-end companionship, priced around $173,000 USD with direct enterprise/individual sales inquiries open.\n\nFourier GR-1 (Fourier Intelligence - China)\n\nOverview: A general-purpose humanoid with strong payload capabilities and 25–27 degrees of freedom, built for rehabilitation, healthcare assistance, and general research.\nAvailability: Offered primarily to institutional and enterprise buyers as a development platform, generally priced around $125,000 USD.\n\nIf you are looking to purchase one, let me know:\n\nAre you looking for a developer/research platform (like Unitree) or an industrial/service robot (like UBTECH)?\nWhat is your approximate budget range?\n\nI can help you narrow down the best fit and point you to the right procurement channel.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Fourier Intelligence GR-1 Specs & Price | Humanoid.guide",
+      "url": "https://humanoid.guide/product/gr-1/",
+      "description": "Physical Specs: Height 165 cm, weight 55 kg, 25-27 overall degrees of freedom, max speed 5 km/h (walking speed 3 km/h), strength/p...",
+      "redirectLink": "https://www.google.com/goto?url=CAESXwHrOzAV7dKrGoBTO_MPtJhCh-X0sKWRl--g7GV3L40vbxowdFpxzRtawEEyWJOm27jHpUDRcL8WN6rndsEmQQtA6jELdSBGleHNG7ZNbU-1Gvv1lsgpsSFmUfCnHn56"
+     },
+     {
+      "position": 2,
+      "label": "UBTECH Walker | Buy Walker S2 Robots for Sale & Price",
+      "url": "https://www.robotsinternational.com/UBTECH-Walker.htm",
+      "description": "The UBTECH Walker series is humanoid robotics' first true industrial franchise, led by the Walker S2, put more than 500 robots int...",
+      "redirectLink": "https://www.google.com/goto?url=CAEScAHrOzAVWDKJFyVtVaOlAj8eaGOTAejerqcFfiAxQceM-u0UBJWrh_wExlP7OG6TDRg69f6KI9BUUUM5JnLdBNzA4LvqKkeXYK5OiWa3gE-sEbKUdAqHKAtOb8LKux5aFV50eH303sfaTAs1aGI3DAk"
+     },
+     {
+      "position": 3,
+      "label": "5 Latest ULTRA REALISTIC Asian Humanoids You Can Buy in ...",
+      "url": "https://www.youtube.com/watch?v=dKlltvf9ofI&t=20",
+      "description": "engineered to hold a surface temperature between 32 and 36°C to mimic a living human body,",
+      "redirectLink": "https://www.google.com/goto?url=CAESawHrOzAV71yzTgCKHaZDF8lgSG-bX-V3Ds5KoeL_YBzjWJ3WaRX4Pgi339IcPwPPlxsfk-i3uHV77gP4JLAQlVDxJ08k7VrR1Yp7cDdxfjpEzb2pvdUb3h2JEkD2TiPtovtU_uv-GiQLWvje"
+     },
+     {
+      "position": 4,
+      "label": "Humanoid Robot – UnitreeRobotics",
+      "url": "https://shop.unitree.com/collections/humanoid-robot",
+      "description": "UnitreeRobotics Product Catalog and Pricing: Quadruped/Mobile Robots: Humanoids/Arms: G1 ($13,500), Z1 ($15,999), H2 ($29,900), H1...",
+      "redirectLink": "https://www.google.com/goto?url=CAESbgHrOzAVJrOEuWZr3cDJ_A7tvx03zdlluQ_L5gKLeAAmUBG3zYf2p0GkJYLiabNwkpqQjPETEX38Udm4tgx3779i7Zxtl3BaGKUccGnijOM2B4muQVVqGmAkByh4UmSIc9iGJ-_tI8i2cJvDrXXE"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "UBTECH Walker | Buy Walker S2 Robots for Sale & Price",
+      "citationPillId": 1,
+      "url": "https://www.robotsinternational.com/UBTECH-Walker.htm",
+      "domain": "robotsinternational.com",
+      "description": "The UBTECH Walker series is humanoid robotics' first true industrial franchise, led by the Walker S2, put more than 500 robots int...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAEScAHrOzAVWDKJFyVtVaOlAj8eaGOTAejerqcFfiAxQceM-u0UBJWrh_wExlP7OG6TDRg69f6KI9BUUUM5JnLdBNzA4LvqKkeXYK5OiWa3gE-sEbKUdAqHKAtOb8LKux5aFV50eH303sfaTAs1aGI3DAk"
+     },
+     {
+      "label": "5 Latest ULTRA REALISTIC Asian Humanoids You Can Buy in ...",
+      "citationPillId": 1,
+      "url": "https://www.youtube.com/watch?v=dKlltvf9ofI&t=20",
+      "domain": "youtube.com",
+      "description": "engineered to hold a surface temperature between 32 and 36°C to mimic a living human body,",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESawHrOzAV71yzTgCKHaZDF8lgSG-bX-V3Ds5KoeL_YBzjWJ3WaRX4Pgi339IcPwPPlxsfk-i3uHV77gP4JLAQlVDxJ08k7VrR1Yp7cDdxfjpEzb2pvdUb3h2JEkD2TiPtovtU_uv-GiQLWvje"
+     },
+     {
+      "label": "Humanoid Robot – UnitreeRobotics",
+      "citationPillId": 2,
+      "url": "https://shop.unitree.com/collections/humanoid-robot",
+      "domain": "shop.unitree.com",
+      "description": "UnitreeRobotics Product Catalog and Pricing: Quadruped/Mobile Robots: Humanoids/Arms: G1 ($13,500), Z1 ($15,999), H2 ($29,900), H1...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAESbgHrOzAVJrOEuWZr3cDJ_A7tvx03zdlluQ_L5gKLeAAmUBG3zYf2p0GkJYLiabNwkpqQjPETEX38Udm4tgx3779i7Zxtl3BaGKUccGnijOM2B4muQVVqGmAkByh4UmSIc9iGJ-_tI8i2cJvDrXXE"
+     },
+     {
+      "label": "UBTECH Walker | Buy Walker S2 Robots for Sale & Price",
+      "citationPillId": 3,
+      "url": "https://www.robotsinternational.com/UBTECH-Walker.htm",
+      "domain": "robotsinternational.com",
+      "description": "The UBTECH Walker series is humanoid robotics' first true industrial franchise, led by the Walker S2, put more than 500 robots int...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAEScAHrOzAVWDKJFyVtVaOlAj8eaGOTAejerqcFfiAxQceM-u0UBJWrh_wExlP7OG6TDRg69f6KI9BUUUM5JnLdBNzA4LvqKkeXYK5OiWa3gE-sEbKUdAqHKAtOb8LKux5aFV50eH303sfaTAs1aGI3DAk"
+     },
+     {
+      "label": "5 Latest ULTRA REALISTIC Asian Humanoids You Can Buy in ...",
+      "citationPillId": 4,
+      "url": "https://www.youtube.com/watch?v=dKlltvf9ofI&t=20",
+      "domain": "youtube.com",
+      "description": "engineered to hold a surface temperature between 32 and 36°C to mimic a living human body,",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESawHrOzAV71yzTgCKHaZDF8lgSG-bX-V3Ds5KoeL_YBzjWJ3WaRX4Pgi339IcPwPPlxsfk-i3uHV77gP4JLAQlVDxJ08k7VrR1Yp7cDdxfjpEzb2pvdUb3h2JEkD2TiPtovtU_uv-GiQLWvje"
+     },
+     {
+      "label": "Fourier Intelligence GR-1 Specs & Price | Humanoid.guide",
+      "citationPillId": 6,
+      "url": "https://humanoid.guide/product/gr-1/",
+      "domain": "humanoid.guide",
+      "description": "Physical Specs: Height 165 cm, weight 55 kg, 25-27 overall degrees of freedom, max speed 5 km/h (walking speed 3 km/h), strength/p...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESXwHrOzAV7dKrGoBTO_MPtJhCh-X0sKWRl--g7GV3L40vbxowdFpxzRtawEEyWJOm27jHpUDRcL8WN6rndsEmQQtA6jELdSBGleHNG7ZNbU-1Gvv1lsgpsSFmUfCnHn56"
+     }
+    ],
+    "markdown": "The commercial market for humanoid robots based in Asia—particularly in China—has rapidly shifted from research prototypes to commercially available units for developers, enterprises, and high-end consumer applications. [UBTECH Walker | Buy Walker S2 Robots for Sale & Price](https://www.robotsinternational.com/UBTECH-Walker.htm)[5 Latest ULTRA REALISTIC Asian Humanoids You Can Buy in](https://www.youtube.com/watch?v=dKlltvf9ofI&t=20)\n\nSeveral notable humanoid robots can be purchased or ordered directly through manufacturers or commercial distributors:\n\n  * **Unitree G1 & H1 / H2 Series (Unitree Robotics - China)**\n    * **Overview:** Unitree offers some of the most competitively priced general-purpose and locomotion-focused humanoids globally. The agile **Unitree G1** human-sized robot is listed commercially starting around $13,500 USD. Their heavier-duty research models like the **H1** and **H2** range from roughly $29,900 to $90,000+ USD.\n    * **Availability:** Available directly via the [Unitree Robot Store](https://shop.unitree.com/collections/humanoid-robot). [Humanoid Robot – UnitreeRobotics](https://shop.unitree.com/collections/humanoid-robot)\n\n  * **UBTECH Walker Series / Walker S2 (UBTECH - China)**\n    * **Overview:** UBTECH's industrial-grade humanoid line (such as the Walker S2) is heavily deployed in smart factories, logistics, and automotive/aviation manufacturing lines (including partnerships with brands like Airbus). They also offer service-oriented models.\n    * **Availability:** Marketed toward enterprise buyers and industrial fleets, and accessible commercially via international robotics distributors like [Robots International](https://www.robotsinternational.com/UBTECH-Walker.htm) (custom quotes required). [UBTECH Walker | Buy Walker S2 Robots for Sale & Price](https://www.robotsinternational.com/UBTECH-Walker.htm)\n\n  * **UBTECH UWorld U1 (UBTECH - China)**\n    * **Overview:** An ultra-realistic, social/bionic humanoid featuring soft silicone skin, real hair, and conversational emotional AI capable of recognizing numerous emotional states.\n    * **Availability:** Sold in tiered packages ranging from a Light tier ($17,600) up to an Ultra custom tier ($145,000). [5 Latest ULTRA REALISTIC Asian Humanoids You Can Buy in](https://www.youtube.com/watch?v=dKlltvf9ofI&t=20)\n\n  * **Droidup Moya (Droidup - China)**\n    * **Overview:** A lightweight bionic humanoid (~32 kg, 1.65 m tall) equipped with heated skin (32-36°C) to mimic body temperature, advanced facial expressions, and a high-accuracy walking gait.\n    * **Availability:** Targeted at hospitality, corporate reception, and high-end companionship, priced around $173,000 USD with direct enterprise/individual sales inquiries open. [youtube.com](https://www.youtube.com/watch?v=dKlltvf9ofI&t=442)\n\n  * **Fourier GR-1 (Fourier Intelligence - China)**\n    * **Overview:** A general-purpose humanoid with strong payload capabilities and 25–27 degrees of freedom, built for rehabilitation, healthcare assistance, and general research.\n    * **Availability:** Offered primarily to institutional and enterprise buyers as a development platform, generally priced around $125,000 USD. [Fourier Intelligence GR-1 Specs & Price | Humanoid.guide](https://humanoid.guide/product/gr-1/)\n\nIf you are looking to purchase one, let me know:\n\n  * Are you looking for a **developer/research platform** (like Unitree) or an **industrial/service robot** (like UBTECH)?\n  * What is your approximate **budget range**?\n\nI can help you narrow down the best fit and point you to the right procurement channel."
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "4515d83138524e858894a8538a182d31",
+   "charged_micro": 2400
+  }
+ }
+}

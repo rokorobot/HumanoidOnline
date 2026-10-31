@@ -82,7 +82,9 @@ const STATIC: Budget[] = [
   // #178's compute_base) appear in unitree-g1's compare column. Measured size plus ~1 kB headroom.
   // HO-RESEARCH-ASIA-01 batch: 43 -> 45 (measured 44.5 in CI): unitree-g1's two new offers and
   // CNY price reach its compare column. Measured size plus ~0.5 kB headroom.
-  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 45, jsRawKB: 431 },
+  // CID-04 (#217): 45 -> 46 (measured 45.2 in CI): the canonical link and the "<A> vs <B>" pair
+  // title/description (repeated in og/twitter meta). Measured size plus ~0.8 kB headroom.
+  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 46, jsRawKB: 431 },
   { path: "/find-a-humanoid", docKB: 46, jsRawKB: 424 },
 ];
 

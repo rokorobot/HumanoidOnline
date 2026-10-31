@@ -14,6 +14,7 @@ import {
   toRobotListParams,
   type RawSearchParams,
 } from "@/lib/search-params";
+import { cataloguePolicy } from "@/lib/index-policy";
 import { resolveAppEnv } from "@/lib/site";
 import { CompareBar } from "@/components/CompareBar";
 import { FilterPanel } from "@/components/FilterPanel";
@@ -35,11 +36,19 @@ export const dynamic = "force-dynamic";
 const DISCOVERY_REVIEW_VISIBLE = ["development", "test"].includes(resolveAppEnv());
 
 // WS8.5 / R22 — specific per-route title (no generic root inheritance).
-export const metadata = {
-  title: "Robot Catalogue",
-  description:
-    "Browse every verified humanoid robot — capabilities, commercial status, availability and evidence, kept as three independent facts.",
-};
+// CID-04: filtered/sorted variants are noindex; the bare catalogue is canonical.
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<RawSearchParams>;
+}) {
+  return {
+    title: "Robot Catalogue",
+    description:
+      "Browse every verified humanoid robot — capabilities, commercial status, availability and evidence, kept as three independent facts.",
+    ...cataloguePolicy(await searchParams),
+  };
+}
 
 export default async function RobotsPage({
   searchParams,

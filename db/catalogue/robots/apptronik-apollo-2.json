@@ -39,7 +39,26 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "manufacturing",
+      "fit_score": null,
+      "is_primary": true,
+      "commercial_readiness": null,
+      "notes": "Apptronik's Apollo 2 page (retrieved 2026-10-31) calls it 'a modular humanoid robot platform with bipedal and wheeled mobility, advanced AI, and dexterous manipulation for real-world operations' and names no use case. Assigned on owner instruction 2026-10-31 (Robert Konecny): same categories as the catalogued Apollo (manufacturing, warehouse-logistics). Apollo's pilot results and scores are not carried over. (https://apptronik.com/apollo/apollo-2). HO-UC-01 evaluation (use_case_assessments/apptronik-apollo-2.json).",
+      "limitations": "Owner-assigned by analogy to Apollo; the Apollo 2 page read so far states no use case. No deployment, results, availability or pricing are recorded for Apollo 2. Associated, not rated.",
+      "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "warehouse-logistics",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "Apptronik's Apollo 2 page (retrieved 2026-10-31) calls it 'a modular humanoid robot platform with bipedal and wheeled mobility, advanced AI, and dexterous manipulation for real-world operations' and names no use case. Assigned on owner instruction 2026-10-31 (Robert Konecny): same categories as the catalogued Apollo (manufacturing, warehouse-logistics). Apollo's pilot results and scores are not carried over. (https://apptronik.com/apollo/apollo-2). HO-UC-01 evaluation (use_case_assessments/apptronik-apollo-2.json).",
+      "limitations": "Owner-assigned by analogy to Apollo; the Apollo 2 page read so far states no use case. No deployment, results, availability or pricing are recorded for Apollo 2. Associated, not rated.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [],
   "extended_specs": [],
   "spec_caveats": []

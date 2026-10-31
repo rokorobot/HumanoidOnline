@@ -5,12 +5,18 @@
   "method": "Evaluation against all categories in use_cases.json from the manufacturer wording recorded in robots/apptronik-apollo-2.json (https://apptronik.com/apollo/apollo-2).",
   "categories": {
     "warehouse-logistics": {
-      "status": "NO_BASIS",
-      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+      "status": "FIT",
+      "basis": "Apptronik's Apollo 2 page (retrieved 2026-10-31) calls it 'a modular humanoid robot platform with bipedal and wheeled mobility, advanced AI, and dexterous manipulation for real-world operations' and names no use case. Assigned on owner instruction 2026-10-31 (Robert Konecny): same categories as the catalogued Apollo (manufacturing, warehouse-logistics). Apollo's pilot results and scores are not carried over. Score NULL, confidence LOW.",
+      "sources": [
+        "https://apptronik.com/apollo/apollo-2"
+      ]
     },
     "manufacturing": {
-      "status": "NO_BASIS",
-      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+      "status": "FIT",
+      "basis": "Apptronik's Apollo 2 page (retrieved 2026-10-31) calls it 'a modular humanoid robot platform with bipedal and wheeled mobility, advanced AI, and dexterous manipulation for real-world operations' and names no use case. Assigned on owner instruction 2026-10-31 (Robert Konecny): same categories as the catalogued Apollo (manufacturing, warehouse-logistics). Apollo's pilot results and scores are not carried over. Score NULL, confidence LOW.",
+      "sources": [
+        "https://apptronik.com/apollo/apollo-2"
+      ]
     },
     "research-education": {
       "status": "NO_BASIS",

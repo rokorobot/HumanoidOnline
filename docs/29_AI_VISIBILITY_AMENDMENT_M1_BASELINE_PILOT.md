@@ -342,6 +342,7 @@ This amendment does not:
 | ID | Decision | Outcome |
 |---|---|---|
 | D7 | Collection method for R1 | **R1 is treg-only, with no manual reference.** Supersedes the hybrid method of §3.1 and D2 for R1, and the named-human-reviewer collection of D5. treg observations keep their own `product_surface` labels (§4); the report states that no manual reference exists. Spend still needs the separate authorization of §9 |
+| D8 | treg spend and cadence | **$10.00 total** authorized for treg sweeps (provider treg; endpoints `cloro.ai-search.chatgpt.scrape`, `cloro.ai-search.gemini.scrape`, `cloro.google.serp.ai_mode`, `perplexity.web.answer.fast`; answers and cited URLs stored in the repo). Raised from the $2 R1 + R2 approval. Sweeps repeat every 14 days until the cap is reached; R2 and later fall outside the §6.1 5–9 day window by owner choice |
 
 ---
 
@@ -363,4 +364,5 @@ Ratified by:     Robert Konecny — Product Owner (D1–D6 approved as recommend
 Ratification date: 2026-10-24
 
 Amended:         2026-10-31 — D7: R1 is treg-only, no manual reference (§11.1)
+                 2026-10-31 — D8: $10 treg spend authorized; 14-day sweep cadence (§11.1)
 ```

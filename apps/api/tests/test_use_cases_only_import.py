@@ -72,6 +72,9 @@ def scratch(database_url):
         ic = _importer()
         with contextlib.redirect_stdout(io.StringIO()):
             ic.run(dsn)
+        # Production before DR-C2 holds no USE_CASE evidence, whatever the repository file
+        # carries (the file gains rows when the HO-CONTENT-01 sources move into it).
+        _sql(dsn, "DELETE FROM evidence_source WHERE subject_type = 'USE_CASE'")
         yield dsn, ic
     finally:
         with psycopg.connect(admin, autocommit=True) as conn:

@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "action": "update_evidence",
+      "table": "evidence_source",
+      "robot": "neura-robotics",
+      "key": {
+        "subject_type": "MANUFACTURER",
+        "source_url": "https://neura-robotics.com/about-us/",
+        "source_type": "MANUFACTURER_SITE",
+        "excerpt": null,
+        "observed_at": "2026-09-13"
+      }
+    }
+  ]
+}

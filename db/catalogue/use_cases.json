@@ -8,7 +8,70 @@
       "description": "Humanoids for material movement in warehouses and distribution centers. On 27 June 2024 Agility Robotics and GXO announced a multi-year Robots-as-a-Service agreement for Digit at GXO's SPANX facility near Atlanta, which they called the industry's first formal commercial deployment of humanoid robots; it followed a proof-of-concept pilot in late 2023. There Digit moves totes from collaborative robots onto conveyors, managed through Agility's Arc cloud platform and working alongside existing autonomous mobile robots.",
       "typical_tasks": ["tote handling", "material movement", "line feeding"],
       "typical_requirements": "Agility lists Digit's workflows as tote handling, palletizing and depalletizing, machine tending, and kitting and sequencing. Deployment also needs fleet-management software (at GXO, Agility Arc) and coexistence with existing automation such as autonomous mobile robots. Safety has no settled standard yet: ISO's proposal for a safety standard for dynamically stable industrial mobile robots (now the draft ISO/CD 25785-1) stated that no ISO safety standard for them was published or in development.",
-      "key_limitations": "Agility says Digit's first skills target repetitive, strenuous, load-intensive work, that certain safety features are still in development, and that safety features do not eliminate all operational risk. Agility's solutions page states no payload or runtime figures. Schaeffler's plan to deploy a significant number of humanoids across its 100 plants by 2030 is a customer aspiration, not a delivered fleet."
+      "key_limitations": "Agility says Digit's first skills target repetitive, strenuous, load-intensive work, that certain safety features are still in development, and that safety features do not eliminate all operational risk. Agility's solutions page states no payload or runtime figures. Schaeffler's plan to deploy a significant number of humanoids across its 100 plants by 2030 is a customer aspiration, not a delivered fleet.",
+      "evidence": [
+        {
+          "source_url": "https://agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics",
+          "source_type": "PRESS_RELEASE",
+          "source_title": "Agility Robotics: GXO signs industry-first multi-year agreement",
+          "excerpt": "On 27 June 2024 Agility and GXO announced a multi-year RaaS agreement for Digit at GXO's SPANX facility near Atlanta, which they called the industry's first formal commercial humanoid deployment; it followed a late-2023 proof-of-concept pilot. Digit moves totes from cobots onto conveyors via Agility Arc, alongside existing AMRs.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description",
+            "typical_requirements"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) WL-1, WL-2. Corroboration https://investors.gxo.com/news-releases/news-release-details/gxo-signs-industry-first-multi-year-agreement-agility-robotics was seen in search results only (403 on fetch). Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.agilityrobotics.com/solutions",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Agility Robotics: solutions",
+          "excerpt": "Agility lists Digit workflows as tote handling, palletizing/depalletizing, machine tending, kitting and sequencing.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "typical_requirements"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) WL-3. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.agilityrobotics.com/solutions",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Agility Robotics: solutions",
+          "excerpt": "Agility says Digit's first skills target repetitive, strenuous, load-intensive work; certain safety features are still in development; safety features do not eliminate all operational risk. The page states no payload or runtime figures; Schaeffler's plan for a significant number of humanoids across 100 plants by 2030 is the customer's aspiration.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "key_limitations"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) WL-5, WL-6. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.mta.org.uk/resources/iso-np-25785-1-link-to-new-work-item-proposal/",
+          "source_type": "OTHER",
+          "source_title": "ISO new work item proposal 25785-1 (copy published by the MTA, a trade body)",
+          "excerpt": "ISO's new-work-item proposal says no ISO safety standard for dynamically stable industrial mobile robots was published or in development.",
+          "observed_at": "2026-11-02",
+          "confidence": "MEDIUM",
+          "claim_fields": [
+            "typical_requirements"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) UC-3 / WL-4. Read via a trade-body copy, not iso.org. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.iso.org/standard/91469.html",
+          "source_type": "OTHER",
+          "source_title": "ISO/CD 25785-1 (title seen in search results)",
+          "excerpt": "The proposal is now the Committee Draft ISO/CD 25785-1.",
+          "observed_at": "2026-11-02",
+          "confidence": "MEDIUM",
+          "claim_fields": [
+            "typical_requirements"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) UC-3 / WL-4. CITATION CAVEAT: the iso.org page returned 403 to WebFetch and curl and was NOT read; the 'Committee Draft ISO/CD 25785-1' label rests on a search-result title. Re-check when iso.org is reachable. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        }
+      ]
     },
     {
       "slug": "manufacturing",
@@ -17,7 +80,71 @@
       "description": "Humanoids on production lines and intralogistics in factories. The most detailed public record is Figure 02 at BMW Group Plant Spartanburg: an 11-month deployment, on 10-hour shifts Monday to Friday, in which it loaded sheet-metal parts onto a welding fixture on an active assembly line. Figure reports more than 1,250 operating hours, more than 90,000 parts loaded and a contribution to more than 30,000 BMW X3 vehicles. Apptronik's Apollo is in a commercial pilot agreement with Mercedes-Benz, and UBTECH began mass production and delivery of the Walker S2 in November 2025, reporting orders above 800 million yuan.",
       "typical_tasks": ["part sequencing", "machine tending", "sheet-metal loading", "kitting"],
       "typical_requirements": "Line-paced precision and uptime. Figure's stated targets for the BMW sheet-metal task were an 84-second total cycle (37 seconds of it for loading), more than 99% successful placements per shift, parts placed within 5 mm, and no human pauses or resets per shift. Figure ran the task as a pick-and-place step feeding six-axis industrial welding robots.",
-      "key_limitations": "Figure published targets for cycle time, placement accuracy and interventions, not the figures achieved. It reports that the forearm was Figure 02's top hardware failure point, and for Figure 03 it removed the forearm distribution board and dynamic cabling. Apptronik states the terms of individual Apollo engagements are not disclosed."
+      "key_limitations": "Figure published targets for cycle time, placement accuracy and interventions, not the figures achieved. It reports that the forearm was Figure 02's top hardware failure point, and for Figure 03 it removed the forearm distribution board and dynamic cabling. Apptronik states the terms of individual Apollo engagements are not disclosed.",
+      "evidence": [
+        {
+          "source_url": "https://www.figure.ai/news/production-at-bmw",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Figure: production at BMW",
+          "excerpt": "Figure 02 at BMW Spartanburg: 11 months, 10-hour shifts Monday to Friday, loaded sheet-metal parts onto a welding fixture on an active line; 1,250+ hours, 90,000+ parts, contributed to 30,000+ BMW X3 vehicles.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) MF-1. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.figure.ai/news/production-at-bmw",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Figure: production at BMW",
+          "excerpt": "Targets, not results: 84 s total cycle, 37 s loading, >99% placement per shift, 5 mm tolerance, zero human pauses/resets; the task feeds six-axis welding robots.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "typical_requirements",
+            "key_limitations"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) MF-2. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.figure.ai/news/production-at-bmw",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Figure: production at BMW",
+          "excerpt": "The forearm was Figure 02's top hardware failure point; Figure 03 removes the forearm distribution board and dynamic cabling.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "key_limitations"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) MF-3. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.prnewswire.com/news-releases/apptronik-and-mercedes-benz-enter-commercial-agreement-that-will-pilot-apptroniks-apollo-humanoid-robot-in-mercedes-benz-manufacturing-facilities-302089972.html",
+          "source_type": "PRESS_RELEASE",
+          "source_title": "Apptronik and Mercedes-Benz enter commercial agreement to pilot Apollo",
+          "excerpt": "Apptronik Apollo is in a commercial pilot agreement with Mercedes-Benz; the terms of the engagement are not stated.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description",
+            "key_limitations"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) MF-4. Already recorded in apptronik-apollo.json; the terms statement matches the existing apptronik deployment_note. The review doc records this release URL as returning 404 on a later fetch. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.prnewswire.com/news-releases/ubtech-humanoid-robot-walker-s2-begins-mass-production-and-delivery-with-orders-exceeding-800-million-yuan-302616924.html",
+          "source_type": "PRESS_RELEASE",
+          "source_title": "UBTECH Walker S2 begins mass production and delivery with orders exceeding 800 million yuan",
+          "excerpt": "UBTECH began Walker S2 mass production and delivery in November 2025, reporting orders above 800 million yuan.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) MF-5. Already recorded on ubtech-robotics. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        }
+      ]
     },
     {
       "slug": "research-education",
@@ -26,7 +153,46 @@
       "description": "Humanoid platforms for labs and universities. Development access varies by edition: Unitree lists secondary development for G1 EDU but not for the base G1, and G1 EDU adds joint freedom (23 to 43 degrees of freedom against 23), a higher arm payload and optional hand and waist upgrades. Booster Robotics, whose team comes from Tsinghua University's robot control lab and RoboCup team, reports more than 700 humanoid deliveries to over 200 customers (November 2025) and that 38 teams competed with Booster robots at RoboCup 2026.",
       "typical_tasks": ["locomotion research", "manipulation research", "teaching"],
       "typical_requirements": "Open interfaces for secondary development, plus simulation and software tooling. Booster, for example, offers Booster Studio, an integrated development environment for agent development, simulation and deployment to physical robots.",
-      "key_limitations": "Arm payload is small and posture-dependent: Unitree lists about 2 kg (G1) and about 3 kg (G1 EDU), varying greatly with arm extension, and about 2 hours of battery life for both."
+      "key_limitations": "Arm payload is small and posture-dependent: Unitree lists about 2 kg (G1) and about 3 kg (G1 EDU), varying greatly with arm extension, and about 2 hours of battery life for both.",
+      "evidence": [
+        {
+          "source_url": "https://www.unitree.com/g1",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Unitree G1",
+          "excerpt": "Unitree lists secondary development for G1 EDU, not base G1; EDU adds 23-43 DOF (vs 23), higher arm payload, optional hand/waist upgrades; arm payload about 2 kg (G1) / 3 kg (EDU), varying with posture; about 2 h battery.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description",
+            "key_limitations"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) RE-1. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.booster.tech/about-us",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Booster Robotics: about us",
+          "excerpt": "Booster's team comes from Tsinghua's robot control lab and RoboCup team; 700+ deliveries to 200+ customers (Nov 2025); 38 teams on Booster robots at RoboCup 2026.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) RE-2. The 38-teams figure is also in the existing booster-robotics manufacturer evidence. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.booster.tech/about-us",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Booster Robotics: about us",
+          "excerpt": "Booster Studio is an IDE for agent development, simulation and deployment to physical robots.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "typical_requirements"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) RE-3. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        }
+      ]
     },
     {
       "slug": "home",
@@ -35,14 +201,102 @@
       "description": "Domestic assistance and companionship. The most developed product is 1X's NEO. 1X says it handles tasks like folding laundry, organizing shelves and tidying, opens doors for guests, fetches items and turns off the lights at night, and that owners can schedule chores in advance. 1X plans to start delivering NEO primarily in the US in 2026 and to expand to other markets from 2027. Figure also states that Figure 03 is designed for the home.",
       "typical_tasks": ["tidying", "fetching", "companionship"],
       "typical_requirements": "Safety around people and household help. 1X describes NEO as having a head-to-toe soft body and an actuation system that creates gentle movements making it \"uniquely safe and compliant around people\"; its published specifications are 5 ft 6 in, 66 lb, a 4-hour battery runtime, 55 lb carry and 18 lb arm payload.",
-      "key_limitations": "1X says NEO works autonomously by default and that, for a chore it does not know, a 1X Expert can remotely supervise its actions at scheduled times. 1X says NEO grows in abilities with every software update, and its CEO told Road to VR (30 October 2025) that NEO would do \"most of the things in your home autonomously\" when it ships but that the quality of work would \"vary and will improve drastically quite fast as we get data\"."
+      "key_limitations": "1X says NEO works autonomously by default and that, for a chore it does not know, a 1X Expert can remotely supervise its actions at scheduled times. 1X says NEO grows in abilities with every software update, and its CEO told Road to VR (30 October 2025) that NEO would do \"most of the things in your home autonomously\" when it ships but that the quality of work would \"vary and will improve drastically quite fast as we get data\".",
+      "evidence": [
+        {
+          "source_url": "https://www.1x.tech/discover/neo-home-robot",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "1X: NEO home robot",
+          "excerpt": "1X says NEO folds laundry, organizes shelves, tidies, opens doors, fetches items and turns off lights; chores can be scheduled. Delivery is planned primarily in the US in 2026 and other markets from 2027.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) HM-1, HM-2. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.1x.tech/discover/neo-home-robot",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "1X: NEO home robot",
+          "excerpt": "NEO has a head-to-toe soft body and gentle actuation 'uniquely safe and compliant around people'.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "typical_requirements"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) HM-4 (safety wording). Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.1x.tech/neo",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "1X: NEO",
+          "excerpt": "NEO specifications: 5 ft 6 in, 66 lb, 4 h battery runtime, 55 lb carry, 18 lb arm payload.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "typical_requirements"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) HM-4 (specifications). Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.1x.tech/neo",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "1X: NEO",
+          "excerpt": "NEO works autonomously by default; a 1X Expert can remotely supervise its actions at scheduled times; it grows in abilities with each software update.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "key_limitations"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) HM-5. The same statements appear on the discover page. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.figure.ai/news/introducing-figure-03",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Figure: introducing Figure 03",
+          "excerpt": "Figure states Figure 03 is designed for the home.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) HM-3. Already recorded in figure-03.json. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://roadtovr.com/helper-robot-neo-vr-telepresence/",
+          "source_type": "NEWS_ARTICLE",
+          "source_title": "Road to VR: 1X NEO",
+          "excerpt": "1X's CEO told Road to VR (30 Oct 2025) NEO would do 'most of the things in your home autonomously' when it ships and that quality will 'vary and will improve drastically quite fast as we get data'.",
+          "observed_at": "2026-11-02",
+          "confidence": "MEDIUM",
+          "claim_fields": [
+            "key_limitations"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) HM-6. Secondary source; the quotation was read on the page. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        }
+      ]
     },
     {
       "slug": "events-entertainment",
       "name": "Events & Entertainment",
       "category": "service",
       "description": "Humanoids as attractions, presenters and brand activations. Engineered Arts markets Ameca for events such as conferences, expos and keynotes as well as research, and offers it to rent, to quote or to book as a demo. It lists 70+ languages, two 8-megapixel eye cameras, 61 actuated movements, a height of 1,870 mm and a weight of 62 kg, and a browser-based Tritium platform in which users write Python scripts.",
-      "typical_tasks": ["presenting", "interaction", "photo engagement"]
+      "typical_tasks": ["presenting", "interaction", "photo engagement"],
+      "evidence": [
+        {
+          "source_url": "https://engineeredarts.com/robot/ameca/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Engineered Arts: Ameca",
+          "excerpt": "Ameca is offered to rent, quote or demo; uses include conferences, expos, keynotes and R&D; 70+ languages; 2 x 8 MP cameras; 61 actuated movements; 1,870 mm; 62 kg; Tritium platform with browser Python scripting.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) EV-1. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        }
+      ]
     },
     {
       "slug": "retail-service",
@@ -51,7 +305,45 @@
       "description": "Humanoids in shops, branches and other customer-facing service environments: assisting and informing customers, demonstrating products and supporting store operations. Galbot says its G1, a wheeled robot with two arms, operates in its Galaxy Space Capsule retail units at more than 170 sites in over 40 cities in China; in July 2025 The Robot Report reported G1 in nearly 10 Beijing stores, deployable into a new store in a day, with a target of 100 stores that year. SoftBank Robotics launched Pepper in June 2014 and received Guinness World Records recognition for it as the world's first mass-produced humanoid robot in February 2026.",
       "typical_tasks": ["customer greeting", "information and wayfinding", "product demonstration", "retail assistance", "store operations"],
       "typical_requirements": "Reliable speech and interaction in noisy public spaces, safe operation among untrained members of the public, long unattended duty hours, and integration with store or service systems.",
-      "key_limitations": "Most humanoids here inform and interact rather than handle goods; unattended operation in a third-party store is rarely documented, and the return on investment is often novelty-driven."
+      "key_limitations": "Most humanoids here inform and interact rather than handle goods; unattended operation in a third-party store is rarely documented, and the return on investment is often novelty-driven.",
+      "evidence": [
+        {
+          "source_url": "http://www.galbot.com/g1/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Galbot G1",
+          "excerpt": "Galbot G1 (wheeled, two arms) operates in Galaxy Space Capsule units at 170+ sites in 40+ cities.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) RS-1. Already recorded in galbot-g1.json. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.therobotreport.com/galbot-picks-up-153m-commercialize-g1-semi-humanoid/",
+          "source_type": "NEWS_ARTICLE",
+          "source_title": "The Robot Report: Galbot picks up $153M to commercialize G1",
+          "excerpt": "July 2025: G1 in nearly 10 Beijing stores, one-day deployment, 100-store target for the year (company statements reported by The Robot Report).",
+          "observed_at": "2026-11-02",
+          "confidence": "MEDIUM",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) RS-2. Secondary source. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.softbankrobotics.com/profile/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "SoftBank Robotics: company profile",
+          "excerpt": "Pepper launched June 2014; Guinness World Records recognition February 2026 as the world's first mass-produced humanoid robot.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) RS-3. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        }
+      ]
     },
     {
       "slug": "healthcare-rehabilitation",
@@ -60,7 +352,21 @@
       "description": "Humanoids used in rehabilitation research, therapeutic assistance, healthcare education, clinical research and healthcare service environments. Fourier began in 2015 in medical rehabilitation robotics, with exoskeletons that help patients with neurological impairments stand and walk, and describes its GR-3 humanoid, released in August 2025, as designed to provide both social and assistive companionship in diverse settings.",
       "typical_tasks": ["rehabilitation research", "therapeutic assistance", "healthcare education", "clinical research support", "patient and visitor interaction"],
       "typical_requirements": "Safe physical and social interaction with patients and older people, supervision by qualified staff, hygiene and data-protection compliance, and for any medical purpose the applicable medical-device approval.",
-      "key_limitations": "Research and experimental use only: no clinical validation or regulatory approval as a medical device is recorded for any robot in this catalogue. A robot listed here is positioned for or studied in healthcare settings; it is not a validated treatment or care device."
+      "key_limitations": "Research and experimental use only: no clinical validation or regulatory approval as a medical device is recorded for any robot in this catalogue. A robot listed here is positioned for or studied in healthcare settings; it is not a validated treatment or care device.",
+      "evidence": [
+        {
+          "source_url": "https://www.wipo.int/en/web/ip-advantage/w/stories/fourier-healthcare-robots-with-humanoid-designs",
+          "source_type": "OTHER",
+          "source_title": "WIPO IP Advantage: Fourier healthcare robots with humanoid designs",
+          "excerpt": "Fourier began in 2015 in medical rehabilitation robotics; its exoskeletons help patients with neurological impairments stand and walk; GR-3 (Aug 2025) is designed for social and assistive companionship.",
+          "observed_at": "2026-11-02",
+          "confidence": "MEDIUM",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) HC-1. WIPO's account of the company, not a Fourier page. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        }
+      ]
     },
     {
       "slug": "security-inspection",
@@ -69,7 +375,57 @@
       "description": "Humanoids for security patrols, facility monitoring and surveillance, remote inspection and inspection of hazardous environments. Among humanoid makers, Kepler positions its Forerunner K2 for high-risk operations alongside manufacturing and logistics, and Unitree lists power inspection among the applications of its robots, which are mostly quadrupeds.",
       "typical_tasks": ["security patrol", "facility monitoring", "remote inspection", "hazardous-environment inspection", "autonomous patrol"],
       "typical_requirements": "Long autonomous runtime, dependable navigation of the site, remote supervision and teleoperation, suitable sensor payloads, and environmental protection for outdoor or hazardous areas. As a benchmark, Boston Dynamics specifies its Spot quadruped for autonomous inspections and for inspections in energized, radioactive or otherwise hazardous areas, with IP54 ingress protection, 14 kg payload capacity and 90 minutes of average runtime; it states IP67 for its Atlas humanoid.",
-      "key_limitations": "Quadrupeds and wheeled robots currently dominate this field; documented humanoid deployments are few, and environmental ratings and inspection payloads are rarely published."
+      "key_limitations": "Quadrupeds and wheeled robots currently dominate this field; documented humanoid deployments are few, and environmental ratings and inspection payloads are rarely published.",
+      "evidence": [
+        {
+          "source_url": "https://bostondynamics.com/products/spot/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Boston Dynamics: Spot",
+          "excerpt": "Spot: autonomous inspections, including in energized, radioactive or otherwise hazardous areas; IP54; 14 kg payload; 90 min average runtime.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "typical_requirements"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) SI-1. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://bostondynamics.com/products/atlas/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Boston Dynamics: Atlas",
+          "excerpt": "Atlas: IP67.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "typical_requirements"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) SI-2. Already recorded in boston-dynamics-atlas-electric.json specs_note. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.prnewswire.com/news-releases/kepler-debuts-forerunner-k2-humanoid-robot-accelerating-commercial-deployment-302281546.html",
+          "source_type": "PRESS_RELEASE",
+          "source_title": "Kepler debuts Forerunner K2 humanoid robot",
+          "excerpt": "Kepler positions Forerunner K2 for high-risk operations.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) SI-3. Already recorded on kepler-robotics. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        },
+        {
+          "source_url": "https://www.unitree.com/about",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Unitree: about",
+          "excerpt": "Unitree lists power inspection among its applications.",
+          "observed_at": "2026-11-02",
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Review-doc claim(s) SI-4. Excerpt is the supported fact as recorded in the review doc, not a page quotation; spot-check against the live page before promotion."
+        }
+      ]
     }
   ]
 }

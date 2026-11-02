@@ -13,6 +13,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { StatusBracket } from "@/components/StatusBadge";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteNav } from "@/components/SiteNav";
+import { SourceRow } from "@/components/SourceRow";
 import { RobotThumb } from "@/components/RobotThumb";
 import { SystemHeader } from "@/components/SystemHeader";
 import { SystemLabel } from "@/components/SystemLabel";
@@ -150,6 +151,26 @@ export default async function UseCaseDetailPage({
             <p className="empty-state">No suitable robots recorded for this use case.</p>
           )}
         </section>
+
+        {/* DR-C2. Omitted when the API does not provide `sources` (the previous API
+            version) and when none are recorded: most use-case text is editorial, and an
+            empty "Sources" block would read as a claim about the page. */}
+        {u.sources && u.sources.length > 0 && (
+          <section className="blk" id="sources" style={{ marginBottom: "var(--ho-sp-7)" }}>
+            <div className="blk-head">
+              <div>
+                <SectionIndex>02 — SOURCES</SectionIndex>
+                <h2>Sources</h2>
+              </div>
+              <SystemLabel>{u.sources.length} SOURCES</SystemLabel>
+            </div>
+            <div className="ev">
+              {u.sources.map((s, i) => (
+                <SourceRow source={s} key={i} />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </>
   );

@@ -21,6 +21,9 @@ claim is attributed to a MANUFACTURER evidence row naming that field in
   6. manufacturer.is_public_company (TRUE or FALSE; NULL asserts nothing)
   7. manufacturer.parent_company
 
+and that every USE_CASE evidence row (DR-C2) points at an existing use case and names
+only use-case fields in `claim_fields`.
+
 Exits non-zero if any published commercial fact lacks evidence (this is the
 same "no commercial fact without evidence" contract the seed enforces, applied
 to the independently sourced catalogue). Prints a summary either way.
@@ -114,6 +117,28 @@ GAP_QUERIES.update({
 })
 
 
+# DR-C2: use-case text carries factual claims, so its evidence rows (subject USE_CASE) must
+# point at an existing use case and name the fields they support. Unlike manufacturers, no
+# use-case field is required to HAVE a source: most use-case text is editorial. This checks
+# only that the rows that exist are well-formed.
+GAP_QUERIES.update({
+    "use_case.evidence (orphan row)": """
+        SELECT e.subject_id::text
+        FROM evidence_source e
+        WHERE e.subject_type='USE_CASE'
+          AND NOT EXISTS (SELECT 1 FROM use_case u WHERE u.id = e.subject_id)
+    """,
+    "use_case.evidence (claim_fields missing or unknown)": """
+        SELECT u.slug
+        FROM evidence_source e JOIN use_case u ON u.id = e.subject_id
+        WHERE e.subject_type='USE_CASE'
+          AND (COALESCE(cardinality(e.claim_fields), 0) = 0
+               OR NOT e.claim_fields <@ ARRAY['description', 'typical_requirements',
+                                               'key_limitations', 'typical_tasks'])
+    """,
+})
+
+
 # Use-case coverage (docs/audit/USE_CASE_ENRICHMENT_REVIEW_2026-10-08.md). A published
 # robot that is commercially accessible -- the canonical predicate: a current NEW
 # availability offer for which commercially_accessible() holds, exactly as
@@ -157,12 +182,16 @@ def main() -> None:
         manufacturer_sources = scalar(
             "SELECT count(*) FROM evidence_source WHERE subject_type='MANUFACTURER'"
         )
+        use_case_sources = scalar(
+            "SELECT count(*) FROM evidence_source WHERE subject_type='USE_CASE'"
+        )
 
         print(
             f"catalogue summary: robots={robots_total} (published={robots_pub}) "
             f"pricing_offers={pricing} availability_offers={availability} "
             f"deployments={deployments} evidence_rows={evidence} verified={verified} "
-            f"manufacturers={manufacturers} manufacturer_sources={manufacturer_sources}"
+            f"manufacturers={manufacturers} manufacturer_sources={manufacturer_sources} "
+            f"use_case_sources={use_case_sources}"
         )
 
         gaps: dict[str, list[str]] = {}

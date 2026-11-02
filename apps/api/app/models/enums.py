@@ -75,6 +75,7 @@ evidence_subject = _pg_enum(
     "evidence_subject",
     "MANUFACTURER", "ROBOT", "ROBOT_VARIANT", "SPECIFICATION", "CAPABILITY",
     "COMMERCIAL_STATUS", "PRICING_OFFER", "AVAILABILITY_OFFER", "DEPLOYMENT", "PROVIDER",
+    "USE_CASE",
 )
 spec_value_type = _pg_enum(
     "spec_value_type", "NUMBER", "BOOLEAN", "TEXT", "ENUM"

@@ -358,3 +358,14 @@ canonical set from these files on every CI run and fails on any drift.
   manufacturer, name, source_url, observed_at, is_published; no commercial facts) and nullable
   `robot.product_line_id`. Additive and idempotent; membership is loaded by the catalogue importer
   from `db/catalogue/product_lines.json`.
+- `0028_use_case_evidence.sql` — DR-C2 (owner-approved 2026-11-02): adds `USE_CASE` to the
+  `evidence_subject` enum, so use-case text that states facts (deployments, orders, published
+  figures) can carry `evidence_source` rows (`subject_type='USE_CASE'`, `subject_id=use_case.id`,
+  `claim_fields` naming the use-case fields supported) exactly as manufacturer profile evidence
+  does. No new table or column; the label is appended last, matching `db/schema.sql`. Only
+  declares the label (a new enum label cannot be used in the transaction that adds it), so it
+  inserts no row. Additive and idempotent. The importer loads rows from the optional `evidence`
+  list per use case in `db/catalogue/use_cases.json`, marked `managed_by='CATALOGUE_IMPORT'`;
+  `uv run db/import_catalogue.py --use-cases-only` loads just that file.
+  **Apply to a database before deploying an API build that lists it in its bundled manifest**
+  (a strict environment refuses to start otherwise).

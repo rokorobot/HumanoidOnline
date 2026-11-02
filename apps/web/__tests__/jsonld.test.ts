@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { buildCatalogueJsonLd, buildRobotJsonLd } from "@/lib/jsonld";
-import type { RobotDetail, RobotListItem } from "@/lib/types";
+import { buildCatalogueJsonLd, buildManufacturerJsonLd, buildRobotJsonLd } from "@/lib/jsonld";
+import type { ManufacturerDetail, RobotDetail, RobotListItem } from "@/lib/types";
 
 // WS8.2 / R8: the canonical origin is no longer defaulted to production
 // (gap B4), so this suite states the origin it is asserting against instead of
@@ -108,5 +108,41 @@ describe("SEO-02 — catalogue JSON-LD", () => {
       ],
     });
     expect(crumbs["@type"]).toBe("BreadcrumbList");
+  });
+});
+
+describe("SEO-03 — brand and manufacturer structured data", () => {
+  it("names the manufacturer as the Product brand", () => {
+    const { product } = graphOf(robot());
+    expect(product.brand).toEqual({ "@type": "Brand", name: "Acme Robotics" });
+  });
+
+  it("emits an Organization joined to the robot graph by @id, omitting unknown facts", () => {
+    const m = {
+      slug: "acme",
+      name: "Acme Robotics",
+      legal_name: null,
+      description: "Builds test humanoids.",
+      website_url: "https://acme.example",
+      founded_year: null,
+    } as unknown as ManufacturerDetail;
+    const [org, crumbs] = buildManufacturerJsonLd(m)["@graph"] as Array<Record<string, unknown>>;
+    expect(org).toEqual({
+      "@type": "Organization",
+      "@id": `${ORIGIN}/manufacturers/acme`,
+      url: `${ORIGIN}/manufacturers/acme`,
+      name: "Acme Robotics",
+      description: "Builds test humanoids.",
+      sameAs: ["https://acme.example"],
+    });
+    expect(org["@id"]).toBe(graphOf(robot()).org["@id"]);
+    expect(crumbs).toMatchObject({
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { position: 1, name: "Home", item: `${ORIGIN}/` },
+        { position: 2, name: "Manufacturers", item: `${ORIGIN}/manufacturers` },
+        { position: 3, name: "Acme Robotics", item: `${ORIGIN}/manufacturers/acme` },
+      ],
+    });
   });
 });

@@ -10,6 +10,7 @@ import { findProductLine } from "@/lib/api-client";
 import { buildProductLineJsonLd } from "@/lib/jsonld";
 import { buildLineAnswer } from "@/lib/line-answer";
 import { lineTitle } from "@/lib/robot-meta";
+import { fitDescription, fitTitle } from "@/lib/meta-text";
 import { absoluteUrl } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -26,10 +27,13 @@ export async function generateMetadata({
   const line = await getLineCached(slug);
   if (!line) return { title: "Not found" };
   return {
-    title: lineTitle(line),
+    title: fitTitle(lineTitle(line)),
     // The description is the first sentence of the direct answer (editions only): it
     // makes no price or availability claim the page might not carry.
-    description: buildLineAnswer(line.name, line.robots).paragraphs[0],
+    description: fitDescription(
+      buildLineAnswer(line.name, line.robots).paragraphs[0],
+      `${line.name} by ${line.manufacturer.name}: editions, specs and evidence on HumanoidOnline.`,
+    ),
     alternates: { canonical: absoluteUrl(`/lines/${line.slug}`) },
   };
 }

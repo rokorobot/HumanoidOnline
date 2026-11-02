@@ -1,5 +1,6 @@
 // Home (highly experimental band). Hero claim is fixed. All numbers come from
 // /api/market-snapshot and /api/robots at runtime — no illustrative values.
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import {
@@ -10,6 +11,7 @@ import {
 } from "@/lib/api-client";
 import { buildHomeJsonLd } from "@/lib/entity";
 import { formatObservedDate, formatRobotCoverage } from "@/lib/format";
+import { absoluteUrl } from "@/lib/site";
 import { DotMatrix, GraphicMarker } from "@/components/GraphicMarker";
 import { MachineCode } from "@/components/MachineCode";
 import { ManufacturerCard } from "@/components/ManufacturerCard";
@@ -21,6 +23,11 @@ import { SystemLabel } from "@/components/SystemLabel";
 import { UseCaseTile } from "@/components/UseCaseTile";
 
 export const dynamic = "force-dynamic";
+
+// Title and description come from the root layout; the home page adds only its canonical.
+export function generateMetadata(): Metadata {
+  return { alternates: { canonical: absoluteUrl("/") } };
+}
 
 export default async function HomePage() {
   const [snapshot, robotPage, useCasePage, manufacturerPage] = await Promise.all([

@@ -17,6 +17,7 @@ import { SiteNav } from "@/components/SiteNav";
 import { type ResearchRegion, loadResearch, researchPath } from "@/lib/research";
 import { buildResearchJsonLd } from "@/lib/research-jsonld";
 import { PREVIEW_COOKIE } from "@/lib/research-preview";
+import { fitDescription, fitTitle } from "@/lib/meta-text";
 import { absoluteUrl, siteUrl } from "@/lib/site";
 
 // One gate + governed read shared by the page and generateMetadata (per-request memo).
@@ -34,8 +35,11 @@ export function researchRegionRoute(region: ResearchRegion) {
     const { access, data } = await resolve(region);
     if (!data) return { title: "Not found", robots: { index: false, follow: false } };
     return {
-      title: `Humanoid robot availability in ${data.region.name}`,
-      description: data.direct_answer,
+      title: fitTitle(`Humanoid robot availability in ${data.region.name}`),
+      description: fitDescription(
+        data.direct_answer,
+        `Evidence-linked humanoid robot availability in ${data.region.name}, from the HumanoidOnline catalogue.`,
+      ),
       alternates: { canonical: absoluteUrl(researchPath(region)) },
       // A preview must never be indexed; only a published resource is.
       robots: access.mode === "published" ? undefined : { index: false, follow: false },

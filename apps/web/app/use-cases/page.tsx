@@ -1,23 +1,37 @@
 // Use-cases index — from /api/use-cases.
+import type { Metadata } from "next";
+
 import { listUseCases } from "@/lib/api-client";
+import { JsonLd } from "@/components/JsonLd";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 import { UseCaseTile } from "@/components/UseCaseTile";
+import { buildCollectionJsonLd } from "@/lib/jsonld";
+import { absoluteUrl } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
 // WS8.5 / R22 — specific per-route title (no generic root inheritance).
-export const metadata = {
-  title: "Use Cases",
-  description:
-    "Humanoid-robot deployment use cases and the robots suited to each, ranked by fit.",
-};
+export function generateMetadata(): Metadata {
+  return {
+    title: "Use Cases",
+    description:
+      "Humanoid-robot deployment use cases and the robots suited to each, ranked by fit.",
+    alternates: { canonical: absoluteUrl("/use-cases") },
+  };
+}
 
 export default async function UseCasesPage() {
   const page = await listUseCases({ limit: 100 });
   return (
     <>
+      <JsonLd
+        data={buildCollectionJsonLd(
+          [{ name: "Use Cases", path: "/use-cases" }],
+          page.items.map((u) => ({ name: u.name, path: `/use-cases/${u.slug}` })),
+        )}
+      />
       <SystemHeader
         title="USE-CASE INDEX"
         fields={[{ value: page.total, label: "" }, { value: "APPLICATIONS", label: "" }]}

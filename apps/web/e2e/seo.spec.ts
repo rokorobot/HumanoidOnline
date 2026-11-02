@@ -26,7 +26,8 @@ test.describe("R22 — per-page metadata (no generic-root inheritance)", () => {
     await page.goto("/robots/unitree-g1", { waitUntil: "domcontentloaded" });
     const title = await page.title();
     expect(title, "must not inherit the generic root title").not.toBe(ROOT_TITLE);
-    expect(title).toMatch(/ — HumanoidOnline$/);
+    // SEO-03: the brand suffix is kept only while the whole title fits in 60 chars.
+    if (title.endsWith(" — HumanoidOnline")) expect(title.length).toBeLessThanOrEqual(60);
     // The title leads with the entity: maker + model, so it contains the robot's H1
     // (CID-04, owner decision 2026-10-31: "Unitree Robotics G1 Basic: …", not "G1 Basic by …").
     const h1 = (await page.getByRole("heading", { level: 1 }).textContent())?.trim();
@@ -85,5 +86,7 @@ test.describe("R23 — machine surface covers the entire published canonical set
     expect(txt).toContain("## Use cases");
     expect(txt).toContain("/manufacturers/unitree");
     expect(txt).toContain("/use-cases/warehouse-logistics");
+    // SEO-03: entries are Markdown links, not bare URLs.
+    expect(txt).toMatch(/^- \[[^\]]+\]\(https?:\/\/[^)]+\/robots\/unitree-g1\)/m);
   });
 });

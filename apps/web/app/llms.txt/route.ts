@@ -26,6 +26,13 @@ import { listAllManufacturers, listAllProductLines, listAllRobots, listAllUseCas
 // nothing is announced as upcoming: machine discovery enumerates public resources.
 export const dynamic = "force-dynamic";
 
+// SEO-03: llms.txt list entries are Markdown links, `- [name](url): notes`, as the
+// llms.txt proposal (and Lighthouse's check) expects — not bare URLs.
+const mdText = (s: string) => s.replace(/[[\]]/g, "\\$&");
+function link(label: string, url: string, note?: string): string {
+  return `- [${mdText(label)}](${url})${note ? `: ${note}` : ""}`;
+}
+
 export async function GET(): Promise<Response> {
   // WS8.2 / R8 — one authoritative origin resolver for every machine surface.
   const origin = siteUrl();
@@ -46,11 +53,11 @@ export async function GET(): Promise<Response> {
       ? []
       : [
           "## Research resources",
-          `- Research hub: ${origin}${RESEARCH_HUB_PATH}`,
+          link("Research hub", `${origin}${RESEARCH_HUB_PATH}`),
           ...liveRegions.flatMap((region) => [
-            `- Humanoid availability in ${regionName(region)}: ${origin}${researchPath(region)}`,
-            `- ${regionName(region)} methodology: ${origin}${researchPath(region)}#method`,
-            `- ${regionName(region)} JSON: ${origin}${researchPath(region)}.json`,
+            link(`Humanoid availability in ${regionName(region)}`, `${origin}${researchPath(region)}`),
+            link(`${regionName(region)} methodology`, `${origin}${researchPath(region)}#method`),
+            link(`${regionName(region)} JSON`, `${origin}${researchPath(region)}.json`),
           ]),
           "",
         ];
@@ -70,16 +77,16 @@ export async function GET(): Promise<Response> {
     "- Publication is not verification: a published fact is not necessarily human-verified. Read its recorded confidence and verified_at.",
     "",
     "## Canonical entry points",
-    `- Catalogue: ${origin}/robots`,
-    `- Manufacturers: ${origin}/manufacturers`,
-    `- Use cases: ${origin}/use-cases`,
-    `- About HumanoidOnline (entity, methodology, FAQ): ${origin}/about`,
-    `- Sitemap: ${origin}/sitemap.xml`,
+    link("Catalogue", `${origin}/robots`),
+    link("Manufacturers", `${origin}/manufacturers`),
+    link("Use cases", `${origin}/use-cases`),
+    link("About HumanoidOnline", `${origin}/about`, "entity, methodology, FAQ"),
+    link("Sitemap", `${origin}/sitemap.xml`),
     "",
     ...researchSection,
     "## Robots (published, canonical)",
     ...robots.map(
-      (r) => `- ${r.name} (${r.manufacturer.name}): ${origin}/robots/${r.slug}`,
+      (r) => link(r.name, `${origin}/robots/${r.slug}`, r.manufacturer.name),
     ),
     "",
     // DR-L1: only when at least one published line exists (an empty heading would announce nothing).
@@ -87,14 +94,14 @@ export async function GET(): Promise<Response> {
       ? []
       : [
           "## Product lines (published, canonical)",
-          ...productLines.map((l) => `- ${l.name} (${l.manufacturer.name}): ${origin}/lines/${l.slug}`),
+          ...productLines.map((l) => link(l.name, `${origin}/lines/${l.slug}`, l.manufacturer.name)),
           "",
         ]),
     "## Manufacturers (published, canonical)",
-    ...manufacturers.map((m) => `- ${m.name}: ${origin}/manufacturers/${m.slug}`),
+    ...manufacturers.map((m) => link(m.name, `${origin}/manufacturers/${m.slug}`)),
     "",
     "## Use cases (published, canonical)",
-    ...useCases.map((u) => `- ${u.name}: ${origin}/use-cases/${u.slug}`),
+    ...useCases.map((u) => link(u.name, `${origin}/use-cases/${u.slug}`)),
     "",
   ];
 

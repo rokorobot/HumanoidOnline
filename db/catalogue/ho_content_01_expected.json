@@ -1,0 +1,775 @@
+{
+  "_comment": "HO-CONTENT-01 + DR-C2: expected business changes for `import_catalogue.py --manufacturers-only` then `--use-cases-only` on a production clone holding migration 0028. Written from the catalogue files (PR #235 head vs main) plus the owner-approved pending makers aimoga and faraday-future. No robot, offer, fit, image, publication or other table changes.",
+  "expected": [
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "1x-technologies"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "1x-technologies",
+        "source_url": "https://www.1x.tech/neo"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "agibot"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "agibot",
+        "source_url": "https://www.agibot.com/about_Zhiyuan"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "agility-robotics"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "agility-robotics",
+        "source_url": "https://agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "ADDED",
+      "match": {
+        "slug": "aimoga"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "aimoga",
+        "source_url": "https://bernama.com/en/press/news.php?id=2622475"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "astribot"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "astribot",
+        "source_url": "https://www.astribot.com/"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "booster-robotics"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "booster-robotics",
+        "source_url": "https://www.booster.tech/about-us"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "clone-robotics"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "clone-robotics",
+        "source_url": "https://clonerobotics.com/android/"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "engineered-arts"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "engineered-arts",
+        "source_url": "https://engineeredarts.com/robot/ameca/"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "ADDED",
+      "match": {
+        "slug": "faraday-future"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "faraday-future",
+        "source_url": "https://robotics.ff.com/us/ff-futurist/"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "figure-ai"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "figure-ai",
+        "source_url": "https://www.figure.ai/news/production-at-bmw"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "fourier-intelligence"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "fourier-intelligence",
+        "source_url": "https://www.wipo.int/en/web/ip-advantage/w/stories/fourier-healthcare-robots-with-humanoid-designs"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "galbot"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "galbot",
+        "source_url": "https://www.therobotreport.com/galbot-picks-up-153m-commercialize-g1-semi-humanoid/"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "galbot",
+        "source_url": "http://www.galbot.com/about/"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "honda"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "honda",
+        "source_url": "https://global.honda/en/robotics/asimo/"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "limx-dynamics"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "limx-dynamics",
+        "source_url": "https://www.limxdynamics.com/en/about"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "neura-robotics"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "REMOVED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "neura-robotics",
+        "source_url": "https://neura-robotics.com/about-us/"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "neura-robotics",
+        "source_url": "https://neura-robotics.com/about-us/"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "neura-robotics",
+        "source_url": "https://neura-robotics.com/about-us/"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "pal-robotics"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "pal-robotics",
+        "source_url": "https://pal-robotics.com/timeline/"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "rainbow-robotics"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "rainbow-robotics",
+        "source_url": "https://www.rainbow-robotics.com/"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "sanctuary-ai"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "sanctuary-ai",
+        "source_url": "https://sanctuary.ai/"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "softbank-robotics"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "softbank-robotics",
+        "source_url": "https://www.softbankrobotics.com/profile/"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "toyota"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "toyota",
+        "source_url": "https://global.toyota/en/newsroom/corporate/19841525.html"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "ubtech-robotics"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "ubtech-robotics",
+        "source_url": "https://www.ubtrobot.com/en/about/company-profile"
+      },
+      "count": 1
+    },
+    {
+      "table": "manufacturer",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "unitree"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "MANUFACTURER",
+        "subject": "unitree",
+        "source_url": "https://www.unitree.com/about"
+      },
+      "count": 1
+    },
+    {
+      "table": "use_case",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "events-entertainment"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "events-entertainment",
+        "source_url": "https://engineeredarts.com/robot/ameca/"
+      },
+      "count": 1
+    },
+    {
+      "table": "use_case",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "healthcare-rehabilitation"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "healthcare-rehabilitation",
+        "source_url": "https://www.wipo.int/en/web/ip-advantage/w/stories/fourier-healthcare-robots-with-humanoid-designs"
+      },
+      "count": 1
+    },
+    {
+      "table": "use_case",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "home"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "home",
+        "source_url": "https://www.1x.tech/discover/neo-home-robot"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "home",
+        "source_url": "https://www.1x.tech/discover/neo-home-robot"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "home",
+        "source_url": "https://www.1x.tech/neo"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "home",
+        "source_url": "https://www.1x.tech/neo"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "home",
+        "source_url": "https://www.figure.ai/news/introducing-figure-03"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "home",
+        "source_url": "https://roadtovr.com/helper-robot-neo-vr-telepresence/"
+      },
+      "count": 1
+    },
+    {
+      "table": "use_case",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "manufacturing"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "manufacturing",
+        "source_url": "https://www.figure.ai/news/production-at-bmw"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "manufacturing",
+        "source_url": "https://www.figure.ai/news/production-at-bmw"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "manufacturing",
+        "source_url": "https://www.figure.ai/news/production-at-bmw"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "manufacturing",
+        "source_url": "https://www.prnewswire.com/news-releases/apptronik-and-mercedes-benz-enter-commercial-agreement-that-will-pilot-apptroniks-apollo-humanoid-robot-in-mercedes-benz-manufacturing-facilities-302089972.html"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "manufacturing",
+        "source_url": "https://www.prnewswire.com/news-releases/ubtech-humanoid-robot-walker-s2-begins-mass-production-and-delivery-with-orders-exceeding-800-million-yuan-302616924.html"
+      },
+      "count": 1
+    },
+    {
+      "table": "use_case",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "research-education"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "research-education",
+        "source_url": "https://www.unitree.com/g1"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "research-education",
+        "source_url": "https://www.booster.tech/about-us"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "research-education",
+        "source_url": "https://www.booster.tech/about-us"
+      },
+      "count": 1
+    },
+    {
+      "table": "use_case",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "retail-service"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "retail-service",
+        "source_url": "http://www.galbot.com/g1/"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "retail-service",
+        "source_url": "https://www.therobotreport.com/galbot-picks-up-153m-commercialize-g1-semi-humanoid/"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "retail-service",
+        "source_url": "https://www.softbankrobotics.com/profile/"
+      },
+      "count": 1
+    },
+    {
+      "table": "use_case",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "security-inspection"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "security-inspection",
+        "source_url": "https://bostondynamics.com/products/spot/"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "security-inspection",
+        "source_url": "https://bostondynamics.com/products/atlas/"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "security-inspection",
+        "source_url": "https://www.prnewswire.com/news-releases/kepler-debuts-forerunner-k2-humanoid-robot-accelerating-commercial-deployment-302281546.html"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "security-inspection",
+        "source_url": "https://www.unitree.com/about"
+      },
+      "count": 1
+    },
+    {
+      "table": "use_case",
+      "kind": "CHANGED",
+      "match": {
+        "slug": "warehouse-logistics"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "warehouse-logistics",
+        "source_url": "https://agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "warehouse-logistics",
+        "source_url": "https://www.agilityrobotics.com/solutions"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "warehouse-logistics",
+        "source_url": "https://www.agilityrobotics.com/solutions"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "warehouse-logistics",
+        "source_url": "https://www.mta.org.uk/resources/iso-np-25785-1-link-to-new-work-item-proposal/"
+      },
+      "count": 1
+    },
+    {
+      "table": "evidence_source",
+      "kind": "ADDED",
+      "match": {
+        "subject_type": "USE_CASE",
+        "subject": "warehouse-logistics",
+        "source_url": "https://www.iso.org/standard/91469.html"
+      },
+      "count": 1
+    }
+  ]
+}

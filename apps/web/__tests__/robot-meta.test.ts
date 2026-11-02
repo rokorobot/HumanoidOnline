@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import { hasPublishedPrice, robotTitle } from "@/lib/robot-meta";
@@ -37,5 +40,14 @@ describe("robotTitle", () => {
 
   it("does not repeat a maker already in the model name", () => {
     expect(robotTitle(robot("Unitree H1", "Unitree Robotics"))).toBe("Unitree H1: Specs, Status & Evidence");
+  });
+});
+
+// Owner decision 2026-11-02: spec caveats are not rendered under the robot page's spec rows.
+
+describe("robot page spec rows", () => {
+  it("do not render spec caveats", () => {
+    const page = readFileSync(join(__dirname, "..", "app", "robots", "[slug]", "page.tsx"), "utf8");
+    expect(page).not.toMatch(/spec_caveats\.map|caveats\.get\(/);
   });
 });

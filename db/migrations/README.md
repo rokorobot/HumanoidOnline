@@ -365,6 +365,7 @@ canonical set from these files on every CI run and fails on any drift.
   does. No new table or column; the label is appended last, matching `db/schema.sql`. Only
   declares the label (a new enum label cannot be used in the transaction that adds it), so it
   inserts no row. Additive and idempotent. The importer loads rows from the optional `evidence`
-  list per use case in `db/catalogue/use_cases.json`, marked `managed_by='CATALOGUE_IMPORT'`.
+  list per use case in `db/catalogue/use_cases.json`, marked `managed_by='CATALOGUE_IMPORT'`;
+  `uv run db/import_catalogue.py --use-cases-only` loads just that file.
   **Apply to a database before deploying an API build that lists it in its bundled manifest**
   (a strict environment refuses to start otherwise).

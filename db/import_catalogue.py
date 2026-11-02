@@ -80,6 +80,15 @@ MANUFACTURER-ONLY MODE (`--manufacturers-only`)
   source attribution are validated before the transaction opens; the write is a
   single transaction. It is the production rollout path for manufacturer data.
 
+USE-CASES-ONLY MODE (`--use-cases-only`)
+  Imports db/catalogue/use_cases.json and nothing else: upserts the use-case rows
+  and reconciles their USE_CASE evidence (DR-C2, `managed_by = 'CATALOGUE_IMPORT'`;
+  unmarked rows are preserved). No robot file is read, and no robot, publication
+  state, use_case_fit, offer, manufacturer, provider, region or any other evidence
+  row is written. The file is validated before the transaction opens; the write is a
+  single transaction. It is the production rollout path when the repository holds
+  merged-but-unimported catalogue changes that a full run would also apply.
+
 SCOPED IMPORT (`--only <robot>`) IS ROBOT-SCOPED RECONCILIATION
   It reconciles the COMPLETE canonical JSON of the selected robots and what they reference with
   the database; it is not "apply only the newest materialized claims". Evidence and facts in
@@ -2011,6 +2020,58 @@ def run_product_lines_only(url: str, *, product_lines_path: Path | None = None,
     return recon
 
 
+class UseCasesImportAborted(SystemExit):
+    """`--use-cases-only` refused before writing anything."""
+
+
+def use_case_file_problems(data: dict) -> list[str]:
+    """Every reason `use_cases.json` must not be written, or [] when clean. Pure."""
+    rows = data.get("use_cases")
+    if not isinstance(rows, list) or not rows:
+        return ["use_cases.json has no non-empty 'use_cases' list"]
+    problems: list[str] = []
+    seen: set[str] = set()
+    for i, u in enumerate(rows):
+        slug = u.get("slug")
+        if not isinstance(slug, str) or not slug.strip():
+            problems.append(f"use_cases[{i}]: missing slug")
+        elif slug in seen:
+            problems.append(f"{slug}: duplicate slug")
+        else:
+            seen.add(slug)
+        if not isinstance(u.get("name"), str) or not u["name"].strip():
+            problems.append(f"{slug or f'use_cases[{i}]'}: missing name")
+    return problems + validate_use_case_evidence(data)
+
+
+def run_use_cases_only(url: str, *, use_cases_path: Path | None = None,
+                       authorize=None) -> Reconciliation:
+    """Import ONLY use_cases.json: upsert the use cases and reconcile their USE_CASE evidence.
+
+    No robot file is read and nothing but `use_case` rows and the importer's own USE_CASE
+    `evidence_source` rows is written (the catalogue-freshness trigger bookkeeping aside).
+    One transaction, so a refusal commits nothing.
+    """
+    path = use_cases_path or CATALOGUE_DIR / "use_cases.json"
+    data = _load(path)
+    problems = use_case_file_problems(data)
+    if problems:
+        raise UseCasesImportAborted(
+            f"use-cases-only import refused before writing - {len(problems)} problem(s) in "
+            f"{path.name}:\n  " + "\n  ".join(problems))
+    recon = Reconciliation(authorize)
+    with psycopg.connect(url, autocommit=False) as conn:
+        with conn.cursor() as cur:
+            cur.execute("SET search_path TO humanoid, public")
+            import_use_cases(cur, data, recon)
+            recon.finish()
+        conn.commit()
+    print(f"USE-CASES-ONLY IMPORT OK: {len(data['use_cases'])} use case(s).")
+    print(recon.summary())
+    print("Robots, fits, offers, other evidence and every other table were not read or written.")
+    return recon
+
+
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description="Import the WS2B verified catalogue")
     ap.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
@@ -2052,6 +2113,15 @@ def main(argv: list[str] | None = None) -> None:
              "combined with --only or --manufacturers-only.",
     )
     ap.add_argument(
+        "--use-cases-only",
+        action="store_true",
+        help="Import ONLY db/catalogue/use_cases.json: upsert the use cases and reconcile "
+             "their USE_CASE evidence (DR-C2). No robot file is read and nothing else is "
+             "written. Validated before writing, in one transaction. Cannot be combined "
+             "with --only, --manufacturers-only, --product-lines-only or "
+             "--apply-publication-state.",
+    )
+    ap.add_argument(
         "--authorize",
         metavar="PATH",
         help="JSON file of changes the importer may make beyond inserting and updating "
@@ -2062,6 +2132,15 @@ def main(argv: list[str] | None = None) -> None:
              "and an entry that matches nothing aborts the run.",
     )
     args = ap.parse_args(argv)
+    if args.use_cases_only:
+        conflicts = [flag for flag, given in (
+            ("--only", bool(args.only)),
+            ("--manufacturers-only", args.manufacturers_only),
+            ("--product-lines-only", args.product_lines_only),
+            ("--apply-publication-state", args.apply_publication_state),
+        ) if given]
+        if conflicts:
+            ap.error("--use-cases-only cannot be combined with " + ", ".join(conflicts))
     if args.product_lines_only:
         conflicts = [flag for flag, given in (
             ("--only", bool(args.only)),
@@ -2078,6 +2157,9 @@ def main(argv: list[str] | None = None) -> None:
             ap.error("--manufacturers-only cannot be combined with " + ", ".join(conflicts))
     if not args.database_url:
         ap.error("no database URL: pass --database-url or set DATABASE_URL")
+    if args.use_cases_only:
+        run_use_cases_only(normalize_url(args.database_url), authorize=args.authorize)
+        return
     if args.product_lines_only:
         run_product_lines_only(normalize_url(args.database_url),
                                apply_publication_state=args.apply_publication_state,

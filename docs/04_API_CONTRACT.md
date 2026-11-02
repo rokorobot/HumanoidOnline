@@ -143,7 +143,9 @@ Profile fields: `legal_name`, `country` (headquarters), `headquarters_city`, `in
 ## 3. Use cases
 
 ### `GET /api/use-cases` — index with `robot_count` per use case.
-### `GET /api/use-cases/{slug}` — detail + `suitable_robots: [{slug, name, fit_score, commercial_readiness, limitations}]` ordered by `fit_score` desc.
+### `GET /api/use-cases/{slug}` — detail + `suitable_robots: [{slug, name, fit_score, commercial_readiness, limitations}]` ordered by `fit_score` desc + `sources: []`.
+
+`sources[]` (DR-C2): the use case's `evidence_source` rows (`subject_type = 'USE_CASE'`), newest observation first, in exactly the shape of `GET /api/manufacturers/{slug}` `sources[]` — `{claim_fields[], source_type, source_title, source_url, published_at, observed_at, verified_at, confidence, retrieval}`. `claim_fields` names the use-case fields the source supports (`description`, `typical_requirements`, `key_limitations`, `typical_tasks`). Internal `note` and `excerpt` are not published. `[]` = no evidence recorded, which asserts nothing about the text.
 
 ## 3a. Product lines (DR-L1)
 

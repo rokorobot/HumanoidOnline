@@ -18,22 +18,11 @@ from app.schemas.manufacturer import (
     ManufacturerDetail,
     ManufacturerListItem,
     ManufacturerRobot,
-    ManufacturerSource,
     ProviderRead,
 )
-from app.services.reads import _primary_image, derive_portfolio_status
+from app.services.reads import _primary_image, derive_portfolio_status, source_read
 
 router = APIRouter(prefix="/api/manufacturers", tags=["manufacturers"])
-
-#: docs/26 §3.1 fixed provenance statement prefix.
-_AGENT_RETRIEVAL_PREFIX = "RETRIEVAL: AGENT_ASSISTED_RESEARCH"
-
-
-def _retrieval(note: str | None) -> str | None:
-    if note and note.startswith(_AGENT_RETRIEVAL_PREFIX):
-        return "AGENT_ASSISTED_RESEARCH"
-    return None
-
 
 @router.get("", response_model=Page[ManufacturerListItem])
 def list_manufacturers(
@@ -183,18 +172,5 @@ def get_manufacturer(
         ],
         providers=[ProviderRead(slug=p.slug, name=p.name, type=p.type) for p in providers],
         deployments=deployments,
-        sources=[
-            ManufacturerSource(
-                claim_fields=list(e.claim_fields or []),
-                source_type=e.source_type,
-                source_title=e.source_title,
-                source_url=e.source_url,
-                published_at=e.published_at,
-                observed_at=e.observed_at,
-                verified_at=e.verified_at,
-                confidence=e.confidence,
-                retrieval=_retrieval(e.note),
-            )
-            for e in evidence_rows
-        ],
+        sources=[source_read(e) for e in evidence_rows],
     )

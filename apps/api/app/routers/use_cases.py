@@ -8,11 +8,12 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.db.session import get_session
+from app.models.evidence import EvidenceSource
 from app.models.robot import Robot
 from app.models.use_case import UseCase, UseCaseFit
 from app.schemas.common import Page
 from app.schemas.use_case import SuitableRobot, UseCaseDetail, UseCaseListItem
-from app.services.reads import _primary_image
+from app.services.reads import _primary_image, source_read
 
 router = APIRouter(prefix="/api/use-cases", tags=["use-cases"])
 
@@ -83,6 +84,15 @@ def get_use_case(
         reverse=True,
     )
 
+    # Deterministic order, as on the manufacturer page: newest observation first,
+    # then URL, then the internal id (never exposed).
+    evidence_rows = session.execute(
+        select(EvidenceSource)
+        .where(EvidenceSource.subject_type == "USE_CASE", EvidenceSource.subject_id == u.id)
+        .order_by(EvidenceSource.observed_at.desc(), EvidenceSource.source_url,
+                  EvidenceSource.id)
+    ).scalars().all()
+
     return UseCaseDetail(
         id=str(u.id),
         slug=u.slug,
@@ -93,4 +103,5 @@ def get_use_case(
         typical_requirements=u.typical_requirements,
         key_limitations=u.key_limitations,
         suitable_robots=suitable,
+        sources=[source_read(e) for e in evidence_rows],
     )

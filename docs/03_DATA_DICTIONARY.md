@@ -158,6 +158,8 @@ Every manufacturer profile is public, so its company claims are attributed per f
 | `is_public_company` (Public company) | Whether **this** entity's shares are listed. TRUE/FALSE require a sourced claim; NULL = unknown | rendered as NO when NULL; TRUE because a parent is listed |
 | `parent_company` / `parent_listing` / `parent_relationship` | Listed-parent or group ownership, kept separate from the entity's own status | stored in `funding_status` |
 
+**Use-case text evidence (migration 0028, DR-C2).** Use-case `description`, `typical_requirements`, `key_limitations` and `typical_tasks` may state facts (named deployments, orders, published figures). Each such claim is attributed the same way: an `evidence_source` row with `subject_type = 'USE_CASE'`, `subject_id = use_case.id` and `claim_fields` naming the use-case fields it supports. The catalogue importer writes them from the optional `evidence` list in `db/catalogue/use_cases.json` with `managed_by = 'CATALOGUE_IMPORT'` and never touches unmarked rows. Editorial text with no factual claim needs no row.
+
 Card-level derived labels: **Published model status** is derived from *published* catalogue records only (`NONE PUBLISHED` when none; `ALL DISCONTINUED` only when every published record is discontinued) and never describes unpublished records or the company. **Catalogue models** shows `N TRACKED · M PUBLISHED`, both counted from records.
 
 `db/validate_catalogue.py` fails when an asserted `deployment_status` (other than UNKNOWN), a non-NULL `is_public_company`, or a `parent_company` lacks a MANUFACTURER evidence row naming that field.

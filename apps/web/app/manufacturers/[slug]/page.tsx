@@ -6,14 +6,14 @@ import { cache } from "react";
 
 import { findManufacturer } from "@/lib/api-client";
 import { buildManufacturerJsonLd } from "@/lib/jsonld";
-import { confidenceLabel, enumLabel, sourceTypeLabel, statusLabel } from "@/lib/labels";
+import { enumLabel, statusLabel } from "@/lib/labels";
 import { boolLabel, deploymentMeaning, formatDate, regionLabel } from "@/lib/format";
 import { manufacturerProfileView } from "@/lib/manufacturer-profile";
 import { fitDescription, fitTitle } from "@/lib/meta-text";
 import { absoluteUrl } from "@/lib/site";
-import type { ManufacturerSource } from "@/lib/types";
 import { JsonLd } from "@/components/JsonLd";
 import { RobotThumb } from "@/components/RobotThumb";
+import { SourceRow } from "@/components/SourceRow";
 import { StatusBracket } from "@/components/StatusBadge";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteNav } from "@/components/SiteNav";
@@ -25,27 +25,6 @@ export const dynamic = "force-dynamic";
 // WS8.5 / R22 — one governed read shared by the page and generateMetadata via
 // React cache() (per-request memoization), never an alternate data path.
 const getManufacturerCached = cache(findManufacturer);
-
-// Human labels for the profile fields a company source can support.
-const FIELD_LABELS: Record<string, string> = {
-  legal_name: "legal entity",
-  country_region_code: "headquarters country",
-  headquarters_city: "headquarters city",
-  incorporation: "incorporation",
-  operating_locations: "other locations",
-  founded_year: "founded",
-  website_url: "website",
-  description: "description",
-  target_markets: "target markets",
-  commercial_model: "business model",
-  deployment_status: "humanoid deployment",
-  deployment_note: "deployment basis",
-  is_public_company: "public company",
-  ticker: "listing",
-  parent_company: "parent",
-  parent_listing: "parent listing",
-  parent_relationship: "ownership",
-};
 
 export async function generateMetadata({
   params,
@@ -71,45 +50,6 @@ function Fact({ k, v, unknown }: { k: string; v: string; unknown?: boolean }) {
     <div className="cf-row">
       <dt>{k}</dt>
       <dd style={unknown ? { color: "var(--ho-unknown)" } : undefined}>{v}</dd>
-    </div>
-  );
-}
-
-function SourceRow({ source: s }: { source: ManufacturerSource }) {
-  const published = formatDate(s.published_at);
-  const observed = formatDate(s.observed_at);
-  const verified = formatDate(s.verified_at);
-  const supports = s.claim_fields.map((f) => FIELD_LABELS[f] ?? f).join(", ");
-  return (
-    <div className="evrow">
-      <div className="subj">
-        {s.source_url ? (
-          <a href={s.source_url} target="_blank" rel="noopener noreferrer">
-            {s.source_title ?? s.source_url} ↗
-          </a>
-        ) : (
-          (s.source_title ?? "Untitled source")
-        )}
-        <br />
-        <span className="stamp">{supports ? `Supports: ${supports}` : "No field claim recorded"}</span>
-      </div>
-      <div className="src">
-        SOURCE: <span data-enum={s.source_type}>{sourceTypeLabel(s.source_type)}</span>
-        <br />
-        {published && <>PUBLISHED {published} · </>}
-        {observed && <>OBSERVED {observed}</>}
-        <br />
-        {verified ? (
-          <>VERIFIED {verified} &reg;</>
-        ) : s.retrieval === "AGENT_ASSISTED_RESEARCH" ? (
-          <>Agent-assisted research · not human-verified</>
-        ) : (
-          <>Unverified claim</>
-        )}
-      </div>
-      <div className="conf-cell stamp" data-enum={s.confidence}>
-        {confidenceLabel(s.confidence)}
-      </div>
     </div>
   );
 }

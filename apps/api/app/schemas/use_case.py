@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
+from app.schemas.manufacturer import ManufacturerSource
 from app.schemas.robot import RobotImagePrimary
 
 
@@ -34,3 +35,6 @@ class UseCaseDetail(BaseModel):
     typical_requirements: str | None = None
     key_limitations: str | None = None
     suitable_robots: list[SuitableRobot]
+    # Evidence rows (subject USE_CASE) for the factual claims in the text; same
+    # shape as ManufacturerDetail.sources. `claim_fields` names the supported fields.
+    sources: list[ManufacturerSource] = []

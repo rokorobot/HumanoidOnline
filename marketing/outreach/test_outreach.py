@@ -45,6 +45,22 @@ class TestDue(unittest.TestCase):
         self.assertEqual(len(followups), 3)
 
 
+class TestLoadEnv(unittest.TestCase):
+    def test_reads_quoted_values_without_overriding(self):
+        import tempfile
+        with tempfile.NamedTemporaryFile("w", suffix=".env", delete=False) as f:
+            f.write('# comment\nOUTREACH_T1="Ada L"\nOUTREACH_T2=keep\n')
+        os.environ["OUTREACH_T2"] = "env wins"
+        try:
+            o.load_env(f.name)
+            self.assertEqual(os.environ["OUTREACH_T1"], "Ada L")
+            self.assertEqual(os.environ["OUTREACH_T2"], "env wins")
+        finally:
+            os.unlink(f.name)
+            os.environ.pop("OUTREACH_T1", None)
+            os.environ.pop("OUTREACH_T2", None)
+
+
 class TestLinkRel(unittest.TestCase):
     def test_variants(self):
         self.assertEqual(o.link_rel('<a href="https://humanoidonline.com/robots">x</a>'), "followed")

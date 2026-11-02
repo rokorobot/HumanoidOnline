@@ -23,7 +23,7 @@ Standard library only; no installs.
 
 Rows with `channel` = `form`, `post`, `pr` or `manual` are never emailed. Submit those by hand, or ask the agent to fill the form (you approve each submit). Reddit, Hacker News and forum posts must be posted by you: automated posting breaks those sites' rules.
 
-## Settings (environment variables, never committed)
+## Settings (environment variables or `marketing/outreach/.env`, never committed)
 
 `SMTP_HOST`, `SMTP_PORT` (587), `SMTP_USER`, `SMTP_PASSWORD`, `OUTREACH_FROM`, `OUTREACH_FROM_NAME`, `OUTREACH_SENDER_TITLE`, `OUTREACH_POSTAL_ADDRESS`
 

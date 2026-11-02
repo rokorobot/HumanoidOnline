@@ -85,7 +85,19 @@ def due(rows, today):
     return pitches, followups
 
 
+def load_env(path=os.path.join(HERE, ".env")):
+    """Read KEY=VALUE lines from marketing/outreach/.env (git-ignored) without overriding the environment."""
+    if not os.path.exists(path):
+        return
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            key, sep, value = line.strip().partition("=")
+            if sep and not key.startswith("#"):
+                os.environ.setdefault(key.strip(), value.strip().strip("'\""))
+
+
 def config():
+    load_env()
     cfg = {
         "name": os.environ.get("OUTREACH_FROM_NAME", ""),
         "title": os.environ.get("OUTREACH_SENDER_TITLE", "Founder"),

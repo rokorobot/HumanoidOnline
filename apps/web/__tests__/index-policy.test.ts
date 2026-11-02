@@ -14,7 +14,7 @@ describe("comparePolicy", () => {
     for (const raw of ["unitree-g1,booster-k1", "booster-k1,unitree-g1", " booster-k1 , unitree-g1 ", ["booster-k1", "unitree-g1"]]) {
       expect(comparePolicy(raw)).toEqual({
         pair: ["booster-k1", "unitree-g1"],
-        meta: { alternates: { canonical: "/compare?ids=booster-k1,unitree-g1" } },
+        meta: { alternates: { canonical: "/compare/booster-k1-vs-unitree-g1" } },
       });
     }
   });

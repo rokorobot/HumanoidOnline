@@ -35,7 +35,7 @@ export async function generateMetadata({
   const m = await getManufacturerCached(slug);
   if (!m) return { title: "Not found" };
   return {
-    title: fitTitle(m.name),
+    title: fitTitle(`${m.name} Humanoid Robots & Company Profile`),
     description: fitDescription(
       m.description,
       `${m.name}: humanoid-robot manufacturer profile and verified platforms on HumanoidOnline.`,

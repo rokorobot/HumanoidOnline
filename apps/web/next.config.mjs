@@ -111,6 +111,7 @@ export const CDN_CACHED_PAGES = [
   "/robots",
   "/robots/:slug",
   "/compare",
+  "/compare/:pair",
   "/lines/:slug",
   "/manufacturers",
   "/manufacturers/:slug",

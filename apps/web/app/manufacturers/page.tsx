@@ -16,9 +16,9 @@ export const dynamic = "force-dynamic";
 // WS8.5 / R22 — specific per-route title (no generic root inheritance).
 export function generateMetadata(): Metadata {
   return {
-    title: "Manufacturers",
+    title: "Humanoid Robot Manufacturers & Companies",
     description:
-      "Humanoid-robot manufacturers tracked by HumanoidOnline, with their verified platforms.",
+      "Every humanoid robot manufacturer tracked by HumanoidOnline: the companies, their robots, commercial status and evidence-backed availability.",
     alternates: { canonical: absoluteUrl("/manufacturers") },
   };
 }

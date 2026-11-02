@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { fetchResearchProjection, researchSitemapEntries } from "@/lib/research";
+import { curatedPairPaths } from "@/lib/compare-pairs";
 import { siteUrl } from "@/lib/site";
 import {
   lastMod,
@@ -87,6 +88,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
 
+  // SEO-04: the curated "A vs B" pages — the same bounded set robot pages link to.
+  const pairPages: MetadataRoute.Sitemap = curatedPairPaths(robots).map((path) => ({
+    url: `${origin}${path}`,
+    changeFrequency: "weekly",
+    priority: 0.6,
+  }));
+
   // ADR-027: regional research resources appear ONLY once published (closed and
   // preview-only resources must not be discoverable); lastModified is the real
   // latest evidence date, never the render time.
@@ -103,5 +111,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Grouped by entity type. At catalogue scale this is one file; Next's
   // generateSitemaps() is the split-by-type path when the catalogue grows.
-  return [...core, ...robotPages, ...linePages, ...mfrPages, ...useCasePages, ...researchHub, ...researchPages];
+  return [...core, ...robotPages, ...linePages, ...mfrPages, ...useCasePages, ...pairPages, ...researchHub, ...researchPages];
 }

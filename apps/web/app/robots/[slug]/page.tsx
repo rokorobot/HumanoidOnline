@@ -9,6 +9,8 @@ import { cache } from "react";
 
 import { findManufacturer, findRobot, listRegions } from "@/lib/api-client";
 import { robotTitle } from "@/lib/robot-meta";
+import { alternativesFor, pairPath } from "@/lib/compare-pairs";
+import { listAllRobots } from "@/lib/seo";
 import { fitDescription, fitTitle } from "@/lib/meta-text";
 import { providerLabel, providerNamesFrom, type ProviderNames } from "@/lib/providers";
 import { buildRobotJsonLd } from "@/lib/jsonld";
@@ -168,11 +170,15 @@ export default async function RobotDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [robot, countries] = await Promise.all([
+  const [robot, countries, catalogue] = await Promise.all([
     getRobotCached(slug),
     listRegions({ type: "COUNTRY" }),
+    // SEO-04: a failed catalogue read only hides the alternatives block.
+    listAllRobots().catch(() => []),
   ]);
   if (!robot) notFound();
+  const self = catalogue.find((r) => r.slug === robot.slug);
+  const alternatives = self ? alternativesFor(self, catalogue) : [];
 
   // UX-02B: the maker's own providers are the only authoritative seller names the API returns.
   // A failed read must not break the page: sellers then fall back to their identifier.
@@ -663,6 +669,39 @@ export default async function RobotDetailPage({
             </p>
           )}
         </section>
+
+        {/* SEO-04 — closest alternatives, each a real link to its clean "A vs B" page */}
+        {alternatives.length > 0 && (
+          <section className="blk" id="alternatives">
+            <div className="blk-head">
+              <div>
+                <SectionIndex>05 — ALTERNATIVES</SectionIndex>
+                <h2>{robot.name} alternatives</h2>
+              </div>
+              <SystemLabel>Closest robots by status, mobility, size and payload</SystemLabel>
+            </div>
+            <div className="matrix">
+              <div className="mrow head">
+                <span>Robot</span>
+                <span>Manufacturer</span>
+                <span>Compare</span>
+              </div>
+              {alternatives.map((o) => (
+                <div className="mrow" key={o.slug}>
+                  <span>
+                    <Link href={`/robots/${o.slug}`}>{o.name}</Link>
+                  </span>
+                  <span>{o.manufacturer.name}</span>
+                  <span>
+                    <Link href={pairPath(robot.slug, o.slug)} style={{ textDecoration: "underline" }}>
+                      {robot.name} vs {o.name}
+                    </Link>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* COMMERCIAL ACTION PANEL */}
         <div className="action-panel">

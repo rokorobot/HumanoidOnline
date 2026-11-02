@@ -4,6 +4,8 @@
 // Pure: same input → same decision. `follow` stays on so links still pass through.
 import type { Metadata } from "next";
 
+import { pairPath } from "@/lib/compare-pairs";
+
 const NOINDEX: Metadata["robots"] = { index: false, follow: true };
 
 function uniqueIds(raw: string | string[] | undefined): string[] {
@@ -12,8 +14,8 @@ function uniqueIds(raw: string | string[] | undefined): string[] {
 }
 
 // Indexable: the bare /compare page and exactly-two-robot pairs. A pair's canonical is
-// its sorted, parameter-free URL, so ordering and view state (ref/units/view/region)
-// fold into one page. Every other selection is noindex.
+// its clean sorted page /compare/<a>-vs-<b> (SEO-04), so ordering and view state
+// (ref/units/view/region) fold into one page. Every other selection is noindex.
 export function comparePolicy(raw: string | string[] | undefined): {
   pair: [string, string] | null;
   meta: Pick<Metadata, "robots" | "alternates">;
@@ -22,7 +24,7 @@ export function comparePolicy(raw: string | string[] | undefined): {
   if (ids.length === 0) return { pair: null, meta: { alternates: { canonical: "/compare" } } };
   if (ids.length !== 2) return { pair: null, meta: { robots: NOINDEX } };
   const pair = [...ids].sort() as [string, string];
-  return { pair, meta: { alternates: { canonical: `/compare?ids=${pair.join(",")}` } } };
+  return { pair, meta: { alternates: { canonical: pairPath(...pair) } } };
 }
 
 // The unfiltered catalogue is the canonical page; any filter, sort or query is noindex.

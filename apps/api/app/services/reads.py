@@ -17,6 +17,7 @@ from app.models.evidence import EvidenceSource
 from app.models.robot import Robot
 from app.models.spec import Specification
 from app.schemas.common import EvidenceRead, ManufacturerRef, PriceDisplay
+from app.schemas.manufacturer import ManufacturerSource
 from app.schemas.robot import (
     AvailabilityOfferRead,
     CapabilityRead,
@@ -86,6 +87,30 @@ def _spec_value(spec: Specification) -> float | bool | str | None:
     if spec.value_bool is not None:
         return spec.value_bool
     return spec.value_text
+
+
+#: docs/26 §3.1 fixed provenance statement prefix.
+_AGENT_RETRIEVAL_PREFIX = "RETRIEVAL: AGENT_ASSISTED_RESEARCH"
+
+
+def source_read(row: EvidenceSource) -> ManufacturerSource:
+    """A MANUFACTURER or USE_CASE evidence row as the public `sources` entry.
+
+    The free-text `note` is internal provenance wording and is not published;
+    `retrieval` exposes the one fact from it a reader needs (docs/26).
+    """
+    return ManufacturerSource(
+        claim_fields=list(row.claim_fields or []),
+        source_type=row.source_type,
+        source_title=row.source_title,
+        source_url=row.source_url,
+        published_at=row.published_at,
+        observed_at=row.observed_at,
+        verified_at=row.verified_at,
+        confidence=row.confidence,
+        retrieval=("AGENT_ASSISTED_RESEARCH"
+                   if row.note and row.note.startswith(_AGENT_RETRIEVAL_PREFIX) else None),
+    )
 
 
 def load_evidence_rows(

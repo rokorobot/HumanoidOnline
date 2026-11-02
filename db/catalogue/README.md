@@ -23,7 +23,9 @@ db/catalogue/
   regions.json           <- region codes (GLOBAL, US, CN, EU, DE, NO, UK ...)
   providers.json         <- commercial counterparties (OEM store, RaaS provider ...)
   capabilities.json      <- capability catalogue (descriptive, not commercial)
-  use_cases.json         <- use-case catalogue
+  use_cases.json         <- use-case catalogue (+ optional per-use-case `evidence`: USE_CASE
+                            evidence rows, claim_fields naming the text fields supported;
+                            see section 3)
   use_case_assessments/  <- per-robot use-case evaluations (section 7)
   manufacturers.json     <- OEM company profiles (+ MANUFACTURER evidence, each row's
                             claim_fields naming the profile fields it supports;
@@ -246,6 +248,19 @@ For **every** commercial fact record: `source_url`, `source_type` (mapped to the
 - Prefer primary sources over media/aggregators; secondary sources are for discovery
   / corroboration only, never the sole basis for a `VERIFIED` fact.
 - `is_published = true` **only** when every published commercial fact carries evidence.
+
+### Use-case text evidence (DR-C2)
+
+Use-case `description`, `typical_requirements`, `key_limitations` and `typical_tasks` that
+state a fact (a named deployment, an order, a published figure) carry evidence the same way a
+manufacturer profile does: an optional `evidence: [ ... ]` list on the use case in
+`use_cases.json`. Each object has `source_type`, `observed_at`, `confidence`, `claim_fields`
+(a non-empty subset of `description`, `typical_requirements`, `key_limitations`,
+`typical_tasks`), and `source_url`, `source_title`, `excerpt` (the exact supported fact) and
+`note` as for any evidence. The importer writes them as `subject_type='USE_CASE'`,
+`managed_by='CATALOGUE_IMPORT'`, validates them before opening a transaction, and leaves unmarked rows alone.
+Editorial text with no factual claim needs no row. The API returns them as `sources` on
+`GET /api/use-cases/{slug}`; the page lists them under "Sources".
 
 ### Status normalization (deterministic mappings)
 

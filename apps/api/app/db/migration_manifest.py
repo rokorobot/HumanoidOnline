@@ -104,4 +104,7 @@ MIGRATIONS: dict[str, str] = {
     "0027_product_line": (
         "2c89a1a9ade09bdcd05c3a41cfc044baac40de4a471b06570c616865c081b376"
     ),
+    "0028_use_case_evidence": (
+        "e1b3e663f23d6a07973ce5eeafddd194af02a00095f68d84091aa6dbe00e9374"
+    ),
 }

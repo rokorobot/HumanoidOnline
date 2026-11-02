@@ -211,7 +211,8 @@ CREATE TYPE evidence_subject AS ENUM (
     'PRICING_OFFER',
     'AVAILABILITY_OFFER',
     'DEPLOYMENT',
-    'PROVIDER'
+    'PROVIDER',
+    'USE_CASE'
 );
 
 -- Lifecycle of a qualified commercial lead (survives every phase).
@@ -802,7 +803,7 @@ CREATE TABLE evidence_source (
     verified_at   TIMESTAMPTZ,
     confidence    confidence_level NOT NULL DEFAULT 'MEDIUM',
     note          TEXT,
-    claim_fields  TEXT[],                -- MANUFACTURER rows: profile fields supported
+    claim_fields  TEXT[],                -- MANUFACTURER / USE_CASE rows: fields supported
     managed_by    TEXT,                  -- 'CATALOGUE_IMPORT' = written by the importer
     created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -811,7 +812,9 @@ COMMENT ON TABLE evidence_source IS
     'deployment...). Polymorphic via (subject_type, subject_id). Powers the '
     '"Verified: 2026-07-24 / Source: manufacturer store" indicators. The moat.';
 COMMENT ON COLUMN evidence_source.claim_fields IS
-    'MANUFACTURER rows: the profile fields this source supports. NULL = no field claim.';
+    'MANUFACTURER and USE_CASE rows: the fields this source supports (manufacturer '
+    'profile fields; use_case description, typical_requirements, key_limitations, '
+    'typical_tasks). NULL = no field claim.';
 
 -- =============================================================================
 -- SECTION 4 — DECISION LAYER: BUYER INTENT & MATCHING (Phase 2)

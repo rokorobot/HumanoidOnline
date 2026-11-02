@@ -352,7 +352,7 @@ export interface ManufacturerDeployment {
 }
 
 export interface ManufacturerSource {
-  // Profile fields this company-level source supports.
+  // Fields this source supports: manufacturer profile fields, or use-case text fields.
   claim_fields: string[];
   source_type: string;
   source_title?: string | null;
@@ -427,6 +427,9 @@ export interface UseCaseDetail {
   typical_requirements?: string | null;
   key_limitations?: string | null;
   suitable_robots: SuitableRobot[];
+  // DR-C2: evidence for the factual claims in the text. OPTIONAL on purpose — the previous
+  // API (still serving while a web deploy goes live first) does not return it.
+  sources?: ManufacturerSource[] | null;
 }
 
 export interface RegionListItem {

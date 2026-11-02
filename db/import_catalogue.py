@@ -835,10 +835,59 @@ def manufacturer_key_problems(data: dict) -> list[str]:
     return out
 
 
-def reconcile_manufacturer_evidence(cur, recon: Reconciliation, manufacturer_slug: str,
-                                    manufacturer_id, evidence: list[dict]) -> dict:
-    """Reconcile ONE manufacturer's company-level evidence without touching rows this
-    importer does not own.
+#: use_case fields a USE_CASE evidence row may name in `claim_fields` (DR-C2).
+USE_CASE_CLAIMABLE_FIELDS = frozenset({
+    "description", "typical_requirements", "key_limitations", "typical_tasks",
+})
+
+
+def validate_use_case_evidence(data: dict) -> list[str]:
+    """Every reason `use_cases.json` evidence must not be written, or [] when clean.
+
+    Pure (no database), the use-case analogue of the evidence rules in
+    validate_manufacturer_profiles: required keys, vocabularies, claim_fields limited
+    to USE_CASE_CLAIMABLE_FIELDS (and required: a row that names no field supports no
+    claim), and no natural key given twice for one use case.
+    """
+    errors: list[str] = []
+    for u in data.get("use_cases", []):
+        where = u.get("slug") or "use_cases[?]"
+        evidence = u.get("evidence")
+        if evidence is None:
+            continue
+        if not isinstance(evidence, list):
+            errors.append(f"{where}: evidence must be a list")
+            continue
+        for j, ev in enumerate(evidence):
+            at = f"{where} evidence[{j}]"
+            if not isinstance(ev, dict):
+                errors.append(f"{at}: must be an object")
+                continue
+            if ev.get("source_type") not in SOURCE_TYPES:
+                errors.append(f"{at}: source_type {ev.get('source_type')!r} is not a source_type")
+            if ev.get("confidence", "MEDIUM") not in CONFIDENCE_LEVELS:
+                errors.append(
+                    f"{at}: confidence {ev.get('confidence')!r} is not a confidence_level")
+            if not ev.get("observed_at"):
+                errors.append(f"{at}: missing observed_at")
+            fields = ev.get("claim_fields")
+            if (not isinstance(fields, list) or not fields
+                    or any(f not in USE_CASE_CLAIMABLE_FIELDS for f in fields)):
+                errors.append(f"{at}: claim_fields must be a non-empty list of "
+                              + ", ".join(sorted(USE_CASE_CLAIMABLE_FIELDS)))
+            if (ev.get("note") or "").startswith(AGENT_RETRIEVAL_PREFIX) and ev.get("verified_at"):
+                errors.append(f"{at}: agent-assisted research row marked verified")
+        keys = [_evidence_key(ev) for ev in evidence
+                if isinstance(ev, dict) and "source_type" in ev and ev.get("observed_at")]
+        errors += [f"use case {where!r}: duplicate evidence key {k}"
+                   for k, n in Counter(keys).items() if n > 1]
+    return errors
+
+
+def reconcile_owned_evidence(cur, recon: Reconciliation, subject_type: str, slug: str,
+                             subject_id, evidence: list[dict]) -> dict:
+    """Reconcile ONE subject's (MANUFACTURER or USE_CASE) evidence without touching rows
+    this importer does not own.
 
     * `managed_by = CATALOGUE_IMPORT` rows are the importer's. They are matched by
       (source_url, source_type, excerpt, observed date): equal rows are left alone
@@ -862,23 +911,37 @@ def reconcile_manufacturer_evidence(cur, recon: Reconciliation, manufacturer_slu
         shared = cur.execute(
             """
             SELECT count(*) FROM evidence_source
-            WHERE subject_type='MANUFACTURER' AND subject_id=%s AND managed_by IS NULL
+            WHERE subject_type=%s AND subject_id=%s AND managed_by IS NULL
               AND source_url IS NOT DISTINCT FROM %s AND source_type = %s
               AND observed_at::date IS NOT DISTINCT FROM %s::date
             """,
-            (manufacturer_id, ev.get("source_url"), ev["source_type"], ev.get("observed_at")),
+            (subject_type, subject_id, ev.get("source_url"), ev["source_type"], ev.get("observed_at")),
         ).fetchone()[0]
         if shared:
             collisions.append(
                 f"{ev.get('source_url')} ({shared} unmarked row(s) share its URL, type "
                 "and observed date; preserved, ownership not assumed)"
             )
-    reconcile_evidence(cur, recon, manufacturer_slug, "MANUFACTURER", manufacturer_id,
+    reconcile_evidence(cur, recon, slug, subject_type, subject_id,
                        evidence, {}, managed_by=MANAGED_BY)
     apply_removals(cur, recon)
     after = recon.counts.get("evidence_source", Counter())
     delta = {o: after[o] - before[o] for o in OUTCOMES}
     return {**delta, "collisions": collisions}
+
+
+def reconcile_manufacturer_evidence(cur, recon: Reconciliation, manufacturer_slug: str,
+                                    manufacturer_id, evidence: list[dict]) -> dict:
+    """One manufacturer's company-level evidence (see reconcile_owned_evidence)."""
+    return reconcile_owned_evidence(cur, recon, "MANUFACTURER", manufacturer_slug,
+                                    manufacturer_id, evidence)
+
+
+def reconcile_use_case_evidence(cur, recon: Reconciliation, use_case_slug: str,
+                                use_case_id, evidence: list[dict]) -> dict:
+    """One use case's evidence (DR-C2), reconciled exactly like a manufacturer's."""
+    return reconcile_owned_evidence(cur, recon, "USE_CASE", use_case_slug,
+                                    use_case_id, evidence)
 
 
 # --------------------------------------------------------------------------- #
@@ -1040,7 +1103,7 @@ def import_capabilities(cur, data: dict, recon: Reconciliation | None = None) ->
 def import_use_cases(cur, data: dict, recon: Reconciliation | None = None) -> None:
     recon = recon or Reconciliation()
     for u in data["use_cases"]:
-        _upsert_entity(
+        use_case_id = _upsert_entity(
             cur, recon, "use_case", "slug",
             ["slug", "name", "category", "description", "typical_tasks",
              "typical_requirements", "key_limitations"],
@@ -1054,6 +1117,11 @@ def import_use_cases(cur, data: dict, recon: Reconciliation | None = None) -> No
                 "key_limitations": "COALESCE(EXCLUDED.key_limitations, use_case.key_limitations)",
             },
         )
+        # DR-C2: only the importer's own USE_CASE evidence is in scope; unmarked rows are
+        # preserved. A file with no `evidence` key reconciles to an empty list, so an
+        # importer-owned row whose source left the JSON is removed only with authorization.
+        reconcile_use_case_evidence(cur, recon, u["slug"], use_case_id, u.get("evidence") or [])
+        apply_removals(cur, recon)
 
 
 def import_spec_definitions(cur, data: dict, collisions: list[str],
@@ -1685,7 +1753,7 @@ def run(url: str, *, apply_publication_state: bool = False,
     # Ambiguity in the JSON itself (a natural key given twice) aborts before anything
     # is written, and before a connection is opened.
     product_lines = None if only is not None else _load(PRODUCT_LINES_PATH)
-    problems = manufacturer_key_problems(manufacturers) + [
+    problems = manufacturer_key_problems(manufacturers) + validate_use_case_evidence(use_cases) + [
         line for robot in loaded for line in incoming_problems(robot)]
     if product_lines is not None:
         problems += product_line_problems(product_lines)

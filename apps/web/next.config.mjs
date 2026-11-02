@@ -89,10 +89,58 @@ function assertCanonicalOriginConfigured() {
 
 assertCanonicalOriginConfigured();
 
+/**
+ * SEO-03 — CDN caching of public HTML (owner decision 2026-11-02).
+ *
+ * Every page is force-dynamic, so Next sends `Cache-Control: private, no-store`
+ * and each first request paid a 2.5–3.3 s render. Netlify's CDN may now keep a
+ * public page for 5 minutes and serve the old copy while it refreshes in the
+ * background. Browsers still get Next's own Cache-Control; only the CDN caches.
+ * A deploy purges the CDN, so only catalogue (database) changes wait out the TTL.
+ *
+ * `Netlify-Vary: query` is REQUIRED: Netlify's Next runtime otherwise keys the
+ * cache on `_rsc` alone, so `/robots?status=x` would be served the cached
+ * `/robots`. The runtime keeps its own RSC/router header variations on top.
+ *
+ * Deliberately NOT cached: /matches (one buyer's results), /research/* (a preview
+ * cookie changes the response), /discovery-review (operator surface), /api/*,
+ * and /find-a-humanoid?from=… (prefilled from a saved buyer requirement).
+ */
+export const CDN_CACHED_PAGES = [
+  "/",
+  "/robots",
+  "/robots/:slug",
+  "/compare",
+  "/lines/:slug",
+  "/manufacturers",
+  "/manufacturers/:slug",
+  "/use-cases",
+  "/use-cases/:slug",
+  "/about",
+  "/contact",
+  "/crawler-policy",
+];
+
+export const CDN_CACHE_HEADERS = [
+  {
+    key: "Netlify-CDN-Cache-Control",
+    value: "public, durable, s-maxage=300, stale-while-revalidate=86400",
+  },
+  { key: "Netlify-Vary", value: "query" },
+];
+
 const nextConfig = {
   reactStrictMode: true,
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      ...CDN_CACHED_PAGES.map((source) => ({ source, headers: CDN_CACHE_HEADERS })),
+      {
+        source: "/find-a-humanoid",
+        missing: [{ type: "query", key: "from" }],
+        headers: CDN_CACHE_HEADERS,
+      },
+    ];
   },
 };
 

@@ -6,6 +6,10 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 
 import { findUseCase } from "@/lib/api-client";
+import { buildCollectionJsonLd } from "@/lib/jsonld";
+import { fitDescription, fitTitle } from "@/lib/meta-text";
+import { absoluteUrl } from "@/lib/site";
+import { JsonLd } from "@/components/JsonLd";
 import { StatusBracket } from "@/components/StatusBadge";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteNav } from "@/components/SiteNav";
@@ -28,10 +32,12 @@ export async function generateMetadata({
   const u = await getUseCaseCached(slug);
   if (!u) return { title: "Not found" };
   return {
-    title: u.name,
-    description:
-      u.description ??
-      `Humanoid robots suited to ${u.name}, ranked by fit on HumanoidOnline.`,
+    title: fitTitle(u.name),
+    description: fitDescription(
+      u.description,
+      `Compare the humanoid robots suited to ${u.name.toLowerCase()}, ranked by fit, with availability and evidence.`,
+    ),
+    alternates: { canonical: absoluteUrl(`/use-cases/${u.slug}`) },
   };
 }
 
@@ -46,6 +52,15 @@ export default async function UseCaseDetailPage({
 
   return (
     <>
+      <JsonLd
+        data={buildCollectionJsonLd(
+          [
+            { name: "Use Cases", path: "/use-cases" },
+            { name: u.name, path: `/use-cases/${u.slug}` },
+          ],
+          u.suitable_robots.map((r) => ({ name: r.name, path: `/robots/${r.slug}` })),
+        )}
+      />
       <SystemHeader
         title={`USE CASE / ${u.slug.toUpperCase()}`}
         fields={[

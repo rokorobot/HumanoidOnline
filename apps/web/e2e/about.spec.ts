@@ -136,6 +136,6 @@ test.describe("About page", () => {
     expect(sitemap).toContain("/about</loc>");
 
     const llms = await (await page.request.get("/llms.txt")).text();
-    expect(llms).toMatch(/\/about$/m);
+    expect(llms).toMatch(/\/about\)/m);
   });
 });

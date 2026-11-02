@@ -5,15 +5,23 @@
 //   - AGENT-01.2 semantic parity: mapped 1:1 from the governed read.
 //   - AGENT-01.3 explicit uncertainty: a null/undefined spec is OMITTED (never
 //     0/false/"" and never an UNKNOWN `PropertyValue`).
-//   - AGENT-01.4: no fabricated provenance/freshness fields (Product has no
-//     honest slot without Offers, which are a later slice) — freshness rides the
+//   - AGENT-01.4: no fabricated provenance/freshness fields — freshness rides the
 //     sitemap `lastmod`.
+//   - SEO-03 (owner decision 2026-11-02): `offers` carries ONLY published,
+//     evidence-linked one-time prices (see `buildOffers`). No other price state
+//     ever becomes an Offer.
 //   - MEDIA-01: `image` uses only the read's display-eligible images (the read
 //     returns nothing else); omitted entirely when there are none.
 // The is_published boundary (AGENT-01.7) is enforced upstream at the fetch layer
 // (the public read returns only published robots); this builder just maps.
 import { absoluteUrl } from "@/lib/site";
-import type { ProductLineDetail, RobotDetail, RobotListItem } from "@/lib/types";
+import type {
+  ManufacturerDetail,
+  PricingOffer,
+  ProductLineDetail,
+  RobotDetail,
+  RobotListItem,
+} from "@/lib/types";
 
 interface PropertyValue {
   "@type": "PropertyValue";
@@ -87,6 +95,56 @@ function additionalProperty(robot: RobotDetail): PropertyValue[] {
   return props;
 }
 
+// One-time acquisitions only: a recurring rental/lease price is not a sale price.
+const ONE_TIME_TRANSACTIONS = new Set(["PURCHASE", "DEVELOPER"]);
+
+const CONDITION: Record<string, string> = {
+  NEW: "https://schema.org/NewCondition",
+  USED: "https://schema.org/UsedCondition",
+  REFURBISHED: "https://schema.org/RefurbishedCondition",
+};
+
+const hasNumber = (v: number | null | undefined): v is number => typeof v === "number" && Number.isFinite(v);
+
+/**
+ * SEO-03 — schema.org `Offer`s from the robot's pricing offers. An offer qualifies
+ * only when ALL hold: a published number (PUBLIC, FROM or RANGE — never QUOTE_ONLY,
+ * ESTIMATED or MANUFACTURER_ESTIMATE), linked evidence (AGENTS rule 7), a currency,
+ * and a one-time purchase. `price` is asserted only for PUBLIC (the price) and FROM
+ * (the stated starting price, with `minPrice`); a RANGE states only its bounds.
+ * Availability is omitted: it is a separate, separately-evidenced fact.
+ */
+export function buildOffers(offers: PricingOffer[], url: string): Record<string, unknown>[] {
+  const out: Record<string, unknown>[] = [];
+  for (const o of offers) {
+    if (!o.evidence || !isAssertableFact(o.currency)) continue;
+    if (!ONE_TIME_TRANSACTIONS.has(o.transaction_type) || o.billing_period !== "ONE_TIME") continue;
+
+    const offer: Record<string, unknown> = { "@type": "Offer", url, priceCurrency: o.currency };
+    if (o.price_type === "PUBLIC" && hasNumber(o.price)) {
+      offer.price = o.price;
+    } else if (o.price_type === "FROM" && hasNumber(o.price ?? o.price_min)) {
+      const from = (o.price ?? o.price_min) as number;
+      offer.price = from;
+      offer.priceSpecification = { "@type": "PriceSpecification", minPrice: from, priceCurrency: o.currency };
+    } else if (o.price_type === "RANGE" && hasNumber(o.price_min) && hasNumber(o.price_max)) {
+      offer.priceSpecification = {
+        "@type": "PriceSpecification",
+        minPrice: o.price_min,
+        maxPrice: o.price_max,
+        priceCurrency: o.currency,
+      };
+    } else {
+      continue;
+    }
+    if (isAssertableFact(o.variant)) offer.name = o.variant;
+    if (o.condition && CONDITION[o.condition]) offer.itemCondition = CONDITION[o.condition];
+    if (isAssertableFact(o.provider_name)) offer.seller = { "@type": "Organization", name: o.provider_name };
+    out.push(offer);
+  }
+  return out;
+}
+
 /** schema.org Product + Organization graph for a robot detail page. */
 export function buildRobotJsonLd(robot: RobotDetail): Record<string, unknown> {
   const robotUrl = absoluteUrl(`/robots/${robot.slug}`);
@@ -105,6 +163,8 @@ export function buildRobotJsonLd(robot: RobotDetail): Record<string, unknown> {
     url: robotUrl,
     name: robot.name,
     category: "Humanoid robot",
+    // SEO-03: brand is the manufacturer, exactly as on the product-line ProductGroup.
+    brand: { "@type": "Brand", name: robot.manufacturer.name },
     manufacturer: { "@id": mfrUrl },
     additionalProperty: additionalProperty(robot),
   };
@@ -118,19 +178,42 @@ export function buildRobotJsonLd(robot: RobotDetail): Record<string, unknown> {
 
   if (robot.announced_year) product.productionDate = String(robot.announced_year);
 
+  const offers = buildOffers(robot.pricing_offers ?? [], robotUrl);
+  if (offers.length > 0) product.offers = offers;
+
   return {
     "@context": "https://schema.org",
     "@graph": [product, organization],
   };
 }
 
+type Crumb = { name: string; path: string };
+
+function breadcrumb(id: string, trail: Crumb[]): Record<string, unknown> {
+  return {
+    "@type": "BreadcrumbList",
+    "@id": id,
+    itemListElement: [{ name: "Home", path: "/" }, ...trail].map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: c.name,
+      item: absoluteUrl(c.path),
+    })),
+  };
+}
+
 /**
- * SEO-02 — CollectionPage + ItemList + BreadcrumbList for the bare /robots
- * catalogue. Lists only the robots the page actually renders, by name and
- * canonical URL; no commercial facts are asserted here.
+ * SEO-02 / SEO-03 — CollectionPage + ItemList + BreadcrumbList for an index page.
+ * Lists only the entries the page actually renders, by name and canonical URL; no
+ * commercial facts are asserted here. `trail` is the breadcrumb below Home, ending
+ * with this page.
  */
-export function buildCatalogueJsonLd(items: RobotListItem[]): Record<string, unknown> {
-  const url = absoluteUrl("/robots");
+export function buildCollectionJsonLd(
+  trail: Crumb[],
+  items: Array<{ name: string; path: string }>,
+): Record<string, unknown> {
+  const self = trail[trail.length - 1];
+  const url = absoluteUrl(self.path);
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -138,7 +221,7 @@ export function buildCatalogueJsonLd(items: RobotListItem[]): Record<string, unk
         "@type": "CollectionPage",
         "@id": url,
         url,
-        name: "Robot Catalogue",
+        name: self.name,
         breadcrumb: { "@id": `${url}#breadcrumb` },
         mainEntity: { "@id": `${url}#list` },
       },
@@ -146,21 +229,47 @@ export function buildCatalogueJsonLd(items: RobotListItem[]): Record<string, unk
         "@type": "ItemList",
         "@id": `${url}#list`,
         numberOfItems: items.length,
-        itemListElement: items.map((r, i) => ({
+        itemListElement: items.map((it, i) => ({
           "@type": "ListItem",
           position: i + 1,
-          url: absoluteUrl(`/robots/${r.slug}`),
-          name: r.name,
+          url: absoluteUrl(it.path),
+          name: it.name,
         })),
       },
-      {
-        "@type": "BreadcrumbList",
-        "@id": `${url}#breadcrumb`,
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
-          { "@type": "ListItem", position: 2, name: "Robot Catalogue", item: url },
-        ],
-      },
+      breadcrumb(`${url}#breadcrumb`, trail),
+    ],
+  };
+}
+
+/** SEO-02 — the bare /robots catalogue. */
+export function buildCatalogueJsonLd(items: RobotListItem[]): Record<string, unknown> {
+  return buildCollectionJsonLd(
+    [{ name: "Robot Catalogue", path: "/robots" }],
+    items.map((r) => ({ name: r.name, path: `/robots/${r.slug}` })),
+  );
+}
+
+/**
+ * SEO-03 — schema.org `Organization` + BreadcrumbList for a manufacturer page. Same
+ * `@id` as the Organization on its robot pages, so the graphs join. Only recorded
+ * profile facts are asserted; absent ones are omitted (AGENT-01.3).
+ */
+export function buildManufacturerJsonLd(m: ManufacturerDetail): Record<string, unknown> {
+  const path = `/manufacturers/${m.slug}`;
+  const url = absoluteUrl(path);
+  const org: Record<string, unknown> = { "@type": "Organization", "@id": url, url, name: m.name };
+  if (isAssertableFact(m.legal_name)) org.legalName = m.legal_name;
+  if (isAssertableFact(m.description)) org.description = m.description;
+  if (isAssertableFact(m.website_url)) org.sameAs = [m.website_url];
+  if (isAssertableFact(m.founded_year)) org.foundingDate = String(m.founded_year);
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      org,
+      breadcrumb(`${url}#breadcrumb`, [
+        { name: "Manufacturers", path: "/manufacturers" },
+        { name: m.name, path },
+      ]),
     ],
   };
 }

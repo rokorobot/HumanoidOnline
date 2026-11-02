@@ -1,24 +1,38 @@
 // Manufacturers index — from /api/manufacturers.
+import type { Metadata } from "next";
+
 import { listManufacturers } from "@/lib/api-client";
 import { ManufacturerCard } from "@/components/ManufacturerCard";
+import { JsonLd } from "@/components/JsonLd";
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 import { SystemLabel } from "@/components/SystemLabel";
+import { buildCollectionJsonLd } from "@/lib/jsonld";
+import { absoluteUrl } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
 // WS8.5 / R22 — specific per-route title (no generic root inheritance).
-export const metadata = {
-  title: "Manufacturers",
-  description:
-    "Humanoid-robot manufacturers tracked by HumanoidOnline, with their verified platforms.",
-};
+export function generateMetadata(): Metadata {
+  return {
+    title: "Manufacturers",
+    description:
+      "Humanoid-robot manufacturers tracked by HumanoidOnline, with their verified platforms.",
+    alternates: { canonical: absoluteUrl("/manufacturers") },
+  };
+}
 
 export default async function ManufacturersPage() {
   const page = await listManufacturers({ limit: 100 });
   return (
     <>
+      <JsonLd
+        data={buildCollectionJsonLd(
+          [{ name: "Manufacturers", path: "/manufacturers" }],
+          page.items.map((m) => ({ name: m.name, path: `/manufacturers/${m.slug}` })),
+        )}
+      />
       <SystemHeader
         title="MANUFACTURER INDEX"
         fields={[{ value: page.total, label: "" }, { value: "MAKERS TRACKED", label: "" }]}

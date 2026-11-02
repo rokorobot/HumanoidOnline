@@ -57,7 +57,10 @@ export function RobotGallery({
           className="ro-gallery__img"
           src={primary.image_url}
           alt={`${robotName} — ${primary.image_type.toLowerCase()}`}
-          loading="lazy"
+          // SEO-03: the primary image is the page's largest above-the-fold element
+          // (LCP). Lazy-loading it delays it; thumbnails below stay lazy.
+          loading="eager"
+          fetchPriority="high"
         />
         <figcaption className="ro-gallery__cap">
           {/* What makes a line/chassis image honest: the caption says what is

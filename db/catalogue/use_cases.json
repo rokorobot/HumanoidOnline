@@ -1,25 +1,75 @@
 {
   "_comment": "Use-case catalogue referenced by robots[].use_case_fits and deployments[].use_case_slug. Upserted by slug.",
   "use_cases": [
-    { "slug": "warehouse-logistics", "name": "Warehouse & Logistics", "category": "logistics", "description": "Humanoids for material movement in warehouses and distribution centers.", "typical_tasks": ["tote handling", "material movement", "line feeding"] },
-    { "slug": "manufacturing",       "name": "Manufacturing",         "category": "industry",  "description": "Humanoids on production lines and intralogistics in factories.", "typical_tasks": ["part sequencing", "machine tending", "sheet-metal loading", "kitting"] },
-    { "slug": "research-education",  "name": "Research & Education",  "category": "research",  "description": "Humanoid platforms for labs and universities.", "typical_tasks": ["locomotion research", "manipulation research", "teaching"] },
-    { "slug": "home",               "name": "Home",                  "category": "consumer",  "description": "Domestic assistance and companionship.", "typical_tasks": ["tidying", "fetching", "companionship"] },
-    { "slug": "events-entertainment","name": "Events & Entertainment","category": "service",   "description": "Humanoids as attractions, presenters and brand activations.", "typical_tasks": ["presenting", "interaction", "photo engagement"] },
-    { "slug": "retail-service", "name": "Retail & Service", "category": "service",
-      "description": "Humanoids in shops, branches and other customer-facing service environments: assisting and informing customers, demonstrating products and supporting store operations.",
+    {
+      "slug": "warehouse-logistics",
+      "name": "Warehouse & Logistics",
+      "category": "logistics",
+      "description": "Humanoids for material movement in warehouses and distribution centers. On 27 June 2024 Agility Robotics and GXO announced a multi-year Robots-as-a-Service agreement for Digit at GXO's SPANX facility near Atlanta, which they called the industry's first formal commercial deployment of humanoid robots; it followed a proof-of-concept pilot in late 2023. There Digit moves totes from collaborative robots onto conveyors, managed through Agility's Arc cloud platform and working alongside existing autonomous mobile robots.",
+      "typical_tasks": ["tote handling", "material movement", "line feeding"],
+      "typical_requirements": "Agility lists Digit's workflows as tote handling, palletizing and depalletizing, machine tending, and kitting and sequencing. Deployment also needs fleet-management software (at GXO, Agility Arc) and coexistence with existing automation such as autonomous mobile robots. Safety has no settled standard yet: ISO's proposal for a safety standard for dynamically stable industrial mobile robots (now the draft ISO/CD 25785-1) stated that no ISO safety standard for them was published or in development.",
+      "key_limitations": "Agility says Digit's first skills target repetitive, strenuous, load-intensive work, that certain safety features are still in development, and that safety features do not eliminate all operational risk. Agility's solutions page states no payload or runtime figures. Schaeffler's plan to deploy a significant number of humanoids across its 100 plants by 2030 is a customer aspiration, not a delivered fleet."
+    },
+    {
+      "slug": "manufacturing",
+      "name": "Manufacturing",
+      "category": "industry",
+      "description": "Humanoids on production lines and intralogistics in factories. The most detailed public record is Figure 02 at BMW Group Plant Spartanburg: an 11-month deployment, on 10-hour shifts Monday to Friday, in which it loaded sheet-metal parts onto a welding fixture on an active assembly line. Figure reports more than 1,250 operating hours, more than 90,000 parts loaded and a contribution to more than 30,000 BMW X3 vehicles. Apptronik's Apollo is in a commercial pilot agreement with Mercedes-Benz, and UBTECH began mass production and delivery of the Walker S2 in November 2025, reporting orders above 800 million yuan.",
+      "typical_tasks": ["part sequencing", "machine tending", "sheet-metal loading", "kitting"],
+      "typical_requirements": "Line-paced precision and uptime. Figure's stated targets for the BMW sheet-metal task were an 84-second total cycle (37 seconds of it for loading), more than 99% successful placements per shift, parts placed within 5 mm, and no human pauses or resets per shift. Figure ran the task as a pick-and-place step feeding six-axis industrial welding robots.",
+      "key_limitations": "Figure published targets for cycle time, placement accuracy and interventions, not the figures achieved. It reports that the forearm was Figure 02's top hardware failure point, and for Figure 03 it removed the forearm distribution board and dynamic cabling. Apptronik states the terms of individual Apollo engagements are not disclosed."
+    },
+    {
+      "slug": "research-education",
+      "name": "Research & Education",
+      "category": "research",
+      "description": "Humanoid platforms for labs and universities. Development access varies by edition: Unitree lists secondary development for G1 EDU but not for the base G1, and G1 EDU adds joint freedom (23 to 43 degrees of freedom against 23), a higher arm payload and optional hand and waist upgrades. Booster Robotics, whose team comes from Tsinghua University's robot control lab and RoboCup team, reports more than 700 humanoid deliveries to over 200 customers (November 2025) and that 38 teams competed with Booster robots at RoboCup 2026.",
+      "typical_tasks": ["locomotion research", "manipulation research", "teaching"],
+      "typical_requirements": "Open interfaces for secondary development, plus simulation and software tooling. Booster, for example, offers Booster Studio, an integrated development environment for agent development, simulation and deployment to physical robots.",
+      "key_limitations": "Arm payload is small and posture-dependent: Unitree lists about 2 kg (G1) and about 3 kg (G1 EDU), varying greatly with arm extension, and about 2 hours of battery life for both."
+    },
+    {
+      "slug": "home",
+      "name": "Home",
+      "category": "consumer",
+      "description": "Domestic assistance and companionship. The most developed product is 1X's NEO. 1X says it handles tasks like folding laundry, organizing shelves and tidying, opens doors for guests, fetches items and turns off the lights at night, and that owners can schedule chores in advance. 1X plans to start delivering NEO primarily in the US in 2026 and to expand to other markets from 2027. Figure also states that Figure 03 is designed for the home.",
+      "typical_tasks": ["tidying", "fetching", "companionship"],
+      "typical_requirements": "Safety around people and household help. 1X describes NEO as having a head-to-toe soft body and an actuation system that creates gentle movements making it \"uniquely safe and compliant around people\"; its published specifications are 5 ft 6 in, 66 lb, a 4-hour battery runtime, 55 lb carry and 18 lb arm payload.",
+      "key_limitations": "1X says NEO works autonomously by default and that, for a chore it does not know, a 1X Expert can remotely supervise its actions at scheduled times. 1X says NEO grows in abilities with every software update, and its CEO told Road to VR (30 October 2025) that NEO would do \"most of the things in your home autonomously\" when it ships but that the quality of work would \"vary and will improve drastically quite fast as we get data\"."
+    },
+    {
+      "slug": "events-entertainment",
+      "name": "Events & Entertainment",
+      "category": "service",
+      "description": "Humanoids as attractions, presenters and brand activations. Engineered Arts markets Ameca for events such as conferences, expos and keynotes as well as research, and offers it to rent, to quote or to book as a demo. It lists 70+ languages, two 8-megapixel eye cameras, 61 actuated movements, a height of 1,870 mm and a weight of 62 kg, and a browser-based Tritium platform in which users write Python scripts.",
+      "typical_tasks": ["presenting", "interaction", "photo engagement"]
+    },
+    {
+      "slug": "retail-service",
+      "name": "Retail & Service",
+      "category": "service",
+      "description": "Humanoids in shops, branches and other customer-facing service environments: assisting and informing customers, demonstrating products and supporting store operations. Galbot says its G1, a wheeled robot with two arms, operates in its Galaxy Space Capsule retail units at more than 170 sites in over 40 cities in China; in July 2025 The Robot Report reported G1 in nearly 10 Beijing stores, deployable into a new store in a day, with a target of 100 stores that year. SoftBank Robotics launched Pepper in June 2014 and received Guinness World Records recognition for it as the world's first mass-produced humanoid robot in February 2026.",
       "typical_tasks": ["customer greeting", "information and wayfinding", "product demonstration", "retail assistance", "store operations"],
       "typical_requirements": "Reliable speech and interaction in noisy public spaces, safe operation among untrained members of the public, long unattended duty hours, and integration with store or service systems.",
-      "key_limitations": "Most humanoids here inform and interact rather than handle goods; unattended operation in a third-party store is rarely documented, and the return on investment is often novelty-driven." },
-    { "slug": "healthcare-rehabilitation", "name": "Healthcare & Rehabilitation", "category": "healthcare",
-      "description": "Humanoids used in rehabilitation research, therapeutic assistance, healthcare education, clinical research and healthcare service environments.",
+      "key_limitations": "Most humanoids here inform and interact rather than handle goods; unattended operation in a third-party store is rarely documented, and the return on investment is often novelty-driven."
+    },
+    {
+      "slug": "healthcare-rehabilitation",
+      "name": "Healthcare & Rehabilitation",
+      "category": "healthcare",
+      "description": "Humanoids used in rehabilitation research, therapeutic assistance, healthcare education, clinical research and healthcare service environments. Fourier began in 2015 in medical rehabilitation robotics, with exoskeletons that help patients with neurological impairments stand and walk, and describes its GR-3 humanoid, released in August 2025, as designed to provide both social and assistive companionship in diverse settings.",
       "typical_tasks": ["rehabilitation research", "therapeutic assistance", "healthcare education", "clinical research support", "patient and visitor interaction"],
       "typical_requirements": "Safe physical and social interaction with patients and older people, supervision by qualified staff, hygiene and data-protection compliance, and for any medical purpose the applicable medical-device approval.",
-      "key_limitations": "Research and experimental use only: no clinical validation or regulatory approval as a medical device is recorded for any robot in this catalogue. A robot listed here is positioned for or studied in healthcare settings; it is not a validated treatment or care device." },
-    { "slug": "security-inspection", "name": "Security & Inspection", "category": "security",
-      "description": "Humanoids for security patrols, facility monitoring and surveillance, remote inspection and inspection of hazardous environments.",
+      "key_limitations": "Research and experimental use only: no clinical validation or regulatory approval as a medical device is recorded for any robot in this catalogue. A robot listed here is positioned for or studied in healthcare settings; it is not a validated treatment or care device."
+    },
+    {
+      "slug": "security-inspection",
+      "name": "Security & Inspection",
+      "category": "security",
+      "description": "Humanoids for security patrols, facility monitoring and surveillance, remote inspection and inspection of hazardous environments. Among humanoid makers, Kepler positions its Forerunner K2 for high-risk operations alongside manufacturing and logistics, and Unitree lists power inspection among the applications of its robots, which are mostly quadrupeds.",
       "typical_tasks": ["security patrol", "facility monitoring", "remote inspection", "hazardous-environment inspection", "autonomous patrol"],
-      "typical_requirements": "Long autonomous runtime, dependable navigation of the site, remote supervision and teleoperation, suitable sensor payloads, and environmental protection for outdoor or hazardous areas.",
-      "key_limitations": "Quadrupeds and wheeled robots currently dominate this field; documented humanoid deployments are few, and environmental ratings and inspection payloads are rarely published." }
+      "typical_requirements": "Long autonomous runtime, dependable navigation of the site, remote supervision and teleoperation, suitable sensor payloads, and environmental protection for outdoor or hazardous areas. As a benchmark, Boston Dynamics specifies its Spot quadruped for autonomous inspections and for inspections in energized, radioactive or otherwise hazardous areas, with IP54 ingress protection, 14 kg payload capacity and 90 minutes of average runtime; it states IP67 for its Atlas humanoid.",
+      "key_limitations": "Quadrupeds and wheeled robots currently dominate this field; documented humanoid deployments are few, and environmental ratings and inspection payloads are rarely published."
+    }
   ]
 }

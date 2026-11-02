@@ -11,7 +11,7 @@
       "operating_locations": ["Hayward, California, United States (NEO factory)"],
       "website_url": "https://www.1x.tech",
       "founded_year": 2014,
-      "description": "1X Technologies develops humanoid robots for homes and workplaces. The company was originally founded as Halodi Robotics in 2014 and gives Palo Alto, California, as its headquarters. Its EVE is a wheeled humanoid used in industrial settings, and its current product, NEO, is a home humanoid. NEO is offered as a US$20,000 Early Access purchase or a US$499 monthly subscription. In April 2026 1X opened a factory in Hayward, California, and said first customer shipments of NEO were planned for 2026.",
+      "description": "1X Technologies develops humanoid robots for homes and workplaces. The company was originally founded as Halodi Robotics in 2014 and gives Palo Alto, California, as its headquarters. Its EVE is a wheeled humanoid used in industrial settings, and its current product, NEO, is a home humanoid. NEO is offered as a US$20,000 Early Access purchase or a US$499 monthly subscription. In April 2026 1X opened a factory in Hayward, California, and said first customer shipments of NEO were planned for 2026. 1X says NEO works autonomously by default and that, for a chore it does not know, a 1X Expert can remotely supervise its actions at scheduled times; it lists NEO at 5 ft 6 in, 66 lb, with a 4-hour battery runtime, and plans to deliver primarily in the US in 2026 and to expand to other markets from 2027.",
       "target_markets": ["home", "consumer"],
       "commercial_model": "Direct preorder: Early Access purchase or monthly subscription.",
       "deployment_status": "EARLY_ACCESS",
@@ -57,6 +57,20 @@
           "confidence": "HIGH",
           "claim_fields": ["operating_locations", "commercial_model", "description", "deployment_note"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Company press release: Hayward factory; US$20,000 Early Access purchase and US$499/month subscription; first customer shipments planned for 2026; line output currently shipped to internal R&D and testing. CONFLICT kept for review: EARLY_ACCESS (owner-approved robot status) versus 'shipments planned' wording."
+        },
+        {
+          "source_url": "https://www.1x.tech/neo",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "1X — NEO Home Robot",
+          "excerpt": "NEO works autonomously by default.",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. NEO page: 'NEO works autonomously by default'; 'an Expert from 1X can remotely supervise its actions at scheduled times'; specs 5'6\", 66 lbs, battery run-time 4h. Delivery plan (US 2026, other markets 2027) from https://www.1x.tech/discover/neo-home-robot, read the same day. The pages' privacy treatment was not found and is not asserted."
         }
       ]
     },
@@ -70,7 +84,7 @@
       "operating_locations": null,
       "website_url": "https://www.agibot.com",
       "founded_year": 2023,
-      "description": "AgiBot (AGIBOT Innovation (Shanghai) Technology Co., Ltd.) is a Shanghai-based developer of general-purpose embodied robots, founded in February 2023. Its range includes the AGIBOT A series of full-size humanoids, including the A2 and A3, the X series, Genie embodied-AI robots, D1 quadrupeds, a cleaning robot and dexterous hands. The company reports that its 15,000th general-purpose robot came off its production line in June 2026. In July 2026 AgiBot began the process of a Hong Kong initial public offering.",
+      "description": "AgiBot (AGIBOT Innovation (Shanghai) Technology Co., Ltd.) is a Shanghai-based developer of general-purpose embodied robots, founded in February 2023. Its range includes the AGIBOT A series of full-size humanoids, including the A2 and A3, the X series, Genie embodied-AI robots, D1 quadrupeds, a cleaning robot and dexterous hands. The company reports that its 15,000th general-purpose robot came off its production line in June 2026. In July 2026 AgiBot began the process of a Hong Kong initial public offering. Its milestone timeline records the 1,000th robot off the line in January 2025, the 10,000th in March 2026 and the 20,000th in September 2026; it also lists AGIBOT A1 unveiled in August 2023 and A2 in August 2024, and AgiBot describes July 2025 as the world's first routine operation of humanoid robots at an industrial site.",
       "target_markets": ["manufacturing", "service"],
       "commercial_model": null,
       "deployment_status": null,
@@ -104,6 +118,20 @@
           "confidence": "MEDIUM",
           "claim_fields": ["is_public_company", "description"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Secondary source: AgiBot initiated a Hong Kong IPO process (July 2026), so AgiBot itself was not listed at that date. is_public_company=false describes AgiBot only; re-check if the listing completes."
+        },
+        {
+          "source_url": "https://www.agibot.com/about_Zhiyuan",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "AGIBOT — About (milestones)",
+          "excerpt": "The 20,000th general-purpose embodied robot rolled off the production line",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Milestones: 2025-01 1,000th robot; 2026-03 10,000th; 2026-06 15,000th; 2026-09 20,000th; 2023-08 A1 unveiled; 2024-08 A2, X1 unveiled; 2025-07 'The world's first routine operation of humanoid robots at an industrial site achieved' (company claim, not independently verified). Supersedes the 15,000th-robot milestone as the latest company-reported count; deployment_note is intentionally unchanged."
         }
       ]
     },
@@ -117,7 +145,7 @@
       "operating_locations": null,
       "website_url": "https://www.agilityrobotics.com",
       "founded_year": 2015,
-      "description": "Agility Robotics, based in Salem, Oregon, builds Digit, a bipedal humanoid for material handling in logistics and manufacturing, such as moving totes. Digit is offered mainly as Robots-as-a-Service with a recurring subscription fee and is built at Agility's RoboFab facility in Salem. According to a June 2026 SEC filing, Digit operates with customers including Amazon, Toyota, GXO, Schaeffler and Mercado Libre. Agility has agreed to become a public company by merging with Churchill Capital Corp XI; the filing describes the transaction as proposed.",
+      "description": "Agility Robotics, based in Salem, Oregon, builds Digit, a bipedal humanoid for material handling in logistics and manufacturing, such as moving totes. Digit is offered mainly as Robots-as-a-Service with a recurring subscription fee and is built at Agility's RoboFab facility in Salem. According to a June 2026 SEC filing, Digit operates with customers including Amazon, Toyota, GXO, Schaeffler and Mercado Libre. Agility has agreed to become a public company by merging with Churchill Capital Corp XI; the filing describes the transaction as proposed. On 27 June 2024 Agility and GXO announced a multi-year Robots-as-a-Service agreement for Digit at GXO's SPANX facility, following a proof-of-concept pilot in late 2023, in which Digit moves totes from cobots onto conveyors through Agility's Arc cloud platform. Agility lists Digit's workflows as tote handling, palletizing and depalletizing, machine tending, and kitting and sequencing, and states that certain safety features are still in development.",
       "target_markets": ["logistics", "warehouse", "manufacturing"],
       "commercial_model": "Primarily Robots-as-a-Service subscriptions; outright purchase is also offered.",
       "deployment_status": "RAAS_DEPLOYMENT",
@@ -151,6 +179,20 @@
           "confidence": "HIGH",
           "claim_fields": ["headquarters_city", "description", "commercial_model", "deployment_status", "deployment_note", "is_public_company"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. SEC filing of the proposed business combination: Salem, Oregon (RoboFab); customers Amazon, Toyota, GXO, Schaeffler, Mercado Libre; two adoption models, RaaS and purchase, with the vast majority of binding orders as RaaS; the merger is proposed and not closed, so Agility was not listed at the filing date. The proposed ticker is not stated in the filing and is not recorded."
+        },
+        {
+          "source_url": "https://agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics",
+          "source_type": "PRESS_RELEASE",
+          "source_title": "Agility Robotics — GXO signs multi-year agreement (27 Jun 2024)",
+          "excerpt": "repetitive tasks such as moving totes from cobots and placing them onto conveyors",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Press release: published 27 June 2024; RaaS; SPANX facility; proof-of-concept pilot late 2023; Agility Arc; works alongside AMRs. Workflow list and safety wording from https://www.agilityrobotics.com/solutions (same day): 'tote handling, palletizing and depalletizing, machine tending, and kitting and sequencing'; 'Certain safety features are still in development.'"
         }
       ]
     },
@@ -260,7 +302,7 @@
       "operating_locations": null,
       "website_url": "https://www.astribot.com",
       "founded_year": 2022,
-      "description": "Astribot (星尘智能) is a Shenzhen-based developer of AI-powered robots, founded in 2022. The company describes a Design for AI approach in which robot hardware and software are developed together, and presents product lines named Lumo and Philia alongside SmoothRL, a reinforcement-learning framework. It states that its aim is robots that learn and work alongside people and take on tedious, difficult or dangerous tasks.",
+      "description": "Astribot (星尘智能) is a Shenzhen-based developer of AI-powered robots, founded in 2022. The company describes a Design for AI approach in which robot hardware and software are developed together, and presents product lines named Lumo and Philia alongside SmoothRL, a reinforcement-learning framework. It states that its aim is robots that learn and work alongside people and take on tedious, difficult or dangerous tasks. Its site gives the founding as the end of 2022 and states a vision of billions of people having AI robot assistants; it lists Lumo 1, Lumo 2, Philia and SmoothRL but gives no specifications, prices or dates for them.",
       "target_markets": [],
       "commercial_model": null,
       "deployment_status": null,
@@ -282,6 +324,20 @@
           "confidence": "HIGH",
           "claim_fields": ["legal_name", "country_region_code", "headquarters_city", "founded_year", "description"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Official site: Chinese legal entity name, Shenzhen, 2022, product lines Lumo 1 / Lumo 2 / Philia and SmoothRL, 'Design for AI' architecture, business-partnership contact form. No English legal name, commercial model or deployment status is stated."
+        },
+        {
+          "source_url": "https://www.astribot.com/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Astribot — home page",
+          "excerpt": "我们的愿景是让数十亿人拥有AI机器人助理",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Home page (Chinese): founded in Shenzhen at the end of 2022 (成立于2022年底); vision of billions of people owning AI robot assistants; the AI menu lists Lumo 1, Lumo 2, Philia and SmoothRL with no specifications, prices or dates."
         }
       ]
     },
@@ -295,7 +351,7 @@
       "operating_locations": null,
       "website_url": "https://www.booster.tech",
       "founded_year": 2023,
-      "description": "Booster Robotics (Booster Robotics Technology Co., Ltd.), founded in 2023, makes bipedal humanoid development platforms, including the full-size T2 and the compact K1, together with development software, for research, education and robot competitions. Its core team comes from Tsinghua University's robot control lab and RoboCup team. The company reports more than 700 humanoid robots delivered to over 200 customers worldwide and says 38 of the 59 teams at RoboCup 2026 competed on Booster robots. Its platforms are sold through an online store.",
+      "description": "Booster Robotics (Booster Robotics Technology Co., Ltd.), founded in 2023, makes bipedal humanoid development platforms, including the full-size T2 and the compact K1, together with development software, for research, education and robot competitions. Its core team comes from Tsinghua University's robot control lab and RoboCup team. The company reports more than 700 humanoid robots delivered to over 200 customers worldwide and says 38 of the 59 teams at RoboCup 2026 competed on Booster robots. Its platforms are sold through an online store. Booster says it was founded in June 2023 by CEO Cheng Hao, that Booster-powered teams took the top two places in both the AdultSize and KidSize RoboCup 2025 divisions, and that its teams won three gold, two silver and three bronze medals at RoboCup 2026; it launched the K1 in October 2025, and offers Booster Studio, an integrated development environment for agent development, simulation and deployment to physical robots.",
       "target_markets": ["research", "education"],
       "commercial_model": "Direct online sale through the company store.",
       "deployment_status": "COMMERCIAL",
@@ -329,6 +385,20 @@
           "confidence": "HIGH",
           "claim_fields": ["legal_name", "founded_year", "description", "target_markets", "deployment_note"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Official about page: legal name Booster Robotics Technology Co., Ltd.; founded 2023; team from Tsinghua Robot Control Lab and Tsinghua Hephaestus RoboCup team; more than 700 humanoid deliveries to more than 200 customers. No address or headquarters statement on the page (HQ held)."
+        },
+        {
+          "source_url": "https://www.booster.tech/about-us",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Booster Robotics — About us",
+          "excerpt": "Booster Robotics surpassed 700 humanoid robot deliveries worldwide, serving more than 200 customers.",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. About page: founded June 2023 by CEO Cheng Hao; RoboCup 2025 (Brazil) top two in AdultSize and KidSize; RoboCup 2026 three gold, two silver, three bronze; K1 launched October 2025; Booster Studio IDE; RoboCup Federation partnership (December 2024)."
         }
       ]
     },
@@ -413,7 +483,7 @@
       "operating_locations": ["Wrocław, Poland (subsidiary Clone Sp. z o.o.)", "New York, New York, United States (address of Clone Incorporated)"],
       "website_url": "https://clonerobotics.com",
       "founded_year": null,
-      "description": "Clone Robotics develops musculoskeletal androids and robotic hands modelled on human anatomy. Its core technology is Myofiber, an artificial muscle the company says it pioneered in 2021, combined with an anatomically modelled skeleton, and it describes its android as powered by water and electricity. It is taking reservations for a Clone Alpha Edition limited to 279 units and also presents a Clone Hand. Its terms of use describe the product as in the development phase. The company operates through Clone Incorporated, a Delaware-registered corporation, and a Polish subsidiary in Wrocław.",
+      "description": "Clone Robotics develops musculoskeletal androids and robotic hands modelled on human anatomy. Its core technology is Myofiber, an artificial muscle the company says it pioneered in 2021, combined with an anatomically modelled skeleton, and it describes its android as powered by water and electricity. It is taking reservations for a Clone Alpha Edition limited to 279 units and also presents a Clone Hand. Its terms of use describe the product as in the development phase. The company operates through Clone Incorporated, a Delaware-registered corporation, and a Polish subsidiary in Wrocław. Its Alpha Edition page says Myofibers are produced in monolithic musculotendon units to eliminate tendon failures, that the android is powered only by water and electricity and carries a GPU at the edge, and its reservation page gives no terms, deposit or refund details.",
       "target_markets": [],
       "commercial_model": "Reservations for a limited Alpha Edition (279 units); the terms of use state that sales are not conducted through the site.",
       "deployment_status": "ANNOUNCED",
@@ -459,6 +529,20 @@
           "confidence": "HIGH",
           "claim_fields": ["legal_name", "incorporation", "operating_locations", "description", "commercial_model", "deployment_status", "deployment_note"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Official terms of use (source_type OTHER: company legal document): Clone Incorporated, 853 7th Ave, New York, NY, with Delaware registered-agent address; subsidiary Clone Sp. z o.o., Wrocław, Poland (KRS 0000947589); 279-unit limited edition; sales not facilitated through the site. HELD: headquarters (US parent address vs Polish operating subsidiary — unresolved) and founding year (secondary search summaries only)."
+        },
+        {
+          "source_url": "https://clonerobotics.com/android/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Clone Robotics — Android",
+          "excerpt": "Myofibers are produced in monolithic musculotendon units to eliminate tendon failures.",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Android page: 'Reserve one of the first 279 Clones ever made, in its Alpha Edition'; 'Powered with only water. And electricity.'; 'GPU at the edge'; the page states no degrees of freedom, sensors, timelines or pricing, and the Reserve link (/pre-order) shows no terms."
         }
       ]
     },
@@ -472,7 +556,7 @@
       "operating_locations": ["Redwood City, California, United States"],
       "website_url": "https://engineeredarts.com",
       "founded_year": 2004,
-      "description": "Engineered Arts designs and manufactures expressive humanoid robots. It was founded in 2004 by Will Jackson and is based in Falmouth, Cornwall, in the United Kingdom. Its products include Ameca, a humanoid platform for human-robot interaction first shown at CES in January 2022, and earlier robots such as RoboThespian, SociBot and Mesmer. Robots are sold by quote and rented for events. In December 2024 the company announced that it had restructured as a US entity, planned to expand at a Redwood City, California, location, and had deployed robots to more than 200 locations worldwide.",
+      "description": "Engineered Arts designs and manufactures expressive humanoid robots. It was founded in 2004 by Will Jackson and is based in Falmouth, Cornwall, in the United Kingdom. Its products include Ameca, a humanoid platform for human-robot interaction first shown at CES in January 2022, and earlier robots such as RoboThespian, SociBot and Mesmer. Robots are sold by quote and rented for events. In December 2024 the company announced that it had restructured as a US entity, planned to expand at a Redwood City, California, location, and had deployed robots to more than 200 locations worldwide. Its Ameca page offers rental, quotes and demo bookings, lists conference, expo and keynote uses alongside research and development, and gives Ameca's specifications as 70+ languages, two 8-megapixel eye cameras, 61 actuated movements, 1,870 mm height and 62 kg weight; Ameca runs the company's Tritium platform, in which users can write Python scripts in a browser.",
       "target_markets": ["events", "entertainment", "research"],
       "commercial_model": "Sale (by quote) and event rental.",
       "deployment_status": "COMMERCIAL",
@@ -530,6 +614,20 @@
           "confidence": "MEDIUM",
           "claim_fields": ["operating_locations", "description", "deployment_note"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Secondary news: restructured as a U.S. entity; plans to hire about 20 at a Redwood City location; robots deployed to more than 200 locations worldwide. The article does not name the US entity or its jurisdiction."
+        },
+        {
+          "source_url": "https://engineeredarts.com/robot/ameca/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Engineered Arts — Ameca",
+          "excerpt": "Communicate fluently in 70+ languages with native-level pronunciation.",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Ameca page: Rent Ameca / Get a Quote / Book a Demo; Conferences & Expos, Keynote Speaker, Research & Development; 2 x 8 MP cameras; 61 actuated movements; 1870 mm; 62 kg; Tritium (web UI, Tritium AI, Tritium OS), Python scripting in browser. The page states no walking capability and no purchase price."
         }
       ]
     },
@@ -580,7 +678,7 @@
       "operating_locations": null,
       "website_url": "https://www.figure.ai",
       "founded_year": 2022,
-      "description": "Figure AI Inc. is a US developer of general-purpose humanoid robots, headquartered in San Jose, California. Its Figure 02 completed an 11-month deployment at BMW Group Plant Spartanburg, where it loaded sheet-metal parts on an active assembly line; Figure says the robots contributed to the production of more than 30,000 BMW X3 vehicles. Figure 02 has been followed by Figure 03, which Figure demonstrated performing a logistics sequencing task at the same plant in June 2026.",
+      "description": "Figure AI Inc. is a US developer of general-purpose humanoid robots, headquartered in San Jose, California. Its Figure 02 completed an 11-month deployment at BMW Group Plant Spartanburg, where it loaded sheet-metal parts on an active assembly line; Figure says the robots contributed to the production of more than 30,000 BMW X3 vehicles. Figure 02 has been followed by Figure 03, which Figure demonstrated performing a logistics sequencing task at the same plant in June 2026. Figure reports that the BMW deployment ran 10-hour shifts Monday to Friday and totalled more than 1,250 operating hours and more than 90,000 parts loaded, and that the forearm was Figure 02's top hardware failure point, which Figure 03 addresses by removing the forearm distribution board and dynamic cabling.",
       "target_markets": ["manufacturing", "logistics", "home"],
       "commercial_model": "Deployments with enterprise customers; commercial terms not disclosed.",
       "deployment_status": "COMMERCIAL",
@@ -638,6 +736,20 @@
           "confidence": "HIGH",
           "claim_fields": ["description", "deployment_note"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Company post: Figure 03 at BMW Plant Spartanburg, Hall 52, performing a parts-sequencing logistics workflow, described as a first demonstration. Production-volume claims (BotQ output) were available only from secondary search summaries and are not used."
+        },
+        {
+          "source_url": "https://www.figure.ai/news/production-at-bmw",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Figure — Production at BMW",
+          "excerpt": "recorded minimal hardware failures",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Figure page: 11 months; 10-hour shifts Monday to Friday; 1,250+ hours; 90,000+ parts; 30,000+ X3 vehicles; forearm top hardware failure point, distribution board and dynamic cabling removed for Figure 03. The 84-second cycle, >99% placement and 5 mm figures on the page are targets, not reported results."
         }
       ]
     },
@@ -651,7 +763,7 @@
       "operating_locations": null,
       "website_url": "https://www.fourierintelligence.com",
       "founded_year": 2015,
-      "description": "Fourier is a Shanghai robotics company founded in 2015. It began in medical rehabilitation robotics, including exoskeletons that help patients with neurological impairments stand and walk, and says it has served more than 2,000 hospitals and institutions in over 40 countries and regions. It has developed the GR series of humanoid robots, starting with GR-1 in 2023; GR-3, released in August 2025, is designed as a care robot focused on social and assistive companionship.",
+      "description": "Fourier is a Shanghai robotics company founded in 2015. It began in medical rehabilitation robotics, including exoskeletons that help patients with neurological impairments stand and walk, and says it has served more than 2,000 hospitals and institutions in over 40 countries and regions. It has developed the GR series of humanoid robots, starting with GR-1 in 2023; GR-3, released in August 2025, is designed as a care robot focused on social and assistive companionship. WIPO's account says the GR series has evolved through three generations since GR-1 in 2023, and describes GR-3 as providing social and assistive interaction in a care setting; it mentions no regulatory approval or certification for Fourier's robots.",
       "target_markets": ["healthcare"],
       "commercial_model": null,
       "deployment_status": null,
@@ -673,6 +785,20 @@
           "confidence": "MEDIUM",
           "claim_fields": ["legal_name", "country_region_code", "headquarters_city", "founded_year", "description", "target_markets"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. WIPO case study (reliable secondary): Shanghai Fourier Intelligence Co. Ltd.; founded 2015; Shanghai; rehabilitation exoskeletons; more than 2,000 hospitals and institutions in 40 countries and areas; GR-1 (2023), GR-2, GR-3 care-bot (August 2025). website_url unchanged: https://www.fourierintelligence.com/ answered HTTP 526 on 2026-09-13, which may be temporary; fftai.com shows the Fourier brand but was not confirmed as the official replacement. Display name unchanged."
+        },
+        {
+          "source_url": "https://www.wipo.int/en/web/ip-advantage/w/stories/fourier-healthcare-robots-with-humanoid-designs",
+          "source_type": "OTHER",
+          "source_title": "WIPO — Fourier: healthcare robots with humanoid designs",
+          "excerpt": "Since the launch of GR-1 in 2023, the series has evolved through three generations.",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. WIPO story: GR series three generations since GR-1 (2023); GR-3 released August 2025 'designed to provide both social and assistive companionship in diverse settings'; no regulatory approval, certification or medical-device clearance is mentioned."
         }
       ]
     },
@@ -686,7 +812,7 @@
       "operating_locations": null,
       "website_url": "https://www.galbot.com",
       "founded_year": 2023,
-      "description": "Galbot (银河通用机器人) is a Beijing embodied-AI robotics company founded in May 2023. Its main product, Galbot G1, is a wheeled robot with two arms for retail tasks such as inventory, replenishment, delivery and packaging, driven by the company's own vision-language-action models. Galbot says its robots operate in smart retail, industrial manufacturing and medical-service settings, and in July 2025 The Robot Report reported G1 deployments in nearly 10 stores in Beijing. The company also presents an S1 robot and its AstraBrain embodied model.",
+      "description": "Galbot (银河通用机器人) is a Beijing embodied-AI robotics company founded in May 2023. Its main product, Galbot G1, is a wheeled robot with two arms for retail tasks such as inventory, replenishment, delivery and packaging, driven by the company's own vision-language-action models. Galbot says its robots operate in smart retail, industrial manufacturing and medical-service settings, and in July 2025 The Robot Report reported G1 deployments in nearly 10 stores in Beijing. The company also presents an S1 robot and its AstraBrain embodied model. In July 2025 it completed an RMB 1.1 billion (about US$153 million) funding round, which it said brought its total to about US$335 million; it said G1 could be deployed into a new store in about a day, handle 5,000 types of goods and work in settings including pharmacies, and its own site describes its robots as operating at scale in smart retail, industrial manufacturing and medical-service scenarios.",
       "target_markets": ["retail", "manufacturing", "logistics", "healthcare"],
       "commercial_model": null,
       "deployment_status": null,
@@ -720,6 +846,34 @@
           "confidence": "MEDIUM",
           "claim_fields": ["country_region_code", "headquarters_city", "founded_year", "description", "deployment_note"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Secondary news: Beijing; founded May 2023; G1 wheeled two-arm robot for inventory, replenishment, delivery and packaging; nearly 10 Beijing stores deployed the G1."
+        },
+        {
+          "source_url": "https://www.therobotreport.com/galbot-picks-up-153m-commercialize-g1-semi-humanoid/",
+          "source_type": "NEWS_ARTICLE",
+          "source_title": "The Robot Report — Galbot picks up $153M to commercialize G1 semi-humanoid",
+          "excerpt": "this week completed a funding round of RMB 1.1 billion, or around $153 million.",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Secondary trade-press report (2025-07-02) of company statements: RMB 1.1bn (~US$153M) round; about US$335M total in two years; one-day store deployment; handles 5,000 goods types; pharmacies listed. Corroborated for the deployment wording by http://www.galbot.com/about/ ('已实现规模化商业落地' - scaled commercial rollout; retrieved the same day)."
+        },
+        {
+          "source_url": "http://www.galbot.com/about/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Galbot — About",
+          "excerpt": "已在智慧零售、工业智能制造、医疗服务等场景中持续运行",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. About page (Chinese): robots operate continuously in smart retail, industrial manufacturing and medical-service scenarios, with scaled commercial rollout. The page gives no funding, headcount or office information. No deployment status is derived from this statement."
         }
       ]
     },
@@ -768,7 +922,7 @@
       "operating_locations": null,
       "website_url": "https://global.honda",
       "founded_year": 1948,
-      "description": "Honda Motor Co., Ltd. is a Tokyo-headquartered company established in 1948. Its humanoid robotics work produced ASIMO, which performed public demonstrations for more than 20 years; across all units ASIMO took more than 33 million steps. Honda says that experience showed a fully autonomous bipedal robot would still require long-term research, and that it is researching other forms of mobility for its robots, such as a guide robot that moves on balls and wheels. Honda's shares are listed on the Tokyo Stock Exchange and its ADRs on the New York Stock Exchange.",
+      "description": "Honda Motor Co., Ltd. is a Tokyo-headquartered company established in 1948. Its humanoid robotics work produced ASIMO, which performed public demonstrations for more than 20 years; across all units ASIMO took more than 33 million steps. Honda says that experience showed a fully autonomous bipedal robot would still require long-term research, and that it is researching other forms of mobility for its robots, such as a guide robot that moves on balls and wheels. Honda's shares are listed on the Tokyo Stock Exchange and its ADRs on the New York Stock Exchange. Honda reports more than 25 years of research and development on bipedal humanoid robots, that ASIMO's units together walked 7,907 km, and that it developed technology to absorb the impact of a collision between a robot and a person; a ball-and-wheel guide robot was tested at Narita International Airport, including for collisions with small children.",
       "target_markets": [],
       "commercial_model": null,
       "deployment_status": null,
@@ -814,6 +968,20 @@
           "confidence": "HIGH",
           "claim_fields": ["description", "deployment_note"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Official page: ASIMO performed demonstrations daily for more than 20 years; more than 33.26 million steps; a fully autonomous bipedal robot would still require long-term research; Honda researching other mobility methods (guide robot using balls and wheels). Company-level deployment_status left null deliberately so a retired research programme is not read as an inactive manufacturer."
+        },
+        {
+          "source_url": "https://global.honda/en/robotics/asimo/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Honda — ASIMO",
+          "excerpt": "Honda reports more than 25 years of research and development on bipedal humanoid robots",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. ASIMO page: performed daily for more than 20 years; all units took over 33.26 million steps and walked 7,907 km; more than 25 years of bipedal humanoid R&D; collision-impact absorption technology; guide robot on balls and wheels tested at Narita International Airport and for collisions with small children."
         }
       ]
     },
@@ -862,7 +1030,7 @@
       "operating_locations": null,
       "website_url": "https://www.limxdynamics.com",
       "founded_year": 2022,
-      "description": "LimX Dynamics is a Shenzhen robotics company founded in January 2022. It builds legged and humanoid robots and robot software: the CL-1 humanoid, the TRON 1 multi-modal biped (2024), the TRON 2 multi-form robot (2025), the full-size Oli general-purpose humanoid (2025) and the Luna interactive humanoid (2026). In January 2026 it released COSA, a humanoid brain system. The company describes building an ecosystem for developers, with open-source infrastructure for training and deploying embodied-AI models.",
+      "description": "LimX Dynamics is a Shenzhen robotics company founded in January 2022. It builds legged and humanoid robots and robot software: the CL-1 humanoid, the TRON 1 multi-modal biped (2024), the TRON 2 multi-form robot (2025), the full-size Oli general-purpose humanoid (2025) and the Luna interactive humanoid (2026). In January 2026 it released COSA, a humanoid brain system. The company describes building an ecosystem for developers, with open-source infrastructure for training and deploying embodied-AI models. Its company timeline records a USD 200M Series B in February 2026 and a US$200M pre-IPO round in July 2026 that it says brought six-month funding to US$400M, a July 2025 memorandum of understanding with SAIC to set up a joint AI lab, and the open-sourcing of its FluxVLA Engine in April 2026.",
       "target_markets": ["research"],
       "commercial_model": null,
       "deployment_status": null,
@@ -884,6 +1052,20 @@
           "confidence": "HIGH",
           "claim_fields": ["country_region_code", "headquarters_city", "founded_year", "description", "target_markets"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Official about page: founded January 2022 in Shenzhen; headquarters Nanshan I Valley, Shenzhen; Oli (July 2025), Luna (May 2026), TRON 2 (December 2025), TRON 1 (October 2024), CL-1, COSA (January 2026); developer ecosystem. Listing status not recorded: a reported confidential Hong Kong IPO filing appeared only in search summaries."
+        },
+        {
+          "source_url": "https://www.limxdynamics.com/en/about",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "LimX Dynamics — About (timeline)",
+          "excerpt": "Closed a US$200M Pre-IPO round, bringing six-month funding to US$400M.",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Timeline entries: Feb 2026 'Secured USD 200M in Series B'; Jul 2026 US$200M pre-IPO round bringing six-month funding to US$400M; Jul 2025 MoU with SAIC to co-establish a joint AI lab; Apr 2026 FluxVLA Engine open-sourced. The page dates TRON 1 to October 2023 whereas this profile says 2024 (see review doc, follow-up)."
         }
       ]
     },
@@ -897,7 +1079,7 @@
       "operating_locations": null,
       "website_url": "https://neura-robotics.com",
       "founded_year": 2019,
-      "description": "NEURA Robotics is a German robotics company founded in 2019 and headquartered in Metzingen. It develops what it calls cognitive robots, combining sensing and AI, including the MAiRA and LARA robot arms, the MAV mobile platform and the MiPA assistant, together with a software ecosystem it calls the Neuraverse. Its humanoid line is 4NE1. NEURA is taking fully refundable EUR 100 reservations for the full-scale 4NE1 Gen 3.5, which it expects to be available at the end of 2026, and for a smaller 4NE1 Mini.",
+      "description": "NEURA Robotics is a German robotics company founded in 2019 and headquartered in Metzingen. It develops what it calls cognitive robots, combining sensing and AI, including the MAiRA and LARA robot arms, the MAV mobile platform and the MiPA assistant, together with a software ecosystem it calls the Neuraverse. Its humanoid line is 4NE1. NEURA is taking fully refundable EUR 100 reservations for the full-scale 4NE1 Gen 3.5, which it expects to be available at the end of 2026, and for a smaller 4NE1 Mini. Its about page names David Reger as founder and CEO, reports a EUR 66M Series A in May 2024 and a EUR 120M Series B in June 2026, and cites a Series C of up to US$1.4 bn without a date; it gives its team size as over 1,500 in the page text and 1,400+ in its page metadata, and says it has eight locations worldwide.",
       "target_markets": [],
       "commercial_model": "Refundable reservations for 4NE1 humanoids, credited toward a later purchase agreement.",
       "deployment_status": null,
@@ -931,6 +1113,20 @@
           "confidence": "HIGH",
           "claim_fields": ["description", "commercial_model", "deployment_note"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Official reservation page: EUR 100 fully refundable reservation credited toward the purchase price; 4NE1 Gen 3.5 expected end of 2026; 4NE1 Mini also reservable. No deployment status asserted."
+        },
+        {
+          "source_url": "https://neura-robotics.com/about-us/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "NEURA Robotics — About us",
+          "excerpt": "Over 1500 team members",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. About page: CEO and founder David Reger; Series A EUR 66M (May 2024); Series B EUR 120M (June 2026); Series C 'Up to $1.4 bn' (no date); 'Over 1500 team members' in the body, '1,400+' in the metadata (inconsistent; both reported); '8 locations worldwide'. The page's timeline gives the foundation date as December 2020, whereas this profile says 2019 (see review doc, follow-up)."
         }
       ]
     },
@@ -944,7 +1140,7 @@
       "operating_locations": null,
       "website_url": "https://pal-robotics.com",
       "founded_year": 2004,
-      "description": "PAL Robotics is a Barcelona robotics company founded in 2004 that builds humanoid, service and mobile manipulation robots for research, industry and service applications. Its bipedal humanoids include REEM-C (2013), designed for research and human-robot interaction, TALOS (2017), a high-performance humanoid for advanced research and industrial applications, and Kangaroo (2021), a biped for legged-locomotion research. It also makes the TIAGo mobile manipulator (2015) and the ARI social robot (2019).",
+      "description": "PAL Robotics is a Barcelona robotics company founded in 2004 that builds humanoid, service and mobile manipulation robots for research, industry and service applications. Its bipedal humanoids include REEM-C (2013), designed for research and human-robot interaction, TALOS (2017), a high-performance humanoid for advanced research and industrial applications, and Kangaroo (2021), a biped for legged-locomotion research. It also makes the TIAGo mobile manipulator (2015) and the ARI social robot (2019). Its timeline dates its first robot, REEM-A, to 2005 and its first EU project, Factory in a Day, to 2014, and says it has taken part in more than 60 projects since; it lists TIAGo Pro (2023) and says Kangaroo Pro went on sale in 2025.",
       "target_markets": ["research"],
       "commercial_model": null,
       "deployment_status": null,
@@ -978,6 +1174,20 @@
           "confidence": "HIGH",
           "claim_fields": ["legal_name"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Official terms: entity PAL Robotics S.L., C/ Pujades 77-79, 7-7, 08005 Barcelona, Spain."
+        },
+        {
+          "source_url": "https://pal-robotics.com/timeline/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "PAL Robotics — Timeline",
+          "excerpt": "We introduced our very first robot, REEM-A, in 2005.",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Timeline entries: 2005 REEM-A; 2014 first EU project 'Factory in a Day', 'Since then, we've been part of over 60 projects'; 2023 TIAGo Pro; 2025 'Our Kangaroo ready for sale'."
         }
       ]
     },
@@ -991,7 +1201,7 @@
       "operating_locations": null,
       "website_url": "https://www.rainbow-robotics.com",
       "founded_year": 2011,
-      "description": "Rainbow Robotics is a South Korean robotics company based in Daejeon, established in 2011 by Professor Oh Jun-ho and students from KAIST's Humanoid Robot Research Center, which developed the HUBO bipedal humanoid. A HUBO-based robot won the 2015 DARPA Robotics Challenge. The company's products include collaborative robots, mobile robots, quadruped robots and research humanoids. It is listed on the Korea Exchange, and Samsung Electronics became its controlling shareholder in 2025.",
+      "description": "Rainbow Robotics is a South Korean robotics company based in Daejeon, established in 2011 by Professor Oh Jun-ho and students from KAIST's Humanoid Robot Research Center, which developed the HUBO bipedal humanoid. A HUBO-based robot won the 2015 DARPA Robotics Challenge. The company's products include collaborative robots, mobile robots, quadruped robots and research humanoids. It is listed on the Korea Exchange, and Samsung Electronics became its controlling shareholder in 2025. Its website says the company started in 2011 from the core technology of the HUBO humanoid and describes itself as a full-stack robotics company, listing collaborative-robot (RBC), mobile humanoid (RBY, with RB-Y1), quadruped (RBQ) and autonomous-mobile-robot (RBM) series; it gives no prices, stock levels or delivery times and directs visitors to consultation and a distributor locator.",
       "target_markets": [],
       "commercial_model": null,
       "deployment_status": null,
@@ -1013,6 +1223,20 @@
           "confidence": "MEDIUM",
           "claim_fields": ["country_region_code", "headquarters_city", "founded_year", "description", "is_public_company", "ticker", "parent_company", "parent_relationship"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Secondary encyclopedia (primary pages unavailable: rainbow-robotics.com/en_introduction and /en_pr/241231 answered 404; the Samsung newsroom timed out and returned 404): established 10 February 2011 by Prof. Oh Jun-ho (KAIST Humanoid Robot Research Center); Yuseong District, Daejeon; traded on the Korea Exchange as 277810; Samsung Electronics acquisition with regulatory approval on 5 March 2025. Stake percentage and Samsung's own listing are not recorded."
+        },
+        {
+          "source_url": "https://www.rainbow-robotics.com/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Rainbow Robotics — home page",
+          "excerpt": "Full-Stack Robotics Company, Rooted in Humanoid Technology.",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Home page (Korean/English): started in 2011 from HUBO core technology; series RBC, RBY ('Mobile Humanoid', RB-Y1), RBQ (RBQ-10), RBM; no pricing, stock or delivery information, only consultation, distributor locator and sales e-mail. The page does not state a stock-exchange listing."
         }
       ]
     },
@@ -1120,7 +1344,7 @@
       "operating_locations": null,
       "website_url": "https://sanctuary.ai/",
       "founded_year": 2018,
-      "description": "Sanctuary AI is a Vancouver, Canada, company founded in 2018 that develops AI for physical work. It built the Phoenix general-purpose humanoid, unveiled in 2023 with dexterous hands and its Carbon control system, and now in its eighth generation. Sanctuary's current focus is deploying its Physical AI software on commercially available robotic systems for industrial tasks, particularly in automotive manufacturing, and it describes Phoenix as optimized for high-quality data capture.",
+      "description": "Sanctuary AI is a Vancouver, Canada, company founded in 2018 that develops AI for physical work. It built the Phoenix general-purpose humanoid, unveiled in 2023 with dexterous hands and its Carbon control system, and now in its eighth generation. Sanctuary's current focus is deploying its Physical AI software on commercially available robotic systems for industrial tasks, particularly in automotive manufacturing, and it describes Phoenix as optimized for high-quality data capture. Its site describes its Physical AI as built for multi-embodiment, supporting diverse hardware configurations, mobility options and end effectors, and names no customers.",
       "target_markets": ["manufacturing"],
       "commercial_model": "Physical AI software deployed on commercially available industrial robots.",
       "deployment_status": null,
@@ -1154,6 +1378,20 @@
           "confidence": "HIGH",
           "claim_fields": ["country_region_code", "headquarters_city", "founded_year", "description"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Company press release: Vancouver, Canada; founded 2018; Phoenix sixth generation with Carbon control system."
+        },
+        {
+          "source_url": "https://sanctuary.ai/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Sanctuary AI — home page",
+          "excerpt": "built for multi-embodiment, supporting diverse hardware configurations, mobility options and end effectors",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Home page: 'deploying Physical AI with production-ready performance across existing and future robotic hardware'; no customers named, only 'industrial leaders'; Carbon, Phoenix and teleoperation are not mentioned on this page."
         }
       ]
     },
@@ -1167,7 +1405,7 @@
       "operating_locations": null,
       "website_url": "https://www.softbankrobotics.com",
       "founded_year": 2012,
-      "description": "SoftBank Robotics Group Corp. is a Tokyo-based robotics company established in January 2012 within the SoftBank Group. It provides robots and robotics services, including the Whiz commercial cleaning robot, the Servi food-delivery robot, the STEAMA steam-cooking robot and AI-based logistics automation. Its humanoid robot Pepper was launched in June 2014.",
+      "description": "SoftBank Robotics Group Corp. is a Tokyo-based robotics company established in January 2012 within the SoftBank Group. It provides robots and robotics services, including the Whiz commercial cleaning robot, the Servi food-delivery robot, the STEAMA steam-cooking robot and AI-based logistics automation. Its humanoid robot Pepper was launched in June 2014. Its company history records Pepper's sales to developers from February 2015, the Pepper PARLOR store at Tokyu Plaza Shibuya in December 2019, and Guinness World Records recognition in February 2026 for Pepper as the world's first mass-produced humanoid robot; it also records investments of JPY 14.5 billion each from Alibaba Group and Foxconn Technology Group in June 2015.",
       "target_markets": ["facilities", "hospitality", "logistics"],
       "commercial_model": null,
       "deployment_status": null,
@@ -1189,6 +1427,20 @@
           "confidence": "HIGH",
           "claim_fields": ["legal_name", "country_region_code", "headquarters_city", "founded_year", "description", "target_markets", "parent_company", "parent_relationship"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Official company profile: SoftBank Robotics Group Corp.; established January 2012; Tokyo head office; SoftBank Group company; Pepper (June 2014), Whiz, Servi, STEAMA, logistics automation. The company's own ranking claim is not repeated. is_public_company left null: the profile does not state listing status, and SoftBank Group's listing was not verified, so parent_listing is null. NAO attribution is out of scope for this task."
+        },
+        {
+          "source_url": "https://www.softbankrobotics.com/profile/",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "SoftBank Robotics — Company profile (history)",
+          "excerpt": "Received Guinness World Records™ recognition for Pepper as the world's first mass-produced humanoid robot",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Company history entries: Feb 2015 sales of Pepper for Developers; Dec 2019 Pepper PARLOR at Tokyu Plaza Shibuya; Feb 2026 Guinness recognition; Jun 2015 JPY 14.5 billion each from Alibaba Group and Foxconn Technology Group."
         }
       ]
     },
@@ -1261,7 +1513,7 @@
       "operating_locations": null,
       "website_url": "https://global.toyota",
       "founded_year": 1937,
-      "description": "Toyota Motor Corporation is headquartered in Toyota City, Aichi Prefecture, Japan, and was established in 1937. Its shares are listed on the Tokyo and Nagoya stock exchanges under code 7203 and trade in New York and London under the ticker TM. Its humanoid research includes the T-HR3, a third-generation humanoid unveiled in November 2017 by its Partner Robot Division as a platform for exploring safe physical interaction between robots and their surroundings. T-HR3 is controlled remotely through a Master Maneuvering System that maps an operator's movements onto the robot.",
+      "description": "Toyota Motor Corporation is headquartered in Toyota City, Aichi Prefecture, Japan, and was established in 1937. Its shares are listed on the Tokyo and Nagoya stock exchanges under code 7203 and trade in New York and London under the ticker TM. Its humanoid research includes the T-HR3, a third-generation humanoid unveiled in November 2017 by its Partner Robot Division as a platform for exploring safe physical interaction between robots and their surroundings. T-HR3 is controlled remotely through a Master Maneuvering System that maps an operator's movements onto the robot. Toyota's announcement says T-HR3 was designed by its Partner Robot Division, with the torque servo module developed with Tamagawa Seiki and NIDEC COPAL ELECTRONICS, and that it was shown at the International Robot Exhibition 2017 in Tokyo from 29 November to 2 December 2017.",
       "target_markets": [],
       "commercial_model": null,
       "deployment_status": null,
@@ -1307,6 +1559,20 @@
           "confidence": "HIGH",
           "claim_fields": ["description", "deployment_note"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Official release: T-HR3 by the Partner Robot Division as a platform to explore safely managing physical interactions; Master Maneuvering System remote control; no commercial plans stated."
+        },
+        {
+          "source_url": "https://global.toyota/en/newsroom/corporate/19841525.html",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Toyota — T-HR3 announcement (21 Nov 2017)",
+          "excerpt": "explore new technologies for safely managing physical interactions between robots and their surroundings",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Unveiled 2017-11-21; designed by Partner Robot Division; torque servo module with Tamagawa Seiki and NIDEC COPAL ELECTRONICS; International Robot Exhibition 2017, Tokyo Big Sight, 29 Nov to 2 Dec."
         }
       ]
     },
@@ -1320,7 +1586,7 @@
       "operating_locations": null,
       "website_url": "https://www.ubtrobot.com",
       "founded_year": 2012,
-      "description": "UBTECH Robotics is a Shenzhen robotics company established in March 2012 and listed on the Main Board of the Hong Kong Stock Exchange since December 2023. Its products span industrial and commercial humanoid robots, service robots, educational AI products and consumer robots. Its Walker series includes the Walker S2 full-size industrial humanoid, for which UBTECH began mass production and delivery in November 2025, reporting accumulated orders of more than 800 million yuan. Named partners include BYD, Geely Auto, FAW-Volkswagen, Foxconn and SF Express.",
+      "description": "UBTECH Robotics is a Shenzhen robotics company established in March 2012 and listed on the Main Board of the Hong Kong Stock Exchange since December 2023. Its products span industrial and commercial humanoid robots, service robots, educational AI products and consumer robots. Its Walker series includes the Walker S2 full-size industrial humanoid, for which UBTECH began mass production and delivery in November 2025, reporting accumulated orders of more than 800 million yuan. Named partners include BYD, Geely Auto, FAW-Volkswagen, Foxconn and SF Express. UBTECH reports 3,112 granted patents as of June 2026, trades in Hong Kong under stock code 9880.HK from 29 December 2023, and says its Walker S series robots have begun training in multiple automotive factories.",
       "target_markets": ["manufacturing", "logistics", "education"],
       "commercial_model": null,
       "deployment_status": "COMMERCIAL",
@@ -1354,6 +1620,20 @@
           "confidence": "HIGH",
           "claim_fields": ["description", "target_markets", "deployment_status", "deployment_note"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Company press release: mass production and delivery of several hundred Walker S2 units; accumulated orders exceeding 800 million yuan; uses in automotive manufacturing, smart factories, logistics and data-collection centres; partners BYD, Dongfeng Liuzhou, Geely, FAW-Volkswagen Qingdao, Audi FAW, BAIC, Foxconn, SF Express."
+        },
+        {
+          "source_url": "https://www.ubtrobot.com/en/about/company-profile",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "UBTECH — Company profile",
+          "excerpt": "listed on the main board of the Hong Kong Stock Exchange on 29 December 2023",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Company profile: 3,112 granted patents as of June 2026 (1,857 invention patents); HKEX main board 29 December 2023, code 9880.HK; Walker S series 'have begun training in multiple automotive factories'. The page names no partners and gives no employee or revenue figure."
         }
       ]
     },
@@ -1367,7 +1647,7 @@
       "operating_locations": null,
       "website_url": "https://www.unitree.com",
       "founded_year": 2016,
-      "description": "Unitree Robotics (宇树科技股份有限公司) was founded in 2016 by Wang Xingxing. It makes quadruped robots, including Go2 and the industrial B2, and humanoid robots, including G1, H1, H2 and R1, which it sells directly through its own online store. Applications cited by the company include power inspection, survey and exploration, public rescue, research, education and entertainment. Unitree's shares have been listed on the STAR Market of the Shanghai Stock Exchange since 19 August 2026.",
+      "description": "Unitree Robotics (宇树科技股份有限公司) was founded in 2016 by Wang Xingxing. It makes quadruped robots, including Go2 and the industrial B2, and humanoid robots, including G1, H1, H2 and R1, which it sells directly through its own online store. Applications cited by the company include power inspection, survey and exploration, public rescue, research, education and entertainment. Unitree's shares have been listed on the STAR Market of the Shanghai Stock Exchange since 19 August 2026. Its website lists ten quadruped models (Laikago to As2), four humanoids (H1, G1, H2 and R1), the GD01 rideable mech, six-axis manipulators and dexterous arms, the UnifoLM embodied-intelligence model and a consumer fitness product, PUMP.",
       "target_markets": ["research", "education", "industry"],
       "commercial_model": "Direct online sale via OEM store (shop.unitree.com).",
       "deployment_status": "COMMERCIAL",
@@ -1413,6 +1693,20 @@
           "confidence": "HIGH",
           "claim_fields": ["legal_name", "is_public_company", "ticker", "description"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Exchange announcement (primary): issuer 宇树科技股份有限公司, short name 宇树科技, stock code 688836, STAR Market, listing on 19 August 2026, announced 18 August 2026. Checked first, before this record changed. legal_name replaced with the issuer name from the exchange; the previous 'Hangzhou Unitree Technology Co., Ltd.' is not the listed issuer's name, and no official English name was captured."
+        },
+        {
+          "source_url": "https://www.unitree.com/about",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Unitree — About (products)",
+          "excerpt": "power inspection",
+          "published_at": null,
+          "observed_at": "2026-11-02",
+          "verified_at": null,
+          "confidence": "HIGH",
+          "claim_fields": [
+            "description"
+          ],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by the product owner under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. About page product lists: quadrupeds Laikago, Aliengo, A1, Go1, Go2, B1, B2, B2-W, A2, As2; humanoids H1, G1, H2, R1; GD01; six-axis manipulators and dexterous arms; UnifoLM-X1-0, UnifoLM-WBT-Dataset, WVLA 2.0; PUMP. Also records the B1 shown as a guide dog at the Asian Para Games torch relay."
         }
       ]
     },

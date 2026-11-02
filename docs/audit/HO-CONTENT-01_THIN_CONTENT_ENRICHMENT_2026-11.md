@@ -16,58 +16,58 @@ Use-case rows have no evidence table (the schema has none), so the sources for e
 
 ## 2. Word counts (words inside `<main>`, `scripts/measure_page_words.py`)
 
-Baseline = production https://humanoidonline.com on 2026-11-02. "After" = the PR's Netlify deploy preview. Catalogue text only reaches a rendered page after the DB is re-imported, and the page text comes from the database through the API, so a deploy preview shows these words only if its API points at a database that has imported this branch. The "Catalogue text words" column is the exact change to the catalogue fields (description + requirements + limitations for use cases; description for makers) and is what the import will add.
+Baseline = production https://humanoidonline.com on 2026-11-02. Preview = https://deploy-preview-235--humanoidonline.netlify.app, measured after CI went green. **The preview shows no gain (every page is within 1 word of baseline) because page text comes from the database through the API, and the preview's API still serves the production database, which has not imported this branch.** That is expected: this catalogue change takes effect only after the owner-approved import. The honest 'after' number is therefore a projection: baseline plus the exact word delta of the catalogue fields (description, requirements, limitations for use cases; description for makers). It assumes the page renders those fields in full, which `apps/web/app/use-cases/[slug]/page.tsx:62-70` and `apps/web/app/manufacturers/[slug]/page.tsx:172` do. Re-measure after the import with `scripts/measure_page_words.py https://humanoidonline.com`. The 1-word drift on the preview vs baseline is measurement noise.
 
 Note on the brief: it quotes 78-314 words for the use-case pages. Production measures 84-799, because the page also renders the ranked robot list and navigation. The thin ones are `home` (84), `security-inspection` (180), `warehouse-logistics` (220). Two makers, `aimoga` and `faraday-future`, are not live in production (404), so no page baseline exists for them.
 
 ### Use cases
 
-| Page | Baseline page words | After (preview) | Catalogue text words (before → after) |
-|---|---|---|---|
-| `/use-cases/warehouse-logistics` | 220 | pending | 9 → 203 |
-| `/use-cases/manufacturing` | 349 | pending | 8 → 203 |
-| `/use-cases/research-education` | 799 | pending | 6 → 146 |
-| `/use-cases/home` | 84 | pending | 4 → 208 |
-| `/use-cases/events-entertainment` | 754 | pending | 7 → 69 |
-| `/use-cases/retail-service` | 313 | pending | 73 → 156 |
-| `/use-cases/healthcare-rehabilitation` | 278 | pending | 86 → 126 |
-| `/use-cases/security-inspection` | 180 | pending | 60 → 133 |
+| Page | Baseline page words | Preview page words (measured) | Catalogue text words (before → after) | Projected page words after import |
+|---|---|---|---|---|
+| `/use-cases/warehouse-logistics` | 220 | 219 | 9 → 203 | ~414 |
+| `/use-cases/manufacturing` | 349 | 348 | 8 → 203 | ~544 |
+| `/use-cases/research-education` | 799 | 798 | 6 → 146 | ~939 |
+| `/use-cases/home` | 84 | 83 | 4 → 208 | ~288 |
+| `/use-cases/events-entertainment` | 754 | 753 | 7 → 69 | ~816 |
+| `/use-cases/retail-service` | 313 | 312 | 73 → 156 | ~396 |
+| `/use-cases/healthcare-rehabilitation` | 278 | 277 | 86 → 126 | ~318 |
+| `/use-cases/security-inspection` | 180 | 179 | 60 → 133 | ~253 |
 
 ### Manufacturers
 
-| Page | Baseline page words | After (preview) | Catalogue description words (before → after) | Status |
-|---|---|---|---|---|
-| `/manufacturers/1x-technologies` | 321 | pending | 81 → 141 | enriched |
-| `/manufacturers/agibot` | 247 | pending | 78 → 134 | enriched |
-| `/manufacturers/agility-robotics` | 299 | pending | 83 → 148 | enriched |
-| `/manufacturers/aimoga` | not live (404) | n/a | 35 → 35 | not enriched |
-| `/manufacturers/apptronik` | 298 | pending | 89 → 89 | not enriched |
-| `/manufacturers/astribot` | 168 | pending | 63 → 103 | enriched |
-| `/manufacturers/booster-robotics` | 271 | pending | 82 → 151 | enriched |
-| `/manufacturers/boston-dynamics` | 389 | pending | 85 → 85 | not enriched |
-| `/manufacturers/clone-robotics` | 327 | pending | 90 → 134 | enriched |
-| `/manufacturers/engineered-arts` | 336 | pending | 94 → 150 | enriched |
-| `/manufacturers/faraday-future` | not live (404) | n/a | 39 → 39 | not enriched |
-| `/manufacturers/figure-ai` | 333 | pending | 76 → 125 | enriched |
-| `/manufacturers/fourier-intelligence` | 191 | pending | 74 → 112 | enriched |
-| `/manufacturers/galbot` | 261 | pending | 82 → 150 | enriched |
-| `/manufacturers/hanson-robotics` | 161 | pending | 60 → 60 | not enriched |
-| `/manufacturers/honda` | 289 | pending | 92 → 147 | enriched |
-| `/manufacturers/kepler-robotics` | 230 | pending | 73 → 73 | not enriched |
-| `/manufacturers/limx-dynamics` | 184 | pending | 74 → 127 | enriched |
-| `/manufacturers/neura-robotics` | 252 | pending | 85 → 151 | enriched |
-| `/manufacturers/pal-robotics` | 204 | pending | 69 → 115 | enriched |
-| `/manufacturers/rainbow-robotics` | 198 | pending | 70 → 126 | enriched |
-| `/manufacturers/realbotix` | 249 | pending | 80 → 80 | not enriched |
-| `/manufacturers/robotera` | 243 | pending | 77 → 77 | not enriched |
-| `/manufacturers/sanctuary-ai` | 245 | pending | 70 → 93 | enriched |
-| `/manufacturers/softbank-robotics` | 183 | pending | 50 → 108 | enriched |
-| `/manufacturers/tesla` | 287 | pending | 73 → 73 | not enriched |
-| `/manufacturers/toyota` | 279 | pending | 89 → 133 | enriched |
-| `/manufacturers/ubtech-robotics` | 315 | pending | 83 → 118 | enriched |
-| `/manufacturers/unitree` | 315 | pending | 73 → 108 | enriched |
-| `/manufacturers/xiaomi` | 137 | pending | 42 → 42 | not enriched |
-| `/manufacturers/xpeng-robotics` | 270 | pending | 74 → 74 | not enriched |
+| Page | Baseline page words | Preview page words (measured) | Catalogue description words (before → after) | Projected page words after import | Status |
+|---|---|---|---|---|---|
+| `/manufacturers/1x-technologies` | 321 | 320 | 81 → 141 | ~381 | enriched |
+| `/manufacturers/agibot` | 247 | 246 | 78 → 134 | ~303 | enriched |
+| `/manufacturers/agility-robotics` | 299 | 298 | 83 → 148 | ~364 | enriched |
+| `/manufacturers/aimoga` | not live (404) | n/a | 35 → 35 | n/a | not enriched |
+| `/manufacturers/apptronik` | 298 | 297 | 89 → 89 | ~298 | not enriched |
+| `/manufacturers/astribot` | 168 | 167 | 63 → 103 | ~208 | enriched |
+| `/manufacturers/booster-robotics` | 271 | 270 | 82 → 151 | ~340 | enriched |
+| `/manufacturers/boston-dynamics` | 389 | 388 | 85 → 85 | ~389 | not enriched |
+| `/manufacturers/clone-robotics` | 327 | 326 | 90 → 134 | ~371 | enriched |
+| `/manufacturers/engineered-arts` | 336 | 335 | 94 → 150 | ~392 | enriched |
+| `/manufacturers/faraday-future` | not live (404) | n/a | 39 → 39 | n/a | not enriched |
+| `/manufacturers/figure-ai` | 333 | 332 | 76 → 125 | ~382 | enriched |
+| `/manufacturers/fourier-intelligence` | 191 | 190 | 74 → 112 | ~229 | enriched |
+| `/manufacturers/galbot` | 261 | 260 | 82 → 150 | ~329 | enriched |
+| `/manufacturers/hanson-robotics` | 161 | 160 | 60 → 60 | ~161 | not enriched |
+| `/manufacturers/honda` | 289 | 288 | 92 → 147 | ~344 | enriched |
+| `/manufacturers/kepler-robotics` | 230 | 229 | 73 → 73 | ~230 | not enriched |
+| `/manufacturers/limx-dynamics` | 184 | 183 | 74 → 127 | ~237 | enriched |
+| `/manufacturers/neura-robotics` | 252 | 251 | 85 → 151 | ~318 | enriched |
+| `/manufacturers/pal-robotics` | 204 | 203 | 69 → 115 | ~250 | enriched |
+| `/manufacturers/rainbow-robotics` | 198 | 197 | 70 → 126 | ~254 | enriched |
+| `/manufacturers/realbotix` | 249 | 248 | 80 → 80 | ~249 | not enriched |
+| `/manufacturers/robotera` | 243 | 242 | 77 → 77 | ~243 | not enriched |
+| `/manufacturers/sanctuary-ai` | 245 | 244 | 70 → 93 | ~268 | enriched |
+| `/manufacturers/softbank-robotics` | 183 | 182 | 50 → 108 | ~241 | enriched |
+| `/manufacturers/tesla` | 287 | 286 | 73 → 73 | ~287 | not enriched |
+| `/manufacturers/toyota` | 279 | 278 | 89 → 133 | ~323 | enriched |
+| `/manufacturers/ubtech-robotics` | 315 | 314 | 83 → 118 | ~350 | enriched |
+| `/manufacturers/unitree` | 315 | 314 | 73 → 108 | ~350 | enriched |
+| `/manufacturers/xiaomi` | 137 | 136 | 42 → 42 | ~137 | not enriched |
+| `/manufacturers/xpeng-robotics` | 270 | 269 | 74 → 74 | ~270 | not enriched |
 
 ## 3. Method and retrieval caveats
 
@@ -215,8 +215,8 @@ Run on Ubuntu with PostgreSQL 15 (CI uses 16; installed because docker is unavai
 |---|---|
 | `uv run db/bootstrap.py && db/import_catalogue.py && db/validate_catalogue.py && db/readiness_check.py integrity` (fresh DB, no seed) | all exit 0; G2 OK; integrity gate PASS (73 robots, 0 blocking) |
 | `cd apps/api && uv sync && uv run ruff check .` | All checks passed |
-| `uv run pytest` (against a **seeded** DB, as CI does with `bootstrap.py --seed`) | {{API}} |
+| `uv run pytest` (against a **seeded** DB, as CI does with `bootstrap.py --seed`) | 3555 passed, 2 skipped, 1 failed locally, run in two parts: `test_catalogue_freshness.py` (slow DB-rebuild tests, ~1 min each locally) was run separately and stopped part-way; it and the whole suite passed in CI (Backend job, 4m44s). The 1 local failure, `test_discovery_cli_foundation.py::test_fresh_process_without_database_configuration`, expects a process with no DB config to exit 1 but exits 3 because this sandbox exports `DATABASE_URL`; it touches no file in this change and passes in CI. |
 | `cd apps/web && npm ci && npx vitest run` | 52 files, 732 tests passed |
-| CI on the PR | {{CI}} |
+| CI on the PR | All 7 CI jobs green (Backend, Catalogue, Database, Frontend, Frontend integration, Frontend discovery review, Frontend zero-match) plus Netlify header/redirect rules and Vercel; checked once after the run finished. |
 
 Note: pytest against a DB where the catalogue was imported (not seeded) fails `test_agent_projection.py::test_price_display_meaning_is_preserved` (expects the seed's 16000, finds 13500). That is environment, not this change: CI seeds, it does not import, for the API job.

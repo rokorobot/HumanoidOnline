@@ -14,6 +14,8 @@ No schema change. No new field. Each new manufacturer evidence row carries `sour
 
 Use-case rows have no evidence table (the schema has none), so the sources for every factual use-case claim are recorded in section 4 of this document.
 
+**Update (DR-C2, 2026-11-02):** with `USE_CASE` evidence (migration 0028, PR #236) the section 4 sources are now also recorded as 28 `evidence` rows in `db/catalogue/use_cases.json` (`claim_fields` naming the text fields each supports; notes credit the session initiator as RK). Section 4 stays as the claim-by-claim index; the rows' `excerpt` is the supported fact as recorded here, not a page quotation.
+
 ## 2. Word counts (words inside `<main>`, `scripts/measure_page_words.py`)
 
 Baseline = production https://humanoidonline.com on 2026-11-02. Preview = https://deploy-preview-235--humanoidonline.netlify.app, measured after CI went green. **The preview shows no gain (every page is within 1 word of baseline) because page text comes from the database through the API, and the preview's API still serves the production database, which has not imported this branch.** That is expected: this catalogue change takes effect only after the owner-approved import. The honest 'after' number is therefore a projection: baseline plus the exact word delta of the catalogue fields (description, requirements, limitations for use cases; description for makers). It assumes the page renders those fields in full, which `apps/web/app/use-cases/[slug]/page.tsx:62-70` and `apps/web/app/manufacturers/[slug]/page.tsx:172` do. Re-measure after the import with `scripts/measure_page_words.py https://humanoidonline.com`. The 1-word drift on the preview vs baseline is measurement noise.

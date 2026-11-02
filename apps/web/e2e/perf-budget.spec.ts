@@ -66,7 +66,9 @@ const STATIC: Budget[] = [
   // not code: five more manufacturer-sourced extended specs with their source labels.
   // HO-RESEARCH-ASIA-01 batch: 109 -> 117 (measured 116.0 in CI). Content, not code: two new
   // offers (Unitree China, GMO AI & Robotics Japan) and a CNY list price, with their evidence.
-  { path: "/robots/unitree-g1", docKB: 117, jsRawKB: 412 },
+  // SEO-04 (#238): 117 -> 121 (measured 119.7 in CI). The "<Robot> alternatives" block: four
+  // links to curated A-vs-B pages, repeated in the streamed payload. Owner-approved.
+  { path: "/robots/unitree-g1", docKB: 121, jsRawKB: 412 },
   // UX-01: 32 -> 33 (measured 32.06). The compare price cell now carries its configuration,
   // basis tag, order note and the shared summary line, plus data-enum traceability.
   // SOCIAL-01: 33 -> 37 (measured 35.4).

@@ -146,3 +146,59 @@ describe("SEO-03 — brand and manufacturer structured data", () => {
     });
   });
 });
+
+describe("SEO-03 — Offers carry only published, evidence-linked one-time prices", () => {
+  const EV = { source_type: "MANUFACTURER", confidence: "HIGH", observed_at: "2026-10-01T00:00:00Z" };
+  const base = {
+    transaction_type: "PURCHASE",
+    billing_period: "ONE_TIME",
+    currency: "USD",
+    condition: "NEW",
+    evidence: EV,
+  };
+  const offersOf = (pricing_offers: unknown[]) =>
+    graphOf(robot({ pricing_offers } as Partial<RobotDetail>)).product.offers as
+      | Array<Record<string, unknown>>
+      | undefined;
+
+  it("maps a PUBLIC price to an Offer with price, currency, condition and seller", () => {
+    const [o] = offersOf([{ ...base, price_type: "PUBLIC", price: 16000, provider_name: "Acme Store", variant: "Pro" }])!;
+    expect(o).toEqual({
+      "@type": "Offer",
+      url: `${ORIGIN}/robots/test-bot`,
+      priceCurrency: "USD",
+      price: 16000,
+      name: "Pro",
+      itemCondition: "https://schema.org/NewCondition",
+      seller: { "@type": "Organization", name: "Acme Store" },
+    });
+  });
+
+  it("states a FROM price as the starting price and a RANGE only by its bounds", () => {
+    const [from, range] = offersOf([
+      { ...base, price_type: "FROM", price: 5900 },
+      { ...base, price_type: "RANGE", price_min: 20000, price_max: 30000 },
+    ])!;
+    expect(from.price).toBe(5900);
+    expect(from.priceSpecification).toMatchObject({ minPrice: 5900 });
+    expect(range.price).toBeUndefined();
+    expect(range.priceSpecification).toMatchObject({ minPrice: 20000, maxPrice: 30000 });
+  });
+
+  it.each([
+    ["quote only", { price_type: "QUOTE_ONLY" }],
+    ["HumanoidOnline estimate", { price_type: "ESTIMATED", price: 1 }],
+    ["manufacturer estimate", { price_type: "MANUFACTURER_ESTIMATE", price: 1 }],
+    ["no evidence", { price_type: "PUBLIC", price: 1, evidence: null }],
+    ["unknown price (NULL is never 0)", { price_type: "PUBLIC", price: null }],
+    ["rental", { price_type: "PUBLIC", price: 1, transaction_type: "RENTAL", billing_period: "MONTHLY" }],
+    ["one-sided range", { price_type: "RANGE", price_min: 1, price_max: null }],
+  ])("emits no Offer for %s", (_label, over) => {
+    expect(offersOf([{ ...base, ...over }])).toBeUndefined();
+  });
+
+  it("omits an unmapped condition rather than mislabel it", () => {
+    const [o] = offersOf([{ ...base, price_type: "PUBLIC", price: 1, condition: "OPEN_BOX" }])!;
+    expect(o.itemCondition).toBeUndefined();
+  });
+});

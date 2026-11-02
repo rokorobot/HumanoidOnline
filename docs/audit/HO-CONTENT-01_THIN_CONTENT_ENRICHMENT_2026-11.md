@@ -193,9 +193,9 @@ Each row is a new `evidence` row in `manufacturers.json` (same URL, `observed_at
 
 ## 7. Conflicts and follow-ups (non-blocking)
 
-1. **LimX TRON 1:** profile says "(2024)"; LimX's about page (the profile's own source) timelines TRON 1 to October 2023. Not changed here.
-2. **NEURA founding year:** profile 2019 (intro); the same page's timeline says December 2020. Team size also differs on the page (1,500+ vs 1,400+); both reported.
-3. **AgiBot latest count:** the page now shows 20,000 robots (Sep 2026). The existing `deployment_note` still cites the 15,000th (Jun 2026). Left unchanged.
+1. **LimX TRON 1 — RESOLVED, no change (2026-11-02).** Re-checked against the raw page: the milestone list is grouped by year and TRON 1 (October) sits in the 2024 block. The profile's 2024 is correct; the October 2023 reading was a misreading of WebFetch's processed text. The evidence note now says so.
+2. **NEURA founding year — RESOLVED (owner decision 2026-11-02: on conflicting dates, take the later one).** The page says 'Founded in 2019' in its intro and metadata and 'December 2020: Foundation' in its timeline. `founded_year` and the description now say 2020; the 2019 statement is preserved in the evidence note, and the 2019 row no longer claims `founded_year`. Team size also differs on the page (1,500+ vs 1,400+); both reported.
+3. **AgiBot latest count — RESOLVED (owner decision 2026-11-02).** The page shows the 20,000th robot (re-checked by curl). `deployment_note` and the description now cite the 20,000th (September 2026).
 4. **Galbot, AgiBot, Sanctuary** `deployment_status` is NULL; the new own-site wording may justify a status review.
 5. **Citation precision:** use-case fact UC-3 (ISO/CD 25785-1 label) rests on a search-result title. Re-check when `iso.org` is reachable.
 6. **Evidence note provenance:** new rows cite the research work order as 'HO-CONTENT-01 thin-content enrichment' (2026-11-02). The existing rows quote a named owner; the owner should confirm the wording.

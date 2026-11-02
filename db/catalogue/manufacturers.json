@@ -84,11 +84,11 @@
       "operating_locations": null,
       "website_url": "https://www.agibot.com",
       "founded_year": 2023,
-      "description": "AgiBot (AGIBOT Innovation (Shanghai) Technology Co., Ltd.) is a Shanghai-based developer of general-purpose embodied robots, founded in February 2023. Its range includes the AGIBOT A series of full-size humanoids, including the A2 and A3, the X series, Genie embodied-AI robots, D1 quadrupeds, a cleaning robot and dexterous hands. The company reports that its 15,000th general-purpose robot came off its production line in June 2026. In July 2026 AgiBot began the process of a Hong Kong initial public offering. Its milestone timeline records the 1,000th robot off the line in January 2025, the 10,000th in March 2026 and the 20,000th in September 2026; it also lists AGIBOT A1 unveiled in August 2023 and A2 in August 2024, and AgiBot describes July 2025 as the world's first routine operation of humanoid robots at an industrial site.",
+      "description": "AgiBot (AGIBOT Innovation (Shanghai) Technology Co., Ltd.) is a Shanghai-based developer of general-purpose embodied robots, founded in February 2023. Its range includes the AGIBOT A series of full-size humanoids, including the A2 and A3, the X series, Genie embodied-AI robots, D1 quadrupeds, a cleaning robot and dexterous hands. The company reports that its 20,000th general-purpose robot came off its production line in September 2026. In July 2026 AgiBot began the process of a Hong Kong initial public offering. Its milestone timeline records the 1,000th robot off the line in January 2025, the 10,000th in March 2026 and the 15,000th in June 2026; it also lists AGIBOT A1 unveiled in August 2023 and A2 in August 2024, and AgiBot describes July 2025 as the world's first routine operation of humanoid robots at an industrial site.",
       "target_markets": ["manufacturing", "service"],
       "commercial_model": null,
       "deployment_status": null,
-      "deployment_note": "Company-reported production milestone: 15,000th general-purpose embodied robot produced (June 2026). A humanoid deployment status has not been established from the sources reviewed.",
+      "deployment_note": "Company-reported production milestone: 20,000th general-purpose embodied robot produced (September 2026). A humanoid deployment status has not been established from the sources reviewed.",
       "is_public_company": false,
       "ticker": null,
       "parent_company": null,
@@ -128,10 +128,8 @@
           "observed_at": "2026-11-02",
           "verified_at": null,
           "confidence": "HIGH",
-          "claim_fields": [
-            "description"
-          ],
-          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Milestones: 2025-01 1,000th robot; 2026-03 10,000th; 2026-06 15,000th; 2026-09 20,000th; 2023-08 A1 unveiled; 2024-08 A2, X1 unveiled; 2025-07 'The world's first routine operation of humanoid robots at an industrial site achieved' (company claim, not independently verified). Supersedes the 15,000th-robot milestone as the latest company-reported count; deployment_note is intentionally unchanged."
+          "claim_fields": ["description", "deployment_note"],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Milestones: 2025-01 1,000th robot; 2026-03 10,000th; 2026-06 15,000th; 2026-09 20,000th; 2023-08 A1 unveiled; 2024-08 A2, X1 unveiled; 2025-07 'The world's first routine operation of humanoid robots at an industrial site achieved' (company claim, not independently verified). Re-checked 2026-11-02 by curl: 'The 20,000th general-purpose embodied robot rolled off the production line'. Supersedes the 15,000th as the latest company-reported count; deployment_note updated per owner decision 2026-11-02."
         }
       ]
     },
@@ -1065,7 +1063,7 @@
           "claim_fields": [
             "description"
           ],
-          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Timeline entries: Feb 2026 'Secured USD 200M in Series B'; Jul 2026 US$200M pre-IPO round bringing six-month funding to US$400M; Jul 2025 MoU with SAIC to co-establish a joint AI lab; Apr 2026 FluxVLA Engine open-sourced. The page dates TRON 1 to October 2023 whereas this profile says 2024 (see review doc, follow-up)."
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Timeline entries: Feb 2026 'Secured USD 200M in Series B'; Jul 2026 US$200M pre-IPO round bringing six-month funding to US$400M; Jul 2025 MoU with SAIC to co-establish a joint AI lab; Apr 2026 FluxVLA Engine open-sourced. Re-checked 2026-11-02 by curl against the raw page: the milestone list is grouped 2026 / 2025 / 2024 / 2023 / 2022 and 'Oct: Launched multi-modal biped robot TRON 1' sits in the 2024 block (after Mar P1, Jul Alibaba-led Series A, Aug CL-1; before the 2023 block's Sep W1 and Oct P1 at IROS). TRON 1 (2024) in this profile is correct; the October 2023 reading was a misreading of the processed text."
         }
       ]
     },
@@ -1078,8 +1076,8 @@
       "incorporation": null,
       "operating_locations": null,
       "website_url": "https://neura-robotics.com",
-      "founded_year": 2019,
-      "description": "NEURA Robotics is a German robotics company founded in 2019 and headquartered in Metzingen. It develops what it calls cognitive robots, combining sensing and AI, including the MAiRA and LARA robot arms, the MAV mobile platform and the MiPA assistant, together with a software ecosystem it calls the Neuraverse. Its humanoid line is 4NE1. NEURA is taking fully refundable EUR 100 reservations for the full-scale 4NE1 Gen 3.5, which it expects to be available at the end of 2026, and for a smaller 4NE1 Mini. Its about page names David Reger as founder and CEO, reports a EUR 66M Series A in May 2024 and a EUR 120M Series B in June 2026, and cites a Series C of up to US$1.4 bn without a date; it gives its team size as over 1,500 in the page text and 1,400+ in its page metadata, and says it has eight locations worldwide.",
+      "founded_year": 2020,
+      "description": "NEURA Robotics is a German robotics company founded in 2020 and headquartered in Metzingen. It develops what it calls cognitive robots, combining sensing and AI, including the MAiRA and LARA robot arms, the MAV mobile platform and the MiPA assistant, together with a software ecosystem it calls the Neuraverse. Its humanoid line is 4NE1. NEURA is taking fully refundable EUR 100 reservations for the full-scale 4NE1 Gen 3.5, which it expects to be available at the end of 2026, and for a smaller 4NE1 Mini. Its about page names David Reger as founder and CEO, reports a EUR 66M Series A in May 2024 and a EUR 120M Series B in June 2026, and cites a Series C of up to US$1.4 bn without a date; it gives its team size as over 1,500 in the page text and 1,400+ in its page metadata, and says it has eight locations worldwide.",
       "target_markets": [],
       "commercial_model": "Refundable reservations for 4NE1 humanoids, credited toward a later purchase agreement.",
       "deployment_status": null,
@@ -1099,7 +1097,7 @@
           "observed_at": "2026-09-13",
           "verified_at": null,
           "confidence": "HIGH",
-          "claim_fields": ["country_region_code", "headquarters_city", "founded_year", "description"],
+          "claim_fields": ["country_region_code", "headquarters_city", "description"],
           "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-09-13 by Claude Opus 5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny for manufacturer profile enrichment, under research work order 'OWNER WORK ORDER — MANUFACTURER PROFILE ENRICHMENT' (2026-09-13; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Official about page: founded 2019; Metzingen, Germany; MAiRA, LARA, MAV, MiPA, 4NE1; Neuraverse. HELD: legal name — the imprint page did not expose the entity name when retrieved, and 'NEURA Robotics GmbH' appeared only in search summaries."
         },
         {
@@ -1123,10 +1121,8 @@
           "observed_at": "2026-11-02",
           "verified_at": null,
           "confidence": "HIGH",
-          "claim_fields": [
-            "description"
-          ],
-          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. About page: CEO and founder David Reger; Series A EUR 66M (May 2024); Series B EUR 120M (June 2026); Series C 'Up to $1.4 bn' (no date); 'Over 1500 team members' in the body, '1,400+' in the metadata (inconsistent; both reported); '8 locations worldwide'. The page's timeline gives the foundation date as December 2020, whereas this profile says 2019 (see review doc, follow-up)."
+          "claim_fields": ["founded_year", "description"],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by Robert Konecny under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. About page: CEO and founder David Reger; Series A EUR 66M (May 2024); Series B EUR 120M (June 2026); Series C 'Up to $1.4 bn' (no date); 'Over 1500 team members' in the body, '1,400+' in the metadata (inconsistent; both reported); '8 locations worldwide'. CONFLICT ON THE SAME PAGE (re-checked 2026-11-02 by curl): the intro and meta description say 'Founded in 2019' / 'since 2019', while the timeline says 'December 2020: Foundation'. founded_year = 2020 per owner decision 2026-11-02 (when sources conflict on a date, take the later one); the 2019 statement is preserved here."
         }
       ]
     },

@@ -1,0 +1,41 @@
+id,rank,site,category,channel,contact,submission_url,status,sent_at,followup_at,live_url,rel_observed,last_checked,notes
+humanoid-robotics-technology,1,Humanoid Robotics Technology,guest,email,editor@humanoidroboticstechnology.com,https://humanoidroboticstechnology.com/about-humanoid-robotics-technology/,draft,,,,,,Email published on About page. In-article links observed followed.
+roboticstomorrow,2,RoboticsTomorrow,directory,email,news@roboticstomorrow.com,https://www.roboticstomorrow.com/site_services.php,draft,,,,,,Free directory listing + news release go to news@. Free bylined articles go to articles@bthmgmt.com (send later as a separate pitch).
+robohub,3,Robohub,guest,email,editors@robohub.org,https://robohub.org/contribute/,draft,,,,,,Pitch must be 100 words or less. Volunteer-run; allow 2+ weeks.
+humanoid-sports-network,4,Humanoid Sports Network,competitor,email,press@humanoidsportsnetwork.com,https://humanoidsportsnetwork.com/contact/,draft,,,,,,Ran a feature on humanoid.guide's database with a followed link.
+github-awesome-lists,5,GitHub awesome lists,resource,pr,jk4e/list-ai-humanoid-robots; keon/awesome-physical-ai; jonyzhang2023/awesome-humanoid-learning,https://github.com/jk4e/list-ai-humanoid-robots,todo,,,,,,One PR per repo from the rokorobot account. Links are nofollow (GitHub). kiloreux/awesome-robotics skipped: no pushes since 2024.
+weekly-robotics,6,Weekly Robotics,resource,email,contact@weeklyrobotics.com,https://www.weeklyrobotics.com/about/,draft,,,,,,Curator: Mat Sadowski. In-issue links observed followed.
+qviro,7,Qviro blog,competitor,manual,,https://qviro.com/blog,todo,,,,,,No public email found. Use the pitch in pitches/qviro.md via a contact form or LinkedIn.
+hugging-face,8,Hugging Face,community,manual,,https://huggingface.co/new-dataset,todo,,,,,,Needs your account. Publish only after confirming data may be redistributed (AGENTS.md rules 6-7).
+alternativeto,9,AlternativeTo,competitor,form,,https://alternativeto.net/software/lots-of-bots/about/,todo,,,,,,Add as alternative to humanoid.guide and Lots of Bots. Copy in pitches/listing.md.
+product-hunt,10,Product Hunt,competitor,form,,https://www.producthunt.com/posts/new,todo,,,,,,Launch Tue-Thu. Copy in pitches/listing.md.
+botstest,11,Botstest,directory,form,,https://botstest.com/submit/,todo,,,,,,Choose Community listing. Confirm it is free before submitting; never pay the $49.
+roboticsbiz,12,RoboticsBiz,guest,form,,https://roboticsbiz.com/write-for-us/,todo,,,,,,Send title + outline first. Bio links nofollow (stated). Pitch in pitches/roboticsbiz.md.
+topbots,13,TOPBOTS,guest,form,,https://www.topbots.com/guest-writer-editorial-content-guidelines/,todo,,,,,,One link allowed. Pitch in pitches/topbots.md.
+robotshop-community,14,RobotShop Community,guest,post,,https://community.robotshop.com/blog,todo,,,,,,Post in the Humanoids category yourself (account needed). Draft in pitches/robotshop-community.md.
+west-valley-libguide,15,West Valley College library guide,resource,manual,,https://libguides.westvalley.edu/Robots,todo,,,,,,No email published on the guide; use the library's Ask a Librarian. Text in pitches/librarian.md.
+wit-libguide,16,Wentworth Institute of Technology library guide,resource,email,systemslibrarian@wit.edu,https://library.wit.edu/guides/robotics/websites,draft,,,,,,Only address published on the guide page.
+mines-libguide,17,Colorado School of Mines library guide,resource,email,library@mines.edu,https://libguides.mines.edu/robotics/organizations,draft,,,,,,General library address published on the guide.
+zenodo,18,Zenodo,community,manual,,https://zenodo.org/uploads/new,todo,,,,,,Same dataset as Hugging Face; gives a DOI.
+revolutionized,19,Revolutionized,guest,form,,https://revolutionized.com/editorial-guidelines/,todo,,,,,,1300-1500 words. Pitch in pitches/revolutionized.md.
+rework,20,RE-WORK blog,guest,form,,https://blog.re-work.co/guest-blogs/,todo,,,,,,Proposal via their form; 1 bio link. Pitch in pitches/rework.md.
+robotics-stackexchange,21,Robotics Stack Exchange,community,manual,,https://robotics.stackexchange.com/users/signup,todo,,,,,,Profile website field + genuine answers only.
+ros-discourse,22,Open Robotics Discourse,community,post,,https://discourse.openrobotics.org/,todo,,,,,,Post yourself. Draft in pitches/ros-discourse.md.
+hacker-news,23,Hacker News,community,post,,https://news.ycombinator.com/submit,todo,,,,,,Post yourself; never automate. Draft in pitches/hacker-news.md.
+reddit,24,Reddit,community,post,,https://www.reddit.com/r/humanoidrobotics/,todo,,,,,,Post yourself; follow each subreddit's self-promotion rules. Draft in pitches/reddit.md.
+industryweek,25,IndustryWeek,guest,email,contributors-mfg@endeavorb2b.com,https://www.industryweek.com/industryweek-contributors-guidelines,draft,,,,,,Contributed content must be first-run and exclusive. Send abstract first.
+automation-com,26,Automation.com (ISA),guest,form,,https://www.automation.com/en/submit-content,todo,,,,,,Use the bylined feature guidelines on that page. Pitch in pitches/automation-com.md.
+shadow-robot,27,Shadow Robot blog,guest,email,contact@shadowrobot.com,https://shadowrobot.com/blog-guest/,draft,,,,,,Experienced robotics writers only. Link back offered (stated).
+uneed,28,Uneed,directory,form,,https://www.uneed.best/submit-a-tool,todo,,,,,,Free queue. Dofollow at 20 upvotes (stated).
+saashub,29,SaaSHub,directory,form,,https://www.saashub.com/submit,todo,,,,,,Nofollow (observed).
+betalist,30,BetaList,directory,form,,https://betalist.com/submissions/new,todo,,,,,,Free; long wait. Nofollow redirect (observed).
+crunchbase,31,Crunchbase,directory,form,,https://www.crunchbase.com/,todo,,,,,,Organization profile; parent Humanoid.Company.
+umich-libguide,32,University of Michigan library guide,resource,email,jniehof@umich.edu,https://guides.lib.umich.edu/robotics,draft,,,,,,Address published on the guide (guide contact). Fallback: libguides@umich.edu.
+drexel-libguide,33,Drexel University library guide,resource,email,bhattjj@drexel.edu,https://libguides.library.drexel.edu/robotics,draft,,,,,,Address published on the guide.
+hackaday,34,Hackaday.io,community,manual,,https://hackaday.io/,todo,,,,,,Project page about the evidence-tracking method.
+brandfetch,35,Brandfetch,competitor,form,,https://brandfetch.com/,todo,,,,,,Claim the humanoidonline.com brand.
+machine-design,36,Machine Design,guest,email,editors@machinedesign.com,https://www.machinedesign.com/contribute,draft,,,,,,Send abstract first.
+substack,37,Substack,community,manual,,https://substack.com/,todo,,,,,,Monthly availability digest; optional.
+cooper-links,38,Cooper Union robotics links,resource,email,mar@cooper.edu,http://faculty.cooper.edu/mar/robotics_links.htm,draft,,,,,,Old page; low response odds.
+robodk-blog,39,RoboDK blog,competitor,email,info@robodk.com,https://robodk.com/blog/comprehensive-robot-directory/,draft,,,,,,Long shot; general contact address.
+smith-links,40,Smith College robotics links,resource,manual,,http://www.science.smith.edu/~istreinu/Teaching/robotLinks.html,todo,,,,,,No email published on the page. Lowest priority.

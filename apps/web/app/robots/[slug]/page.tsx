@@ -194,10 +194,9 @@ export default async function RobotDetailPage({
     accessibleModes(robot.availability_offers),
   );
 
-  // A caveat EXPLAINS a spec — most often why it is UNKNOWN, or that sources
-  // disagree. It never supplies a value: the row still renders whatever the
-  // record holds (usually the UNKNOWN state), with the explanation beneath it.
-  const caveats = new Map(robot.spec_caveats.map((c) => [c.field, c.text]));
+  // Spec caveats (why a spec is UNKNOWN, or that sources disagree) stay in the catalogue
+  // and the API but are not rendered under the spec rows (owner decision 2026-11-02):
+  // the rows show the value or the UNKNOWN state only.
 
   // G4: scoped facts are resolved once, by the API. UNKNOWN here means no accepted canonical
   // knowledge at product or variant scope; nothing is re-derived in the web layer.
@@ -559,34 +558,34 @@ export default async function RobotDetailPage({
           <div className="specgrid">
             <div className="spectbl">
               <h3>Physical</h3>
-              <SpecRow label="Height" value={s.height_cm} unit="cm" note={caveats.get("height_cm")} />
-              <SpecRow label="Weight" value={s.weight_kg} unit="kg" note={caveats.get("weight_kg")} />
-              <SpecRow label="Arm span" value={s.arm_span_cm} unit="cm" note={caveats.get("arm_span_cm")} />
-              <SpecRow label="Reach" value={s.reach_cm} unit="cm" note={caveats.get("reach_cm")} />
-              <SpecRow label="Payload" value={s.payload_kg} unit="kg" note={caveats.get("payload_kg")} />
-              <SpecRow label="Walk speed" value={s.walk_speed_ms} unit="m/s" note={caveats.get("walk_speed_ms")} />
-              <SpecRow label="Runtime" value={s.runtime_minutes} unit="min" note={caveats.get("runtime_minutes")} />
-              <SpecRow label="Battery" value={s.battery_wh} unit="Wh" note={caveats.get("battery_wh")} />
-              <SpecRow label="Mobility" value={s.mobility ? mobilityLabel(s.mobility) : s.mobility} rawEnum={s.mobility} note={caveats.get("mobility")} />
-              <SpecRow label="DOF" value={s.degrees_of_freedom} note={caveats.get("degrees_of_freedom")} />
+              <SpecRow label="Height" value={s.height_cm} unit="cm" />
+              <SpecRow label="Weight" value={s.weight_kg} unit="kg" />
+              <SpecRow label="Arm span" value={s.arm_span_cm} unit="cm" />
+              <SpecRow label="Reach" value={s.reach_cm} unit="cm" />
+              <SpecRow label="Payload" value={s.payload_kg} unit="kg" />
+              <SpecRow label="Walk speed" value={s.walk_speed_ms} unit="m/s" />
+              <SpecRow label="Runtime" value={s.runtime_minutes} unit="min" />
+              <SpecRow label="Battery" value={s.battery_wh} unit="Wh" />
+              <SpecRow label="Mobility" value={s.mobility ? mobilityLabel(s.mobility) : s.mobility} rawEnum={s.mobility} />
+              <SpecRow label="DOF" value={s.degrees_of_freedom} />
             </div>
             <div className="spectbl">
               <h3>Intelligence</h3>
-              <SpecRow label="Autonomy" value={s.autonomy ? autonomyLabel(s.autonomy) : s.autonomy} rawEnum={s.autonomy} note={caveats.get("autonomy")} />
-              <ResolvedRow label="Manipulation" value={s.has_manipulation} fact={resolved.has_manipulation} note={caveats.get("has_manipulation")} />
-              <ResolvedRow label="Teleoperation" value={s.has_teleoperation} fact={resolved.has_teleoperation} note={caveats.get("has_teleoperation")} />
-              <SpecRow label="Vision" value={s.has_vision} note={caveats.get("has_vision")} />
-              <SpecRow label="Language UI" value={s.has_language_ui} note={caveats.get("has_language_ui")} />
-              <SpecRow label="Hand type" value={s.hand_type} note={caveats.get("hand_type")} />
-              <SpecRow label="Hand DOF" value={s.hand_dof} note={caveats.get("hand_dof")} />
+              <SpecRow label="Autonomy" value={s.autonomy ? autonomyLabel(s.autonomy) : s.autonomy} rawEnum={s.autonomy} />
+              <ResolvedRow label="Manipulation" value={s.has_manipulation} fact={resolved.has_manipulation} />
+              <ResolvedRow label="Teleoperation" value={s.has_teleoperation} fact={resolved.has_teleoperation} />
+              <SpecRow label="Vision" value={s.has_vision} />
+              <SpecRow label="Language UI" value={s.has_language_ui} />
+              <SpecRow label="Hand type" value={s.hand_type} />
+              <SpecRow label="Hand DOF" value={s.hand_dof} />
             </div>
             <div className="spectbl">
               <h3>Developer</h3>
-              <ResolvedRow label="SDK" value={s.has_sdk} fact={resolved.has_sdk} note={caveats.get("has_sdk")} />
-              <SpecRow label="API" value={s.has_api} note={caveats.get("has_api")} />
-              <ResolvedRow label="ROS support" value={s.ros_support} fact={resolved.ros_support} note={caveats.get("ros_support")} />
-              <SpecRow label="Developer edition" value={s.developer_edition} note={caveats.get("developer_edition")} />
-              <SpecRow label="Simulation support" value={s.simulation_support} note={caveats.get("simulation_support")} />
+              <ResolvedRow label="SDK" value={s.has_sdk} fact={resolved.has_sdk} />
+              <SpecRow label="API" value={s.has_api} />
+              <ResolvedRow label="ROS support" value={s.ros_support} fact={resolved.ros_support} />
+              <SpecRow label="Developer edition" value={s.developer_edition} />
+              <SpecRow label="Simulation support" value={s.simulation_support} />
               <SpecRow label="Announced" value={robot.announced_year} />
             </div>
           </div>
@@ -814,24 +813,17 @@ function ResolvedRow({
   label,
   value,
   fact,
-  note,
 }: {
   label: string;
   value: number | string | boolean | null | undefined;
   fact: ResolvedFact | undefined;
-  note?: string | null;
 }) {
-  if (!hasScopedKnowledge(fact)) return <SpecRow label={label} value={value} note={note} />;
+  if (!hasScopedKnowledge(fact)) return <SpecRow label={label} value={value} />;
   return (
     <div className="srow">
       <span className="k">{label}</span>
       <span className="d-blk">
         <ResolvedFactCell fact={fact} />
-        {note && (
-          <span className="ho-syslabel d-blk">
-            {note}
-          </span>
-        )}
       </span>
     </div>
   );

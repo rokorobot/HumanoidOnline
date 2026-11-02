@@ -259,7 +259,12 @@ manufacturer profile does: an optional `evidence: [ ... ]` list on the use case 
 `typical_tasks`), and `source_url`, `source_title`, `excerpt` (the exact supported fact) and
 `note` as for any evidence. The importer writes them as `subject_type='USE_CASE'`,
 `managed_by='CATALOGUE_IMPORT'`, validates them before opening a transaction, and leaves unmarked rows alone.
-Editorial text with no factual claim needs no row. The API returns them as `sources` on
+Editorial text with no factual claim needs no row. To load them without a full import (for
+example when `main` holds merged-but-unimported robot changes), run
+`uv run db/import_catalogue.py --use-cases-only`: it upserts `use_cases.json` and reconciles
+the USE_CASE evidence, validated first, in one transaction, and writes nothing else. It
+cannot be combined with `--only`, `--manufacturers-only`, `--product-lines-only` or
+`--apply-publication-state`. A rerun is a no-op. The API returns them as `sources` on
 `GET /api/use-cases/{slug}`; the page lists them under "Sources".
 
 ### Status normalization (deterministic mappings)

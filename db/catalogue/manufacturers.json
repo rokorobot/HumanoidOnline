@@ -810,11 +810,11 @@
       "operating_locations": null,
       "website_url": "https://www.galbot.com",
       "founded_year": 2023,
-      "description": "Galbot (银河通用机器人) is a Beijing embodied-AI robotics company founded in May 2023. Its main product, Galbot G1, is a wheeled robot with two arms for retail tasks such as inventory, replenishment, delivery and packaging, driven by the company's own vision-language-action models. Galbot says its robots operate in smart retail, industrial manufacturing and medical-service settings, and in July 2025 The Robot Report reported G1 deployments in nearly 10 stores in Beijing. The company also presents an S1 robot and its AstraBrain embodied model. In July 2025 it completed an RMB 1.1 billion (about US$153 million) funding round, which it said brought its total to about US$335 million; it said G1 could be deployed into a new store in about a day, handle 5,000 types of goods and work in settings including pharmacies, and its own site describes its robots as operating at scale in smart retail, industrial manufacturing and medical-service scenarios.",
+      "description": "Galbot (银河通用机器人) is a Beijing embodied-AI robotics company founded in May 2023. Its main product, Galbot G1, is a wheeled robot with two arms for retail tasks such as inventory, replenishment, delivery and packaging, driven by the company's own vision-language-action models. The company also presents an S1 robot and its AstraBrain embodied model. Galbot's own site says its robots have reached scaled commercial rollout and operate continuously in smart retail, industrial manufacturing and medical-service settings. In July 2025 The Robot Report reported G1 deployments in nearly 10 stores in Beijing, and Galbot completed an RMB 1.1 billion (about US$153 million) funding round, which it said brought its total to about US$335 million. It said G1 could be deployed into a new store in about a day, handle 5,000 types of goods and work in settings including pharmacies.",
       "target_markets": ["retail", "manufacturing", "logistics", "healthcare"],
       "commercial_model": null,
-      "deployment_status": null,
-      "deployment_note": "Galbot states its robots operate continuously in smart retail, industrial manufacturing and medical-service settings; The Robot Report (2025-07-02) reported G1 units deployed in nearly 10 Beijing stores. The sources do not say whether these are pilots or commercial contracts, so no status is asserted.",
+      "deployment_status": "COMMERCIAL",
+      "deployment_note": "Galbot states its robots have reached scaled commercial rollout and operate continuously in smart retail, industrial manufacturing and medical-service settings; The Robot Report (2025-07-02) reported G1 units deployed in nearly 10 Beijing stores. COMMERCIAL rests on the company's own claim and this one news report (MEDIUM confidence): no named customer, contract terms or price are on record.",
       "is_public_company": null,
       "ticker": null,
       "parent_company": null,
@@ -854,10 +854,8 @@
           "observed_at": "2026-11-02",
           "verified_at": null,
           "confidence": "MEDIUM",
-          "claim_fields": [
-            "description"
-          ],
-          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Secondary trade-press report (2025-07-02) of company statements: RMB 1.1bn (~US$153M) round; about US$335M total in two years; one-day store deployment; handles 5,000 goods types; pharmacies listed. Corroborated for the deployment wording by http://www.galbot.com/about/ ('已实现规模化商业落地' - scaled commercial rollout; retrieved the same day)."
+          "claim_fields": ["description", "deployment_status", "deployment_note"],
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. Secondary trade-press report (2025-07-02) of company statements: RMB 1.1bn (~US$153M) round; about US$335M total in two years; one-day store deployment; handles 5,000 goods types; pharmacies listed. Corroborated for the deployment wording by http://www.galbot.com/about/ ('已实现规模化商业落地' - scaled commercial rollout; retrieved the same day). Supports deployment_status = COMMERCIAL at MEDIUM confidence (owner decision 2026-11-02): it rests on Galbot's own claim and this one news report; no named customer, contract terms or price."
         },
         {
           "source_url": "http://www.galbot.com/about/",
@@ -871,7 +869,7 @@
           "claim_fields": [
             "description"
           ],
-          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. About page (Chinese): robots operate continuously in smart retail, industrial manufacturing and medical-service scenarios, with scaled commercial rollout. The page gives no funding, headcount or office information. No deployment status is derived from this statement."
+          "note": "RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-02 by Claude Sonnet 5.5 (WebFetch; processed page text, no page hash available) in a session initiated by RK under research work order 'HO-CONTENT-01 thin-content enrichment' (2026-11-02; docs/26 §2.1). Not a MANUAL_BOOTSTRAP reading. Not human-verified. About page (Chinese): robots operate continuously in smart retail, industrial manufacturing and medical-service scenarios, with scaled commercial rollout. The page gives no funding, headcount or office information. With The Robot Report row, this is the basis for deployment_status = COMMERCIAL (owner decision 2026-11-02); the status claim is recorded at MEDIUM confidence on that row, not here."
         }
       ]
     },

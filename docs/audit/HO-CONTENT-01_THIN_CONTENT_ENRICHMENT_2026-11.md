@@ -183,7 +183,7 @@ Each row is a new `evidence` row in `manufacturers.json` (same URL, `observed_at
 **Facts found but deliberately not used:**
 
 - **Realbotix Echo reservation** (US$199, 225 tabletop and 25 full-body units shipping 2027, from https://realbotix.com/about): a price and availability fact. Out of scope (no price/availability changes). Needs a robot record and owner decision; it also contradicts `commercial_model` ("custom-built via enquiry").
-- **Galbot "scaled commercial rollout"** wording: kept as company wording in the description only. `deployment_status` and `deployment_note` unchanged; whether it supports COMMERCIAL is an owner call.
+- **Galbot "scaled commercial rollout"** wording: kept as company wording in the description. **Owner decision 2026-11-02:** `deployment_status` = COMMERCIAL at MEDIUM confidence, resting on this company claim plus The Robot Report (2025-07); the `deployment_note` says so. The description was also tidied to state the retail/manufacturing/medical wording once.
 - **AgiBot** "certifications in China, US and Europe" (May 2025) and "highest international safety standards" (Jul 2026): the certification bodies are not named; not repeated. The `deployment_note` still says no humanoid deployment status is established and was left as is.
 - **1X privacy/Expert data handling:** the 1X pages fetched do not describe it; privacy-policy text was not read. Press coverage of "Expert Mode" safeguards is secondary and one-sided, so none is asserted. The home page states only what 1X itself says.
 - **Use-case limitations for events-entertainment and research-education beyond Unitree's own figures:** none sourceable without editorial judgement.
@@ -196,7 +196,7 @@ Each row is a new `evidence` row in `manufacturers.json` (same URL, `observed_at
 1. **LimX TRON 1 — RESOLVED, no change (2026-11-02).** Re-checked against the raw page: the milestone list is grouped by year and TRON 1 (October) sits in the 2024 block. The profile's 2024 is correct; the October 2023 reading was a misreading of WebFetch's processed text. The evidence note now says so.
 2. **NEURA founding year — RESOLVED (owner decision 2026-11-02: on conflicting dates, take the later one).** The page says 'Founded in 2019' in its intro and metadata and 'December 2020: Foundation' in its timeline. `founded_year` and the description now say 2020; the 2019 statement is preserved in the evidence note, and the 2019 row no longer claims `founded_year`. Team size also differs on the page (1,500+ vs 1,400+); both reported.
 3. **AgiBot latest count — RESOLVED (owner decision 2026-11-02).** The page shows the 20,000th robot (re-checked by curl). `deployment_note` and the description now cite the 20,000th (September 2026).
-4. **Galbot, AgiBot, Sanctuary** `deployment_status` is NULL; the new own-site wording may justify a status review.
+4. **Galbot — RESOLVED (owner decision 2026-11-02): COMMERCIAL, MEDIUM confidence.** AgiBot and Sanctuary `deployment_status` stay NULL; not reviewed here.
 5. **Citation precision:** use-case fact UC-3 (ISO/CD 25785-1 label) rests on a search-result title. Re-check when `iso.org` is reachable.
 6. **Evidence note provenance:** new rows cite the research work order as 'HO-CONTENT-01 thin-content enrichment' (2026-11-02). The existing rows quote a named owner; the owner should confirm the wording.
 

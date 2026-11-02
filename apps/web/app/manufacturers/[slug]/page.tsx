@@ -5,10 +5,14 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 
 import { findManufacturer } from "@/lib/api-client";
+import { buildManufacturerJsonLd } from "@/lib/jsonld";
 import { confidenceLabel, enumLabel, sourceTypeLabel, statusLabel } from "@/lib/labels";
 import { boolLabel, deploymentMeaning, formatDate, regionLabel } from "@/lib/format";
 import { manufacturerProfileView } from "@/lib/manufacturer-profile";
+import { fitDescription, fitTitle } from "@/lib/meta-text";
+import { absoluteUrl } from "@/lib/site";
 import type { ManufacturerSource } from "@/lib/types";
+import { JsonLd } from "@/components/JsonLd";
 import { RobotThumb } from "@/components/RobotThumb";
 import { StatusBracket } from "@/components/StatusBadge";
 import { SectionIndex } from "@/components/SectionIndex";
@@ -52,10 +56,12 @@ export async function generateMetadata({
   const m = await getManufacturerCached(slug);
   if (!m) return { title: "Not found" };
   return {
-    title: m.name,
-    description:
-      m.description ??
-      `${m.name} — humanoid-robot manufacturer profile and verified platforms on HumanoidOnline.`,
+    title: fitTitle(m.name),
+    description: fitDescription(
+      m.description,
+      `${m.name}: humanoid-robot manufacturer profile and verified platforms on HumanoidOnline.`,
+    ),
+    alternates: { canonical: absoluteUrl(`/manufacturers/${m.slug}`) },
   };
 }
 
@@ -138,6 +144,7 @@ export default async function ManufacturerDetailPage({
 
   return (
     <>
+      <JsonLd data={buildManufacturerJsonLd(m)} />
       <SystemHeader
         title={`MANUFACTURER / ${m.slug.toUpperCase()}`}
         fields={[

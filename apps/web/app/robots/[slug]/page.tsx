@@ -9,6 +9,7 @@ import { cache } from "react";
 
 import { findManufacturer, findRobot, listRegions } from "@/lib/api-client";
 import { robotTitle } from "@/lib/robot-meta";
+import { fitDescription, fitTitle } from "@/lib/meta-text";
 import { providerLabel, providerNamesFrom, type ProviderNames } from "@/lib/providers";
 import { buildRobotJsonLd } from "@/lib/jsonld";
 import { absoluteUrl } from "@/lib/site";
@@ -152,10 +153,11 @@ export async function generateMetadata({
   // (docs/23 §10, CIT-K).
   const canonical = absoluteUrl(`/robots/${robot.slug}`);
   return {
-    title: robotTitle(robot),
-    description:
-      robot.summary ??
-      `${robot.name} by ${robot.manufacturer.name} — capabilities, commercial status and evidence on HumanoidOnline.`,
+    title: fitTitle(robotTitle(robot)),
+    description: fitDescription(
+      robot.summary,
+      `${robot.name} by ${robot.manufacturer.name}: capabilities, commercial status and evidence on HumanoidOnline.`,
+    ),
     alternates: { canonical },
   };
 }

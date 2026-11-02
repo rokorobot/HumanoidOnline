@@ -4,19 +4,28 @@
 // auth — those are later workstreams. The TASK step is seeded from the live
 // use-case catalogue; the COUNTRY step from the live canonical region list;
 // /find-a-humanoid?use_case=<slug> pre-selects a use case.
+import type { Metadata } from "next";
+
 import { SectionIndex } from "@/components/SectionIndex";
 import { SiteNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
 import { getRequirement, listRegions, listUseCases } from "@/lib/api-client";
+import { absoluteUrl } from "@/lib/site";
 import { answersFromRawInput, type Answers } from "@/lib/wizard";
 
 import { Wizard } from "./Wizard";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Find a Humanoid",
-};
+// The wizard's prefill parameters (use_case, from) fold into one canonical page.
+export function generateMetadata(): Metadata {
+  return {
+    title: "Find a Humanoid",
+    description:
+      "Answer a few questions about your use case and country to get humanoid robots matched to your requirements, with availability and evidence.",
+    alternates: { canonical: absoluteUrl("/find-a-humanoid") },
+  };
+}
 
 export default async function FindAHumanoidPage({
   searchParams,

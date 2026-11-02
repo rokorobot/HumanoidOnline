@@ -290,8 +290,12 @@ describe("published (after an owner decision)", () => {
 
   it("is indexable with a unique title, canonical URL and the generated description", async () => {
     const meta = await visitMeta();
-    expect(meta.title).toBe("Humanoid robot availability in North America");
-    expect(meta.description).toBe(naProjection().direct_answer);
+    // Over 60 chars with the brand suffix, so the title is absolute (SEO-03).
+    expect(meta.title).toEqual({ absolute: "Humanoid robot availability in North America" });
+    // The direct answer, cut at whole sentences to the 160-char limit.
+    const description = meta.description as string;
+    expect(description.length).toBeLessThanOrEqual(160);
+    expect(naProjection().direct_answer.startsWith(description)).toBe(true);
     expect(meta.alternates?.canonical).toBe(PAGE_URL);
     expect(meta.robots).toBeUndefined();
   });

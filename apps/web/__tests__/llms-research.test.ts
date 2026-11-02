@@ -73,10 +73,10 @@ describe("Research section", () => {
     apiServes = true;
     const text = await body();
     expect(text).toContain("## Research resources");
-    expect(text).toContain(`- Research hub: ${HUB}`);
-    expect(text).toContain(`- Humanoid availability in Europe: ${EUROPE}`);
-    expect(text).toContain(`- Europe methodology: ${EUROPE}#method`);
-    expect(text).toContain(`- Europe JSON: ${EUROPE}.json`);
+    expect(text).toContain(`- [Research hub](${HUB})`);
+    expect(text).toContain(`- [Humanoid availability in Europe](${EUROPE})`);
+    expect(text).toContain(`- [Europe methodology](${EUROPE}#method)`);
+    expect(text).toContain(`- [Europe JSON](${EUROPE}.json)`);
   });
 
   it("enumerates only public resources: no other region is named or teased", async () => {

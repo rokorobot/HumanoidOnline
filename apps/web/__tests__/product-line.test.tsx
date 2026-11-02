@@ -137,6 +137,6 @@ describe("sitemap and llms.txt", () => {
     const { GET } = await import("@/app/llms.txt/route");
     const text = await (await GET()).text();
     expect(text).toContain("## Product lines (published, canonical)");
-    expect(text).toContain(`- Unitree G1 (Unitree Robotics): ${ORIGIN}/lines/unitree-g1`);
+    expect(text).toContain(`- [Unitree G1](${ORIGIN}/lines/unitree-g1): Unitree Robotics`);
   });
 });

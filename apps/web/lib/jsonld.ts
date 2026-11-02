@@ -5,15 +5,23 @@
 //   - AGENT-01.2 semantic parity: mapped 1:1 from the governed read.
 //   - AGENT-01.3 explicit uncertainty: a null/undefined spec is OMITTED (never
 //     0/false/"" and never an UNKNOWN `PropertyValue`).
-//   - AGENT-01.4: no fabricated provenance/freshness fields (Product has no
-//     honest slot without Offers, which are a later slice) — freshness rides the
+//   - AGENT-01.4: no fabricated provenance/freshness fields — freshness rides the
 //     sitemap `lastmod`.
+//   - SEO-03 (owner decision 2026-11-02): `offers` carries ONLY published,
+//     evidence-linked one-time prices (see `buildOffers`). No other price state
+//     ever becomes an Offer.
 //   - MEDIA-01: `image` uses only the read's display-eligible images (the read
 //     returns nothing else); omitted entirely when there are none.
 // The is_published boundary (AGENT-01.7) is enforced upstream at the fetch layer
 // (the public read returns only published robots); this builder just maps.
 import { absoluteUrl } from "@/lib/site";
-import type { ManufacturerDetail, ProductLineDetail, RobotDetail, RobotListItem } from "@/lib/types";
+import type {
+  ManufacturerDetail,
+  PricingOffer,
+  ProductLineDetail,
+  RobotDetail,
+  RobotListItem,
+} from "@/lib/types";
 
 interface PropertyValue {
   "@type": "PropertyValue";
@@ -87,6 +95,56 @@ function additionalProperty(robot: RobotDetail): PropertyValue[] {
   return props;
 }
 
+// One-time acquisitions only: a recurring rental/lease price is not a sale price.
+const ONE_TIME_TRANSACTIONS = new Set(["PURCHASE", "DEVELOPER"]);
+
+const CONDITION: Record<string, string> = {
+  NEW: "https://schema.org/NewCondition",
+  USED: "https://schema.org/UsedCondition",
+  REFURBISHED: "https://schema.org/RefurbishedCondition",
+};
+
+const hasNumber = (v: number | null | undefined): v is number => typeof v === "number" && Number.isFinite(v);
+
+/**
+ * SEO-03 — schema.org `Offer`s from the robot's pricing offers. An offer qualifies
+ * only when ALL hold: a published number (PUBLIC, FROM or RANGE — never QUOTE_ONLY,
+ * ESTIMATED or MANUFACTURER_ESTIMATE), linked evidence (AGENTS rule 7), a currency,
+ * and a one-time purchase. `price` is asserted only for PUBLIC (the price) and FROM
+ * (the stated starting price, with `minPrice`); a RANGE states only its bounds.
+ * Availability is omitted: it is a separate, separately-evidenced fact.
+ */
+export function buildOffers(offers: PricingOffer[], url: string): Record<string, unknown>[] {
+  const out: Record<string, unknown>[] = [];
+  for (const o of offers) {
+    if (!o.evidence || !isAssertableFact(o.currency)) continue;
+    if (!ONE_TIME_TRANSACTIONS.has(o.transaction_type) || o.billing_period !== "ONE_TIME") continue;
+
+    const offer: Record<string, unknown> = { "@type": "Offer", url, priceCurrency: o.currency };
+    if (o.price_type === "PUBLIC" && hasNumber(o.price)) {
+      offer.price = o.price;
+    } else if (o.price_type === "FROM" && hasNumber(o.price ?? o.price_min)) {
+      const from = (o.price ?? o.price_min) as number;
+      offer.price = from;
+      offer.priceSpecification = { "@type": "PriceSpecification", minPrice: from, priceCurrency: o.currency };
+    } else if (o.price_type === "RANGE" && hasNumber(o.price_min) && hasNumber(o.price_max)) {
+      offer.priceSpecification = {
+        "@type": "PriceSpecification",
+        minPrice: o.price_min,
+        maxPrice: o.price_max,
+        priceCurrency: o.currency,
+      };
+    } else {
+      continue;
+    }
+    if (isAssertableFact(o.variant)) offer.name = o.variant;
+    if (o.condition && CONDITION[o.condition]) offer.itemCondition = CONDITION[o.condition];
+    if (isAssertableFact(o.provider_name)) offer.seller = { "@type": "Organization", name: o.provider_name };
+    out.push(offer);
+  }
+  return out;
+}
+
 /** schema.org Product + Organization graph for a robot detail page. */
 export function buildRobotJsonLd(robot: RobotDetail): Record<string, unknown> {
   const robotUrl = absoluteUrl(`/robots/${robot.slug}`);
@@ -119,6 +177,9 @@ export function buildRobotJsonLd(robot: RobotDetail): Record<string, unknown> {
   if (images.length > 0) product.image = images;
 
   if (robot.announced_year) product.productionDate = String(robot.announced_year);
+
+  const offers = buildOffers(robot.pricing_offers ?? [], robotUrl);
+  if (offers.length > 0) product.offers = offers;
 
   return {
     "@context": "https://schema.org",

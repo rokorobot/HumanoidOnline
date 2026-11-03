@@ -1,0 +1,7 @@
+{
+  "_comment": "Digit 4 variant label (owner approval 2026-11-03): expected changes for `import_catalogue.py --only agility-digit`. Variant 'digit-v5' of agility-digit is renamed 'Digit (current gen)' -> 'Digit 4' with a new description; slug unchanged. The preflight compares row content, so the rename appears as one REMOVED (old label) and one ADDED (new label) row. No robot, offer, evidence, deployment or other-robot change.",
+  "expected": [
+    {"table": "robot_variant", "kind": "REMOVED", "match": {"robot": "agility-digit", "slug": "digit-v5", "name": "Digit (current gen)"}, "count": 1},
+    {"table": "robot_variant", "kind": "ADDED", "match": {"robot": "agility-digit", "slug": "digit-v5", "name": "Digit 4"}, "count": 1}
+  ]
+}

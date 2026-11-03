@@ -48,9 +48,9 @@
   "variants": [
     {
       "slug": "digit-v5",
-      "name": "Digit (current gen)",
+      "name": "Digit 4",
       "is_developer": false,
-      "description": "Current-generation deployment model used in commercial RaaS operations."
+      "description": "Digit 4, the generation used in Agility's commercial RaaS deployments (Agility, 2026-09-15: 'three years of Digit 4 working on their production floors'). Digit 5 is a separate record (agility-digit-5). Variant slug 'digit-v5' is a legacy stable key, not a generation number."
     }
   ],
   "pricing_offers": [],

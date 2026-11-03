@@ -55,6 +55,28 @@
       "verified_at": null,
       "confidence": "HIGH",
       "note": "Corroborates the pre-production status and timeline. Safety certification is ongoing ('ahead of final third-party certification'): cooperative safety is a design objective, not a certified outcome. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-03 by Claude Opus 5.5 (curl; processed page text) in a session initiated by Robert Konecny (HO-DATA Fast Lane intake, Digit 5). Not a MANUAL_BOOTSTRAP reading. Not human-verified."
+    },
+    {
+      "source_url": "https://www.agilityrobotics.com/solutions/digit-5",
+      "source_type": "MANUFACTURER_SITE",
+      "source_title": "Digit 5 | Agility",
+      "excerpt": "Digit 5 is in development and the features, specifications, capabilities, and designs shown are subject to change.",
+      "published_at": null,
+      "observed_at": "2026-11-03",
+      "verified_at": null,
+      "confidence": "HIGH",
+      "note": "Product page confirms the model is not yet shipping (supports ANNOUNCED). RETRIEVAL: agent-assisted (curl, page text), 2026-11-03. Not human-verified."
+    },
+    {
+      "source_url": "https://drivesncontrols.com/next-gen-us-humanoid-designed-for-safety-will-be-sold-in-the-uk-and-eu/",
+      "source_type": "NEWS_ARTICLE",
+      "source_title": "Next-gen US humanoid designed for safety will be sold in the UK and EU (Drives & Controls)",
+      "excerpt": "Early access to Digit 5 is expected to start in the first half of 2027, with general availability expected by the end of the year.",
+      "published_at": "2026-09-22",
+      "observed_at": "2026-11-03",
+      "verified_at": null,
+      "confidence": "MEDIUM",
+      "note": "Secondary corroboration only; restates Agility's 2026-09-15 release, including the planned EU/UK launch and expected CE mark. Adds no fact beyond the release. RETRIEVAL: agent-assisted (curl, page text), 2026-11-03. Not human-verified."
     }
   ],
   "variants": [],

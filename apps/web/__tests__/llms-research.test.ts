@@ -59,7 +59,8 @@ const body = async () => (await GET()).text();
 
 describe("Research section", () => {
   it("is absent when zero regions are published: no /research URL, no region teasers", async () => {
-    const text = await body();
+    // The Insights section (DR-I1) comes last and is editorial, not Research: scope to what precedes it.
+    const text = (await body()).split("## Insights")[0];
     expect(text).not.toContain("/research");
     expect(text).not.toContain("## Research resources");
     for (const word of ["Europe", "North America", "Asia", "coming soon", "in preparation"]) {

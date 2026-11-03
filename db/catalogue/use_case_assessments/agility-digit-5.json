@@ -1,0 +1,46 @@
+{
+  "robot_slug": "agility-digit-5",
+  "assessed_on": "2026-11-03",
+  "assessed_by": "Claude (Opus 5.5) in a session initiated by the owner. Not human-verified.",
+  "method": "Evaluation against all categories in use_cases.json from Agility's 2026-09-15 Digit 5 release and the /solutions/digit-5 page, recorded in robots/agility-digit-5.json.",
+  "categories": {
+    "warehouse-logistics": {
+      "status": "FIT",
+      "sources": [
+        "https://www.agilityrobotics.com/content/agility-unveils-digit-5-humanoid-robot-built-for-cooperatively-safe-work-at-scale"
+      ],
+      "basis": "Release names depalletizing, tote handling, kitting, sequencing and palletizing for warehouse and distribution operators. Score NULL, confidence MEDIUM."
+    },
+    "manufacturing": {
+      "status": "FIT",
+      "sources": [
+        "https://www.agilityrobotics.com/content/agility-unveils-digit-5-humanoid-robot-built-for-cooperatively-safe-work-at-scale"
+      ],
+      "basis": "Release names machine tending, kitting, sequencing and quality inspection for manufacturing. Score NULL, confidence MEDIUM."
+    },
+    "research-education": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "home": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "events-entertainment": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "retail-service": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "healthcare-rehabilitation": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "security-inspection": {
+      "status": "UNSUPPORTED_POSSIBILITY",
+      "basis": "The release names 'quality inspection' inside production workflows only; no security, patrol or facility-inspection use is recorded."
+    }
+  }
+}

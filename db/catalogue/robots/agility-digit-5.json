@@ -1,0 +1,112 @@
+{
+  "slug": "agility-digit-5",
+  "name": "Digit 5",
+  "manufacturer_slug": "agility-robotics",
+  "model_code": null,
+  "summary": null,
+  "announced_year": 2026,
+  "commercial_status": "ANNOUNCED",
+  "is_published": false,
+  "specs": {
+    "height_cm": 181,
+    "weight_kg": 129,
+    "arm_span_cm": null,
+    "reach_cm": null,
+    "payload_kg": 23.0,
+    "walk_speed_ms": null,
+    "runtime_minutes": 90,
+    "battery_wh": null,
+    "mobility": "BIPEDAL",
+    "degrees_of_freedom": null,
+    "hand_type": null,
+    "hand_dof": null,
+    "autonomy": null,
+    "has_manipulation": null,
+    "has_teleoperation": null,
+    "has_vision": null,
+    "has_language_ui": null,
+    "has_sdk": null,
+    "has_api": null,
+    "ros_support": null,
+    "developer_edition": null,
+    "simulation_support": null
+  },
+  "specs_note": "OWNER-APPROVED 2026-11-03 (in thread, 'go ahead'); unpublished, publication is a separate decision. commercial_status ANNOUNCED set on the owner's approval 2026-11-03. RETRIEVAL: AUTOMATED discovery observation 2026-10-18 by an owner-authorized (docs/28 A4) source; values verbatim from https://www.agilityrobotics.com/solutions/digit-5 as stored in production candidate_claim rows. Not a MANUAL_BOOTSTRAP reading. Not human-verified. A new generation, not merged into the existing 'Digit' record (agility-digit). Agility's 'Work/Shift* 20HRS/24HRS' and 'Run to charge ratio* 10:1' are duty-cycle statements, not a generic operating time: kept as discovery evidence only, not recorded in this record. UPDATE 2026-11-03 (agent-assisted, not human-verified): height_cm 181, weight_kg 129 and runtime_minutes 90 added from Agility's press release of 2026-09-15 (https://www.agilityrobotics.com/content/agility-unveils-digit-5-humanoid-robot-built-for-cooperatively-safe-work-at-scale): 'Digit 5 weighs 284 lb. (129 kg), stands 5' 11\" (1.81 m)'; 'A new 90-minute runtime battery system charges in just 9 minutes'. The same release states plans for 'commercial deployment outside North America, starting with the European Union and United Kingdom', an expected CE mark plus marks for the EU, Great Britain and Northern Ireland, early access 'in the first half of 2027' and general availability 'by the end of 2027'. These are plans, so no availability offer or region is recorded. Corroborating secondary source (NEWS_ARTICLE, Drives & Controls, published 2026-09-22, observed 2026-11-03): https://drivesncontrols.com/next-gen-us-humanoid-designed-for-safety-will-be-sold-in-the-uk-and-eu/ restates the same figures and the EU/UK plan. It adds no fact beyond the release.",
+  "official_url": "https://www.agilityrobotics.com/solutions/digit-5",
+  "commercial_status_evidence": [
+    {
+      "source_url": "https://www.agilityrobotics.com/content/agility-unveils-digit-5-humanoid-robot-built-for-cooperatively-safe-work-at-scale",
+      "source_type": "PRESS_RELEASE",
+      "source_title": "Agility Unveils Digit 5 Humanoid Robot Built for Cooperatively Safe Work at Scale",
+      "excerpt": "Early access to Digit 5 is expected to begin in the first half of 2027, with general availability for manufacturing, warehouse and distribution operators expected by the end of 2027.",
+      "published_at": "2026-09-15",
+      "observed_at": "2026-11-03",
+      "verified_at": null,
+      "confidence": "HIGH",
+      "note": "Maker's own release: Digit 5 unveiled 2026-09-15, no units shipping yet -> ANNOUNCED (mapping, so HIGH not VERIFIED). Owner set ANNOUNCED 2026-11-03. RETRIEVAL: agent-assisted (curl, page text), 2026-11-03. Not human-verified."
+    },
+    {
+      "source_url": "https://www.agilityrobotics.com/solutions/digit-5",
+      "source_type": "MANUFACTURER_SITE",
+      "source_title": "Digit 5 | Agility",
+      "excerpt": "Digit 5 is in development and the features, specifications, capabilities, and designs shown are subject to change.",
+      "published_at": null,
+      "observed_at": "2026-11-03",
+      "verified_at": null,
+      "confidence": "HIGH",
+      "note": "Product page confirms the model is not yet shipping."
+    },
+    {
+      "source_url": "https://drivesncontrols.com/next-gen-us-humanoid-designed-for-safety-will-be-sold-in-the-uk-and-eu/",
+      "source_type": "NEWS_ARTICLE",
+      "source_title": "Next-gen US humanoid designed for safety will be sold in the UK and EU (Drives & Controls)",
+      "excerpt": "Early access to Digit 5 is expected to start in the first half of 2027, with general availability expected by the end of the year.",
+      "published_at": "2026-09-22",
+      "observed_at": "2026-11-03",
+      "verified_at": null,
+      "confidence": "MEDIUM",
+      "note": "Secondary corroboration only; restates the 2026-09-15 Agility release, including the planned EU/UK launch and expected CE mark. Adds no fact beyond the release."
+    }
+  ],
+  "variants": [],
+  "pricing_offers": [],
+  "availability_offers": [],
+  "deployments": [],
+  "capabilities": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "warehouse-logistics",
+      "fit_score": null,
+      "is_primary": true,
+      "commercial_readiness": "ANNOUNCED",
+      "notes": "Agility's 2026-09-15 release targets warehousing and logistics workflows: depalletizing, tote handling, kitting and sequencing, palletizing for shipment; general availability is aimed at 'manufacturing, warehouse and distribution operators'.",
+      "limitations": "Digit 5 is announced, not shipping (early access H1 2027, general availability by end-2027); specifications are preliminary. Digit 4's deployments are not carried over to this record.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "use_case_slug": "manufacturing",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": "ANNOUNCED",
+      "notes": "The same release names machine tending, kitting, sequencing and quality inspection on production floors as Digit 5 workflows.",
+      "limitations": "Digit 5 is announced, not shipping (early access H1 2027, general availability by end-2027); specifications are preliminary. Digit 4's deployments are not carried over to this record.",
+      "confidence": "MEDIUM"
+    }
+  ],
+  "images": [],
+  "extended_specs": [],
+  "spec_caveats": [
+    {
+      "field": "payload_kg",
+      "text": "Agility states 'Payload* 23kg/50lbs' with a footnote marker; the footnote text is not on the page. Agility's 2026-09-15 release states 'up to 50 lb. (22.7 kg) loads'; 23 kg is the page's rounding of the same 50 lb. The draft keeps the page value."
+    },
+    {
+      "field": "reach_cm",
+      "text": "Left UNKNOWN: Agility states 'Reach* 2.2m/7.2ft', which is not the schema's single-arm reach. The release says Digit 5 'can reach heights of up to 7.2 feet (2.2 m)', a vertical reach height."
+    },
+    {
+      "field": "runtime_minutes",
+      "text": "Agility states a '90-minute runtime battery system' (release 2026-09-15). The page marks specifications as preliminary and subject to change."
+    }
+  ]
+}

@@ -146,7 +146,8 @@ test.describe("@responsive UX-02A catalogue search", () => {
     await form.getByRole("textbox", { name: "Search robots" }).fill("digit");
     await form.getByRole("button", { name: "Search" }).click();
     await expect(page).toHaveURL(/\/robots\?q=digit$/);
-    await expect(cards(page)).toHaveCount(1);
+    // "digit" matches Digit (Digit 4) and Digit 5 (published 2026-11-03).
+    await expect(cards(page)).toHaveCount(2);
   });
 });
 

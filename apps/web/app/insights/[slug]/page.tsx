@@ -12,16 +12,14 @@ import { SiteNav } from "@/components/SiteNav";
 import { StatusBadge } from "@/components/StatusBadge";
 import { SystemHeader } from "@/components/SystemHeader";
 import { findRobot } from "@/lib/api-client";
-import { type Block, type Inline, findInsight, insightPath, publishedInsights } from "@/lib/insights";
+import { type Block, type Inline, findInsight, insightPath } from "@/lib/insights";
 import { buildInsightJsonLd } from "@/lib/jsonld";
 import { absoluteUrl } from "@/lib/site";
 import type { RobotDetail } from "@/lib/types";
 
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return publishedInsights.map((i) => ({ slug: i.slug }));
-}
+// Live robot blocks come from the API, so render per request like /robots/[slug]
+// (a build-time prerender has no API). Unknown or draft slugs 404 via findInsight.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const insight = findInsight((await params).slug);

@@ -32,7 +32,7 @@ vi.mock("next/navigation", () => ({
   },
 }));
 
-import InsightPage, { generateMetadata, generateStaticParams } from "../app/insights/[slug]/page";
+import InsightPage, { generateMetadata } from "../app/insights/[slug]/page";
 import InsightsIndexPage from "../app/insights/page";
 import sitemap from "../app/sitemap";
 import { ALL_INSIGHTS, publishedInsights } from "../lib/insights";
@@ -90,8 +90,7 @@ describe("insight content", () => {
 });
 
 describe("routes", () => {
-  it("static params and sitemap list published insights only", async () => {
-    expect(generateStaticParams()).toEqual(publishedInsights.map((i) => ({ slug: i.slug })));
+  it("sitemap lists published insights only", async () => {
     const urls = (await sitemap()).map((e) => e.url);
     expect(urls).toContain(`${ORIGIN}/insights`);
     expect(urls).toContain(`${ORIGIN}/insights/${SLUG}`);

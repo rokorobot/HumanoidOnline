@@ -6,7 +6,7 @@
   "summary": "Digit 5 is Agility Robotics' fifth-generation bipedal humanoid, unveiled on 15 September 2026 for manufacturing, warehouse and logistics work. Agility expects early customer access in the first half of 2027 and general availability by the end of 2027, including planned entry to the EU and UK.",
   "announced_year": 2026,
   "commercial_status": "ANNOUNCED",
-  "is_published": false,
+  "is_published": true,
   "specs": {
     "height_cm": 181.0,
     "weight_kg": 129.0,
@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "PROMOTED FROM IDENTITY DRAFT 2026-11-03 (HO-DATA Fast Lane intake); unpublished, owner approval pending; publication is a separate decision. A new generation, kept separate from the existing 'Digit' record (agility-digit), whose deployments and specifications remain attributed to Digit 4. Values from Agility's launch release of 2026-09-15 (https://www.agilityrobotics.com/content/agility-unveils-digit-5-humanoid-robot-built-for-cooperatively-safe-work-at-scale): 'Digit 5 weighs 284 lb. (129 kg), stands 5' 11\" (1.81 m)', 'repeatedly lift up to 50 lb. (22.7 kg) loads', 'A new 90-minute runtime battery system charges in just 9 minutes'. has_manipulation true: the release states it lifts loads and that a 'swappable gripper design ... allows Digit's tools to be changed'. Other capability booleans stay null (not stated in words). All figures are manufacturer-reported, pre-production values, not independently validated. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-03 by Claude Opus 5.5 (curl; processed page text) in a session initiated by Robert Konecny (HO-DATA Fast Lane intake, Digit 5). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
+  "specs_note": "PROMOTED FROM IDENTITY DRAFT 2026-11-03 (HO-DATA Fast Lane intake). PUBLICATION OWNER-APPROVED 2026-11-03 (Robert Konecny, in thread). A new generation, kept separate from the existing 'Digit' record (agility-digit), whose deployments and specifications remain attributed to Digit 4. Values from Agility's launch release of 2026-09-15 (https://www.agilityrobotics.com/content/agility-unveils-digit-5-humanoid-robot-built-for-cooperatively-safe-work-at-scale): 'Digit 5 weighs 284 lb. (129 kg), stands 5' 11\" (1.81 m)', 'repeatedly lift up to 50 lb. (22.7 kg) loads', 'A new 90-minute runtime battery system charges in just 9 minutes'. has_manipulation true: the release states it lifts loads and that a 'swappable gripper design ... allows Digit's tools to be changed'. Other capability booleans stay null (not stated in words). All figures are manufacturer-reported, pre-production values, not independently validated. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-03 by Claude Opus 5.5 (curl; processed page text) in a session initiated by Robert Konecny (HO-DATA Fast Lane intake, Digit 5). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
   "official_url": "https://www.agilityrobotics.com/solutions/digit-5",
   "commercial_status_evidence": [
     {

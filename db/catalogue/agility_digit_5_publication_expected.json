@@ -1,0 +1,11 @@
+{
+  "_comment": "Agility Digit 5 publication (owner approval 2026-11-03, HO-DATA Fast Lane): expected changes for `import_catalogue.py --only agility-digit-5` (new robot row, is_published true on INSERT). Adds the robot (ANNOUNCED), its two commercial-status evidence rows (Agility releases 2026-09-15 and 2026-10-22), one primary image, four extended specs and two use-case fits (manufacturing, warehouse-logistics). No offer, price, deployment or other-robot change; agility-digit (Digit 4) untouched.",
+  "expected": [
+    {"table": "robot", "kind": "ADDED", "match": {"slug": "agility-digit-5", "is_published": true, "commercial_status": "ANNOUNCED"}, "count": 1},
+    {"table": "evidence_source", "kind": "ADDED", "match": {"source_url~": "agilityrobotics.com/content/agility-unveils-digit-5"}, "count": 1},
+    {"table": "evidence_source", "kind": "ADDED", "match": {"source_url~": "agilityrobotics.com/content/agility-robotics-expands-nvidia-collaboration"}, "count": 1},
+    {"table": "robot_image", "kind": "ADDED", "match": {"robot": "agility-digit-5", "image_url": "/robots/agility-digit-5.jpg"}, "count": 1},
+    {"table": "specification", "kind": "ADDED", "match": {"robot": "agility-digit-5"}, "count": 4},
+    {"table": "use_case_fit", "kind": "ADDED", "match": {"robot": "agility-digit-5"}, "count": 2}
+  ]
+}

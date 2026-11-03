@@ -14,7 +14,8 @@
 //     returns nothing else); omitted entirely when there are none.
 // The is_published boundary (AGENT-01.7) is enforced upstream at the fetch layer
 // (the public read returns only published robots); this builder just maps.
-import { absoluteUrl } from "@/lib/site";
+import { type Insight, insightPath } from "@/lib/insights";
+import { absoluteUrl, siteUrl } from "@/lib/site";
 import type {
   ManufacturerDetail,
   PricingOffer,
@@ -307,5 +308,36 @@ export function buildProductLineJsonLd(line: ProductLineDetail): Record<string, 
         url: mfrUrl,
       },
     ],
+  };
+}
+
+/**
+ * /insights article — schema.org `Article`. `about` points at the catalogue robots' URLs (their facts
+ * live on those pages, not here); `citation` lists the article's sources.
+ */
+export function buildInsightJsonLd(insight: Insight): Record<string, unknown> {
+  const origin = siteUrl();
+  const url = absoluteUrl(insightPath(insight.slug));
+  const publisher = { "@type": "Organization", name: "HumanoidOnline", url: `${origin}/` };
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "@id": url,
+    mainEntityOfPage: url,
+    url,
+    headline: insight.title,
+    description: insight.description,
+    datePublished: insight.publishedAt,
+    dateModified: insight.updatedAt,
+    author: publisher,
+    publisher,
+    about: insight.robotSlugs.map((s) => ({ "@id": absoluteUrl(`/robots/${s}`), url: absoluteUrl(`/robots/${s}`) })),
+    citation: insight.sources.map((s) => ({
+      "@type": "CreativeWork",
+      name: s.title,
+      url: s.url,
+      datePublished: s.date,
+      publisher: { "@type": "Organization", name: s.publisher },
+    })),
   };
 }

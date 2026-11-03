@@ -1,4 +1,5 @@
 import { HUB_REGIONS, RESEARCH_HUB_PATH, liveResearchRegions, researchPath } from "@/lib/research";
+import { insightPath, publishedInsights } from "@/lib/insights";
 import { siteUrl } from "@/lib/site";
 import { listAllManufacturers, listAllProductLines, listAllRobots, listAllUseCases } from "@/lib/seo";
 
@@ -62,6 +63,17 @@ export async function GET(): Promise<Response> {
           "",
         ];
 
+  // DR-I1: editorial insights, published only; the section is omitted while there are none.
+  const insightsSection: string[] =
+    publishedInsights.length === 0
+      ? []
+      : [
+          "## Insights (editorial, dated and sourced)",
+          link("Insights", `${origin}/insights`),
+          ...publishedInsights.map((i) => link(i.title, `${origin}${insightPath(i.slug)}`, i.description)),
+          "",
+        ];
+
   const lines: string[] = [
     "# HumanoidOnline",
     "",
@@ -103,6 +115,7 @@ export async function GET(): Promise<Response> {
     "## Use cases (published, canonical)",
     ...useCases.map((u) => link(u.name, `${origin}/use-cases/${u.slug}`)),
     "",
+    ...insightsSection,
   ];
 
   return new Response(lines.join("\n"), {

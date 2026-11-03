@@ -59,9 +59,11 @@ const body = async () => (await GET()).text();
 
 describe("Research section", () => {
   it("is absent when zero regions are published: no /research URL, no region teasers", async () => {
-    const text = await body();
-    expect(text).not.toContain("/research");
-    expect(text).not.toContain("## Research resources");
+    const full = await body();
+    expect(full).not.toContain("/research");
+    expect(full).not.toContain("## Research resources");
+    // Region words: the Insights section (DR-I1, last) may name a region in an article title.
+    const text = full.split("## Insights")[0];
     for (const word of ["Europe", "North America", "Asia", "coming soon", "in preparation"]) {
       expect(text).not.toContain(word);
     }

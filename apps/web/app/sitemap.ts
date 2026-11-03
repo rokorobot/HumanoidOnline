@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { fetchResearchProjection, researchSitemapEntries } from "@/lib/research";
+import { insightPath, publishedInsights } from "@/lib/insights";
 import { curatedPairPaths } from "@/lib/compare-pairs";
 import { siteUrl } from "@/lib/site";
 import {
@@ -109,7 +110,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ? [{ url: `${origin}/research`, changeFrequency: "weekly", priority: 0.7 }]
       : [];
 
+  // DR-I1: published editorial insights only (drafts are never exported). The index joins with the first one.
+  const insightPages: MetadataRoute.Sitemap =
+    publishedInsights.length > 0
+      ? [
+          { url: `${origin}/insights`, changeFrequency: "weekly", priority: 0.6 },
+          ...publishedInsights.map((i) => ({
+            url: `${origin}${insightPath(i.slug)}`,
+            lastModified: i.updatedAt,
+            changeFrequency: "monthly" as const,
+            priority: 0.6,
+          })),
+        ]
+      : [];
+
   // Grouped by entity type. At catalogue scale this is one file; Next's
   // generateSitemaps() is the split-by-type path when the catalogue grows.
-  return [...core, ...robotPages, ...linePages, ...mfrPages, ...useCasePages, ...pairPages, ...researchHub, ...researchPages];
+  return [...core, ...robotPages, ...linePages, ...mfrPages, ...useCasePages, ...pairPages, ...researchHub, ...researchPages, ...insightPages];
 }

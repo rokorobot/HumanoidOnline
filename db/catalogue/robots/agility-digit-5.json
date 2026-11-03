@@ -1,0 +1,138 @@
+{
+  "slug": "agility-digit-5",
+  "name": "Digit 5",
+  "manufacturer_slug": "agility-robotics",
+  "model_code": "Digit 5",
+  "summary": "Digit 5 is Agility Robotics' fifth-generation bipedal humanoid, unveiled on 15 September 2026 for manufacturing, warehouse and logistics work. Agility expects early customer access in the first half of 2027 and general availability by the end of 2027, including planned entry to the EU and UK.",
+  "announced_year": 2026,
+  "commercial_status": "ANNOUNCED",
+  "is_published": false,
+  "specs": {
+    "height_cm": 181.0,
+    "weight_kg": 129.0,
+    "arm_span_cm": null,
+    "reach_cm": null,
+    "payload_kg": 22.7,
+    "walk_speed_ms": null,
+    "runtime_minutes": 90,
+    "battery_wh": null,
+    "mobility": "BIPEDAL",
+    "degrees_of_freedom": null,
+    "hand_type": null,
+    "hand_dof": null,
+    "autonomy": null,
+    "has_manipulation": true,
+    "has_teleoperation": null,
+    "has_vision": null,
+    "has_language_ui": null,
+    "has_sdk": null,
+    "has_api": null,
+    "ros_support": null,
+    "developer_edition": null,
+    "simulation_support": null
+  },
+  "specs_note": "PROMOTED FROM IDENTITY DRAFT 2026-11-03 (HO-DATA Fast Lane intake); unpublished, owner approval pending; publication is a separate decision. A new generation, kept separate from the existing 'Digit' record (agility-digit), whose deployments and specifications remain attributed to Digit 4. Values from Agility's launch release of 2026-09-15 (https://www.agilityrobotics.com/content/agility-unveils-digit-5-humanoid-robot-built-for-cooperatively-safe-work-at-scale): 'Digit 5 weighs 284 lb. (129 kg), stands 5' 11\" (1.81 m)', 'repeatedly lift up to 50 lb. (22.7 kg) loads', 'A new 90-minute runtime battery system charges in just 9 minutes'. has_manipulation true: the release states it lifts loads and that a 'swappable gripper design ... allows Digit's tools to be changed'. Other capability booleans stay null (not stated in words). All figures are manufacturer-reported, pre-production values, not independently validated. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-03 by Claude Opus 5.5 (curl; processed page text) in a session initiated by Robert Konecny (HO-DATA Fast Lane intake, Digit 5). Not a MANUAL_BOOTSTRAP reading. Not human-verified.",
+  "official_url": "https://www.agilityrobotics.com/solutions/digit-5",
+  "commercial_status_evidence": [
+    {
+      "source_url": "https://www.agilityrobotics.com/content/agility-unveils-digit-5-humanoid-robot-built-for-cooperatively-safe-work-at-scale",
+      "source_type": "PRESS_RELEASE",
+      "source_title": "Agility Unveils Digit 5 Humanoid Robot Built for Cooperatively Safe Work at Scale",
+      "excerpt": "In addition to the United States and Canada, for the first time, Agility plans to make Digit available for commercial deployment outside North America, starting with the European Union and United Kingdom. Digit 5 is expected to carry a CE mark and additional regulatory marks to enable market access to the EU, Great Britain and Northern Ireland. Early access to Digit 5 is expected to begin in the first half of 2027, with general availability for manufacturing, warehouse and distribution operators expected by the end of 2027.",
+      "published_at": "2026-09-15",
+      "observed_at": "2026-11-03",
+      "verified_at": null,
+      "confidence": "HIGH",
+      "note": "ANNOUNCED = publicly revealed, no hardware shipping: early access and general availability are stated as future (H1 2027 / end-2027). EU and UK entry is a stated plan, not an offer: no availability_offers row is recorded for any region (no NOT_AVAILABLE either). CE marking is 'expected', not confirmed. The '$300 million in multi-year customer orders' is stated 'subject to satisfaction of certain contractual milestones'; it is not recorded as revenue or as a deployment. No Digit 5 customer deployment is recorded. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-03 by Claude Opus 5.5 (curl; processed page text) in a session initiated by Robert Konecny (HO-DATA Fast Lane intake, Digit 5). Not a MANUAL_BOOTSTRAP reading. Not human-verified."
+    },
+    {
+      "source_url": "https://www.agilityrobotics.com/content/agility-robotics-expands-nvidia-collaboration-as-it-prepares-digit-5-for-commercial-scale",
+      "source_type": "PRESS_RELEASE",
+      "source_title": "Agility Robotics Expands NVIDIA Collaboration as It Prepares Digit 5 for Commercial Scale",
+      "excerpt": "to support the evaluation of Digit's safety-related software, AI components and cybersecurity protections ahead of final third-party certification. ... Early access to Digit 5 is expected to begin in the first half of 2027, with increasing availability over the following six to nine months for manufacturing, warehouse and distribution operators.",
+      "published_at": "2026-10-22",
+      "observed_at": "2026-11-03",
+      "verified_at": null,
+      "confidence": "HIGH",
+      "note": "Corroborates the pre-production status and timeline. Safety certification is ongoing ('ahead of final third-party certification'): cooperative safety is a design objective, not a certified outcome. RETRIEVAL: AGENT_ASSISTED_RESEARCH (docs/26) — retrieved 2026-11-03 by Claude Opus 5.5 (curl; processed page text) in a session initiated by Robert Konecny (HO-DATA Fast Lane intake, Digit 5). Not a MANUAL_BOOTSTRAP reading. Not human-verified."
+    }
+  ],
+  "variants": [],
+  "pricing_offers": [],
+  "availability_offers": [],
+  "deployments": [],
+  "capabilities": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "manufacturing",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": "ANNOUNCED",
+      "notes": "Agility's launch release (2026-09-15) names manufacturing among Digit 5's target markets and says Digit 5 will 'add more manipulation skills' to cover 'machine tending, kitting and sequencing, and quality inspection'. (https://www.agilityrobotics.com/content/agility-unveils-digit-5-humanoid-robot-built-for-cooperatively-safe-work-at-scale). HO-UC-01 evaluation (use_case_assessments/agility-digit-5.json).",
+      "limitations": "Announced, pre-production: no Digit 5 deployment, availability offer or price is recorded. Workflows beyond tote handling are planned by Agility, not demonstrated with Digit 5. Digit 4's commercial deployments (agility-digit) are not carried over. Safety certification is still in progress.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "use_case_slug": "warehouse-logistics",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": "ANNOUNCED",
+      "notes": "Agility's launch release (2026-09-15) names warehousing and logistics among Digit 5's target markets and describes workflows 'from depalletizing goods as they arrive ... and finally palletizing them for shipment', with tote handling. (https://www.agilityrobotics.com/content/agility-unveils-digit-5-humanoid-robot-built-for-cooperatively-safe-work-at-scale). HO-UC-01 evaluation (use_case_assessments/agility-digit-5.json).",
+      "limitations": "Announced, pre-production: no Digit 5 deployment, availability offer or price is recorded. Workflows beyond tote handling are planned by Agility, not demonstrated with Digit 5. Digit 4's commercial deployments (agility-digit) are not carried over. Safety certification is still in progress.",
+      "confidence": "MEDIUM"
+    }
+  ],
+  "images": [],
+  "extended_specs": [
+    {
+      "key": "operating_time",
+      "value": "90-minute runtime battery system charges in 9 minutes; 10:1 run-to-charge ratio; more than 20 hours of productive work in a 24-hour day",
+      "source_label": "Agility Robotics — Digit 5 launch release (2026-09-15)",
+      "source_url": "https://www.agilityrobotics.com/content/agility-unveils-digit-5-humanoid-robot-built-for-cooperatively-safe-work-at-scale",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-11-03"
+    },
+    {
+      "key": "standing_dimensions",
+      "value": "Height 1.81 m (5' 11\"); can reach heights of up to 2.2 m (7.2 ft)",
+      "source_label": "Agility Robotics — Digit 5 launch release (2026-09-15)",
+      "source_url": "https://www.agilityrobotics.com/content/agility-unveils-digit-5-humanoid-robot-built-for-cooperatively-safe-work-at-scale",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-11-03"
+    },
+    {
+      "key": "hand_module",
+      "value": "Swappable gripper design with ISO-standard mounting flanges",
+      "source_label": "Agility Robotics — Digit 5 launch release (2026-09-15)",
+      "source_url": "https://www.agilityrobotics.com/content/agility-unveils-digit-5-humanoid-robot-built-for-cooperatively-safe-work-at-scale",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-11-03"
+    },
+    {
+      "key": "compute_ai",
+      "value": "NVIDIA IGX Thor (stated as the exclusive onboard compute for the general availability version)",
+      "source_label": "Agility Robotics — NVIDIA collaboration release (2026-10-22)",
+      "source_url": "https://www.agilityrobotics.com/content/agility-robotics-expands-nvidia-collaboration-as-it-prepares-digit-5-for-commercial-scale",
+      "source_kind": "MANUFACTURER",
+      "edition_scope": "THIS_EDITION",
+      "observed_at": "2026-11-03"
+    }
+  ],
+  "spec_caveats": [
+    {
+      "field": "payload_kg",
+      "text": "Agility's launch release states 'repeatedly lift up to 50 lb. (22.7 kg) loads'; the product page rounds this to 'Payload* 23kg/50lbs' (footnote text not on the page). 22.7 kg recorded."
+    },
+    {
+      "field": "reach_cm",
+      "text": "Left UNKNOWN: Agility states Digit 5 'can reach heights of up to 7.2 feet (2.2 m)', a maximum vertical reach, not the schema's single-arm reach. Recorded under body dimensions instead."
+    },
+    {
+      "field": "runtime_minutes",
+      "text": "Agility states 'A new 90-minute runtime battery system charges in just 9 minutes'. Pre-production manufacturer figure."
+    }
+  ]
+}

@@ -82,7 +82,22 @@
       "confidence": "MEDIUM"
     }
   ],
-  "images": [],
+  "images": [
+    {
+      "image_url": "/robots/agility-digit-5.jpg",
+      "source_url": "https://www.agilityrobotics.com/content/agility-unveils-digit-5-humanoid-robot-built-for-cooperatively-safe-work-at-scale",
+      "source_name": "Agility Robotics",
+      "source_type": "MANUFACTURER",
+      "image_type": "FRONT",
+      "identity_status": "VERIFIED",
+      "rights_status": "UNKNOWN",
+      "usage_basis": "OFFICIAL_MANUFACTURER_MEDIA",
+      "is_official": true,
+      "is_primary": true,
+      "attribution": "© Agility Robotics",
+      "last_verified_at": "2026-11-03T00:00:00Z"
+    }
+  ],
   "extended_specs": [
     {
       "key": "operating_time",

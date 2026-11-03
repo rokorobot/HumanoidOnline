@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-import { ClarityScript } from "@/components/ClarityScript";
+import { Analytics } from "@/components/Analytics";
 import { SiteFooter } from "@/components/SiteFooter";
 import { siteUrl } from "@/lib/site";
 
@@ -57,7 +57,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <footer> exposes the contentinfo landmark — a footer nested in <main>
             gets no landmark role (WS8.4 / R17). Pages no longer render their own. */}
         <SiteFooter />
-        <ClarityScript />
+        <Analytics />
       </body>
     </html>
   );

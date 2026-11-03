@@ -1,22 +1,22 @@
 {
   "robot_slug": "agility-digit-5",
   "assessed_on": "2026-11-03",
-  "assessed_by": "Claude (Opus 5.5) in a session initiated by the owner. Not human-verified.",
-  "method": "Evaluation against all categories in use_cases.json from Agility's 2026-09-15 Digit 5 release and the /solutions/digit-5 page, recorded in robots/agility-digit-5.json.",
+  "assessed_by": "Claude (Opus 5.5) in a session initiated by Robert Konecny. Not human-verified.",
+  "method": "Evaluation against all categories in use_cases.json from the manufacturer wording recorded in robots/agility-digit-5.json (Agility launch release 2026-09-15). Digit 4 deployments are not carried over.",
   "categories": {
     "warehouse-logistics": {
       "status": "FIT",
+      "basis": "Agility's launch release names warehousing and logistics among Digit 5's target markets and describes planned workflows from depalletizing to palletizing, plus tote handling. Planned for Digit 5, not yet demonstrated with it. Score NULL, confidence MEDIUM.",
       "sources": [
         "https://www.agilityrobotics.com/content/agility-unveils-digit-5-humanoid-robot-built-for-cooperatively-safe-work-at-scale"
-      ],
-      "basis": "Release names depalletizing, tote handling, kitting, sequencing and palletizing for warehouse and distribution operators. Score NULL, confidence MEDIUM."
+      ]
     },
     "manufacturing": {
       "status": "FIT",
+      "basis": "Agility's launch release names manufacturing among Digit 5's target markets and lists machine tending, kitting and sequencing, and quality inspection as planned workflows. Planned for Digit 5, not yet demonstrated with it. Score NULL, confidence MEDIUM.",
       "sources": [
         "https://www.agilityrobotics.com/content/agility-unveils-digit-5-humanoid-robot-built-for-cooperatively-safe-work-at-scale"
-      ],
-      "basis": "Release names machine tending, kitting, sequencing and quality inspection for manufacturing. Score NULL, confidence MEDIUM."
+      ]
     },
     "research-education": {
       "status": "NO_BASIS",
@@ -39,8 +39,8 @@
       "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
     },
     "security-inspection": {
-      "status": "UNSUPPORTED_POSSIBILITY",
-      "basis": "The release names 'quality inspection' inside production workflows only; no security, patrol or facility-inspection use is recorded."
+      "status": "NO_BASIS",
+      "basis": "The release mentions 'quality inspection' of items inside a production or logistics flow, which belongs to manufacturing, not site security or facility inspection. Nothing recorded links Digit 5 to this category."
     }
   }
 }

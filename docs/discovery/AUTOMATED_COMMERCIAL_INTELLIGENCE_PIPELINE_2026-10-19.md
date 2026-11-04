@@ -41,6 +41,26 @@ deployment or credential; each of those still needs its own approval.
 
 PR #174 is not modified by this document. Reconciling it with these decisions is separate work.
 
+## Relation to the HO-DATA Fast Lane — 2026-10-22
+
+The owner-approved HO-DATA Fast Lane ([`08_DEVELOPMENT_ROADMAP.md`](../08_DEVELOPMENT_ROADMAP.md)
+§1.2) is the operating cadence for this document's single approval: standing research
+authorization ([`HO-DATA-SR-01`](../HO_DATA_SR_01_STANDING_RESEARCH_ORDER.md)) → authorized
+research batches → **one owner approval per validated production batch**. It adds no pipeline,
+scheduler, source registry or approval system; its steps FL-1 to FL-4 reuse Workstream B
+(§5) and the ROUTINE / REVIEW REQUIRED / RESTRICTED classes of §5 B2 unchanged.
+
+- D1–D5 are unchanged. In particular **D5 still withholds production write credentials from
+  GitHub Actions**; the Fast Lane does not request or imply them.
+- The promotion executor is **not activated** (see
+  [`CATALOGUE_PROMOTION_AUTOMATION_DESIGN_2026-10-19.md`](CATALOGUE_PROMOTION_AUTOMATION_DESIGN_2026-10-19.md)
+  and the activation gates in
+  [`PROMOTION_EXECUTOR_SECURITY_PROPOSAL_2026-10-19.md`](PROMOTION_EXECUTOR_SECURITY_PROPOSAL_2026-10-19.md)).
+  Until D5 is decided, post-approval execution is an operator-run step, within the named
+  actions of the owner's approval.
+- Research under HO-DATA-SR-01 keeps provenance `AGENT_ASSISTED_RESEARCH`; owner approval of a
+  batch is not human verification.
+
 ## 1. Why this development is needed
 
 HumanoidOnline has a governed manufacturer-discovery and catalogue-enrichment system, but turning a verified new specification into an update to an existing published robot still entails many separate manual operations: checking claims, modifying catalogue JSON, preparing an expected-change manifest, merging code, creating a Neon safety branch, importing selected robots, running semantic preflight, and checking the live website.

@@ -1,0 +1,57 @@
+To: support@unitree.com
+Cc: sales_global@unitree.com
+Subject: Specification confirmation for G1, H1, H2 and R1 on HumanoidOnline
+
+Dear Unitree team,
+
+I run HumanoidOnline (humanoidonline.com), an independent catalogue of humanoid robots for buyers and researchers. We publish only specifications the manufacturer supports and show anything we cannot source as "unknown" - we never estimate.
+
+We have read unitree.com, shop.unitree.com, your Document Center (English and Chinese) and the unitreerobotics GitHub repositories. The values below are not stated there. A short answer per item, or a link to a public page or PDF that states it, would be a great help. Partial answers are very welcome.
+
+G1 (base model)
+ 1. Rated walking speed on flat ground (m/s)
+ 2. Battery energy of the standard pack (Wh)
+ 3. Is an SDK / programming API available to buyers of the base G1 (not EDU)?
+ 4. Can the base G1 grasp and manipulate objects with its standard hands?
+ 5. Arm span, fingertip to fingertip with arms horizontal (cm) - your table lists "Arm Span about 0.45 m"; could you confirm what that figure measures?
+
+G1 EDU (as sold with the U2 configuration)
+ 6. Rated walking speed (m/s) and battery energy (Wh), if different from the base G1
+ 7. Is a grasping hand fitted as standard in this configuration, and if so which model?
+
+H1
+ 8. Rated payload per arm (kg)
+ 9. Battery runtime during continuous walking (minutes)
+10. Total actuated degrees of freedom (one number)
+11. Standard end effector (model, DoF per hand), or "none" if hands are optional
+12. Spoken conversation with users supported (yes/no)
+13. Arm span (cm) and single-arm reach, shoulder axis to end-effector tip (cm)
+
+H2 and H2 EDU (please answer per edition where they differ)
+14. Rated walking speed (m/s)
+15. DoF per hand of the factory-standard hand
+16. H2 base: SDK / API, ROS 2 support and teleoperation available to buyers (yes/no each)
+17. H2 EDU: ROS 2 support (yes/no); standard hand fitted (model, DoF per hand)
+18. Can each edition grasp and manipulate objects in its standard configuration?
+19. Arm span (cm) and single-arm reach (cm)
+
+R1 (base model)
+20. Rated walking speed (m/s) and battery energy (Wh)
+21. Standard end effector (model, DoF per hand), or "none"
+22. SDK / API, ROS 2, official simulation model and teleoperation available to buyers of the base R1 (yes/no each)
+23. Can the base R1 grasp and manipulate objects?
+24. Arm span (cm) and single-arm reach (cm) for R1 and R1 EDU - the table lists "Arm Span 0.435 m"; what does that figure measure?
+
+R1 EDU
+European distributors sell R1 EDU in six configurations labelled U1 to U6. If Unitree uses different names, please tell us which edition each corresponds to.
+25. Per configuration (U1 to U6): weight with battery (kg), total degrees of freedom, and the hand fitted (model, DoF per hand, or none)
+26. Rated walking speed (m/s) and battery energy (Wh) for R1 EDU
+27. Can R1 EDU with the standard configuration grasp and manipulate objects?
+
+Definitions, so that answers are comparable: walking speed = rated speed on flat ground, not running or peak; payload = per arm, arm extended (please say if your figure is for both arms or a peak value); arm span = fingertip to fingertip with arms horizontal; reach = from shoulder axis to end-effector tip.
+
+How we use your answer: please reply from a company address or point to a public page or PDF on your domain, and name the product and edition each value applies to. We will show the values as manufacturer statements with the date of your reply, and we are happy to share the entries with you before they go live.
+
+Thank you very much,
+Robert Konecny
+HumanoidOnline - humanoidonline.com

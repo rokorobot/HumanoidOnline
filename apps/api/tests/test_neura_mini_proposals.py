@@ -256,7 +256,8 @@ def test_the_live_adapter_is_untouched_and_the_proposals_are_not_wired_in():
     assert set(ADAPTERS) == {"neura-robotics-official", "xpeng-official",   # + XPENG, 2026-10-03
                             "unitree-robotics-official", "booster-robotics-official",
                             "agibot-official", "agility-robotics-official",
-                            "figure-ai-official"}                      # + A4, 2026-10-18/19
+                            "figure-ai-official",                      # + A4, 2026-10-18/19
+                            "limx-dynamics-official", "faraday-future-official"}   # + 2026-11-05
     assert ADAPTERS["neura-robotics-official"] is CONFIG
     # The production path still extracts identity only: no claim, signal or image.
     identity = extract_neura_product(CONFIG, PAGE.encode("utf-8"), MINI_URL)

@@ -10,7 +10,9 @@ from app.services.discovery.sources import (
     agibot,
     agility_robotics,
     booster_robotics,
+    faraday_future,
     figure_ai,
+    limx_dynamics,
     neura_robotics,
     unitree_robotics,
     xpeng_robotics,
@@ -20,7 +22,7 @@ ADAPTERS: dict[str, SourceAdapterConfig] = {
     config.source_key: config
     for config in (neura_robotics.CONFIG, xpeng_robotics.CONFIG, unitree_robotics.CONFIG,
                    booster_robotics.CONFIG, agibot.CONFIG, agility_robotics.CONFIG,
-                   figure_ai.CONFIG)
+                   figure_ai.CONFIG, limx_dynamics.CONFIG, faraday_future.CONFIG)
 }
 
 

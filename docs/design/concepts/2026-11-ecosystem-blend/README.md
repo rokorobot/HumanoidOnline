@@ -42,6 +42,9 @@ Use **B (home) + C (robot page) + D (catalogue board view)**. **A** is the low-r
 you want to change less at once. C and D give the most practical value. B gives the strongest
 family identity.
 
+**Owner selection (2026-11-05): B for the home page, plus C and D.** This is a design-direction
+choice. It does not yet amend UI-D1 or approve a build.
+
 ## Decisions needed before any build
 
 1. Amend UI-D1 to adopt a condensed grotesk (Archivo) and self-host the fonts (`next/font`). Production uses system fallback fonts today.

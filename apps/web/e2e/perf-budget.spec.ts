@@ -54,7 +54,11 @@ const STATIC: Budget[] = [
   // SOCIAL-01: 62 -> 65 (measured 63.8).
   // SEO-02 (#219): 65 -> 68 (measured 66.5 in CI). WebSite + Organization JSON-LD for Bing's
   // "No Markup found"; Next repeats the inline script in the streamed payload. Owner-approved.
-  { path: "/", docKB: 68, jsRawKB: 404 },
+  // DR-UI2 (#247, owner-approved 2026-11-05): 68 -> 90 (measured 87.3 in CI). The obtainable-now board (8 rows, each
+  // headline price with its seller, region and terms), the requirement brief, the
+  // ecosystem section and the site-wide ecosystem rail + font tags, repeated in the
+  // streamed payload. No JS change.
+  { path: "/", docKB: 90, jsRawKB: 404 },
   // SOCIAL-01: 89 -> 95 (measured 93.6). The largest increase: this route has
   // the longest description, and it is the one repeated per card.
   // A4 promotion batch 1: 95 -> 102 (measured 101.1 in CI). Content, not code: the record gains
@@ -68,7 +72,10 @@ const STATIC: Budget[] = [
   // offers (Unitree China, GMO AI & Robotics Japan) and a CNY list price, with their evidence.
   // SEO-04 (#238): 117 -> 121 (measured 119.7 in CI). The "<Robot> alternatives" block: four
   // links to curated A-vs-B pages, repeated in the streamed payload. Owner-approved.
-  { path: "/robots/unitree-g1", docKB: 121, jsRawKB: 412 },
+  // DR-UI2 (#247, owner-approved 2026-11-05): 121 -> 141 (measured 139.0 in CI). The offer board: per offer row, the
+  // availability status, the price with its terms, evidence for each record and the
+  // Request action with its selected-offer stub; plus the ecosystem rail + font tags.
+  { path: "/robots/unitree-g1", docKB: 141, jsRawKB: 412 },
   // UX-01: 32 -> 33 (measured 32.06). The compare price cell now carries its configuration,
   // basis tag, order note and the shared summary line, plus data-enum traceability.
   // SOCIAL-01: 33 -> 37 (measured 35.4).
@@ -88,8 +95,10 @@ const STATIC: Budget[] = [
   // CNY price reach its compare column. Measured size plus ~0.5 kB headroom.
   // CID-04 (#217): 45 -> 46 (measured 45.2 in CI): the canonical link and the "<A> vs <B>" pair
   // title/description (repeated in og/twitter meta). Measured size plus ~0.8 kB headroom.
-  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 46, jsRawKB: 431 },
-  { path: "/find-a-humanoid", docKB: 46, jsRawKB: 424 },
+  // DR-UI2 (#247, owner-approved 2026-11-05): 46 -> 51 (measured 49.5 in CI). Site-wide ecosystem rail + font tags only.
+  { path: "/compare?ids=unitree-g1,agility-digit", docKB: 51, jsRawKB: 431 },
+  // DR-UI2 (#247, owner-approved 2026-11-05): 46 -> 49 (measured 47.2 in CI). Site-wide ecosystem rail + font tags only.
+  { path: "/find-a-humanoid", docKB: 49, jsRawKB: 424 },
 ];
 
 for (const b of STATIC) {
@@ -125,7 +134,10 @@ for (const b of STATIC) {
  * The card count is read from the RENDERED page, never assumed, so the gate
  * stays correct as the catalogue changes.
  */
-const ROBOTS_FIXED_KB = 22; // measured 20.1
+// DR-UI2 (#247, owner-approved 2026-11-05): 22 -> 27 (measured 232.4 kB for 44 cards = 25.6 kB fixed at 4.7 kB/card). Fixed
+// page cost only: the mode tabs with counts, the Cards / Board switch, the ecosystem rail and
+// font tags. The per-card cost is unchanged.
+const ROBOTS_FIXED_KB = 27; // measured 20.1 (pre-DR-UI2)
 // UX-01: 4.0 -> 4.35 (measured 4.32/card; main 3.96). Per card: the one-line commercial summary,
 // buyer-facing labels with data-enum, and the "Price terms" disclosure - each counted twice
 // because the RSC payload repeats the server-rendered tree.

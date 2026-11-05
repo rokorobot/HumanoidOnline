@@ -20,6 +20,9 @@ export default defineConfig({
       "next/headers": fileURLToPath(
         new URL("./test/stubs/next-headers.ts", import.meta.url),
       ),
+      "next/font/google": fileURLToPath(
+        new URL("./test/stubs/next-font-google.ts", import.meta.url),
+      ),
     },
   },
   test: {

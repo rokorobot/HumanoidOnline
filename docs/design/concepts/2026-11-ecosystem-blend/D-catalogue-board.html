@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Concept D — Catalogue with board view · HumanoidOnline × Ecosystem</title>
+<link rel="stylesheet" href="blend.css">
+<style>
+  .chead { padding: 36px 0 22px; display: flex; justify-content: space-between; align-items: end; }
+  .chead h1 { font-size: 92px; }
+  .search { display: flex; border: 1px solid var(--ink); background: var(--paper-2); }
+  .search div { flex: 1; padding: 14px 16px; font: 13px var(--f-mono); color: var(--g500); }
+  .search span { padding: 14px 20px; background: var(--ink); color: var(--paper-ink); font: 700 11px var(--f-mono); letter-spacing: var(--track); }
+  .layout { display: grid; grid-template-columns: 210px minmax(0,1fr); gap: 24px; margin: 22px 0 64px; }
+  .filters { border: 1px solid var(--ink); background: var(--paper-2); padding: 14px; font-size: 13px; align-self: start; }
+  .filters h6 { font: 500 10.5px var(--f-mono); letter-spacing: var(--track); text-transform: uppercase; margin: 14px 0 8px; padding-top: 12px; border-top: 1px solid var(--g200); }
+  .filters h6:first-of-type { border-top: 0; margin-top: 4px; padding-top: 0; }
+  .filters label { display: flex; gap: 8px; align-items: center; padding: 3px 0; }
+  .filters select { width: 100%; padding: 6px; font: 12px var(--f-ui); border: 1px solid var(--ink); background: var(--paper); }
+  .toolbar { display: flex; align-items: stretch; border: 1px solid var(--ink); border-bottom: 0; background: var(--paper-2); }
+  .toolbar .tab { padding: 12px 16px; font: 500 11px var(--f-mono); letter-spacing: var(--track); text-transform: uppercase; border-right: 1px solid var(--g200); color: var(--g600); }
+  .toolbar .tab em { font-style: normal; color: var(--g500); margin-left: 6px; }
+  .toolbar .tab.on { color: var(--ink); box-shadow: inset 0 -3px 0 var(--signal); }
+  .toolbar .sp { flex: 1; }
+  .seg { display: flex; align-items: center; gap: 0; padding: 0 12px; border-left: 1px solid var(--g200); }
+  .seg span { padding: 5px 10px; border: 1px solid var(--ink); font: 700 10px var(--f-mono); letter-spacing: .1em; }
+  .seg span + span { border-left: 0; }
+  .seg span.on { background: var(--ink); color: var(--paper-ink); }
+  .cat { width: 100%; border-collapse: collapse; border: 1px solid var(--ink); background: var(--paper-2); }
+  .cat th { text-align: left; font: 500 10px var(--f-mono); letter-spacing: .1em; text-transform: uppercase; background: var(--ink); color: var(--paper-ink); padding: 10px 9px; position: sticky; top: 0; }
+  .cat td { padding: 9px 9px; border-bottom: 1px solid var(--g200); font-size: 13px; vertical-align: middle; }
+  .cat tbody tr:hover td { background: #FBF9F3; }
+  .cat .cmp { width: 34px; }
+  .cat .rn { font: 500 19px/1.05 var(--f-serif); text-decoration: none; display: block; white-space: nowrap; }
+  .cat .rmk { font: 10.5px var(--f-mono); color: var(--g600); letter-spacing: .06em; text-transform: uppercase; }
+  .cat .flap { background: var(--paper); color: var(--ink); border-color: var(--ink); font-size: 10.5px; }
+  .cat .pr small { display: block; font: 10px var(--f-mono); color: var(--g600); letter-spacing: .06em; text-transform: uppercase; margin-top: 3px; white-space: nowrap; }
+  .cat .num { font: 12.5px var(--f-mono); white-space: nowrap; }
+  .cat .go { color: var(--signal-ink); }
+  .cat .bracket { white-space: nowrap; font-size: 10.5px; }
+  .chip.ghost { border-style: dashed; border-color: var(--g400); color: var(--g600); background: transparent; }
+  .unk.sm { font-size: 10px; padding: 1px 6px; }
+  .thumb { width: 46px; height: 46px; background: #ECE8DE; display: inline-block; margin-right: 12px; overflow: hidden; flex: none; border: 1px solid var(--g200); }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .cellr { display: flex; align-items: center; }
+  .cbar { position: relative; background: var(--ink); color: var(--paper-ink); display: flex; align-items: center; gap: 16px; padding: 12px 40px; border-top: 2px solid var(--signal); }
+</style></head>
+<body>
+<nav class="eco"><div class="wrap">
+  <a class="on" href="#"><i class="dot" style="background:var(--signal)"></i>HumanoidOnline</a>
+  <a href="#"><i class="dot" style="background:var(--rh)"></i>RentHumanoid</a>
+  <a class="soon" href="#"><i class="dot" style="border:1px solid var(--g500)"></i>HumanoidMart · soon</a>
+  <a class="soon" href="#"><i class="dot" style="border:1px solid var(--g500)"></i>HumanoidLease · soon</a>
+  <span class="right">A <span style="color:var(--hc)">Humanoid.Company</span> platform</span>
+</div></nav>
+<header class="nav paper"><div class="wrap">
+  <a class="brand" href="#">HUMANOID<b>ONLINE</b></a>
+  <ul><li><a class="on" href="#">Robots</a></li><li><a href="#">Compare</a></li><li><a href="#">Manufacturers</a></li><li><a href="#">Use cases</a></li><li><a href="#">Research</a></li></ul>
+  <a class="btn primary sm" href="#">■ Find a humanoid</a>
+</div></header>
+
+<div class="wrap">
+  <div class="chead"><div><span class="label idx">Catalogue — all tracked humanoids</span><h1 class="cond" style="margin-top:10px">Robot catalogue</h1></div><span class="label muted">3 dimensions: maturity / obtainability / evidence — independent</span></div>
+  <div class="search"><div>e.g. warehouse robot under EUR 20000</div><span>SEARCH</span></div>
+
+  <div class="layout">
+    <aside class="filters"><span class="label">Filters · 52 results <span class="tag-new keep">kept</span></span>
+      <h6>■ Commercial status</h6>
+      <label><input type="checkbox">Commercial</label><label><input type="checkbox">Robot-as-a-service</label><label><input type="checkbox">Limited commercial</label><label><input type="checkbox">Early access</label><label><input type="checkbox">Pilot</label><label><input type="checkbox">Prototype</label><label><input type="checkbox">Status not verified</label>
+      <h6>■ Region</h6><select><option>Any region</option></select>
+      <h6>■ Max purchase price</h6><select><option>No limit · no conversion</option></select>
+      <h6>■ Physical</h6><select><option>Mobility: any</option></select>
+      <h6>■ Developer</h6><label><input type="checkbox">Has SDK</label><label><input type="checkbox">ROS support</label>
+    </aside>
+    <main>
+      <div class="toolbar annot"><span class="pin">New · mode tabs + board view</span>
+        <span class="tab on">All<em>52</em></span><span class="tab">Purchase<em>17</em></span><span class="tab">Rental<em>3</em></span><span class="tab">RaaS<em>1</em></span><span class="tab">Lease<em>1</em></span>
+        <span class="sp"></span>
+        <div class="seg"><span>Cards</span><span class="on">Board</span></div>
+        <div class="seg label">Sort: Name A–Z ▾</div>
+      </div>
+      <table class="cat">
+        <thead><tr><th></th><th>Robot</th><th>Maturity</th><th>Obtainable as</th><th>Best known price</th><th>Height</th><th>Payload</th><th>Mobility</th><th></th></tr></thead>
+        <tbody>
+<tr><td class="cmp"><input type="checkbox" ></td><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/4ne1-mini.webp" alt=""></span><div><a class="rn" href="#">4NE1 Mini</a><span class="rmk">Neura Robotics</span></div></div></td><td><span class="bracket">Status not verified</span></td><td><span class="flap">PURCHASE</span></td><td class="pr"><span class="quote">€19,999</span><small>Manufacturer estimate</small></td><td class="num">132 cm</td><td class="num">3 kg</td><td>Bipedal</td><td><a class="go" href="#">→</a></td></tr>
+<tr><td class="cmp"><input type="checkbox" checked></td><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/agibot-a2-ultra.webp" alt=""></span><div><a class="rn" href="#">A2 Ultra</a><span class="rmk">AgiBot</span></div></div></td><td><span class="bracket">Commercial</span></td><td><span class="flap">PURCHASE</span> <span class="flap">RENTAL</span></td><td class="pr"><b class="mono">€6,500</b><small>Per week · Robotoplus · BG</small></td><td class="num">169 cm</td><td class="num"><span class="unk sm">UNKNOWN</span></td><td>Bipedal</td><td><a class="go" href="#">→</a></td></tr>
+<tr><td class="cmp"><input type="checkbox" ></td><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/honda-asimo.jpg" alt=""></span><div><a class="rn" href="#">ASIMO</a><span class="rmk">Honda</span></div></div></td><td><span class="bracket">Status not verified</span></td><td><span class="chip ghost">Availability unknown</span></td><td class="pr"><span class="unk">No published price</span><small>Price unknown</small></td><td class="num">130 cm</td><td class="num"><span class="unk sm">UNKNOWN</span></td><td>Bipedal</td><td><a class="go" href="#">→</a></td></tr>
+<tr><td class="cmp"><input type="checkbox" checked></td><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/engineered-arts-ameca.webp" alt=""></span><div><a class="rn" href="#">Ameca</a><span class="rmk">Engineered Arts</span></div></div></td><td><span class="bracket">Commercial</span></td><td><span class="flap">PURCHASE</span> <span class="flap">RENTAL</span></td><td class="pr"><span class="quote">Price on request</span><small>Quote required · global</small></td><td class="num">187 cm</td><td class="num"><span class="unk sm">UNKNOWN</span></td><td>Stationary</td><td><a class="go" href="#">→</a></td></tr>
+<tr><td class="cmp"><input type="checkbox" ></td><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/apptronik-apollo.jpg" alt=""></span><div><a class="rn" href="#">Apollo</a><span class="rmk">Apptronik</span></div></div></td><td><span class="bracket">Pilot</span></td><td><span class="chip ghost">Availability unknown</span></td><td class="pr"><span class="unk">No published price</span><small>Price unknown</small></td><td class="num">172.7 cm</td><td class="num">24.9 kg</td><td>Bipedal</td><td><a class="go" href="#">→</a></td></tr>
+<tr><td class="cmp"><input type="checkbox" ></td><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/apptronik-apollo-2.webp" alt=""></span><div><a class="rn" href="#">Apollo 2</a><span class="rmk">Apptronik</span></div></div></td><td><span class="bracket">Status not verified</span></td><td><span class="chip ghost">Availability unknown</span></td><td class="pr"><span class="unk">No published price</span><small>Price unknown</small></td><td class="num"><span class="unk sm">UNKNOWN</span></td><td class="num"><span class="unk sm">UNKNOWN</span></td><td><span class="unk sm">UNKNOWN</span></td><td><a class="go" href="#">→</a></td></tr>
+<tr><td class="cmp"><input type="checkbox" ></td><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/boston-dynamics-atlas-electric.jpg" alt=""></span><div><a class="rn" href="#">Atlas (Electric)</a><span class="rmk">Boston Dynamics</span></div></div></td><td><span class="bracket">Status not verified</span></td><td><span class="chip ghost">Availability unknown</span></td><td class="pr"><span class="unk">No published price</span><small>Price unknown</small></td><td class="num">190 cm</td><td class="num">30 kg</td><td>Bipedal</td><td><a class="go" href="#">→</a></td></tr>
+<tr><td class="cmp"><input type="checkbox" ></td><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/agility-digit.avif" alt=""></span><div><a class="rn" href="#">Digit</a><span class="rmk">Agility Robotics</span></div></div></td><td><span class="bracket">Robot-as-a-service</span></td><td><span class="flap">RAAS</span></td><td class="pr"><span class="unk">No published price</span><small>Price unknown</small></td><td class="num">175 cm</td><td class="num">16 kg</td><td>Bipedal</td><td><a class="go" href="#">→</a></td></tr>
+<tr><td class="cmp"><input type="checkbox" ></td><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/agility-digit-5.jpg" alt=""></span><div><a class="rn" href="#">Digit 5</a><span class="rmk">Agility Robotics</span></div></div></td><td><span class="bracket">Announced</span></td><td><span class="chip ghost">Availability unknown</span></td><td class="pr"><span class="unk">No published price</span><small>Price unknown</small></td><td class="num">181 cm</td><td class="num">22.7 kg</td><td>Bipedal</td><td><a class="go" href="#">→</a></td></tr>
+<tr><td class="cmp"><input type="checkbox" ></td><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/1x-eve.jpg" alt=""></span><div><a class="rn" href="#">EVE</a><span class="rmk">1X Technologies</span></div></div></td><td><span class="bracket">Status not verified</span></td><td><span class="chip ghost">Availability unknown</span></td><td class="pr"><span class="unk">No published price</span><small>Price unknown</small></td><td class="num">186 cm</td><td class="num"><span class="unk sm">UNKNOWN</span></td><td>Wheeled</td><td><a class="go" href="#">→</a></td></tr>
+<tr><td class="cmp"><input type="checkbox" ></td><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/figure-02.jpg" alt=""></span><div><a class="rn" href="#">Figure 02</a><span class="rmk">Figure</span></div></div></td><td><span class="bracket">Discontinued</span></td><td><span class="chip ghost">Availability unknown</span></td><td class="pr"><span class="unk">No published price</span><small>Price unknown</small></td><td class="num"><span class="unk sm">UNKNOWN</span></td><td class="num"><span class="unk sm">UNKNOWN</span></td><td>Bipedal</td><td><a class="go" href="#">→</a></td></tr>
+<tr><td class="cmp"><input type="checkbox" ></td><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/figure-03.webp" alt=""></span><div><a class="rn" href="#">Figure 03</a><span class="rmk">Figure</span></div></div></td><td><span class="bracket">Pilot</span></td><td><span class="chip ghost">Availability unknown</span></td><td class="pr"><span class="unk">No published price</span><small>Price unknown</small></td><td class="num">173 cm</td><td class="num">20 kg</td><td>Bipedal</td><td><a class="go" href="#">→</a></td></tr>        </tbody>
+      </table>
+      <p class="label muted" style="margin-top:10px">Showing 12 of 52 · Board view is a denser reading of the same cards. Nothing is hidden: unknown values stay in the row.</p>
+    </main>
+  </div>
+</div>
+<div class="cbar"><span class="label" style="color:var(--signal)">Compare tray</span><span class="mono">A2 Ultra · Ameca</span><span class="label muted">2 of 4</span><span style="flex:1"></span><a class="btn primary sm" href="#">Compare 2 →</a></div>
+</body></html>

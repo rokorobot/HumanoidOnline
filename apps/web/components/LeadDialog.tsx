@@ -48,6 +48,13 @@ export interface LeadDialogProps {
   // Robot-Detail "Request availability", no requirement context) keeps the
   // full editable form, as before.
   identity?: Identity | null;
+  // DR-UI2 — request-from-row on the offer board. `offer` renders a read-only stub
+  // naming the selected offer. `initialTransaction` / `initialMessage` seed the
+  // (still editable) preferred transaction and message, so what is sent about the
+  // offer is visible in the form itself. Absent = the dialog behaves exactly as before.
+  offer?: { label: string; value: string }[];
+  initialTransaction?: string;
+  initialMessage?: string;
 }
 
 // Requirement-linked contact identity is canonical once the Find a Humanoid
@@ -96,6 +103,9 @@ export function LeadDialog({
   robotSlugs,
   countries,
   identity,
+  offer,
+  initialTransaction,
+  initialMessage,
 }: LeadDialogProps) {
   const [draft, setDraft] = useState<LeadDraft>(emptyDraft);
   const [submitting, setSubmitting] = useState(false);
@@ -126,7 +136,11 @@ export function LeadDialog({
   // the requirement's identity when we have one (still fully editable).
   useEffect(() => {
     if (open) {
-      setDraft(draftFromIdentity(identity));
+      setDraft({
+        ...draftFromIdentity(identity),
+        ...(initialTransaction ? { preferred_transaction: initialTransaction } : {}),
+        ...(initialMessage ? { message: initialMessage } : {}),
+      });
       setError(null);
       setNameError(null);
       setOrgError(null);
@@ -135,7 +149,7 @@ export function LeadDialog({
       submittingRef.current = false;
       setSubmitting(false);
     }
-  }, [open, identity]);
+  }, [open, identity, initialTransaction, initialMessage]);
 
   // Move focus into the dialog on open: the heading in the success state, the
   // first required field — full name — when it's editable, or the heading
@@ -262,7 +276,7 @@ export function LeadDialog({
       }}
     >
       <div
-        className="lead-modal"
+        className={offer ? "lead-modal lead-modal--pass" : "lead-modal"}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
@@ -282,6 +296,8 @@ export function LeadDialog({
           </button>
         </div>
 
+        <div className={offer ? "lead-pass" : undefined}>
+          <div className="lead-pass__body">
         {done ? (
           <div aria-live="polite">
             <p className="prose">
@@ -474,6 +490,22 @@ export function LeadDialog({
             </p>
           </form>
         )}
+          </div>
+          {offer && (
+            <aside className="lead-stub ho-dark" aria-label="Selected offer">
+              <p className="lead-stub__k">Selected offer</p>
+              <dl>
+                {offer.map((o) => (
+                  <div key={o.label}>
+                    <dt>{o.label}</dt>
+                    <dd>{o.value}</dd>
+                  </div>
+                ))}
+              </dl>
+              <span className="lead-stub__code" aria-hidden="true" />
+            </aside>
+          )}
+        </div>
       </div>
     </div>
   );

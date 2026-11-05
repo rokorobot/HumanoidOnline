@@ -15,7 +15,7 @@ import { absoluteUrl } from "@/lib/site";
 import { DotMatrix, GraphicMarker } from "@/components/GraphicMarker";
 import { MachineCode } from "@/components/MachineCode";
 import { ManufacturerCard } from "@/components/ManufacturerCard";
-import { RobotCard } from "@/components/RobotCard";
+import { HomeOfferBoard } from "@/components/HomeOfferBoard";
 import { SectionIndex } from "@/components/SectionIndex";
 import { DarkNav } from "@/components/SiteNav";
 import { SystemHeader } from "@/components/SystemHeader";
@@ -30,11 +30,15 @@ export function generateMetadata(): Metadata {
 }
 
 export default async function HomePage() {
-  const [snapshot, robotPage, useCasePage, manufacturerPage] = await Promise.all([
+  const [snapshot, robotPage, useCasePage, manufacturerPage, ...modeTotals] = await Promise.all([
     getMarketSnapshot(),
-    listRobots({ limit: 24, sort: "name" }),
+    listRobots({ limit: 100, sort: "name" }),
     listUseCases({ limit: 100 }),
     listManufacturers({ limit: 100 }),
+    // DR-UI2 board tabs: live per-mode totals from the same cached list read.
+    ...HOME_MODES.map((m) =>
+      listRobots({ transaction_type: [m.mode], limit: 1 }).then((p) => p.total),
+    ),
   ]);
 
   // Catalogue freshness: the last committed change to public catalogue content,
@@ -42,9 +46,12 @@ export default async function HomePage() {
   const catalogueUpdated = formatObservedDate(snapshot.latest_catalogue_updated_at);
   // "Obtainable now" = robots with a current commercially-accessible offer
   // (available_modes computed by the canonical predicate). Never re-derived here.
+  // DR-UI2: shown as a board (name order — a display order, never a ranking).
   const obtainable = robotPage.items
     .filter((r) => r.available_modes.length > 0)
-    .slice(0, 4);
+    .slice(0, 8);
+  const modeTabs = HOME_MODES.map((m, i) => ({ ...m, count: modeTotals[i] }));
+  const accessible = snapshot.commercially_accessible;
 
   return (
     <>
@@ -100,10 +107,17 @@ export default async function HomePage() {
               <span className="ho-reg-box">&reg;</span>
             </div>
 
-            <h1>
-              Find the right
-              <br />
-              <em>humanoid.</em>
+            {/* DR-UI2: the headline leads with a live, server-rendered fact (never a
+                placeholder 0); the fixed claim stays inside the same H1. */}
+            <h1 className="hero-h1">
+              <span className="hero-count">
+                <span className="n">{accessible}</span> {accessible === 1 ? "humanoid" : "humanoids"}{" "}
+                <br />
+                obtainable now
+              </span>{" "}
+              <span className="hero-claim">
+                Find the right <em>humanoid.</em>
+              </span>
             </h1>
 
             <div className="subrow">
@@ -165,35 +179,78 @@ export default async function HomePage() {
                 <Leader k="UPDATED" v={catalogueUpdated ?? "UNKNOWN"} />
               </div>
             </div>
+
+            <section className="hero-board" aria-labelledby="obtainable-now">
+              <div className="hero-board__head">
+                <SectionIndex>01 — COMMERCIAL ACCESS</SectionIndex>
+                <h2 id="obtainable-now" className="ho-section-title">
+                  Obtainable now
+                </h2>
+                <SystemLabel>
+                  <abbr title="Current offers that are not marked unavailable or discontinued">
+                    CURRENT CONFIRMED OFFERS
+                  </abbr>
+                </SystemLabel>
+              </div>
+              <HomeOfferBoard robots={obtainable} tabs={modeTabs} />
+            </section>
           </div>
         </div>
       </div>
 
-      {/* OBTAINABLE NOW */}
+      {/* DR-UI2: TELL US THE JOB — the requirement brief as a pass. Real links into the
+          deterministic wizard (prefilled use case via ?use_case=). */}
       <section className="block">
         <div className="wrap">
           <div className="block-head">
             <div>
-              <SectionIndex>01 — COMMERCIAL ACCESS</SectionIndex>
-              <h2 className="ho-section-title">Obtainable now</h2>
+              <SectionIndex>02 — MATCH BY REQUIREMENT</SectionIndex>
+              <h2 className="ho-section-title">Tell us the job</h2>
             </div>
-            <SystemLabel>
-              <abbr title="Current offers that are not marked unavailable or discontinued">
-                CURRENT CONFIRMED OFFERS
-              </abbr>
-            </SystemLabel>
+            <SystemLabel>Same input, same result. No account needed.</SystemLabel>
           </div>
-          {obtainable.length > 0 ? (
-            <div className="card-row">
-              {obtainable.map((r) => (
-                <RobotCard key={r.slug} robot={r} />
-              ))}
+          <div className="brief">
+            <div className="brief-pass">
+              <div className="brief-pass__form">
+                <p className="brief-pass__t">Requirement brief</p>
+                <p className="ho-syslabel">Start with the job. Four short steps, then a deterministic match.</p>
+                <ul className="brief-uc" aria-label="Start with a use case">
+                  {useCasePage.items.slice(0, 8).map((u) => (
+                    <li key={u.slug}>
+                      <Link href={`/find-a-humanoid?use_case=${encodeURIComponent(u.slug)}`}>{u.name}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="brief-pass__stub ho-dark">
+                <p className="ho-syslabel">Your brief</p>
+                <ol>
+                  <li>Use case</li>
+                  <li>How you want it: buy, rent, lease or RaaS</li>
+                  <li>Region and budget</li>
+                  <li>Contact</li>
+                </ol>
+                <span className="lead-stub__code" aria-hidden="true" />
+                <Link className="btn btn--signal" href="/find-a-humanoid">
+                  <GraphicMarker /> Start the brief
+                </Link>
+              </div>
             </div>
-          ) : (
-            <p className="empty-state">
-              No robots currently expose a commercially-accessible offer.
-            </p>
-          )}
+            <ol className="brief-why">
+              <li>
+                <b>Three facts, never one flag.</b> Maturity, obtainability and evidence stay separate.
+              </li>
+              <li>
+                <b>Unknown stays unknown.</b> &ldquo;Price on request&rdquo; and &ldquo;no published price&rdquo; are different answers.
+              </li>
+              <li>
+                <b>Every fact has a source.</b> Prices, status and availability link to where they came from.
+              </li>
+              <li>
+                <b>Manufacturer-neutral.</b> No maker can buy a better ranking. Matching is a pure, testable function.
+              </li>
+            </ol>
+          </div>
         </div>
       </section>
 
@@ -202,7 +259,7 @@ export default async function HomePage() {
         <div className="wrap">
           <div className="block-head">
             <div>
-              <SectionIndex>02 — EXPLORE BY USE CASE</SectionIndex>
+              <SectionIndex>03 — EXPLORE BY USE CASE</SectionIndex>
               <h2 className="ho-section-title">Explore by use case</h2>
             </div>
             <SystemLabel>{useCasePage.total} APPLICATIONS</SystemLabel>
@@ -243,7 +300,7 @@ export default async function HomePage() {
         <div className="wrap">
           <div className="block-head">
             <div>
-              <SectionIndex>03 — WHO BUILDS THEM</SectionIndex>
+              <SectionIndex>04 — WHO BUILDS THEM</SectionIndex>
               <h2 className="ho-section-title">Who builds them</h2>
             </div>
             <SystemLabel>{manufacturerPage.total} TRACKED</SystemLabel>
@@ -263,7 +320,7 @@ export default async function HomePage() {
       {/* MARKET SNAPSHOT (dark) */}
       <section className="snapshot ho-dark ho-scan">
         <div className="wrap">
-          <SectionIndex>04 — MARKET SNAPSHOT</SectionIndex>
+          <SectionIndex>05 — MARKET SNAPSHOT</SectionIndex>
           <div className="snap-grid">
             <Snap
               n={snapshot.total_tracked}
@@ -299,9 +356,50 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* DR-UI2: ONE RECORD, FOUR PLATFORMS — real platform status only. */}
+      <section className="block eco-section ho-dark">
+        <div className="wrap">
+          <div className="block-head">
+            <div>
+              <SectionIndex>06 — ONE RECORD, FOUR PLATFORMS</SectionIndex>
+              <h2 className="ho-section-title">From research to robot on site</h2>
+            </div>
+            <SystemLabel>HumanoidOnline is the evidence layer of the Humanoid.Company family</SystemLabel>
+          </div>
+          <ul className="eco-grid">
+            {ECOSYSTEM.map((p) => (
+              <li key={p.code} className={`eco-card eco-card--${p.tone}`}>
+                <span className="eco-card__code" aria-hidden="true">{p.code}</span>
+                <h3>{p.name}</h3>
+                <p>{p.job}</p>
+                {p.href ? (
+                  <a href={p.href}>{p.status} ↗</a>
+                ) : (
+                  <span className="eco-card__status">{p.status}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
     </>
   );
 }
+
+const HOME_MODES = [
+  { mode: "PURCHASE", label: "Purchase" },
+  { mode: "RENTAL", label: "Rental" },
+  { mode: "RAAS", label: "RaaS" },
+  { mode: "LEASE", label: "Lease" },
+];
+
+const ECOSYSTEM: { code: string; name: string; job: string; status: string; tone: string; href?: string }[] = [
+  { code: "HO", name: "HumanoidOnline", job: "Intelligence and comparison: catalogue, evidence, prices.", status: "You are here", tone: "ho" },
+  { code: "RH", name: "RentHumanoid", job: "Live board of humanoids you can rent, lease or hire as a service.", status: "Live · renthumanoid.com", tone: "rh", href: "https://renthumanoid.com/" },
+  { code: "HM", name: "HumanoidMart", job: "Purchasing and marketplace for qualified buyers.", status: "In development", tone: "soon" },
+  { code: "HL", name: "HumanoidLease", job: "Long-term leasing and robot-as-a-service structures.", status: "In development", tone: "soon" },
+];
 
 function Leader({ k, v }: { k: string; v: string }) {
   return (

@@ -12,7 +12,7 @@ import { robotTitle } from "@/lib/robot-meta";
 import { alternativesFor, pairPath } from "@/lib/compare-pairs";
 import { listAllRobots } from "@/lib/seo";
 import { fitDescription, fitTitle } from "@/lib/meta-text";
-import { providerLabel, providerNamesFrom, type ProviderNames } from "@/lib/providers";
+import { providerNamesFrom, type ProviderNames } from "@/lib/providers";
 import { buildRobotJsonLd } from "@/lib/jsonld";
 import { absoluteUrl } from "@/lib/site";
 import {
@@ -28,7 +28,6 @@ import {
   confidenceLabel,
   mobilityLabel,
   priceTypeLabel,
-  sourceTypeLabel,
   statusLabel,
 } from "@/lib/labels";
 import {
@@ -41,7 +40,6 @@ import type {
   Deployment,
   Evidence,
   ExtendedSpec,
-  PricingOffer,
   RobotDetail,
 } from "@/lib/types";
 import { DetailComparisonLink } from "@/components/DetailComparisonLink";
@@ -55,7 +53,7 @@ import { GraphicMarker } from "@/components/GraphicMarker";
 import { RequestAvailabilityButton } from "@/components/RequestAvailabilityButton";
 import { RobotGallery } from "@/components/RobotGallery";
 import { MachineCode } from "@/components/MachineCode";
-import { PriceStateLong } from "@/components/PricingState";
+import { OfferBoard } from "@/components/OfferBoard";
 import { SpecRow, SpecValue } from "@/components/DataCell";
 import { ResolvedFactCell } from "@/components/ResolvedFactCell";
 import { factsByProperty, hasScopedKnowledge } from "@/lib/resolved-facts";
@@ -504,52 +502,31 @@ export default async function RobotDetailPage({
           </div>
         </section>
 
-        {/* PRICING */}
+        {/* OFFER BOARD (DR-UI2) — one row per offer: availability + price + evidence.
+            Keeps the #pricing anchor; a price joins an availability record only on an
+            identical offer identity (lib/offer-board.ts). */}
         <section className="blk" id="pricing">
           <div className="blk-head">
             <div>
-              <SectionIndex>02 — PRICING</SectionIndex>
-              <h2>Price is never one column</h2>
+              <SectionIndex>02 — WHERE YOU CAN GET IT</SectionIndex>
+              <h2>Offer board</h2>
             </div>
             <SystemLabel>
-              Mode, price type, billing, region and seller
+              One row per offer: mode × region × seller. Price is never one column
             </SystemLabel>
           </div>
-
-          {/* WS8.4 / R17: horizontally-scrollable on narrow viewports, so it is
-              keyboard-focusable (WCAG 2.1.1) with a named region. */}
-          <div className="ptable" tabIndex={0} role="group" aria-label="Specifications table">
-            <div className="prow head">
-              <div>Mode</div>
-              <div>Region</div>
-              <div>Provider</div>
-              <div>Price</div>
-              <div>Evidence</div>
-            </div>
-            {robot.pricing_offers.length > 0 ? (
-              robot.pricing_offers.map((p, i) => (
-                <PricingRow key={i} offer={p} names={providerNames} />
-              ))
-            ) : (
-              <div className="prow">
-                <div className="val unknown tt-none">
-                  —
-                </div>
-                <div className="val unknown tt-none">
-                  —
-                </div>
-                <div className="val unknown tt-none">
-                  —
-                </div>
-                <div>
-                  <PriceStateLong price={null} />
-                </div>
-                <div className="stamp faint">
-                  — absence claims nothing —
-                </div>
-              </div>
-            )}
-          </div>
+          <OfferBoard
+            robotSlug={robot.slug}
+            robotName={robot.name}
+            pricing={robot.pricing_offers}
+            availability={robot.availability_offers}
+            names={providerNames}
+            countries={countries}
+          />
+          <p className="stamp" style={{ marginTop: "var(--ho-sp-3)" }}>
+            A price and an availability share a row only when they describe the same
+            offer. No row for a region or seller means unknown, not ruled out.
+          </p>
         </section>
 
         {/* SPECIFICATIONS */}
@@ -740,100 +717,6 @@ function CommercialTriadInline({
   );
 }
 
-function PricingRow({ offer, names }: { offer: PricingOffer; names: ProviderNames }) {
-  const price = {
-    type: offer.price_type,
-    amount: offer.price,
-    amount_min: offer.price_min,
-    amount_max: offer.price_max,
-    currency: offer.currency,
-    billing_period: offer.billing_period,
-  };
-  return (
-    <div className="prow">
-      <div>
-        {modeLabel(offer.transaction_type)}
-        {/* A variant-scoped price names its configuration, so Standard and Pro are never
-            read as two prices for one thing. */}
-        {offer.variant && (
-          <span className="ho-syslabel d-blk">
-            {offer.variant} configuration
-          </span>
-        )}
-      </div>
-      <div className={offer.region ? "tt-none" : "val unknown tt-none"}>
-        {offer.region ?? "—"}
-      </div>
-      <div
-        className={offer.provider ? "tt-none" : "val unknown tt-none"}
-        {...(offer.provider && (offer.provider_name || names[offer.provider]) ? { "data-provider": offer.provider } : {})}
-      >
-        {offer.provider ? providerLabel(offer.provider, names, offer.provider_name).text : "—"}
-      </div>
-      <div>
-        <PriceStateLong price={price} />
-        {/* The terms this price is quoted on. They belong to THIS offer row and
-            are rendered with it, so one seller's number is never read under
-            another seller's terms. */}
-        {offer.price_basis && (
-          <span className="ho-syslabel d-blk">
-            {offer.price_basis}
-          </span>
-        )}
-        {offer.shipping_terms && (
-          <span className="ho-syslabel d-blk">
-            {offer.shipping_terms}
-          </span>
-        )}
-        {offer.package_contents && (
-          <span className="ho-syslabel d-blk">
-            Includes: {offer.package_contents}
-          </span>
-        )}
-        {offer.warranty_terms && (
-          <span className="ho-syslabel d-blk">
-            Warranty (this seller): {offer.warranty_terms}
-          </span>
-        )}
-        {offer.order_status_note && (
-          <span className="ho-syslabel d-blk">
-            {offer.order_status_note}
-          </span>
-        )}
-        {/* Only an explicit FALSE is a warning. null means the edition match was
-            never assessed, and silence is the honest rendering of that. */}
-        {offer.edition_confirmed === false && (
-          <span className="ho-syslabel d-blk">
-            ⚠ {offer.edition_note ?? "This listing is not confirmed to be this edition."}
-          </span>
-        )}
-      </div>
-      <div className="stamp">
-        {offer.evidence ? (
-          <>
-            <span data-enum={offer.evidence.confidence}>
-              {confidenceLabel(offer.evidence.confidence)}
-            </span>
-            {offer.evidence.verified_at
-              ? ` · ${formatDate(offer.evidence.verified_at)}`
-              : ""}
-            <br />
-            SOURCE:{" "}
-            <span data-enum={offer.evidence.source_type}>
-              {sourceTypeLabel(offer.evidence.source_type)}
-            </span>
-          </>
-        ) : (
-          <span className="faint">— no evidence —</span>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// Stable grouping for the extended table: categories in first-appearance order
-// (the API already sorts the rows), so the page cannot reorder itself between
-// renders. No fact is computed here — only which heading a row sits under.
 function groupExtendedSpecs(specs: ExtendedSpec[]): [string, ExtendedSpec[]][] {
   const groups = new Map<string, ExtendedSpec[]>();
   for (const spec of specs) {

@@ -211,6 +211,8 @@ export function FilterPanel({
       {asString(params.compare) ? (
         <input type="hidden" name="compare" value={asString(params.compare)} />
       ) : null}
+      {/* DR-UI2: the Cards / Board view is orthogonal state too. */}
+      {asString(params.view) === "board" ? <input type="hidden" name="view" value="board" /> : null}
 
       <div className="fhead">
         <span className="ho-syslabel">Filters</span>

@@ -42,8 +42,8 @@ Use **B (home) + C (robot page) + D (catalogue board view)**. **A** is the low-r
 you want to change less at once. C and D give the most practical value. B gives the strongest
 family identity.
 
-**Owner selection (2026-11-05): B for the home page, plus C and D.** This is a design-direction
-choice. It does not yet amend UI-D1 or approve a build.
+**Owner selection (2026-11-05): B for the home page, plus C and D.** The amendment is
+[`DR-UI2`](../../../decisions/DR-UI2_ECOSYSTEM_BLEND.md), built on a branch (not merged, not deployed).
 
 ## Decisions needed before any build
 

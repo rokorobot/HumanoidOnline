@@ -40,6 +40,14 @@ Corollaries, binding:
    > *Machine surfaces stay verbatim:* `llms.txt`, JSON-LD, the research JSON, citation
    > facts, API payloads, URL parameters and form values.
 
+> **Amendment (DR-UI2 ecosystem blend, 2026-11-05 — approved for branch build; ratified on merge):**
+> self-hosted Archivo / Playfair Display / JetBrains Mono (the preferred faces named in §4),
+> condensed section titles, an ecosystem rail (banner, not a nav landmark), the **offer
+> board** (one row per offer: availability + price + evidence, joined only on an identical
+> mode × region × provider × configuration × condition key), request-from-row lead capture,
+> a fact-led home hero and catalogue mode tabs with a board view. Everything in §0.1 holds.
+> See [`decisions/DR-UI2_ECOSYSTEM_BLEND.md`](decisions/DR-UI2_ECOSYSTEM_BLEND.md).
+
 ## 0.1 FROZEN UI LAWS
 
 These are frozen for WS3. They override any local styling temptation.

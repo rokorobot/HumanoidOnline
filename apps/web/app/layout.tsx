@@ -1,12 +1,36 @@
 import type { Metadata } from "next";
+import { Archivo, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import type { ReactNode } from "react";
 
 import { Analytics } from "@/components/Analytics";
+import { EcosystemRail } from "@/components/EcosystemRail";
 import { SiteFooter } from "@/components/SiteFooter";
 import { siteUrl } from "@/lib/site";
 
 import "./tokens.css";
 import "./globals.css";
+
+// DR-UI2 — the preferred faces UI-D1 §4 already names, self-hosted by next/font at
+// build time (no third-party request at runtime). tokens.css puts each variable at
+// the front of its existing fallback stack, so the 3-tier hierarchy is unchanged.
+const grotesk = Archivo({
+  subsets: ["latin"],
+  axes: ["wdth"],
+  display: "swap",
+  variable: "--ho-face-grotesk",
+});
+const serif = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["500"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--ho-face-serif",
+});
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--ho-face-mono",
+});
 
 // WS8.5 / R22 — a title template so every child route gets a specific title and
 // none inherits a bare generic root title. `default` is the home title; child
@@ -41,11 +65,12 @@ export function generateMetadata(): Metadata {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${grotesk.variable} ${serif.variable} ${mono.variable}`}>
       <body>
         <a className="skip-link" href="#main-content">
           Skip to content
         </a>
+        <EcosystemRail />
         {/* tabIndex={-1} so activating the skip link actually MOVES focus to the
             main landmark (WS8.4 / R17 focus behaviour) — a fragment link only
             scrolls to a non-focusable target; without this the keyboard user's

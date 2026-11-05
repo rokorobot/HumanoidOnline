@@ -75,12 +75,12 @@
 
   /* DISPLAY-SERIF — high-contrast editorial serif (Didone / modern).
      Expressive headlines, editorial voice. */
-  --ho-font-display-serif: "Canela", "GT Sectra", "Playfair Display",
+  --ho-font-display-serif: var(--ho-face-serif, "Playfair Display"), "Canela", "GT Sectra", "Playfair Display",
                            "Didot", "Bodoni MT", "Georgia", "Times New Roman", serif;
 
   /* DISPLAY-GROTESK — heavy industrial/condensed grotesk.
      Machine + product headlines (huge robot names, "ACTIVE", "FUEL"). */
-  --ho-font-display-grotesk: "Druk Wide", "Aeonik Fono", "Archivo Black",
+  --ho-font-display-grotesk: var(--ho-face-grotesk, "Archivo"), "Druk Wide", "Aeonik Fono", "Archivo Black",
                              "Helvetica Neue", "Arial Narrow", Arial, sans-serif;
 
   /* DISPLAY-TECHNO — OPTIONAL special-use accent ONLY (short system/status
@@ -94,7 +94,7 @@
                        system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 
   /* MACHINE — monospace / technical: codes, metrics, labels, status logs */
-  --ho-font-machine: "JetBrains Mono", "IBM Plex Mono", "Berkeley Mono",
+  --ho-font-machine: var(--ho-face-mono, "JetBrains Mono"), "JetBrains Mono", "IBM Plex Mono", "Berkeley Mono",
                      ui-monospace, "Cascadia Mono", Consolas, "SFMono-Regular",
                      Menlo, monospace;
 

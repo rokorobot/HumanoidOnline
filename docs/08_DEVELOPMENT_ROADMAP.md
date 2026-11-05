@@ -203,6 +203,8 @@ renumber G2-6.
 - automatic cache pruning;
 - a web review UI.
 
+**Design (DR-UI2, owner-approved for branch build 2026-11-05):** UI-D1 amendment adopting the shared ecosystem grammar (offer board, ecosystem rail, condensed titles, catalogue board view). Web-only; no backend, schema or catalogue change.
+
 **Editorial (DR-I1, owner-approved 2026-11-03):** `/insights` is a web-only, static editorial section; its first article is the Agility Digit 5 Europe piece. No backend, schema or catalogue change.
 
 **Rent / Buy / Lease / RaaS** remain the strategic product programme (§9). They are not

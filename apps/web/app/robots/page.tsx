@@ -17,6 +17,15 @@ import {
 import { cataloguePolicy } from "@/lib/index-policy";
 import { buildCatalogueJsonLd } from "@/lib/jsonld";
 import { resolveAppEnv } from "@/lib/site";
+import {
+  activeModeTab,
+  catalogueView,
+  MODE_TABS,
+  modeTabHref,
+  viewHref,
+  withoutMode,
+} from "@/lib/catalogue-view";
+import { CatalogueBoard } from "@/components/CatalogueBoard";
 import { CompareBar } from "@/components/CompareBar";
 import { FilterPanel } from "@/components/FilterPanel";
 import { RobotCard } from "@/components/RobotCard";
@@ -85,7 +94,19 @@ export default async function RobotsPage({
     : null;
   const cq = resolveCatalogueQuery(sp, vocab);
   const apiParams = toRobotListParams(cq.effective);
-  const page = await listRobots({ ...apiParams, limit: 100 });
+  // DR-UI2 mode tabs: one count per mode under the CURRENT filters (minus the mode
+  // itself), from the same cached list read. Never a client-side recount.
+  const modeBase = toRobotListParams(withoutMode(cq.effective));
+  const [page, ...modeCounts] = await Promise.all([
+    listRobots({ ...apiParams, limit: 100 }),
+    ...MODE_TABS.map((t) =>
+      listRobots({ ...modeBase, transaction_type: t.mode ? [t.mode] : [], limit: 1 }).then(
+        (p) => p.total,
+      ),
+    ),
+  ]);
+  const activeTab = activeModeTab(cq.effective);
+  const view = catalogueView(sp);
   const interp = cq.interpretation;
   const residualUnmatched = page.total === 0 && interp?.residual ? interp.residual.split(" ") : [];
 
@@ -189,7 +210,39 @@ export default async function RobotsPage({
               <SortSelect params={sp} />
             </div>
 
-            {page.items.length > 0 ? (
+            {/* DR-UI2: mode tabs (real links, filtered catalogue) + Cards / Board switch. */}
+            <div className="cat-toolbar">
+              <ul className="mode-tabs" aria-label="Obtainable as">
+                {MODE_TABS.map((t, i) => (
+                  <li key={t.label}>
+                    <Link
+                      href={modeTabHref(sp, t.mode)}
+                      className={activeTab === t.mode ? "mode-tab is-on" : "mode-tab"}
+                      aria-current={activeTab === t.mode ? "page" : undefined}
+                    >
+                      {t.label} <span className="mode-tab__n">{modeCounts[i]}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <ul className="view-switch" aria-label="View">
+                {(["cards", "board"] as const).map((v) => (
+                  <li key={v}>
+                    <Link
+                      href={viewHref(sp, v)}
+                      className={view === v ? "view-opt is-on" : "view-opt"}
+                      aria-current={view === v ? "page" : undefined}
+                    >
+                      {v === "cards" ? "Cards" : "Board"}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {page.items.length > 0 && view === "board" ? (
+              <CatalogueBoard robots={page.items} compareHref={compareHref} compareSlugs={compareSlugs} />
+            ) : page.items.length > 0 ? (
               <div className="grid">
                 {page.items.map((r) => (
                   <RobotCard

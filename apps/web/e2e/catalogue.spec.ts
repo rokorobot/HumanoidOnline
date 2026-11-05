@@ -112,7 +112,7 @@ test("unknown-price robot (agility-digit) shows explicit unknown, never $0/0/una
   const bodyNoImageState = body.toLowerCase().replaceAll("image unavailable", "");
   expect(bodyNoImageState).not.toContain("unavailable");
   // The price cell must not read a bare "0".
-  await expect(page.locator(".prow .val.unknown").first()).toBeVisible();
+  await expect(page.locator(".offer-board .val.unknown").first()).toBeVisible();
 });
 
 test("QUOTE_ONLY and UNKNOWN render as visibly different states on the catalogue", async ({

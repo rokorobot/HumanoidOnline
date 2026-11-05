@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Concept B — Control Room · HumanoidOnline × Ecosystem</title>
+<link rel="stylesheet" href="blend.css">
+<style>
+  .hero { padding: 56px 0 64px; }
+  .hero-top { display: grid; grid-template-columns: 1fr 380px; gap: 48px; align-items: end; }
+  .hero h1 { font-size: clamp(80px, 9.4vw, 140px); white-space: nowrap; }
+  .hero h1 .n { color: var(--signal); }
+  .hero .side .sub { font: italic 500 34px/1.1 var(--f-serif); color: var(--paper-ink); margin-bottom: 18px; }
+  .hero .side p { font: 13px/1.65 var(--f-mono); color: var(--dmute); margin-bottom: 20px; }
+  .hero .board { margin-top: 40px; }
+  .board .rname { font-size: 23px; white-space: nowrap; } .ev { white-space: nowrap; }
+  .thumb { width: 44px; height: 44px; background: #ECE8DE; display: inline-block; vertical-align: middle; margin-right: 12px; overflow: hidden; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .cellr { display: flex; align-items: center; }
+  .tick { border-top: 1px solid var(--dline); border-bottom: 1px solid var(--dline); background: #0A0A09; }
+  .tick .wrap { display: flex; gap: 0; height: 40px; align-items: center; overflow: hidden; }
+  .tick span { padding: 0 20px; border-right: 1px solid var(--dline); white-space: nowrap; font: 500 11px var(--f-mono); letter-spacing: var(--track); text-transform: uppercase; color: var(--dmute); }
+  .tick b { color: var(--paper-ink); font-weight: 700; }
+  .brief { display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px; align-items: start; }
+  .opts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .opt { border: 1px solid var(--ink); padding: 6px 10px; font: 500 11px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; background: var(--paper-2); }
+  .opt.on { background: var(--ink); color: var(--paper-ink); box-shadow: inset 0 -3px 0 var(--signal); }
+  .why { border: 1px solid var(--ink); }
+  .why > div { padding: 18px 20px; border-bottom: 1px solid var(--g200); display: grid; grid-template-columns: 54px 1fr; gap: 14px; background: var(--paper-2); }
+  .why > div:last-child { border-bottom: 0; }
+  .why b { font-size: 40px; color: var(--signal-ink); }
+  .why h5 { font: 900 22px/1 var(--f-cond); font-stretch: 62%; text-transform: uppercase; margin-bottom: 4px; }
+  .why p { font-size: 13px; color: var(--g700); }
+  .eco-grid { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--dline); }
+  .eco-grid > div { padding: 22px; border-right: 1px solid var(--dline); }
+  .eco-grid > div:last-child { border-right: 0; }
+  .eco-grid .code { font-size: 64px; }
+  .eco-grid h5 { font: 900 24px/1 var(--f-cond); font-stretch: 62%; text-transform: uppercase; margin: 10px 0 6px; }
+  .eco-grid p { font: 12px/1.55 var(--f-mono); color: var(--dmute); min-height: 56px; }
+  .pill { display: inline-flex; gap: 6px; align-items: center; font: 700 10px var(--f-mono); letter-spacing: .12em; text-transform: uppercase; margin-top: 14px; }
+  @media (max-width: 760px) {
+    .hero { padding: 36px 0 40px; }
+    .hero-top, .brief { grid-template-columns: 1fr; gap: 24px; }
+    .hero h1 { font-size: 64px; white-space: normal; }
+    .hero .side .sub { font-size: 26px; }
+    .tick .wrap { overflow-x: auto; }
+    .board .rname { font-size: 20px; }
+    .thumb { width: 36px; height: 36px; }
+  }
+</style></head>
+<body>
+
+<nav class="eco"><div class="wrap">
+  <a class="on" href="#"><i class="dot" style="background:var(--signal)"></i>HumanoidOnline</a>
+  <a href="#"><i class="dot" style="background:var(--rh)"></i>RentHumanoid</a>
+  <a class="soon" href="#"><i class="dot" style="border:1px solid var(--g500)"></i>HumanoidMart · soon</a>
+  <a class="soon" href="#"><i class="dot" style="border:1px solid var(--g500)"></i>HumanoidLease · soon</a>
+  <span class="right">A <span style="color:var(--hc)">Humanoid.Company</span> platform</span>
+</div></nav>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="#">HUMANOID<b>ONLINE</b></a>
+  <ul><li><a href="#">Offer board</a></li><li><a href="#">Robots</a></li><li><a href="#">Compare</a></li><li><a href="#">Manufacturers</a></li><li><a href="#">Use cases</a></li><li><a href="#">Research</a></li></ul>
+  <a class="btn primary sm" href="#">■ Find a humanoid</a>
+</div></header>
+
+<!-- Hero headline IS a fact (from /api/market-snapshot), not a slogan — "boldness around the data" -->
+<section class="hero dark scan"><div class="wrap">
+  <div class="hero-top">
+    <div>
+      <span class="label idx">00 — The humanoid market, instrumented · 03 Nov 2026</span>
+      <h1 class="cond" style="margin-top:18px"><span class="n">19</span> humanoids<br>obtainable now</h1>
+    </div>
+    <div class="side">
+      <p class="sub">Find the right humanoid.</p>
+      <p>Of 72 humanoids tracked, 19 can be bought, rented, leased or hired as a service today, each with a named provider, a price basis, and a source. The rest are pilots, prototypes, or unknown, and we say which.</p>
+      <div style="display:flex;gap:10px"><a class="btn primary" href="#">Find a humanoid →</a><a class="btn" href="#">Explore all 52</a></div>
+    </div>
+  </div>
+
+  <div class="board">
+    <div class="board-tabs"><span class="on">All offers</span><span>Purchase<em>17</em></span><span>Rental<em>3</em></span><span>RaaS<em>1</em></span><span>Lease<em>1</em></span><span class="note">Region: Any ▾</span></div>
+    <table>
+      <thead><tr><th>Robot</th><th>Mode</th><th>Region</th><th>Provider</th><th>Listed price</th><th>Status</th><th>Evidence</th><th></th></tr></thead>
+      <tbody>
+        <tr><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/agibot-a2-ultra.webp" alt=""></span><div><span class="rname">A2 Ultra</span><span class="rmaker">AgiBot</span></div></div></td><td><span class="flap">RENTAL</span></td><td><span class="flap">BG</span></td><td>Robotoplus</td><td><span class="price">€6,500<small>per week · published</small></span></td><td><span class="st on">Available</span></td><td class="ev"><span class="conf m"><i></i><i></i><i></i><i></i></span>Medium<br>observed <b>04 Oct 2026</b></td><td><a class="go" href="#">Detail →</a></td></tr>
+        <tr><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/1x-neo.jpg" alt=""></span><div><span class="rname">NEO</span><span class="rmaker">1X Technologies</span></div></div></td><td><span class="flap">PURCHASE</span></td><td><span class="flap">US</span></td><td>1X Technologies (direct)</td><td><span class="price">$20,000<small>published</small></span></td><td><span class="st req">Pre-order</span></td><td class="ev"><span class="conf v"><i></i><i></i><i></i><i></i></span><span class="v">Verified</span><br>verified <b>24 Jul 2026</b></td><td><a class="go" href="#">Detail →</a></td></tr>
+        <tr><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/booster-t2-professional.webp" alt=""></span><div><span class="rname">T2 Professional</span><span class="rmaker">Booster Robotics</span></div></div></td><td><span class="flap">PURCHASE</span></td><td><span class="flap">DE</span></td><td>reichelt elektronik</td><td><span class="price">€35,800<small>published · 3–5 day delivery (DE)</small></span></td><td><span class="st on">Available</span></td><td class="ev"><span class="conf m"><i></i><i></i><i></i><i></i></span>Medium<br>observed <b>26 Sep 2026</b></td><td><a class="go" href="#">Detail →</a></td></tr>
+        <tr><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/unitree-g1.jpg" alt=""></span><div><span class="rname">G1 Basic</span><span class="rmaker">Unitree Robotics</span></div></div></td><td><span class="flap">PURCHASE</span></td><td><span class="flap">GLOBAL</span></td><td>Unitree Online Store</td><td><span class="price">$13,500<small>published</small></span></td><td><span class="st req">Limited</span></td><td class="ev"><span class="conf h"><i></i><i></i><i></i><i></i></span>High<br>observed <b>24 Jul 2026</b></td><td><a class="go" href="#">Detail →</a></td></tr>
+        <tr><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/engineered-arts-ameca.webp" alt=""></span><div><span class="rname">Ameca</span><span class="rmaker">Engineered Arts</span></div></div></td><td><span class="flap">RENTAL</span></td><td><span class="flap">GLOBAL</span></td><td>Engineered Arts</td><td><span class="price quote">Price on request<small>quote required</small></span></td><td><span class="st on">Available</span></td><td class="ev"><span class="conf h"><i></i><i></i><i></i><i></i></span>High<br>observed <b>24 Jul 2026</b></td><td><a class="go" href="#">Detail →</a></td></tr>
+        <tr><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/softbank-pepper.jpg" alt=""></span><div><span class="rname">Pepper</span><span class="rmaker">SoftBank Robotics</span></div></div></td><td><span class="flap">RENTAL</span></td><td><span class="flap">JP</span></td><td>TENT Inc. (Kauriru)</td><td><span class="price">from ¥43,780<small>per month · from price</small></span></td><td><span class="st on">Available</span></td><td class="ev"><span class="conf m"><i></i><i></i><i></i><i></i></span>Medium<br>observed <b>24 Oct 2026</b></td><td><a class="go" href="#">Detail →</a></td></tr>
+        <tr><td><div class="cellr"><span class="thumb"><img src="../../../../apps/web/public/robots/agility-digit.avif" alt=""></span><div><span class="rname">Digit</span><span class="rmaker">Agility Robotics</span></div></div></td><td><span class="flap">RAAS</span></td><td><span class="flap">US</span></td><td>Agility Robotics</td><td><span class="price unk">No published price<small>price unknown</small></span></td><td><span class="st req">On request</span></td><td class="ev"><span class="conf h"><i></i><i></i><i></i><i></i></span>High<br>observed <b>24 Jul 2026</b></td><td><a class="go" href="#">Detail →</a></td></tr>
+      </tbody>
+    </table>
+    <div class="board-foot"><span>Server-rendered from the HumanoidOnline catalogue · each row links its source · “Verified” only where a verification date exists</span><a class="go" href="#">All 19 obtainable →</a></div>
+  </div>
+</div></section>
+
+<div class="tick dark"><div class="wrap">
+  <span>Tracked <b>72</b></span><span>Published <b>52</b></span><span>Obtainable <b style="color:var(--signal)">19</b></span><span>Pilot / deployment <b>5</b></span><span>Manufacturers <b>31</b></span><span>Rental offers <b>present</b></span><span>Catalogue updated <b>03 Nov 2026</b></span>
+</div></div>
+
+<!-- Paper register for the decision tool. Boarding-pass grammar = the brief summarises itself as you fill it -->
+<section class="sec"><div class="wrap">
+  <div class="sec-head"><div><span class="label idx">01 — Match by requirement</span><h2 class="cond">Tell us the job</h2></div><p>Four answers, a deterministic match. Same input, same result, every time. No account needed.</p></div>
+  <div class="brief">
+    <div class="pass">
+      <div class="form">
+        <h3 class="cond">Requirement brief</h3>
+        <span class="label muted">Step 1 of 4 — usability first: ordinary controls</span>
+        <div class="field"><label>Use case</label><div class="opts"><span class="opt">Events</span><span class="opt on">Warehouse &amp; logistics</span><span class="opt">Manufacturing</span><span class="opt">Research</span><span class="opt">Retail</span></div></div>
+        <div class="field"><label>How you want it</label><div class="opts"><span class="opt">Buy</span><span class="opt on">Rent</span><span class="opt on">RaaS</span><span class="opt">Lease</span></div></div>
+        <div class="row2"><div class="field"><label>Region</label><div>Europe (EU)</div></div><div class="field"><label>Budget (optional)</label><div class="ph">e.g. 30,000 EUR</div></div></div>
+        <div class="field"><label>Payload minimum (optional)</label><div class="ph">kg</div></div>
+      </div>
+      <div class="stub">
+        <span class="label" style="color:var(--signal)">Your brief</span>
+        <div class="kv"><label>Use case</label><div>WAREHOUSE</div></div>
+        <div class="kv"><label>Mode</label><div>RENT · RAAS</div></div>
+        <div class="kv"><label>Region</label><div>EU</div></div>
+        <div class="kv"><label>Budget</label><div style="color:var(--g400)">— not set</div></div>
+        <div class="barcode"></div>
+        <a class="btn primary" href="#" style="justify-content:center">See matches →</a>
+      </div>
+    </div>
+    <div class="why">
+      <div><b class="cond">01</b><div><h5>Three facts, never one flag</h5><p>Maturity, obtainability and evidence stay separate. There is no single “available” switch.</p></div></div>
+      <div><b class="cond">02</b><div><h5>Unknown stays unknown</h5><p>No price is guessed. “Price on request” and “no published price” are different answers.</p></div></div>
+      <div><b class="cond">03</b><div><h5>Every fact has a source</h5><p>Prices, status and availability link to where they came from and when they were checked.</p></div></div>
+      <div><b class="cond">04</b><div><h5>Manufacturer-neutral</h5><p>No maker can buy a better ranking. Matching is a pure, testable function.</p></div></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec" style="padding-top:0"><div class="wrap">
+  <div class="sec-head"><div><span class="label idx">02 — Explore by use case</span><h2 class="cond">Where they work</h2></div><p>8 applications · 52 published robots.</p></div>
+  <div class="path" style="grid-template-columns:repeat(4,1fr);border:1px solid var(--ink);background:var(--paper-2)">
+    <div style="padding:16px;border-right:1px solid var(--g200)"><span class="label muted">01 · 20 robots</span><h4 class="cond" style="font-size:30px;margin-top:8px">Events &amp; entertainment</h4></div>
+    <div style="padding:16px;border-right:1px solid var(--g200)"><span class="label muted">04 · 13 robots</span><h4 class="cond" style="font-size:30px;margin-top:8px">Manufacturing</h4></div>
+    <div style="padding:16px;border-right:1px solid var(--g200)"><span class="label muted">05 · 27 robots</span><h4 class="cond" style="font-size:30px;margin-top:8px">Research &amp; education</h4></div>
+    <div style="padding:16px"><span class="label muted">08 · 7 robots</span><h4 class="cond" style="font-size:30px;margin-top:8px">Warehouse &amp; logistics</h4></div>
+  </div>
+</div></section>
+
+<!-- Ecosystem section: HO as flagship of the Humanoid.Company family -->
+<section class="dark scan sec"><div class="wrap">
+  <div class="sec-head"><div><span class="label idx">03 — One record, four platforms</span><h2 class="cond">From research to robot on site</h2></div><p>HumanoidOnline is the evidence layer. Rental, purchase and leasing platforms read the same verified record.</p></div>
+  <div class="eco-grid">
+    <div><span class="cond code" style="color:var(--signal)">HO</span><h5>HumanoidOnline</h5><p>Intelligence &amp; comparison. Verified catalogue, evidence, prices.</p><span class="pill"><span class="st on">You are here</span></span></div>
+    <div><span class="cond code" style="color:var(--rh)">RH</span><h5>RentHumanoid</h5><p>Live board of humanoids you can rent, lease or hire as a service.</p><span class="pill" style="color:var(--rh)">● Live · renthumanoid.com ↗</span></div>
+    <div><span class="cond code" style="color:var(--g500)">HM</span><h5 style="color:var(--g400)">HumanoidMart</h5><p>Purchasing &amp; marketplace for qualified buyers.</p><span class="pill" style="color:var(--g500)">○ In development</span></div>
+    <div><span class="cond code" style="color:var(--g500)">HL</span><h5 style="color:var(--g400)">HumanoidLease</h5><p>Long-term leasing and RaaS structures at scale.</p><span class="pill" style="color:var(--g500)">○ In development</span></div>
+  </div>
+</div></section>
+
+<footer class="footer" style="border-top:1px solid var(--dline)"><div class="wrap"><a class="brand" href="#">HUMANOID<b>ONLINE</b></a><span class="label muted">A Humanoid.Company platform · © 2026</span></div></footer>
+</body></html>

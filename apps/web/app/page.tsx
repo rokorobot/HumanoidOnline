@@ -397,7 +397,7 @@ const HOME_MODES = [
 const ECOSYSTEM: { code: string; name: string; job: string; status: string; tone: string; href?: string }[] = [
   { code: "HO", name: "HumanoidOnline", job: "Intelligence and comparison: catalogue, evidence, prices.", status: "You are here", tone: "ho" },
   { code: "RH", name: "RentHumanoid", job: "Live board of humanoids you can rent, lease or hire as a service.", status: "Live · renthumanoid.com", tone: "rh", href: "https://renthumanoid.com/" },
-  { code: "HM", name: "HumanoidMart", job: "Purchasing and marketplace for qualified buyers.", status: "In development", tone: "soon" },
+  { code: "HM", name: "HumanoidMart", job: "Buy a humanoid robot from a named seller.", status: "Live · humanoidmart.com", tone: "hm", href: "https://humanoidmart.com/" },
   { code: "HL", name: "HumanoidLease", job: "Long-term leasing and robot-as-a-service structures.", status: "In development", tone: "soon" },
 ];
 

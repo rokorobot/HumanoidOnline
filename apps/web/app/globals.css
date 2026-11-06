@@ -1196,6 +1196,7 @@ body:has(.cmp-tray) { padding-bottom: 84px; }
 .eco-rail__dot { width: 6px; height: 6px; flex: none; }
 .eco-rail__item--ho .eco-rail__dot { background: var(--ho-signal); }
 .eco-rail__item--rh .eco-rail__dot { background: #FFB400; }
+.eco-rail__item--hm .eco-rail__dot { background: #8F6BFF; }
 .eco-rail__item--soon .eco-rail__dot { border: 1px solid var(--ho-grey-400); }
 .eco-rail__status { color: var(--ho-grey-400); }
 .eco-rail__owner { display: flex; align-items: center; color: var(--ho-grey-400); white-space: nowrap; }
@@ -1379,6 +1380,7 @@ body:has(.cmp-tray) { padding-bottom: 84px; }
   font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; }
 .eco-card--ho .eco-card__code, .eco-card--ho .eco-card__status { color: var(--ho-signal); }
 .eco-card--rh .eco-card__code, .eco-card--rh a { color: #FFB400; }
+.eco-card--hm .eco-card__code, .eco-card--hm a { color: #8F6BFF; }
 .eco-card--soon .eco-card__code, .eco-card--soon .eco-card__status { color: var(--ho-grey-400); }
 @media (max-width: 900px) {
   .eco-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }

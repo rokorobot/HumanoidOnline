@@ -1,12 +1,12 @@
 // DR-UI2 — ecosystem rail. Names the four Humanoid.Company platforms with their
-// REAL status (HumanoidMart and HumanoidLease are in development, so they are
-// text, not links). Rendered once by the root layout as a <header> (banner),
+// REAL status (live platforms are links; HumanoidLease is in development, so it is
+// text, not a link). Rendered once by the root layout as a <header> (banner),
 // deliberately NOT a <nav>: the frozen landmark structure is Primary + Footer
 // only, and robot detail carries no Primary nav (e2e/semantics.spec.ts).
 const PLATFORMS: { name: string; href?: string; current?: boolean; status?: string; tone: string }[] = [
   { name: "HumanoidOnline", current: true, tone: "ho" },
   { name: "RentHumanoid", href: "https://renthumanoid.com/", tone: "rh" },
-  { name: "HumanoidMart", status: "In development", tone: "soon" },
+  { name: "HumanoidMart", href: "https://humanoidmart.com/", tone: "hm" },
   { name: "HumanoidLease", status: "In development", tone: "soon" },
 ];
 

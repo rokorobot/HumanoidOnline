@@ -243,7 +243,8 @@ describe("ecosystem rail", () => {
     expect(container.querySelector("nav")).toBeNull();
     expect(screen.getByRole("banner", { name: "Humanoid.Company platforms" })).toBeTruthy();
     expect(screen.getByRole("link", { name: /RentHumanoid/ }).getAttribute("href")).toBe("https://renthumanoid.com/");
-    expect(screen.queryByRole("link", { name: /HumanoidMart|HumanoidLease/ })).toBeNull();
-    expect(screen.getAllByText("· In development")).toHaveLength(2);
+    expect(screen.getByRole("link", { name: /HumanoidMart/ }).getAttribute("href")).toBe("https://humanoidmart.com/");
+    expect(screen.queryByRole("link", { name: /HumanoidLease/ })).toBeNull();
+    expect(screen.getAllByText("· In development")).toHaveLength(1);
   });
 });

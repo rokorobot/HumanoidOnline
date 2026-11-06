@@ -14,7 +14,7 @@ HumanoidOnline adopts the structural grammar it shares with RentHumanoid.com and
 |---|---|---|
 | 1 | **Self-hosted typefaces.** The preferred faces UI-D1 already names are now loaded (`next/font`, self-hosted at build time, no third-party request at runtime): **Archivo** (variable width and weight) as DISPLAY-GROTESK, **Playfair Display** as DISPLAY-SERIF, **JetBrains Mono** as MACHINE. The 3-tier hierarchy (§4) is unchanged. | all routes |
 | 2 | **Condensed section titles.** Section titles use Archivo at weight 900, width 62%, at a larger size. | all routes |
-| 3 | **Ecosystem rail.** A thin strip above every page names the four platforms (HumanoidOnline · RentHumanoid · HumanoidMart · HumanoidLease) with their real status. It is a `<header>` (banner), **not** a navigation landmark, so the frozen landmark structure (Primary + Footer, and no Primary on robot detail) is unchanged. | all routes |
+| 3 | **Ecosystem rail.** A thin strip above every page names the four platforms (HumanoidOnline · RentHumanoid · HumanoidMart · HumanoidLease) with their real status (live platforms link out). It is a `<header>` (banner), **not** a navigation landmark, so the frozen landmark structure (Primary + Footer, and no Primary on robot detail) is unchanged. | all routes |
 | 4 | **Offer board (robot page).** The pricing table becomes one board: **one row per offer** (mode × region × provider × configuration × condition). The row shows the availability status, the price (with its full terms), and the evidence for each. A price is only joined to an availability record with exactly the same key; it is never attached to a different seller or region. A price with no availability record, or the reverse, shows the missing side as unknown. | `/robots/[slug]` |
 | 5 | **Request from a row.** Each board row has a "Request" action. It opens the existing lead dialog with a stub that shows the selected offer. It preselects the matching preferred transaction and pre-fills an editable message that names the offer. It is still lead capture only (AGENTS rule 9). The buyer's country is **not** prefilled from the offer region. | `/robots/[slug]` |
 | 6 | **Obtainable-now board (home).** The four "Obtainable now" cards become a board with one row per commercially accessible robot: modes, headline price with seller and region, maturity. Mode tabs link to the filtered catalogue. | `/` |
@@ -32,7 +32,7 @@ Paper data register for catalogue, compare, specs and wizard; serif robot names;
 
 ## 2. Family colour rule
 
-Shared structure, one accent per brand: HumanoidOnline **orange** `#FF4A00`, RentHumanoid **amber** `#FFB400`, Humanoid.Company **lime** `#BFFF00`. On HumanoidOnline the other accents appear only as small identity marks in the ecosystem rail and section, never on data.
+Shared structure, one accent per brand: HumanoidOnline **orange** `#FF4A00`, RentHumanoid **amber** `#FFB400`, HumanoidMart **violet** `#8F6BFF` (live since 2026-11-06), Humanoid.Company **lime** `#BFFF00`. On HumanoidOnline the other accents appear only as small identity marks in the ecosystem rail and section, never on data.
 
 ## 3. Follow-ups (not in this change)
 

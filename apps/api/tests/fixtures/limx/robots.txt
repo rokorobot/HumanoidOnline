@@ -1,0 +1,80 @@
+User-Agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+User-Agent: Baiduspider
+User-Agent: Baiduspider-render
+User-Agent: Baiduspider-image
+User-Agent: Sogou web spider
+User-Agent: Sogou inst spider
+User-Agent: Sogou spider2
+User-Agent: 360Spider
+User-Agent: YisouSpider
+User-Agent: Bytespider
+User-Agent: PetalBot
+User-Agent: Googlebot
+User-Agent: Googlebot-Image
+User-Agent: bingbot
+User-Agent: YandexBot
+Allow: /
+
+User-Agent: KimiBot
+User-Agent: Kimi-SearchBot
+User-Agent: Kimi-User
+User-Agent: DeepSeekBot
+User-Agent: DoubaoBot
+User-Agent: QwenBot
+User-Agent: TongyiBot
+User-Agent: ChatGLM-Spider
+User-Agent: ERNIEBot
+User-Agent: YiyanBot
+User-Agent: PanguBot
+Allow: /
+
+User-Agent: TencentBot
+User-Agent: HunyuanBot
+User-Agent: Yuanbao
+User-Agent: AlibabaBot
+User-Agent: AliyunBot
+User-Agent: MoonshotBot
+User-Agent: ZhipuBot
+User-Agent: MiniMaxBot
+User-Agent: iFlytekBot
+User-Agent: SparkBot
+User-Agent: XiaomiBot
+User-Agent: StepFunBot
+User-Agent: Baidu-AIGC-Bot
+User-Agent: ByteDance-AI
+User-Agent: ByteBot
+Allow: /
+
+User-Agent: OAI-SearchBot
+User-Agent: ChatGPT-User
+User-Agent: PerplexityBot
+User-Agent: Perplexity-User
+User-Agent: Claude-User
+User-Agent: Claude-SearchBot
+User-Agent: Claude-Web
+User-Agent: MistralAI-User
+Allow: /
+
+User-Agent: GPTBot
+User-Agent: ClaudeBot
+User-Agent: Google-Extended
+User-Agent: Applebot
+User-Agent: Applebot-Extended
+User-Agent: CCBot
+User-Agent: Amazonbot
+User-Agent: meta-externalagent
+User-Agent: meta-externalfetcher
+User-Agent: FacebookBot
+User-Agent: anthropic-ai
+Allow: /
+
+User-Agent: AdsBot-Google
+User-Agent: AdsBot-Google-Mobile
+Allow: /
+
+Sitemap: https://www.limxdynamics.com/sitemap.xml
+Sitemap: https://www.limxdynamics.com/sitemap-images.xml

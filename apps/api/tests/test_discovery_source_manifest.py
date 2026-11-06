@@ -46,6 +46,9 @@ COVERAGE_2026_10_31 = {
     "limx-dynamics-official",
     "pal-robotics-official", "rainbow-robotics-official", "sanctuary-ai-official",
     "softbank-robotics-official", "tesla-official", "ubtech-robotics-official"}
+#: Of those, the two humanoid hosts structurally reviewed on 2026-11-05 (owner "go") now have a
+#: reviewed adapter (identity only). Registered and adapter-backed; still not enabled by code.
+ADAPTED_2026_11_05 = {"limx-dynamics-official", "faraday-future-official"}
 
 
 # ---------------------------------------------------------------- manifest (pure) --
@@ -54,7 +57,7 @@ COVERAGE_2026_10_31 = {
 def test_manifest_lists_exactly_the_registered_sources():
     entries = load_manifest()
     assert {e["key"] for e in entries} == A4_SOURCES | EXISTING | COVERAGE_2026_10_31
-    assert not COVERAGE_2026_10_31 & set(ADAPTERS)
+    assert COVERAGE_2026_10_31 & set(ADAPTERS) == ADAPTED_2026_11_05
     assert [e["key"] for e in entries] == sorted(e["key"] for e in entries)
 
 

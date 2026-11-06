@@ -320,7 +320,7 @@ export default async function AboutPage() {
             </div>
             <div className="seg logo">
               <Link href="/">
-                <b>HUMANOIDONLINE</b>
+                <b>HUMANOID<span className="logo-on">ONLINE</span></b>
               </Link>
             </div>
             <div className="seg mid">ABOUT / ENTITY DEFINITION</div>

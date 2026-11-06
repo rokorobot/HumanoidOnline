@@ -21,7 +21,7 @@ export function SiteNav({ active = null }: { active?: NavSection }) {
     <header className="site-head">
       <div className="logo">
         <Link href="/" aria-label="HumanoidOnline home">
-          <b>HUMANOIDONLINE</b>
+          <b>HUMANOID<span className="logo-on">ONLINE</span></b>
         </Link>
       </div>
       <nav className="nav" aria-label="Primary">

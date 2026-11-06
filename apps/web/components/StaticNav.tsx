@@ -12,7 +12,7 @@ export function StaticNav() {
     <header className="site-head">
       <div className="logo">
         <Link href="/" aria-label="HumanoidOnline home">
-          <b>HUMANOIDONLINE</b>
+          <b>HUMANOID<span className="logo-on">ONLINE</span></b>
         </Link>
       </div>
       <nav className="nav nav--static" aria-label="Primary">

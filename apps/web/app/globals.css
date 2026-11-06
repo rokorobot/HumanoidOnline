@@ -1410,3 +1410,6 @@ body:has(.cmp-tray) { padding-bottom: 84px; }
   .eco-card { border-right: 0; border-bottom: var(--ho-rule-hair) solid var(--ho-grey-800); }
   .eco-card:last-child { border-bottom: 0; }
 }
+/* Logo: "ONLINE" in the active (signal) color */
+.logo-on { color: var(--ho-signal-ink); }
+.ho-dark .logo-on { color: var(--ho-signal); }

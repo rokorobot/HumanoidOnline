@@ -80,7 +80,7 @@ export default async function HomePage() {
             </div>
             <div className="seg logo">
               <Link href="/">
-                <b>HUMANOIDONLINE</b>
+                <b>HUMANOID<span className="logo-on">ONLINE</span></b>
               </Link>
             </div>
             <div className="seg mid">MARKET INTELLIGENCE PLATFORM</div>

@@ -30,7 +30,7 @@ export function SiteFooter() {
       <div className="wrap foot-grid">
         <div>
           <span className="foot-mark" aria-hidden="true" />
-          <b>HUMANOIDONLINE</b>
+          <b>HUMANOID<span className="logo-on">ONLINE</span></b>
           <span className="foot-brand">
             {" "}· A{" "}
             <a className="foot-brand-link" href="https://humanoid.company/">

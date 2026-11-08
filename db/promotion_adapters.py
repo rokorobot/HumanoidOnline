@@ -17,12 +17,16 @@ from __future__ import annotations
 import json
 import os
 import time
+from datetime import datetime, timedelta, timezone
 import urllib.error
 import urllib.parse
 import urllib.request
 from typing import Any
 
 NEON_API = "https://console.neon.tech/api/v2"
+# Every branch this adapter creates expires on its own, so retained safety branches cannot
+# pile up (each extra branch is billed per hour).
+BRANCH_TTL = timedelta(days=7)
 INCIDENT_LABEL = "promotion-incident"
 
 
@@ -126,7 +130,9 @@ class NeonBranches:
     def create(self, name: str) -> str:
         self.verify_origin()
         made = self._call("POST", "/branches", {
-            "branch": {"name": name, "parent_id": self._parent},
+            "branch": {"name": name, "parent_id": self._parent,
+                       "expires_at": (datetime.now(timezone.utc) + BRANCH_TTL)
+                       .strftime("%Y-%m-%dT%H:%M:%SZ")},
             "endpoints": [{"type": "read_write"}]})
         branch = made["branch"]
         branch_id = branch["id"]

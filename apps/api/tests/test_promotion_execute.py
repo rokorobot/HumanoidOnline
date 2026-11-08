@@ -9,7 +9,7 @@ from __future__ import annotations
 import copy
 import json
 import re
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta, timezone
 
 import psycopg
 import pytest
@@ -383,9 +383,13 @@ def test_neon_branches_create_and_delete_via_the_rest_api(monkeypatch):
     assert branches.create("promo-x") == "postgresql://u:p@h/db"
     branches.delete("promo-x")
     post = [c for c in calls if c[0] == "POST"][0]
+    expires = post[2]["branch"].pop("expires_at")
     assert post == ("POST", "/projects/proj-1/branches", {
         "branch": {"name": "promo-x", "parent_id": "br-prod"},
         "endpoints": [{"type": "read_write"}]})
+    ttl = datetime.strptime(expires, "%Y-%m-%dT%H:%M:%SZ").replace(
+        tzinfo=timezone.utc) - datetime.now(timezone.utc)
+    assert timedelta(days=6, hours=23) < ttl <= timedelta(days=7)
     assert calls[-1][:2] == ("DELETE", "/projects/proj-1/branches/br-1")
     assert branches.origins["promo-x"] == {"branch_id": "br-1", "parent_id": "br-prod",
                                            "parent_lsn": "0/1A"}

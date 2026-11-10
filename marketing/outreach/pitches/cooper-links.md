@@ -6,7 +6,7 @@ Hello Professor Mar,
 Your Robotics Links and Resources page is a remarkable collection. May I suggest an addition for humanoid robots?
 
 HumanoidOnline: https://humanoidonline.com/robots
-A free, source-cited reference for 51 published humanoid robot profiles, covering specifications, commercial status and deployment evidence. Every fact links to its original source.
+A free, source-cited reference for 52 published humanoid robot profiles, covering specifications, commercial status and deployment evidence. Every fact links to its original source.
 
 Thank you for considering it.
 

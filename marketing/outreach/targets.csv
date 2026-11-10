@@ -1,15 +1,15 @@
 id,rank,site,category,channel,contact,submission_url,status,sent_at,followup_at,live_url,rel_observed,last_checked,notes
-humanoid-robotics-technology,1,Humanoid Robotics Technology,guest,email,editor@humanoidroboticstechnology.com,https://humanoidroboticstechnology.com/about-humanoid-robotics-technology/,draft,,,,,,Email published on About page. In-article links observed followed.
-roboticstomorrow,2,RoboticsTomorrow,directory,email,news@roboticstomorrow.com,https://www.roboticstomorrow.com/site_services.php,draft,,,,,,Free directory listing + news release go to news@. Free bylined articles go to articles@bthmgmt.com (send later as a separate pitch).
+humanoid-robotics-technology,1,Humanoid Robotics Technology,guest,email,info@humanoidroboticstechnology.com,https://humanoidroboticstechnology.com/about-humanoid-robotics-technology/,sent,2026-11-10,,,,,2026-11-10: editor@ (listed on About page) bounced 550 No mailbox; resent to info@ (About + Contact page). In-article links observed followed.
+roboticstomorrow,2,RoboticsTomorrow,directory,email,news@roboticstomorrow.com,https://www.roboticstomorrow.com/site_services.php,sent,2026-11-10,,,,,Free directory listing + news release go to news@. Free bylined articles go to articles@bthmgmt.com (send later as a separate pitch).
 robohub,3,Robohub,guest,email,editors@robohub.org,https://robohub.org/contribute/,draft,,,,,,Pitch must be 100 words or less. Volunteer-run; allow 2+ weeks.
 humanoid-sports-network,4,Humanoid Sports Network,competitor,email,press@humanoidsportsnetwork.com,https://humanoidsportsnetwork.com/contact/,draft,,,,,,Ran a feature on humanoid.guide's database with a followed link.
 github-awesome-lists,5,GitHub awesome lists,resource,pr,jk4e/list-ai-humanoid-robots; keon/awesome-physical-ai; jonyzhang2023/awesome-humanoid-learning,https://github.com/jk4e/list-ai-humanoid-robots,todo,,,,,,One PR per repo from the rokorobot account. Links are nofollow (GitHub). kiloreux/awesome-robotics skipped: no pushes since 2024.
-weekly-robotics,6,Weekly Robotics,resource,email,contact@weeklyrobotics.com,https://www.weeklyrobotics.com/about/,draft,,,,,,Curator: Mat Sadowski. In-issue links observed followed.
+weekly-robotics,6,Weekly Robotics,resource,email,contact@weeklyrobotics.com,https://www.weeklyrobotics.com/about/,sent,2026-11-10,,,,,Curator: Mat Sadowski. In-issue links observed followed.
 qviro,7,Qviro blog,competitor,manual,,https://qviro.com/blog,todo,,,,,,No public email found. Use the pitch in pitches/qviro.md via a contact form or LinkedIn.
 hugging-face,8,Hugging Face,community,manual,,https://huggingface.co/new-dataset,todo,,,,,,Needs your account. Publish only after confirming data may be redistributed (AGENTS.md rules 6-7).
 alternativeto,9,AlternativeTo,competitor,form,,https://alternativeto.net/software/lots-of-bots/about/,todo,,,,,,Add as alternative to humanoid.guide and Lots of Bots. Copy in pitches/listing.md.
 product-hunt,10,Product Hunt,competitor,form,,https://www.producthunt.com/posts/new,todo,,,,,,Launch Tue-Thu. Copy in pitches/listing.md.
-botstest,11,Botstest,directory,form,,https://botstest.com/submit/,todo,,,,,,Choose Community listing. Confirm it is free before submitting; never pay the $49.
+botstest,11,Botstest,directory,form,robert@humanoidonline.com,https://botstest.com/submit/,sent,2026-11-10,,,,2026-11-10,Submitted 2026-11-10 as free Community listing (category Products). Awaiting editorial review. Never pay the $49/$199 tiers.
 roboticsbiz,12,RoboticsBiz,guest,form,,https://roboticsbiz.com/write-for-us/,todo,,,,,,Send title + outline first. Bio links nofollow (stated). Pitch in pitches/roboticsbiz.md.
 topbots,13,TOPBOTS,guest,form,,https://www.topbots.com/guest-writer-editorial-content-guidelines/,todo,,,,,,One link allowed. Pitch in pitches/topbots.md.
 robotshop-community,14,RobotShop Community,guest,post,,https://community.robotshop.com/blog,todo,,,,,,Post in the Humanoids category yourself (account needed). Draft in pitches/robotshop-community.md.
@@ -28,7 +28,7 @@ automation-com,26,Automation.com (ISA),guest,form,,https://www.automation.com/en
 shadow-robot,27,Shadow Robot blog,guest,email,contact@shadowrobot.com,https://shadowrobot.com/blog-guest/,draft,,,,,,Experienced robotics writers only. Link back offered (stated).
 uneed,28,Uneed,directory,form,,https://www.uneed.best/submit-a-tool,todo,,,,,,Free queue. Dofollow at 20 upvotes (stated).
 saashub,29,SaaSHub,directory,form,,https://www.saashub.com/submit,todo,,,,,,Nofollow (observed).
-betalist,30,BetaList,directory,form,,https://betalist.com/submissions/new,todo,,,,,,Free; long wait. Nofollow redirect (observed).
+betalist,30,BetaList,directory,form,,https://betalist.com/submissions/new,rejected,,,,,2026-11-10,No longer free: since Nov 2026 every submission must pick a paid plan before review (betalist.com/agent). Dropped under the no-paid rule.
 crunchbase,31,Crunchbase,directory,form,,https://www.crunchbase.com/,todo,,,,,,Organization profile; parent Humanoid.Company.
 umich-libguide,32,University of Michigan library guide,resource,email,jniehof@umich.edu,https://guides.lib.umich.edu/robotics,draft,,,,,,Address published on the guide (guide contact). Fallback: libguides@umich.edu.
 drexel-libguide,33,Drexel University library guide,resource,email,bhattjj@drexel.edu,https://libguides.library.drexel.edu/robotics,draft,,,,,,Address published on the guide.

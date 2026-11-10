@@ -23,7 +23,10 @@ def parse_sitemap(xml: str) -> list[tuple[str, dt.datetime | None]]:
     for url in ET.fromstring(xml).findall("s:url", NS):
         loc = url.findtext("s:loc", namespaces=NS)
         mod = url.findtext("s:lastmod", namespaces=NS)
-        out.append((loc.strip(), dt.datetime.fromisoformat(mod.replace("Z", "+00:00")) if mod else None))
+        d = dt.datetime.fromisoformat(mod.strip().replace("Z", "+00:00")) if mod else None
+        if d is not None and d.tzinfo is None:  # date-only lastmod ("2026-11-03") -> treat as UTC
+            d = d.replace(tzinfo=dt.timezone.utc)
+        out.append((loc.strip(), d))
     return out
 
 

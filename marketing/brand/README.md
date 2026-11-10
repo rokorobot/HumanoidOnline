@@ -5,7 +5,9 @@ Colours: ink `#131210`, paper `#EFEBE2`, off-white `#E7E3D8`, signal orange `#FF
 
 | File | Use |
 |---|---|
-| `humanoidonline-wordmark-dark.png` (2095×384) | Default logo: Gmail signature, press kit, dark backgrounds |
+| `humanoidonline-signature.png` (349×64, shows at ~175 px) | **Gmail signature** (wordmark only, no star) |
+| `humanoidonline-wordmark-nostar-dark.png` / `-light.png` (1771×352) | Wordmark only, for small sizes and headers |
+| `humanoidonline-wordmark-dark.png` (2095×384) | Full logo with star: press kit, dark backgrounds |
 | `humanoidonline-wordmark-light.png` (2095×384) | Light backgrounds |
 | `humanoidonline-icon-512.png` (512×512) | Square icon for directory listings (Uneed, SaaSHub, Product Hunt, Crunchbase) |
 | `humanoidonline-icon.svg` | Vector icon (same as the site favicon) |

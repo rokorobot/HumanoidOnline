@@ -33,4 +33,4 @@ Rows with `channel` = `form`, `post`, `pr` or `manual` are never emailed. Submit
 
 ## Before each batch
 
-The figures in the drafts are from the 2 November 2026 snapshot (51 published humanoids; 5 with a confirmed North America offer). Re-check https://humanoidonline.com/research/humanoid-availability/north-america and update the drafts if the numbers have changed.
+The figures in the drafts are from the 10 November 2026 snapshot (52 published humanoids; 5 with a confirmed North America offer). Re-check https://humanoidonline.com/research/humanoid-availability/north-america and update the drafts if the numbers have changed.

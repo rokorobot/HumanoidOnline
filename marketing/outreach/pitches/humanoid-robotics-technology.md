@@ -3,6 +3,8 @@ Followup-Subject: Re: Data: only 5 of 52 humanoids have a confirmed North Americ
 
 Hi,
 
+Your About page lists editor@humanoidroboticstechnology.com for news, but that mailbox is bouncing ("550 No mailbox"), so I'm sending this here instead.
+
 I'm {sender_name}, {sender_title} of HumanoidOnline (humanoidonline.com). We built an evidence-linked catalogue of humanoid robots. For each robot, commercial status, offers (purchase, rental, RaaS) and deployment claims are tracked separately, and each one links to its source.
 
 One finding from our latest snapshot (10 November 2026) that may interest your readers: of 52 published humanoid profiles, only 5 have a confirmed offer a North American buyer can act on. 47 have no confirmed North America offer on file. The full breakdown, with sources and observation dates, is here:

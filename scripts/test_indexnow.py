@@ -21,6 +21,10 @@ class IndexNowTest(unittest.TestCase):
     def test_all_includes_urls_without_lastmod(self):
         self.assertEqual(len(indexnow.select(indexnow.parse_sitemap(XML), NOW, 26, True)), 3)
 
+    def test_date_only_lastmod_is_treated_as_utc(self):
+        xml = XML.replace("</urlset>", "<url><loc>https://x/d</loc><lastmod>2099-01-01</lastmod></url></urlset>")
+        self.assertIn("https://x/d", indexnow.select(indexnow.parse_sitemap(xml), NOW, 26, False))
+
     def test_payload_points_at_the_served_key_file(self):
         p = indexnow.payload(["https://humanoidonline.com/"])
         self.assertEqual(p["host"], "humanoidonline.com")

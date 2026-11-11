@@ -31,7 +31,7 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "Entered by claude-code (read for robert@humanoid.company) from https://robotera.com/#/product/L7 (retrieved 2026-07-30). 10 field(s) not stated by the source and left UNKNOWN.",
+  "specs_note": "Entered by claude-code (read for robert@humanoid.company) from https://robotera.com/#/product/L7 (retrieved 2026-07-30). 10 field(s) not stated by the source and left UNKNOWN. USE-CASE SCENARIOS (2026-11-11, owner-supplied saved copy of https://www.robotera.com/en/#/product/L7): 'Applicable to commercial, logistics, and manufacturing scenarios'; tags 'Commercial Services', 'Logistics Application', 'Manufacturing Application', 'Research Application'; demos 'Hip-hop Performance', 'Bartending Services'.",
   "official_url": "https://www.robotera.com/",
   "commercial_status_evidence": [],
   "variants": [],
@@ -39,7 +39,44 @@
   "availability_offers": [],
   "deployments": [],
   "capabilities": [],
-  "use_case_fits": [],
+  "use_case_fits": [
+    {
+      "use_case_slug": "manufacturing",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "Page names Manufacturing Application and states applicability to manufacturing scenarios. Manufacturer positioning only.",
+      "limitations": "No deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only.",
+      "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "warehouse-logistics",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "Page names Logistics Application and states applicability to logistics scenarios. Manufacturer positioning only.",
+      "limitations": "No deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only.",
+      "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "retail-service",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "Page names Commercial Services and a Bartending Services demo. Manufacturer positioning only.",
+      "limitations": "No deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only.",
+      "confidence": "LOW"
+    },
+    {
+      "use_case_slug": "research-education",
+      "fit_score": null,
+      "is_primary": false,
+      "commercial_readiness": null,
+      "notes": "Page names Research Application. Manufacturer positioning only.",
+      "limitations": "No deployments or demonstrations are recorded; fit rests on the maker's stated scenarios only.",
+      "confidence": "LOW"
+    }
+  ],
   "images": [
     {
       "image_url": "/robots/robotera-l7.png",

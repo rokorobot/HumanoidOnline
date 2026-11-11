@@ -1,0 +1,40 @@
+{
+  "robot_slug": "engineered-arts-ami-desktop",
+  "assessed_on": "2026-11-11",
+  "assessed_by": "Claude (Sonnet 5.5) in a session initiated by Robert Konecny, on owner approval 2026-11-11. Not human-verified.",
+  "method": "Evaluation against all categories in use_cases.json from the first-party page recorded in robots/engineered-arts-ami-desktop.json.",
+  "categories": {
+    "warehouse-logistics": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "manufacturing": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "research-education": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "home": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "events-entertainment": {
+      "status": "UNSUPPORTED_POSSIBILITY",
+      "basis": "Maker site frames the robot as social; no entertainment scenario is recorded."
+    },
+    "retail-service": {
+      "status": "UNSUPPORTED_POSSIBILITY",
+      "basis": "Engineered Arts describes social humanoid robots for businesses; the page records no retail or service scenario."
+    },
+    "healthcare-rehabilitation": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "security-inspection": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    }
+  }
+}

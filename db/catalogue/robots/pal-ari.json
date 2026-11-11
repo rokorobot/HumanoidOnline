@@ -1,11 +1,11 @@
 {
-  "slug": "limx-dynamics-tron-2",
-  "name": "TRON 2",
-  "manufacturer_slug": "limx-dynamics",
+  "slug": "pal-ari",
+  "name": "ARI",
+  "manufacturer_slug": "pal-robotics",
   "model_code": null,
   "summary": null,
   "announced_year": null,
-  "commercial_status": null,
+  "commercial_status": "UNKNOWN",
   "is_published": false,
   "specs": {
     "height_cm": null,
@@ -31,8 +31,8 @@
     "developer_edition": null,
     "simulation_support": null
   },
-  "specs_note": "IDENTITY DRAFT (owner decision pending; not imported). RETRIEVAL: HO-DATA new-robot scan 2026-11-09, first-party page https://www.limxdynamics.com/en/products/tron2 (robots.txt disallows only /api/ and /admin/). Page text: 'TRON 2 Multi-Form Embodied Robot'; 'Tri-Form New Configuration: Dual Arms, Wheeled Legs, Sole'; '7-DoF per Arm'; '10kg Dual-Arm Payload'; 'Up to 1.5 m working height'; 'bipedal body height'. The maker does NOT call it a humanoid. Owner view (2026-11-11): not a typical humanoid on its own, but arguably one when the parts are combined. Scope decision required (docs/16 §17.1). All spec fields null.",
-  "official_url": "https://www.limxdynamics.com/en/products/tron2",
+  "specs_note": "Owner approved 2026-11-11 (unpublished; publication is a separate decision). RETRIEVAL: HO-DATA new-robot scan 2026-11-09, first-party page https://pal-robotics.com/robot/ari/ (robots.txt allows). Page text: 'The social humanoid robot uses advanced technology based on multiple sensors that allows the robot to safely interact and navigate...'. Listed beside TALOS, REEM-C, KANGAROO on https://pal-robotics.com/robots/. No specs copied (all null). Scope question for owner: maker calls it a social humanoid, but it is a wheeled-base robot; confirm it fits humanoid scope (docs/16 §17.1).",
+  "official_url": "https://pal-robotics.com/robot/ari/",
   "commercial_status_evidence": [],
   "variants": [],
   "pricing_offers": [],

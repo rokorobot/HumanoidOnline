@@ -1,0 +1,52 @@
+{
+  "robot_slug": "robotera-l7",
+  "assessed_on": "2026-11-11",
+  "assessed_by": "Claude (Sonnet 5.5) in a session initiated by Robert Konecny, on owner approval 2026-11-11. Not human-verified.",
+  "method": "Evaluation against all categories in use_cases.json from the first-party page recorded in robots/robotera-l7.json.",
+  "categories": {
+    "warehouse-logistics": {
+      "status": "FIT",
+      "sources": [
+        "https://robotera.com/#/product/L7"
+      ],
+      "basis": "Page names Logistics Application. Score NULL, confidence LOW."
+    },
+    "manufacturing": {
+      "status": "FIT",
+      "sources": [
+        "https://robotera.com/#/product/L7"
+      ],
+      "basis": "Page names Manufacturing Application. Score NULL, confidence LOW."
+    },
+    "research-education": {
+      "status": "FIT",
+      "sources": [
+        "https://robotera.com/#/product/L7"
+      ],
+      "basis": "Page names Research Application. Score NULL, confidence LOW."
+    },
+    "home": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "events-entertainment": {
+      "status": "UNSUPPORTED_POSSIBILITY",
+      "basis": "A 'Hip-hop Performance' demo is shown; no entertainment scenario is claimed."
+    },
+    "retail-service": {
+      "status": "FIT",
+      "sources": [
+        "https://robotera.com/#/product/L7"
+      ],
+      "basis": "Page names Commercial Services and a Bartending Services demo. Score NULL, confidence LOW."
+    },
+    "healthcare-rehabilitation": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    },
+    "security-inspection": {
+      "status": "NO_BASIS",
+      "basis": "Nothing recorded links the robot to this category. Suitability is unknown, not negative."
+    }
+  }
+}

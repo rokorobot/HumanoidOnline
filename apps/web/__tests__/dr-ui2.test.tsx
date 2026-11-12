@@ -238,13 +238,12 @@ describe("boards keep UNKNOWN explicit", () => {
 });
 
 describe("ecosystem rail", () => {
-  it("is a banner, not a navigation landmark, and links only live platforms", () => {
+  it("is a banner, not a navigation landmark, and links every other live platform", () => {
     const { container } = render(<EcosystemRail />);
     expect(container.querySelector("nav")).toBeNull();
     expect(screen.getByRole("banner", { name: "Humanoid.Company platforms" })).toBeTruthy();
     expect(screen.getByRole("link", { name: /RentHumanoid/ }).getAttribute("href")).toBe("https://renthumanoid.com/");
     expect(screen.getByRole("link", { name: /HumanoidMart/ }).getAttribute("href")).toBe("https://humanoidmart.com/");
-    expect(screen.queryByRole("link", { name: /HumanoidLease/ })).toBeNull();
-    expect(screen.getAllByText("· In development")).toHaveLength(1);
+    expect(screen.getByRole("link", { name: /HumanoidLease/ }).getAttribute("href")).toBe("https://humanoidlease.com/");
   });
 });

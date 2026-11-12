@@ -398,7 +398,7 @@ const ECOSYSTEM: { code: string; name: string; job: string; status: string; tone
   { code: "HO", name: "HumanoidOnline", job: "Intelligence and comparison: catalogue, evidence, prices.", status: "You are here", tone: "ho" },
   { code: "RH", name: "RentHumanoid", job: "Live board of humanoids you can rent, lease or hire as a service.", status: "Live · renthumanoid.com", tone: "rh", href: "https://renthumanoid.com/" },
   { code: "HM", name: "HumanoidMart", job: "Buy a humanoid robot from a named seller.", status: "Live · humanoidmart.com", tone: "hm", href: "https://humanoidmart.com/" },
-  { code: "HL", name: "HumanoidLease", job: "Long-term leasing and robot-as-a-service structures.", status: "In development", tone: "soon" },
+  { code: "HL", name: "HumanoidLease", job: "Lease a humanoid robot fleet and pay monthly, including robot-as-a-service.", status: "Live · humanoidlease.com", tone: "hl", href: "https://humanoidlease.com/" },
 ];
 
 function Leader({ k, v }: { k: string; v: string }) {

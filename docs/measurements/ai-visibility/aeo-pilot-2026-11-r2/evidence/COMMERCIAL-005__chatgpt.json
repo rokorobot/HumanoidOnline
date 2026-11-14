@@ -1,0 +1,305 @@
+{
+ "observed_at": "2026-11-14T07:16:19+00:00",
+ "endpoint": "cloro.ai-search.chatgpt.scrape",
+ "request": {
+  "prompt": "Which humanoid robots can be purchased in Asia?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "model": null,
+    "text": "Asia is currently one of the strongest markets for commercially available humanoid robots, particularly China. Several manufacturers offer robots for research, education, industrial testing, and increasingly general-purpose applications.\n\nThe important distinction is between:\n\nPurchase-ready robots: Available for direct purchase or commercial orders.\n\nResearch robots: Available to universities, laboratories, and developers.\n\nIndustrial humanoids: Primarily sold to companies for pilot projects and factory deployment.\n\nHere are the main manufacturers and models worth considering.\n\n1. Chinese humanoid robots available to buy\n\nIndicative prices in USD, November 2026. Actual prices depend on configuration, distributor and destination.\n\n1. Unitree G1\n\nAvailable to order\n\nManufacturer: Unitree Robotics, China\n\nHeight: approximately 132 cm\n\nPrice: approximately $13,500 and up\n\nApplication: AI research, robotics development, manipulation and education\n\nOne of the most accessible advanced humanoid platforms.\n\nPurchase reference: .\n\n2. Unitree R1\n\nAvailable to order\n\nManufacturer: Unitree Robotics, China\n\nHeight: approximately 123 cm\n\nPrice: approximately $4,900–$5,900\n\nApplication: education, development and experimentation\n\nA relatively affordable entry into full-body humanoid robotics.\n\n3. EngineAI PM01\n\nCommercial orders\n\nManufacturer: EngineAI, Shenzhen, China\n\nHeight: approximately 138–140 cm\n\nIndicative reseller price: €18,824\n\nApplication: research, AI development and humanoid movement experiments.\n\nPurchase reference: .\n\n4. Fourier GR-1\n\nManufacturer: Fourier Intelligence, Shanghai, China\n\nHeight: approximately 165 cm\n\nIndicative reseller price: €37,647\n\nApplication: rehabilitation research, human-robot interaction and research laboratories.\n\nPurchase reference: .\n\n5. Booster T1\n\nManufacturer: Booster Robotics, China\n\nHeight: approximately 118 cm\n\nIndicative reseller price: €34,545\n\nApplication: robotics education, programming, research and robot competitions.\n\nPurchase reference: .\n\nOther Chinese manufacturers worth investigating:\n\nAgiBot – A2 and Lingxi series.\n\nLimX Dynamics – Oli and TRON.\n\nUBTECH Robotics – Walker S series.\n\nEngineAI – T800.\n\nDobot Robotics – Atom.\n\nSome of these are sold through enterprise contracts rather than straightforward online checkout.\n\n2. Other Asian manufacturers\n\nCountry\n\nManufacturer\n\nRelevant robots\n\nJapan\n\nKondo Kagaku\n\nKHR-3HV\n\nJapan\n\nKawada Robotics\n\nNEXTAGE\n\nSouth Korea\n\nROBOTIS\n\nOP3, MINI\n\nSouth Korea\n\nRainbow Robotics\n\nRB-Y1\n\nThese are worth investigating, particularly if you want an Asian supplier outside China. However, availability, production status and suitability vary considerably.\n\n3. Price comparison\n\nModel\n\nIndicative price\n\nBest suited for\n\nUnitree R1\n\n$4,900–5,900\n\nEntry-level development\n\nUnitree G1\n\nFrom $13,500\n\nAdvanced research\n\nEngineAI PM01\n\nAround $20,000+\n\nResearch and development\n\nFourier GR-1\n\nAround $40,000+\n\nHuman interaction research\n\nBooster T1\n\nAround $35,000+\n\nEducation and competitions\n\nPrices are indicative rather than confirmed quotations.\n\n4. Where to purchase\n\nThe main purchasing channels are:\n\nUnitree Robotics – Manufacturer and product ordering.\n\nEngineAI – Shenzhen-based manufacturer.\n\nFourier Intelligence – Humanoid and rehabilitation robotics.\n\nBooster Robotics – Educational and research humanoids.\n\nAgiBot – Chinese humanoid robotics manufacturer.\n\nFor international orders, check shipping to your country, export restrictions, CE certification where applicable, warranty coverage, spare parts and software support.\n\n5. My recommendation\n\nIf the objective is to acquire a working humanoid robot rather than simply invest in a demonstration model:\n\nUnder $10,000: Unitree R1.\n\n$10,000–$20,000: Unitree G1.\n\n$20,000–$40,000: EngineAI PM01 or Booster T1.\n\nAbove $40,000: Fourier GR-1 or larger industrial platforms.\n\nOne important question\n\nWhat is your intended application?\n\nIndustrial use – factory work, logistics, assembly and material handling.\n\nResearch and development – AI, machine learning, robotics programming.\n\nCommercial use – reception, customer service, hotels and exhibitions.\n\nPersonal use – home assistance and general-purpose humanoid robotics.\n\nInvestment or distribution – purchasing robots in Asia for resale in Europe.\n\nI can narrow this down to manufacturers that actually accept orders, with pricing, technical specifications and purchasing contacts in Asia.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Humanoid robots for sale (2026): every price, and which you can buy",
+      "url": "https://humanoidvs.com/humanoid-robots-for-sale",
+      "footnote": false
+     },
+     {
+      "position": 2,
+      "label": "Which humanoid robot can you actually buy?",
+      "url": "https://humanoid.observer/",
+      "footnote": false
+     },
+     {
+      "position": 3,
+      "label": "Humanoid robot: models, prices, uses",
+      "url": "https://robot-distribution.com/en/robots/humanoids?brand=leju-robotics",
+      "footnote": false
+     },
+     {
+      "position": 4,
+      "label": "Every humanoid robot that matters, compared",
+      "url": "https://www.thehumanoid.report/robots/",
+      "footnote": false
+     },
+     {
+      "position": 5,
+      "label": "Humanoid Robots — Buy from OEMs (China, USA, UK, AU) 2026",
+      "url": "https://www.botsales.com/humanoids",
+      "footnote": false
+     },
+     {
+      "position": 6,
+      "label": "Humanoid Robots for Sale: Prices and Who Sells (2026)",
+      "url": "https://www.hardwaremap.com/blog/humanoid-robots-for-sale",
+      "footnote": false
+     },
+     {
+      "position": 7,
+      "label": "Humanoid Robot Prices 2026: Every Model We Track",
+      "url": "https://www.antarum.ai/humanoid-robot-prices/",
+      "footnote": false
+     },
+     {
+      "position": 8,
+      "label": "Fourier Intelligence",
+      "url": "https://www.fftai.com/",
+      "footnote": false
+     },
+     {
+      "position": 9,
+      "label": "Unitree Robotics",
+      "url": "https://www.unitree.com/",
+      "footnote": false
+     },
+     {
+      "position": 10,
+      "label": "EngineAI",
+      "url": "https://www.engineai.com.cn/",
+      "footnote": false
+     },
+     {
+      "position": 11,
+      "label": "Booster Robotics",
+      "url": "https://www.boosterobotics.com/",
+      "footnote": false
+     },
+     {
+      "position": 12,
+      "label": "AgiBot",
+      "url": "https://www.agibot.com/",
+      "footnote": false
+     },
+     {
+      "position": 13,
+      "label": "",
+      "url": "https://3logic.ru/products/programmno-apparatnyy-kompleks-robot-unitree-model-g1-163835/",
+      "footnote": true
+     },
+     {
+      "position": 14,
+      "label": "",
+      "url": "https://humanoid-mart.com/unitree/",
+      "footnote": true
+     },
+     {
+      "position": 15,
+      "label": "",
+      "url": "https://www.engineai.com.cn/product-pm01",
+      "footnote": true
+     },
+     {
+      "position": 16,
+      "label": "",
+      "url": "https://www.everyhumanoid.com/robot/fourier-gr-1",
+      "footnote": true
+     },
+     {
+      "position": 17,
+      "label": "",
+      "url": "https://www.asiasatellite.co/Booster-T1-Basic-Humanoid-Robot.htm",
+      "footnote": true
+     },
+     {
+      "position": 18,
+      "label": "",
+      "url": "https://biorobot.ai/en",
+      "footnote": true
+     },
+     {
+      "position": 19,
+      "label": "",
+      "url": "https://internetofthingsnews.com/robotics/chinese-humanoid-robots/",
+      "footnote": true
+     },
+     {
+      "position": 20,
+      "label": "",
+      "url": "https://offbrandhuman.com/tracker",
+      "footnote": true
+     },
+     {
+      "position": 21,
+      "label": "",
+      "url": "https://robotics.hellobike.com/en/humanoid-robot-prices",
+      "footnote": true
+     },
+     {
+      "position": 22,
+      "label": "",
+      "url": "https://www.humanrobots.si/prices/",
+      "footnote": true
+     }
+    ],
+    "entities": [
+     {
+      "type": "product",
+      "name": "Unitree G1"
+     },
+     {
+      "type": "product",
+      "name": "Unitree R1"
+     },
+     {
+      "type": "product",
+      "name": "EngineAI PM01"
+     },
+     {
+      "type": "product",
+      "name": "Fourier GR-1"
+     },
+     {
+      "type": "product",
+      "name": "Booster T1"
+     },
+     {
+      "type": "company",
+      "name": "AgiBot"
+     },
+     {
+      "type": "company",
+      "name": "LimX Dynamics"
+     },
+     {
+      "type": "company",
+      "name": "UBTECH Robotics"
+     },
+     {
+      "type": "company",
+      "name": "EngineAI"
+     },
+     {
+      "type": "company",
+      "name": "Dobot Robotics"
+     },
+     {
+      "type": "company",
+      "name": "Kondo Kagaku"
+     },
+     {
+      "type": "company",
+      "name": "Kawada Robotics"
+     },
+     {
+      "type": "company",
+      "name": "ROBOTIS"
+     },
+     {
+      "type": "company",
+      "name": "Rainbow Robotics"
+     }
+    ],
+    "map": [],
+    "followUpForm": null,
+    "markdown": "Asia is currently one of the strongest markets for commercially available humanoid robots, particularly China. Several manufacturers offer robots for research, education, industrial testing, and increasingly general-purpose applications.\n\nThe important distinction is between:\n\n- Purchase-ready robots: Available for direct purchase or commercial orders.\n- Research robots: Available to universities, laboratories, and developers.\n- Industrial humanoids: Primarily sold to companies for pilot projects and factory deployment.\n\nHere are the main manufacturers and models worth considering.\n\n## 1. Chinese humanoid robots available to buy\n\nIndicative prices in USD, November 2026. Actual prices depend on configuration, distributor and destination.\n\n1. Unitree G1\n\nAvailable to order\n\n- Manufacturer: Unitree Robotics, China\n- Height: approximately 132 cm\n- Price: approximately $13,500 and up\n- Application: AI research, robotics development, manipulation and education\n- One of the most accessible advanced humanoid platforms.\n\nPurchase reference: .\n\n2. Unitree R1\n\nAvailable to order\n\n- Manufacturer: Unitree Robotics, China\n- Height: approximately 123 cm\n- Price: approximately $4,900–$5,900\n- Application: education, development and experimentation\n- A relatively affordable entry into full-body humanoid robotics.\n\n3. EngineAI PM01\n\nCommercial orders\n\n- Manufacturer: EngineAI, Shenzhen, China\n- Height: approximately 138–140 cm\n- Indicative reseller price: €18,824\n- Application: research, AI development and humanoid movement experiments.\n\nPurchase reference: .\n\n4. Fourier GR-1\n\n- Manufacturer: Fourier Intelligence, Shanghai, China\n- Height: approximately 165 cm\n- Indicative reseller price: €37,647\n- Application: rehabilitation research, human-robot interaction and research laboratories.\n\nPurchase reference: .\n\n5. Booster T1\n\n- Manufacturer: Booster Robotics, China\n- Height: approximately 118 cm\n- Indicative reseller price: €34,545\n- Application: robotics education, programming, research and robot competitions.\n\nPurchase reference: .\n\nOther Chinese manufacturers worth investigating:\n\n- AgiBot – A2 and Lingxi series.\n- LimX Dynamics – Oli and TRON.\n- UBTECH Robotics – Walker S series.\n- EngineAI – T800.\n- Dobot Robotics – Atom.\n\nSome of these are sold through enterprise contracts rather than straightforward online checkout. [Which humanoid robot can you actually buy?](https://humanoid.observer/)[Humanoid robots for sale (2026): every price, and which you can buy](https://humanoidvs.com/humanoid-robots-for-sale)[Every humanoid robot that matters, compared](https://www.thehumanoid.report/robots/)[Humanoid robot: models, prices, uses](https://robot-distribution.com/en/robots/humanoids?brand=leju-robotics)\n\n## 2. Other Asian manufacturers\n\n| Country | Manufacturer | Relevant robots |\n| --- | --- | --- |\n| Japan | Kondo Kagaku | KHR-3HV |\n| Japan | Kawada Robotics | NEXTAGE |\n| South Korea | ROBOTIS | OP3, MINI |\n| South Korea | Rainbow Robotics | RB-Y1 |\n\nThese are worth investigating, particularly if you want an Asian supplier outside China. However, availability, production status and suitability vary considerably. [Which humanoid robot can you actually buy?](https://humanoid.observer/)[Humanoid Robots — Buy from OEMs (China, USA, UK, AU) 2026](https://www.botsales.com/humanoids)\n\n## 3. Price comparison\n\n| Model | Indicative price | Best suited for |\n| --- | --- | --- |\n| Unitree R1 | $4,900–5,900 | Entry-level development |\n| Unitree G1 | From $13,500 | Advanced research |\n| EngineAI PM01 | Around $20,000+ | Research and development |\n| Fourier GR-1 | Around $40,000+ | Human interaction research |\n| Booster T1 | Around $35,000+ | Education and competitions |\n\nPrices are indicative rather than confirmed quotations. [Humanoid Robots for Sale: Prices and Who Sells (2026)](https://www.hardwaremap.com/blog/humanoid-robots-for-sale)[Humanoid robots for sale (2026): every price, and which you can buy](https://humanoidvs.com/humanoid-robots-for-sale)[Humanoid Robot Prices 2026: Every Model We Track](https://www.antarum.ai/humanoid-robot-prices/)[Humanoid robot: models, prices, uses](https://robot-distribution.com/en/robots/humanoids?brand=leju-robotics)\n\n## 4. Where to purchase\n\nThe main purchasing channels are:\n\n- [Unitree Robotics](https://www.unitree.com/?utm_source=chatgpt.com) – Manufacturer and product ordering.\n- [EngineAI](https://www.engineai.com.cn/?utm_source=chatgpt.com) – Shenzhen-based manufacturer.\n- [Fourier Intelligence](https://www.fftai.com/?utm_source=chatgpt.com) – Humanoid and rehabilitation robotics.\n- [Booster Robotics](https://www.boosterobotics.com/?utm_source=chatgpt.com) – Educational and research humanoids.\n- [AgiBot](https://www.agibot.com/?utm_source=chatgpt.com) – Chinese humanoid robotics manufacturer.\n\nFor international orders, check shipping to your country, export restrictions, CE certification where applicable, warranty coverage, spare parts and software support.\n\n## 5. My recommendation\n\nIf the objective is to acquire a working humanoid robot rather than simply invest in a demonstration model:\n\n- Under $10,000: Unitree R1.\n- $10,000–$20,000: Unitree G1.\n- $20,000–$40,000: EngineAI PM01 or Booster T1.\n- Above $40,000: Fourier GR-1 or larger industrial platforms.\n\n## One important question\n\nWhat is your intended application?\n\n1. Industrial use – factory work, logistics, assembly and material handling.\n2. Research and development – AI, machine learning, robotics programming.\n3. Commercial use – reception, customer service, hotels and exhibitions.\n4. Personal use – home assistance and general-purpose humanoid robotics.\n5. Investment or distribution – purchasing robots in Asia for resale in Europe.\n\nI can narrow this down to manufacturers that actually accept orders, with pricing, technical specifications and purchasing contacts in Asia.",
+    "citationPills": [
+     {
+      "url": "https://humanoid.observer/",
+      "label": "Which humanoid robot can you actually buy?",
+      "domain": "humanoid.observer",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 2
+     },
+     {
+      "url": "https://humanoidvs.com/humanoid-robots-for-sale",
+      "label": "Humanoid robots for sale (2026): every price, and which you can buy",
+      "domain": "humanoidvs.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 1
+     },
+     {
+      "url": "https://www.thehumanoid.report/robots/",
+      "label": "Every humanoid robot that matters, compared",
+      "domain": "thehumanoid.report",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 4
+     },
+     {
+      "url": "https://robot-distribution.com/en/robots/humanoids?brand=leju-robotics",
+      "label": "Humanoid robot: models, prices, uses",
+      "domain": "robot-distribution.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 3
+     },
+     {
+      "url": "https://humanoid.observer/",
+      "label": "Which humanoid robot can you actually buy?",
+      "domain": "humanoid.observer",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 2
+     },
+     {
+      "url": "https://www.botsales.com/humanoids",
+      "label": "Humanoid Robots — Buy from OEMs (China, USA, UK, AU) 2026",
+      "domain": "botsales.com",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 5
+     },
+     {
+      "url": "https://www.hardwaremap.com/blog/humanoid-robots-for-sale",
+      "label": "Humanoid Robots for Sale: Prices and Who Sells (2026)",
+      "domain": "hardwaremap.com",
+      "type": "groupedWebpage",
+      "citationPillId": 2,
+      "position": 6
+     },
+     {
+      "url": "https://humanoidvs.com/humanoid-robots-for-sale",
+      "label": "Humanoid robots for sale (2026): every price, and which you can buy",
+      "domain": "humanoidvs.com",
+      "type": "groupedWebpage",
+      "citationPillId": 2,
+      "position": 1
+     },
+     {
+      "url": "https://www.antarum.ai/humanoid-robot-prices/",
+      "label": "Humanoid Robot Prices 2026: Every Model We Track",
+      "domain": "antarum.ai",
+      "type": "groupedWebpage",
+      "citationPillId": 2,
+      "position": 7
+     },
+     {
+      "url": "https://robot-distribution.com/en/robots/humanoids?brand=leju-robotics",
+      "label": "Humanoid robot: models, prices, uses",
+      "domain": "robot-distribution.com",
+      "type": "groupedWebpage",
+      "citationPillId": 2,
+      "position": 3
+     }
+    ]
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "e04d070e84074aadba9fc0f817d08c5b",
+   "charged_micro": 2800
+  }
+ }
+}

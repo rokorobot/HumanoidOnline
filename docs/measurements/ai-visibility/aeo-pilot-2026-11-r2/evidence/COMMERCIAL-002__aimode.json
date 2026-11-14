@@ -1,0 +1,151 @@
+{
+ "observed_at": "2026-11-14T07:17:57+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "Which humanoid robots are commercially available?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Several general-purpose and industrial humanoid robots have transitioned out of research labs and are commercially available for purchase, enterprise deployment, or developer integration.\n\nTop Commercially Available Humanoid Robots\n\nUnitree G1 (Unitree Robotics)\n\nType / Height: Bipedal compact humanoid (~ 1.3m)\nEstimated Price: From ~ $13,500 USD on the Unitree Official Shop (with higher-spec Edu/Ultimate tiers ranging up to $60,000+)\nOverview: One of the most affordable and widely accessible bipedal humanoids on the market, featuring force-controlled joints and AI-driven locomotion.\n\nUBTECH Walker S Series (UBTECH Robotics)\n\nType / Height: Full-scale industrial humanoid (~ 1.7m)\nEstimated Price: ~ $149,000 to $210,000 USD (available via specialized distributors like Robots International)\nOverview: Built specifically for smart manufacturing and automotive assembly lines (deployed with brands like NIO and BYD), featuring 41 force-feedback servo joints and LLM-based task planning.\n\nEngineAI T800 Pro (EngineAI)\n\nType / Height: Full-size bipedal humanoid\nEstimated Price: ~ $63,000 USD\nOverview: Positioned as an accessible mid-tier commercial and research platform for general-purpose physical tasks.\n\nAiMOGA Mornine M1 (AiMOGA)\n\nType / Height: Multilingual service-oriented humanoid\nEstimated Price: ~ $59,950 USD\nOverview: Designed primarily for public-facing commercial applications like retail, reception, and customer interaction.\n\nUBTECH Cruzr 1S (UBTECH Robotics)\n\nType / Height: Wheeled commercial service humanoid\nEstimated Price: ~ $12,000 to $16,000 USD\nOverview: A more budget-friendly, mobile (wheeled) alternative geared toward service, navigation, and interactive communication in commercial spaces.\n\nClone Robotics Protoclone\n\nType / Height: Bionic/anatomical musculoskeletal humanoid\nOverview: A European-built bio-inspired platform featuring fluid-actuated \"muscles\" and an artificial skeletal structure intended for high-dexterity research and specialized deployments.\n\nNot Yet Mass-Market Consumer Available\n\nBoston Dynamics Atlas (All-Electric): Deployed in pilot/industrial partnership settings (such as Hyundai plants), though not sold off-the-shelf as an open consumer product.\n\nTesla Optimus / Figure (Figure 01 & 02): Active in factory testing or pilot commercial trials, scaling toward commercial rollout rather than broad public/retail availability yet.\n\nAre you looking at these for industrial automation/factory work, software/AI research and development, or a commercial service/public-facing role? Let me know and I can narrow down the best fit.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Humanoid Robot - Unitree Shop",
+      "url": "https://shop.unitree.com/collections/humanoid-robot?srsltid=AYCX9vK_seSW1R41vjfzFyMbll12VBakTQCOhKXA4pVoFAv1DwdQnFiK",
+      "description": "From $750.00 USD · Humanoid Robot. R1. From $4,900.00 USD. Unitree H2. $29,900.00 USD. Dual-Arm Humanoid Robot.",
+      "redirectLink": "https://www.google.com/goto?url=CAESsQEBxCJF1ynaT08RrP9C1DCrl3fMRTDjMTTrWfOl06Kbqf8PVZiZJgEuK2QE-jVdzW6w62t7MsvV0i0jZu5tqY2ujRyCnottafoUAQx1Od2WHHMszUHdBBzzgxGpRplIITEqrIYdNTMd0UBx_pdyC7vi_dOyBYINcpEgtXrjMfwoeqkUcXGw2ZHaUuPnQoyZFXuTbIb3frj1Rp56SEkLSB7r3RP-l_u9vD7zcTRv7OCSPe8"
+     },
+     {
+      "position": 2,
+      "label": "5 INSANE Humanoid Robots You Can Actually Buy in 2026",
+      "url": "https://www.youtube.com/watch?v=wetRWg4xWA4",
+      "description": "Number three is the all-electric Boston Dynamics Atlas, standing 5 feet 9 inches and weighing 200 pounds, already working shifts a...",
+      "redirectLink": "https://www.google.com/goto?url=CAESaAHEIkXXkhxh5PmV2uL-nR5D8RY3tyg8qbaD7dSxb4ZW8UDcm20l7ogddQWmmnKMS9gib4J_QuKj2NDiFNdqEXLNhtMNIUIvUDip-BpV8x_fc2UbwkQ5buzhY1ZIVLTjHJXf51MI9yPY"
+     },
+     {
+      "position": 3,
+      "label": "Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International",
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm",
+      "description": "Humanoid Robots for Sale: Bipedal, Wheeled, Upper Body, and Bionic platforms from Unitree, AgiBot, UBTECH, EngineAI, Pudu, and AiM...",
+      "redirectLink": "https://www.google.com/goto?url=CAESdAHEIkXXMovgGO5QcO63_kynFxRcfjNhRfx3Z8ZrymvKE8kThezQOoPFtB3Nx_xOKmaPrV-mqFtGoDtqquMyTq3pybyNh9F0Sw2jxMl3vca3tdZERehN9PPn9IVacrNluRt3jNMzxI_fvoGFGTL2p4MM-nFJ"
+     },
+     {
+      "position": 4,
+      "label": "UBTECH Walker S Industrial Humanoid Robot",
+      "url": "https://sonnyrobotics.com/products/ubtech-robotics-walker-s?srsltid=AYCX9vIJ5oJryXKE_SSngvJr-m-2bwk_Y6AZ8l3GBluiWbJoXZ0F0ReX",
+      "description": "A 1.7m industrial humanoid with 41 force-feedback servo joints, RGBD vision, U-SLAM navigation, LLM AI, and 15kg payload. Height. ...",
+      "redirectLink": "https://www.google.com/goto?url=CAESuQEBxCJF1-qOAK3-3bROHWpQAVJlJvrtbw6AE020j511zifPR7U6ZzbWGAyu4Ec-L3HffEmHZNl3qqt9kNWAlFNdZ695m469IveyQtgtQJXvi4YX4MHOYNndplR4ElqtQSe0pB-GYqEMyCplwWPwb20xwPBzZZU8TTnCqmadiBWY6hd7cA6vzTosMUC34kwzESxqiEOBAVntDSK704TmwrTY__7jUP_sQdPhbp4uKGyb-uIyUcWj-ciSGA"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "5 INSANE Humanoid Robots You Can Actually Buy in 2026",
+      "citationPillId": 1,
+      "url": "https://www.youtube.com/watch?v=wetRWg4xWA4",
+      "domain": "youtube.com",
+      "description": "Number three is the all-electric Boston Dynamics Atlas, standing 5 feet 9 inches and weighing 200 pounds, already working shifts a...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESaAHEIkXXkhxh5PmV2uL-nR5D8RY3tyg8qbaD7dSxb4ZW8UDcm20l7ogddQWmmnKMS9gib4J_QuKj2NDiFNdqEXLNhtMNIUIvUDip-BpV8x_fc2UbwkQ5buzhY1ZIVLTjHJXf51MI9yPY"
+     },
+     {
+      "label": "Humanoid Robot - Unitree Shop",
+      "citationPillId": 2,
+      "url": "https://shop.unitree.com/collections/humanoid-robot?srsltid=AYCX9vK_seSW1R41vjfzFyMbll12VBakTQCOhKXA4pVoFAv1DwdQnFiK",
+      "domain": "shop.unitree.com",
+      "description": "From $750.00 USD · Humanoid Robot. R1. From $4,900.00 USD. Unitree H2. $29,900.00 USD. Dual-Arm Humanoid Robot.",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESsQEBxCJF1ynaT08RrP9C1DCrl3fMRTDjMTTrWfOl06Kbqf8PVZiZJgEuK2QE-jVdzW6w62t7MsvV0i0jZu5tqY2ujRyCnottafoUAQx1Od2WHHMszUHdBBzzgxGpRplIITEqrIYdNTMd0UBx_pdyC7vi_dOyBYINcpEgtXrjMfwoeqkUcXGw2ZHaUuPnQoyZFXuTbIb3frj1Rp56SEkLSB7r3RP-l_u9vD7zcTRv7OCSPe8"
+     },
+     {
+      "label": "Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International",
+      "citationPillId": 2,
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm",
+      "domain": "robotsinternational.com",
+      "description": "Humanoid Robots for Sale: Bipedal, Wheeled, Upper Body, and Bionic platforms from Unitree, AgiBot, UBTECH, EngineAI, Pudu, and AiM...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESdAHEIkXXMovgGO5QcO63_kynFxRcfjNhRfx3Z8ZrymvKE8kThezQOoPFtB3Nx_xOKmaPrV-mqFtGoDtqquMyTq3pybyNh9F0Sw2jxMl3vca3tdZERehN9PPn9IVacrNluRt3jNMzxI_fvoGFGTL2p4MM-nFJ"
+     },
+     {
+      "label": "Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International",
+      "citationPillId": 3,
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm",
+      "domain": "robotsinternational.com",
+      "description": "Humanoid Robots for Sale: Bipedal, Wheeled, Upper Body, and Bionic platforms from Unitree, AgiBot, UBTECH, EngineAI, Pudu, and AiM...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESdAHEIkXXMovgGO5QcO63_kynFxRcfjNhRfx3Z8ZrymvKE8kThezQOoPFtB3Nx_xOKmaPrV-mqFtGoDtqquMyTq3pybyNh9F0Sw2jxMl3vca3tdZERehN9PPn9IVacrNluRt3jNMzxI_fvoGFGTL2p4MM-nFJ"
+     },
+     {
+      "label": "UBTECH Walker S Industrial Humanoid Robot",
+      "citationPillId": 3,
+      "url": "https://sonnyrobotics.com/products/ubtech-robotics-walker-s?srsltid=AYCX9vIJ5oJryXKE_SSngvJr-m-2bwk_Y6AZ8l3GBluiWbJoXZ0F0ReX",
+      "domain": "sonnyrobotics.com",
+      "description": "A 1.7m industrial humanoid with 41 force-feedback servo joints, RGBD vision, U-SLAM navigation, LLM AI, and 15kg payload. Height. ...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAESuQEBxCJF1-qOAK3-3bROHWpQAVJlJvrtbw6AE020j511zifPR7U6ZzbWGAyu4Ec-L3HffEmHZNl3qqt9kNWAlFNdZ695m469IveyQtgtQJXvi4YX4MHOYNndplR4ElqtQSe0pB-GYqEMyCplwWPwb20xwPBzZZU8TTnCqmadiBWY6hd7cA6vzTosMUC34kwzESxqiEOBAVntDSK704TmwrTY__7jUP_sQdPhbp4uKGyb-uIyUcWj-ciSGA"
+     },
+     {
+      "label": "Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International",
+      "citationPillId": 4,
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm",
+      "domain": "robotsinternational.com",
+      "description": "Humanoid Robots for Sale: Bipedal, Wheeled, Upper Body, and Bionic platforms from Unitree, AgiBot, UBTECH, EngineAI, Pudu, and AiM...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESdAHEIkXXMovgGO5QcO63_kynFxRcfjNhRfx3Z8ZrymvKE8kThezQOoPFtB3Nx_xOKmaPrV-mqFtGoDtqquMyTq3pybyNh9F0Sw2jxMl3vca3tdZERehN9PPn9IVacrNluRt3jNMzxI_fvoGFGTL2p4MM-nFJ"
+     },
+     {
+      "label": "Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International",
+      "citationPillId": 5,
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm",
+      "domain": "robotsinternational.com",
+      "description": "Humanoid Robots for Sale: Bipedal, Wheeled, Upper Body, and Bionic platforms from Unitree, AgiBot, UBTECH, EngineAI, Pudu, and AiM...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESdAHEIkXXMovgGO5QcO63_kynFxRcfjNhRfx3Z8ZrymvKE8kThezQOoPFtB3Nx_xOKmaPrV-mqFtGoDtqquMyTq3pybyNh9F0Sw2jxMl3vca3tdZERehN9PPn9IVacrNluRt3jNMzxI_fvoGFGTL2p4MM-nFJ"
+     },
+     {
+      "label": "Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International",
+      "citationPillId": 6,
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm",
+      "domain": "robotsinternational.com",
+      "description": "Humanoid Robots for Sale: Bipedal, Wheeled, Upper Body, and Bionic platforms from Unitree, AgiBot, UBTECH, EngineAI, Pudu, and AiM...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESdAHEIkXXMovgGO5QcO63_kynFxRcfjNhRfx3Z8ZrymvKE8kThezQOoPFtB3Nx_xOKmaPrV-mqFtGoDtqquMyTq3pybyNh9F0Sw2jxMl3vca3tdZERehN9PPn9IVacrNluRt3jNMzxI_fvoGFGTL2p4MM-nFJ"
+     },
+     {
+      "label": "5 INSANE Humanoid Robots You Can Actually Buy in 2026",
+      "citationPillId": 7,
+      "url": "https://www.youtube.com/watch?v=wetRWg4xWA4",
+      "domain": "youtube.com",
+      "description": "Number three is the all-electric Boston Dynamics Atlas, standing 5 feet 9 inches and weighing 200 pounds, already working shifts a...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESaAHEIkXXkhxh5PmV2uL-nR5D8RY3tyg8qbaD7dSxb4ZW8UDcm20l7ogddQWmmnKMS9gib4J_QuKj2NDiFNdqEXLNhtMNIUIvUDip-BpV8x_fc2UbwkQ5buzhY1ZIVLTjHJXf51MI9yPY"
+     },
+     {
+      "label": "5 INSANE Humanoid Robots You Can Actually Buy in 2026",
+      "citationPillId": 8,
+      "url": "https://www.youtube.com/watch?v=wetRWg4xWA4",
+      "domain": "youtube.com",
+      "description": "Number three is the all-electric Boston Dynamics Atlas, standing 5 feet 9 inches and weighing 200 pounds, already working shifts a...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESaAHEIkXXkhxh5PmV2uL-nR5D8RY3tyg8qbaD7dSxb4ZW8UDcm20l7ogddQWmmnKMS9gib4J_QuKj2NDiFNdqEXLNhtMNIUIvUDip-BpV8x_fc2UbwkQ5buzhY1ZIVLTjHJXf51MI9yPY"
+     }
+    ],
+    "markdown": "Several general-purpose and industrial humanoid robots have transitioned out of research labs and are commercially available for purchase, enterprise deployment, or developer integration. [5 INSANE Humanoid Robots You Can Actually Buy in 2026](https://www.youtube.com/watch?v=wetRWg4xWA4)\n\n* * *\n\nTop Commercially Available Humanoid Robots\n\n  * **Unitree G1 (Unitree Robotics)**\n    * **Type / Height:** Bipedal compact humanoid (~ 1.3m)\n    * **Estimated Price:** From ~ $13,500 USD on the [Unitree Official Shop](https://shop.unitree.com/collections/humanoid-robot?srsltid=AYCX9vK_seSW1R41vjfzFyMbll12VBakTQCOhKXA4pVoFAv1DwdQnFiK) (with higher-spec Edu/Ultimate tiers ranging up to $60,000+)\n    * **Overview:** One of the most affordable and widely accessible bipedal humanoids on the market, featuring force-controlled joints and AI-driven locomotion. [Humanoid Robot - Unitree Shop](https://shop.unitree.com/collections/humanoid-robot?srsltid=AYCX9vK_seSW1R41vjfzFyMbll12VBakTQCOhKXA4pVoFAv1DwdQnFiK)[Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International](https://www.robotsinternational.com/Humanoid-Robots.htm)\n\n  * **UBTECH Walker S Series (UBTECH Robotics)**\n    * **Type / Height:** Full-scale industrial humanoid (~ 1.7m)\n    * **Estimated Price:** ~ $149,000 to $210,000 USD (available via specialized distributors like [Robots International](https://www.robotsinternational.com/Humanoid-Robots.htm))\n    * **Overview:** Built specifically for smart manufacturing and automotive assembly lines (deployed with brands like NIO and BYD), featuring 41 force-feedback servo joints and LLM-based task planning. [Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International](https://www.robotsinternational.com/Humanoid-Robots.htm)[UBTECH Walker S Industrial Humanoid Robot](https://sonnyrobotics.com/products/ubtech-robotics-walker-s?srsltid=AYCX9vIJ5oJryXKE_SSngvJr-m-2bwk_Y6AZ8l3GBluiWbJoXZ0F0ReX)\n\n  * **EngineAI T800 Pro (EngineAI)**\n    * **Type / Height:** Full-size bipedal humanoid\n    * **Estimated Price:** ~ $63,000 USD\n    * **Overview:** Positioned as an accessible mid-tier commercial and research platform for general-purpose physical tasks. [Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International](https://www.robotsinternational.com/Humanoid-Robots.htm)\n\n  * **AiMOGA Mornine M1 (AiMOGA)**\n    * **Type / Height:** Multilingual service-oriented humanoid\n    * **Estimated Price:** ~ $59,950 USD\n    * **Overview:** Designed primarily for public-facing commercial applications like retail, reception, and customer interaction. [Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International](https://www.robotsinternational.com/Humanoid-Robots.htm)\n\n  * **UBTECH Cruzr 1S (UBTECH Robotics)**\n    * **Type / Height:** Wheeled commercial service humanoid\n    * **Estimated Price:** ~ $12,000 to $16,000 USD\n    * **Overview:** A more budget-friendly, mobile (wheeled) alternative geared toward service, navigation, and interactive communication in commercial spaces. [Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International](https://www.robotsinternational.com/Humanoid-Robots.htm)\n\n  * **Clone Robotics Protoclone**\n    * **Type / Height:** Bionic/anatomical musculoskeletal humanoid\n    * **Overview:** A European-built bio-inspired platform featuring fluid-actuated \"muscles\" and an artificial skeletal structure intended for high-dexterity research and specialized deployments. [5 INSANE Humanoid Robots You Can Actually Buy in 2026](https://www.youtube.com/watch?v=wetRWg4xWA4)\n\n* * *\n\nNot Yet Mass-Market Consumer Available\n\n  * **Boston Dynamics Atlas (All-Electric):** Deployed in pilot/industrial partnership settings (such as Hyundai plants), though not sold off-the-shelf as an open consumer product. [5 INSANE Humanoid Robots You Can Actually Buy in 2026](https://www.youtube.com/watch?v=wetRWg4xWA4)\n\n  * **Tesla Optimus / Figure (Figure 01 & 02):** Active in factory testing or pilot commercial trials, scaling toward commercial rollout rather than broad public/retail availability yet.\n\nAre you looking at these for **industrial automation/factory work**, **software/AI research and development**, or a **commercial service/public-facing role**? Let me know and I can narrow down the best fit."
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "6642130960fc4843a395676d52b554bc",
+   "charged_micro": 2400
+  }
+ }
+}

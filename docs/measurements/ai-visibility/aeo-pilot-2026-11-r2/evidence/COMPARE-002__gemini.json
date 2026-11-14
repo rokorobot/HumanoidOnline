@@ -1,0 +1,124 @@
+{
+ "observed_at": "2026-11-14T07:19:42+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "Unitree G1 vs Booster K1.",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Both the Unitree G1 and the Booster K1 are compact, highly capable humanoid robots designed for research, education, and AI development, but they target slightly different form factors and performance tiers.\n\nCore Specifications Comparison\n\nFeature\nUnitree G1\nBooster K1\nHeight\n~127 cm (approx. 4.2 ft)\n~95 cm (approx. 3.1 ft)\nWeight\n~35 kg\n~19.5 kg\nDegrees of Freedom (DoF)\n23 (standard) up to 43+\n22 (Head: 2, Arms: 4×2, Legs: 6×2)\nKnee Torque\n~90 N·m (standard) / up to 120 N·m\n60 N·m\nPerception Suite\nLivox MID360 3D LiDAR + Depth Camera (e.g., RealSense D435i)\nWide-angle stereo/depth camera + 9-axis IMU\nAI Computing\n8-core CPU (Optional Jetson Orin modules in EDU versions)\nScalable options: 48, 117, or up to 200 TOPS (Qualcomm or Jetson Orin NX/AGX)\nBattery Life\n~2 hours\n~30 mins (2Ah) to ~80 mins (5Ah)\n\nKey Differences\n\nSize and Portability:\n\nThe Booster K1 is smaller and lighter (95 cm, 19.5 kg), making it exceptionally portable, desktop-friendly, and easy to transport in a case between classrooms or labs.\n\nThe Unitree G1 is taller and heavier (~1.27 m, 35 kg), aligning closer to a miniature adult human profile with higher torque capacity and more robust physical presence.\n\nSensors and Navigation:\n\nUnitree equips the G1 with a Livox MID360 3D LiDAR alongside depth cameras, giving it heavy-duty mapping and spatial awareness suited for complex environment navigation.\n\nThe K1 relies on a robust stereo/depth vision system and a 9-axis IMU, optimized for standard indoor research, lab environments, and platform competitions like RoboCup.\n\nActuation and Dexterity:\n\nThe G1 offers higher joint flexibility options (up to 43 DoF variants) and advanced hand configurations (including three-finger or five-finger dexterous hands).\n\nThe K1 features a balanced 22 DoF setup with torque-controlled smart servos designed for stable bipedal walking and foundational locomotion research.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Edu%2FPro%3A%2012%2Dmonth%20warranty%20%2B%201%2Dyear%20technical%20support,in%20a%20compact%2C%20ready%2Dto%2Duse%20format.%20%EE%97%87%20%EE%97%85",
+      "description": " Edu/Pro: 12-month warranty + 1-year technical support (response within 24 \nbusiness hours). The Booster K1 is a humanoid robot designed for education, \nresearch,..."
+     },
+     {
+      "position": 2,
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=The%20Booster%20K1%20was%20designed%20for%20practical,enable%20smooth%20motion%20and%20realistic%20locomotion%20scenarios.",
+      "description": "The Booster K1 was designed for practical use in academic environments. Its \ncompact format makes it easy to move between classrooms, laboratories, demo \nspaces a..."
+     },
+     {
+      "position": 3,
+      "label": "Unitree G1",
+      "url": "https://www.unitree.com/g1#:~:text=About%2035kg%2B%20*%20Total%20Degrees%20of%20Freedom%EF%BC%88Joint,thumb%20has%203%20active%20degrees%20of%20freedom%3B",
+      "description": "About 35kg+ * Total Degrees of Freedom（Joint Freedom） 23. 23 - 43. * Single \nLeg Degrees of Freedom. 6. 6. * Waist Degrees of Freedom. 1. 1+(Optional 2 \nadditiona..."
+     },
+     {
+      "position": 4,
+      "label": "Overview | Unitree G1 - QRE DOCS",
+      "url": "https://docs.quadruped.de/projects/g1/html/g1_overview.html#:~:text=This%20lidar%20employs%20omnidirectional%20and%20full%2Dangle%20scanning,comprehensive%20spatial%20awareness.%20MID360%20Laser%20Radar%20FOV.",
+      "description": "This lidar employs omnidirectional and full-angle scanning technology, \nachieving a horizontal field of view (FOV) of up to 360° and a maximum \nvertical angle of ..."
+     },
+     {
+      "position": 5,
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Embedded%20AI%20computing%3A%2048%2C%20117%20or%20200,STEM%20education%2C%20research%2C%20embedded%20AI%2C%20demonstrations%2C%20RoboCup.",
+      "description": "Embedded AI computing: 48, 117 or 200 TOPS depending on the version. \nIntegrated sensors: stereo / depth camera, 9-axis IMU, microphone array, \nspeaker. Software ..."
+     },
+     {
+      "position": 6,
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Key%20features%20of%20the%20Booster%20K1%20humanoid,Connectivity%3A%20Wi%2DFi%206%2C%20Bluetooth%205.2%2C%20Gigabit%20Ethernet.",
+      "description": "Key features of the Booster K1 humanoid robot. Compact humanoid: 95 cm, \n19.5 kg. 22 DoF: smooth motion, biped locomotion and articulated control. \nTorque-control..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Edu%2FPro%3A%2012%2Dmonth%20warranty%20%2B%201%2Dyear%20technical%20support,in%20a%20compact%2C%20ready%2Dto%2Duse%20format.%20%EE%97%87%20%EE%97%85",
+      "domain": "generationrobots.com",
+      "position": 1,
+      "description": " Edu/Pro: 12-month warranty + 1-year technical support (response within 24 \nbusiness hours). The Booster K1 is a humanoid robot designed for education, \nresearch,...",
+      "citationPillId": 1
+     },
+     {
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=The%20Booster%20K1%20was%20designed%20for%20practical,enable%20smooth%20motion%20and%20realistic%20locomotion%20scenarios.",
+      "domain": "generationrobots.com",
+      "position": 2,
+      "description": "The Booster K1 was designed for practical use in academic environments. Its \ncompact format makes it easy to move between classrooms, laboratories, demo \nspaces a...",
+      "citationPillId": 2
+     },
+     {
+      "label": "Unitree G1",
+      "url": "https://www.unitree.com/g1#:~:text=About%2035kg%2B%20*%20Total%20Degrees%20of%20Freedom%EF%BC%88Joint,thumb%20has%203%20active%20degrees%20of%20freedom%3B",
+      "domain": "unitree.com",
+      "position": 3,
+      "description": "About 35kg+ * Total Degrees of Freedom（Joint Freedom） 23. 23 - 43. * Single \nLeg Degrees of Freedom. 6. 6. * Waist Degrees of Freedom. 1. 1+(Optional 2 \nadditiona...",
+      "citationPillId": 3
+     },
+     {
+      "label": "Overview | Unitree G1 - QRE DOCS",
+      "url": "https://docs.quadruped.de/projects/g1/html/g1_overview.html#:~:text=This%20lidar%20employs%20omnidirectional%20and%20full%2Dangle%20scanning,comprehensive%20spatial%20awareness.%20MID360%20Laser%20Radar%20FOV.",
+      "domain": "docs.quadruped.de",
+      "position": 4,
+      "description": "This lidar employs omnidirectional and full-angle scanning technology, \nachieving a horizontal field of view (FOV) of up to 360° and a maximum \nvertical angle of ...",
+      "citationPillId": 4
+     },
+     {
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Embedded%20AI%20computing%3A%2048%2C%20117%20or%20200,STEM%20education%2C%20research%2C%20embedded%20AI%2C%20demonstrations%2C%20RoboCup.",
+      "domain": "generationrobots.com",
+      "position": 5,
+      "description": "Embedded AI computing: 48, 117 or 200 TOPS depending on the version. \nIntegrated sensors: stereo / depth camera, 9-axis IMU, microphone array, \nspeaker. Software ...",
+      "citationPillId": 5
+     },
+     {
+      "label": "Unitree G1",
+      "url": "https://www.unitree.com/g1#:~:text=About%2035kg%2B%20*%20Total%20Degrees%20of%20Freedom%EF%BC%88Joint,thumb%20has%203%20active%20degrees%20of%20freedom%3B",
+      "domain": "unitree.com",
+      "position": 3,
+      "description": "About 35kg+ * Total Degrees of Freedom（Joint Freedom） 23. 23 - 43. * Single \nLeg Degrees of Freedom. 6. 6. * Waist Degrees of Freedom. 1. 1+(Optional 2 \nadditiona...",
+      "citationPillId": 6
+     },
+     {
+      "label": "Booster K1 humanoid robot | Generation Robots",
+      "url": "https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Key%20features%20of%20the%20Booster%20K1%20humanoid,Connectivity%3A%20Wi%2DFi%206%2C%20Bluetooth%205.2%2C%20Gigabit%20Ethernet.",
+      "domain": "generationrobots.com",
+      "position": 6,
+      "description": "Key features of the Booster K1 humanoid robot. Compact humanoid: 95 cm, \n19.5 kg. 22 DoF: smooth motion, biped locomotion and articulated control. \nTorque-control...",
+      "citationPillId": 7
+     }
+    ],
+    "markdown": "Both the **Unitree G1** and the **Booster K1** are compact, highly capable humanoid robots designed for research, education, and AI development, but they target slightly different form factors and performance tiers. [Booster K1 humanoid robot | Generation Robots](https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Edu%2FPro%3A%2012%2Dmonth%20warranty%20%2B%201%2Dyear%20technical%20support,in%20a%20compact%2C%20ready%2Dto%2Duse%20format.%20%EE%97%87%20%EE%97%85)\n\n### Core Specifications Comparison\n\n| Feature | Unitree G1 | Booster K1 |\n|------------------------------|---------------------------------------------------------------|-------------------------------------------------------------------------------|\n| **Height** |  ~127 cm (approx. 4.2 ft) | ~95 cm (approx. 3.1 ft) |\n| **Weight** |  ~35 kg | ~19.5 kg |\n| **Degrees of Freedom (DoF)** |  23 (standard) up to 43+ | 22 (Head: 2, Arms: 4×2, Legs: 6×2) |\n| **Knee Torque** |  ~90 N·m (standard) / up to 120 N·m | 60 N·m |\n| **Perception Suite** |  Livox MID360 3D LiDAR + Depth Camera (e.g., RealSense D435i) | Wide-angle stereo/depth camera + 9-axis IMU |\n| **AI Computing** |  8-core CPU (Optional Jetson Orin modules in EDU versions) | Scalable options: 48, 117, or up to 200 TOPS (Qualcomm or Jetson Orin NX/AGX) |\n| **Battery Life** |  ~2 hours | ~30 mins (2Ah) to ~80 mins (5Ah) |\n\n### Key Differences\n\n  * **Size and Portability:**\n\n * The **Booster K1** is smaller and lighter (95 cm, 19.5 kg), making it exceptionally portable, desktop-friendly, and easy to transport in a case between classrooms or labs. [Booster K1 humanoid robot | Generation Robots](https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=The%20Booster%20K1%20was%20designed%20for%20practical,enable%20smooth%20motion%20and%20realistic%20locomotion%20scenarios.)\n\n * The **Unitree G1** is taller and heavier (~1.27 m, 35 kg), aligning closer to a miniature adult human profile with higher torque capacity and more robust physical presence. [Unitree G1](https://www.unitree.com/g1#:~:text=About%2035kg%2B%20*%20Total%20Degrees%20of%20Freedom%EF%BC%88Joint,thumb%20has%203%20active%20degrees%20of%20freedom%3B)\n\n  * **Sensors and Navigation:**\n\n * Unitree equips the G1 with a **Livox MID360 3D LiDAR** alongside depth cameras, giving it heavy-duty mapping and spatial awareness suited for complex environment navigation. [Overview | Unitree G1 - QRE DOCS](https://docs.quadruped.de/projects/g1/html/g1_overview.html#:~:text=This%20lidar%20employs%20omnidirectional%20and%20full%2Dangle%20scanning,comprehensive%20spatial%20awareness.%20MID360%20Laser%20Radar%20FOV.)\n\n * The K1 relies on a robust stereo/depth vision system and a 9-axis IMU, optimized for standard indoor research, lab environments, and platform competitions like RoboCup. [Booster K1 humanoid robot | Generation Robots](https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Embedded%20AI%20computing%3A%2048%2C%20117%20or%20200,STEM%20education%2C%20research%2C%20embedded%20AI%2C%20demonstrations%2C%20RoboCup.)\n\n  * **Actuation and Dexterity:**\n\n * The G1 offers higher joint flexibility options (up to 43 DoF variants) and advanced hand configurations (including three-finger or five-finger dexterous hands). [Unitree G1](https://www.unitree.com/g1#:~:text=About%2035kg%2B%20*%20Total%20Degrees%20of%20Freedom%EF%BC%88Joint,thumb%20has%203%20active%20degrees%20of%20freedom%3B)\n\n * The K1 features a balanced 22 DoF setup with torque-controlled smart servos designed for stable bipedal walking and foundational locomotion research. [Booster K1 humanoid robot | Generation Robots](https://www.generationrobots.com/en/404324-booster-k1-humanoid-robot.html#:~:text=Key%20features%20of%20the%20Booster%20K1%20humanoid,Connectivity%3A%20Wi%2DFi%206%2C%20Bluetooth%205.2%2C%20Gigabit%20Ethernet.)"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "8ad3ba6580f442fe9544ed8c0deefadb",
+   "charged_micro": 2400
+  }
+ }
+}

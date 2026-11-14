@@ -1,0 +1,110 @@
+{
+ "observed_at": "2026-11-14T07:20:44+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "How many commercial humanoid robots exist?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Assessing how many commercial humanoid robots exist depends on whether you look at annual shipments/sales or the total active deployed fleet. While traditional industrial robots (like robotic arms) number in the millions (>5 million operational globally), humanoid robots are still in an early commercial scaling phase.\n\nKey metrics and tracking data break down the landscape:\n\n1. Annual Shipments (Recent Sales)\n\n2025 Shipments: Industry trackers like IDC counted over 18,000 global humanoid robot shipments in 2025, while Omdia (using a more conservative, narrow definition) estimated around 13,000 units.\n\n2026 Projections: Analysts at TrendForce and market reports estimate global shipments for 2026 to scale past 50,000 units, heavily driven by manufacturing and pilot deployments in China and the US.\n\nIFR Data: The International Federation of Robotics (IFR) noted that around 7,000 units were sold globally in a prior baseline tracking period specifically for targeted industrial/professional humanoid use, reflecting how quickly definitions and pilot programs are expanding.\n\n2. Context vs. Traditional Robotics\n\nTotal Industrial Robots: To put humanoids in perspective, the broader industrial robotics market crossed 5 million operational units worldwide, with over 600,000 new units installed annually.\n\nHumanoid Share: Humanoids still represent a tiny fraction (<1%) of total commercial robotics, mostly deployed in controlled proof-of-concept environments, automotive assembly pilots, logistics warehouses, and research institutions rather than general autonomous labor.\n\nMajor Players Driving the Numbers\n\nThe commercial supply is heavily concentrated among a handful of key commercial developers and manufacturers:\n\nBoston Dynamics (Atlas - transitioning to commercial/industrial applications)\n\nTesla (Optimus - scaling internal factory pilots and external projections)\n\nFigure AI (Figure 01 / 02 deployed in partnership with BMW and others)\n\nAgility Robotics (Digit - deployed in logistics and warehouse trials with Amazon and GXO)\n\nUnitree Robotics & UBTECH (Leading high-volume commercial shipments out of China)\n\nWould you like to drill down into a specific company's deployment numbers, or are you looking for data on a particular region (like North America, China, or Europe)?",
+    "sources": [
+     {
+      "position": 1,
+      "label": "What is the real market size of humanoid robotics? - New Market Pitch",
+      "url": "https://newmarketpitch.com/blogs/news/humanoid-robotics-market-size",
+      "description": "Global humanoid robot shipments are now measured … it remains tiny beside conventional industrial robotics. IDC counted more than ...",
+      "redirectLink": "https://www.google.com/goto?url=CAESgAEBxCJF147gKOT2hoTFQdTxbKvBrHj7SzYoCWhJQnK3P7fKE3geqID34WbIJq6Sw5hRbgEtwDCvnGA6a246gj83_DVmss45539IV_Q3EzAwdZswAwMsD96PHbrj0oduFCRnQtM66Vf2wXPUuhEBlN07vvLHfaQkTkQZMDvktMu2JA"
+     },
+     {
+      "position": 2,
+      "label": "Five million robots now work in factories as humanoid hype faces reality check | Euronews",
+      "url": "https://www.euronews.com/2026/09/29/five-million-robots-now-work-in-factories-as-humanoid-hype-faces-reality-check",
+      "description": "Global Statistics: Operational industrial robots reached 5.08 million (9% increase); annual installations surpassed 600,000 units ...",
+      "redirectLink": "https://www.google.com/goto?url=CAESrwEBxCJF10W7j8QBm4qtrFUVIEHU2YjtIZs_iBQU4TqfI_YuogWLZBzNSGi6fh_Vsn3jhs31B5oOE0TgUKG7DQ37E_guQ0zJncAvK8IKKRhzHf4nC8Fywpxt13bj9bUYSvB7VDL5AnNgNFPijNLIXKMNdP-yGOH9m_GEbwCPlmgE3-ASr4Imzy5pkOx1S3cXHjoMKPl4IEc3RkHnx2qYOFHRCm1KwItxDYoBF29XnkkB"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "What is the real market size of humanoid robotics? - New Market Pitch",
+      "citationPillId": 1,
+      "url": "https://newmarketpitch.com/blogs/news/humanoid-robotics-market-size",
+      "domain": "newmarketpitch.com",
+      "description": "Global humanoid robot shipments are now measured … it remains tiny beside conventional industrial robotics. IDC counted more than ...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESgAEBxCJF147gKOT2hoTFQdTxbKvBrHj7SzYoCWhJQnK3P7fKE3geqID34WbIJq6Sw5hRbgEtwDCvnGA6a246gj83_DVmss45539IV_Q3EzAwdZswAwMsD96PHbrj0oduFCRnQtM66Vf2wXPUuhEBlN07vvLHfaQkTkQZMDvktMu2JA"
+     },
+     {
+      "label": "Five million robots now work in factories as humanoid hype faces reality check | Euronews",
+      "citationPillId": 1,
+      "url": "https://www.euronews.com/2026/09/29/five-million-robots-now-work-in-factories-as-humanoid-hype-faces-reality-check",
+      "domain": "euronews.com",
+      "description": "Global Statistics: Operational industrial robots reached 5.08 million (9% increase); annual installations surpassed 600,000 units ...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESrwEBxCJF10W7j8QBm4qtrFUVIEHU2YjtIZs_iBQU4TqfI_YuogWLZBzNSGi6fh_Vsn3jhs31B5oOE0TgUKG7DQ37E_guQ0zJncAvK8IKKRhzHf4nC8Fywpxt13bj9bUYSvB7VDL5AnNgNFPijNLIXKMNdP-yGOH9m_GEbwCPlmgE3-ASr4Imzy5pkOx1S3cXHjoMKPl4IEc3RkHnx2qYOFHRCm1KwItxDYoBF29XnkkB"
+     },
+     {
+      "label": "What is the real market size of humanoid robotics? - New Market Pitch",
+      "citationPillId": 2,
+      "url": "https://newmarketpitch.com/blogs/news/humanoid-robotics-market-size",
+      "domain": "newmarketpitch.com",
+      "description": "Global humanoid robot shipments are now measured … it remains tiny beside conventional industrial robotics. IDC counted more than ...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESgAEBxCJF147gKOT2hoTFQdTxbKvBrHj7SzYoCWhJQnK3P7fKE3geqID34WbIJq6Sw5hRbgEtwDCvnGA6a246gj83_DVmss45539IV_Q3EzAwdZswAwMsD96PHbrj0oduFCRnQtM66Vf2wXPUuhEBlN07vvLHfaQkTkQZMDvktMu2JA"
+     },
+     {
+      "label": "What is the real market size of humanoid robotics? - New Market Pitch",
+      "citationPillId": 3,
+      "url": "https://newmarketpitch.com/blogs/news/humanoid-robotics-market-size",
+      "domain": "newmarketpitch.com",
+      "description": "Global humanoid robot shipments are now measured … it remains tiny beside conventional industrial robotics. IDC counted more than ...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESgAEBxCJF147gKOT2hoTFQdTxbKvBrHj7SzYoCWhJQnK3P7fKE3geqID34WbIJq6Sw5hRbgEtwDCvnGA6a246gj83_DVmss45539IV_Q3EzAwdZswAwMsD96PHbrj0oduFCRnQtM66Vf2wXPUuhEBlN07vvLHfaQkTkQZMDvktMu2JA"
+     },
+     {
+      "label": "Five million robots now work in factories as humanoid hype faces reality check | Euronews",
+      "citationPillId": 4,
+      "url": "https://www.euronews.com/2026/09/29/five-million-robots-now-work-in-factories-as-humanoid-hype-faces-reality-check",
+      "domain": "euronews.com",
+      "description": "Global Statistics: Operational industrial robots reached 5.08 million (9% increase); annual installations surpassed 600,000 units ...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESrwEBxCJF10W7j8QBm4qtrFUVIEHU2YjtIZs_iBQU4TqfI_YuogWLZBzNSGi6fh_Vsn3jhs31B5oOE0TgUKG7DQ37E_guQ0zJncAvK8IKKRhzHf4nC8Fywpxt13bj9bUYSvB7VDL5AnNgNFPijNLIXKMNdP-yGOH9m_GEbwCPlmgE3-ASr4Imzy5pkOx1S3cXHjoMKPl4IEc3RkHnx2qYOFHRCm1KwItxDYoBF29XnkkB"
+     },
+     {
+      "label": "Five million robots now work in factories as humanoid hype faces reality check | Euronews",
+      "citationPillId": 5,
+      "url": "https://www.euronews.com/2026/09/29/five-million-robots-now-work-in-factories-as-humanoid-hype-faces-reality-check",
+      "domain": "euronews.com",
+      "description": "Global Statistics: Operational industrial robots reached 5.08 million (9% increase); annual installations surpassed 600,000 units ...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESrwEBxCJF10W7j8QBm4qtrFUVIEHU2YjtIZs_iBQU4TqfI_YuogWLZBzNSGi6fh_Vsn3jhs31B5oOE0TgUKG7DQ37E_guQ0zJncAvK8IKKRhzHf4nC8Fywpxt13bj9bUYSvB7VDL5AnNgNFPijNLIXKMNdP-yGOH9m_GEbwCPlmgE3-ASr4Imzy5pkOx1S3cXHjoMKPl4IEc3RkHnx2qYOFHRCm1KwItxDYoBF29XnkkB"
+     },
+     {
+      "label": "What is the real market size of humanoid robotics? - New Market Pitch",
+      "citationPillId": 6,
+      "url": "https://newmarketpitch.com/blogs/news/humanoid-robotics-market-size",
+      "domain": "newmarketpitch.com",
+      "description": "Global humanoid robot shipments are now measured … it remains tiny beside conventional industrial robotics. IDC counted more than ...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESgAEBxCJF147gKOT2hoTFQdTxbKvBrHj7SzYoCWhJQnK3P7fKE3geqID34WbIJq6Sw5hRbgEtwDCvnGA6a246gj83_DVmss45539IV_Q3EzAwdZswAwMsD96PHbrj0oduFCRnQtM66Vf2wXPUuhEBlN07vvLHfaQkTkQZMDvktMu2JA"
+     }
+    ],
+    "markdown": "Assessing how many **commercial humanoid robots** exist depends on whether you look at **annual shipments/sales** or the **total active deployed fleet**. While traditional industrial robots (like robotic arms) number in the millions (>5 million operational globally), humanoid robots are still in an early commercial scaling phase. [What is the real market size of humanoid robotics? - New Market Pitch](https://newmarketpitch.com/blogs/news/humanoid-robotics-market-size)[Five million robots now work in factories as humanoid hype faces reality check | Euronews](https://www.euronews.com/2026/09/29/five-million-robots-now-work-in-factories-as-humanoid-hype-faces-reality-check)\n\nKey metrics and tracking data break down the landscape:\n\n1\\. Annual Shipments (Recent Sales)\n\n  * **2025 Shipments:** Industry trackers like **IDC** counted over **18,000** global humanoid robot shipments in 2025, while **Omdia** (using a more conservative, narrow definition) estimated around **13,000** units. [What is the real market size of humanoid robotics? - New Market Pitch](https://newmarketpitch.com/blogs/news/humanoid-robotics-market-size)\n\n  * **2026 Projections:** Analysts at **TrendForce** and market reports estimate global shipments for 2026 to scale past **50,000 units**, heavily driven by manufacturing and pilot deployments in China and the US. [What is the real market size of humanoid robotics? - New Market Pitch](https://newmarketpitch.com/blogs/news/humanoid-robotics-market-size)\n\n  * **IFR Data:** The International Federation of Robotics (IFR) noted that around **7,000 units** were sold globally in a prior baseline tracking period specifically for targeted industrial/professional humanoid use, reflecting how quickly definitions and pilot programs are expanding. [Five million robots now work in factories as humanoid hype faces reality check | Euronews](https://www.euronews.com/2026/09/29/five-million-robots-now-work-in-factories-as-humanoid-hype-faces-reality-check)\n\n2\\. Context vs. Traditional Robotics\n\n  * **Total Industrial Robots:** To put humanoids in perspective, the broader industrial robotics market crossed **5 million operational units** worldwide, with over **600,000 new units** installed annually. [Five million robots now work in factories as humanoid hype faces reality check | Euronews](https://www.euronews.com/2026/09/29/five-million-robots-now-work-in-factories-as-humanoid-hype-faces-reality-check)\n\n  * **Humanoid Share:** Humanoids still represent a tiny fraction (<1%) of total commercial robotics, mostly deployed in controlled proof-of-concept environments, automotive assembly pilots, logistics warehouses, and research institutions rather than general autonomous labor. [What is the real market size of humanoid robotics? - New Market Pitch](https://newmarketpitch.com/blogs/news/humanoid-robotics-market-size)\n\nMajor Players Driving the Numbers\n\nThe commercial supply is heavily concentrated among a handful of key commercial developers and manufacturers:\n\n  * **Boston Dynamics** (Atlas - transitioning to commercial/industrial applications)\n\n  * **Tesla** (Optimus - scaling internal factory pilots and external projections)\n\n  * **Figure AI** (Figure 01 / 02 deployed in partnership with BMW and others)\n\n  * **Agility Robotics** (Digit - deployed in logistics and warehouse trials with Amazon and GXO)\n\n  * **Unitree Robotics & UBTECH** (Leading high-volume commercial shipments out of China)\n\nWould you like to drill down into a **specific company's deployment numbers**, or are you looking for data on a **particular region** (like North America, China, or Europe)?"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "78c2f9d9e38c4eb6a928849cd2f0d5e4",
+   "charged_micro": 2400
+  }
+ }
+}

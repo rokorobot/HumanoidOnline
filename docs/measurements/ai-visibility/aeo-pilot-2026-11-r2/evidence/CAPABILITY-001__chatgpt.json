@@ -1,0 +1,394 @@
+{
+ "observed_at": "2026-11-14T07:18:51+00:00",
+ "endpoint": "cloro.ai-search.chatgpt.scrape",
+ "request": {
+  "prompt": "Which humanoid robots have SDK access?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "model": null,
+    "text": "As of November 2026, several commercially available humanoid robots offer developer SDKs, APIs, or ROS 2 interfaces. The strongest options depend on whether you want to develop applications, control joints, build autonomous behaviors, or train your own AI models.\n\nThe important distinction is between:\n\nOpen SDK: Public documentation and development libraries.\n\nROS 2 access: Integration with the standard robotics middleware ecosystem.\n\nLow-level control: Direct access to motors, joints, sensors and actuators.\n\nCloud API: Remote control through a manufacturer's platform.\n\nResearch access: Development interfaces available through partnerships or research agreements.\n\nHumanoid robots with developer SDKs\n\n1. Unitree G1\n\nPublic SDK\n\nPython and C++ SDKs\n\nROS 2 support\n\nJoint and motion control\n\nReinforcement learning and simulation\n\nOpen-source developer repositories\n\nDocumentation: Unitree SDK · GitHub\n\n2. Unitree H1 / H2\n\nPublic SDK\n\nPython and C++ interfaces\n\nROS 2\n\nLow-level motor control\n\nLocomotion and motion-control development\n\nSimulation integration\n\nDocumentation: Unitree developer documentation\n\n3. Booster T1 / T2\n\nPublic SDK\n\nPython SDK\n\nC++ SDK\n\nDDS-based communication\n\nROS 2 interoperability\n\nJoint, trajectory and motion control\n\nSensor and camera data access\n\nDocumentation: Python SDK · C++ SDK\n\n4. LimX Oli\n\nPublic SDK\n\nFull Python development\n\nModular SDK\n\nHigh- and low-level interfaces\n\nURDF model\n\nJoint and end-effector control\n\nAI and reinforcement-learning research\n\nDocumentation: Oli developer FAQ · Documentation center\n\n5. AGIBOT X2\n\nPublic SDK\n\nAimDK development platform\n\nDownloadable SDK\n\nURDF models\n\nROS-based development\n\nEducation and research configurations\n\nDocumentation: AimDK X2 SDK\n\nOther platforms worth investigating\n\nRobot\n\nManufacturer\n\nSDK situation\n\nGR-3\n\nFourier\n\nOfficial SDK\n\nGalbot G1\n\nGalbot\n\nOfficial SDK\n\nAstribot S1\n\nAstribot\n\nOfficial SDK\n\nNoetix Bumi\n\nNoetix\n\nOfficial SDK\n\nNoetix E1\n\nNoetix\n\nOfficial SDK\n\nLimX TRON 1 / 2\n\nLimX\n\nOpen SDK\n\nThese have published development support, although access conditions and the extent of publicly available documentation vary.\n\nRobots without publicly documented general-purpose SDKs\n\nThese are notable platforms, but I would not assume unrestricted third-party development access:\n\nTesla Optimus\n\nBoston Dynamics Atlas\n\n1X NEO\n\nFigure 03\n\nAgility Digit\n\nThis means no publicly documented general-purpose SDK comparable to Unitree's, not necessarily that manufacturer or research-partner access is impossible.\n\nMy recommendation\n\nIf your goal is to build software that runs on a physical humanoid, I would shortlist these four:\n\nObjective\n\nBest starting point\n\nGeneral-purpose robotics development\n\nUnitree G1\n\nPython-first development\n\nLimX Oli\n\nROS 2 and C++ integration\n\nBooster T1\n\nAI research and manipulation\n\nAGIBOT X2\n\nOne important question\n\nWhat kind of SDK access are you looking for?\n\nI can then narrow this down to robots with genuinely usable developer access, rather than robots that merely advertise AI capabilities.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "GitHub",
+      "url": "https://github.com/unitreerobotics",
+      "footnote": false
+     },
+     {
+      "position": 2,
+      "label": "Unitree SDK",
+      "url": "https://support.unitree.com/home/en/developer/",
+      "footnote": false
+     },
+     {
+      "position": 3,
+      "label": "C++ SDK",
+      "url": "https://doc-dev.booster.tech/docs/developer-guide/cpp/sdk-overview/",
+      "footnote": false
+     },
+     {
+      "position": 4,
+      "label": "Python SDK",
+      "url": "https://docs.booster.tech/docs/developer-guide/booster-os-python-sdk/sdk-overview/",
+      "footnote": false
+     },
+     {
+      "position": 5,
+      "label": "Oli developer FAQ",
+      "url": "https://www.limxdynamics.com/en/products/oli/faq",
+      "footnote": false
+     },
+     {
+      "position": 6,
+      "label": "Documentation center",
+      "url": "https://www.limxdynamics.com/en/documents",
+      "footnote": false
+     },
+     {
+      "position": 7,
+      "label": "AimDK X2 SDK",
+      "url": "https://x2-aimdk.agibot.com/en/dev/get_sdk/index.html",
+      "footnote": false
+     },
+     {
+      "position": 8,
+      "label": "Humanoid robot database: 51 robots with specs and SDKs",
+      "url": "https://webuildhumanoids.com/robots",
+      "footnote": false
+     },
+     {
+      "position": 9,
+      "label": "GitHub - limxdynamics/limxdynamics: Official home of the LimX Dynamics open-source ecosystem — humanoid robots, legged robots, locomotion & manipulation, and embodied AI.",
+      "url": "https://github.com/limxdynamics/limxdynamics",
+      "footnote": false
+     },
+     {
+      "position": 10,
+      "label": "",
+      "url": "https://unitree.ru/products/g1/",
+      "footnote": true
+     },
+     {
+      "position": 11,
+      "label": "",
+      "url": "https://www.crkennedy.co.nz/products/uth1/unitree-h1-universal-humanoid-robot",
+      "footnote": true
+     },
+     {
+      "position": 12,
+      "label": "",
+      "url": "https://www.europasatellite.com/Booster-T1-Basic-Humanoid-Robot.htm",
+      "footnote": true
+     },
+     {
+      "position": 13,
+      "label": "",
+      "url": "https://www.maverickdrone.com/products/limx-oli-full-size-general-purpose-humanoid-robot",
+      "footnote": true
+     },
+     {
+      "position": 14,
+      "label": "",
+      "url": "https://robob2b.ru/catalog/roboty-gumanoidy/robot-gumanoid-agibot-x2/",
+      "footnote": true
+     },
+     {
+      "position": 15,
+      "label": "",
+      "url": "https://doc-dev.booster.tech/docs/developer-guide/booster-os-python-sdk/sdk-overview/",
+      "footnote": true
+     },
+     {
+      "position": 16,
+      "label": "",
+      "url": "https://doc-dev.booster.tech/docs/developer-guide/cpp/architecture/",
+      "footnote": true
+     },
+     {
+      "position": 17,
+      "label": "",
+      "url": "https://docs.booster.tech/developer-guide/",
+      "footnote": true
+     },
+     {
+      "position": 18,
+      "label": "",
+      "url": "https://github.com/BoosterRobotics/booster_robotics_sdk",
+      "footnote": true
+     },
+     {
+      "position": 19,
+      "label": "",
+      "url": "https://huggingface.co/docs/lerobot/unitree_g1",
+      "footnote": true
+     },
+     {
+      "position": 20,
+      "label": "",
+      "url": "https://manush.si/developers",
+      "footnote": true
+     },
+     {
+      "position": 21,
+      "label": "",
+      "url": "https://manush.si/developers/docs/getting-started-introduction",
+      "footnote": true
+     },
+     {
+      "position": 22,
+      "label": "",
+      "url": "https://shop.limxdynamics.com/pages/faq",
+      "footnote": true
+     },
+     {
+      "position": 23,
+      "label": "",
+      "url": "https://static.generation-robots.com/media/user-manual-booster-t1-en.pdf",
+      "footnote": true
+     },
+     {
+      "position": 24,
+      "label": "",
+      "url": "https://support.unitree.com/home/en/R1_developer/about_R1",
+      "footnote": true
+     },
+     {
+      "position": 25,
+      "label": "",
+      "url": "https://support.unitree.com/home/en/Z1_developer/use",
+      "footnote": true
+     },
+     {
+      "position": 26,
+      "label": "",
+      "url": "https://webuildhumanoids.com/guides/humanoid-development-tools",
+      "footnote": true
+     },
+     {
+      "position": 27,
+      "label": "",
+      "url": "https://webuildhumanoids.com/makers/booster-robotics",
+      "footnote": true
+     },
+     {
+      "position": 28,
+      "label": "",
+      "url": "https://www.limxdynamics.com/en/faq",
+      "footnote": true
+     },
+     {
+      "position": 29,
+      "label": "",
+      "url": "https://www.limxdynamics.com/en/faq?trk=article-ssr-frontend-pulse_little-text-block",
+      "footnote": true
+     },
+     {
+      "position": 30,
+      "label": "",
+      "url": "https://www.unitree.com/mobile/opensource/",
+      "footnote": true
+     },
+     {
+      "position": 31,
+      "label": "",
+      "url": "https://x2-aimdk.agibot.com/en/dev/quick_start/prerequisites.html",
+      "footnote": true
+     },
+     {
+      "position": 32,
+      "label": "",
+      "url": "https://x2-aimdk.agibot.com/en/latest/get_sdk/index.html",
+      "footnote": true
+     }
+    ],
+    "entities": [
+     {
+      "type": "product",
+      "name": "Unitree G1"
+     },
+     {
+      "type": "product",
+      "name": "Unitree H1 / H2"
+     },
+     {
+      "type": "product",
+      "name": "Booster T1 / T2"
+     },
+     {
+      "type": "product",
+      "name": "LimX Oli"
+     },
+     {
+      "type": "product",
+      "name": "AGIBOT X2"
+     },
+     {
+      "type": "product",
+      "name": "Tesla Optimus"
+     },
+     {
+      "type": "product",
+      "name": "Boston Dynamics Atlas"
+     },
+     {
+      "type": "product",
+      "name": "1X NEO"
+     },
+     {
+      "type": "product",
+      "name": "Figure 03"
+     },
+     {
+      "type": "product",
+      "name": "Agility Digit"
+     }
+    ],
+    "map": [],
+    "followUpForm": {
+     "questions": [
+      {
+       "label": "1. What do you want to develop?",
+       "type": "radio",
+       "options": [
+        {
+         "label": "Full robot control (motors, joints, movement)",
+         "value": "Full robot control (motors, joints, movement)",
+         "selected": true
+        },
+        {
+         "label": "AI agents and LLM integration",
+         "value": "AI agents and LLM integration",
+         "selected": false
+        },
+        {
+         "label": "Computer vision and autonomous manipulation",
+         "value": "Computer vision and autonomous manipulation",
+         "selected": false
+        },
+        {
+         "label": "Custom applications and skills",
+         "value": "Custom applications and skills",
+         "selected": false
+        },
+        {
+         "label": "Reinforcement learning and robotics research",
+         "value": "Reinforcement learning and robotics research",
+         "selected": false
+        }
+       ],
+       "name": "goal"
+      },
+      {
+       "label": "2. What level of access do you require?",
+       "type": "radio",
+       "options": [
+        {
+         "label": "Completely open SDK and source code",
+         "value": "Completely open SDK and source code",
+         "selected": true
+        },
+        {
+         "label": "Public API and Python SDK",
+         "value": "Public API and Python SDK",
+         "selected": false
+        },
+        {
+         "label": "ROS 2 access",
+         "value": "ROS 2 access",
+         "selected": false
+        },
+        {
+         "label": "Direct low-level hardware access",
+         "value": "Direct low-level hardware access",
+         "selected": false
+        },
+        {
+         "label": "Any developer access, including commercial agreements",
+         "value": "Any developer access, including commercial agreements",
+         "selected": false
+        }
+       ],
+       "name": "access"
+      },
+      {
+       "label": "3. Approximate hardware budget",
+       "type": "radio",
+       "options": [
+        {
+         "label": "Up to €10,000",
+         "value": "Up to €10,000",
+         "selected": false
+        },
+        {
+         "label": "Up to €30,000",
+         "value": "Up to €30,000",
+         "selected": true
+        },
+        {
+         "label": "€30,000–€100,000",
+         "value": "€30,000–€100,000",
+         "selected": false
+        },
+        {
+         "label": "Above €100,000",
+         "value": "Above €100,000",
+         "selected": false
+        },
+        {
+         "label": "No fixed budget",
+         "value": "No fixed budget",
+         "selected": false
+        }
+       ],
+       "name": "budget"
+      }
+     ],
+     "submitLabel": "Find the best humanoid robots",
+     "followUpPrompt": "Please shortlist humanoid robots based on these requirements: {goal}. SDK requirement: {access}. Budget: {budget}. Include official SDK links, access conditions, and hardware availability."
+    },
+    "markdown": "As of November 2026, several commercially available humanoid robots offer developer SDKs, APIs, or ROS 2 interfaces. The strongest options depend on whether you want to develop applications, control joints, build autonomous behaviors, or train your own AI models.\n\nThe important distinction is between:\n\n- Open SDK: Public documentation and development libraries.\n- ROS 2 access: Integration with the standard robotics middleware ecosystem.\n- Low-level control: Direct access to motors, joints, sensors and actuators.\n- Cloud API: Remote control through a manufacturer's platform.\n- Research access: Development interfaces available through partnerships or research agreements.\n\n## Humanoid robots with developer SDKs\n\n1. Unitree G1\n\nPublic SDK\n\n- Python and C++ SDKs\n- ROS 2 support\n- Joint and motion control\n- Reinforcement learning and simulation\n- Open-source developer repositories\n\nDocumentation: [Unitree SDK](https://support.unitree.com/home/en/developer/?utm_source=chatgpt.com) · [GitHub](https://github.com/unitreerobotics?utm_source=chatgpt.com)\n\n2. Unitree H1 / H2\n\nPublic SDK\n\n- Python and C++ interfaces\n- ROS 2\n- Low-level motor control\n- Locomotion and motion-control development\n- Simulation integration\n\nDocumentation: [Unitree developer documentation](https://support.unitree.com/home/en/developer/?utm_source=chatgpt.com)\n\n3. Booster T1 / T2\n\nPublic SDK\n\n- Python SDK\n- C++ SDK\n- DDS-based communication\n- ROS 2 interoperability\n- Joint, trajectory and motion control\n- Sensor and camera data access\n\nDocumentation: [Python SDK](https://docs.booster.tech/docs/developer-guide/booster-os-python-sdk/sdk-overview/?utm_source=chatgpt.com) · [C++ SDK](https://doc-dev.booster.tech/docs/developer-guide/cpp/sdk-overview/?utm_source=chatgpt.com)\n\n4. LimX Oli\n\nPublic SDK\n\n- Full Python development\n- Modular SDK\n- High- and low-level interfaces\n- URDF model\n- Joint and end-effector control\n- AI and reinforcement-learning research\n\nDocumentation: [Oli developer FAQ](https://www.limxdynamics.com/en/products/oli/faq?utm_source=chatgpt.com) · [Documentation center](https://www.limxdynamics.com/en/documents?utm_source=chatgpt.com)\n\n5. AGIBOT X2\n\nPublic SDK\n\n- AimDK development platform\n- Downloadable SDK\n- URDF models\n- ROS-based development\n- Education and research configurations\n\nDocumentation: [AimDK X2 SDK](https://x2-aimdk.agibot.com/en/dev/get_sdk/index.html?utm_source=chatgpt.com)\n\n## Other platforms worth investigating\n\n| Robot | Manufacturer | SDK situation |\n| --- | --- | --- |\n| GR-3 | Fourier | Official SDK |\n| Galbot G1 | Galbot | Official SDK |\n| Astribot S1 | Astribot | Official SDK |\n| Noetix Bumi | Noetix | Official SDK |\n| Noetix E1 | Noetix | Official SDK |\n| LimX TRON 1 / 2 | LimX | Open SDK |\n\nThese have published development support, although access conditions and the extent of publicly available documentation vary. [Humanoid robot database: 51 robots with specs and SDKs](https://webuildhumanoids.com/robots)[GitHub - limxdynamics/limxdynamics: Official home of the LimX Dynamics open-source ecosystem — humanoid robots, legged robots, locomotion & manipulation, and embodied AI.](https://github.com/limxdynamics/limxdynamics)[Documentation Center](https://www.limxdynamics.com/en/documents)\n\n## Robots without publicly documented general-purpose SDKs\n\nThese are notable platforms, but I would not assume unrestricted third-party development access:\n\n- Tesla Optimus\n- Boston Dynamics Atlas\n- 1X NEO\n- Figure 03\n- Agility Digit\n\nThis means no publicly documented general-purpose SDK comparable to Unitree's, not necessarily that manufacturer or research-partner access is impossible.\n\n## My recommendation\n\nIf your goal is to build software that runs on a physical humanoid, I would shortlist these four:\n\n| Objective | Best starting point |\n| --- | --- |\n| General-purpose robotics development | Unitree G1 |\n| Python-first development | LimX Oli |\n| ROS 2 and C++ integration | Booster T1 |\n| AI research and manipulation | AGIBOT X2 |\n\n## One important question\n\nWhat kind of SDK access are you looking for?\n\nI can then narrow this down to robots with genuinely usable developer access, rather than robots that merely advertise AI capabilities.",
+    "citationPills": [
+     {
+      "url": "https://webuildhumanoids.com/robots",
+      "label": "Humanoid robot database: 51 robots with specs and SDKs",
+      "domain": "webuildhumanoids.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 8
+     },
+     {
+      "url": "https://github.com/limxdynamics/limxdynamics",
+      "label": "GitHub - limxdynamics/limxdynamics: Official home of the LimX Dynamics open-source ecosystem — humanoid robots, legged robots, locomotion & manipulation, and embodied AI.",
+      "domain": "github.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 9
+     },
+     {
+      "url": "https://www.limxdynamics.com/en/documents",
+      "label": "Documentation Center",
+      "domain": "limxdynamics.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 6
+     }
+    ]
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "f3dbea01e9c84de28c1d319ed2d66c69",
+   "charged_micro": 2800
+  }
+ }
+}

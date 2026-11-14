@@ -1,0 +1,88 @@
+{
+ "observed_at": "2026-11-14T07:15:29+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "Which humanoid robots can be purchased in Europe?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Several humanoid robots can be purchased, ordered, or reserved for delivery in Europe, primarily catering to research institutions, developers, industrial pilot projects, and early adopters.\n\nThe options available in the European market generally fall into three main categories:\n\n1. Globally Available Commercial & Research Humanoids (Imported)\n\nThese are manufactured internationally (predominantly in China) but are readily accessible in Europe through local robotics distributors, specialized online automation marketplaces (such as RobotShop EU and RBTX), or regional integrators:\n\nUnitree Robotics (G1, H1, R1): Unitree's models are some of the most widely accessible bipedal and humanoid robots in Europe. The Unitree G1 (compact humanoid) and Unitree R1 are frequently stocked by European robotics suppliers for roughly €8,000 to €20,000+ depending on the configuration, while their heavier industrial/research versions (like the H-series) are available via quotation.\n\nAgibot (AgiBot G2, A2 Series): Distributed through select European robotics platforms and automation web shops for industrial and logistics pilot testing.\n\nBooster Robotics (K1 and T2 Series): Educational and professional humanoid platforms available via European specialized robotics retailers.\n\n2. European-Made Humanoids\n\nEurope has a fast-growing ecosystem of domestic humanoid developers, many of which sell directly to enterprise partners, research facilities, or take pre-orders:\n\n1X Technologies (NEO Beta / NEO Gamma): Headquartered in Norway, 1X builds bipedal humanoids focused on domestic and general-purpose assistance, deploying initial units to select markets.\n\nPollen Robotics (Reachy 2): Based in France, Pollen Robotics builds open-source upper-body humanoid platforms widely used for research and development, available commercially internationally and in Europe.\n\nNEURA Robotics (4NE1) & Agile Robots (Agile ONE): Based in Germany, these heavyweights build advanced humanoids targeted heavily at European industrial automation (partnering with major automotive and manufacturing firms). They typically require direct enterprise engagement, quotation, or pre-order commitments.\n\nPurchasing Considerations\n\nMost humanoid robots currently available on the open market in Europe are designated for R&D, educational use, or controlled industrial pilots (such as logistics sorting or manufacturing testing) rather than ready-to-use household consumer tasks. If you are looking to purchase one for a business or institution, they are typically sourced through specialized European robotics integrators or B2B marketplaces rather than standard retail channels.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Humanoid Robots | RBTX Marketplace",
+      "url": "https://rbtx.de/en-GB/components/humanoid#:~:text=Humanoid%20robots%20are%20currently%20used%20primarily%20in,other%20commercial%20sectors%20is%20expected%20to%20expand.",
+      "description": " Humanoid robots are currently used primarily in research, universities, \nindustrial pilot projects, service environments, trade shows and public \ndemonstrations...."
+     },
+     {
+      "position": 2,
+      "label": "Humanoid Robots | RBTX Marketplace",
+      "url": "https://rbtx.de/en-GB/components/humanoid#:~:text=Compare%20manufacturers%2C%20review%20technical%20specifications%2C%20explore%20AI%2Denabled,and%20future%20automation%20projects%E2%80%94all%20in%20one%20marketplace.",
+      "description": " Compare manufacturers, review technical specifications, explore AI-enabled \nrobotic platforms and find the right solution for research, education, \nindustrial in..."
+     },
+     {
+      "position": 3,
+      "label": "Humanoid Robots Available in the UK and Europe: 2026 Tracker",
+      "url": "https://robotharbour.com/humanoid-robots-uk-europe/#:~:text=RobotShop%20EU%20G1%2DBasic%20%E2%82%AC19%2C789.01%20including%20displayed%20tax.,EDU%20configuration%2C%20country%20delivery%20and%20support%20separately.",
+      "description": "RobotShop EU G1-Basic €19,789.01 including displayed tax. EDU separately \nquoted. | UK Current — Scan retailer route | Europe Current — RobotShop \nregional listin..."
+     },
+     {
+      "position": 4,
+      "label": "Professional Humanoid Robots - RobotShop",
+      "url": "https://eu.robotshop.com/collections/professional-humanoid-robots#:~:text=Unitree%20RoboticsUnitree%20R1%20EDU%20(U1)%20Humanoid%20Robot,SKU%3A%20RB%2DBoo%2D01.%20%E2%82%AC50.358%2C00.%20Discontinued.%20*%20On%20Demand.",
+      "description": "Unitree RoboticsUnitree R1 EDU (U1) Humanoid Robot (EU) SKU: RB-Unt-167. \n€15.972,00. * On Demand. Booster RoboticsBooster Robotics T2 Pro P3-3 w/ \nBrainCo Revo3 ..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Humanoid Robots | RBTX Marketplace",
+      "url": "https://rbtx.de/en-GB/components/humanoid#:~:text=Humanoid%20robots%20are%20currently%20used%20primarily%20in,other%20commercial%20sectors%20is%20expected%20to%20expand.",
+      "domain": "rbtx.de",
+      "position": 1,
+      "description": " Humanoid robots are currently used primarily in research, universities, \nindustrial pilot projects, service environments, trade shows and public \ndemonstrations....",
+      "citationPillId": 1
+     },
+     {
+      "label": "Humanoid Robots | RBTX Marketplace",
+      "url": "https://rbtx.de/en-GB/components/humanoid#:~:text=Compare%20manufacturers%2C%20review%20technical%20specifications%2C%20explore%20AI%2Denabled,and%20future%20automation%20projects%E2%80%94all%20in%20one%20marketplace.",
+      "domain": "rbtx.de",
+      "position": 2,
+      "description": " Compare manufacturers, review technical specifications, explore AI-enabled \nrobotic platforms and find the right solution for research, education, \nindustrial in...",
+      "citationPillId": 2
+     },
+     {
+      "label": "Humanoid Robots Available in the UK and Europe: 2026 Tracker",
+      "url": "https://robotharbour.com/humanoid-robots-uk-europe/#:~:text=RobotShop%20EU%20G1%2DBasic%20%E2%82%AC19%2C789.01%20including%20displayed%20tax.,EDU%20configuration%2C%20country%20delivery%20and%20support%20separately.",
+      "domain": "robotharbour.com",
+      "position": 3,
+      "description": "RobotShop EU G1-Basic €19,789.01 including displayed tax. EDU separately \nquoted. | UK Current — Scan retailer route | Europe Current — RobotShop \nregional listin...",
+      "citationPillId": 3
+     },
+     {
+      "label": "Professional Humanoid Robots - RobotShop",
+      "url": "https://eu.robotshop.com/collections/professional-humanoid-robots#:~:text=Unitree%20RoboticsUnitree%20R1%20EDU%20(U1)%20Humanoid%20Robot,SKU%3A%20RB%2DBoo%2D01.%20%E2%82%AC50.358%2C00.%20Discontinued.%20*%20On%20Demand.",
+      "domain": "eu.robotshop.com",
+      "position": 4,
+      "description": "Unitree RoboticsUnitree R1 EDU (U1) Humanoid Robot (EU) SKU: RB-Unt-167. \n€15.972,00. * On Demand. Booster RoboticsBooster Robotics T2 Pro P3-3 w/ \nBrainCo Revo3 ...",
+      "citationPillId": 4
+     }
+    ],
+    "markdown": "Several humanoid robots can be purchased, ordered, or reserved for delivery in Europe, primarily catering to research institutions, developers, industrial pilot projects, and early adopters. [Humanoid Robots | RBTX Marketplace](https://rbtx.de/en-GB/components/humanoid#:~:text=Humanoid%20robots%20are%20currently%20used%20primarily%20in,other%20commercial%20sectors%20is%20expected%20to%20expand.)\n\nThe options available in the European market generally fall into three main categories:\n\n### 1\\. Globally Available Commercial & Research Humanoids (Imported)\n\nThese are manufactured internationally (predominantly in China) but are readily accessible in Europe through local robotics distributors, specialized online automation marketplaces (such as RobotShop EU and RBTX), or regional integrators: [Humanoid Robots | RBTX Marketplace](https://rbtx.de/en-GB/components/humanoid#:~:text=Compare%20manufacturers%2C%20review%20technical%20specifications%2C%20explore%20AI%2Denabled,and%20future%20automation%20projects%E2%80%94all%20in%20one%20marketplace.)\n\n  * **Unitree Robotics (G1, H1, R1):** Unitree's models are some of the most widely accessible bipedal and humanoid robots in Europe. The **Unitree G1** (compact humanoid) and **Unitree R1** are frequently stocked by European robotics suppliers for roughly €8,000 to €20,000+ depending on the configuration, while their heavier industrial/research versions (like the H-series) are available via quotation. [Humanoid Robots Available in the UK and Europe: 2026 Tracker](https://robotharbour.com/humanoid-robots-uk-europe/#:~:text=RobotShop%20EU%20G1%2DBasic%20%E2%82%AC19%2C789.01%20including%20displayed%20tax.,EDU%20configuration%2C%20country%20delivery%20and%20support%20separately.)\n\n  * **Agibot (AgiBot G2, A2 Series):** Distributed through select European robotics platforms and automation web shops for industrial and logistics pilot testing.\n\n  * **Booster Robotics (K1 and T2 Series):** Educational and professional humanoid platforms available via European specialized robotics retailers. [Professional Humanoid Robots - RobotShop](https://eu.robotshop.com/collections/professional-humanoid-robots#:~:text=Unitree%20RoboticsUnitree%20R1%20EDU%20\\(U1\\)%20Humanoid%20Robot,SKU%3A%20RB%2DBoo%2D01.%20%E2%82%AC50.358%2C00.%20Discontinued.%20*%20On%20Demand.)\n\n### 2\\. European-Made Humanoids\n\nEurope has a fast-growing ecosystem of domestic humanoid developers, many of which sell directly to enterprise partners, research facilities, or take pre-orders:\n\n  * **1X Technologies (NEO Beta / NEO Gamma):** Headquartered in Norway, 1X builds bipedal humanoids focused on domestic and general-purpose assistance, deploying initial units to select markets.\n\n  * **Pollen Robotics (Reachy 2):** Based in France, Pollen Robotics builds open-source upper-body humanoid platforms widely used for research and development, available commercially internationally and in Europe.\n\n  * **NEURA Robotics (4NE1) & Agile Robots (Agile ONE):** Based in Germany, these heavyweights build advanced humanoids targeted heavily at European industrial automation (partnering with major automotive and manufacturing firms). They typically require direct enterprise engagement, quotation, or pre-order commitments.\n\n### Purchasing Considerations\n\nMost humanoid robots currently available on the open market in Europe are designated for **R&D, educational use, or controlled industrial pilots** (such as logistics sorting or manufacturing testing) rather than ready-to-use household consumer tasks. If you are looking to purchase one for a business or institution, they are typically sourced through specialized European robotics integrators or B2B marketplaces rather than standard retail channels."
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "1a68929e86b64eb4a0f3177bfd4590e5",
+   "charged_micro": 2400
+  }
+ }
+}

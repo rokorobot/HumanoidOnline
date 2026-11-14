@@ -1,0 +1,130 @@
+{
+ "observed_at": "2026-11-14T07:17:57+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "Which humanoid robots are commercially available?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Several humanoid robots are commercially available or open for purchase and enterprise deployment. The market spans entry-level developer platforms, industrial workhorses, and consumer-focused models:\n\n1. Consumer, Developer, and Research Humanoids (Direct-to-Buyer)\n\nThese models can be purchased directly by researchers, developers, or early adopters through manufacturer websites or select online channels:\n\nUnitree G1 & R1: Unitree offers some of the most accessible bipedal hardware on the market. The G1 (starting around $13,500) is a compact, agile platform popular with research labs, while the R1 serves as an entry-level education and hobbyist model.\n\nAGIBOT X2: Ranging from roughly $28,000, AGIBOT's compact humanoid is built for interactive research, demos, and multimodal AI development.\n\n1X NEO: Designed as a lightweight, safety-first humanoid for everyday household tasks, 1X offers NEO for purchase or via a Robotics-as-a-Service (RaaS) subscription model.\n\n2. Industrial and Logistics Humanoids (Enterprise Deployments)\n\nThese robots are generally deployed via direct enterprise sales, pilot programs, or Robots-as-a-Service (RaaS) contracts for warehouses and automotive manufacturing:\n\nAgility Robotics Digit: Extensively deployed in real-world warehouse and logistics operations (such as with GXO and major automotive manufacturers) to handle repetitive material handling tasks like tote moving.\n\nApptronik Apollo: Built for heavy industrial and logistics tasks, Apollo is deployed via enterprise partnerships with companies like Mercedes-Benz.\n\nBoston Dynamics Atlas (Electric): Boston Dynamics' commercial electric version of Atlas is actively shipping initial production allocations to strategic enterprise partners like Hyundai.\n\nFigure AI (Figure 03): Utilized in advanced manufacturing and logistics pilot workflows (such as with BMW), though scaled through direct enterprise partnerships rather than open public retail.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Humanoid Robots in 2026: What Is Actually Available, Piloting, or",
+      "url": "https://physicalaiguide.com/guides/humanoid-robots-2026-availability/#:~:text=shipping%20terms%20and%20capabilities%20depend%20on%20configuration,the%20cited%20page%20%7C%20Commercially%20available%20%7C",
+      "description": "shipping terms and capabilities depend on configuration | Commercially \navailable | | H1 / H1-2 | Unitree | Introduced in 2023; current product \nfamily page revie..."
+     },
+     {
+      "position": 2,
+      "label": "38 Best Humanoid Robots in 2026 (Evidence-Ranked) - Blog",
+      "url": "https://blog.robozaps.com/b/best-humanoid-robots#:~:text=none%20confirmed%20%7C%20%7C%207%20%7C%20AgiBot,%E2%80%94%20%7C%20No%20price%20exists%20%7C%20Factory%3B",
+      "description": "none confirmed | | 7 | AgiBot A2 | 169 cm | 69 kg | Contact sales | \nService, reception | Mass production | | 8 | Unitree H2 | ~180 cm | ~70 kg \n| $29,900 | Comme..."
+     },
+     {
+      "position": 3,
+      "label": "Humanoid Robots in 2026: The Complete Market Overview",
+      "url": "https://www.roboticscenter.ai/blog/humanoid-robot-2026#:~:text=If%20you%20want%20a%20humanoid%20designed%20for,%2443%2C800.00%20%7C%20Manipulation%20research%2C%20data%20collection%20%7C",
+      "description": "If you want a humanoid designed for the home, follow 1X NEO and Figure 03. \nTable_title: Our humanoid lineup Table_content: | Platform | Purchase | \nBest for | | ..."
+     },
+     {
+      "position": 4,
+      "label": "Humanoid Robots in 2026: What Is Actually Available, Piloting, or",
+      "url": "https://physicalaiguide.com/guides/humanoid-robots-2026-availability/#:~:text=AGIBOT%20reports%2064%2B%20cumulative%20hours%2C%20about%203%2C000,current%20platform%20(source)%20%7C%20Partner%2Dled%20commercial%20engagement%3B",
+      "description": "AGIBOT reports 64+ cumulative hours, about 3,000 units per shift, and \ndowntime loss below 4% (customer, vendor) | Enterprise deployment; no \nstandard public pric..."
+     },
+     {
+      "position": 5,
+      "label": "Humanoid Robots in 2026: The Complete Market Overview",
+      "url": "https://www.roboticscenter.ai/blog/humanoid-robot-2026#:~:text=8.%20Named%20customers%20include%20GXO%2C%20Schaeffler%20and,or%20wheeled%20mobility%20depending%20on%20the%20site.",
+      "description": "8. Named customers include GXO, Schaeffler and Toyota Motor Manufacturing \nCanada. 8. See Agility Robotics for deployment programs. Good fit for: \nwarehouse and l..."
+     },
+     {
+      "position": 6,
+      "label": "Humanoid Robots in 2026: The Complete Market Overview",
+      "url": "https://www.roboticscenter.ai/blog/humanoid-robot-2026#:~:text=Apptronik%20designs%20Apollo%20for%20physically%20demanding%2C%20repetitive,structured%20industrial%20deployment.%20Home%20and%20general%2Dpurpose%20platforms.",
+      "description": "Apptronik designs Apollo for physically demanding, repetitive work in \nmanufacturing, logistics and retail, with bipedal or wheeled mobility \ndepending on the sit..."
+     },
+     {
+      "position": 7,
+      "label": "Humanoid Robots for Sale in 2026: Complete Buyers Guide",
+      "url": "https://theresarobotforthat.com/blog/humanoid-robots-for-sale/#:~:text=The%20third%2Dgeneration%20robot%20stands%20168%20cm%20tall%2C,across%2030%2C000%2B%20vehicles%20(Figure%20AI%2C%20May%202026).",
+      "description": " The third-generation robot stands 168 cm tall, features 30 DOF, a 5-hour \nbattery, and the Helix-02 VLA AI system. During the BMW Spartanburg pilot, \nFigure robo..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Humanoid Robots in 2026: What Is Actually Available, Piloting, or",
+      "url": "https://physicalaiguide.com/guides/humanoid-robots-2026-availability/#:~:text=shipping%20terms%20and%20capabilities%20depend%20on%20configuration,the%20cited%20page%20%7C%20Commercially%20available%20%7C",
+      "domain": "physicalaiguide.com",
+      "position": 1,
+      "description": "shipping terms and capabilities depend on configuration | Commercially \navailable | | H1 / H1-2 | Unitree | Introduced in 2023; current product \nfamily page revie...",
+      "citationPillId": 1
+     },
+     {
+      "label": "38 Best Humanoid Robots in 2026 (Evidence-Ranked) - Blog",
+      "url": "https://blog.robozaps.com/b/best-humanoid-robots#:~:text=none%20confirmed%20%7C%20%7C%207%20%7C%20AgiBot,%E2%80%94%20%7C%20No%20price%20exists%20%7C%20Factory%3B",
+      "domain": "blog.robozaps.com",
+      "position": 2,
+      "description": "none confirmed | | 7 | AgiBot A2 | 169 cm | 69 kg | Contact sales | \nService, reception | Mass production | | 8 | Unitree H2 | ~180 cm | ~70 kg \n| $29,900 | Comme...",
+      "citationPillId": 2
+     },
+     {
+      "label": "Humanoid Robots in 2026: The Complete Market Overview",
+      "url": "https://www.roboticscenter.ai/blog/humanoid-robot-2026#:~:text=If%20you%20want%20a%20humanoid%20designed%20for,%2443%2C800.00%20%7C%20Manipulation%20research%2C%20data%20collection%20%7C",
+      "domain": "roboticscenter.ai",
+      "position": 3,
+      "description": "If you want a humanoid designed for the home, follow 1X NEO and Figure 03. \nTable_title: Our humanoid lineup Table_content: | Platform | Purchase | \nBest for | | ...",
+      "citationPillId": 3
+     },
+     {
+      "label": "Humanoid Robots in 2026: What Is Actually Available, Piloting, or",
+      "url": "https://physicalaiguide.com/guides/humanoid-robots-2026-availability/#:~:text=AGIBOT%20reports%2064%2B%20cumulative%20hours%2C%20about%203%2C000,current%20platform%20(source)%20%7C%20Partner%2Dled%20commercial%20engagement%3B",
+      "domain": "physicalaiguide.com",
+      "position": 4,
+      "description": "AGIBOT reports 64+ cumulative hours, about 3,000 units per shift, and \ndowntime loss below 4% (customer, vendor) | Enterprise deployment; no \nstandard public pric...",
+      "citationPillId": 4
+     },
+     {
+      "label": "Humanoid Robots in 2026: The Complete Market Overview",
+      "url": "https://www.roboticscenter.ai/blog/humanoid-robot-2026#:~:text=8.%20Named%20customers%20include%20GXO%2C%20Schaeffler%20and,or%20wheeled%20mobility%20depending%20on%20the%20site.",
+      "domain": "roboticscenter.ai",
+      "position": 5,
+      "description": "8. Named customers include GXO, Schaeffler and Toyota Motor Manufacturing \nCanada. 8. See Agility Robotics for deployment programs. Good fit for: \nwarehouse and l...",
+      "citationPillId": 5
+     },
+     {
+      "label": "Humanoid Robots in 2026: The Complete Market Overview",
+      "url": "https://www.roboticscenter.ai/blog/humanoid-robot-2026#:~:text=Apptronik%20designs%20Apollo%20for%20physically%20demanding%2C%20repetitive,structured%20industrial%20deployment.%20Home%20and%20general%2Dpurpose%20platforms.",
+      "domain": "roboticscenter.ai",
+      "position": 6,
+      "description": "Apptronik designs Apollo for physically demanding, repetitive work in \nmanufacturing, logistics and retail, with bipedal or wheeled mobility \ndepending on the sit...",
+      "citationPillId": 6
+     },
+     {
+      "label": "Humanoid Robots for Sale in 2026: Complete Buyers Guide",
+      "url": "https://theresarobotforthat.com/blog/humanoid-robots-for-sale/#:~:text=The%20third%2Dgeneration%20robot%20stands%20168%20cm%20tall%2C,across%2030%2C000%2B%20vehicles%20(Figure%20AI%2C%20May%202026).",
+      "domain": "theresarobotforthat.com",
+      "position": 7,
+      "description": " The third-generation robot stands 168 cm tall, features 30 DOF, a 5-hour \nbattery, and the Helix-02 VLA AI system. During the BMW Spartanburg pilot, \nFigure robo...",
+      "citationPillId": 7
+     }
+    ],
+    "markdown": "Several humanoid robots are commercially available or open for purchase and enterprise deployment. The market spans entry-level developer platforms, industrial workhorses, and consumer-focused models: [Humanoid Robots in 2026: What Is Actually Available, Piloting, or](https://physicalaiguide.com/guides/humanoid-robots-2026-availability/#:~:text=shipping%20terms%20and%20capabilities%20depend%20on%20configuration,the%20cited%20page%20%7C%20Commercially%20available%20%7C)\n\n### 1\\. Consumer, Developer, and Research Humanoids (Direct-to-Buyer)\n\nThese models can be purchased directly by researchers, developers, or early adopters through manufacturer websites or select online channels:\n\n  * **Unitree G1 & R1:** Unitree offers some of the most accessible bipedal hardware on the market. The **G1** (starting around $13,500) is a compact, agile platform popular with research labs, while the **R1** serves as an entry-level education and hobbyist model. [38 Best Humanoid Robots in 2026 (Evidence-Ranked) - Blog](https://blog.robozaps.com/b/best-humanoid-robots#:~:text=none%20confirmed%20%7C%20%7C%207%20%7C%20AgiBot,%E2%80%94%20%7C%20No%20price%20exists%20%7C%20Factory%3B)\n\n  * **AGIBOT X2:** Ranging from roughly $28,000, AGIBOT's compact humanoid is built for interactive research, demos, and multimodal AI development. [Humanoid Robots in 2026: The Complete Market Overview](https://www.roboticscenter.ai/blog/humanoid-robot-2026#:~:text=If%20you%20want%20a%20humanoid%20designed%20for,%2443%2C800.00%20%7C%20Manipulation%20research%2C%20data%20collection%20%7C)\n\n  * **1X NEO:** Designed as a lightweight, safety-first humanoid for everyday household tasks, 1X offers NEO for purchase or via a Robotics-as-a-Service (RaaS) subscription model.\n\n### 2\\. Industrial and Logistics Humanoids (Enterprise Deployments)\n\nThese robots are generally deployed via direct enterprise sales, pilot programs, or Robots-as-a-Service (RaaS) contracts for warehouses and automotive manufacturing: [Humanoid Robots in 2026: What Is Actually Available, Piloting, or](https://physicalaiguide.com/guides/humanoid-robots-2026-availability/#:~:text=AGIBOT%20reports%2064%2B%20cumulative%20hours%2C%20about%203%2C000,current%20platform%20\\(source\\)%20%7C%20Partner%2Dled%20commercial%20engagement%3B)\n\n  * **Agility Robotics Digit:** Extensively deployed in real-world warehouse and logistics operations (such as with GXO and major automotive manufacturers) to handle repetitive material handling tasks like tote moving. [Humanoid Robots in 2026: The Complete Market Overview](https://www.roboticscenter.ai/blog/humanoid-robot-2026#:~:text=8.%20Named%20customers%20include%20GXO%2C%20Schaeffler%20and,or%20wheeled%20mobility%20depending%20on%20the%20site.)\n\n  * **Apptronik Apollo:** Built for heavy industrial and logistics tasks, Apollo is deployed via enterprise partnerships with companies like Mercedes-Benz. [Humanoid Robots in 2026: The Complete Market Overview](https://www.roboticscenter.ai/blog/humanoid-robot-2026#:~:text=Apptronik%20designs%20Apollo%20for%20physically%20demanding%2C%20repetitive,structured%20industrial%20deployment.%20Home%20and%20general%2Dpurpose%20platforms.)\n\n  * **Boston Dynamics Atlas (Electric):** Boston Dynamics' commercial electric version of Atlas is actively shipping initial production allocations to strategic enterprise partners like Hyundai.\n\n  * **Figure AI (Figure 03):** Utilized in advanced manufacturing and logistics pilot workflows (such as with BMW), though scaled through direct enterprise partnerships rather than open public retail. [Humanoid Robots for Sale in 2026: Complete Buyers Guide](https://theresarobotforthat.com/blog/humanoid-robots-for-sale/#:~:text=The%20third%2Dgeneration%20robot%20stands%20168%20cm%20tall%2C,across%2030%2C000%2B%20vehicles%20\\(Figure%20AI%2C%20May%202026\\).)"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "3bfbd0890d854447b97579caceaff6a2",
+   "charged_micro": 2400
+  }
+ }
+}

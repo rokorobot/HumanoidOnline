@@ -1,0 +1,58 @@
+{
+ "observed_at": "2026-11-14T07:20:20+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "How tall is the Unitree G1?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "The\n\nUnitree G1\n\nhumanoid robot stands approximately 1.32 meters (about 4.3 feet) tall when standing upright.\n\nKey Dimensions & Specifications\n\nHeight: ~1.32 m (4.3 ft)\n\nWidth: ~45 cm (17.7 in)\n\nDepth: ~20 cm (7.9 in)\n\nWeight: ~35 kg (77 lbs) with battery\n\nDegrees of Freedom (DoF): 23 DoF on the standard version (up to 43 DoF on certain G1 EDU configurations)\n\nWould you like to know more about the Unitree G1's capabilities, battery life, or pricing/availability?",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Unitree G1: technical specs, capabilities and limits",
+      "url": "https://robotics.libella.io/en/blog/unitree-g1-technical-specifications",
+      "description": "The Unitree G1 is about 1.32 metres tall, about 45 cm wide and 20 cm deep when standing. battery life with a 9,000 mAh battery. Th...",
+      "redirectLink": "https://www.google.com/goto?url=CAEShAEBxCJF1yVuYmRPNNJTbQ_AW_yn2drAnHfh5tgsJxeHVPS_bmTXXC4Jz562POBZohIix8LIyGTVRoYOiFQHnwfK5ea9BaHSpRPJbqJwSxiCnWy6fANOtFDxv_bZ9qoJcQue_gl7_04glKLcX7lmyZ648AQZT9qCGjApihiSeflenuRxqNU"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Unitree G1: technical specs, capabilities and limits",
+      "citationPillId": 1,
+      "url": "https://robotics.libella.io/en/blog/unitree-g1-technical-specifications",
+      "domain": "robotics.libella.io",
+      "description": "The Unitree G1 is about 1.32 metres tall, about 45 cm wide and 20 cm deep when standing. battery life with a 9,000 mAh battery. Th...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAEShAEBxCJF1yVuYmRPNNJTbQ_AW_yn2drAnHfh5tgsJxeHVPS_bmTXXC4Jz562POBZohIix8LIyGTVRoYOiFQHnwfK5ea9BaHSpRPJbqJwSxiCnWy6fANOtFDxv_bZ9qoJcQue_gl7_04glKLcX7lmyZ648AQZT9qCGjApihiSeflenuRxqNU"
+     },
+     {
+      "label": "Unitree G1: technical specs, capabilities and limits",
+      "citationPillId": 2,
+      "url": "https://robotics.libella.io/en/blog/unitree-g1-technical-specifications",
+      "domain": "robotics.libella.io",
+      "description": "The Unitree G1 is about 1.32 metres tall, about 45 cm wide and 20 cm deep when standing. battery life with a 9,000 mAh battery. Th...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAEShAEBxCJF1yVuYmRPNNJTbQ_AW_yn2drAnHfh5tgsJxeHVPS_bmTXXC4Jz562POBZohIix8LIyGTVRoYOiFQHnwfK5ea9BaHSpRPJbqJwSxiCnWy6fANOtFDxv_bZ9qoJcQue_gl7_04glKLcX7lmyZ648AQZT9qCGjApihiSeflenuRxqNU"
+     }
+    ],
+    "markdown": "The \n\n[Unitree G1](https://shop.unitree.com/zh-gb/products/unitree-g1)\n\nhumanoid robot stands approximately **1.32 meters (about 4.3 feet)** tall when standing upright. [Unitree G1: technical specs, capabilities and limits](https://robotics.libella.io/en/blog/unitree-g1-technical-specifications)\n\nKey Dimensions & Specifications\n\n  * **Height:** ~1.32 m (4.3 ft)\n\n  * **Width:** ~45 cm (17.7 in)\n\n  * **Depth:** ~20 cm (7.9 in)\n\n  * **Weight:** ~35 kg (77 lbs) with battery\n\n  * **Degrees of Freedom (DoF):** 23 DoF on the standard version (up to 43 DoF on certain G1 EDU configurations) [Unitree G1: technical specs, capabilities and limits](https://robotics.libella.io/en/blog/unitree-g1-technical-specifications)\n\nWould you like to know more about the **Unitree G1's capabilities**, **battery life**, or **pricing/availability**?"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "2cee424d7d6d4cd79baceff1b9ea3e32",
+   "charged_micro": 2400
+  }
+ }
+}

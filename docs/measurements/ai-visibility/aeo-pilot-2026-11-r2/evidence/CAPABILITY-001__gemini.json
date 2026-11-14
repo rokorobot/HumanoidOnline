@@ -1,0 +1,131 @@
+{
+ "observed_at": "2026-11-14T07:18:52+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "Which humanoid robots have SDK access?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Several humanoid and bipedal robotic platforms provide software development kits (SDKs), APIs, and developer toolsets for researchers, engineers, and programmers. Depending on whether you are looking for physical hardware or software ecosystems, several key options stand out:\n\n1. Hardware Platforms with Dedicated SDKs\n\nUnitree (e.g., G1 / H2 Series): Unitree provides developer documentation and SDK interfaces for several of its bipedal and humanoid robots. These SDKs typically offer low-level motor control, high-level motion control, simulation tools, and ROS (Robot Operating System) integration, though exact access can vary depending on the specific model tier (research vs. commercial consumer variants).\n\nPollen Robotics (Reachy 2): Reachy 2 is an open-source, mobile humanoid manipulation platform built heavily for developers. It features a Python SDK, ROS 2 (Humble) integration, VR teleoperation capabilities, and direct access to camera feeds and motion trajectories.\n\nAsimov (Asimov 1): Built as an open-source humanoid platform, Asimov features a Python SDK that lets developers interact directly with the robot's hardware—allowing users to send walking commands, manipulate individual joints, and poll real-time operating states.\n\nPAL Robotics (ARI): Known primarily for its social humanoid robot ARI, PAL Robotics offers a comprehensive SDK featuring ROS integration, fully offline speech recognition (ASR) in multiple languages, text-to-speech, and built-in chatbot/interaction engines.\n\nROBOTIS (THORMANG Series): ROBOTIS provides robust Linux and ROS-backed frameworks aimed at research labs wanting to program whole-body bipedal locomotion and manipulation.\n\n2. Software Development Frameworks & Simulation Ecosystems\n\nIf you are developing software, AI policies, or control algorithms for humanoids without necessarily buying a specific pre-built robot body, industry-standard simulation and development stacks act as universal SDKs:\n\nNVIDIA Isaac GR00T: A comprehensive, open-end-to-end software platform and foundation model framework specifically built for humanoid robots. It provides simulation engines (Isaac Sim), GPU-accelerated robot learning (Isaac Lab), CUDA-accelerated ROS 2 stacks (Isaac ROS), and developer workflows designed to train general-purpose humanoid intelligence.\n\nROS / ROS 2 (Robot Operating System): The underlying middleware used by the vast majority of humanoid SDKs (including Unitree, Pollen, and PAL Robotics). It provides standard hardware abstraction, message passing, and tools like RViz for visualization.\n\nNote: Availability of developer SDKs often depends on whether you purchase an academic/research edition versus an enterprise/industrial deployment tier. It is always best to check the specific vendor's documentation or contact their developer relations team to confirm API depth for a particular hardware batch.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Humanoid research robots: SDKs, data access and operation - Joybuy",
+      "url": "https://www.joybuy.de/blog/humanoidresearchrobots/MmWOVN8R#:~:text=Relevant%20brands%20and%20platforms%20to%20consider%20*,states%20that%20SDK%2FAPI%20access%20is%20currently%20unavailable.",
+      "description": "Relevant brands and platforms to consider * Unitree. The G1 range includes \ndifferent configurations, so the exact version matters for development \nprojects. Unit..."
+     },
+     {
+      "position": 2,
+      "label": "Humanoid research robots: SDKs, data access and operation - Joybuy",
+      "url": "https://www.joybuy.de/blog/humanoidresearchrobots/MmWOVN8R#:~:text=Development%20access%20and%20rights%20should%20therefore%20not,robot%20to%20be%20on%20the%20same%20network.",
+      "description": "Development access and rights should therefore not be assumed to carry over \nfrom one G1 variant to another. * Pollen Robotics. Reachy 2 is a mobile, \nhumanoid-st..."
+     },
+     {
+      "position": 3,
+      "label": "Humanoid research robots: SDKs, data access and operation - Joybuy",
+      "url": "https://www.joybuy.de/blog/humanoidresearchrobots/MmWOVN8R#:~:text=For%20Reachy%202%2C%20Pollen%20Robotics%20describes%20ROS,services%20should%20suit%20your%20lab's%20planned%20setup.",
+      "description": "For Reachy 2, Pollen Robotics describes ROS 2 Humble, a Python SDK, VR \nteleoperation and documented features for camera images and trajectories. \nThe local SDK c..."
+     },
+     {
+      "position": 4,
+      "label": "Asimov Releases Open-Source SDK for Its Humanoid Robot",
+      "url": "https://robotico.market/news/asimov-releases-open-source-sdk-for-its-humanoid-robot#:~:text=Menlo%20Research%20has%20released%20a%20Python%20software,accessing%20information%20about%20the%20robot's%20operating%20state.",
+      "description": "Menlo Research has released a Python software development kit for its \nAsimov 1 humanoid robot, expanding the tools available to researchers and \ndevelopers build..."
+     },
+     {
+      "position": 5,
+      "label": "Humanoid research robots: SDKs, data access and operation - Joybuy",
+      "url": "https://www.joybuy.de/blog/humanoidresearchrobots/MmWOVN8R#:~:text=Teams%20with%20in%2Dhouse%20ROS%20and%20Linux%20expertise,development%20access%20available%20for%20the%20exact%20variant.",
+      "description": "Teams with in-house ROS and Linux expertise can integrate a sensor-rich \nplatform into their research environment. For THORMANG3, this means \nchecking the Ubuntu ..."
+     },
+     {
+      "position": 6,
+      "label": "Isaac GR00T | Humanoid Robot Development Platform - NVIDIA",
+      "url": "https://www.nvidia.com/en-us/industries/robotics/isaac-groot/#:~:text=Breakthrough%20research%20and%20real%2Dworld%20validation.%20*%20Software.,Cloud%2Dnative%20orchestration%20for%20large%2Dscale%20robotics%20workflows.%20Metropolis.",
+      "description": "Breakthrough research and real-world validation. * Software. Isaac \nOverview. AI robotics platform for robot simulation, training, and \ndeployment. Isaac ROS. CUD..."
+     },
+     {
+      "position": 7,
+      "label": "Humanoid research robots: SDKs, data access and operation - Joybuy",
+      "url": "https://www.joybuy.de/blog/humanoidresearchrobots/MmWOVN8R#:~:text=Table_title%3A%20ROBOTIS%20THORMANG3%20Table_content%3A%20%7C%20Requirement%20%7C,%25%20of%20buyers%20put%20development%20access%20first.",
+      "description": "Table_title: ROBOTIS THORMANG3 Table_content: | Requirement | What to check \nbefore buying | Who should pay particular attention | | --- | --- | --- | | \nDevelopm..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Humanoid research robots: SDKs, data access and operation - Joybuy",
+      "url": "https://www.joybuy.de/blog/humanoidresearchrobots/MmWOVN8R#:~:text=Relevant%20brands%20and%20platforms%20to%20consider%20*,states%20that%20SDK%2FAPI%20access%20is%20currently%20unavailable.",
+      "domain": "joybuy.de",
+      "position": 1,
+      "description": "Relevant brands and platforms to consider * Unitree. The G1 range includes \ndifferent configurations, so the exact version matters for development \nprojects. Unit...",
+      "citationPillId": 1
+     },
+     {
+      "label": "Humanoid research robots: SDKs, data access and operation - Joybuy",
+      "url": "https://www.joybuy.de/blog/humanoidresearchrobots/MmWOVN8R#:~:text=Development%20access%20and%20rights%20should%20therefore%20not,robot%20to%20be%20on%20the%20same%20network.",
+      "domain": "joybuy.de",
+      "position": 2,
+      "description": "Development access and rights should therefore not be assumed to carry over \nfrom one G1 variant to another. * Pollen Robotics. Reachy 2 is a mobile, \nhumanoid-st...",
+      "citationPillId": 2
+     },
+     {
+      "label": "Humanoid research robots: SDKs, data access and operation - Joybuy",
+      "url": "https://www.joybuy.de/blog/humanoidresearchrobots/MmWOVN8R#:~:text=For%20Reachy%202%2C%20Pollen%20Robotics%20describes%20ROS,services%20should%20suit%20your%20lab's%20planned%20setup.",
+      "domain": "joybuy.de",
+      "position": 3,
+      "description": "For Reachy 2, Pollen Robotics describes ROS 2 Humble, a Python SDK, VR \nteleoperation and documented features for camera images and trajectories. \nThe local SDK c...",
+      "citationPillId": 2
+     },
+     {
+      "label": "Asimov Releases Open-Source SDK for Its Humanoid Robot",
+      "url": "https://robotico.market/news/asimov-releases-open-source-sdk-for-its-humanoid-robot#:~:text=Menlo%20Research%20has%20released%20a%20Python%20software,accessing%20information%20about%20the%20robot's%20operating%20state.",
+      "domain": "robotico.market",
+      "position": 4,
+      "description": "Menlo Research has released a Python software development kit for its \nAsimov 1 humanoid robot, expanding the tools available to researchers and \ndevelopers build...",
+      "citationPillId": 3
+     },
+     {
+      "label": "Humanoid research robots: SDKs, data access and operation - Joybuy",
+      "url": "https://www.joybuy.de/blog/humanoidresearchrobots/MmWOVN8R#:~:text=Teams%20with%20in%2Dhouse%20ROS%20and%20Linux%20expertise,development%20access%20available%20for%20the%20exact%20variant.",
+      "domain": "joybuy.de",
+      "position": 5,
+      "description": "Teams with in-house ROS and Linux expertise can integrate a sensor-rich \nplatform into their research environment. For THORMANG3, this means \nchecking the Ubuntu ...",
+      "citationPillId": 4
+     },
+     {
+      "label": "Isaac GR00T | Humanoid Robot Development Platform - NVIDIA",
+      "url": "https://www.nvidia.com/en-us/industries/robotics/isaac-groot/#:~:text=Breakthrough%20research%20and%20real%2Dworld%20validation.%20*%20Software.,Cloud%2Dnative%20orchestration%20for%20large%2Dscale%20robotics%20workflows.%20Metropolis.",
+      "domain": "nvidia.com",
+      "position": 6,
+      "description": "Breakthrough research and real-world validation. * Software. Isaac \nOverview. AI robotics platform for robot simulation, training, and \ndeployment. Isaac ROS. CUD...",
+      "citationPillId": 5
+     },
+     {
+      "label": "Humanoid research robots: SDKs, data access and operation - Joybuy",
+      "url": "https://www.joybuy.de/blog/humanoidresearchrobots/MmWOVN8R#:~:text=Table_title%3A%20ROBOTIS%20THORMANG3%20Table_content%3A%20%7C%20Requirement%20%7C,%25%20of%20buyers%20put%20development%20access%20first.",
+      "domain": "joybuy.de",
+      "position": 7,
+      "description": "Table_title: ROBOTIS THORMANG3 Table_content: | Requirement | What to check \nbefore buying | Who should pay particular attention | | --- | --- | --- | | \nDevelopm...",
+      "citationPillId": 6
+     }
+    ],
+    "markdown": "Several humanoid and bipedal robotic platforms provide software development kits (SDKs), APIs, and developer toolsets for researchers, engineers, and programmers. Depending on whether you are looking for physical hardware or software ecosystems, several key options stand out:\n\n### 1\\. Hardware Platforms with Dedicated SDKs\n\n  * **Unitree (e.g., G1 / H2 Series):** Unitree provides developer documentation and SDK interfaces for several of its bipedal and humanoid robots. These SDKs typically offer low-level motor control, high-level motion control, simulation tools, and ROS (Robot Operating System) integration, though exact access can vary depending on the specific model tier (research vs. commercial consumer variants). [Humanoid research robots: SDKs, data access and operation - Joybuy](https://www.joybuy.de/blog/humanoidresearchrobots/MmWOVN8R#:~:text=Relevant%20brands%20and%20platforms%20to%20consider%20*,states%20that%20SDK%2FAPI%20access%20is%20currently%20unavailable.)\n\n  * **Pollen Robotics (Reachy 2):** Reachy 2 is an open-source, mobile humanoid manipulation platform built heavily for developers. It features a Python SDK, ROS 2 (Humble) integration, VR teleoperation capabilities, and direct access to camera feeds and motion trajectories. [Humanoid research robots: SDKs, data access and operation - Joybuy](https://www.joybuy.de/blog/humanoidresearchrobots/MmWOVN8R#:~:text=Development%20access%20and%20rights%20should%20therefore%20not,robot%20to%20be%20on%20the%20same%20network.)[Humanoid research robots: SDKs, data access and operation - Joybuy](https://www.joybuy.de/blog/humanoidresearchrobots/MmWOVN8R#:~:text=For%20Reachy%202%2C%20Pollen%20Robotics%20describes%20ROS,services%20should%20suit%20your%20lab's%20planned%20setup.)\n\n  * **Asimov (Asimov 1):** Built as an open-source humanoid platform, Asimov features a Python SDK that lets developers interact directly with the robot's hardware—allowing users to send walking commands, manipulate individual joints, and poll real-time operating states. [Asimov Releases Open-Source SDK for Its Humanoid Robot](https://robotico.market/news/asimov-releases-open-source-sdk-for-its-humanoid-robot#:~:text=Menlo%20Research%20has%20released%20a%20Python%20software,accessing%20information%20about%20the%20robot's%20operating%20state.)\n\n  * **PAL Robotics (ARI):** Known primarily for its social humanoid robot ARI, PAL Robotics offers a comprehensive SDK featuring ROS integration, fully offline speech recognition (ASR) in multiple languages, text-to-speech, and built-in chatbot/interaction engines.\n\n  * **ROBOTIS (THORMANG Series):** ROBOTIS provides robust Linux and ROS-backed frameworks aimed at research labs wanting to program whole-body bipedal locomotion and manipulation. [Humanoid research robots: SDKs, data access and operation - Joybuy](https://www.joybuy.de/blog/humanoidresearchrobots/MmWOVN8R#:~:text=Teams%20with%20in%2Dhouse%20ROS%20and%20Linux%20expertise,development%20access%20available%20for%20the%20exact%20variant.)\n\n### 2\\. Software Development Frameworks & Simulation Ecosystems\n\nIf you are developing software, AI policies, or control algorithms for humanoids without necessarily buying a specific pre-built robot body, industry-standard simulation and development stacks act as universal SDKs:\n\n  * **NVIDIA Isaac GR00T:** A comprehensive, open-end-to-end software platform and foundation model framework specifically built for humanoid robots. It provides simulation engines (Isaac Sim), GPU-accelerated robot learning (Isaac Lab), CUDA-accelerated ROS 2 stacks (Isaac ROS), and developer workflows designed to train general-purpose humanoid intelligence. [Isaac GR00T | Humanoid Robot Development Platform - NVIDIA](https://www.nvidia.com/en-us/industries/robotics/isaac-groot/#:~:text=Breakthrough%20research%20and%20real%2Dworld%20validation.%20*%20Software.,Cloud%2Dnative%20orchestration%20for%20large%2Dscale%20robotics%20workflows.%20Metropolis.)\n\n  * **ROS / ROS 2 (Robot Operating System):** The underlying middleware used by the vast majority of humanoid SDKs (including Unitree, Pollen, and PAL Robotics). It provides standard hardware abstraction, message passing, and tools like RViz for visualization.\n\n_Note: Availability of developer SDKs often depends on whether you purchase an academic/research edition versus an enterprise/industrial deployment tier. It is always best to check the specific vendor's documentation or contact their developer relations team to confirm API depth for a particular hardware batch._ [Humanoid research robots: SDKs, data access and operation - Joybuy](https://www.joybuy.de/blog/humanoidresearchrobots/MmWOVN8R#:~:text=Table_title%3A%20ROBOTIS%20THORMANG3%20Table_content%3A%20%7C%20Requirement%20%7C,%25%20of%20buyers%20put%20development%20access%20first.)"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "ae69c34c185d4008a31fdfa56eb53818",
+   "charged_micro": 2400,
+   "hint": "feedback"
+  }
+ }
+}

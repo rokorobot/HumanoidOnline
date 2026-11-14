@@ -1,0 +1,133 @@
+{
+ "observed_at": "2026-11-14T07:18:09+00:00",
+ "endpoint": "cloro.ai-search.chatgpt.scrape",
+ "request": {
+  "prompt": "How much does the Unitree G1 cost?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "model": null,
+    "text": "The Unitree G1 starts at $13,500 USD (approximately €11,600) from the manufacturer.\n\nHowever, the price depends heavily on the version and configuration.\n\nPrices (November 2026)\n\nVersion\n\nApproximate price\n\nG1 Basic (manufacturer)\n\n$13,500\n\nG1 Basic (Germany)\n\n€16,999–€27,370\n\nG1 EDU (developer edition)\n\n€37,000+\n\nAdvanced EDU configurations\n\n€40,000–€67,000+\n\nSources: Unitree and German retailer listings.\n\nWhat do you get?\n\nG1 Basic: Walking, movement demonstrations and basic interaction.\n\nG1 EDU: More development capabilities, programmable functions and additional hardware options.\n\nAdvanced EDU: More sophisticated dexterous hands, computing hardware and research capabilities.\n\nWhere can you buy one?\n\nOfficial Unitree shop\n\nImportant: Manufacturer prices exclude shipping, taxes and import costs. The EDU version also requires a separate sales enquiry.\n\nAre you interested in buying one to experiment with AI and robotics, use as a personal robot, or develop your own applications? The best version depends considerably on what you want it to do.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Humanoiden Roboter kaufen 2026: Preise, Händler, Modelle",
+      "url": "https://roboterradar.de/kaufratgeber/humanoiden-roboter-kaufen/",
+      "footnote": false
+     },
+     {
+      "position": 2,
+      "label": "Unitree G1 kaufen 2026: Preis, Varianten & Ausstattung",
+      "url": "https://www.drohnen.de/97666/unitree-g1-kaufen/",
+      "footnote": false
+     },
+     {
+      "position": 3,
+      "label": "Humanoid robot G1\\_Humanoid Robot Functions\\_Humanoid Robot Price",
+      "url": "https://www.unitree.com/g1/",
+      "footnote": false
+     },
+     {
+      "position": 4,
+      "label": "Unitree G1",
+      "url": "https://shop.unitree.com/products/unitree-g1?trk=article-ssr-frontend-pulse_little-text-block",
+      "footnote": false
+     },
+     {
+      "position": 5,
+      "label": "",
+      "url": "https://robostore.com/products/unitree-g1-robotic-humanoid",
+      "footnote": true
+     },
+     {
+      "position": 6,
+      "label": "",
+      "url": "https://www.svet-robotu.cz/products/unitree-g1-edu-standard-edition-intelligent-ai-interactive-bionic-humanoid-bipedal-robot",
+      "footnote": true
+     },
+     {
+      "position": 7,
+      "label": "",
+      "url": "https://www.robotsepeti.com/unitree-g1-edu-u6-humanoid-insansi-ai-robot-5-parmakli-taktil-el",
+      "footnote": true
+     },
+     {
+      "position": 8,
+      "label": "",
+      "url": "https://robostore.com/blogs/news/discover-the-optimal-robotics-solution-for-r-d-unitree-g1-edu-vs-h1-2-comparison?srsltid=AfmBOorGyCAUjaARtWmHLT_UpwjHBfgYH-bf4tElP18CIc9GQwZW8LGe",
+      "footnote": true
+     },
+     {
+      "position": 9,
+      "label": "",
+      "url": "https://www.maginative.com/article/unitree-launches-production-version-of-g1-humanoid-robot/",
+      "footnote": true
+     },
+     {
+      "position": 10,
+      "label": "",
+      "url": "https://robotio.cz/unitree-g1-edu/",
+      "footnote": true
+     }
+    ],
+    "entities": [
+     {
+      "type": "product",
+      "name": "Unitree G1"
+     }
+    ],
+    "map": [],
+    "followUpForm": null,
+    "markdown": "The Unitree G1 starts at $13,500 USD (approximately €11,600) from the manufacturer.\n\nHowever, the price depends heavily on the version and configuration.\n\n## Prices (November 2026)\n\n| Version | Approximate price |\n| --- | --- |\n| G1 Basic (manufacturer) | $13,500 |\n| G1 Basic (Germany) | €16,999–€27,370 |\n| G1 EDU (developer edition) | €37,000+ |\n| Advanced EDU configurations | €40,000–€67,000+ |\n\nSources: Unitree and German retailer listings. [Humanoid robot G1\\_Humanoid Robot Functions\\_Humanoid Robot Price](https://www.unitree.com/g1/)[Unitree G1](https://shop.unitree.com/products/unitree-g1?trk=article-ssr-frontend-pulse_little-text-block)[Unitree G1 kaufen 2026: Preis, Varianten & Ausstattung](https://www.drohnen.de/97666/unitree-g1-kaufen/)[Humanoiden Roboter kaufen 2026: Preise, Händler, Modelle](https://roboterradar.de/kaufratgeber/humanoiden-roboter-kaufen/)\n\n## What do you get?\n\n- G1 Basic: Walking, movement demonstrations and basic interaction.\n- G1 EDU: More development capabilities, programmable functions and additional hardware options.\n- Advanced EDU: More sophisticated dexterous hands, computing hardware and research capabilities.\n\n## Where can you buy one?\n\n- [Official Unitree shop](https://shop.unitree.com/products/unitree-g1?trk=article-ssr-frontend-pulse_little-text-block&utm_source=chatgpt.com)\n\nImportant: Manufacturer prices exclude shipping, taxes and import costs. The EDU version also requires a separate sales enquiry.\n\nAre you interested in buying one to experiment with AI and robotics, use as a personal robot, or develop your own applications? The best version depends considerably on what you want it to do.",
+    "citationPills": [
+     {
+      "url": "https://www.unitree.com/g1/",
+      "label": "Humanoid robot G1_Humanoid Robot Functions_Humanoid Robot Price",
+      "domain": "unitree.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 3
+     },
+     {
+      "url": "https://shop.unitree.com/products/unitree-g1?trk=article-ssr-frontend-pulse_little-text-block",
+      "label": "Unitree G1",
+      "domain": "shop.unitree.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 4
+     },
+     {
+      "url": "https://www.drohnen.de/97666/unitree-g1-kaufen/",
+      "label": "Unitree G1 kaufen 2026: Preis, Varianten & Ausstattung",
+      "domain": "drohnen.de",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 2
+     },
+     {
+      "url": "https://roboterradar.de/kaufratgeber/humanoiden-roboter-kaufen/",
+      "label": "Humanoiden Roboter kaufen 2026: Preise, Händler, Modelle",
+      "domain": "roboterradar.de",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 1
+     }
+    ]
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "a20815e893e040058fd65d76541f7ed5",
+   "charged_micro": 2800
+  }
+ }
+}

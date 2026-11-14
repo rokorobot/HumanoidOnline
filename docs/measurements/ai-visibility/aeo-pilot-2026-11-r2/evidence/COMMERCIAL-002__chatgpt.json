@@ -1,0 +1,321 @@
+{
+ "observed_at": "2026-11-14T07:21:25+00:00",
+ "endpoint": "cloro.ai-search.chatgpt.scrape",
+ "request": {
+  "prompt": "Which humanoid robots are commercially available?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "model": null,
+    "text": "As of November 2026, there are quite a few commercially available humanoid robots. Most are manufactured by Chinese companies and are aimed at research, education, industrial automation and development rather than household use.\n\nAn important distinction: some robots can be purchased directly, others are available only through business contracts, and some are still prototypes or pre-orders.\n\nSince you're in Germany, I've included models available through European distributors and indicative euro prices.\n\n1. Humanoid robots you can buy in Europe\n\nThese are among the more interesting commercially available models.\n\nIndicative European prices, including VAT where stated. Actual prices depend on configuration, dealer and availability.\n\n1. Unitree R1\n\nAvailable to order\n\nManufacturer: Unitree (China)\n\nHeight: approximately 123 cm\n\nPrice: from approximately €4,350 equivalent\n\nEntry-level humanoid for research and development.\n\nEuropean availability and dealers\n\n2. Unitree G1\n\nAvailable to order\n\nManufacturer: Unitree (China)\n\nHeight: approximately 132 cm\n\nPrice: approximately €12,000–€27,000+\n\nOne of the most interesting platforms for AI, manipulation and robotics research.\n\nEuropean availability and dealers\n\n3. Unitree H2\n\nAvailable / dealer order\n\nManufacturer: Unitree\n\nHeight: approximately 182 cm\n\nPrice: approximately €54,000\n\nFull-size humanoid with more human-like proportions.\n\nEuropean availability and dealers\n\n4. Booster K1\n\nAvailable to order\n\nManufacturer: Booster Robotics\n\nHeight: approximately 95 cm\n\nPrice: from approximately €9,000\n\nParticularly interesting for education, research and robotics competitions.\n\nEuropean availability and dealers\n\n5. Booster T2\n\nManufacturer: Booster Robotics\n\nHeight: approximately 140 cm\n\nPrice: from approximately €27,000\n\nMore advanced development platform.\n\nEuropean availability and dealers\n\n6. AgiBot X2\n\nManufacturer: AgiBot (China)\n\nHeight: approximately 131 cm\n\nPrice: approximately €31,500+\n\nDesigned for interaction, service applications and research.\n\nEuropean availability and dealers\n\n7. LimX Oli\n\nManufacturer: LimX Dynamics\n\nHeight: approximately 165 cm\n\nPrice: approximately €85,000\n\nFull-size research and development humanoid.\n\nEuropean availability and dealers\n\n8. Dobot Atom\n\nManufacturer: Dobot (China)\n\nPrice: approximately €71,000–€87,000\n\nIndustrial-oriented humanoid platform.\n\nEuropean availability and dealers\n\nSource for European availability and dealer pricing: .\n\n2. Other commercially available humanoid robots\n\nThese are also worth knowing, although purchasing arrangements are more restricted.\n\nAmeca\n\nManufacturer: Engineered Arts\n\nUK\n\nPrice: quotation required\n\nParticularly impressive facial expressions and human interaction.\n\nAvailable for institutional and commercial customers.\n\nFigure 03\n\nManufacturer: Figure AI\n\nUSA\n\nCommercial customer arrangements\n\nFocus: industrial work and general-purpose manipulation.\n\nDigit\n\nManufacturer: Agility Robotics\n\nUSA\n\nEnterprise contracts and robot-as-a-service\n\nDesigned for logistics, warehouses and material handling.\n\nApollo\n\nManufacturer: Apptronik\n\nUSA\n\nCommercial pilot and enterprise arrangements\n\nIntended for manufacturing and logistics.\n\nWalker S2\n\nManufacturer: UBTECH\n\nChina\n\nBusiness-to-business deployments\n\nDesigned for manufacturing and industrial environments.\n\n3. Famous robots that are not generally available to buy\n\nRobot\n\nManufacturer\n\nCommercial status\n\nOptimus\n\nTesla\n\nInternal deployment, not publicly orderable\n\nAtlas\n\nBoston Dynamics\n\nStrategic industrial customers\n\nNEO\n\n1X Technologies\n\nUS pre-orders; limited availability\n\n4NE1\n\nNEURA Robotics\n\nPre-order / availability subject to delivery\n\nXPENG IRON\n\nXPENG\n\nIndustrial deployment and pilots\n\n4. My assessment\n\nIf I were evaluating the current market, I would divide the interesting options into four categories:\n\nApplication\n\nRobots worth investigating\n\nAI and robotics development\n\nUnitree G1, LimX Oli\n\nIndustrial automation\n\nAgiBot, UBTECH, Apptronik\n\nHuman interaction\n\nAmeca, AgiBot X2\n\nEducation and research\n\nUnitree R1, Booster K1\n\nOne important caveat: Commercial availability does not mean that these robots can independently perform a human job. Most still have significant limitations in dexterity, reliability, autonomous decision-making and operating speed.\n\n5. Where I would focus next\n\nThere is a significant difference between buying a humanoid robot as a research platform and buying one that can actually perform useful work.\n\nI can put together a more detailed comparison of the commercially available robots, including:\n\nPurchase price in Germany, excluding and including VAT.\n\nHeight, weight, payload and battery life.\n\nDegrees of freedom and hand dexterity.\n\nWalking, stair climbing and manipulation capabilities.\n\nROS 2, Python and AI integration.\n\nAvailability of SDKs and autonomous operation.\n\nEuropean distributors and delivery times.\n\nAre you primarily interested in humanoid robots for industrial applications, research and AI development, or general-purpose robots that could eventually work alongside humans?",
+    "sources": [
+     {
+      "position": 1,
+      "label": "European availability and dealers",
+      "url": "https://www.thehumanoid.report/buy/europe/",
+      "footnote": false
+     },
+     {
+      "position": 2,
+      "label": "Humanoid Robot Prices 2026: Every Model We Track",
+      "url": "https://www.antarum.ai/humanoid-robot-prices/",
+      "footnote": false
+     },
+     {
+      "position": 3,
+      "label": "Humanoid robot: models, prices, uses",
+      "url": "https://robot-distribution.com/en/robots/humanoids",
+      "footnote": false
+     },
+     {
+      "position": 4,
+      "label": "Humanoid robots: what is real and what you can buy",
+      "url": "https://www.thehumanoid.report/",
+      "footnote": false
+     },
+     {
+      "position": 5,
+      "label": "Humanoid Robots: Specs, Prices & Availability (2026)",
+      "url": "https://www.humanrobots.si/",
+      "footnote": false
+     },
+     {
+      "position": 6,
+      "label": "Humanoid Robots",
+      "url": "https://www.uscc.gov/sites/default/files/2024-10/Humanoid_Robots.pdf?trk=article-ssr-frontend-pulse_little-text-block",
+      "footnote": false
+     },
+     {
+      "position": 7,
+      "label": "China can build kung fu-fighting robots. But it can't get them to do factory work",
+      "url": "https://www.reuters.com/investigations/chinas-humanoid-robots-arent-smart-enough-take-your-job-yet-2026-08-27/",
+      "footnote": false
+     },
+     {
+      "position": 8,
+      "label": "",
+      "url": "https://robostore.com/products/unitree-r1-basic-humanoid-robot",
+      "footnote": true
+     },
+     {
+      "position": 9,
+      "label": "",
+      "url": "https://terra-robotics.de/products/unitree-g1-basic-humanoider-roboter",
+      "footnote": true
+     },
+     {
+      "position": 10,
+      "label": "",
+      "url": "https://robostore.com/products/unitree-h2-destiny-awakening-humanoid",
+      "footnote": true
+     },
+     {
+      "position": 11,
+      "label": "",
+      "url": "https://www.mirobot.ai/storeitems/p/booster-k1-humanoid-robot",
+      "footnote": true
+     },
+     {
+      "position": 12,
+      "label": "",
+      "url": "https://www.booster.tech/cn/booster-t2/",
+      "footnote": true
+     },
+     {
+      "position": 13,
+      "label": "",
+      "url": "https://illeon.de/",
+      "footnote": true
+     },
+     {
+      "position": 14,
+      "label": "",
+      "url": "https://www.maverickdrone.com/products/limx-oli-full-size-general-purpose-humanoid-robot",
+      "footnote": true
+     },
+     {
+      "position": 15,
+      "label": "",
+      "url": "https://teswel.ru/product/roboty/gumanoidnye-roboty/dobot-atom---standard/",
+      "footnote": true
+     },
+     {
+      "position": 16,
+      "label": "",
+      "url": "https://www.australiasatellite.com/Engineered-Arts-Ameca.htm",
+      "footnote": true
+     },
+     {
+      "position": 17,
+      "label": "",
+      "url": "https://roboselect360.com/en/robots/figure-03.html",
+      "footnote": true
+     },
+     {
+      "position": 18,
+      "label": "",
+      "url": "https://www.robotatta.com/products/517",
+      "footnote": true
+     },
+     {
+      "position": 19,
+      "label": "",
+      "url": "https://apptronik.com/product-page",
+      "footnote": true
+     },
+     {
+      "position": 20,
+      "label": "",
+      "url": "https://rbtx.co.kr/ko-KR/components/humanoid/ubtech-humanoid-walker-s2",
+      "footnote": true
+     },
+     {
+      "position": 21,
+      "label": "",
+      "url": "https://deploy.report/explainers/best-humanoid-robot-to-buy",
+      "footnote": true
+     },
+     {
+      "position": 22,
+      "label": "",
+      "url": "https://myrobotforlife.com/guides/humanoid-robots-for-sale",
+      "footnote": true
+     },
+     {
+      "position": 23,
+      "label": "",
+      "url": "https://offbrandhuman.com/tracker",
+      "footnote": true
+     },
+     {
+      "position": 24,
+      "label": "",
+      "url": "https://robot-distribution.com/en/robots/tesla-optimus",
+      "footnote": true
+     },
+     {
+      "position": 25,
+      "label": "",
+      "url": "https://roboterradar.de/reports/2026/",
+      "footnote": true
+     },
+     {
+      "position": 26,
+      "label": "",
+      "url": "https://webuildhumanoids.com/robots/type/commercially-available",
+      "footnote": true
+     }
+    ],
+    "entities": [
+     {
+      "type": "product",
+      "name": "Unitree R1"
+     },
+     {
+      "type": "product",
+      "name": "Unitree G1"
+     },
+     {
+      "type": "product",
+      "name": "Unitree H2"
+     },
+     {
+      "type": "product",
+      "name": "Booster K1"
+     },
+     {
+      "type": "product",
+      "name": "Booster T2"
+     },
+     {
+      "type": "product",
+      "name": "AgiBot X2"
+     },
+     {
+      "type": "product",
+      "name": "LimX Oli"
+     },
+     {
+      "type": "product",
+      "name": "Dobot Atom"
+     },
+     {
+      "type": "product",
+      "name": "Ameca"
+     },
+     {
+      "type": "company",
+      "name": "Engineered Arts"
+     },
+     {
+      "type": "product",
+      "name": "Figure 03"
+     },
+     {
+      "type": "company",
+      "name": "Figure AI"
+     },
+     {
+      "type": "product",
+      "name": "Digit"
+     },
+     {
+      "type": "company",
+      "name": "Agility Robotics"
+     },
+     {
+      "type": "product",
+      "name": "Apollo"
+     },
+     {
+      "type": "company",
+      "name": "Apptronik"
+     },
+     {
+      "type": "product",
+      "name": "Walker S2"
+     },
+     {
+      "type": "company",
+      "name": "UBTECH"
+     }
+    ],
+    "map": [],
+    "followUpForm": null,
+    "markdown": "As of November 2026, there are quite a few commercially available humanoid robots. Most are manufactured by Chinese companies and are aimed at research, education, industrial automation and development rather than household use.\n\nAn important distinction: some robots can be purchased directly, others are available only through business contracts, and some are still prototypes or pre-orders.\n\nSince you're in Germany, I've included models available through European distributors and indicative euro prices.\n\n## 1. Humanoid robots you can buy in Europe\n\nThese are among the more interesting commercially available models.\n\nIndicative European prices, including VAT where stated. Actual prices depend on configuration, dealer and availability.\n\n1. Unitree R1\n\nAvailable to order\n\n- Manufacturer: Unitree (China)\n- Height: approximately 123 cm\n- Price: from approximately €4,350 equivalent\n- Entry-level humanoid for research and development.\n\n  [European availability and dealers](https://www.thehumanoid.report/buy/europe/?utm_source=chatgpt.com)\n\n2. Unitree G1\n\nAvailable to order\n\n- Manufacturer: Unitree (China)\n- Height: approximately 132 cm\n- Price: approximately €12,000–€27,000+\n- One of the most interesting platforms for AI, manipulation and robotics research.\n\n  [European availability and dealers](https://www.thehumanoid.report/buy/europe/?utm_source=chatgpt.com)\n\n3. Unitree H2\n\nAvailable / dealer order\n\n- Manufacturer: Unitree\n- Height: approximately 182 cm\n- Price: approximately €54,000\n- Full-size humanoid with more human-like proportions.\n\n  [European availability and dealers](https://www.thehumanoid.report/buy/europe/?utm_source=chatgpt.com)\n\n4. Booster K1\n\nAvailable to order\n\n- Manufacturer: Booster Robotics\n- Height: approximately 95 cm\n- Price: from approximately €9,000\n- Particularly interesting for education, research and robotics competitions.\n\n  [European availability and dealers](https://www.thehumanoid.report/buy/europe/?utm_source=chatgpt.com)\n\n5. Booster T2\n\n- Manufacturer: Booster Robotics\n- Height: approximately 140 cm\n- Price: from approximately €27,000\n- More advanced development platform.\n\n  [European availability and dealers](https://www.thehumanoid.report/buy/europe/?utm_source=chatgpt.com)\n\n6. AgiBot X2\n\n- Manufacturer: AgiBot (China)\n- Height: approximately 131 cm\n- Price: approximately €31,500+\n- Designed for interaction, service applications and research.\n\n  [European availability and dealers](https://www.thehumanoid.report/buy/europe/?utm_source=chatgpt.com)\n\n7. LimX Oli\n\n- Manufacturer: LimX Dynamics\n- Height: approximately 165 cm\n- Price: approximately €85,000\n- Full-size research and development humanoid.\n\n  [European availability and dealers](https://www.thehumanoid.report/buy/europe/?utm_source=chatgpt.com)\n\n8. Dobot Atom\n\n- Manufacturer: Dobot (China)\n- Price: approximately €71,000–€87,000\n- Industrial-oriented humanoid platform.\n\n  [European availability and dealers](https://www.thehumanoid.report/buy/europe/?utm_source=chatgpt.com)\n\nSource for European availability and dealer pricing: [Humanoid robots for sale in Europe (2026), with prices](https://www.thehumanoid.report/buy/europe/)[Humanoid Robot Prices 2026: Every Model We Track](https://www.antarum.ai/humanoid-robot-prices/).\n\n## 2. Other commercially available humanoid robots\n\nThese are also worth knowing, although purchasing arrangements are more restricted.\n\nAmeca\n\n- Manufacturer: Engineered Arts\n- UK\n- Price: quotation required\n- Particularly impressive facial expressions and human interaction.\n- Available for institutional and commercial customers.\n\nFigure 03\n\n- Manufacturer: Figure AI\n- USA\n- Commercial customer arrangements\n- Focus: industrial work and general-purpose manipulation.\n\nDigit\n\n- Manufacturer: Agility Robotics\n- USA\n- Enterprise contracts and robot-as-a-service\n- Designed for logistics, warehouses and material handling.\n\nApollo\n\n- Manufacturer: Apptronik\n- USA\n- Commercial pilot and enterprise arrangements\n- Intended for manufacturing and logistics.\n\nWalker S2\n\n- Manufacturer: UBTECH\n- China\n- Business-to-business deployments\n- Designed for manufacturing and industrial environments.\n\n## 3. Famous robots that are not generally available to buy\n\n| Robot | Manufacturer | Commercial status |\n| --- | --- | --- |\n| Optimus | Tesla | Internal deployment, not publicly orderable |\n| Atlas | Boston Dynamics | Strategic industrial customers |\n| NEO | 1X Technologies | US pre-orders; limited availability |\n| 4NE1 | NEURA Robotics | Pre-order / availability subject to delivery |\n| XPENG IRON | XPENG | Industrial deployment and pilots |\n\n[Humanoid robots: what is real and what you can buy](https://www.thehumanoid.report/)[Humanoid robot: models, prices, uses](https://robot-distribution.com/en/robots/humanoids)[Humanoid Robots: Specs, Prices & Availability (2026)](https://www.humanrobots.si/)\n\n## 4. My assessment\n\nIf I were evaluating the current market, I would divide the interesting options into four categories:\n\n| Application | Robots worth investigating |\n| --- | --- |\n| AI and robotics development | Unitree G1, LimX Oli |\n| Industrial automation | AgiBot, UBTECH, Apptronik |\n| Human interaction | Ameca, AgiBot X2 |\n| Education and research | Unitree R1, Booster K1 |\n\nOne important caveat: Commercial availability does not mean that these robots can independently perform a human job. Most still have significant limitations in dexterity, reliability, autonomous decision-making and operating speed. [China can build kung fu-fighting robots. But it can't get them to do factory work](https://www.reuters.com/investigations/chinas-humanoid-robots-arent-smart-enough-take-your-job-yet-2026-08-27/)[Humanoid Robots](https://www.uscc.gov/sites/default/files/2024-10/Humanoid_Robots.pdf?trk=article-ssr-frontend-pulse_little-text-block)\n\n## 5. Where I would focus next\n\nThere is a significant difference between buying a humanoid robot as a research platform and buying one that can actually perform useful work.\n\nI can put together a more detailed comparison of the commercially available robots, including:\n\n- Purchase price in Germany, excluding and including VAT.\n- Height, weight, payload and battery life.\n- Degrees of freedom and hand dexterity.\n- Walking, stair climbing and manipulation capabilities.\n- ROS 2, Python and AI integration.\n- Availability of SDKs and autonomous operation.\n- European distributors and delivery times.\n\nAre you primarily interested in humanoid robots for industrial applications, research and AI development, or general-purpose robots that could eventually work alongside humans?",
+    "citationPills": [
+     {
+      "url": "https://www.thehumanoid.report/buy/europe/",
+      "label": "Humanoid robots for sale in Europe (2026), with prices",
+      "domain": "thehumanoid.report",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 1
+     },
+     {
+      "url": "https://www.antarum.ai/humanoid-robot-prices/",
+      "label": "Humanoid Robot Prices 2026: Every Model We Track",
+      "domain": "antarum.ai",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 2
+     },
+     {
+      "url": "https://www.thehumanoid.report/",
+      "label": "Humanoid robots: what is real and what you can buy",
+      "domain": "thehumanoid.report",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 4
+     },
+     {
+      "url": "https://robot-distribution.com/en/robots/humanoids",
+      "label": "Humanoid robot: models, prices, uses",
+      "domain": "robot-distribution.com",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 3
+     },
+     {
+      "url": "https://www.humanrobots.si/",
+      "label": "Humanoid Robots: Specs, Prices & Availability (2026)",
+      "domain": "humanrobots.si",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 5
+     },
+     {
+      "url": "https://www.reuters.com/investigations/chinas-humanoid-robots-arent-smart-enough-take-your-job-yet-2026-08-27/",
+      "label": "China can build kung fu-fighting robots. But it can't get them to do factory work",
+      "domain": "reuters.com",
+      "type": "groupedWebpage",
+      "citationPillId": 2,
+      "position": 7
+     },
+     {
+      "url": "https://www.uscc.gov/sites/default/files/2024-10/Humanoid_Robots.pdf?trk=article-ssr-frontend-pulse_little-text-block",
+      "label": "Humanoid Robots",
+      "domain": "uscc.gov",
+      "type": "groupedWebpage",
+      "citationPillId": 2,
+      "position": 6
+     }
+    ]
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "832334833897404582101d665e585f6d",
+   "charged_micro": 2800
+  }
+ }
+}

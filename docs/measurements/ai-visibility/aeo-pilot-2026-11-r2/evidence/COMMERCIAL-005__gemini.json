@@ -1,0 +1,46 @@
+{
+ "observed_at": "2026-11-14T07:16:19+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "Which humanoid robots can be purchased in Asia?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Several humanoid and bipedal robots developed by Asian tech companies (predominantly in China) are available for purchase, primarily targeting research institutions, developers, and industrial commercial pilots.\n\nNotable humanoid robots that can be bought or ordered include:\n\nUnitree Robotics G1 & H-Series (China): Unitree offers some of the market's most accessible humanoid robots. The Unitree G1 is a smaller, highly agile humanoid starting at a relatively consumer-accessible entry point (often around $10,000 to $16,000 for base configurations, scaling up with EDU and advanced hand packages). They also manufacture larger models like the Unitree H1 and H2 series for advanced research and development.\n\nBooster Robotics K1 and T-Series (China): Booster Robotics produces humanoid platforms like the K1 (targeted at education, geek, and professional tiers) and the T2 series, which can be configured with dexterous multi-finger hands. Prices generally range from roughly $11,000 to over $50,000 depending on the model tier.\n\nUBTECH Robotics (China): Known for both industrial-focused humanoids (like the Walker series) and commercial service or bionic androids (such as the Cruzr commercial service robots and U1 bionic models), UBTECH supplies hardware built for automated logistics, reception, and public-facing environments.\n\nEngineAI T-Series (China): EngineAI offers bipedal and humanoid systems like the T800 Pro, which are built for robust movement and commercial applications.\n\nNote: While many of these robots are listed via international robotics distributors or direct manufacturer storefronts, they are predominantly shipped as developer kits, enterprise evaluation units, or industrial platforms rather than plug-and-play household appliances.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Robots Asia | Humanoid, Quadruped & Industrial Robotics Solutions",
+      "url": "https://www.robotsinternational.com/Asia.htm#:~:text=View%20All%20Reception%20Delivery%20Medical.%20View%20All,View%20All%20Batteries%20Chargers%20Controllers%20Gantries%20Hands.",
+      "description": "View All Reception Delivery Medical. View All Concrete Robots Coating \nRobots. BrainCo. View All X Series Lite Series LYNX Series Humanoids \nAccessories. View All..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Robots Asia | Humanoid, Quadruped & Industrial Robotics Solutions",
+      "url": "https://www.robotsinternational.com/Asia.htm#:~:text=View%20All%20Reception%20Delivery%20Medical.%20View%20All,View%20All%20Batteries%20Chargers%20Controllers%20Gantries%20Hands.",
+      "domain": "robotsinternational.com",
+      "position": 1,
+      "description": "View All Reception Delivery Medical. View All Concrete Robots Coating \nRobots. BrainCo. View All X Series Lite Series LYNX Series Humanoids \nAccessories. View All...",
+      "citationPillId": 1
+     }
+    ],
+    "markdown": "Several humanoid and bipedal robots developed by Asian tech companies (predominantly in China) are available for purchase, primarily targeting research institutions, developers, and industrial commercial pilots.\n\nNotable humanoid robots that can be bought or ordered include:\n\n  * **Unitree Robotics G1 & H-Series (China):** Unitree offers some of the market's most accessible humanoid robots. The **Unitree G1** is a smaller, highly agile humanoid starting at a relatively consumer-accessible entry point (often around $10,000 to $16,000 for base configurations, scaling up with EDU and advanced hand packages). They also manufacture larger models like the **Unitree H1** and **H2** series for advanced research and development.\n\n  * **Booster Robotics K1 and T-Series (China):** Booster Robotics produces humanoid platforms like the **K1** (targeted at education, geek, and professional tiers) and the **T2** series, which can be configured with dexterous multi-finger hands. Prices generally range from roughly $11,000 to over $50,000 depending on the model tier.\n\n  * **UBTECH Robotics (China):** Known for both industrial-focused humanoids (like the Walker series) and commercial service or bionic androids (such as the Cruzr commercial service robots and U1 bionic models), UBTECH supplies hardware built for automated logistics, reception, and public-facing environments.\n\n  * **EngineAI T-Series (China):** EngineAI offers bipedal and humanoid systems like the **T800 Pro**, which are built for robust movement and commercial applications. [Robots Asia | Humanoid, Quadruped & Industrial Robotics Solutions](https://www.robotsinternational.com/Asia.htm#:~:text=View%20All%20Reception%20Delivery%20Medical.%20View%20All,View%20All%20Batteries%20Chargers%20Controllers%20Gantries%20Hands.)\n\n _Note: While many of these robots are listed via international robotics distributors or direct manufacturer storefronts, they are predominantly shipped as developer kits, enterprise evaluation units, or industrial platforms rather than plug-and-play household appliances._"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "eff1851495ca404fa1d8461e2b0a7cad",
+   "charged_micro": 2400
+  }
+ }
+}

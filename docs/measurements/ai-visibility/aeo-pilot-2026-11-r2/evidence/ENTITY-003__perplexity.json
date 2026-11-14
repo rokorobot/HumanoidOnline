@@ -1,0 +1,199 @@
+{
+ "observed_at": "2026-11-14T07:20:20+00:00",
+ "endpoint": "perplexity.web.answer.fast",
+ "request": {
+  "preset": "fast",
+  "input": "How tall is the Unitree G1?",
+  "max_steps": 1,
+  "max_output_tokens": 512
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "background": false,
+   "completed_at": 1794640821,
+   "created_at": 1794640821,
+   "effort": "fast@2026-11-11.0",
+   "error": null,
+   "frequency_penalty": 0,
+   "id": "resp_a4d92ea8-9028-495f-a2e7-23dfc4c37f46",
+   "incomplete_details": null,
+   "instructions": null,
+   "max_output_tokens": 512,
+   "max_tool_calls": null,
+   "metadata": {},
+   "model": "openai/gpt-6-luna",
+   "object": "response",
+   "output": [
+    {
+     "queries": [
+      "How tall is the Unitree G1?"
+     ],
+     "results": [
+      {
+       "id": 1,
+       "last_updated": "2026-10-12",
+       "snippet": "Mechanical Dimensions\n- Model\nG1\nG1 EDU\n- Height, Width and Thickness（Stand）\n1320x450x200mm\n1320x450x200mm\n- Height, Width and Thickness（Fold）\n690x450x300mm\n690x450x300mm\n- Weight (With Battery)\n...\n- Total Degrees of Freedom（Joint Freedom）",
+       "source": "web",
+       "title": "Humanoid robot G1_Humanoid Robot Functions_Humanoid Robot Price",
+       "url": "https://www.unitree.com/g1/"
+      },
+      {
+       "id": 2,
+       "last_updated": "2026-11-13",
+       "snippet": "The Unitree G1 is a compact bipedal humanoid built for research, education and content work.\nIt stands about 1.27 m, weighs roughly 35 kg with its quick-release battery, and ships with 23 degrees of freedom — rising to 4\n...\nThe Unitree G1 is a compact bipedal humanoid built for research, education and content work.\nIt stands about 1.27 m, weighs roughly 35 kg with its quick-release battery, and ships with 23 degrees of freedom — rising to 43 once dexterous hands and the upgraded waist and arms are fitted.\n...\n|Specification|Unitree G1|Unitree H2|UBTech Walker|\n|--|--|--|--|\n|Best for|Affordable, portable humanoid R&D|Full-size locomotion & manipulation research|Turnkey full-size service humanoid|\n|Purchase price|$23,700|$68,900|$960,000|\n|Height|1.32 m|~1.80 m|1.45 m|\n|Weight|~35 kg|~70 kg|77 kg|\n|Degrees of freedom|23 (up to 43 EDU)|31|36|\n|Single-arm payload|~2 kg (3 kg EDU)|~8 kg|~1.5 kg|\n|Max walking speed|2 m/s|~1.4 m/s|Contact for details|\n|Battery runtime|~2 h (9 Ah, hot-swap)|~2-3 h (972 Wh)|~2 h (54.6V/10Ah)|\n|Onboard compute|8-core CPU (+opt. Orin)|Intel i5+i7 (+opt. Jetson Thor 2070 TOPS)|Intel i7/i5|\n|Dexterous hands|Optional 7-DoF hands|10-finger hands|4-DoF per hand|\n|Sensing|3D LiDAR + depth cam + mic array|Torque-sensing joints + cameras|Depth cameras + LiDAR|\n|Primary use case|Research & education|Research, logistics, industry|Home/office service|\n...\n383 g\n- **Size**\n160 mm tall, fingertip to palm base\n...\n- Compute: Jetson Orin, 100 TOPS, for your code.\n- Built on Edu Standard: 5-DoF arms carrying up to 3 kg, 1-DoF waist.\n...\n160 mm tall, fingertip to palm base\n...\n- **Your code runs on**\n...\n- **Wrist camera**\n...\n## About the Unitree G1 Humanoid Robot.\n...\n2. ### What are the key specifications?\nThe G1 stands about 1.32 m tall and weighs roughly 35 kg with battery.\nIt has 23 degrees of freedom standard (6 per leg, 5 per arm, 1 waist), expandable to as many as 43 DOF on EDU configurations with optional waist, wrist, and the three-fingered Dex3-1 dexterous hand.",
+       "source": "web",
+       "title": "Unitree G1 Humanoid Robot | Prices & Configurations",
+       "url": "https://www.robotlab.com/store/unitree-g1-robot/"
+      },
+      {
+       "date": "2026-11-12",
+       "id": 3,
+       "last_updated": "2026-11-13",
+       "snippet": "**Unitree G1 is a humanoid robot for projects that need human-scale movement and room for further development.** It stands about 132 cm tall, weighs about 35 kg with the battery and moves at up to 2 m/s.\nFor transport, the body folds to 690 x 450 x 300 mm.\n...\n|Standing size|1,320 x 450 x 200 mm|\n|--|--|",
+       "source": "web",
+       "title": "Unitree G1",
+       "url": "https://siambc.com/en/collections/robotics/products/unitree-g1"
+      },
+      {
+       "id": 4,
+       "last_updated": "2026-11-13",
+       "snippet": "- Height: 130cm\n...\n**Super Flexible\n** The G1 humanoid robot is 1.27 meters tall, weighs 35kg, has a large joint movement angle space, and 23 to 43 joint motors.\nA single leg has 6 degrees of freedom, a single arm has 5 degrees of freedom, and a waist has 1+degrees of freedom (2 additional waist degrees of freedom can be selected).\n...\n**Unitree G1 Edu Model\n** The **Untiree G1 Edu** is an open-source model of the Unitree humanoid robot G1 series aimed at educational users.\nThe **G1-Edu** humanoid robot is designed with lightweight materials, with an overall height of 127cm and a weight of approximately 35kg.\n...\n|**Model**|**G1**|**G1 EDU**|\n|--|--|--|\n|Dimensions (standing)|1270x450x200mm|1270x450x200mm|\n...\n- Height: 130cm\n...\n**Super Flexible\n** The G1 humanoid robot is 1.27 meters tall, weighs 35kg, has a large joint movement angle space, and 23 to 43 joint motors.\nA single leg has 6 degrees of freedom, a single arm has 5 degrees of freedom, and a waist has 1+degrees of freedom (2 additional waist degrees of freedom can be selected).",
+       "source": "web",
+       "title": "survey.crkennedy.com.au › products › utg1 › unitree-g1-humanoid-robot",
+       "url": "https://survey.crkennedy.com.au/products/utg1/unitree-g1-humanoid-robot"
+      },
+      {
+       "id": 5,
+       "last_updated": "2026-09-30",
+       "snippet": "# Unitree G1 宇树人形机器人\n### 产品介绍\nUnitree G1人形智能体，AI化身。身高约132厘米，体重约35公斤，具有超越常人的灵活性，解锁无限运动潜力。其小跑速度大于2m/s，拥有广阔的关节运动空间，23至43个关节，最大关节扭矩达到120N.m，可进行高难度的动态动作，如动态站起、坐下折叠、舞棍等。\n并且G1还基于深度强化学习和仿真训练，借助AI的加速发展，在不断进行升级和演进。\n...\n### 规格参数介绍\n1) 高宽厚（站立）：1320*450*200mm\n2) 高宽厚（折叠）：690*450*300mm",
+       "source": "web",
+       "title": "Unitree G1 宇树人形机器人",
+       "url": "https://www.unitree.com/operate/g1/"
+      },
+      {
+       "date": "2026-08-30",
+       "id": 6,
+       "last_updated": "2026-11-03",
+       "snippet": "Standing height1,320 mm\n...\n|Standing height|1,320 mm|\n|--|--|\n...\n### How tall and how heavy is the Unitree G1?\nThe Unitree G1 is 1,320 mm tall and weighs 35 kg, as published by Unitree.",
+       "source": "web",
+       "title": "Unitree G1: Specifications, Price and Sources - TroubleAtlas",
+       "url": "https://www.troubleatlas.com/robots/humanoids/unitree-g1"
+      },
+      {
+       "date": "2024-08-19",
+       "id": 7,
+       "last_updated": "2026-10-26",
+       "snippet": "Unitree G1 starts at $13,500 (official price, observed Oct 2026) and is available to order (observed Oct 24, 2026), with 132 cm height and 35 kg weight.\n...\nThe base model's published dimensions and joint count are 132 cm, about 35 kg with battery and 23 degrees of freedom.\n...\n|Height|132 cmNotes & sourcesStanding height, base version (1320 mm) [1]|\n|--|--|\n...\n### Highlights\n- Base configuration: 132 cm, about 35 kg with battery and 23 DoF\n...\nUnitree G1 is a 132 cm, 35 kg biped from Unitree Robotics (China), available to order · observed oct 24, 2026 at a starting price of $13,500.\n...\n[9][11]\nHow tall is Unitree G1 and how much does it weigh?+\nUnitree G1 is 132 cm tall and weighs 35 kg (With battery; base version).\n[1]",
+       "source": "web",
+       "title": "Unitree G1 Price 2026: from $13,500, Specs & Availability",
+       "url": "https://humanoidversus.com/robots/unitree-g1"
+      },
+      {
+       "id": 8,
+       "last_updated": "2026-09-22",
+       "snippet": "# Unitree Robotics Biorobots at World Robotics Congress 2024\n### G1 humanoid Biorobot that can incorporate AI to continuously refine skills\nSince its release in May this year, the Unitree G1 humanoid robot has gained a lot of attention for its excellent performance and flexible posture.\nG1 is about 127cm tall and weighs about 35kg, with a trotting speed of over 2m/s.\n...\n### H1 Universal Humanoid Robot, the world's first in-place backflip\nAnother Unitree Robotics heavyweight, the H1 Universal Humanoid Robot has rapidly reached volume production and led global shipments since its initial launch at World Robotics 2023.H1 has broken the full-size humanoid record for walking speed with its lightweight design (weighing approximately 47kg and standing approximately 180cm tall), 19 degrees of freedom, and moving speed of 3.3 metres per second.H1 is the world's first electrically driven humanoid robot capable of performing in-situ backflips.",
+       "source": "web",
+       "title": "Unitree Robotics Biorobots at World Robotics Congress 2024",
+       "url": "https://www.unitree.com/news1/"
+      },
+      {
+       "id": 9,
+       "last_updated": "2026-10-15",
+       "snippet": "Unitree G1 is a 1.32m humanoid robot with 23–43 DOF, AI-driven control, 2 m/s speed, 360° LiDAR perception, and force-position controlled hands for precise industrial and research tasks.\n...\nUnitree G1 is a compact, AI-driven humanoid robot standing approximately 1.32 meters tall and weighing about 35 kg.\n...\nHeight (ResT)\n-\n690\nmm\nHeight (Stand)\n-\n1270\nmm\nHeight (Min)\n-\n1270\nmm\nHeight (Max)\n-\n1320\nmm\n...\n## Intro\nUnitree G1 stands 1320 mm tall, 450 mm wide, and 200 mm thick when standing.\nIt folds compactly to 690 x 450 x 300 mm for transport.",
+       "source": "web",
+       "title": "Unitree G1 - Robot Details, Use Case and Specifications ...",
+       "url": "https://www.aparobot.com/robots/unitree-g1"
+      },
+      {
+       "id": 10,
+       "last_updated": "2026-11-11",
+       "snippet": "It stands about 1.3 m tall (Unitree's launch announcement gave about 127 cm; its specification sheet lists 1,320 mm), weighs roughly 35 kg (77 lb), walks at up to 2 m/s, and ships with 23 to 43 [degrees of freedom](https://aiwiki.ai/wiki/degrees_of_freedom) depending on configuration.\n...\nThe G1 stands 1,320 mm tall, 450 mm wide, and 200 mm deep in its upright posture.\nIt weighs approximately 35 kg with the battery installed.\n...\n|---|---|\n| Height (standing) | 1,320 mm (132 cm / 4 ft 4 in) |\n...\n| Height (folded) | 690 mm |\n...\nFour G1 robots, each about 130 cm tall and 35 kg, fitted with padded headgear and standard kickboxing gloves, fought one-on-one over three two-minute rounds.\n...\n|---|---|---|---|---|\n| Height | 132 cm | 132 cm | 180 cm | 178 cm |\n...\n| Height | 132 cm | 173 cm | 150 cm | 170 cm | 175 cm |\n...\nDespite its strengths, the G1 has several notable limitations:\n- **Limited reach and workspace:** At 132 cm tall, the G1 cannot interact with environments designed for adult humans, such as standard kitchen counters, workbenches, and shelving.\nThis constrains its usefulness for many practical commercial applications.",
+       "source": "web",
+       "title": "Unitree G1",
+       "url": "https://aiwiki.ai/wiki/unitree_g1/raw"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "content": [
+      {
+       "annotations": [],
+       "text": "The Unitree G1 stands **132 cm tall** (about **4 ft 4 in**) in its upright position.[1]",
+       "type": "output_text"
+      }
+     ],
+     "id": "msg_cf3da083-1a2c-4eca-adf7-8f4ac3627a49",
+     "role": "assistant",
+     "status": "completed",
+     "type": "message"
+    }
+   ],
+   "parallel_tool_calls": true,
+   "presence_penalty": 0,
+   "preset": "fast@2026-11-11.0",
+   "previous_response_id": null,
+   "prompt_cache_key": null,
+   "reasoning": null,
+   "safety_identifier": null,
+   "service_tier": "fast",
+   "status": "completed",
+   "store": true,
+   "temperature": 1,
+   "text": {
+    "format": {
+     "type": "text"
+    }
+   },
+   "tool_choice": "auto",
+   "tools": [
+    {
+     "type": "web_search"
+    }
+   ],
+   "top_logprobs": 0,
+   "top_p": 1,
+   "truncation": "",
+   "usage": {
+    "cost": {
+     "cache_creation_cost": 0.00034,
+     "cache_read_cost": 2e-05,
+     "currency": "USD",
+     "input_cost": 0,
+     "output_cost": 2e-05,
+     "tool_calls_cost": 0.001,
+     "tool_calls_cost_details": {
+      "search_web": 0.001
+     },
+     "total_cost": 0.00138
+    },
+    "input_tokens": 4524,
+    "input_tokens_details": {
+     "cache_creation_input_tokens": 2741,
+     "cache_read_input_tokens": 1780,
+     "cached_tokens": 1780
+    },
+    "output_tokens": 31,
+    "output_tokens_details": {
+     "reasoning_tokens": 0
+    },
+    "tool_calls_details": {
+     "search_web": {
+      "cost_usd": 0.001,
+      "invocation": 1
+     }
+    },
+    "total_tokens": 4555
+   },
+   "user": null
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "be933468ab0241d498911ae9a7924c9f",
+   "charged_micro": 1380
+  }
+ }
+}

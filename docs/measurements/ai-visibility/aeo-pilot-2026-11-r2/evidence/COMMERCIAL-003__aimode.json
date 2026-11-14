@@ -1,0 +1,176 @@
+{
+ "observed_at": "2026-11-14T07:15:29+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "Which humanoid robots can be purchased in Europe?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Several bipedal and human-scale humanoid robots can be purchased, preordered, or sourced through specialized European distributors and direct manufacturers.\n\nAvailable & Shipping in Europe\n\nUnitree G1 (China / Sourced via European distributors like QUADRUPED.DE or RobotShop)\n\nType: Compact/Mid-size bipedal humanoid\nEstimated Price: From ~∈ 6,399 for entry/basic configurations up to ∈ 23,000 - ∈ 33,000+ for advanced EDU/research variants with high-DOF dexterous hands.\nBest for: Research, AI development, and programming.\n\nFourier Intelligence GR-1 (China / Global & European distribution)\n\nType: Full-size general-purpose humanoid (165 cm)\nStatus: Shipping / available via commercial robotics integrators.\nBest for: R&D, commercial showcases, and academic laboratories.\n\nPreorder & Upcoming Rollouts in Europe\n\nNEURA Robotics 4NE1 (Germany)\n\nType: Full-size industrial and domestic humanoid (180 cm, up to 100 kg payload capacity with tactile sensor skin).\nEstimated Price: ~∈ 98,000 for single units; scaling down to ~∈ 60,000 for enterprise fleet orders.\nStatus: Preorders open, with ongoing rollouts targeting industrial and service deployments.\n\n1X Technologies NEO Beta (Norway / US)\n\nType: Bipedal/wearable-inspired consumer-leaning domestic humanoid.\nStatus: Pilot testing and phased rollout stages managed directly through 1X Technologies.\n\nSourcing & Platforms\n\nIf you are looking to browse catalog options, compare hardware specs, or request institutional quotes within the EU, platforms like MERA Robotics and RobotShop Europe aggregate active B2B ordering and import channels for these models.\n\nAre you looking for a humanoid robot specifically for academic research/education, industrial automation, or personal/home use?\n\nIf you share your budget range or preferred use case, I can point you toward the most practical model.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Humanoid Robot 4NE1 for Work and Life | NEURA Robotics",
+      "url": "https://neura-robotics.com/products/4ne1/",
+      "description": "4 humanoid robot (180 cm height, 80 kg weight, 10-20 kg payload, 5 km/h speed). force/contact sensing, hearing, memory, 360° perce...",
+      "redirectLink": "https://www.google.com/goto?url=CAESZgHEIkXXGv0zhoIstnxb-pbveI0ceZ5zNnKgxG-qRuHMMFPirIkroQJoPt4FmPVkNJ4MOoYT5WXoivVVSQxg1QRebt_vhYE8kZ32khdXrfe5S5cqYQpWLtIRTMgJJf5WOCgAmWhVZA"
+     },
+     {
+      "position": 2,
+      "label": "Humanoid robots you can buy in 2026",
+      "url": "https://merarobotics.com/blog/humanoids/list/available-to-buy-2026",
+      "description": "45 models from the MERA Robotics catalogue (manufacturer data). AGIBOT A2-W, AgiBot X1, Specs from the manufacturer; they may chan...",
+      "redirectLink": "https://www.google.com/goto?url=CAESfwHEIkXX87Zju1Ui2T7vodEIOu60FbSR0GvH98vMbEbp_GTNHaIc17r9kT-oApsx2089YP3xJH74lyQLJPIsdkzXdWA-8LbEi_sfDYGEoNjrKBXMHSWw7-2QnIjeu5SYw1l5v8yhJcgwz2-CjBf_FIdJOB_4_fFHXD-mqTV4NMc"
+     },
+     {
+      "position": 3,
+      "label": "Unitree G1 | QUADRUPED.DE, 23.000,00 €",
+      "url": "https://www.quadruped.de/Unitree-G1_1",
+      "description": "Bipedal humanoid robot starting at 23.000,00 €, SKU 1121. Features 23 to 69 DOF, 35 kg weight, ~2h operating time, self-righting a...",
+      "redirectLink": "https://www.google.com/goto?url=CAESYgHEIkXXcdmeHZej4wMSdDyJ9Ec3xB4jXXK3lHSldfwf25iF5EoYP1UXGMNZ0Q16Rm3mM_hVu3SzmF4gtmpebf3jBDysoffIrNvkb-J_ACxu_NrB4e9qRls-C2t9uF6HmzdV"
+     },
+     {
+      "position": 4,
+      "label": "Professional Humanoid Robots - RobotShop",
+      "url": "https://www.robotshop.com/collections/professional-humanoid-robots",
+      "description": "RobotShop offers professional humanoid robots engineered with mobility, perception, and interaction capabilities for research, edu...",
+      "redirectLink": "https://www.google.com/goto?url=CAESfwHEIkXXHDaU4j-CcybLb4YpGbsLLP-pr-Jb8viqDNVN1fPD0rSA7ZgW3YZ16Cbp1mKlfh3QDASSDO7zwxOheQjrDeLa2bQVoS1A8q7JdUyqhyXmwGe43XtnDTKdR8UkVeMN2Og0o24faCdxEskyjR5kyTkDwMNIHyBLZWPHXk0"
+     },
+     {
+      "position": 5,
+      "label": "Neura Robotics 4NE1: Preis, Specs & Kaufen | Humanoid Scout",
+      "url": "https://www.humanoid-scout.de/roboter/neura-robotics-4ne-1",
+      "description": "Der Preis für den 4NE1 (Gen 3.5) liegt für Einzelbestellungen (1-19 Einheiten) bei ca. 98.000 €. ist für Ende 2026 geplant.",
+      "redirectLink": "https://www.google.com/goto?url=CAESdwHEIkXXRCEJo1lwwdt52G-CsuEFU8kkfCSPRkgiZXfzTsmgvnq9-J6Z1UVaWRQafLOx5zegN-ztjm7UvSD0V4URHuKV_eF7s6GjLx_uuaJUfYT0-Ftf1-vlxuaawTSgneKH3JL8DpLY0J99-LWLp_DiqXc0xj2S"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Humanoid robots you can buy in 2026",
+      "citationPillId": 1,
+      "url": "https://merarobotics.com/blog/humanoids/list/available-to-buy-2026",
+      "domain": "merarobotics.com",
+      "description": "45 models from the MERA Robotics catalogue (manufacturer data). AGIBOT A2-W, AgiBot X1, Specs from the manufacturer; they may chan...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESfwHEIkXX87Zju1Ui2T7vodEIOu60FbSR0GvH98vMbEbp_GTNHaIc17r9kT-oApsx2089YP3xJH74lyQLJPIsdkzXdWA-8LbEi_sfDYGEoNjrKBXMHSWw7-2QnIjeu5SYw1l5v8yhJcgwz2-CjBf_FIdJOB_4_fFHXD-mqTV4NMc"
+     },
+     {
+      "label": "Unitree G1 | QUADRUPED.DE, 23.000,00 €",
+      "citationPillId": 2,
+      "url": "https://www.quadruped.de/Unitree-G1_1",
+      "domain": "quadruped.de",
+      "description": "Bipedal humanoid robot starting at 23.000,00 €, SKU 1121. Features 23 to 69 DOF, 35 kg weight, ~2h operating time, self-righting a...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESYgHEIkXXcdmeHZej4wMSdDyJ9Ec3xB4jXXK3lHSldfwf25iF5EoYP1UXGMNZ0Q16Rm3mM_hVu3SzmF4gtmpebf3jBDysoffIrNvkb-J_ACxu_NrB4e9qRls-C2t9uF6HmzdV"
+     },
+     {
+      "label": "Humanoid robots you can buy in 2026",
+      "citationPillId": 2,
+      "url": "https://merarobotics.com/blog/humanoids/list/available-to-buy-2026",
+      "domain": "merarobotics.com",
+      "description": "45 models from the MERA Robotics catalogue (manufacturer data). AGIBOT A2-W, AgiBot X1, Specs from the manufacturer; they may chan...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESfwHEIkXX87Zju1Ui2T7vodEIOu60FbSR0GvH98vMbEbp_GTNHaIc17r9kT-oApsx2089YP3xJH74lyQLJPIsdkzXdWA-8LbEi_sfDYGEoNjrKBXMHSWw7-2QnIjeu5SYw1l5v8yhJcgwz2-CjBf_FIdJOB_4_fFHXD-mqTV4NMc"
+     },
+     {
+      "label": "Professional Humanoid Robots - RobotShop",
+      "citationPillId": 2,
+      "url": "https://www.robotshop.com/collections/professional-humanoid-robots",
+      "domain": "robotshop.com",
+      "description": "RobotShop offers professional humanoid robots engineered with mobility, perception, and interaction capabilities for research, edu...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAESfwHEIkXXHDaU4j-CcybLb4YpGbsLLP-pr-Jb8viqDNVN1fPD0rSA7ZgW3YZ16Cbp1mKlfh3QDASSDO7zwxOheQjrDeLa2bQVoS1A8q7JdUyqhyXmwGe43XtnDTKdR8UkVeMN2Og0o24faCdxEskyjR5kyTkDwMNIHyBLZWPHXk0"
+     },
+     {
+      "label": "Professional Humanoid Robots - RobotShop",
+      "citationPillId": 3,
+      "url": "https://www.robotshop.com/collections/professional-humanoid-robots",
+      "domain": "robotshop.com",
+      "description": "RobotShop offers professional humanoid robots engineered with mobility, perception, and interaction capabilities for research, edu...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAESfwHEIkXXHDaU4j-CcybLb4YpGbsLLP-pr-Jb8viqDNVN1fPD0rSA7ZgW3YZ16Cbp1mKlfh3QDASSDO7zwxOheQjrDeLa2bQVoS1A8q7JdUyqhyXmwGe43XtnDTKdR8UkVeMN2Og0o24faCdxEskyjR5kyTkDwMNIHyBLZWPHXk0"
+     },
+     {
+      "label": "Humanoid robots you can buy in 2026",
+      "citationPillId": 3,
+      "url": "https://merarobotics.com/blog/humanoids/list/available-to-buy-2026",
+      "domain": "merarobotics.com",
+      "description": "45 models from the MERA Robotics catalogue (manufacturer data). AGIBOT A2-W, AgiBot X1, Specs from the manufacturer; they may chan...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESfwHEIkXX87Zju1Ui2T7vodEIOu60FbSR0GvH98vMbEbp_GTNHaIc17r9kT-oApsx2089YP3xJH74lyQLJPIsdkzXdWA-8LbEi_sfDYGEoNjrKBXMHSWw7-2QnIjeu5SYw1l5v8yhJcgwz2-CjBf_FIdJOB_4_fFHXD-mqTV4NMc"
+     },
+     {
+      "label": "Humanoid Robot 4NE1 for Work and Life | NEURA Robotics",
+      "citationPillId": 4,
+      "url": "https://neura-robotics.com/products/4ne1/",
+      "domain": "neura-robotics.com",
+      "description": "4 humanoid robot (180 cm height, 80 kg weight, 10-20 kg payload, 5 km/h speed). force/contact sensing, hearing, memory, 360° perce...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESZgHEIkXXGv0zhoIstnxb-pbveI0ceZ5zNnKgxG-qRuHMMFPirIkroQJoPt4FmPVkNJ4MOoYT5WXoivVVSQxg1QRebt_vhYE8kZ32khdXrfe5S5cqYQpWLtIRTMgJJf5WOCgAmWhVZA"
+     },
+     {
+      "label": "Humanoid robots you can buy in 2026",
+      "citationPillId": 4,
+      "url": "https://merarobotics.com/blog/humanoids/list/available-to-buy-2026",
+      "domain": "merarobotics.com",
+      "description": "45 models from the MERA Robotics catalogue (manufacturer data). AGIBOT A2-W, AgiBot X1, Specs from the manufacturer; they may chan...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESfwHEIkXX87Zju1Ui2T7vodEIOu60FbSR0GvH98vMbEbp_GTNHaIc17r9kT-oApsx2089YP3xJH74lyQLJPIsdkzXdWA-8LbEi_sfDYGEoNjrKBXMHSWw7-2QnIjeu5SYw1l5v8yhJcgwz2-CjBf_FIdJOB_4_fFHXD-mqTV4NMc"
+     },
+     {
+      "label": "Neura Robotics 4NE1: Preis, Specs & Kaufen | Humanoid Scout",
+      "citationPillId": 4,
+      "url": "https://www.humanoid-scout.de/roboter/neura-robotics-4ne-1",
+      "domain": "humanoid-scout.de",
+      "description": "Der Preis für den 4NE1 (Gen 3.5) liegt für Einzelbestellungen (1-19 Einheiten) bei ca. 98.000 €. ist für Ende 2026 geplant.",
+      "position": 5,
+      "redirectLink": "https://www.google.com/goto?url=CAESdwHEIkXXRCEJo1lwwdt52G-CsuEFU8kkfCSPRkgiZXfzTsmgvnq9-J6Z1UVaWRQafLOx5zegN-ztjm7UvSD0V4URHuKV_eF7s6GjLx_uuaJUfYT0-Ftf1-vlxuaawTSgneKH3JL8DpLY0J99-LWLp_DiqXc0xj2S"
+     },
+     {
+      "label": "Humanoid robots you can buy in 2026",
+      "citationPillId": 5,
+      "url": "https://merarobotics.com/blog/humanoids/list/available-to-buy-2026",
+      "domain": "merarobotics.com",
+      "description": "45 models from the MERA Robotics catalogue (manufacturer data). AGIBOT A2-W, AgiBot X1, Specs from the manufacturer; they may chan...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESfwHEIkXX87Zju1Ui2T7vodEIOu60FbSR0GvH98vMbEbp_GTNHaIc17r9kT-oApsx2089YP3xJH74lyQLJPIsdkzXdWA-8LbEi_sfDYGEoNjrKBXMHSWw7-2QnIjeu5SYw1l5v8yhJcgwz2-CjBf_FIdJOB_4_fFHXD-mqTV4NMc"
+     },
+     {
+      "label": "Professional Humanoid Robots - RobotShop",
+      "citationPillId": 6,
+      "url": "https://www.robotshop.com/collections/professional-humanoid-robots",
+      "domain": "robotshop.com",
+      "description": "RobotShop offers professional humanoid robots engineered with mobility, perception, and interaction capabilities for research, edu...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAESfwHEIkXXHDaU4j-CcybLb4YpGbsLLP-pr-Jb8viqDNVN1fPD0rSA7ZgW3YZ16Cbp1mKlfh3QDASSDO7zwxOheQjrDeLa2bQVoS1A8q7JdUyqhyXmwGe43XtnDTKdR8UkVeMN2Og0o24faCdxEskyjR5kyTkDwMNIHyBLZWPHXk0"
+     },
+     {
+      "label": "Humanoid robots you can buy in 2026",
+      "citationPillId": 6,
+      "url": "https://merarobotics.com/blog/humanoids/list/available-to-buy-2026",
+      "domain": "merarobotics.com",
+      "description": "45 models from the MERA Robotics catalogue (manufacturer data). AGIBOT A2-W, AgiBot X1, Specs from the manufacturer; they may chan...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESfwHEIkXX87Zju1Ui2T7vodEIOu60FbSR0GvH98vMbEbp_GTNHaIc17r9kT-oApsx2089YP3xJH74lyQLJPIsdkzXdWA-8LbEi_sfDYGEoNjrKBXMHSWw7-2QnIjeu5SYw1l5v8yhJcgwz2-CjBf_FIdJOB_4_fFHXD-mqTV4NMc"
+     }
+    ],
+    "markdown": "Several bipedal and human-scale humanoid robots can be purchased, preordered, or sourced through specialized European distributors and direct manufacturers. [Humanoid robots you can buy in 2026](https://merarobotics.com/blog/humanoids/list/available-to-buy-2026)\n\n* * *\n\nAvailable & Shipping in Europe\n\n  * **Unitree G1** _(China / Sourced via European distributors like[QUADRUPED.DE](https://www.quadruped.de/Unitree-G1_1) or [RobotShop](https://www.robotshop.com/collections/professional-humanoid-robots))_\n    * **Type:** Compact/Mid-size bipedal humanoid\n    * **Estimated Price:** From ~∈ 6,399 for entry/basic configurations up to ∈ 23,000 - ∈ 33,000+ for advanced EDU/research variants with high-DOF dexterous hands.\n    * **Best for:** Research, AI development, and programming. [Unitree G1 | QUADRUPED.DE, 23.000,00 €](https://www.quadruped.de/Unitree-G1_1)[Humanoid robots you can buy in 2026](https://merarobotics.com/blog/humanoids/list/available-to-buy-2026)[Professional Humanoid Robots - RobotShop](https://www.robotshop.com/collections/professional-humanoid-robots)\n\n  * **Fourier Intelligence GR-1** _(China / Global & European distribution)_\n    * **Type:** Full-size general-purpose humanoid (165 cm)\n    * **Status:** Shipping / available via commercial robotics integrators.\n    * **Best for:** R&D, commercial showcases, and academic laboratories. [Professional Humanoid Robots - RobotShop](https://www.robotshop.com/collections/professional-humanoid-robots)[Humanoid robots you can buy in 2026](https://merarobotics.com/blog/humanoids/list/available-to-buy-2026)\n\n* * *\n\nPreorder & Upcoming Rollouts in Europe\n\n  * **NEURA Robotics 4NE1** _(Germany)_\n    * **Type:** Full-size industrial and domestic humanoid (180 cm, up to 100 kg payload capacity with tactile sensor skin).\n    * **Estimated Price:** ~∈ 98,000 for single units; scaling down to ~∈ 60,000 for enterprise fleet orders.\n    * **Status:** Preorders open, with ongoing rollouts targeting industrial and service deployments. [Humanoid Robot 4NE1 for Work and Life | NEURA Robotics](https://neura-robotics.com/products/4ne1/)[Humanoid robots you can buy in 2026](https://merarobotics.com/blog/humanoids/list/available-to-buy-2026)[Neura Robotics 4NE1: Preis, Specs & Kaufen | Humanoid Scout](https://www.humanoid-scout.de/roboter/neura-robotics-4ne-1)\n\n  * **1X Technologies NEO Beta** _(Norway / US)_\n    * **Type:** Bipedal/wearable-inspired consumer-leaning domestic humanoid.\n    * **Status:** Pilot testing and phased rollout stages managed directly through 1X Technologies. [Humanoid robots you can buy in 2026](https://merarobotics.com/blog/humanoids/list/available-to-buy-2026)\n\n* * *\n\nSourcing & Platforms\n\nIf you are looking to browse catalog options, compare hardware specs, or request institutional quotes within the EU, platforms like [MERA Robotics](https://merarobotics.com/blog/humanoids/list/available-to-buy-2026) and RobotShop Europe aggregate active B2B ordering and import channels for these models. [Professional Humanoid Robots - RobotShop](https://www.robotshop.com/collections/professional-humanoid-robots)[Humanoid robots you can buy in 2026](https://merarobotics.com/blog/humanoids/list/available-to-buy-2026)\n\nAre you looking for a humanoid robot specifically for **academic research/education**, **industrial automation**, or **personal/home use**?\n\nIf you share your **budget range** or **preferred use case**, I can point you toward the most practical model."
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "dc2633779598440cada1ba3675645811",
+   "charged_micro": 2400
+  }
+ }
+}

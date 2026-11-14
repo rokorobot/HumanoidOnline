@@ -1,0 +1,205 @@
+{
+ "observed_at": "2026-11-14T07:20:00+00:00",
+ "endpoint": "perplexity.web.answer.fast",
+ "request": {
+  "preset": "fast",
+  "input": "Unitree G1 vs Booster K1.",
+  "max_steps": 1,
+  "max_output_tokens": 512
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": "treg: this answer is 32 KB; to keep it whole send it to a file (> a.json 2> a.err) and read the parts you need with jq (start with jq 'keys' a.json)\n",
+ "response": {
+  "result": {
+   "background": false,
+   "completed_at": 1794640801,
+   "created_at": 1794640801,
+   "effort": "fast@2026-11-11.0",
+   "error": null,
+   "frequency_penalty": 0,
+   "id": "resp_c77f0982-cf75-4f5b-9897-5226a980e402",
+   "incomplete_details": null,
+   "instructions": null,
+   "max_output_tokens": 512,
+   "max_tool_calls": null,
+   "metadata": {},
+   "model": "openai/gpt-6-luna",
+   "object": "response",
+   "output": [
+    {
+     "queries": [
+      "Unitree G1 vs Booster K1."
+     ],
+     "results": [
+      {
+       "date": "2026-07-17",
+       "id": 1,
+       "last_updated": "2026-10-19",
+       "snippet": "Booster T2 is the best direct cross-brand alternative to the Unitree G1.\nBooster K1 Geek is the budget development pick, R1 is the cheapest Unitree, PM01 favors openness, and H2 is the strongest full-size upgrade.\nFor most labs, the programmable G1 EDU remains the safer all-round buy.\n...\n- Booster K1 Geek starts at $5,999 and supports secondary development, making it the strongest budget developer option.\n...\nFor most serious labs, however, the Unitree G1 EDU is still the best all-round choice.\nIt is buyable, widely used and backed by a mature developer ecosystem.\nThe catch is that the $13,500 base model is not the programmable version.\n...\n|Robot|Price|Height / weight|DOF|Runtime|Best for|Main trade-off versus G1|\n|--|--|--|--|--|--|--|\n|Unitree G1|$13,500 base; EDU roughly $44K+|132 cm / 35 kg|23 base; up to 43 EDU|About 2 hours|Best all-round research platform|Base model is not programmable|\n|Booster T2|Quote required|140 cm / 42-43 kg|31|About 2 hours walking|Higher-payload embodied-AI development|Newer platform; price and support package are not public|\n|Booster K1 Geek|From $5,999|95 cm / 19.5 kg|22|About 30 minutes walking|Budget development and teaching|Smaller, slower and less manipulator-focused|\n|Unitree R1|$4,900-$5,900; EDU quote-only|123 cm / 27-29 kg|20-26; EDU expands further|About 1 hour|Low-cost Unitree experimentation|Standard versions do not support secondary development|\n|EngineAI PM01|Quote / regional purchase|About 140 cm / 42 kg|At least 23|About 2 hours|Open locomotion and control research|Pricing and global support are less transparent|\n|Noetix N2|Contact for pricing|118 cm / 30 kg|18|1-2 hours|Compact research, education and demos|Lower articulation; development access depends on version|\n|Unitree H2|$29,900 base; EDU quote-only|About 180 cm / about 70 kg|31|About 3 hours|Full-size performance and configurable compute|Base model lacks secondary development and a high-power compute module|\n|Unitree H1|About $90,000|180 cm / 47 kg|19 body DOF|Swappable 864 Wh battery|High-dynamic locomotion and torque research|Far more expensive and less lab-friendly|\n...\nAt $5,999, the Booster K1 Geek is a more honest budget development option than the cheap base versions of the G1 or R1.\nBooster explicitly supports secondary development and offers open-source tools; Unitree reserves secondary development for its EDU configurations.\nThe K1 is much smaller: 95 cm tall and 19.5 kg, with 22 degrees of freedom and 48 TOPS of onboard AI compute in the Geek edition.\n...\n|If your priority is...|Start with...|Why|\n|--|--|--|\n|Best all-round research platform|Unitree G1 EDU|Strongest mix of availability, ecosystem, sensors and research adoption|\n|Programmable hardware below $10K|Booster K1 Geek|$5,999 entry price with secondary development support|\n|Cheapest Unitree hardware|Unitree R1|$4,900-$5,900, provided you do not need development access|\n|Open low-level control|EngineAI PM01|Hardware interfaces plus open training and deployment code|\n|Newer high-payload development platform|Booster T2|31 DOF and up to 10 kg across both arms|\n|Full-size performance and configurable compute|Unitree H2|$29,900 base, 31 DOF, 360 N·m maximum leg-joint torque and about three hours of stated battery life|\n|High-dynamic locomotion research|Unitree H1|3.3 m/s rated movement and 360 N·m knee torque|",
+       "source": "web",
+       "title": "7 Best Unitree G1 Alternatives in 2026 (Compared) - Blog",
+       "url": "https://blog.robozaps.com/b/unitree-g1-alternatives"
+      },
+      {
+       "date": "2025-11-20",
+       "id": 2,
+       "last_updated": "2026-11-11",
+       "snippet": "**Which version:** Same 95 cm, 22-DOF robot, and all three run your code.\nBooster's spec: the GEEK has 48 TOPS and about 30 minutes of walking; the EDU 117 TOPS and the Professional 200 TOPS, about 80 minutes each.\n...\n|Version|Price|Order|\n|--|--|--|\n|Booster K1 · same 95 cm, 22-DOF body · all three run your code|Booster K1 · same 95 cm, 22-DOF body · all three run your code|Booster K1 · same 95 cm, 22-DOF body · all three run your code|\n|K1 GEEK48 TOPS · 2 Ah battery, about 30 minutes of walking · Booster's warranty: 3 months|Price on requestQuote desk|Request a quote →|\n|K1 EDU117 TOPS · 5 Ah battery, about 80 minutes of walking · Booster's warranty: 1 yearClassroom pick|Price on requestQuote desk|Request a quote →|\n|K1 Professional200 TOPS · 5 Ah battery, about 80 minutes of walking · Booster's warranty: 1 yearMost compute|Price on requestQuote desk|Request a quote →|\n...\n|Humanoid|Price|Order|\n|--|--|--|\n|Noetix Bumi PRO CompactAbout 94 cm · no FCC filing under the Noetix name found|Outside Chinasee the Bumi guide|See prices →|\n|Unitree R1 AirAbout 123 cm · demonstration unit, no SDK|Price on requestQuote desk|Request a quote →|\n|Unitree R1 EDU StandardAbout 123 cm · programmable · ships from a US dealer within North America|$15,950Cart checkOct 5, 2026|Affiliate links: we may earn a referral fee. Disclosure Order|\n|Unitree G1 Basic127 cm · demonstration unit, no SDK · ships from a US dealer within North America|$17,990Cart checkOct 5, 2026|Order|\n...\n| |GEEK|EDU|Professional|\n|--|--|--|--|\n|AI compute|48 TOPS (dense)|117 TOPS|200 TOPS|\n|Battery|2 Ah|5 Ah|5 Ah|\n|Walking time|About 30 min|About 80 min|About 80 min|\n|Wi-Fi|Wi-Fi|Wi-Fi 6|Wi-Fi 6|\n|Booster's warranty|3 months|1 year|1 year|\n|Secondary development|Yes|Yes|Yes|\n...\n### Booster K1 or Unitree G1?\n| |Booster K1|Unitree G1|\n|--|--|--|\n|Price|On request (quote only on BotInfo)|$17,990 (Basic, no SDK, Oct 5, 2026); EDU from $41,705 in the US dealer's cart, Nov 4, 2026|\n|Runs your code|Every version|EDU builds only|\n|Height and weight|About 95 cm, 19.5 kg|127 cm, 35 kg|\n|Runtime per charge|About 30 to 80 min walking|About 2 hours standing|\nThe G1 is bigger and runs longer per charge; the K1 is smaller and runs your code in every version.",
+       "source": "web",
+       "title": "Booster K1 (2026): GEEK vs EDU vs Professional, Specs & Quotes",
+       "url": "https://botinfo.ai/articles/booster-k1-robot"
+      },
+      {
+       "id": 3,
+       "last_updated": "2026-11-10",
+       "snippet": "Our lab works with the Booster K1 [2], a 22-DoF humanoid that is noticeably smaller than the G1, and we wanted a SONIC-style tracker for it on the hardware we have.\n...\n| |SONIC|SONIC-K1 (ours)|\n|--|--|--|\n|Robot|Unitree G1, 29 DoF|Booster K1, 22 DoF|\n|Training data|700 h in-house mocap|9,991 Bones-SEED clips|\n|Compute|128 GPUs \\times \\sim3 days|1 shared H100, 135.4 h|\n|Post-training|–|v1.0: 1 RTX PRO 6000, 9.2 h|\n|Parallel envs|\\sim524K|16,384|\n|Iterations|\\sim100K|50,000 (+4,000, v1.0)|\n|Init. action std|0.05|0.5|\n|Rewards|SONIC Table 3|+ head joints; v1.0: + torque|\n|Delay|none|0–40 ms (v1.0)|",
+       "source": "web",
+       "title": "SONIC-K1: Porting a Universal Humanoid Motion Tracker to a Small ...",
+       "url": "https://arxiv.org/html/2610.39327"
+      },
+      {
+       "id": 4,
+       "last_updated": "2026-11-13",
+       "snippet": "The Booster K1 is a 95 cm, 19.5 kg bipedal humanoid built for people who want to write the control code themselves.\n...\nAll three are 95 cm, 19.5 kg and 22 DOF, with 60 Nm peak torque and a quoted top walking speed of 2 m/s.\n...\nThe K1's only real competitor at this end of the market is the **Unitree G1**, and they are less alike than the price bracket suggests.\nThe G1 is bigger — 1.32 m, around 35 kg — with far more degrees of freedom, optional dexterous hands, and a much larger public software ecosystem.\nIt is also the most widely owned research humanoid in the world, which cuts both ways: the ecosystem is deeper, and on 29 August 2026 two vulnerabilities were disclosed in the G1 EDU allowing root-level remote code execution, one of them over Bluetooth.\n...\nNo comparable audit of the K1 has been published, which is not the same as the K1 being safer.\nThe K1's case against it is size, price and durability.\nAt 95 cm and 19.5 kg it is a machine a student can carry, drop and reset alone.\nIt is cheaper at entry.\nAnd it has the RoboCup evidence, which the G1 does not have in the same form.\n...\n| |This robot Booster Robotics Booster K1|Unitree Robotics Unitree R1|Unitree Robotics Unitree G1|Unitree Robotics Unitree H1|\n|--|--|--|--|--|\n|Price (US)|$11,865 – $26,998|$4,900 – $5,900|$13,500 – $73,900|~$90,000|\n|Availability|On the market|On the market|On the market|On the market|\n|Height|95 cm|1.23 m|1.32 m standing|~1.80 m|\n|Payload|Unknown|Unknown|Arm ~2 kg|Not rated for H1|\n|DoF|22|20|23|~19|\n|Buyer|Individuals|Individuals|Individuals|Enterprise|\n|Made in|China|China|China|China|\n...\nBooster K1 or Unitree G1?+\nThe G1 is bigger (1.32 m, about 35 kg), has more degrees of freedom, offers dexterous hands and has the largest public software ecosystem in the category.\nThe K1 is smaller, cheaper at entry, easier for one person to handle, and has the stronger independent competition record.\nNote also the root-level vulnerabilities disclosed in the G1 EDU on 29 August 2026 — no equivalent audit of the K1 has been published either way.",
+       "source": "web",
+       "title": "Booster K1 Robot: Price, Specs & Editions (2026) - Humanoza",
+       "url": "https://humanoza.com/robots/booster-k1"
+      },
+      {
+       "date": "2026-04-12",
+       "id": 5,
+       "last_updated": "2026-11-13",
+       "snippet": "|Platform|Price|Height / weight|DoF|Development access|Best for|\n|--|--|--|--|--|--|\n|**Unitree G1**|Base $21,500.00; EDU from $43,800.00|132 cm / ≈35 kg|23 (base), up to 43 (EDU)|EDU only|Research, teleoperation data, learning-based control|\n|**Unitree H1**|$99,800.00|≈180 cm / ≈47 kg|5 per leg, 4 per arm|Yes|Full-size locomotion research|\n|**Unitree H1-2**|$128,800.00|≈178 cm / ≈70 kg|27|Yes|Full-size loco-manipulation|\n|**Unitree H2**|From $40,800.00|182 cm / ≈70 kg|31|EDU only|Full-size research (EDU), demos and reception (base)|\n|**Booster T1**|Request a Quote|≈118 cm / ≈30 kg|23 to 41|Yes|Locomotion and RoboCup research|\n|**Booster K1**|From $11,998.00|≈95 cm / ≈19.5 kg|22|Yes|Education, competitions, first projects|\n|**Unitree R1**|$6,270.00|≈123 cm / ≈29 kg|20 to 40|EDU only|Entry-level demos and teaching|\n|**AGIBOT X2**|From $27,999.00|131 cm|Varies by model|X2 Ultra|Interaction, performances, education|\n...\nThe Unitree G1 is the humanoid most research labs start with.\nUnitree sells it in two versions that look the same but are very different purchases.\nThe base G1 (current store price: $21,500.00) has 23 degrees of freedom and, per Unitree's spec table, no secondary development.\nThe **G1 EDU** (from $43,800.00 in our store) is open to secondary development, goes up to 43 degrees of freedom with optional dexterous hands and extra waist and wrist joints, takes an added compute module, and carries an 18-month warranty instead of 8.\n...\n|Your Need|Best Form Factor|Recommended Platform|\n|--|--|--|\n|Tabletop manipulation research|**Robot arm**|OpenArm$6,500.00 or Franka FR3|\n|Mobile inspection / patrol|**Quadruped**|Unitree Go2$3,690.00 or Boston Dynamics SpotRequest a Quote|\n|Mobile manipulation (navigate + pick)|**Quadruped + arm**|Unitree B2$85,800.00 + Z1 arm$20,799.00|\n|Two-armed tasks around a building (kitchens, cabinets, doors)|**Wheeled bimanual**|RC Mobile Aloha$20,000.00|\n|Bipedal locomotion research|**Humanoid**|Unitree G1 EDU$43,800.00 or Booster T1Request a Quote|\n|Loco-manipulation research|**Humanoid**|Unitree G1 EDU$43,800.00 or Unitree H1-2$128,800.00|\n|Human-scale environment tasks|**Humanoid**|Unitree H1$99,800.00 or Unitree H2 EDU$66,700.00|\n|Teaching and outreach|**Small humanoid**|Booster K1From $11,998.00 or Unitree R1$6,270.00|\n...\nIn our store, from $6,270.00 for the Unitree R1 and From $11,998.00 for the Booster K1, through $21,500.00 for the base Unitree G1, to $99,800.00 for the full-size Unitree H1.",
+       "source": "web",
+       "title": "Event Humanoid Robot Applications and Use Cases",
+       "url": "https://www.roboticscenter.ai/guides/humanoid-robot-buyers-guide-2025"
+      },
+      {
+       "date": "2026-10-18",
+       "id": 6,
+       "last_updated": "2026-11-10",
+       "snippet": "- **Entry level:** the Unitree R1 ($6,270.00) and Booster K1 (From $11,998.00) are among the least expensive humanoids we sell.\nBoth stand 1.25 m or less and suit teaching, demos and first projects.\n- **The research default:** a Unitree G1 EDU configuration.\nOnly EDU-class G1s are open to secondary development; the base G1 ($21,500.00) is not.\n...\n|Model|Price|Class|\n|--|--|--|\n|G1|$21,500.00|Base G1, 23 DoF, no secondary development|\n|G1 Pro|$27,890.00|G1 configuration|\n|G1 EDU-U1|$43,800.00|Entry EDU configuration|\n|G1 EDU-U2|$53,800.00|EDU configuration|\n|G1 EDU-U3|$65,800.00|EDU configuration|\n|G1 Edu Ultimate B|$67,800.00|EDU with dexterous hands|\n|G1 Edu Plus Teleop Bundle|$68,800.00|EDU with teleoperation equipment|\n|G1-Comp|$48,800.00|G1 configuration|\n...\n|Model|Price|Class|\n|--|--|--|\n|Booster K1|From $11,998.00|95 cm, 22 DoF; education and competitions|\n|Booster T1|Request a Quote|≈1.2 m, 23–41 DoF; locomotion and RoboCup research|\n|Booster T2|From $38,850.00|≈1.4 m, 31 DoF; loco-manipulation|",
+       "source": "web",
+       "title": "Humanoid Robot Price 2026: Every Model We Sell, Live",
+       "url": "https://www.roboticscenter.ai/guides/research-humanoid-cost"
+      },
+      {
+       "date": "2026-10-18",
+       "id": 7,
+       "last_updated": "2026-11-10",
+       "snippet": "|Model|Price|Why researchers pick it|\n|--|--|--|\n|Unitree G1 EDU-U1|$43,800.00|Entry EDU configuration of the G1. Only the EDU is open to secondary development and takes dexterous hands (Unitree)|\n|Booster T1|Request a Quote|≈1.2 m, open SDK and open-source RL training and deployment code; a RoboCup favourite|\n|Unitree H1|$99,800.00|Full-size (≈180 cm) locomotion platform with a user development PC, 3D LiDAR and depth camera (Unitree)|\n|Unitree H2 Edu Smart|$66,700.00|Full-size, 31-DoF H2 configured for secondary development|\n|EngineAI PM01|Request a Quote|138 cm open platform for research and education|\n...\n|Model|Price|Why educators pick it|\n|--|--|--|\n|Booster K1|From $11,998.00|95 cm and ≈19.5 kg, with Python and C++ SDKs, built-in soccer and dance agents, and automatic fall recovery (Booster)|\n|Unitree R1|$6,270.00|≈123 cm, ≈29 kg entry humanoid; the R1 EDU adds secondary development (Unitree)|\n|Unitree R1 Edu Standard|$15,950.00|R1 configured for programming classes|\n|NOETIX Bumi|$4,045.00|Small (≈94 cm, ≈17 kg) education humanoid|\n|AGIBOT X2|From $27,999.00|1.31 m interactive humanoid; the X2 Ultra adds 3D LiDAR, an RGB-D camera and an Orin NX board for secondary development|\n...\n|Model|Price|Notes|\n|--|--|--|\n|Unitree G1 Edu Plus Teleop Bundle|$68,800.00|G1 EDU packaged with teleoperation equipment|\n|Unitree H1-2|$128,800.00|Full-size, 7-DoF arms; supported by Unitree's xr_teleoperate|\n|Dobot Atom D|Request a Quote|Humanoid torso with 7-DoF arms and a binocular head camera, built for VR/MR teleoperation|\n|Unitree H2 Plus Ultimate|$83,500.00|EDU-class H2 with NVIDIA Jetson Thor onboard|\n...\n|Model|Price|Notes|\n|--|--|--|\n|AGIBOT X2|From $27,999.00|Walks, dances and holds conversations, with an expressive face screen|\n|AGIBOT A2 Ultra|$69,999.00|169 cm, built for reception and guided tours|\n|AGIBOT A3|From $63,999.00|Full-size performance humanoid with dual hot-swappable batteries|\n|Unitree H2|$40,800.00|182 cm with a bionic head and voice interaction (Unitree)|\n|Booster K1|From $11,998.00|Small and portable, with built-in dance, soccer and chat agents|",
+       "source": "web",
+       "title": "Humanoid Robots by Use Case: Research, Teaching, Data Collection and Events",
+       "url": "https://www.roboticscenter.ai/guides/humanoids"
+      },
+      {
+       "date": "2026-02-24",
+       "id": 8,
+       "last_updated": "2026-10-18",
+       "snippet": "|Robot family|Published entry price|Entry configuration and main catch|Buying status|\n|--|--|--|--|\n|Unitree R1|R1 AIR $4,900; R1 $5,900; R1 EDU quote-only|AIR has 20 DoF and a monocular camera; R1 has 26 DoF and binocular vision. Neither has dexterous hands or secondary-development access. EDU adds development options.|Official Unitree listing; tax and shipping excluded; stock varies.|\n|Booster K1|From $5,999|Three 22-DoF tiers: Geek, Education and Professional. All list a stereo depth camera and development support, but compute, battery and warranty vary. The starting tier is not named.|Sales inquiry rather than instant checkout.|\n|Unitree G1|G1 $13,500; G1 EDU quote-only|Base has 23 DoF, a depth camera, 3D LiDAR and about two hours of battery, but no high-compute module, dexterous hands or secondary-development access.|Official Unitree store listing; currently backordered; shipping, tax and duties are extra.|\n|1X NEO|$20,000 outright; $499/month subscription (not ownership); $200 refundable deposit|Home-first preorder. It begins with limited autonomy; scheduled Expert Mode can involve remote human supervision.|1X says US deliveries start in 2026.|\n|LimX Oli|From CNY 158,000|Full-size family with Lite (31 DoF), EDU (33 DoF) and Super (43 DoF). The price announcement does not name the starting tier, and hardware varies.|Current site uses order consultation; confirm price and tier in writing.|\n|EngineAI PM01|CNY 188,000|The current store card does not identify Commercial or Education. Only Education lists depth cameras, Orin NX and secondary development.|Manufacturer store listing; exact configuration needs confirmation.|\n|Unitree H2|H2 $29,900; H2 EDU quote-only|Base has 31 DoF, binocular vision and about three hours of battery, but no dexterous hands, high-compute module or secondary development.|Publicly priced by Unitree but sold through contact sales; tax and shipping excluded.|\n|Kepler K2 Bumblebee|RMB 248,000 per unit (company release)|Industrial humanoid sold through a business inquiry. The release does not map the price to a detailed biped configuration or service package.|Kepler reported mass production and deliveries; current quote required.|\nAll list a stereo depth camera and development support, but compute, battery and warranty vary.\n...\n|Family|Lowest published option|Development-oriented option|Difference that matters|\n|--|--|--|--|\n|Unitree R1|R1 AIR $4,900; 20 DoF; monocular camera|R1 EDU, quote-only; 26–40 DoF; optional dexterous hands and high-compute module|Unitree's table marks secondary development only on EDU. The $5,900 R1 improves joints and vision but still is not the EDU tier.|\n|Booster K1|Family advertised from $5,999; exact tier not stated|Geek / Education / Professional all list secondary development|Compute rises from 48 to 117 to 200 TOPS; the listed battery rises from 2Ah to 5Ah and the warranty from 3 months to 1 year on the two higher tiers.|\n|Unitree G1|G1 $13,500; 23 DoF; no high-compute module|G1 EDU, quote-only; up to 43 DoF with optional compute and hands|The advertised base price is a mobility chassis, not the research configuration shown in many manipulation demonstrations.|\n|1X NEO|$499/month Standard subscription|$20,000 Early Access ownership|The ownership offer lists a 3-year warranty, premium support and priority delivery. A monthly payment is not an outright purchase price.|\n|LimX Oli|From CNY 158,000; tier not stated|Oli Lite / EDU / Super|The current matrix varies end effectors, perception compute and developer hardware by tier. Request the matrix with the quoted SKU.|\n|EngineAI PM01|CNY 188,000 storefront card; version not stated|Commercial / Education|Commercial lists 23 DoF and no secondary development. Education lists 24 DoF, two depth cameras, Orin NX and secondary development.|\n|Unitree H2|H2 $29,900; 31 DoF|H2 EDU, quote-only|Dexterous hands, high-performance compute and secondary development belong to the EDU configuration, not the base price.|\n...\nBooster advertises K1 from $5,999.\nIts three 22-DoF configurations are Geek, Education and Professional, and all three list secondary-development support.\n...\nUnitree lists the base G1 at $13,500 before tax and shipping.\nIt has 23 DoF, a depth camera, 3D LiDAR and about two hours of listed battery life.\nThe G1 EDU price is not public.\nBase G1 does not include dexterous hands, a high-compute module or secondary-development support in Unitree's own matrix.\nEDU can expand the body to as many as 43 DoF and add compute and hand options.\n...\n|Need|Lowest-priced fit here|Why|Main caveat|\n|--|--|--|--|\n|Complete biped at the lowest current price|Unitree R1 AIR ($4,900)|Lowest current manufacturer price for a complete biped in this scope.|No dexterous hands; secondary development is reserved for EDU.|\n|Entry embodied-AI development|Booster K1 (from $5,999)|Every named tier lists secondary-development support.|Starting price is not mapped to a tier; obtain the exact compute and battery quote.|\n|Unitree ecosystem with more sensors|Unitree G1 ($13,500)|Depth camera and 3D LiDAR add perception beyond the cheaper R1 tiers.|Research compute, hands and secondary development require G1 EDU.|\n|Home-first program|1X NEO ($20,000 or $499/month)|Only model here sold around household use.|It is a preorder with early autonomy limits and optional remote supervision.|\n|Full-size development body|LimX Oli (from CNY 158,000)|Lowest published full-size starting price in this shortlist and a detailed development matrix.|Published price is not mapped to Lite, EDU or Super; get a current tier quote.|\n|Industrial pilot|Kepler K2 (RMB 248,000 per unit)|Company reports production and industrial positioning.|Commercial evidence and configuration still need buyer verification.|",
+       "source": "web",
+       "title": "8 Cheapest Humanoid Robots (2026 Prices & Configs) - Blog - RoboZaps",
+       "url": "https://blog.robozaps.com/b/cheapest-humanoid-robots-2026"
+      },
+      {
+       "date": "2026-03-10",
+       "id": 9,
+       "last_updated": "2026-10-18",
+       "snippet": "|Robot|Price (July 2026)|Where it beats the G1|Where it doesn't|\n|--|--|--|--|\n|Unitree R1 / R1 EDU|$5,900 / $10,500 shop-listed|Cheapest programmable humanoid from a major maker|Smaller (25 kg class), lighter sensor suite, no LiDAR-grade research stack; see our R1 vs G1 comparison|\n|Booster K1|$5,999|All variants programmable; RoboCup pedigree|95 cm education-class machine, not a G1-scale platform|\n|EngineAI PM01|~¥88,000 (~$12–14k)|Comparable price, Jetson onboard|Far smaller software ecosystem and install base|\n|Unitree H2|$29,900 listed|Full-size, stronger|Listed but not currently orderable online; see our H2 review|",
+       "source": "web",
+       "title": "Unitree G1 Price 2026: From $13,500, EDU Cost & Full Specs",
+       "url": "https://blog.robozaps.com/b/unitree-g1-review"
+      },
+      {
+       "date": "2026-10-26",
+       "id": 10,
+       "last_updated": "2026-11-12",
+       "snippet": "The Unitree G1 EDU and Booster K1 bring different strengths to humanoid robotics.\nWhile the G1 EDU emphasizes configurable hardware, manipulation research and embodied AI, the K1 focuses on compact design, programmable locomotion and accessible development tools.\nThis comparison examines their capabilities, computing, runtime and research applications to help identify the right platform for each project.\n...\nThe Unitree G1 EDU focuses on secondary development, flexible joint configurations, and optional dexterous hands for manipulation research.\nThe Booster K1 pairs a small size with programmable mobility, intelligent sensing, and a broad range of pre-installed applications.\n...\n|Metric|Unitree G1 EDU|Booster K1|\n|--|--|--|\n|Robot type|Programmable humanoid research platform|Compact humanoid robotics development platform|\n|Best-fit use cases|Humanoid locomotion, embodied AI, manipulation research and reinforcement learning|Education, soccer robotics, locomotion research and interactive development|\n|Dimensions|1,320 × 450 × 200 mm (standing; H × W × D)|Approx. 950 mm standing height|\n|Weight|Approx. 35 kg+ with battery|Approx. 19.5 kg|\n|Degrees of freedom (DoF)|23–43, depending on configuration|22 across the head, arms and legs|\n|Arm load capacity|Approx. 3 kg maximum for the EDU arm, depending on extension and posture|No directly comparable arm payload figure established in the cited specification|\n|Runtime / charging|Approx. 2 h stated battery life; varies by operation and configuration|Geek: 20 min; Education/Professional: up to 70 min at the specified test speed of 1.1 m/s; charging up to 2 h|\n|Navigation / sensing|Depth camera, 3D LiDAR and microphone array|Stereo/depth camera, 9-axis IMU and microphone array; perception configuration varies by edition|\n|Computing|8-core CPU; optional high-compute modules, including Orin-based options|Geek: 48 TOPS; Education: 117 TOPS; Professional: 200 TOPS|\n|Locomotion|Humanoid movement with configurable joint architecture and developer control|Forward/backward and lateral walking, turning, balance recovery and compound gaits|\n|Software / development|Secondary development supported; configuration-dependent hardware and computing options|Python/C++ SDK support, Agent framework, Booster Studio and simulation-to-robot development workflows|\n|Distinctive capabilities|Optional three-finger force-controlled dexterous hands, additional wrist and waist axes, and extensive joint configuration|Lightweight design, built-in interactive Agents, autonomous get-up capability and an accessible development ecosystem|\n|Key limitation / caveat|Confirm the exact EDU configuration, optional hands, waist joints and computing module before comparing specifications|Battery life, computing performance and warranty vary by edition; published walking-speed figures differ by test conditions|\n...\nResearch focus and operational role: The Unitree G1 EDU is an appropriate robot for communities working on humanoid control, reinforcement learning and manipulation.\nCustomizable joints and optional dexterous hands expand the possibilities for experiments involving object handling and manipulation.\nThe Booster K1 is a robot built for embodied AI education, research in locomotion, and interactive applications with its embedded Agents supporting soccer, dance, and dialogue.\nHardware and manipulation: The G1 EDU can achieve 23-43 degrees of freedom (depending on which configuration you choose), versus 22 degrees of freedom in the K1.\nBut just having more degrees of freedom does not equate to better performance.\nFor manipulation research, the G1 EDU has optional dexterous hands, more wrist axes and a waist configuration.\nThe K1's light 19.5kg body makes transportation and configuration simple across classrooms, laboratories and competitions.\nComputing and development: Unitree has an eight-core CPU, as well as optional high-compute modules for the G1 EDU.\nBooster has three levels of its K1 with claimed AI computing capabilities of 48, 117 and 200 TOPS.\nIts development environment supports Python and C++, as well as its Agent framework and simulation tools to enable a link between virtual testing and physical-robot realisation.\nThese figures should be weighed against access to software, supported frameworks, integration burdens and the actual computation hardware included in the purchase.\nLocomotion and endurance: Both units support humanoid type walking and running, but K1 makes an explicit claim to support (horizontal) lateral walking in addition.\nBooster currently states the peak walking speed on its product page as 2 m/sec and (on the spec sheet) as 1.1 m/sec under specified test conditions, and its 'Education' and 'Professional' editions are rated for 70 minutes at this specified speed compared to 20 minutes for the Geek.\nUnitree lists 2 hours battery life for the G1 'EDU' model, though endurance will depend on how far it walks, what payloads it carries, what computing it uses and how it is configured - not all of these figures are directly comparable.\nDeployment and usability: The K1's smaller profile and integrated interactive features could make it easier to use for demos, training and repeatable development activities.\nThe G1 EDU provides a more configurable research platform but its optional accessories and compute options will need to be specified carefully.\n...\nBooster K1: Geek, Education and Professional editions all run on the same 22-DoF body, but vary in battery and computing spec.\n...\nNo overall performance winner for either specification sheet.\nThe actual test results will vary according to the task, the hardware configuration, the control software, the computer and the environment.\n...\nSelect the Unitree G1 EDU if robotics research emphasizes customizable humanoid chassis, advanced manipulation testbeds and optional dexterous Hand development.\nSelect the Booster K1 if a lightweight platform, built-in interactive capabilities and a well-defined development ecosystem are the best matches for your curriculum, walking and embodiment research, and prototyping of AI working inside robots.\nThe choice should be driven by the needs of the research tasks, the tools provided (or not provided), software flexibility, run-time and support issues.\nThe best way to determine which platform will work best is to have a pilot study using the algorithms, sensors and manipulation tasks of interest.",
+       "source": "web",
+       "title": "Unitree G1 EDU vs. Booster K1",
+       "url": "https://robot24.com/unitree-g1-edu-vs-booster-k1"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "content": [
+      {
+       "annotations": [],
+       "text": "**The Unitree G1 is the better fit for configurable research and manipulation; the Booster K1 is the better fit for a compact, lighter robot that’s easier to transport and program across its product tiers.** They’re not direct equivalents: the G1 is substantially taller and heavier, while the K1 is aimed more at education, locomotion, and interactive projects.[1][2][10]\n\n| | Unitree G1 | Booster K1 |\n|---|---|---|\n| **Size** | About 132 cm and 35 kg[1] | About 95 cm and 19.5 kg[2] |\n| **Degrees of freedom** | 23 on the base version; EDU configurations can offer up to 43[1] | 22[2] |\n| **Programming access** | Secondary development is for EDU configurations; confirm the exact model and options[1][5] | Secondary development is listed across K1 tiers[2] |\n| **Manipulation** | EDU can be configured with optional dexterous hands and additional wrist/waist joints[5][10] | Better suited to locomotion and education; no directly comparable arm-payload figure is established in the cited specs[10] |\n| **Compute and runtime** | EDU options vary; roughly two hours is commonly stated, but depends on configuration and use[1][10] | Editions vary: listed compute ranges from 48 to 200 TOPS, with walking-time estimates varying by edition and test conditions[2][10] |\n| **Price** | Base and EDU prices differ substantially; the base model is not equivalent to a programmable EDU robot[5][6] | Published starting prices vary by seller and configuration; get a quote for the specific tier[1][5] |\n\n**Choose the G1 EDU** if your work needs a larger platform, optional hands, or a configurable research/manipulation setup. **Choose the K1** if portability, teaching, locomotion experiments, or programming access across tiers matter more. Compare written quotes and included hardware—not headline prices—because compute, batteries, hands, and development access depend on the exact configuration.[2][5][10]",
+       "type": "output_text"
+      }
+     ],
+     "id": "msg_70eeac75-9a57-4dd4-98a5-fc7596e8f351",
+     "role": "assistant",
+     "status": "completed",
+     "type": "message"
+    }
+   ],
+   "parallel_tool_calls": true,
+   "presence_penalty": 0,
+   "preset": "fast@2026-11-11.0",
+   "previous_response_id": null,
+   "prompt_cache_key": null,
+   "reasoning": null,
+   "safety_identifier": null,
+   "service_tier": "fast",
+   "status": "completed",
+   "store": true,
+   "temperature": 1,
+   "text": {
+    "format": {
+     "type": "text"
+    }
+   },
+   "tool_choice": "auto",
+   "tools": [
+    {
+     "type": "web_search"
+    }
+   ],
+   "top_logprobs": 0,
+   "top_p": 1,
+   "truncation": "",
+   "usage": {
+    "cost": {
+     "cache_creation_cost": 0.00097,
+     "cache_read_cost": 2e-05,
+     "currency": "USD",
+     "input_cost": 0,
+     "output_cost": 0.00023,
+     "tool_calls_cost": 0.001,
+     "tool_calls_cost_details": {
+      "search_web": 0.001
+     },
+     "total_cost": 0.00222
+    },
+    "input_tokens": 9549,
+    "input_tokens_details": {
+     "cache_creation_input_tokens": 7766,
+     "cache_read_input_tokens": 1780,
+     "cached_tokens": 1780
+    },
+    "output_tokens": 451,
+    "output_tokens_details": {
+     "reasoning_tokens": 0
+    },
+    "tool_calls_details": {
+     "search_web": {
+      "cost_usd": 0.001,
+      "invocation": 1
+     }
+    },
+    "total_tokens": 10000
+   },
+   "user": null
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "cfb9fcaf3cb34376be4d94c17d110c73",
+   "charged_micro": 2220,
+   "hint": "feedback"
+  }
+ }
+}

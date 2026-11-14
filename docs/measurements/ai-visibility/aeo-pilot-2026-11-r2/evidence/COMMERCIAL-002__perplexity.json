@@ -1,0 +1,302 @@
+{
+ "observed_at": "2026-11-14T07:18:07+00:00",
+ "endpoint": "perplexity.web.answer.fast",
+ "request": {
+  "preset": "fast",
+  "input": "Which humanoid robots are commercially available?",
+  "max_steps": 1,
+  "max_output_tokens": 512
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": "treg: this answer is 37 KB; to keep it whole send it to a file (> a.json 2> a.err) and read the parts you need with jq (start with jq 'keys' a.json)\n",
+ "response": {
+  "result": {
+   "background": false,
+   "completed_at": 1794640688,
+   "created_at": 1794640688,
+   "effort": "fast@2026-11-11.0",
+   "error": null,
+   "frequency_penalty": 0,
+   "id": "resp_d53254f1-80c6-4463-ba74-12fe4ad7d3cd",
+   "incomplete_details": null,
+   "instructions": null,
+   "max_output_tokens": 512,
+   "max_tool_calls": null,
+   "metadata": {},
+   "model": "openai/gpt-6-luna",
+   "object": "response",
+   "output": [
+    {
+     "queries": [
+      "Which humanoid robots are commercially available?"
+     ],
+     "results": [
+      {
+       "date": "2026-02-24",
+       "id": 1,
+       "last_updated": "2026-10-18",
+       "snippet": "All 53 companies clear the database inclusion rule, while only ten current flagships have evidence strong enough for the commercially available label.\n...\nTen flagships now carry the commercially available label, including AGIBOT A3, Booster K1, Dexmate Vega, MagicBot Gen1, Robosen K1 Pro, UBTECH Walker S2 and Unitree H2.\n...\nThe four largest disclosed raises in the directory all belong to US companies: Figure AI at a Series C of at least $1 billion, Apptronik at a Series A of at least $935 million, Agility Robotics at a $150 million Series B and 1X Technologies at a $100 million Series B. Against that, only Dexmate's Vega carries the commercially available label and 1X's NEO is pre-order, while availability for Digit, Apollo, Atlas, Figure 03 and Optimus is recorded as unknown rather than assumed.\n...\n- **Which humanoid robots are commercially available?**",
+       "source": "web",
+       "title": "53 Humanoid Robot Companies Compared (2026 Directory)",
+       "url": "https://blog.robozaps.com/b/humanoid-robot-companies"
+      },
+      {
+       "date": "2026-07-20",
+       "id": 2,
+       "last_updated": "2026-10-02",
+       "snippet": "# We found 33 commercial humanoid robot families. Just one full-size model targets the home\nA review of 74 RoboZaps listings found 33 current, commercially addressable bipedal families.\n...\nFigure has put its humanoid on a BMW production line and signed another commercial deployment agreement.\nUBTECH says Walker S2 has entered mass production and begun deliveries.\nAgility Robotics offers Digit through enterprise deployments and Robots-as-a-Service agreements.\nBoston Dynamics says its initial 2026 Atlas production is committed to Hyundai and Google DeepMind.\n...\n1X NEO can be preordered with a $200 deposit.\nNEURA Robotics describes its €100 reservation for 4NE1 as refundable and says availability is expected at the end of 2026.\n...\nOnly four qualifying families sat outside the work-and-development market: 1X NEO, Maxtronics NAO6, Noetix Dora and Robosen K1 Pro.\n...\nK1 Pro is available through a manufacturer cart, but at consumer and STEM scale.",
+       "source": "web",
+       "title": "Commercial humanoid robot market: 33 families, one home ...",
+       "url": "https://blog.robozaps.com/b/commercial-humanoid-robots-work-not-home-2026"
+      },
+      {
+       "id": 3,
+       "last_updated": "2026-11-09",
+       "snippet": "Commercially Available Humanoid Robots — Catalog 2026 | HumanoidHub\n# Commercially available humanoid robots\nMany humanoid robots are announced, demonstrated, or in pilot — far fewer are buyable today.\nThis page filters the catalog to platforms with active commercial procurement channels.\n18 robots match\n...\n### Apollo\nApollo is a bipedal humanoid robot from Apptronik aimed at automating tasks in industrial and commercial environments.\n...\n### Which humanoid robots can I buy today?\nThe shortest list: Unitree platforms (G1, H1) for research/education; Fourier GR-1 for research; some Chinese platforms via direct order.\nMost flagship US platforms (Atlas, Figure 03, Apollo) are deployment-partner-only as of mid-2026.",
+       "source": "web",
+       "title": "Commercially Available Humanoid Robots — Catalog 2026",
+       "url": "https://www.humanoidhub.ai/humanoid-robots/commercially-available"
+      },
+      {
+       "date": "2026-10-28",
+       "id": 4,
+       "last_updated": "2026-10-31",
+       "snippet": "|NAO|Aldebaran Robotics (NAO now continued by Maxtronics)|France|2007|Bipedal|58|-|25|Commercially available|Chosen in August 2007 as the RoboCup Standard Platform League robot; Aldebaran reported about 20,000 sold.\n...\n|PAL Robotics TALOS|PAL Robotics|Spain|2017|Bipedal|175|95|32|Commercially available (research platform)|Research biped IEEE Spectrum called an improvement on PAL's REEM humanoids; 6 kg per extended arm.\n|Tokyo Robotics Torobo|Tokyo Robotics|Japan|2017|Wheeled|-|-|-|Commercially offered (orders opened late 2017)|Torque-sensing humanoid; orders opened late 2017.\n...\n|PAL Robotics ARI|PAL Robotics|Spain|2019|Wheeled|165|-|-|Commercially available|Wheeled social humanoid with expressive eyes, gesturing arms and a chest touchscreen, used for human-robot interaction research and customer service.\n|Engineered Arts Ameca|Engineered Arts|United Kingdom|2021|Other|187|62|61|Commercially available (sale and rental)|Social humanoid with expressive face; announced December 2021, shown at CES 2022.\n...\n|Pollen Robotics Reachy 2|Pollen Robotics (Hugging Face since 2025)|France|2024|Wheeled|136-166|-|-|Commercially available|Open-source bimanual humanoid with 7-DoF arms (about 3 kg each) on an optional three-omniwheel base; launched October 2024.\n|Rainbow Robotics RB-Y1|Rainbow Robotics|South Korea|2024|Wheeled|-|-|-|Commercially available|Two arms on a wheeled base, launched March 2024; adopted by MIT, UC Berkeley and others.\n...\n|Dexmate Vega|Dexmate|United States|2025|Wheeled|-|135|24|Commercially available|Wheeled humanoid with two 7-DoF arms, a 3-DoF torso reaching 2.2 m and a 3-DoF head; mass and DoF are for Vega 1 Pro.\n...\n|Robros IGRIS-C|Robros|South Korea|2025|Bipedal|154|56|-|Commercially sold (18 units by August 2026)|In-house bipedal humanoid that competed at Humanoids 2025 in Seoul; Robros reports 36 built and 18 sold by end of August 2026.\n...\n|UBTECH Walker X|UBTECH Robotics|China|2021|Bipedal|130|63|41|Commercially available|Service-oriented Walker generation unveiled in 2021; served as a guide at the China Pavilion of Expo 2020 Dubai.\n...\n|Unitree H1|Unitree Robotics|China|2023|Bipedal|180|47|-|Commercially available|Unitree's first full-size humanoid, teased in August 2023.\n...\n|AgiBot A2 (Expedition A2)|AgiBot (Zhiyuan Robotics)|China|2024|Bipedal|169|69|40+|Commercially available|Full-size interactive service humanoid unveiled 18 August 2024 in a five-robot launch; AgiBot markets it for reception and guided tours.\n...\n|EngineAI PM01|EngineAI (Shenzhen EngineAI Robotics)|China|2024|Bipedal|140|44|24|Commercially available|Lightweight open platform with 320-degree waist rotation, unveiled December 2024.\nFigures are EngineAI's 2026 edition; launch coverage gave 138 cm, 40 kg.\n...\n|EngineAI SE01|EngineAI (Shenzhen EngineAI Robotics)|China|2024|Bipedal|-|-|-|Commercially available|Full-size humanoid announced October 2024; EngineAI says its gait is trained end-to-end by a neural network.\nGlobal sales began 24 December 2024.\n...\n|Galbot G1|Galbot (Beijing Galaxy General Robot)|China|2024|Wheeled|173|92.5|21|Commercially available|Wheeled humanoid announced May 2024 with a liftable torso; DOF figure excludes chassis and end effectors.\n...\n|Pudu D7|Pudu Robotics|China|2024|Wheeled|175|140|23|Commercially available|Pudu's first humanoid, a semi-humanoid on an omnidirectional chassis, unveiled September 2024.\n...\n|UBTECH Walker S1|UBTECH Robotics|China|2024|Bipedal|-|-|41|Commercially available|Industrial humanoid launched in October 2024; heise reported about 500 orders from automakers in 2024 and a training project at Foxconn.\n|Unitree G1|Unitree Robotics|China|2024|Bipedal|132|35|23|Commercially available|Introduced May 2024 and shown at ICRA 2024.\n...\n|AgiBot X2 (Lingxi X2)|AgiBot (Zhiyuan Robotics)|China|2025|Bipedal|131|35|25|Commercially available|Half-size humanoid shown riding a bicycle in a March 2025 video; launch coverage cited 28 DOF, 33.8 kg.\nX2 Ultra: 30 DOF, about 39 kg.\n...\n|LimX Oli|LimX Dynamics|China|2025|Bipedal|165|-|31|Commercially available|Full-size general-purpose humanoid unveiled 2025 in Lite, EDU and Super versions from RMB 158,000; LimX lists up to 31 DOF.\n^[235]^^[236]^|\n...\n|Noetix N2|Noetix Robotics|China|2025|Bipedal|120|30|-|Commercially available|Low-cost backflipping humanoid unveiled March 2025; two teams ran N2 robots in the April 2025 Beijing humanoid half-marathon.\n...\n|Robotera L7|Robotera (Beijing Xingdongjiyuan)|China|2025|Bipedal|171|65|55|Commercially available|Full-size humanoid launched July 2025; Robotera lists 4 m/s running speed and 55 DOF including its 12-DOF XHAND 1 hands.\nMass excludes hands.\n...\n|Robotera Q5|Robotera (Beijing Xingdongjiyuan)|China|2025|Wheeled|165|70|44|Commercially available|Wheeled service humanoid unveiled June 2025 for guidance, education and healthcare, with 11-DOF XHAND 1 Lite hands.\n...\n|UBTECH Cruzr S2|UBTECH Robotics|China|2025|Wheeled|-|-|-|Commercially available|Wheeled humanoid shown at WRC 2025 with visual-laser fusion navigation; UBTECH says it handles 15 kg payloads across a 0-1.8 m workspace.\n|UBTECH Tiangong Walker (Walker Tienkung)|UBTECH Robotics with Beijing Humanoid Robot Innovation Center|China|2025|Bipedal|170|-|20|Commercially available|Research and education humanoid launched March 2025 at RMB 299,000; TechNode reports 10 km/h running speed per the companies.\n|UBTECH Walker C|UBTECH Robotics|China|2025|Bipedal|163|43|20|Commercially available|Commercial reception and guide humanoid; UBTECH says it debuted in 2025 and served as a tour guide at the China Pavilion, Expo 2025 Osaka.\n...\n|Unitree H2|Unitree Robotics|China|2025|Bipedal|182|70|31|Commercially available|Successor to the H1, introduced in a video on 20 October 2025.\n|Unitree R1|Unitree Robotics|China|2025|Bipedal|123|29|26|Commercially available|Low-cost humanoid announced July 2025.\n...\n|AgiBot A3 (Expedition A3)|AgiBot (Zhiyuan Robotics)|China|2026|Bipedal|173|55|-|Commercially available|Full-size performance humanoid revealed 13 February 2026 in a flying-kick video; first commercial units were delivered in April 2026.\n^[267]^^[268]^^[269]^|\n...\n## References\n\"World's First Commercially Available Hybrid-Architecture Humanoid Robot Moves Into Mass Production.\"",
+       "source": "web",
+       "title": "List of humanoid robots - AI Wiki",
+       "url": "https://aiwiki.ai/wiki/list_of_humanoid_robots"
+      },
+      {
+       "date": "2026-05-29",
+       "id": 5,
+       "last_updated": "2026-10-11",
+       "snippet": "As of Jul 2026, the Unitree G1 ($13.5K) and Figure 03 (enterprise RaaS) are the only humanoid robots with confirmed commercial availability.\n...\nFor consumer home use, 1X NEO is the only verified-available option ($20,000 outright or $499/month subscription with a six-month minimum; late-2026 US delivery).\n...\nIs Boston Dynamics Atlas commercially available?+",
+       "source": "web",
+       "title": "What is the best humanoid robot to buy in 2026?",
+       "url": "https://deploy.report/explainers/best-humanoid-robot-to-buy"
+      },
+      {
+       "id": 6,
+       "last_updated": "2026-10-24",
+       "snippet": "Available now in the store, with deployment, training, and service included.\n...\n**Status:** Commercial — Shipping commercially **Price:** $29,900 base **Size:** 182 cm / 70 kg **Battery:** 0.972 kWh, ~3 hrs **DoF:** 31 (hands optional) **AI:** Open platform **Best fit:** Research, education, light commercial.\n...\n**Status:** Commercial — Commercial (social robot) **Price:** R&D version available **Size:** 167 cm / 20 kg **Battery:** 1-1.5 hrs or tethered **DoF:** 74 (32 head, 14 arms, 14 hands) **Best fit:** Events, education, social interaction, brand ambassador\n...\n|Robot|Company|Country|Status|Height|Weight|DoF|Battery Life|Hot-Swap|Payload|AI / Learning|Price|Best-Fit Applications|Mobility|\n|--|--|--|--|--|--|--|--|--|--|--|--|--|--|\n|Tesla Optimus|Tesla|USA|Pilot / Factory|173 cm|57 kg|28 + 22/hand|~8 hrs|No|9 kg carry|FSD vision, learning from observation|$20K-$30K target|Manufacturing, logistics|Walking|\n|Figure 03|Figure AI|USA|Pre-commercial|168 cm|61 kg|44 (16/hand)|~5 hrs|Wireless (feet)|25 kg|Helix VLA, on-device, voice|$20K-$25K target|Home, light commercial, mfg|Walking|\n|Atlas (Electric)|Boston Dynamics|USA|Shipping fleets|190 cm|90 kg|56|~4 hrs|Self-swap <3 min|50 kg instant|Google DeepMind partnership|Not disclosed|Heavy industrial, automotive|Walking|\n|Digit|Agility Robotics|USA|Commercial|175 cm|64 kg|28 (30+ next)|Up to 8 hrs|Yes (2:1 ratio)|16 kg|Agility Arc platform|~$250K / $2-4K/mo|Warehouse logistics|Walking|\n|NEO|1X Technologies|Norway/USA|Pre-orders|168 cm|30 kg|N/D|~4 hrs|Quick charge|N/D|Teleoperation learning|$20K / $499/mo|Home, household|Walking|\n|Apollo|Apptronik|USA|Pilot|173 cm|73 kg|71|4 hrs|Yes (22 hrs/day)|25 kg|Multi-modal AI stack|<$50K target|Logistics, automotive mfg|Walking|\n|Phoenix Gen 8|Sanctuary AI|Canada|Enterprise pilot|170 cm|70 kg|44-75 est.|~4 hrs|Yes|N/D|Carbon AI, 88% faster training|Not disclosed|Warehouse, retail, general|Walking|\n|Unitree H2|Unitree Robotics|China|Commercial|182 cm|70 kg|31|~3 hrs|No|N/D|Open platform|$29,900|Research, education|Walking|\n|Unitree G1|Unitree Robotics|China|Commercial|127-132 cm|35 kg|23/43 EDU|~2 hrs|No|N/D|Open dev platform|$16K-$25K|Education, research|Walking|\n|Fourier GR-2|Fourier Intelligence|China|Shipping|175 cm|63 kg|53|~2 hrs|Detachable|3 kg/arm|Rehab expertise expanding|$100K-$150K|Rehabilitation, research|Walking|\n|Walker S2|UBTECH Robotics|China|Commercial|176 cm|70 kg|N/D|2-4 hrs|Auto hot-swap <3 min|N/D|Industrial AI|$180K / $5K/mo|Industrial inspection, logistics|Walking|\n|4NE-1 Gen 3.5|NEURA Robotics|Germany|Deliveries late 2026|180 cm|80 kg|55|24/7 (dual battery)|Yes|100 kg|NVIDIA Isaac GR00T|€60K-€98K|Heavy industrial, mfg|Walking|\n|Xpeng Iron|Xpeng Robotics|China|Mass prod. end 2026|173 cm|70 kg|82|Solid-state (TBD)|N/D|N/D|Tianji AIOS, VLA/VLM, 2,250 TOPS|Not disclosed|Factory, retail, service|Walking|\n|SE01|Engine AI|China|Shipping|170 cm|55 kg|32|~2 hrs|No|N/D|Open research platform|$13K-$26K|Research, education|Walking (2 m/s)|\n|CyberOne|Xiaomi|China|R&D|177 cm|52 kg|21 + 22-27 hand|N/D|No|1.5 kg/hand|Internal R&D|N/A|Tech demo, social|Walking|\n|Ameca|Engineered Arts|UK|Commercial|187 cm|62 kg|61-71|N/A (stationary)|N/A|N/D|GPT-4, Claude, Gemini (Tritium)|$100K-$500K|Events, entertainment, HRI|Stationary|\n|Sophia|Hanson Robotics|Hong Kong|Commercial|167 cm|20 kg|74|1-1.5 hrs|No (tethered option)|N/D|Multi-AI integration|R&D version available|Events, education, social|Rolling base|\n...\nSome humanoid robots are shipping commercially in 2026, but broad deployment is still early.\nRobots like Agility Digit, Unitree H2, and UBTECH Walker S2 are in active commercial use.",
+       "source": "web",
+       "title": "Humanoid Robots — Prices & Use Cases",
+       "url": "https://www.robotlab.com/capabilities/humanoid-robots/"
+      },
+      {
+       "date": "2026-03-10",
+       "id": 7,
+       "last_updated": "2026-10-18",
+       "snippet": "This report tracks 26 humanoid robots across 7 countries — 14 commercially available — against more than $5 billion of industry investment.\n...\n- Tracks 26 humanoid robots across 7 countries, 14 of them commercially available.\n...\n- **14 robots commercially available** today (available for purchase or pre-order with confirmed pricing)\n...\n|Robot|Company|Price (USD)|Tier|Status|Country|\n|--|--|--|--|--|--|\n|Unitree R1|Unitree Robotics|$4,900|Consumer|Pre-order|China|\n|Unitree G1|Unitree Robotics|$13,500|Consumer|Available|China|\n|1X NEO|1X Technologies|$20,000|Consumer|Pre-order|Norway|\n|AgiBot X1|AgiBot|<$20,000|Consumer|Available|China|\n|Figure 03|Figure AI|~$20,000 (target)|Consumer|Announced|USA|\n|NEURA 4NE1 Mini|NEURA Robotics|€19,999|Consumer|Pre-order|Germany|\n|LimX Oli|LimX Dynamics|$22,730|Consumer|Pre-order|China|\n|Tesla Optimus|Tesla|$25,000 (target)|Consumer|Announced|USA|\n|Apptronik Apollo|Apptronik|<$50,000 (target)|Commercial|Pre-order|USA|\n|Fauna Sprout|Fauna Robotics|$50,000|Commercial|Available|USA|\n|Figure 02|Figure AI|$50,000-$100,000 (est.)|Commercial|Pre-order|USA|\n|Unitree H1|Unitree Robotics|Contact for pricing|Commercial|Available|China|\n|Astribot S1|Astribot|Quote-only (~¥500k reported)|Commercial|Available|China|\n|NEURA 4NE1|NEURA Robotics|$105,000|Industrial|Pre-order|Germany|\n|Ameca|Engineered Arts|$120,000|Entertainment|Available|UK|\n|Sanctuary Phoenix|Sanctuary AI|$100,000+ (est.)|Industrial|Prototype|Canada|\n|Fourier GR-1|Fourier Intelligence|$150,000|Healthcare|Available|China|\n|Agility Digit|Agility Robotics|$250,000|Industrial|Available|USA|\n|Boston Dynamics Atlas|Boston Dynamics|$150,000+ (est.)|Industrial|Pre-order|USA|\n...\n|Robot|Customer|Sector|Status|Location|\n|--|--|--|--|--|\n|Agility Digit|Amazon|Warehouse/Logistics|Active pilot|USA|\n|Agility Digit|GXO Logistics (Spanx)|Warehouse/Logistics|Active (RaaS)|Flowery Branch, GA|\n|Figure 02|BMW|Automotive Manufacturing|Active pilot|Spartanburg, SC|\n|Apptronik Apollo|Mercedes-Benz|Automotive Manufacturing|Active pilot|Germany|\n|Fourier GR-1|Hospitals|Healthcare/Rehab|Active (reported)|China|\n|Sanctuary Phoenix|Microsoft (Hannover Messe)|Demo/Exhibition|Demo|Germany|",
+       "source": "web",
+       "title": "Humanoid Robot Industry Report 2026",
+       "url": "https://blog.robozaps.com/b/humanoid-robot-industry-report-2026"
+      },
+      {
+       "date": "2026-06-17",
+       "id": 8,
+       "last_updated": "2026-09-10",
+       "snippet": "The Unitree G1, at around $16,000, is available online, while Agility Robotics' Digit, costing about $250,000, targets industrial clients like Amazon.\n1X's Neo Gamma is opening pre-orders for home use at $20,000 or $499/month, with 2026 shipping.\nOther models like Figure O3 and Agibot A2 serve enterprise or industrial roles.\nNotably, Tesla Optimus and Boston Dynamics Atlas remain unavailable for purchase.\n...\nHumanoid robots are moving from science fiction into the real world, with several models now available for homes, research labs and industrial deployments.\n...\nThe Unitree G1 is one of the few humanoid robots that can easily be ordered by anyone today.\n...\nMost of the humanoid robots that are available today aren’t as easily accessible as the G1, and purchases are negotiated through enterprise procurement channels rather than websites.\n...\nNeo Gamma, from 1X, has been available to companies running enterprise deployments for a while, but pre-orders have just opened up for individual private purchasers.\nNeo Gamma, standing at 5ft 5in tall and weighing 30kg, is among the first commercially available humanoids designed specifically for the home.\n...\nFigure AI’s general-purpose humanoid is another model that’s apparently available to buy, although this is through enterprise partnership and piloting channels rather than retail.\n...\nAgibot, from Shanghai-based Zhiyuan Robotics, can be purchased directly from its website today.\n...\nBoston Dynamics’ electric Atlas is one of the most advanced humanoid platforms in the world, but it is not available to ordinary customers.",
+       "source": "web",
+       "title": "The Humanoid Robots You Can Actually Buy Right Now",
+       "url": "https://www.forbes.com/sites/bernardmarr/2026/06/17/the-humanoid-robots-you-can-actually-buy-right-now/"
+      },
+      {
+       "id": 9,
+       "last_updated": "2026-10-04",
+       "snippet": "As of Jul 2026, 7 humanoid models are commercially available; the rest are in pilot, prototype, or research stage.\n...\n1X NEO is the only consumer-available option ($20,000 outright or $499/month subscription with six-month minimum, late-2026 US delivery).\n...\n### Is Boston Dynamics Atlas commercially available?\n...\nThe Unitree R1 is the cheapest walking humanoid robot commercially available in 2026 at $5,900 base (smaller-form mass-market consumer + developer platform launched July 2025).",
+       "source": "web",
+       "title": "Humanoid robots, DEPLOY explainers",
+       "url": "https://deploy.report/explainers/humanoid-robots"
+      },
+      {
+       "id": 10,
+       "last_updated": "2026-10-03",
+       "snippet": "Robots in the main comparison table are limited to platforms an individual, lab, or small business can actually order today or pre-order with a published price and delivery window.\n...\nRobots that are not orderable by individuals at all (Tesla Optimus, Figure 03, Boston Dynamics Atlas) are covered separately in the Watch List section below, since combining \"buy today\" and \"maybe in 2027\" products in one table misleads readers about what's actually purchasable.\n...\n|Model|Price (USD)|Best For|Availability|Height|Weight|\n|--|--|--|--|--|--|\n|Unitree R1|$4,900–$5,900|Ultra-budget / Entry|Shipping now / In stock|~123 cm|~25-29 kg|\n|Unitree G1|$13,500 (base; EDU edition higher)|Value / Research|Shipping now|~132 cm|35 kg|\n|1X NEO|$20,000 (or $499/mo)|Home use|Pre-order • US deliveries late 2026|~165 cm|~30 kg|\n|EngineAI T800|$40,500+ (Basic)|Mid-range power|Pre-order / Shipments underway 2026|~173 cm|~75 kg|\n|Unitree H1|~$90,000+ (contact)|High-end performance|Contact / Available|~180 cm|~47 kg|\n|Agility Digit|Contact (~$100K–$250K est.)|Industrial|Pilots / B2B|Industrial focus|~65 kg|",
+       "source": "web",
+       "title": "Humanoid Robot Buying Guide 2026: Prices & Availability",
+       "url": "https://humanoid.press/shopping-guide/"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "queries": [
+      "Unitree G1 R1 commercial order 2026 official",
+      "Agility Digit UBTECH Walker S2 commercial deliveries 2026",
+      "1X NEO preorder home robot 2026"
+     ],
+     "results": [
+      {
+       "date": "2024-10-10",
+       "id": 11,
+       "last_updated": "2026-10-02",
+       "snippet": "1X NEO Home Robot | Order Today\n# NEO Home Robot | Order Today\n...\n## Pricing and Availability\nNEO is now available for pre-order, with first orders shipping to consumer homes in 2026.\nNEO is now available via 1X’s online store [1x.tech/order] and comes in three distinct colors (Tan, Gray, Dark Brown).\nCustomers interested owning one of the first NEOs can purchase Early Access for $20,000, which includes priority delivery in 2026.\nThere is also a subscription model offering of $499/month which will be shipped at a later date.\n1X will start delivering NEOs primarily in the U.S in 2026 and expand to other markets starting in 2027.",
+       "source": "web",
+       "title": "1X NEO Home Robot | Order Today",
+       "url": "https://www.1x.tech/discover/neo-home-robot"
+      },
+      {
+       "date": "2024-10-10",
+       "id": 12,
+       "last_updated": "2026-10-03",
+       "snippet": "Order NEO\n...\nHome Robot\n...\n### $499/mo Subscription\n- Monthly Subscription\n- Starter Productivity Package\n...\n## Early Access\n### $20,000 Ownership\n- Ownership with 3-Year Warranty\n- Premium Support\n- Priority Delivery\n### $200 Deposit Due Today\n### Fully Refundable\n### US Deliveries start 2026\nOrder Now",
+       "source": "web",
+       "title": "Order NEO",
+       "url": "https://www.1x.tech/order"
+      },
+      {
+       "date": "2024-10-10",
+       "id": 13,
+       "last_updated": "2026-10-02",
+       "snippet": "Six months ago, we launched the preorder campaign for NEO The Home Robot.\n...\nSome of you will get your NEO this year, some will get them later.\nWe promised the first NEOs would ship in 2026, and we’re keeping that promise.\n...\nWhile the current NEOs coming off the line are being prioritized for our internal team to accelerate development and testing in homes, we are working around the clock to deliver NEO to your doorstep starting in 2026.",
+       "source": "web",
+       "title": "NEO Factory | Building Your NEO",
+       "url": "https://www.1x.tech/discover/neo-factory"
+      },
+      {
+       "date": "2025-09-23",
+       "id": 14,
+       "last_updated": "2026-10-03",
+       "snippet": "NEO Home Robot\n# NEO\nHome Robot\nOrder Now\n$200 Deposit",
+       "source": "web",
+       "title": "NEO Home Robot",
+       "url": "https://www.1x.tech/neo"
+      },
+      {
+       "date": "2024-06-05",
+       "id": 15,
+       "last_updated": "2026-11-10",
+       "snippet": "Unitree G1 - G1 is backordered and will ship as soon as it is back in stock.",
+       "source": "web",
+       "title": "Unitree G1",
+       "url": "https://shop.unitree.com/products/unitree-g1"
+      },
+      {
+       "date": "2026-05-01",
+       "id": 16,
+       "last_updated": "2026-11-03",
+       "snippet": "The first NEOs will be delivered to owners this year, 1x said, warning that the timeline might take longer than expected.\n\"Some of you will get your NEO this year, some will get them later,\" the company said.\n\"We promised the first NEOs would ship in 2026, and we're keeping that promise.\"\n...\nWhen 1x launched NEO for preorder in October, it did so with a video of the robot taking out the trash, watering plants and dancing.\n...\nDespite the company's great ambitions, it's still unclear when the robot will enter U.S. homes.",
+       "source": "web",
+       "title": "NEO humanoid robot company plans to release 100,000 units by late 2027",
+       "url": "https://eu.lancastereaglegazette.com/story/tech/2026/05/01/neo-humanoid-robot-company-1x-releasing-100000-units-by-2027/89891813007"
+      },
+      {
+       "date": "2026-02-02",
+       "id": 17,
+       "last_updated": "2026-10-18",
+       "snippet": "1X NEO is the only model in this guide sold specifically for household tasks, but it remains an early-access preorder.\n...\n**Yes, you can order several humanoid robots in 2026.\nThat does not make them household appliances.** Among the systems compared here, 1X NEO is the only one sold specifically as a home robot, and it remains an early-access preorder.\n...\n|Product and configuration|Price and order status|Capability path|Home-use verdict|\n|--|--|--|--|\n|1X NEO Early Access|$20,000 ownership; $200 refundable deposit; US deliveries scheduled to start in 2026|Basic onboard autonomy, remote control and scheduled 1X Expert assistance|Purpose-built for home use, but still early access rather than a broadly proven household appliance|\n|1X NEO Standard|$499 per month; 1X says this option ships later than Early Access|Same intended domestic platform; final subscription terms may be supplied with the order invitation|Do not treat the subscription as a robot a buyer can receive immediately|\n|Unitree R1 Air / R1|$4,900 / $5,900 before tax and shipping; online listing, but selected variants may be backordered|20 / 26 DoF, manual controller and vendor software; base models do not support secondary development|Purchasable humanoid hardware, not an out-of-box domestic assistant|\n|Unitree R1 EDU|Contact sales|26–40 DoF, secondary development and optional higher-compute module|Education and development platform that can be programmed for indoor experiments|\n|Unitree G1 base|$13,500 before tax and shipping; official store currently marks it backordered|23 DoF, no dexterous-hand DoF and no secondary development|Can be operated indoors, but it is not the programmable 43-DoF system shown in many demos|\n|Unitree G1 EDU|Contact sales|23–43 DoF, secondary development, optional dexterous hands and optional higher compute|Research and developer platform, not a consumer home assistant|\n|Fauna Sprout Creator Edition|Request a robot; manufacturer does not currently publish a retail price|SDK, mapping, navigation, modular autonomy and whole-body teleoperation|Shared-space developer platform, not a turnkey household helper|\n...\n1X's order page lists two offers: $20,000 ownership under Early Access and a $499 monthly Standard subscription.\nEarly Access requires a $200 refundable deposit and has priority delivery.\nThe company says US deliveries start in 2026.\n...\nIn an April 2026 factory update, 1X said some customers would receive NEO during 2026 and others later.\nThe company also said current production units were being prioritised for internal testing in employees' homes.\nThe defensible status is therefore **preorder with deliveries scheduled to begin in 2026**, not generally available now.\n...\nThe official R1 specification page separates three configurations:\n...\nThe $13,500 base G1 has 23 DoF, no hand DoF, an arm load of about 2 kg, no higher-compute module and no secondary development.\nThe official shop currently marks that model backordered.\n...\nYou can place an order or request several humanoids, but their status differs.",
+       "source": "web",
+       "title": "Humanoid Robots for Home [2026] - Blog - RoboZaps",
+       "url": "https://blog.robozaps.com/b/humanoid-robots-for-home"
+      },
+      {
+       "date": "2026-05-01",
+       "id": 18,
+       "last_updated": "2026-11-14",
+       "snippet": "1X Technologies AS, the Norway-founded robotics startup backed by OpenAI, has opened a new 58,000-square-foot factory in Hayward, Calif., where it aims to be among the first to build humanoids for consumers at scale.\n...\nShipments are expected to begin by the end of this year.\n...\n1X’s “Neo” humanoid, which is currently available for preorder at $20,000, has generated buzz on social media for its soft, human-like body, designed to help with domestic tasks like folding laundry and tidying up.",
+       "source": "web",
+       "title": "Robotics startup plans to build 10000 home robots in ...",
+       "url": "https://www.latimes.com/business/story/2026-05-01/robotics-startup-plans-to-build-10-000-home-robots-in-california-in-coming-year"
+      },
+      {
+       "date": "2026-11-02",
+       "id": 19,
+       "last_updated": "2026-11-09",
+       "snippet": "{\n\"schema_version\": \"0.1\",\n\"robot\": {\n\"id\": \"1x-neo\",\n\"name\": \"1X NEO\",\n\"company_id\": \"1x-technologies\",\n\"company_name\": \"1X Technologies\",\n\"country\": \"Norway / United States\",\n\"generation\": null,\n\"first_announced_date\": \"2025-10-29\",\n\"release_date\": null,\n\"status\": \"purchasable\",\n\"status_notes\": \"Preorder home robot: $200 refundable deposit, $20,000 Early Access ownership, or $499/month subscription; first U.S. deliveries claimed for 2026.\",\n\"is_biped\": true,\n\"is_wheeled_or_hybrid\": false,\n...\n\"currentness_notes\": \"Treated as purchasable/preorder-current based on official order and factory updates reviewed on 2026-05-16; no verified customer delivery evidence found.\"\n...\n\"notes\": \"Official product/order specs; not independently tested.\",\n...\n\"summary\": \"Official specs claim 22 DoF per hand and an 18 lb per-arm payload; company AI posts show pick/place and some dexterous task trials, but independent dexterity validation is still absent.\",\n...\n\"summary\": \"Official order page supports $200 refundable deposits, $20,000 Early Access ownership, $499/month subscription, and U.S. deliveries starting 2026; 1X says 10,000 NEOs booked out next-year production capacity in five days and Hayward full-scale production has commenced.\",\n...\n\"title\": \"Official NEO hardware and availability specs\",\n\"claim\": \"1X's product/order pages list NEO as a 5'6\\\", 66 lb bipedal home robot with 22 DoF per hand, 18 lb arm payload, 55 lb carry, 154 lb lift, 1.4 m/s walking speed, 842 Wh battery, 4h runtime, Nvidia Jetson Thor compute, dual stereo fisheye cameras, $20,000 Early Access ownership, and $499/month subscription.\",\n...\n\"title\": \"Official factory and preorder-capacity update\",\n\"claim\": \"1X says the NEO preorder campaign booked out the next year's production capacity in five days at 10,000 NEOs, the Hayward factory has commenced full-scale production, and current capacity is up to 10,000 NEOs per year with a plan to scale toward 100,000+ annually by the end of 2027.\",\n...\nOfficial claims say NEO has basic autonomy and grows over time, while official Expert Mode and media hands-on reporting show a material human-in-the-loop caveat.\",\n...\n\"reason\": \"Official sources support preorders, planned 2026 shipments, and production capacity, but reviewed sources did not independently confirm delivered customer homes or sustained operating metrics.\",\n...\n\"one_paragraph_summary\": \"1X NEO is a preorder/purchasable home humanoid with unusually detailed official specs and production claims: 5'6\\\", 66 lb, 75 total listed DoF, 22 DoF per hand, 18 lb per-arm payload, 4h runtime, Jetson Thor compute, stereo fisheye cameras, $20,000 Early Access ownership, $499/month subscription, and claimed 2026 U.S. deliveries.\nStronger 2026 evidence adds factory production and company-run AI/mobility results, but the decisive caveat remains autonomy: official Expert Mode/remote-control disclosures and WSJ/media hands-on reporting mean household chore completion should not be credited as broad autonomous capability.\",\n...\n\"Official product/order pages provide concrete hardware specs, pricing, preorder terms, Expert Mode, remote control, and 2026 delivery claims.\",\n...\n\"title\": \"Order NEO\",\n...\n\"url\": \"https://www.1x.tech/order\",\n...\n\"source_type\": \"official_product_page\",\n...\n\"reliability_notes\": \"Official order page for $200 refundable deposit, $20,000 Early Access ownership, $499/month subscription, U.S. delivery timing, hardware specs, Expert Mode, and remote-control disclosure.\"\n...\n\"short_verdict_for_arena\": \"Best scored as a serious preorder home humanoid with detailed official specs, manufacturing momentum, and company-run AI/mobility evidence, but still weak independent proof and major Expert Mode/teleoperation caveats.\",\n...\n\"Official product/order pages now provide concrete specs: 5'6\\\", 66 lb, 22 DoF per hand, 18 lb arm payload, 4h runtime, 842 Wh battery, stereo fisheye cameras, Jetson Thor compute, $20,000 ownership, and $499/month subscription.\",",
+       "source": "web",
+       "title": "humanoid-robot-database/evidence/robots/1x-neo.json at main · humanoid-arena-ai/humanoid-robot-database",
+       "url": "https://github.com/humanoid-arena-ai/humanoid-robot-database/blob/main/evidence/robots/1x-neo.json"
+      },
+      {
+       "date": "2026-07-23",
+       "id": 20,
+       "last_updated": "2026-11-12",
+       "snippet": "|Robot|Best proof available now|What still holds it back|\n|--|--|--|\n|Agility Digit|More than 100,000 totes, more than 65,000 operating hours, nine committed customer facilities (company-stated)|Narrow material-handling tasks; $1.78 million in 2025 sales and $174,000 in the first half of 2026|\n|Figure 02 and 03|Figure 02 supported more than 30,000 BMW X3s; 1,000 Figure 03 units built by July 2026 (CEO-stated)|Figure 02 retired; no published output yet for Figure 03|\n|UBTECH Walker S2|921 full-size humanoids sold and RMB590.3 million in related revenue in the first half of 2026|Little public detail on uptime and output at each customer|\n|AgiBot G2|A six-day factory run of more than 64 hours; top shipper in the first half of 2026 under a broad definition|One detailed public factory case and a wheeled base|\n...\nAgility reports more than 100,000 totes moved in commercial use and more than 65,000 hours of real-world operation.\nIt lists deployments or agreements with GXO, Schaeffler, and Toyota, plus a deal with Mercado Libre, and says commitments now cover nine customer facilities.\n...\nIn its 2026 interim results, published in August, UBTECH reported 921 full-size humanoid robots sold in the first half and RMB590.3 million in related revenue, up 1,445% from RMB38.2 million a year earlier.\n...\nUnitree officially clarified that it delivered more than 5,500 humanoid robots to end customers during 2025 and produced more than 6,500.\nThe total covers humanoids only, excluding its wheeled dual-arm machines and quadrupeds.\nIn the first half of 2026, Smart Analytics Global estimates it shipped about 5,900 more, second to AgiBot.\n...\nUBTECH now clearly leads in commercial volume, with 921 full-size humanoids sold in six months, though we cannot inspect its robots’ daily performance as closely.",
+       "source": "web",
+       "title": "Which humanoid robot actually works today?",
+       "url": "https://newmarketpitch.com/blogs/news/humanoid-robotics-which-robot-works"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "content": [
+      {
+       "annotations": [],
+       "text": "“Commercially available” ranges from robots you can order directly to enterprise-only systems sold through pilots or deployment contracts. **The clearest options as of late 2026 are:**\n\n- **Unitree R1 and G1** — orderable through Unitree’s store for research, education, and development; the G1 may be backordered. [15][17]\n- **Unitree H1 and H2** — commercial platforms generally sold through business or institutional channels. [6][10]\n- **Agility Robotics Digit** — available for warehouse and industrial deployments, typically through enterprise agreements or Robotics-as-a-Service. [2][6]\n- **UBTECH Walker-series robots, including Walker S2** — offered for industrial and service applications; UBTECH reported substantial 2026 sales of full-size humanoids. [2][20]\n- **AgiBot models, including A2 and A3** — commercially marketed, with reported deliveries of A3 units and direct-purchase channels for some models. [4][8]\n- **Fourier GR-1** — sold mainly for research and healthcare-related use. [6][7]\n- **Engineered Arts Ameca** — commercially offered for events, entertainment, and human–robot interaction, including sale or rental. [4][6]\n- **1X NEO** — available by preorder, not a broadly in-stock home robot; the company lists a $20,000 early-access option and planned 2026 deliveries. [11][12]\n\nOther robots—including **Figure, Apptronik Apollo, and Boston Dynamics Atlas**—have commercial pilots, partner deployments, or announced production, but generally aren’t straightforward retail purchases. [2][6][8]",
+       "type": "output_text"
+      }
+     ],
+     "id": "msg_221ef925-eac0-4a5e-a0cf-318a543756da",
+     "role": "assistant",
+     "status": "completed",
+     "type": "message"
+    }
+   ],
+   "parallel_tool_calls": true,
+   "presence_penalty": 0,
+   "preset": "fast@2026-11-11.0",
+   "previous_response_id": null,
+   "prompt_cache_key": null,
+   "reasoning": null,
+   "safety_identifier": null,
+   "service_tier": "fast",
+   "status": "completed",
+   "store": true,
+   "temperature": 1,
+   "text": {
+    "format": {
+     "type": "text"
+    }
+   },
+   "tool_choice": "auto",
+   "tools": [
+    {
+     "type": "web_search"
+    }
+   ],
+   "top_logprobs": 0,
+   "top_p": 1,
+   "truncation": "",
+   "usage": {
+    "cost": {
+     "cache_creation_cost": 0.00185,
+     "cache_read_cost": 3e-05,
+     "currency": "USD",
+     "input_cost": 1e-05,
+     "output_cost": 0.00022,
+     "tool_calls_cost": 0.002,
+     "tool_calls_cost_details": {
+      "search_web": 0.002
+     },
+     "total_cost": 0.00411
+    },
+    "input_tokens": 18331,
+    "input_tokens_details": {
+     "cache_creation_input_tokens": 14765,
+     "cache_read_input_tokens": 3488,
+     "cached_tokens": 3488
+    },
+    "output_tokens": 442,
+    "output_tokens_details": {
+     "reasoning_tokens": 0
+    },
+    "tool_calls_details": {
+     "search_web": {
+      "cost_usd": 0.002,
+      "invocation": 2
+     }
+    },
+    "total_tokens": 18773
+   },
+   "user": null
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "6a2fa71d974c4c90981824b43f1021c1",
+   "charged_micro": 4110
+  }
+ }
+}

@@ -545,6 +545,41 @@
       ]
     },
     {
+      "slug": "embodied-ai",
+      "name": "Embodied AI",
+      "legal_name": null,
+      "country_region_code": "CH",
+      "headquarters_city": null,
+      "incorporation": null,
+      "operating_locations": [],
+      "website_url": "https://embodiedai.ch",
+      "founded_year": null,
+      "description": "Embodied AI is a robotics company that, on its own site, describes safe-by-design robots that learn on the job, with industries listed as flexible manufacturing and complex manipulation. Its product list names AIR01 (a humanoid for everyday operations), Flex02 (collaborative manipulation hardware) and HELIX (a soft manipulator). The site says its team comes from EPFL, ETH Zurich, TU Delft, Oxford and MIT.",
+      "target_markets": [],
+      "commercial_model": null,
+      "deployment_status": null,
+      "deployment_note": null,
+      "is_public_company": null,
+      "ticker": null,
+      "parent_company": null,
+      "parent_listing": null,
+      "parent_relationship": null,
+      "evidence": [
+        {
+          "source_url": "https://embodiedai.ch",
+          "source_type": "MANUFACTURER_SITE",
+          "source_title": "Embodied AI home page",
+          "excerpt": "AIR01 The versatile humanoid for everyday operations.",
+          "published_at": null,
+          "observed_at": "2026-11-19",
+          "verified_at": null,
+          "confidence": "MEDIUM",
+          "claim_fields": ["description"],
+          "note": "Home page read 2026-11-19 (robots.txt: no Disallow). Country CH is the owner's statement of 2026-11-22 (approval of PR #260 / DR-D2); the site itself does not state a country or headquarters city."
+        }
+      ]
+    },
+    {
       "slug": "engineered-arts",
       "name": "Engineered Arts",
       "legal_name": "Engineered Arts Limited",

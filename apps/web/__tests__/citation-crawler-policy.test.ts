@@ -57,14 +57,29 @@ describe("CIT-G — search/retrieval crawlers may retrieve public content", () =
       if (!appliesToOai) continue;
       const disallow = rule?.disallow;
       const disallowList = Array.isArray(disallow) ? disallow : disallow ? [disallow] : [];
-      // A disallow of "" is the robots.txt idiom for "nothing is disallowed".
-      expect(disallowList.filter((d) => d !== "")).toEqual([]);
+      // The only disallow is the combinatorial compare query space (no public
+      // record lives there; see app/robots.ts). Anything wider would fail CIT-G.
+      expect(disallowList.filter((d) => d !== "")).toEqual(["/compare?"]);
     }
   });
 
   it("declares the sitemap so crawlers can enumerate the published set", () => {
     const r = robots();
     expect(r.sitemap).toBe(`${ORIGIN}/sitemap.xml`);
+  });
+
+  it("blocks only the compare query space; /compare and the curated pair pages stay crawlable", () => {
+    const r = robots();
+    const wildcard = (Array.isArray(r.rules) ? r.rules : [r.rules]).find(
+      (rule) => rule?.userAgent === "*",
+    );
+    const disallow = String(wildcard?.disallow);
+    expect(disallow).toBe("/compare?");
+    // robots.txt rules are path-prefix matches on path + query.
+    expect("/compare?ids=honda-asimo,pal-talos,unitree-g1,1x-neo".startsWith(disallow)).toBe(true);
+    for (const open of ["/compare", "/compare/1x-neo-vs-unitree-g1", "/robots/unitree-g1", "/robots?q=unitree"]) {
+      expect(open.startsWith(disallow), `${open} must stay crawlable`).toBe(false);
+    }
   });
 
   it("emits no blanket Disallow anywhere in the policy", () => {

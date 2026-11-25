@@ -407,19 +407,21 @@ describe("comparison continuity resolver", () => {
 });
 
 describe("DetailComparisonLink (robot detail)", () => {
-  const props = { slug: "unitree-g1", name: "G1", href: "/compare?ids=unitree-g1" };
+  const props = { slug: "unitree-g1", name: "G1" };
 
-  it("server HTML is one plain anchor to this robot's own compare URL, no tray", () => {
+  it("server HTML is one plain anchor to /compare (never the ?ids= query space), no tray", () => {
     const html = renderToStaticMarkup(<DetailComparisonLink {...props} />);
-    expect(html).toContain('href="/compare?ids=unitree-g1"');
+    expect(html).toContain('href="/compare"');
+    expect(html).not.toContain("?ids=");
     expect(html).not.toContain("cmp-tray");
     expect(html).not.toContain("compare=");
   });
 
-  it("with no carried selection the click navigates as before (not intercepted)", () => {
+  it("with no carried selection a click opens this robot's compare URL, as before", () => {
+    window.history.replaceState(null, "", "/robots/unitree-g1");
     render(<DetailComparisonLink {...props} />);
-    const a = screen.getByRole("link", { name: /Compare \+/ });
-    expect(fireEvent.click(a)).toBe(true); // default not prevented
+    fireEvent.click(screen.getByRole("link", { name: /Compare \+/ }));
+    expect(push).toHaveBeenCalledWith("/compare?ids=unitree-g1");
     expect(screen.queryByRole("region", { name: "Compare selection" })).toBeNull();
   });
 

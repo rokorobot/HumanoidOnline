@@ -214,3 +214,21 @@ def test_query_count_grows_sublinearly_not_a_full_bundle_per_robot(
         f"(2 robots={n2} queries, 4 robots={n4} queries) — batching may not "
         f"be effective"
     )
+
+
+def test_maker_and_product_line_ride_the_robot_statement(client, database_url) -> None:
+    """Every statement is one sequential network hop to the database, and those
+    hops — not the queries — are what a cold compare costs. The maker and the
+    product line are single rows per robot, so `reads._DETAIL_LOAD_OPTIONS`
+    JOINs them into the robot statement instead of issuing one follow-up each.
+    A follow-up reappearing here means that JOIN was lost."""
+    compare_cache.clear()
+    statements = _queries_during(
+        lambda: _get(client, "unitree-h1,optimus,digit,unitree-g1")
+    )
+    primary_tables = [
+        " ".join(s.split()).split(" FROM ", 1)[1].split()[0] for s in statements
+    ]
+    assert primary_tables.count("humanoid.robot") == 1
+    assert "humanoid.manufacturer" not in primary_tables
+    assert "humanoid.product_line" not in primary_tables

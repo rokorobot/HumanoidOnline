@@ -363,7 +363,7 @@ export default async function RobotDetailPage({
                 <GraphicMarker /> Official product page ↗
               </a>
             )}
-            <DetailComparisonLink slug={robot.slug} name={robot.name} href={`/compare?ids=${robot.slug}`} />
+            <DetailComparisonLink slug={robot.slug} name={robot.name} />
             <RequestAvailabilityButton
               robotSlug={robot.slug}
               robotName={robot.name}

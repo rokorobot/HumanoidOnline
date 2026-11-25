@@ -1,0 +1,296 @@
+{
+ "observed_at": "2026-11-14T07:19:26+00:00",
+ "endpoint": "perplexity.web.answer.fast",
+ "request": {
+  "preset": "fast",
+  "input": "Which humanoid robots are suitable for research?",
+  "max_steps": 1,
+  "max_output_tokens": 512
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": "treg: this answer is 41 KB; to keep it whole send it to a file (> a.json 2> a.err) and read the parts you need with jq (start with jq 'keys' a.json)\n",
+ "response": {
+  "result": {
+   "background": false,
+   "completed_at": 1794640766,
+   "created_at": 1794640766,
+   "effort": "fast@2026-11-11.0",
+   "error": null,
+   "frequency_penalty": 0,
+   "id": "resp_40cab653-5679-4aac-80c7-61d697c9a859",
+   "incomplete_details": null,
+   "instructions": null,
+   "max_output_tokens": 512,
+   "max_tool_calls": null,
+   "metadata": {},
+   "model": "openai/gpt-6-luna",
+   "object": "response",
+   "output": [
+    {
+     "queries": [
+      "Which humanoid robots are suitable for research?"
+     ],
+     "results": [
+      {
+       "date": "2026-01-20",
+       "id": 1,
+       "last_updated": "2026-10-20",
+       "snippet": "Models such as Unitree H1, H1/2, G1, and G1-Edu work autonomously, respond to their environment, and adapt flexibly to complex tasks, whether in industry, research, or development.\n...\n### DOBOT LUMO L1\nCompact humanoid robot for embodied AI, research, education, and interactive human-robot applications.\n- 30 degrees of freedom\n...\n### Walker Tienkung DEX\nHumanoid research platform for physical AI and robotics development\n- Dexterous manipulation\n- 31-axis full-body control\n- Up to 2070 TOPS\n- ROS 2 & open development\n...\n### Unitree R1 EDU\nCompact humanoid research robot for teaching, AI development, and hands-on robotics projects.\n...\n### Dobot ATOM Max\nFull-scale humanoid with 41 degrees of freedom for advanced AI, robotics, and embodied AI research.\n- 41 DoF\n...\nHumanoid research platform for teaching, data collection, embodied AI, and VR teleoperation.\n...\n### Which humanoid robot is suitable for research and development?\nFor research and development, humanoid robots with an open SDK, good documentation, sensor access, teleoperation, simulation capabilities, and flexible programming are particularly suitable.\nModels such as the Unitree G1, Unitree G1-EDU, or Dobot ATOM Max are interesting for AI development, mobile manipulation, grasping research, human-robot interaction, embodied AI, and robotics education.\n...\n### Are humanoid robots suitable for schools, colleges, and universities?\n...\nIn research & education, platforms such as the *Unitree G1* and *G1-EDU* serve as a testbed for mobile manipulation, grasping under uncertainty, multimodal perception, and HRI studies.",
+       "source": "web",
+       "title": "Humanoid robots for industry",
+       "url": "https://terra-robotics.de/en/pages/humanoide-roboter"
+      },
+      {
+       "id": 2,
+       "last_updated": "2026-11-05",
+       "snippet": "Unitree Robotics offers two complementary humanoid plat-forms: the compact G1 \\[41\\] and the full-size H1 \\[42\\], tar-geting distinct segments of humanoid research and deploy-ment.\nThe G1 is a compact, manipulation-oriented humanoid  \n(∼132 cm tall, ∼35 kg), configurable with 23–43 degrees\nof freedom and arm payloads up to roughly 2–3 kg, an open SDK supporting ROS2 and high-level programming, making it well suited for education, AI-driven manipulation research, and imitation/reinforcement-learning-based develop-ment environments.\n...\nTogether, G1 and H1 exemplify  \nUnitree’s strategy of offering a low-cost, research-friendly platform (G1) side-by-side with a high-power, industry-ready platform (H1), covering a broad spectrum of humanoid ex-perimentation from algorithm and perception research to real-world automation scenarios\\[43, 44, 45\\].\n...\nlifting loads of ∼50 kg instantaneously and ∼30 kg sustained, making it suitable for palletizing, material handling, and machine tending in industrial settings \\[48\\].\n...\nTogether, these platforms illustrate the diversity of contem-porary humanoid robotics, spanning AI-driven general-purpose systems targeting large-scale deployment (Tesla Optimus and\nFigure 03), compact open research platforms (Unitree G1), full-size high-performance locomotion and manipulation lead-ers (Unitree H1 and Boston Dynamics Electric Atlas), and\n...\nUnitree G1 is designed as an open and accessible humanoid research platform.\nIts ROS2-based software architecture ex-poses low-level control interfaces, sensor streams, and devel-opment tools to researchers, facilitating experimentation with reinforcement learning, imitation learning, and custom control algorithms \\[55\\].\nThe platform’s openness has led to growing adoption within academia and has accelerated community-driven software development.\nAs a result, G1 is increasingly used as a benchmark platform for humanoid robotics research.\n...\nCompared with G1, H1 is op-timized more toward demonstrating agile full-body locomotion and whole-body motion control rather than serving primarily as a general-purpose research platform \\[42\\].\n...\nThis design philosophy makes the platform particularly suitable for healthcare, rehabilitation, and service-oriented applications where safety and human interaction are critical.",
+       "source": "web",
+       "title": "Humanoid Robots 2026: A Comprehensive Review of Technical ...",
+       "url": "https://pdfs.semanticscholar.org/acc8/74124be62935479797903af900cacfd3c118.pdf"
+      },
+      {
+       "id": 3,
+       "last_updated": "2026-11-06",
+       "snippet": "Research-grade humanoid platforms are the entry point to the field — open SDKs, supported simulation environments, and price points compatible with university budgets.\nThis page lists every robot tagged for research or education use.\n...\nAgiBot X1 is a 130 cm, 33 kg open-source humanoid platform with 34 DOF for research and education.\n...\nAiNex is a compact ROS-enabled educational humanoid robot from Hiwonder with an HD camera for AI vision experiments.\n...\nAlbert HUBO is a KAIST HUBO-platform humanoid with an expressive Einstein-like animatronic head for HRI demos and research.\n...\nAmi Desktop is a stationary, desktop-sized expressive robot head from Engineered Arts for HRI and conversational AI research and education.\n...\nARI is a human-size wheeled service robot from PAL Robotics for human–robot interaction in public spaces and labs.\n...\n### Asimo\nASIMO is Honda’s bipedal humanoid research robot developed to demonstrate advanced walking/running, balance, and human interaction.\n...\nASIMO is Honda’s humanoid biped robot developed for robotics R&D and public demonstrations, with autonomous walking/running and voice/face interaction.\n...\nDOBOT ATOM is Dobot Robotics’ first full-size humanoid robot aimed at embodied AI research and cross-scenario industrial/commercial task automation.\n...\nCL-1 is a bipedal humanoid robot platform by LimX Dynamics intended for R&D and real-world automation trials.\n...\nCyberOne is Xiaomi’s full-size biped humanoid robot prototype unveiled in 2022 for R&D and technology demonstrations.\n...\nFranka Research 3 (FR3) is a 7‑DoF, force-sensitive collaborative robot arm for robotics and AI research.\n...\nFourier Intelligence GR-2 is a bipedal humanoid robot platform in the GRx series intended for embodied AI research and application development.\n...\nHUBO (KHR-2 based) is a full-size biped humanoid research platform developed at KAIST.\nIt is reported at 41 DOF, ~125 cm tall, and ~55 kg.\n...\nKinova Gen3 is a lightweight 7-DOF collaborative robotic arm for research and applied manipulation tasks.\n...\nKUAVO is Leju Robotics’ bipedal humanoid robot platform aimed at research and applied service/industrial scenarios.\n...\nLumos LUS 2 is a full-size bipedal humanoid robot platform for research, education, and commercial applications.\n...\nMenteeBot is an AI-focused humanoid robotics platform from Mentee Robotics aimed at education, research, and commercial applications.\n...\nMercury X1 is Elephant Robotics’ wheeled humanoid research platform with a 7‑axis arm and onboard NVIDIA Jetson Orin Nano compute.\n...\nNAO6 is a 58 cm tall, 25-DoF humanoid robot from Maxtronics designed for human interaction in education, research, healthcare, and elderly care.\n...\nROBOTIS OP3 is a small bipedal humanoid research and education platform with 20 DOF and an open software stack used in robotics competitions and labs.\n...\nEngineAI PM01 is a full-size bipedal humanoid robot platform intended for education and research use.\n...\nRB-Y1 is Rainbow Robotics’ dual-arm mobile manipulator platform for AI research and real-world automation use.\n...\nEngineAI SE01 is a full-size bipedal humanoid focused on smooth, human-like gait for research and industrial applications.\n...\nTALOS is a full-size biped humanoid robot platform from PAL Robotics for research and industrial prototyping using ROS and torque control.\n...\nTIAGo by PAL Robotics is a wheeled mobile manipulator for research and education, combining a navigation base with a single arm and sensor suite.\n...\nUniversity research typically prioritizes open SDK access, simulation support, and price.\nSub-$20k research-grade bipedal platforms dominate this segment — see the price-filtered \"under $20k\" page for the affordable options.",
+       "source": "web",
+       "title": "Humanoid Robots for Research & Education — Catalog 2026",
+       "url": "https://www.humanoidhub.ai/humanoid-robots/for-research"
+      },
+      {
+       "id": 4,
+       "last_updated": "2026-10-28",
+       "snippet": "### Research and experimental models\nRobotics companies and universities develop research and experimental models to test new capabilities, such as dynamic balancing, obstacle negotiation, and fine motor skills.\nThey influence future commercial robots but are rarely available for purchase.\n- **Example:** Boston Dynamics’ Atlas, known for agility and parkour-like movement; Tesla Optimus prototypes for industrial applications.\n- **Common roles:** R&D in mobility, AI decision-making, and human–robot collaboration scenarios.\n...\n|**Robot**|**Description**|**Applications**|**Notable details**|\n|--|--|--|--|\n|**Agility Robotics Digit**|Bipedal industrial humanoid for logistics and warehousing; lifts totes, navigates ramps, and maneuvers in tight or uneven spaces|Order picking, loading/unloading trucks, transferring goods|Estimated $250,000 in pilot deployments; used by Amazon and other logistics firms|\n|**Unitree H1**|Affordable full-size humanoid with high walking speed, responsive balance, and full sensor suite; modular design for upgrades|Light assembly, inspections, research, and public demos|$90,000 price; 5.4 km/h walking speed; advanced stability under contact|\n|**Figure 01: humanoid robot**|General-purpose industrial worker with dexterous hands and full-body mobility for repetitive manufacturing and logistics tasks|Assembly operations, quality checks, and moving components|Estimated $30,000 to $150,000; in pilots with automotive and tech firms|\n|**Fourier Intelligence GR-1**|Cost-effective industrial/healthcare humanoid; supports light lifting and patient care; scalable for mass production|Physical therapy, elder care, rehabilitation, and light material handling|Projected $150,000 to $170,000; 1.65 m height; 55 kg payload|\n|**Tesla Optimus**|Prototype humanoid aimed at future industrial and consumer roles; public demos show walking, object handling, and assembly|Potential manufacturing, logistics, and home tasks|No confirmed price; Musk targets under $20,000 for future consumer models|\n|**SoftBank’s Pepper**|Service humanoid with facial recognition, conversational AI, and expressive body language for customer engagement|Hospitality, retail assistance, events, and education|Discontinued for mass sales; available via special programs or orders|\n...\nIts ability to maintain balance while supporting a patient makes it suitable for elder care and post-surgery recovery programs.",
+       "source": "web",
+       "title": "Humanoid robots in 2026: Types, prices, and what's next",
+       "url": "https://standardbots.com/guides/humanoid-robot"
+      },
+      {
+       "date": "2026-04-21",
+       "id": 5,
+       "last_updated": "2026-11-06",
+       "snippet": "#### Unitree G1\n...\nCompact humanoid (127 cm, 35 kg) with 23–43 DOF depending on configuration.\nFeatures dexterous hands and force-feedback joints.\nIdeal for research, education, and light manipulation tasks.\n...\nPopular for warehouse and manufacturing research pilots.\n...\nA 55 kg, 165 cm humanoid with 44 DOF and FSA (Fourier Smart Actuator) series motors.\nDesigned as an open research platform with ROS 2 integration and extensive SDK.\nStrong adoption in university labs and rehabilitation research.\n...\nUniversities and research labs use humanoid platforms to advance locomotion, manipulation, and AI research.\nOpen-source-friendly platforms like the Fourier GR-1 and Unitree G1 serve as standardized testbeds.\nIts published store price ($21,500.00) has made full-size humanoids accessible to labs that previously could only simulate them.\n...\n- **Compact humanoids** (120–140 cm) like the Unitree G1 (Basic: $21,500.00; EDU-U1: $43,800.00; Edu Pro and Ultimate configurations are listed separately in the store).\nBest for research, education, and controlled environments.\n...\n- **Mid-tier humanoids** like the Booster K1 (current store price: From $11,998.00) and Fourier GR-1. 170 cm frames, high-torque actuators, and modular tooling.\nSuitable for research, education, and warehouse/manufacturing pilots.",
+       "source": "web",
+       "title": "What Is a Humanoid Robot? Complete Guide 2026 | Silicon Valley ...",
+       "url": "https://www.roboticscenter.ai/learn/what-is-humanoid-robot"
+      },
+      {
+       "date": "2026-11-09",
+       "id": 6,
+       "last_updated": "2026-11-10",
+       "snippet": "The table below provides an overview of the main positioning of the best-known humanoid robots used in education and research.\n|Robot|Manufacturer|Positioning|Strengths|Common uses|\n|--|--|--|--|--|\n|**H1 / G1**|Unitree Robotics|advanced humanoid robotics|dynamic bipedal locomotion, balance, motion control|research, embedded AI, robotics experimentation|\n|**Booster T1**|Booster Robotics|humanoid technology platform|locomotion, perception, technology demonstration|R&D, demonstrators, innovation projects|\n|**NAO**|Maxtronics|education and human-robot interaction|educational ecosystem, onboard sensors, accessible programming|education, science outreach, HRI research|\n|**Poppy Humanoid**|Poppy Project|open-source platform|modularity, experimentation, mechanical customization|academic research, prototyping, educational projects|\n...\n**Unitree Robotics** develops a new generation of humanoid robots designed for advanced research.\nOriginally known for its quadruped robots, the brand also offers humanoid platforms intended for the study of bipedal locomotion, dynamic stabilization and real-time motion control.\nUnitree humanoid robots are particularly relevant for teams working on:\n- dynamic bipedal walking\n- robot balance in motion\n- whole-body coordination\n- environment perception and embedded intelligence\nThese platforms are suited to research projects where motor performance and motion control are central challenges.\n...\n**Booster Robotics** also develops humanoid robots designed as technology platforms for laboratories and innovation projects.\nThese robots are used to experiment with locomotion, robotic perception and the integration of advanced software components.\n...\n**Poppy** is an open-source humanoid platform developed for research and education.\nIts modular architecture allows researchers, teachers and students to modify the robot, experiment with different mechanical approaches and test motion control algorithms.\n...\nSeveral platforms are used in education and research, notably robots developed by **Unitree Robotics**, **Booster Robotics**, as well as well-known references such as **NAO** and **Poppy**.",
+       "source": "web",
+       "title": "Humanoid robots | Génération Robots",
+       "url": "https://www.generationrobots.com/en/545-humanoid-robots%3Fsrsltid=AfmBOor3AI7AsRgZ5NBEYyONv8u4JUMN5BpZ9rKfEeptxyvvLQfkqooP"
+      },
+      {
+       "id": 7,
+       "last_updated": "2026-11-05",
+       "snippet": "actuators are particularly suitable for applications requiring\n...\nIn terms  \nof height, robots such as LOLA, WALK-MAN, and HRP-5P reach 180 cm, 191.5 cm, and 183 cm, respectively, close to the height of an adult human.\nThese robots are highly suitable for scenarios that require high interactivity or complex environ-mental operations.\nIn contrast, smaller robots such as NAO and DARwIn-OP have heights of only 57 cm and 45.5 cm, re-spectively; these robots are lightweight and agile, making them highly suitable for education, entertainment, and domestic ap-plications.",
+       "source": "web",
+       "title": "[PDF] A comprehensive review on humanoid robots: perspectives from ...",
+       "url": "https://www.fitee.zjujournals.com/rc-pub/front/front-article/download/152530728/lowqualitypdf/A%20comprehensive%20review%20on%20humanoid%20robots:%20perspectives%20from%20academia%20and%20industry.pdf"
+      },
+      {
+       "id": 8,
+       "last_updated": "2026-09-25",
+       "snippet": "To address these challenges and promote democratization in humanoid robotics, we demonstrate Berkeley Humanoid Lite, an open-source humanoid robot designed to be accessible, customizable, and beneficial for the entire community.\n...\nTo demonstrate the capabilities of Berkeley Humanoid Lite, we conducted a series of experiments, including the development of a locomotion controller using reinforcement learning.\nThese experiments successfully showcased zero-shot policy transfer from simulation to hardware, highlighting the platform’s suitability for research validation.\n...\nAdditionally, the teleoperation system enables real-time manipulation tasks, further showcasing the robot’s adaptability for research and education.\n...\nCommercial platforms—such as Agility Robotics’ Digit [1], Fourier Intelligence’s GR1 [9], Westwood Robotics’ THEMIS [2], OpenLoong FXV2750 [26], and NAO H25 [24]—are engineered for robust execution.\nHowever, their substantial price tag renders them largely inaccessible to most research groups and the broader robotics community.\nAlthough lower-cost alternatives like Unitree’s H1 [35] and G1 [34] are available, their closed-source architecture restricts user modifications and complicates repairs, limiting customization for research applications.\n...\nOther projects, such as the Poppy Humanoid [16], OP3 [29], and NimbRo-OP2 [8], take advantage of 3D printing and utilize servo motors as the joints.\n...\nNevertheless, servos typically lack backdrivability and exhibit high reflected inertia, making them slower and less suitable for scaling up to mid-scale or larger humanoid platforms.\n...\nOur design serves as a robust platform for investigating humanoid robot locomotion.\nNotably, we achieve a direct sim-to-real transfer of an Isaac Gym-trained policy to the physical robot without relying on additional state estimation methods.\n...\nThe two 5-DOF arms and integrated grippers enable the robot to serve as an effective platform for bimanual manipulation research.",
+       "source": "web",
+       "title": "Demonstrating Berkeley Humanoid Lite: An Open-source ...",
+       "url": "https://arxiv.org/html/2504.17249"
+      },
+      {
+       "id": 9,
+       "last_updated": "2026-10-09",
+       "snippet": "Abstract—Humanoid robots are increasingly popular as a research tool, which is motivated by the versatility of humans to locomote, to communicate, and to perform arbitrary tasks in unstructured environments.\n...\nIn this work, we present a first prototype of a TeenSize humanoid robot, targeted to close the gap between small, low-cost KidSize robots with limited capabilities and adult-sized, but extremely cost intensive research platforms.\nThe NimbRo-OP prototype is large enough to act and interact in everyday human environments and is equipped with enough torque to investigate dynamic bipedal locomotion, ample computing power, and a wide field-of-view.\nThe prototype is available at low acquisition cost and can easily be modified or repaired.\n...\nThe\nNimbRo-OP bipedal prototype is easy to maintain and to mod-ify.\nGiven the open-source construction plans, the prototype can be reproduced and assembled at low cost from commonly available materials and standard electronic components.\nThe robot is equipped with enough computational power and torque to cover full-scale operation from image processing over trajectory planning down to the generation of dynamic full-body motions.\nIt is large enough to be able to interact with human-scale environments and is therefore suitable to support research in relevant aspects of humanoid robotics.\n...\nAs the research on humanoid robotics enjoys increasing popularity, several commercially available products suitable as research platforms appeared on the market.\n...\nto legitimate competition participation [15], the very limited capabilities of these construction kits make them suitable for entry-level research only, as they lack the strength to carry a reasonably-sized processing unit and sufficient electric power\n...\nWith a body height of approximately 60 cm, the Nao robot\n[6] produced by the company Aldebaran Robotics was the first European bipedal standard platform to appear with a strongly reduced size and an affordable price for research institutions to purchase a few copies.\n...\nThe recently introduced DARwIn-OP [7] is a strong al-ternative in the KidSize sector.\n...\nAside from the KidSize robots, a number of AdultSize commercial platforms are available with sizes larger than\n120 cm.\nThe most prominent models are the Honda Asimo [8], the HRP [10] series developed by AIST and produced by\nKawada Industries in Japan, the Toyota Partner Robot [14], and Hubo [12], developed at KAIST in South-Korea.\nThe extremely high acquisition and maintenance costs of these robots make them unreachable for most universities and thus unavailable for many research efforts.\nFurthermore, these robots are not designed to survive falls, neither are they easy to repair.\n...\nThe NimbRo-OP platform closes the gap between afford-able, but too small, and large enough, but too expensive models and combines an affordable price and low maintenance costs with the versatility and dynamics of larger humanoids.\n...\nIn this paper, we presented a new bipedal TeenSize robot prototype which is particularly interesting because it is large enough to be a research platform employed in realistic envi-ronments.\nYet, the robot is available at low acquisition costs and is easy to assemble and easy to operate.",
+       "source": "web",
+       "title": "NimbRo-OP Humanoid TeenSize Open Platform",
+       "url": "https://www.ais.uni-bonn.de/humanoidsoccer/ws12/papers/HSR12_Schwarz.pdf"
+      },
+      {
+       "date": "2002-04-08",
+       "id": 10,
+       "last_updated": "2026-11-02",
+       "snippet": "# Humanoid robot\nThe design may be aimed at functional purposes, such as interacting with human tools and environments and working alongside humans, for experimental purposes, such as the study of bipedal locomotion,^[2]^ or for other purposes.\n...\n## Applications\n### Medical and research\nHumanoid robots can be used as test subjects for the practice and development of personalized healthcare aids, essentially performing as robotic nurses for demographics such as the elderly.^[4]^ Humanoids are also suitable for some procedurally-based vocations, such as reception-desk administrators and automotive manufacturing line workers.\n...\n## Timeline of developments\n|1995|Hadaly|Developed in Waseda University to study human-robot communication and has three subsystems: a head-eye subsystem, a voice control system for listening and speaking in Japanese, and a motion-control subsystem to use the arms to point toward campus destinations.^[64]^|\n...\n|2006|Nao|A small o\npen source programmable humanoid robot developed by Aldebaran Robotics, in France.\nWidely used by worldwide universities as a research platform and educational tool.^[74]^|\n...\n|2006|iCub|A biped humanoid open source robot for cognition research.^[76]^|",
+       "source": "web",
+       "title": "Humanoid robot - Wikipedia",
+       "url": "https://en.wikipedia.org/wiki/Humanoid_robot"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "queries": [
+      "Unitree G1 research robot ROS 2 SDK",
+      "humanoid research platforms NAO Poppy OP3",
+      "Berkeley Humanoid Lite open source research"
+     ],
+     "results": [
+      {
+       "id": 11,
+       "last_updated": "2026-10-06",
+       "snippet": "To address this gap, we present Berkeley Humanoid Lite, an open-source humanoid robot designed for affordability, modularity, and ease of replication.\nThe robot employs modular 3D-printed gearboxes and structural components combined with off-the-shelf parts for actuators and electronics.\n...\nThe platform’s overall capability is also demonstrated through reinforcement-learning-based locomotion and teleoperated manipulation experiments.\nAll hardware designs, embedded code, and training and deployment frameworks are fully open-sourced.\nIn addition, we provide detailed documentation, tutorials, and community groups to help users get started.\n...\nAll resources are available at https://lite.berkeley-humanoid.org.",
+       "source": "web",
+       "title": "Open-source, Accessible, and Customizable 3D-printed Humanoid ...",
+       "url": "https://www2.eecs.berkeley.edu/Pubs/TechRpts/2025/EECS-2025-207.html"
+      },
+      {
+       "date": "2025-11-10",
+       "id": 12,
+       "last_updated": "2026-10-27",
+       "snippet": "Now a Ph.D. student, Chi is part of a team of Berkeley engineers that has developed Berkeley Humanoid Lite, a low-cost, open-source robot made of 3D-printed parts.\n...\nBerkeley Humanoid Lite’s hardware design, embedded code, and training and deployment frameworks are fully open source.\nThe researchers wanted users to be able to see how everything works and to easily customize the robot.",
+       "source": "web",
+       "title": "Building bots on a budget - Berkeley Engineering",
+       "url": "https://engineering.berkeley.edu/news/2025/11/building-bots-on-a-budget/"
+      },
+      {
+       "date": "2025-06-25",
+       "id": 13,
+       "last_updated": "2026-10-27",
+       "snippet": "Now a Ph.D. student in the Department of Electrical Engineering and Computer Sciences, Chi is part of a team of Berkeley engineers that has developed Berkeley Humanoid Lite, a low-cost, open-source robot made of 3D-printed parts.\n...\n“Our aim is to help people in the research and education space become familiar with how a humanoid system works, including how to assemble and develop a robot platform, by providing them with a template to get started,” he said.\n...\nBerkeley Humanoid Lite’s hardware design, embedded code, and training and deployment frameworks are fully open source.\nThe researchers wanted users to be able to see how everything works and to easily customize the robot.",
+       "source": "web",
+       "title": "Berkeley engineers develop customizable, 3D-printed robot ...",
+       "url": "https://engineering.berkeley.edu/news/2025/06/berkeley-engineers-develop-customizable-3d-printed-robot-for-tech-newbies/"
+      },
+      {
+       "date": "2026-11-13",
+       "id": 14,
+       "last_updated": "2026-11-13",
+       "snippet": "|Title|Description|Stars|Forks|\n|--|--|--|--|\n|AGI|unifolm-wla UnifoLM-WLA-1.0 is Unitree Robotics' comprehensively upgraded, next-generation general-purpose humanoid robot foundation model with 6B parameters.| | |\n|AGI|unifolm-world-model-action UnifoLM-WMA-0 is Unitree‘s open-source world-model–action architecture spanning multiple types of robotic embodiments, designed specifically for general-purpose robot learning.| | |\n|AGI|unifolm-vla UnifoLM-VLA-0 is a Vision–Language–Action (VLA) large model in the UnifoLM series, designed for general-purpose humanoid robot manipulation.| | |\n|Locomotion|unitree_rl_gym An Issac simulation example for reinforcement learning, supports Go2, H1, G1.| | |\n|Locomotion|unitree_rl_lab Reinforcement learning implementation for Unitree robots, based on IsaacLab. Supports Tasks: Velocity: (Go2, H1, G1-29dof) Mimic: (G1-29dof)| | |\n|Locomotion|unitree_rl_mjlab Reinforcement learning implementation for Unitree robots, based on Mujoco.| | |\n|Locomotion|unitree_mujoco Use Mujoco as a simulator and has sim-to-real implementations, integrate with terrain generator. Support C++/Python interface.| | |\n|Manipulation|xr_teleoperate Teleoperate Unitree robots( H2, H1, H1_2, G1, R1) via XR devices (Apple Vision Pro, PICO, Quest) with integrated data recording.| | |\n|Manipulation|unitree_lerobot For Unitree robots (H1, H1_2, G1), this framework provides an end-to-end embodied AI solution, seamlessly integrating standardized data conversion, LeRobot policy training and inference, and closed-loop real-world deployment.| | |\n|Manipulation|unitree_sim_isaaclab Supporting Unitree robots (H1_2, G1), this high-fidelity simulation platform based on Isaac Lab employs the same DDS communication interface as the physical robots.| | |\n|Manipulation|teleimager An image server that captures video streams from multiple cameras (UVC, V4L2, Gstreamer and RealSense) and publishes them over the network using ZeroMQ or WebRTC.| | |\n|Manipulation|unitree_robotskills Robot skill framework that connects frontier AI models (GPT-6 Astra, Claude Opus, ...) to Unitree robots (G1-D, R1-D): the model observes the scene, reasons and calls robot skills such as painting, Gomoku, Chinese chess and navigation.| | |\n|UniStore|unitree-app-templates This repository provides an out-of-the-box development environment to help developers quickly get started with building applications for Unitree robots.| | |\n|Robot SDK|unitree_sdk2 An SDK package used to develop Go2, B2, H1, G1, H2, R1, A2 robots in real environments. Bindings: [ unitree_sdk2_python | unitree_sdk2_rs ]| | |\n|Robot SDK|r1-7a_sdk Low-level control SDK for the R1 7-DOF robotic arm over the IM6014 serial bus: FOC / stop / home / goto examples, left and right hand support, URDF and STEP files.| | |\n|Robot SDK|D2-Arm Delivery package for the D2 robotic arm: ArmEcho host software (Docker image + `armecho-compose.yml`), a Python SDK with prebuilt wheels for CPython 3.10 / 3.11 / 3.12 and examples, and the `D2_URDF` ROS model package.| | |\n|Robot SDK|unitree_actuator_sdk SDK for Unitree GO-M8010-6, A1 and B1 motors: serial-bus register access, mode configuration and control examples (x86 / ARM).| | |\n|Robot SDK|unitree_legged_sdk An SDK package used to develop Aliengo, A1, Go1 and B1 robots in real environments.| | |\n|URDF|Humanoid Robots: H2-X, R1, R1 Air, R1-A7-D, H2, H2-A, H2 Plus, H2-D, G1-D, G1, G1+, G1 with Brainco Hand, H1-2, H1 Quadruped Robots: As2, As2-W, A2, Go2, Go2-W, Go1, B2-W, B2, B1, A1, AlienGo, Laikago Dexterous Hands: Dex1-1, Dex2/5, Dex3-1, Dex5-1, Dex5-S Robotic Arms: R1-7a, R1-A5, R1-A7, Z1, AlienGo with Z1| | |\n|USD|USD for robots: H2_Plus, H2, G1, B2, H1, Go2, etc.| | |\n|ROS1/ROS2|unitree_ros ROS1 simulation package. It has urdf files of all Unitree series robots.| | |\n|ROS1/ROS2|unitree_ros2 Develop Go2 and B2 robots in the ROS2 environment. The interface types provided are consistent with unitree_sdk2.| | |\n|unitree_guide|An instance control algorithm by book \"Quadruped Robot Control Algorithm--Modeling, Control and Practice\" published by Unitree. It demonstrates the robot joint motor control method, simple foot movements, and force control algorithm. Both simulation and real robot development environments supports.| | |\n|point_lio_unilidar|This repository adapts the state-of-the-art lidar inertial odometry algorithm, Point-LIO, for use Unitree 4D Lidar L1. It can complete SLAM using only its piontcloud and built-in IMU.| | |\n|DIY|Unitree-Motor-Assistant Official open-source configuration and debugging tool for Unitree J288/S288 and IM6014 joint motors, featuring a Qt-based GUI and serial port communication.| | |\n|DIY|Qmini A fully open-sourced, low-cost bipedal robot that can be entirely 3D printed by individual users.| | |\n|DIY|UniArmL1 UniArmL1 is a lightweight, open-source 6-DOF robotic arm and teleoperation framework that supports three control modes and standardized data acquisition. The acquired data can be seamlessly integrated with unitree_lerobot for imitation learning training and deployment.| | |\n|DIY|R1-7A A 7-DOF robotic arm teleoperation framework supporting single-arm and dual-arm control, multi-camera data recording, and trajectory replay.| | |\n...\nUnitree robot sdk version 2.",
+       "source": "web",
+       "title": "Unitree Robotics",
+       "url": "https://github.com/UnitreeRobotics"
+      },
+      {
+       "id": 15,
+       "last_updated": "2026-10-29",
+       "snippet": "- unitree_ros\nunitree_ros is a ROS simulation package for Unitree robots.\nIt contains the urdf files of all Unitree robots.\nYou can obtain information such as the mass inertia moment limit of the Unitree robot through this package.\nAt the same time, the unitree_controller and unitree_gazebo packages allow you to quickly Build the simulation verification program in the Gazebo simulator.\n- unitree_legged_sdk\nunitree_legged_sdk is an SDK package used to develop Aliengo, A1, and Go1 robots in real environments.\nYou can control the movement of a single joint of the robot based on the low-level development interface, or you can control the robot to move at a specific speed based on the high-level development interface.\n...\nunitree_sdk2 is an SDK package used to develop Go2, B2, and H1 robots in real environments.\nIts functional positioning is similar to the unitree_legged_sdk package.\n...\nunitree_ros2 is a function package used to develop Go2 and B2 robots in the ros2 environment.\nThe interface types provided are consistent with unitree_sdk2.\n...\n- unitree_sdk2_python\nPython interface for unitree_sdk2, used to develop Go2, B2, H1, G1 robots in real environments.",
+       "source": "web",
+       "title": "Official Open Source",
+       "url": "https://www.unitree.com/mobile/opensource/"
+      },
+      {
+       "date": "2026-07-20",
+       "id": 16,
+       "last_updated": "2026-11-10",
+       "snippet": "G1 SDK Development Guide\n...\nSDK Overview\n...\nGet SDK\n...\nRos2 Communication Routine\nDDS Communication Routine\n...\n2. Get SDK\nGet SDK\n...\nQuadruped - Consumer/Research\n...\nHow do I get the Go2 SDK?",
+       "source": "web",
+       "title": "宇树科技 文档中心 - support.unitree.com",
+       "url": "https://support.unitree.com/home/en/G1_developer/get_sdk"
+      },
+      {
+       "date": "2026-06-16",
+       "id": 17,
+       "last_updated": "2026-11-10",
+       "snippet": "The total BOM cost is approximately $4,312 when sourced in the US and approximately $3,236 when sourced in China, with the official marketing claim of \"under $5,000\" (source: research archive berkeley-humanoid-lite.md, same below).\n...\nBerkeley Humanoid Lite is a **fully open-source, modular 3D-printed, lightweight humanoid robot research platform with a total cost under $5,000**.\n...\n|Platform|Cost (USD)|Degrees of Freedom|Reducer Solution|Open-Source Level|Applicable Scenarios|\n|--|--|--|--|--|--|\n|Berkeley Humanoid Lite|Approx. $4,312 (US BOM)|22|3D-printed cycloidal (quasi-direct-drive)|Fully open-source (MIT + CC BY-SA 4.0)|RL research, algorithm validation, education|\n|Unitree H1 (2024)|Tens of thousands of dollars (to be confirmed)|To be confirmed|Metal harmonic reducer (high reduction ratio)|Closed-source|Industrial and commercial applications|\n|Tesla Optimus|Not disclosed|To be confirmed|To be confirmed|Closed-source|Industrial manufacturing|",
+       "source": "web",
+       "title": "awesome-humanoid-robot/research/robot_systems/ent ... - GitHub",
+       "url": "https://github.com/YansongW/awesome-humanoid-robot/blob/main/research/robot_systems/ent_robot_system_berkeley_humanoid_lite.md"
+      },
+      {
+       "id": 18,
+       "last_updated": "2026-11-13",
+       "snippet": "The Unitree G1 is a compact bipedal humanoid built for research, education and content work.\n...\nThe Unitree G1 is a compact bipedal humanoid built for research, education and content work.\n...\n- **Programming**\nYes, high and low level.\nC++ or Python SDK, over DDS or ROS 2.\n...\n- **Programming**\nYes, high and low level.\nC++ or Python SDK, over DDS or ROS 2.\n...\nYes, high and low level.\nC++ or Python SDK, over DDS or ROS 2.\n...\nC++ or Python SDK, over DDS or ROS 2.\n...\n- **Software**\nBrainCo Python and C SDK, ROS 2 and MoveIt; supported by Unitree's xr_teleoperate\n...\nC++ or Python SDK, over DDS or ROS 2.\n...\nC++ or Python SDK, over DDS or ROS 2.\n...\nC++ or Python SDK, over DDS or ROS 2.\n...\nUnitree SDK; supported by Unitree's xr_teleoperate and Isaac simulation\n...\nC++ or Python SDK, over DDS or ROS 2.\n...\nC++ or Python SDK, over DDS or ROS 2.\n...\nUnitree SDK; supported by Unitree's xr_teleoperate and Isaac simulation\n...\nC++ or Python SDK, over DDS or ROS 2.\n...\n- **Software**\nBrainCo Python and C SDK, ROS 2 and MoveIt; supported by Unitree's xr_teleoperate\n...\nC++ or Python SDK, over DDS or ROS 2.\n...\nBrainCo Python and C SDK, ROS 2 and MoveIt; supported by Unitree's xr_teleoperate\n...\nC++ or Python SDK, over DDS or ROS 2.\n...\nC++ or Python SDK, over DDS or ROS 2.\n...\nUnitree SDK; supported by Unitree's xr_teleoperate and Isaac simulation\n...\nYes, high and low level.\nC++ or Python SDK, over DDS or ROS 2.\n...\nUnitree SDK; supported by Unitree's xr_teleoperate and Isaac simulation\n...\nC++ or Python SDK, over DDS or ROS 2.\n...\nC++ or Python SDK, over DDS or ROS 2.\n...\nBrainCo Python and C SDK, ROS 2 and MoveIt; supported by Unitree's xr_teleoperate\n...\nC++ or Python SDK, over DDS or ROS 2.\n...\nC++ or Python SDK, over DDS or ROS 2.\n...\n- **Software**\nPython and C SDK, ROS 2, MuJoCo and Isaac\n...\nDexterous research and learning skilled finger motion on a G1 or H2.\n...\nC++ or Python SDK, over DDS or ROS 2.\n...\nPython and C SDK, ROS 2, MuJoCo and Isaac\n...\nC++ or Python SDK, over DDS or ROS 2.\n...\nThe Unitree G1 is a compact bipedal humanoid robot designed for research, development, and education.",
+       "source": "web",
+       "title": "Unitree G1 Humanoid Robot | Prices & Configurations",
+       "url": "https://www.robotlab.com/store/unitree-g1-robot/"
+      },
+      {
+       "id": 19,
+       "last_updated": "2026-07-24",
+       "snippet": "## References\n...\n- [5] Y.\nChi, Q. Liao, J. Long, X. Huang, S. Shao, B. Nikolic, Z. Li, and K. Sreenath (2025) Demonstrating berkeley humanoid lite: an open-source, accessible, and customizable 3d-printed humanoid robot.\nExternal Links: 2504.17249, Link Cited by: §2.\n...\nLiao, B. Zhang, X. Huang, X. Huang, Z. Li, and K. Sreenath (2024) Berkeley humanoid: a research platform for learning-based control.",
+       "source": "web",
+       "title": "Handroid: Bridging Dexterous Hand and Humanoid",
+       "url": "https://arxiv.org/html/2607.16187"
+      },
+      {
+       "date": "2026-04-15",
+       "id": 20,
+       "last_updated": "2026-11-08",
+       "snippet": "Berkeley Humanoid Lite is an open-source, sub-$5,000 humanoid robot featuring modular 3D-printed gearboxes and widely available components, designed to democratize and advance humanoid robotics research.\n...\n## Overview\nThis repository is the workspace for the Berkeley Humanoid Lite project that contains everything we need, including policy training, sim2sim validation, real-world deployment, motion capture, and teleoperated manipulation controls.\n...\n- `source/berkeley_humanoid_lite_lowlevel/` contains the lowlevel code running on the real robot.\nOnly contents inside this folder are required to deploy to the real robot.",
+       "source": "web",
+       "title": "GitHub - berkeley-humanoids/berkeley-humanoid-lite: Codebase for Berkeley Humanoid Lite v1",
+       "url": "https://github.com/Berkeley-Humanoids/berkeley-humanoid-lite"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "content": [
+      {
+       "annotations": [],
+       "text": "Suitable choices depend on the research goal, budget, and how much you need to modify the robot:\n\n| Platform | Best fit | Considerations |\n|---|---|---|\n| **Unitree G1** | Bipedal locomotion, balance, manipulation, and embodied-AI experiments. It has developer SDKs and simulation resources, though it is not fully open-source.[2][14] | A practical commercial platform when you want a ready-built robot and established software tools. |\n| **Berkeley Humanoid Lite** | Low-cost, hands-on work on locomotion, reinforcement learning, teleoperation, and robot design. Hardware, code, and training frameworks are open-source.[11][12] | Better for teams comfortable assembling and maintaining a platform. |\n| **NAO** | Human–robot interaction, education, and accessible experiments with a smaller humanoid.[3][6] | Less suited to research requiring adult-scale strength or advanced whole-body manipulation. |\n| **Poppy Humanoid** | Mechanical customization, prototyping, and education using a modular open-source platform.[6] | Check whether its capabilities match your performance needs before selecting it. |\n| **Unitree H1** | Full-size locomotion and whole-body control research.[2][14] | More capable at full scale, but likely a larger investment and less oriented toward extensive hardware modification than an open design. |\n\nFor a general-purpose lab starting with a commercial humanoid, **Unitree G1** is a strong candidate; for maximum hardware transparency and customization, consider **Berkeley Humanoid Lite**. Before buying, verify access to low-level controls and sensor data, ROS or simulation support, safety features, repairability, and the exact capabilities included in the configuration.",
+       "type": "output_text"
+      }
+     ],
+     "id": "msg_fc6250e0-ff9d-4880-ab9b-13318f701bc7",
+     "role": "assistant",
+     "status": "completed",
+     "type": "message"
+    }
+   ],
+   "parallel_tool_calls": true,
+   "presence_penalty": 0,
+   "preset": "fast@2026-11-11.0",
+   "previous_response_id": null,
+   "prompt_cache_key": null,
+   "reasoning": null,
+   "safety_identifier": null,
+   "service_tier": "fast",
+   "status": "completed",
+   "store": true,
+   "temperature": 1,
+   "text": {
+    "format": {
+     "type": "text"
+    }
+   },
+   "tool_choice": "auto",
+   "tools": [
+    {
+     "type": "web_search"
+    }
+   ],
+   "top_logprobs": 0,
+   "top_p": 1,
+   "truncation": "",
+   "usage": {
+    "cost": {
+     "cache_creation_cost": 0.0017,
+     "cache_read_cost": 3e-05,
+     "currency": "USD",
+     "input_cost": 1e-05,
+     "output_cost": 0.00022,
+     "tool_calls_cost": 0.002,
+     "tool_calls_cost_details": {
+      "search_web": 0.002
+     },
+     "total_cost": 0.00396
+    },
+    "input_tokens": 17198,
+    "input_tokens_details": {
+     "cache_creation_input_tokens": 13632,
+     "cache_read_input_tokens": 3488,
+     "cached_tokens": 3488
+    },
+    "output_tokens": 430,
+    "output_tokens_details": {
+     "reasoning_tokens": 0
+    },
+    "tool_calls_details": {
+     "search_web": {
+      "cost_usd": 0.002,
+      "invocation": 2
+     }
+    },
+    "total_tokens": 17628
+   },
+   "user": null
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "aa56e1ef92894072a1e84deaf2cf0ae2",
+   "charged_micro": 3960
+  }
+ }
+}

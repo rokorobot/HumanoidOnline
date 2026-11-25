@@ -1,0 +1,108 @@
+{
+ "observed_at": "2026-11-14T07:18:30+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "How much does the Unitree G1 cost?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "The cost of the Unitree G1 humanoid robot varies depending on the specific model and tier you choose:\n\nBase G1 Humanoid: $17,990 USD (originally starting around $16,000 USD upon initial release), featuring 23 degrees of freedom, a 3D LiDAR, depth camera, and ~2-hour battery life.\n\nG1 Pro: $28,950 USD, offering upgraded performance and AI capabilities.\n\nEducation & Research Configurations (G1 Edu): $43,900 to $73,900 USD, depending on expanded degrees of freedom (up to 43+ DOF), dexterous hands (like the Dex3-1), and specialized wrist/waist modules.\n\nYou can check current availability or specific configurations directly on the Unitree Robotics Official Website or explore distributor pricing through guides like Global Drone HQ's Unitree Price Guide.\n\nAre you looking at the base model for general use, or do you need a research/EDU configuration with dexterous hands? I can help break down the specs further if you'd like.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Unitree G1 | QUADRUPED.DE, 23.000,00 €",
+      "url": "https://www.quadruped.de/Unitree-G1_1",
+      "description": "Features 23 to 69 DOF, 35 kg weight, ~2h operating time, self-righting ability, and NVIDIA Orin NX. Pro/E (entertainment/AI),",
+      "redirectLink": "https://www.google.com/goto?url=CAESYgHEIkXXsh7iIdgSSNxKa88N68gnodpjJ5Rz3fOvJpiSbdXzVcj051I_bKWHV1FZjTgpzGflMrHwUy6cxP8smYbgkc3DSBuCaLpvAUws69B4qg0LYdwYalJNoIgBI6YC_O4B"
+     },
+     {
+      "position": 2,
+      "label": "Unitree Robot Price Guide 2026: Every Model and What It Costs",
+      "url": "https://globaldronehq.com/blogs/guides/unitree-robot-price-guide-2026?srsltid=AYCX9vLleSpaA1n_j7_OzvBuwiDcVyWlXek4phD6fk7knWGntrXV7cwF",
+      "description": "The base G1 humanoid is $17,990 and the G1 Pro is $28,950 as of October 2026. Education and research configurations range from $43...",
+      "redirectLink": "https://www.google.com/goto?url=CAESxAEBxCJF10bWoyMGZNl8BQIE5KLYvn1_pfX3O1Bu8X4D4Qk016gT_b7J0MMU3zX6dyTrXjfTehveg0CozXLwDijVJyXboNyf8vUwgwnL9iLRwyo856HEUHZ0ss1KPdmi_FZ_FxlN7dHFQjvVpaGAn1Ad3Pk03lzW3PkL85cJEMUICAt4_GVjDc_s14WMcAFuxkBPunRLMjHM8v0pcC0sM2LXIYX2mQ505Gqil-KfbOTP_F5SPrOY_4o-KuuZ2KMGpth6B9RL"
+     },
+     {
+      "position": 3,
+      "label": "Unitree G1 Humanoid Agent | Price from $16K",
+      "url": "https://www.unitree.com/news/29",
+      "description": "Unitree G1 Humanoid Agent | Price from $16K. ; Industrial Applications. Advanced Quadruped Inspection SolutionsFire Rescue Solutio...",
+      "redirectLink": "https://www.google.com/goto?url=CAESXAHEIkXXIwF66XYAHknEwb0zykvsWQBRuEQD_IPF7gad3tIdtQtjF1nfahdNr8oKIb_3agjBzE8oxZDGuZQX_4fcUdU2lv_tWwm87ubomcGFqy8pddcuPk_SMRKC"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Unitree Robot Price Guide 2026: Every Model and What It Costs",
+      "citationPillId": 1,
+      "url": "https://globaldronehq.com/blogs/guides/unitree-robot-price-guide-2026?srsltid=AYCX9vLleSpaA1n_j7_OzvBuwiDcVyWlXek4phD6fk7knWGntrXV7cwF",
+      "domain": "globaldronehq.com",
+      "description": "The base G1 humanoid is $17,990 and the G1 Pro is $28,950 as of October 2026. Education and research configurations range from $43...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESxAEBxCJF10bWoyMGZNl8BQIE5KLYvn1_pfX3O1Bu8X4D4Qk016gT_b7J0MMU3zX6dyTrXjfTehveg0CozXLwDijVJyXboNyf8vUwgwnL9iLRwyo856HEUHZ0ss1KPdmi_FZ_FxlN7dHFQjvVpaGAn1Ad3Pk03lzW3PkL85cJEMUICAt4_GVjDc_s14WMcAFuxkBPunRLMjHM8v0pcC0sM2LXIYX2mQ505Gqil-KfbOTP_F5SPrOY_4o-KuuZ2KMGpth6B9RL"
+     },
+     {
+      "label": "Unitree G1 Humanoid Agent | Price from $16K",
+      "citationPillId": 2,
+      "url": "https://www.unitree.com/news/29",
+      "domain": "unitree.com",
+      "description": "Unitree G1 Humanoid Agent | Price from $16K. ; Industrial Applications. Advanced Quadruped Inspection SolutionsFire Rescue Solutio...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESXAHEIkXXIwF66XYAHknEwb0zykvsWQBRuEQD_IPF7gad3tIdtQtjF1nfahdNr8oKIb_3agjBzE8oxZDGuZQX_4fcUdU2lv_tWwm87ubomcGFqy8pddcuPk_SMRKC"
+     },
+     {
+      "label": "Unitree Robot Price Guide 2026: Every Model and What It Costs",
+      "citationPillId": 2,
+      "url": "https://globaldronehq.com/blogs/guides/unitree-robot-price-guide-2026?srsltid=AYCX9vLleSpaA1n_j7_OzvBuwiDcVyWlXek4phD6fk7knWGntrXV7cwF",
+      "domain": "globaldronehq.com",
+      "description": "The base G1 humanoid is $17,990 and the G1 Pro is $28,950 as of October 2026. Education and research configurations range from $43...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESxAEBxCJF10bWoyMGZNl8BQIE5KLYvn1_pfX3O1Bu8X4D4Qk016gT_b7J0MMU3zX6dyTrXjfTehveg0CozXLwDijVJyXboNyf8vUwgwnL9iLRwyo856HEUHZ0ss1KPdmi_FZ_FxlN7dHFQjvVpaGAn1Ad3Pk03lzW3PkL85cJEMUICAt4_GVjDc_s14WMcAFuxkBPunRLMjHM8v0pcC0sM2LXIYX2mQ505Gqil-KfbOTP_F5SPrOY_4o-KuuZ2KMGpth6B9RL"
+     },
+     {
+      "label": "Unitree G1 | QUADRUPED.DE, 23.000,00 €",
+      "citationPillId": 3,
+      "url": "https://www.quadruped.de/Unitree-G1_1",
+      "domain": "quadruped.de",
+      "description": "Features 23 to 69 DOF, 35 kg weight, ~2h operating time, self-righting ability, and NVIDIA Orin NX. Pro/E (entertainment/AI),",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESYgHEIkXXsh7iIdgSSNxKa88N68gnodpjJ5Rz3fOvJpiSbdXzVcj051I_bKWHV1FZjTgpzGflMrHwUy6cxP8smYbgkc3DSBuCaLpvAUws69B4qg0LYdwYalJNoIgBI6YC_O4B"
+     },
+     {
+      "label": "Unitree Robot Price Guide 2026: Every Model and What It Costs",
+      "citationPillId": 3,
+      "url": "https://globaldronehq.com/blogs/guides/unitree-robot-price-guide-2026?srsltid=AYCX9vLleSpaA1n_j7_OzvBuwiDcVyWlXek4phD6fk7knWGntrXV7cwF",
+      "domain": "globaldronehq.com",
+      "description": "The base G1 humanoid is $17,990 and the G1 Pro is $28,950 as of October 2026. Education and research configurations range from $43...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESxAEBxCJF10bWoyMGZNl8BQIE5KLYvn1_pfX3O1Bu8X4D4Qk016gT_b7J0MMU3zX6dyTrXjfTehveg0CozXLwDijVJyXboNyf8vUwgwnL9iLRwyo856HEUHZ0ss1KPdmi_FZ_FxlN7dHFQjvVpaGAn1Ad3Pk03lzW3PkL85cJEMUICAt4_GVjDc_s14WMcAFuxkBPunRLMjHM8v0pcC0sM2LXIYX2mQ505Gqil-KfbOTP_F5SPrOY_4o-KuuZ2KMGpth6B9RL"
+     },
+     {
+      "label": "Unitree Robot Price Guide 2026: Every Model and What It Costs",
+      "citationPillId": 4,
+      "url": "https://globaldronehq.com/blogs/guides/unitree-robot-price-guide-2026?srsltid=AYCX9vLleSpaA1n_j7_OzvBuwiDcVyWlXek4phD6fk7knWGntrXV7cwF",
+      "domain": "globaldronehq.com",
+      "description": "The base G1 humanoid is $17,990 and the G1 Pro is $28,950 as of October 2026. Education and research configurations range from $43...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESxAEBxCJF10bWoyMGZNl8BQIE5KLYvn1_pfX3O1Bu8X4D4Qk016gT_b7J0MMU3zX6dyTrXjfTehveg0CozXLwDijVJyXboNyf8vUwgwnL9iLRwyo856HEUHZ0ss1KPdmi_FZ_FxlN7dHFQjvVpaGAn1Ad3Pk03lzW3PkL85cJEMUICAt4_GVjDc_s14WMcAFuxkBPunRLMjHM8v0pcC0sM2LXIYX2mQ505Gqil-KfbOTP_F5SPrOY_4o-KuuZ2KMGpth6B9RL"
+     }
+    ],
+    "markdown": "The cost of the **Unitree G1** humanoid robot varies depending on the specific model and tier you choose: [Unitree Robot Price Guide 2026: Every Model and What It Costs](https://globaldronehq.com/blogs/guides/unitree-robot-price-guide-2026?srsltid=AYCX9vLleSpaA1n_j7_OzvBuwiDcVyWlXek4phD6fk7knWGntrXV7cwF)\n\n  * **Base G1 Humanoid:** **$17,990 USD** (originally starting around $16,000 USD upon initial release), featuring 23 degrees of freedom, a 3D LiDAR, depth camera, and ~2-hour battery life. [Unitree G1 Humanoid Agent | Price from $16K](https://www.unitree.com/news/29)[Unitree Robot Price Guide 2026: Every Model and What It Costs](https://globaldronehq.com/blogs/guides/unitree-robot-price-guide-2026?srsltid=AYCX9vLleSpaA1n_j7_OzvBuwiDcVyWlXek4phD6fk7knWGntrXV7cwF)\n\n  * **G1 Pro:** **$28,950 USD**, offering upgraded performance and AI capabilities. [Unitree G1 | QUADRUPED.DE, 23.000,00 €](https://www.quadruped.de/Unitree-G1_1)[Unitree Robot Price Guide 2026: Every Model and What It Costs](https://globaldronehq.com/blogs/guides/unitree-robot-price-guide-2026?srsltid=AYCX9vLleSpaA1n_j7_OzvBuwiDcVyWlXek4phD6fk7knWGntrXV7cwF)\n\n  * **Education & Research Configurations (G1 Edu):** **$43,900 to $73,900 USD**, depending on expanded degrees of freedom (up to 43+ DOF), dexterous hands (like the Dex3-1), and specialized wrist/waist modules. [Unitree Robot Price Guide 2026: Every Model and What It Costs](https://globaldronehq.com/blogs/guides/unitree-robot-price-guide-2026?srsltid=AYCX9vLleSpaA1n_j7_OzvBuwiDcVyWlXek4phD6fk7knWGntrXV7cwF)\n\nYou can check current availability or specific configurations directly on the [Unitree Robotics Official Website](https://www.unitree.com/news/29) or explore distributor pricing through guides like Global Drone HQ's Unitree Price Guide.\n\nAre you looking at the **base model for general use**, or do you need a **research/EDU configuration** with dexterous hands? I can help break down the specs further if you'd like."
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "d262272b0be143ce89c87a8845875071",
+   "charged_micro": 2400
+  }
+ }
+}

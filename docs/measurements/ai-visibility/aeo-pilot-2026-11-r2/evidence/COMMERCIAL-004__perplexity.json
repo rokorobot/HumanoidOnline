@@ -1,0 +1,203 @@
+{
+ "observed_at": "2026-11-14T07:16:14+00:00",
+ "endpoint": "perplexity.web.answer.fast",
+ "request": {
+  "preset": "fast",
+  "input": "Which humanoid robots can be purchased in North America?",
+  "max_steps": 1,
+  "max_output_tokens": 512
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "background": false,
+   "completed_at": 1794640575,
+   "created_at": 1794640575,
+   "effort": "fast@2026-11-11.0",
+   "error": null,
+   "frequency_penalty": 0,
+   "id": "resp_52e98354-c36a-4e96-b6e7-28094298b054",
+   "incomplete_details": null,
+   "instructions": null,
+   "max_output_tokens": 512,
+   "max_tool_calls": null,
+   "metadata": {},
+   "model": "openai/gpt-6-luna",
+   "object": "response",
+   "output": [
+    {
+     "queries": [
+      "Which humanoid robots can be purchased in North America?"
+     ],
+     "results": [
+      {
+       "date": "2026-11-06",
+       "id": 1,
+       "last_updated": "2026-11-06",
+       "snippet": "# Humanoid Robots You Can Buy Today: Prices and Availability\nSeven humanoid robots you can buy today have a confirmed order path.\nFour list a public price and an Add to cart button, but only the Unitree R1 shows as in stock.\n...\nTesla Optimus, Figure 03 and XPeng IRON are covered under “Not for sale yet.”\n## Humanoid Robots You Can Buy Today\n|Robot|Price (USD)|Availability|How to buy|Best for|\n|--|--|--|--|--|\n|**Unitree R1**|From $4,900 for the R1 Air; Unitree’s main site lists the R1 at $5,900; R1 EDU price not published|In stock; R1 Air (White) backordered|Direct from Unitree’s store; EDU through sales|Low-cost entry; EDU for research|\n|**Unitree G1**|$13,500 for the standard G1; EDU price not published|Backordered|Direct from Unitree’s store; EDU through sales|Labs that need a small full-body robot|\n|**AgiBot X2 Neo**|$25,600; X2 Ultra price on request|Add to cart; contact sales to confirm delivery timing|Direct from AgiBot’s store or sales|Performances and interaction|\n|**AgiBot A2 Lite**|$44,560; A2 Ultra price on request|Add to cart; contact customer service for delivery details|Direct from AgiBot’s store or sales|Performances and interaction|\n|**1X NEO**|$20,000 early-access purchase, or $499 per month|Pre-order; U.S. deliveries start 2026, no date given for the monthly plan|Direct from 1X; early access takes a $200 refundable deposit|Home chores|\n|**LimX Oli**|Not published|Not stated|Buy Now button; LimX advises consulting sales first|Research (EDU edition)|\n|**Dobot ATOM**|Not published|Not stated|Sales form or email|Research and industrial pilots|",
+       "source": "web",
+       "title": "Humanoid Robots You Can Buy Today: Prices (2026)",
+       "url": "https://theroboticlife.com/humanoid-robots-you-can-buy/"
+      },
+      {
+       "date": "2026-11-07",
+       "id": 2,
+       "last_updated": "2026-11-11",
+       "snippet": "Yes, you can buy a humanoid robot in 2026.\nThe easiest one to own is the Unitree R1: it sits in Unitree's online store at $4,900, marked in stock, with an Add to Cart button.\nFeather and the AgiBot A2 Lite can also be ordered online today, the Unitree G1+ has a public list price of $15,000, and the Nori A3 takes full orders at $1,688 for its fall 2026 batch.\nThree more, the 1X NEO Home Robot, the NEURA 4NE-1 Mini and the Lightberry Lumi, take refundable reservations for 2026 deliveries.\n...\nThese are the eight humanoids with a published price and a public order route, in rank order, with where to buy each one.\n|Rank|Robot|Manufacturer|Key Strength|Best For|Where and How to Order|\n|--|--|--|--|--|--|\n|#1|Unitree R1|Unitree Robotics|Walks, runs and does cartwheels at 123 cm and 29 kg|First walking humanoid for learners and makers|Unitree online store, in stock, $4,900|\n|#2|Feather|Feather Robotics|Two 7-DoF arms, 600 mm torso lift, 10-hour battery|Developers building work apps for labs and kitchens|Configure on feather.dev, Standard preset $32,990|\n|#3|AgiBot A2 Lite|AgiBot|Full-size 169 cm biped with a built-in routine library|Shows, venues and commercial performances|AgiBot online store, add to cart, $44,560|\n|#4|Unitree G1+|Unitree Robotics|25 DoF, moving neck, quick-release 2-hour battery|Universities, schools and research labs|Unitree G1+ page and sales booking, $15,000|\n|#5|Nori A3|Nori Robotics|Two arms on a 69 to 145 cm lifting column, 6 to 8 hours|Home chores on the smallest outlay|Order on norirobotics.com, $1,688 paid in full, ships fall 2026|\n|#6|NEO Home Robot|1X Technologies|75 DoF tendon-driven body built for homes|US households that want a full-size helper|$200 refundable deposit, $20,000 or $499 a month|\n|#7|4NE-1 Mini|NEURA Robotics|Compact 132 cm biped, 3 kg per arm|European schools and research groups|€100 refundable reservation, €19,999 or €29,999 Pro|\n|#8|Lumi|Lightberry|34 DoF with Jetson Thor and conversation software|Events, retail and guided visits|Reserve on lightberry.com, $39,990 Founder Edition|\n...\nFive can be ordered outright today and three take refundable reservations; shipping, customs and taxes are extra on every one of them.\n...\nNEO Home Robot ranks sixth because 1X takes orders on its website with a fully refundable deposit for US deliveries starting in 2026, but you cannot take one home today.\n...\nThe Unitree R1 is in stock in Unitree's online store, and the AgiBot A2 Lite can be added to a cart in AgiBot's store.\nFeather takes online orders through its build page, and Nori takes full orders for its fall 2026 batch of the A3.",
+       "source": "web",
+       "title": "Humanoid Robots You Can Actually Buy Right Now in 2026, and ...",
+       "url": "https://www.originofbots.com/articles/humanoid-robots-you-can-actually-buy-right-now-in-2026-and-how-to-order"
+      },
+      {
+       "date": "2026-10-12",
+       "id": 3,
+       "last_updated": "2026-10-28",
+       "snippet": "# Humanoid robots for sale: what you can buy and the price\nHumanoid robots for sale to individuals exist in October 2026, but only a few models list a price.\nUnitree sells the R1 from $4,900 and the G1 from $13.5K, and 1X takes $200 deposits for its NEO home robot at $20,000 or $499 a month.\nAgility Robotics and Boston Dynamics sell Digit and Atlas to businesses through their sales teams, while Figure and Tesla describe their humanoids without offering them for sale.\n...\n## Humanoid robots you can order, at a glance\n|Robot|Maker|Who can buy|Price listed by the maker|Key specs from the maker|\n|--|--|--|--|--|\n|R1 AIR / R1|Unitree|Anyone, online|$4,900 / $5,900; EDU version through sales|About 1.23 m, 27–29 kg, about 1 h battery|\n|G1|Unitree|Anyone, online|From $13.5K, excluding tax and shipping; EDU version through sales|About 1.32 m, about 35 kg, 23–43 joints, about 2 h battery|\n|NEO|1X|Consumers, by deposit|$20,000 to own, or $499 a month; $200 deposit|5 ft 6 in, 66 lb, lifts 154 lb, carries 55 lb|\n|Digit|Agility Robotics|Businesses|None listed; contact sales|Built for warehouse and logistics work|\n|Atlas|Boston Dynamics|Enterprise customers|None listed; “qualified prospects”|1.9 m, 90 kg, 56 degrees of freedom, 4 h battery|\n|Figure 03|Figure|Not on sale|None listed|Described for help in the home|\n|Optimus|Tesla|Not on sale|None listed|Described as a goal on Tesla’s AI page|\n...\n## A home humanoid by preorder: 1X NEO\n1X is the one maker taking consumer orders for a humanoid designed for housework.\nIts order page offers NEO at $20,000 to own, including a three-year warranty and priority delivery, or as a $499 monthly subscription.\n...\n1X says US deliveries start in 2026 and other markets follow from 2027.\n...\n## Questions\nYou can order one.\n1X sells NEO to consumers for household tasks, with US deliveries starting in 2026 according to the company.\nUnitree’s robots can be bought by individuals too, but Unitree presents them as research and development platforms and warns buyers to understand their limitations first.",
+       "source": "web",
+       "title": "Humanoid robots for sale: models, prices and who can buy",
+       "url": "https://themodelpress.com/explainers/humanoid-robots-for-sale"
+      },
+      {
+       "id": 4,
+       "last_updated": "2026-10-11",
+       "snippet": "## The Robots Are Here. America Is Ready.\nHumanoids, robot dogs, cobots and service robots from the world's leading manufacturers and shipped to all 50 states.\n...\nUnitree H2 Humanoid Robot\nUS$39,900.00 Special Price US$37,500.00\n- Unitree H2 EDU Humanoid Robot\nUS$68,900.00 Special Price US$67,995.00\n...\n**Unitree G1**\nThe world's most popular research humanoid, from Basic to Ultimate editions.\n**LimX Oli EDU**\nA full-size, open-source general-purpose humanoid for research at human scale.\n...\nUnitree · UBTECH · Keenon · Pudu · Deep Robotics · LimX · SIASUN · Seer Robotics · Geek+ · Fairino · MagicLab · Galbot · Fourier · Kepler · Alpha Robotics · Faraday Future · BrainCo · **View all brands**\n...\n## America's Online Robot Store\n...\nYes.\nEvery product can be ordered directly from the site with prices in US dollars, or added to a quote for institutional and volume purchases.",
+       "source": "web",
+       "title": "Robots USA – Buy Humanoid Robots, Robot Dogs, Industrial & Service Robots Online in the USA | RobotsUSA",
+       "url": "https://www.robotsusa.com/"
+      },
+      {
+       "date": "2026-11-01",
+       "id": 5,
+       "last_updated": "2026-10-27",
+       "snippet": "# Humanoid Robots\n- Unitree G1 Humanoid Robot by Unitree Robotics $21,600.00 In Stock View add-ons & extras The Unitree G1 is a bipedal humanoid robot designed for R&D, education, medical, and commercial use...\n- Unitree H1 Humanoid Robot (w/ AI) $94,905.00 In Stock View add-ons & extras The Unitree H1 is a 180 cm, 47 kg full-size universal humanoid robot with 19 degrees of freedom, dua..\n- Agibot A2 Humanoid Robot w/ Advanced AI Price on request In Stock View add-ons & extras Request a quote The AGIBOT A2 is a 175 cm tall, 55 kg humanoid robot developed by the Chinese company AGIBOT, design..\n...\n- Unitree G1 Comp Humanoid Robot $48,900.00 In Stock The Unitree G1 Comp from Unitree Robotics is a 45-DOF humanoid robot powered by an NVIDIA Jetson Ori..\n...\n## What humanoid robots are available for sale?\nThere are more than 20 humanoid robots available for sale.\nThe 3 main robots are listed below.\n- Unitree H1: Standing 1.80m tall, weighing 47kg, with advanced sensing and walking speeds up to 5.4 km/h.\n- Unitree G1: A more accessible option at 127cm tall, featuring 23 joint motors and approximately 2 hours of battery life.\n- Tesla Optimus Gen 2: Designed for both industrial and domestic tasks, 5'8\" tall and weighing 125 pounds.\n...\n## What support and warranty options are available?\nAdditionally, optional spare parts and accessories, such as dexterous hands or debugging brackets, can be purchased separately for repairs or upgrades.",
+       "source": "web",
+       "title": "Humanoid Robots for Sale - Top 3D Shop",
+       "url": "https://top3dshop.com/robots/humanoid-robots/"
+      },
+      {
+       "id": 6,
+       "last_updated": "2026-11-11",
+       "snippet": "# North America\nRobots in North America explained: robotics applications, buying options, deployment factors, support, and availability.\n- AiMOGA Mornine M1 Multilingual AI Powered Humanoid Robot\n$59,950.00\n- Free Shipping\nEngineAI T800 Pro Edition Humanoid Robot\n$63,000.00\n- Free Shipping\nUBTECH Cruzr 1S Intelligent Commercial Service Wheeled Humanoid Robot\n$15,999.99 As low as $11,999.99\n- Guo Xing Firefighting Robot (RXR-M40D-880T)\n$35,895.00\n- Free Shipping\nGalbot S1 Heavy Duty Wheeled Humanoid Robot\n$175,000.00\n- MagicLab MagicDog-W Wheeled Quadruped Robot Dog\n...\nUnitree H2 Humanoid Robot\n$37,500.00\n- Unitree R1 Basic Humanoid Robot\n$9,990.00\n- Unitree G1 Edu Ultimate E U7 Humanoid Robot With Revo 2 Basic Hands (G1EDU-U7)\n$60,500.00\n- Unitree R1 Edu Pro A Humanoid Robot (R1 EDU U3)\n$30,900.00\n- Unitree G1 Edu Standard Humanoid Robot With Fake Hands (G1EDU-U1)\n$41,750.00\n...\n- RobotEra Q5 Wheeled Humanoid Service Robot W\n$63,000.00\n...\n## FAQ Section\n### Where can I buy robots for North America?\nRobots can be purchased through specialist robotics suppliers, distributors, manufacturers, or integrators.",
+       "source": "web",
+       "title": "Robots North America: Industrial & Service Robotics",
+       "url": "https://www.robotsinternational.com/North-America.htm"
+      },
+      {
+       "date": "2026-11-07",
+       "id": 7,
+       "last_updated": "2026-11-13",
+       "snippet": "Spark is a humanoid robot that stands about three feet tall, weighs 35 pounds, and moves on 22 degrees of freedom, and it comes from StarBot Robotics in Santa Barbara, California.\n...\nThe standard price starts at $7,999, and the first 100 confirmed orders start at $5,999.\n...\nReservations are open at $200 per unit, and that deposit counts toward the final purchase price.\n...\nThe company says Spark is 100 percent manufactured in the United States, and it calls Spark North America’s first US-made developer humanoid robot in its size and price category.\n...\nBuyers who care where a robot is built now have a domestic option to weigh.\nInside StarBot’s own line, the step up is Astra, a five-foot research humanoid with 23 degrees of freedom starting at $9,999, aimed at universities and R&D teams.\n...\nIf you need a research humanoid that ships on a known schedule today, the Unitree G1 at $13,500 is the safer buy at nearly twice the price.\nSpark is the cheaper machine, built in the US, for buyers who can afford to wait for it to arrive.",
+       "source": "web",
+       "title": "StarBot Spark is a three-foot humanoid robot built in the US ...",
+       "url": "https://the-gadgeteer.com/2026/11/07/starbot-spark-is-a-three-foot-humanoid-robot-built-in-the-us-for-7999/"
+      },
+      {
+       "date": "2026-11-08",
+       "id": 8,
+       "last_updated": "2026-11-13",
+       "snippet": "StarBot Robotics of Santa Barbara is taking $200 deposits on Spark, a three-foot, US-built humanoid priced from $7,999 and aimed at classrooms and developers.\n...\nThat is the offer from StarBot Robotics, the Santa Barbara company taking reservations for Spark, a three-foot humanoid built in the United States and priced from $7,999.",
+       "source": "web",
+       "title": "StarBot Spark Humanoid Opens $200 Reservations, Starts at $7,999",
+       "url": "https://www.roboticsintl.com/article/starbot-spark-humanoid-opens-200-reservations-starts-at-7999"
+      },
+      {
+       "id": 9,
+       "last_updated": "2026-10-08",
+       "snippet": "Robots in the main comparison table are limited to platforms an individual, lab, or small business can actually order today or pre-order with a published price and delivery window.\n...\nRobots that are not orderable by individuals at all (Tesla Optimus, Figure 03, Boston Dynamics Atlas) are covered separately in the Watch List section below, since combining \"buy today\" and \"maybe in 2027\" products in one table misleads readers about what's actually purchasable.\n...\n|Model|Price (USD)|Best For|Availability|Height|Weight|\n|--|--|--|--|--|--|\n|Unitree R1|$4,900–$5,900|Ultra-budget / Entry|Shipping now / In stock|~123 cm|~25-29 kg|\n|Unitree G1|$13,500 (base; EDU edition higher)|Value / Research|Shipping now|~132 cm|35 kg|\n|1X NEO|$20,000 (or $499/mo)|Home use|Pre-order • US deliveries late 2026|~165 cm|~30 kg|\n|EngineAI T800|$40,500+ (Basic)|Mid-range power|Pre-order / Shipments underway 2026|~173 cm|~75 kg|\n|Unitree H1|~$90,000+ (contact)|High-end performance|Contact / Available|~180 cm|~47 kg|\n|Agility Digit|Contact (~$100K–$250K est.)|Industrial|Pilots / B2B|Industrial focus|~65 kg|",
+       "source": "web",
+       "title": "Humanoid Robot Buying Guide 2026: Prices & Availability",
+       "url": "https://www.humanoid.press/shopping-guide/"
+      },
+      {
+       "date": "2026-03-31",
+       "id": 10,
+       "last_updated": "2026-11-12",
+       "snippet": "**Disclosure:** Robotics Center sells and leases several of the robots below (marked with a live price chip).\nRobots we do not sell link to the maker's own page.\n...\nThe Unitree G1$21,500.00 is the most widely available research humanoid.\n...\n|Robot|Height|Weight|Total DOF|Battery|How to get one|\n|--|--|--|--|--|--|\n|1X NEO|5'6\"^10^|66 lb^10^|—|—|Pre-order from 1X^11^|\n|AGIBOT X2|~1.31 m^4^|~35 kg^4^|25^4^|~2 h walking at 0.5 m/s^4^|From $27,999.00 at our store|\n|Booster K1|~95 cm^5^|~19.5 kg^5^|22^5^|Up to 70 min walking (Edu/Pro)^5^|From $11,998.00 at our store|\n|Unitree G1|1320 mm^6^|~35 kg^6^|23 (EDU 23–43)^6^|~2 h^6^|$21,500.00 at our store|\n|Unitree R1|1230 mm^7^|~29 kg^7^|26 (EDU 26–40)^7^|~1 h^7^|$6,270.00 at our store|\n...\nWe stock and support the humanoids below for sale and lease from our San Francisco facility, with setup support, teleoperation training and data collection services.\n|Platform|Purchase|Lease|Best for|\n|--|--|--|--|\n|AGIBOT X2|From $27,999.00|Quote|Interaction research, demos|\n|Booster K1|From $11,998.00|Quote|Teaching, competitions, light research|\n|Unitree G1 (base)|$21,500.00|Quote|Research labs, early prototyping|\n|Unitree G1 EDU-U1|$43,800.00|Quote|Manipulation research, data collection|\n|Unitree R1|$6,270.00|Quote|Education, first humanoid projects|\n|Data collection add-on|Quote|Quote|Teleoperation setup, operator training, data pipeline|",
+       "source": "web",
+       "title": "Humanoid Robots in 2026: The Complete Market Overview",
+       "url": "https://www.roboticscenter.ai/blog/humanoid-robot-2026"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "content": [
+      {
+       "annotations": [],
+       "text": "Several humanoid robots have a public purchase or preorder route in North America. **For individual buyers**, the clearest options are Unitree’s R1 and G1, while 1X NEO is available by preorder; prices and stock can vary by seller and configuration.[1][3][9]\n\n- **Unitree R1** — listed from about **US$4,900**; the most accessible option, with direct online ordering reported.[1][2]\n- **Unitree G1** — listed from about **US$13,500**; available through Unitree and specialist North American resellers, with EDU versions typically sold through sales channels.[1][3][4]\n- **1X NEO** — a home-oriented robot offered by preorder, listed at **US$20,000** or **US$499/month**; the source reports U.S. deliveries starting in 2026.[2][3]\n- **StarBot Spark** — a U.S.-made developer humanoid taking **US$200 reservations**, with a stated starting price of **US$7,999**; this is a reservation, not an immediately available purchase.[7][8]\n- **AgiBot A2 Lite and X2 Neo** — listed for online ordering, at approximately **US$44,560** and **US$25,600**, respectively; confirm delivery timing with the seller.[1]\n- **Other research or commercial models** — North American specialist retailers also list models such as Unitree H1/H2, LimX Oli, and AgiBot A2, often with quote-based pricing or limited stock.[4][5]\n\nAvailability is not the same as consumer suitability: many of these are developer, research, or commercial platforms rather than turnkey household helpers. **Tesla Optimus, Figure 03, and Boston Dynamics Atlas are not listed as generally purchasable products** in the sources reviewed.[1][3][9]",
+       "type": "output_text"
+      }
+     ],
+     "id": "msg_c2c610be-f82a-46f6-ab2e-4aedf8f8b561",
+     "role": "assistant",
+     "status": "completed",
+     "type": "message"
+    }
+   ],
+   "parallel_tool_calls": true,
+   "presence_penalty": 0,
+   "preset": "fast@2026-11-11.0",
+   "previous_response_id": null,
+   "prompt_cache_key": null,
+   "reasoning": null,
+   "safety_identifier": null,
+   "service_tier": "fast",
+   "status": "completed",
+   "store": true,
+   "temperature": 1,
+   "text": {
+    "format": {
+     "type": "text"
+    }
+   },
+   "tool_choice": "auto",
+   "tools": [
+    {
+     "type": "web_search"
+    }
+   ],
+   "top_logprobs": 0,
+   "top_p": 1,
+   "truncation": "",
+   "usage": {
+    "cost": {
+     "cache_creation_cost": 0.00055,
+     "cache_read_cost": 2e-05,
+     "currency": "USD",
+     "input_cost": 0,
+     "output_cost": 0.0002,
+     "tool_calls_cost": 0.001,
+     "tool_calls_cost_details": {
+      "search_web": 0.001
+     },
+     "total_cost": 0.00177
+    },
+    "input_tokens": 6207,
+    "input_tokens_details": {
+     "cache_creation_input_tokens": 4424,
+     "cache_read_input_tokens": 1780,
+     "cached_tokens": 1780
+    },
+    "output_tokens": 401,
+    "output_tokens_details": {
+     "reasoning_tokens": 0
+    },
+    "tool_calls_details": {
+     "search_web": {
+      "cost_usd": 0.001,
+      "invocation": 1
+     }
+    },
+    "total_tokens": 6608
+   },
+   "user": null
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "b2feb8c18253490d84b1c0e9c43b3c64",
+   "charged_micro": 1770
+  }
+ }
+}

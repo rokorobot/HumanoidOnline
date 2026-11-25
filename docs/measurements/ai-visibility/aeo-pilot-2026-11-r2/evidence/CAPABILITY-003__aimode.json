@@ -1,0 +1,111 @@
+{
+ "observed_at": "2026-11-14T07:19:23+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "Which humanoid robots are suitable for research?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Choosing the right humanoid robot for research depends heavily on your budget, whether you are studying bipedal locomotion, AI/manipulation, or human-robot interaction, and how much open-source software access you need.\n\nSeveral prominent platforms stand out across different research tiers:\n\n1. Entry-Level & Value Research\n\nUnitree G1 EDU: Widely considered one of the best-value entry points into bipedal and manipulation research. While the consumer base model is inexpensive, the EDU version unlocks open APIs, secondary development, and seamless integration with ROS/ROS 2, Python, C++, and Linux.\n\nBooster Robotics T1 / K1: Built explicitly as research and training platforms, featuring high degrees of freedom (DoF) and out-of-the-box ROS 2 compatibility, open APIs, and simulation support.\n\n2. Full-Size Bipedal & Whole-Body Manipulation\n\nFourier GR Series (GR-1 / GR-2): Popular for academic and lab trials involving whole-body movement, heavy-duty actuators, and complex grasping. The GR-2 scales up degrees of freedom (~53 DoF) making it well-suited for full-scale human-mimetic physical tasks.\n\nApptronik Apollo: Built with a heavy focus on industrial AI training and modularity, making it ideal for labs bridging the gap between academic reinforcement learning and real-world warehouse/factory logistics.\n\nBoston Dynamics Atlas (Electric): Featuring high degrees of freedom, extreme payload capacity, and rugged build quality, Atlas is the gold standard for high-end industrial and dynamic physics research—though typically accessible primarily to well-funded partner labs.\n\n3. Human-Robot Interaction & Social/Service Research\n\nPAL Robotics ARI / TIAGo: If your research centers on human-robot interaction (HRI), social behavior, or mobile manipulation rather than human-like bipedal walking, platforms like ARI or TIAGo are deeply integrated with ROS/ROS 2. They save labs from the constant maintenance and safety hurdles of balancing a bipedal robot.\n\nKey Questions to Narrow Down Your Choice:\n\nLocomotion or Manipulation? Do you strictly need a bipedal walking robot, or will a wheeled/torso-based mobile manipulator suffice?\n\nSoftware Stack: Does your team require full open-source access (ROS 2, custom C++/Python control loops), or a closed/semi-closed ecosystem?\n\nBudget Scale: Are you working with an entry academic grant ($15k–$40k range like Unitree) or a multi-hundred-thousand-dollar institutional lab budget?\n\nIf you can share what specific research domain you're focusing on (e.g., reinforcement learning for walking, fine-dexterity hand manipulation, or human-robot social interaction) and your approximate budget, I can give you a targeted shortlist and compare their software ecosystems.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "38 Best Humanoid Robots in 2026 (Evidence-Ranked) - Blog",
+      "url": "https://blog.robozaps.com/b/best-humanoid-robots",
+      "description": "Atlas has the strongest published industrial hardware: 56 degrees of freedom, IP67 protection and up to 50 kg instantaneous payloa...",
+      "redirectLink": "https://www.google.com/goto?url=CAESbQHEIkXXM5iStjAuabNCkv_DYS7XcUvrIRZZpPJ3cerU4wF0Fzx9R_0xmcOwZi7kOP09yomnuSIuAqjD_QwusH2TrAxXoUn6tBPL8FVbo0JjAv2sFGFaYM6VAA7_hhtVpAGenDRXQSHJOsbj-oU"
+     },
+     {
+      "position": 2,
+      "label": "Humanoid robots for research: which platform is right for you? - Joybuy",
+      "url": "https://www.joybuy.de/blog/humanoidrobotsresearch/c8qBhkIa",
+      "description": "team needs software access for movement, perception or manipulation projects. RBTX lists open APIs and integration with ROS, Pytho...",
+      "redirectLink": "https://www.google.com/goto?url=CAESdwHEIkXXOxiKR9KVSAgiJ3BylUcGlnEl1Ap2UZ-ZGmS07_1WuFaL-LksA9uvA5waqW65MYRTlh7lB2ttB8RMCWPYApw8mGdWJ35dEPCfZZAK4CXn8KqGrenMchYeprmpB1JYRFxDEccdnzhgYQHfQPFpUA1GrM9L"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "38 Best Humanoid Robots in 2026 (Evidence-Ranked) - Blog",
+      "citationPillId": 1,
+      "url": "https://blog.robozaps.com/b/best-humanoid-robots",
+      "domain": "blog.robozaps.com",
+      "description": "Atlas has the strongest published industrial hardware: 56 degrees of freedom, IP67 protection and up to 50 kg instantaneous payloa...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESbQHEIkXXM5iStjAuabNCkv_DYS7XcUvrIRZZpPJ3cerU4wF0Fzx9R_0xmcOwZi7kOP09yomnuSIuAqjD_QwusH2TrAxXoUn6tBPL8FVbo0JjAv2sFGFaYM6VAA7_hhtVpAGenDRXQSHJOsbj-oU"
+     },
+     {
+      "label": "Humanoid robots for research: which platform is right for you? - Joybuy",
+      "citationPillId": 1,
+      "url": "https://www.joybuy.de/blog/humanoidrobotsresearch/c8qBhkIa",
+      "domain": "joybuy.de",
+      "description": "team needs software access for movement, perception or manipulation projects. RBTX lists open APIs and integration with ROS, Pytho...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESdwHEIkXXOxiKR9KVSAgiJ3BylUcGlnEl1Ap2UZ-ZGmS07_1WuFaL-LksA9uvA5waqW65MYRTlh7lB2ttB8RMCWPYApw8mGdWJ35dEPCfZZAK4CXn8KqGrenMchYeprmpB1JYRFxDEccdnzhgYQHfQPFpUA1GrM9L"
+     },
+     {
+      "label": "Humanoid robots for research: which platform is right for you? - Joybuy",
+      "citationPillId": 2,
+      "url": "https://www.joybuy.de/blog/humanoidrobotsresearch/c8qBhkIa",
+      "domain": "joybuy.de",
+      "description": "team needs software access for movement, perception or manipulation projects. RBTX lists open APIs and integration with ROS, Pytho...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESdwHEIkXXOxiKR9KVSAgiJ3BylUcGlnEl1Ap2UZ-ZGmS07_1WuFaL-LksA9uvA5waqW65MYRTlh7lB2ttB8RMCWPYApw8mGdWJ35dEPCfZZAK4CXn8KqGrenMchYeprmpB1JYRFxDEccdnzhgYQHfQPFpUA1GrM9L"
+     },
+     {
+      "label": "Humanoid robots for research: which platform is right for you? - Joybuy",
+      "citationPillId": 3,
+      "url": "https://www.joybuy.de/blog/humanoidrobotsresearch/c8qBhkIa",
+      "domain": "joybuy.de",
+      "description": "team needs software access for movement, perception or manipulation projects. RBTX lists open APIs and integration with ROS, Pytho...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESdwHEIkXXOxiKR9KVSAgiJ3BylUcGlnEl1Ap2UZ-ZGmS07_1WuFaL-LksA9uvA5waqW65MYRTlh7lB2ttB8RMCWPYApw8mGdWJ35dEPCfZZAK4CXn8KqGrenMchYeprmpB1JYRFxDEccdnzhgYQHfQPFpUA1GrM9L"
+     },
+     {
+      "label": "38 Best Humanoid Robots in 2026 (Evidence-Ranked) - Blog",
+      "citationPillId": 4,
+      "url": "https://blog.robozaps.com/b/best-humanoid-robots",
+      "domain": "blog.robozaps.com",
+      "description": "Atlas has the strongest published industrial hardware: 56 degrees of freedom, IP67 protection and up to 50 kg instantaneous payloa...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESbQHEIkXXM5iStjAuabNCkv_DYS7XcUvrIRZZpPJ3cerU4wF0Fzx9R_0xmcOwZi7kOP09yomnuSIuAqjD_QwusH2TrAxXoUn6tBPL8FVbo0JjAv2sFGFaYM6VAA7_hhtVpAGenDRXQSHJOsbj-oU"
+     },
+     {
+      "label": "Humanoid robots for research: which platform is right for you? - Joybuy",
+      "citationPillId": 5,
+      "url": "https://www.joybuy.de/blog/humanoidrobotsresearch/c8qBhkIa",
+      "domain": "joybuy.de",
+      "description": "team needs software access for movement, perception or manipulation projects. RBTX lists open APIs and integration with ROS, Pytho...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESdwHEIkXXOxiKR9KVSAgiJ3BylUcGlnEl1Ap2UZ-ZGmS07_1WuFaL-LksA9uvA5waqW65MYRTlh7lB2ttB8RMCWPYApw8mGdWJ35dEPCfZZAK4CXn8KqGrenMchYeprmpB1JYRFxDEccdnzhgYQHfQPFpUA1GrM9L"
+     },
+     {
+      "label": "Humanoid robots for research: which platform is right for you? - Joybuy",
+      "citationPillId": 6,
+      "url": "https://www.joybuy.de/blog/humanoidrobotsresearch/c8qBhkIa",
+      "domain": "joybuy.de",
+      "description": "team needs software access for movement, perception or manipulation projects. RBTX lists open APIs and integration with ROS, Pytho...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESdwHEIkXXOxiKR9KVSAgiJ3BylUcGlnEl1Ap2UZ-ZGmS07_1WuFaL-LksA9uvA5waqW65MYRTlh7lB2ttB8RMCWPYApw8mGdWJ35dEPCfZZAK4CXn8KqGrenMchYeprmpB1JYRFxDEccdnzhgYQHfQPFpUA1GrM9L"
+     }
+    ],
+    "markdown": "Choosing the right humanoid robot for research depends heavily on your budget, whether you are studying **bipedal locomotion**, **AI/manipulation**, or **human-robot interaction**, and how much open-source software access you need.\n\nSeveral prominent platforms stand out across different research tiers:\n\n1\\. Entry-Level & Value Research\n\n  * **Unitree G1 EDU**: Widely considered one of the best-value entry points into bipedal and manipulation research. While the consumer base model is inexpensive, the **EDU version** unlocks open APIs, secondary development, and seamless integration with ROS/ROS 2, Python, C++, and Linux. [38 Best Humanoid Robots in 2026 (Evidence-Ranked) - Blog](https://blog.robozaps.com/b/best-humanoid-robots)[Humanoid robots for research: which platform is right for you? - Joybuy](https://www.joybuy.de/blog/humanoidrobotsresearch/c8qBhkIa)\n\n  * **Booster Robotics T1 / K1**: Built explicitly as research and training platforms, featuring high degrees of freedom (DoF) and out-of-the-box ROS 2 compatibility, open APIs, and simulation support. [Humanoid robots for research: which platform is right for you? - Joybuy](https://www.joybuy.de/blog/humanoidrobotsresearch/c8qBhkIa)\n\n2\\. Full-Size Bipedal & Whole-Body Manipulation\n\n  * **Fourier GR Series (GR-1 / GR-2)**: Popular for academic and lab trials involving whole-body movement, heavy-duty actuators, and complex grasping. The GR-2 scales up degrees of freedom (~53 DoF) making it well-suited for full-scale human-mimetic physical tasks. [Humanoid robots for research: which platform is right for you? - Joybuy](https://www.joybuy.de/blog/humanoidrobotsresearch/c8qBhkIa)\n\n  * **Apptronik Apollo**: Built with a heavy focus on industrial AI training and modularity, making it ideal for labs bridging the gap between academic reinforcement learning and real-world warehouse/factory logistics.\n\n  * **Boston Dynamics Atlas (Electric)**: Featuring high degrees of freedom, extreme payload capacity, and rugged build quality, Atlas is the gold standard for high-end industrial and dynamic physics research—though typically accessible primarily to well-funded partner labs. [38 Best Humanoid Robots in 2026 (Evidence-Ranked) - Blog](https://blog.robozaps.com/b/best-humanoid-robots)\n\n3\\. Human-Robot Interaction & Social/Service Research\n\n  * **PAL Robotics ARI / TIAGo**: If your research centers on **human-robot interaction (HRI)**, social behavior, or mobile manipulation rather than human-like bipedal walking, platforms like ARI or TIAGo are deeply integrated with ROS/ROS 2. They save labs from the constant maintenance and safety hurdles of balancing a bipedal robot. [Humanoid robots for research: which platform is right for you? - Joybuy](https://www.joybuy.de/blog/humanoidrobotsresearch/c8qBhkIa)\n\n* * *\n\nKey Questions to Narrow Down Your Choice:\n\n  * **Locomotion or Manipulation?** Do you strictly need a bipedal walking robot, or will a wheeled/torso-based mobile manipulator suffice?\n\n  * **Software Stack:** Does your team require full open-source access (ROS 2, custom C++/Python control loops), or a closed/semi-closed ecosystem?\n\n  * **Budget Scale:** Are you working with an entry academic grant ($15k–$40k range like Unitree) or a multi-hundred-thousand-dollar institutional lab budget? [Humanoid robots for research: which platform is right for you? - Joybuy](https://www.joybuy.de/blog/humanoidrobotsresearch/c8qBhkIa)\n\nIf you can share **what specific research domain** you're focusing on (e.g., reinforcement learning for walking, fine-dexterity hand manipulation, or human-robot social interaction) and your **approximate budget**, I can give you a targeted shortlist and compare their software ecosystems."
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "da54a18d7ee144a48cb1c8e003280cca",
+   "charged_micro": 2400,
+   "hint": "review"
+  }
+ }
+}

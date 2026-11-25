@@ -1,0 +1,160 @@
+{
+ "observed_at": "2026-11-14T07:19:58+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "Unitree G1 vs Booster K1.",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Comparing the Unitree G1 and the Booster K1 puts two popular, compact, next-generation humanoid/bipedal robotics platforms head-to-head. While both target research, development, education, and light commercial/entertainment roles, they differ significantly in size, weight, and configuration.\n\nKey Specifications at a Glance\n\nFeature\nUnitree G1 (Base/Standard)\nBooster K1\nStanding Height\n~132 cm (1320 mm)\n~95 cm\nWeight\n~35 kg (with battery)\n~19.5 kg\nDegrees of Freedom (DoF)\n23 DoF (up to 43+ on EDU/Hand configs)\n22 DoF total (Legs: 6×2, Arms: 4×2, Head: 2)\nWalking Speed\nVaries / Agile dynamic movement\nUp to 2.0 m/s\nAI Compute\nNVIDIA Orin NX 16GB (100 TOPS) on EDU variants\n~200 TOPS AI compute\nBattery / Runtime\n~2 hours\n~70 mins (5Ah magnetic, direct charging)\nPrice Range (Approx.)\nStarts around €23,000 / $16k–$25k+ depending on tier\n~$11,998 (Geek) to $26,998 (Pro)\n\nDesign & Portability\n\nUnitree G1: Taller and heavier (~132 cm, 35 kg), built with industrial-grade crossed-roller joints. It can fold down compactly for storage/transport (~69 cm folded height) and possesses a more mature, human-proportioned bipedal frame.\n\nBooster K1: Noticeably smaller and lighter (~95 cm tall, ~19.5 kg) with a built-in carrying handle, making it much easier to pick up, move around classrooms, or toss into a car trunk without heavy lifting.\n\nArticulations & Hands\n\nUnitree G1: Starts at 23 DoF for the base model, scaling up into 29 DoF (Pro/E) or high-dexterity EDU variants featuring 3-finger or 5-finger force-controlled tactile hands (up to 37–43 DoF).\n\nBooster K1: Fixed at 22 DoF total (6 per leg, 4 per arm, 2 in the head), leaning toward a simpler, streamlined kinematic structure rather than ultra-dexterous multi-finger manipulation out of the box.\n\nComputing & Intelligence\n\nUnitree G1: Leverages NVIDIA Orin-based processing options (like the Orin NX 16GB / 100 TOPS on EDU models), paired with deep ecosystem support for VirDyn teleoperation, ROS, and secondary C++/Python development.\n\nBooster K1: Packed with a surprisingly high-throughput AI compute board (~200 TOPS), voice interaction (English/Chinese), built-in agent presets (Soccer, Dance, Chat), and a beginner-friendly \"Vibe Coding\" / Booster Studio workflow.\n\nPricing & Tiers\n\nUnitree G1:\n\nBasic / Show model: ~€23,000\nPro / EDU variants scale higher depending on hand/sensor add-ons.\n\nBooster K1:\n\nK1 Geek: ~$11,998\nK1 Edu: ~$19,998\nK1 Pro: ~$26,998\n\nWhich one fits best?\n\nChoose the Unitree G1 if you need a larger, more human-scaled platform, higher potential for advanced multi-finger dexterous hand integration, and an established industrial pedigree.\n\nChoose the Booster K1 if you want a lighter, more portable, budget-friendly desktop/classroom robot with high AI compute per kilo and fast out-of-the-box app/agent interactivity.\n\nAre you looking at these for academic research/software development, educational lab use, or content creation/performance, and do you have a specific budget in mind?",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Unitree G1 | QUADRUPED.DE, 23.000,00 €",
+      "url": "https://www.quadruped.de/Unitree-G1_1",
+      "description": "Unitree G1: Bipedal humanoid robot starting at 23.000,00 €, SKU 1121. Features 23 to 69 DOF, 35 kg weight, ~2h operating time, sel...",
+      "redirectLink": "https://www.google.com/goto?url=CAESYgHEIkXX8tjQUWCRZ6z3TN23Bq0SwzEfdxavmnOikXpINWZ3G4hHu06GWp2bn-irWa0C8jf3HqIMiU9ZkG_GhX-WYtRUq4pmLQg3i4n7t5ZWwJ5adgzaRKqM9XE4jC6dqtd9"
+     },
+     {
+      "position": 2,
+      "label": "Booster K1 | Introductory Embodied Development Platform",
+      "url": "https://www.booster.tech/booster-k1/",
+      "description": "Height 95 cm, weight 19.5 kg, 5Ah magnetic battery … 200 TOPS AI compute. Capabilities: Active balance recovery, auto get-up, emer...",
+      "redirectLink": "https://www.google.com/goto?url=CAESYQHEIkXXnqUTAcEtJ-EBp8ccMVE6jg-5Kor1kXI8jQEo9RM1EQ_SLAIdXRlUqi7ecjbv0vRf70-s1mmytuJNXMFcSOXl2o9FtdSvBacejabdzihXPv1bOwBjW-FRzVG-ATw"
+     },
+     {
+      "position": 3,
+      "label": "Unitree G1 Developer Guide",
+      "url": "https://support.unitree.com/home/en/G1_developer",
+      "description": "Force control of three-fingered hand)+2(Optional. Industrial grade crossed roller bearings (high precision, high load capacity)",
+      "redirectLink": "https://www.google.com/goto?url=CAESbQHEIkXXe6nzeO1sJckYik0M12mqDEyG1kLhoqWxRH7lHezmTkRAWS1ocu5-4tXzXxcvAEKhk-mDkTu7SmxdBaGfEw__5PrH-_iLZbOJlUphmnZzUaoetXhzg0muLEv9GSlZImuTD03_jcvldZE"
+     },
+     {
+      "position": 4,
+      "label": "Booster K1 Humanoid Robot: Price & Specs",
+      "url": "https://www.roboticscenter.ai/store/product/booster-k1",
+      "description": "Booster K1 * K1 Edu$19,998.00 * K1 Geek$11,998.00 * K1 Geek Upgrade Package$15,398.00 * K1 Pro$26,998.00",
+      "redirectLink": "https://www.google.com/goto?url=CAEScwHEIkXXg8mk61uULBzrqVjY5MG0ikQ9_gHn1A74pE8RFdCIyTMaAvqti-KmIAND1LkZlgtGaRVDAGrGPw_Nvinie5hzNfSW9uKwDnTUIhzLCV-As03W3svxXcX9TvP0mr_fyfiUHrvjXtkzMiP6WDTnxzQ"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Unitree G1 | QUADRUPED.DE, 23.000,00 €",
+      "citationPillId": 1,
+      "url": "https://www.quadruped.de/Unitree-G1_1",
+      "domain": "quadruped.de",
+      "description": "Unitree G1: Bipedal humanoid robot starting at 23.000,00 €, SKU 1121. Features 23 to 69 DOF, 35 kg weight, ~2h operating time, sel...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESYgHEIkXX8tjQUWCRZ6z3TN23Bq0SwzEfdxavmnOikXpINWZ3G4hHu06GWp2bn-irWa0C8jf3HqIMiU9ZkG_GhX-WYtRUq4pmLQg3i4n7t5ZWwJ5adgzaRKqM9XE4jC6dqtd9"
+     },
+     {
+      "label": "Booster K1 | Introductory Embodied Development Platform",
+      "citationPillId": 1,
+      "url": "https://www.booster.tech/booster-k1/",
+      "domain": "booster.tech",
+      "description": "Height 95 cm, weight 19.5 kg, 5Ah magnetic battery … 200 TOPS AI compute. Capabilities: Active balance recovery, auto get-up, emer...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESYQHEIkXXnqUTAcEtJ-EBp8ccMVE6jg-5Kor1kXI8jQEo9RM1EQ_SLAIdXRlUqi7ecjbv0vRf70-s1mmytuJNXMFcSOXl2o9FtdSvBacejabdzihXPv1bOwBjW-FRzVG-ATw"
+     },
+     {
+      "label": "Unitree G1 Developer Guide",
+      "citationPillId": 2,
+      "url": "https://support.unitree.com/home/en/G1_developer",
+      "domain": "support.unitree.com",
+      "description": "Force control of three-fingered hand)+2(Optional. Industrial grade crossed roller bearings (high precision, high load capacity)",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESbQHEIkXXe6nzeO1sJckYik0M12mqDEyG1kLhoqWxRH7lHezmTkRAWS1ocu5-4tXzXxcvAEKhk-mDkTu7SmxdBaGfEw__5PrH-_iLZbOJlUphmnZzUaoetXhzg0muLEv9GSlZImuTD03_jcvldZE"
+     },
+     {
+      "label": "Booster K1 | Introductory Embodied Development Platform",
+      "citationPillId": 3,
+      "url": "https://www.booster.tech/booster-k1/",
+      "domain": "booster.tech",
+      "description": "Height 95 cm, weight 19.5 kg, 5Ah magnetic battery … 200 TOPS AI compute. Capabilities: Active balance recovery, auto get-up, emer...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESYQHEIkXXnqUTAcEtJ-EBp8ccMVE6jg-5Kor1kXI8jQEo9RM1EQ_SLAIdXRlUqi7ecjbv0vRf70-s1mmytuJNXMFcSOXl2o9FtdSvBacejabdzihXPv1bOwBjW-FRzVG-ATw"
+     },
+     {
+      "label": "Unitree G1 | QUADRUPED.DE, 23.000,00 €",
+      "citationPillId": 4,
+      "url": "https://www.quadruped.de/Unitree-G1_1",
+      "domain": "quadruped.de",
+      "description": "Unitree G1: Bipedal humanoid robot starting at 23.000,00 €, SKU 1121. Features 23 to 69 DOF, 35 kg weight, ~2h operating time, sel...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESYgHEIkXX8tjQUWCRZ6z3TN23Bq0SwzEfdxavmnOikXpINWZ3G4hHu06GWp2bn-irWa0C8jf3HqIMiU9ZkG_GhX-WYtRUq4pmLQg3i4n7t5ZWwJ5adgzaRKqM9XE4jC6dqtd9"
+     },
+     {
+      "label": "Unitree G1 Developer Guide",
+      "citationPillId": 4,
+      "url": "https://support.unitree.com/home/en/G1_developer",
+      "domain": "support.unitree.com",
+      "description": "Force control of three-fingered hand)+2(Optional. Industrial grade crossed roller bearings (high precision, high load capacity)",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESbQHEIkXXe6nzeO1sJckYik0M12mqDEyG1kLhoqWxRH7lHezmTkRAWS1ocu5-4tXzXxcvAEKhk-mDkTu7SmxdBaGfEw__5PrH-_iLZbOJlUphmnZzUaoetXhzg0muLEv9GSlZImuTD03_jcvldZE"
+     },
+     {
+      "label": "Booster K1 | Introductory Embodied Development Platform",
+      "citationPillId": 5,
+      "url": "https://www.booster.tech/booster-k1/",
+      "domain": "booster.tech",
+      "description": "Height 95 cm, weight 19.5 kg, 5Ah magnetic battery … 200 TOPS AI compute. Capabilities: Active balance recovery, auto get-up, emer...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESYQHEIkXXnqUTAcEtJ-EBp8ccMVE6jg-5Kor1kXI8jQEo9RM1EQ_SLAIdXRlUqi7ecjbv0vRf70-s1mmytuJNXMFcSOXl2o9FtdSvBacejabdzihXPv1bOwBjW-FRzVG-ATw"
+     },
+     {
+      "label": "Unitree G1 | QUADRUPED.DE, 23.000,00 €",
+      "citationPillId": 6,
+      "url": "https://www.quadruped.de/Unitree-G1_1",
+      "domain": "quadruped.de",
+      "description": "Unitree G1: Bipedal humanoid robot starting at 23.000,00 €, SKU 1121. Features 23 to 69 DOF, 35 kg weight, ~2h operating time, sel...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESYgHEIkXX8tjQUWCRZ6z3TN23Bq0SwzEfdxavmnOikXpINWZ3G4hHu06GWp2bn-irWa0C8jf3HqIMiU9ZkG_GhX-WYtRUq4pmLQg3i4n7t5ZWwJ5adgzaRKqM9XE4jC6dqtd9"
+     },
+     {
+      "label": "Booster K1 | Introductory Embodied Development Platform",
+      "citationPillId": 6,
+      "url": "https://www.booster.tech/booster-k1/",
+      "domain": "booster.tech",
+      "description": "Height 95 cm, weight 19.5 kg, 5Ah magnetic battery … 200 TOPS AI compute. Capabilities: Active balance recovery, auto get-up, emer...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESYQHEIkXXnqUTAcEtJ-EBp8ccMVE6jg-5Kor1kXI8jQEo9RM1EQ_SLAIdXRlUqi7ecjbv0vRf70-s1mmytuJNXMFcSOXl2o9FtdSvBacejabdzihXPv1bOwBjW-FRzVG-ATw"
+     },
+     {
+      "label": "Unitree G1 | QUADRUPED.DE, 23.000,00 €",
+      "citationPillId": 7,
+      "url": "https://www.quadruped.de/Unitree-G1_1",
+      "domain": "quadruped.de",
+      "description": "Unitree G1: Bipedal humanoid robot starting at 23.000,00 €, SKU 1121. Features 23 to 69 DOF, 35 kg weight, ~2h operating time, sel...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESYgHEIkXX8tjQUWCRZ6z3TN23Bq0SwzEfdxavmnOikXpINWZ3G4hHu06GWp2bn-irWa0C8jf3HqIMiU9ZkG_GhX-WYtRUq4pmLQg3i4n7t5ZWwJ5adgzaRKqM9XE4jC6dqtd9"
+     },
+     {
+      "label": "Booster K1 Humanoid Robot: Price & Specs",
+      "citationPillId": 8,
+      "url": "https://www.roboticscenter.ai/store/product/booster-k1",
+      "domain": "roboticscenter.ai",
+      "description": "Booster K1 * K1 Edu$19,998.00 * K1 Geek$11,998.00 * K1 Geek Upgrade Package$15,398.00 * K1 Pro$26,998.00",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAEScwHEIkXXg8mk61uULBzrqVjY5MG0ikQ9_gHn1A74pE8RFdCIyTMaAvqti-KmIAND1LkZlgtGaRVDAGrGPw_Nvinie5hzNfSW9uKwDnTUIhzLCV-As03W3svxXcX9TvP0mr_fyfiUHrvjXtkzMiP6WDTnxzQ"
+     }
+    ],
+    "markdown": "Comparing the **Unitree G1** and the **Booster K1** puts two popular, compact, next-generation humanoid/bipedal robotics platforms head-to-head. While both target research, development, education, and light commercial/entertainment roles, they differ significantly in size, weight, and configuration. [Unitree G1 | QUADRUPED.DE, 23.000,00 €](https://www.quadruped.de/Unitree-G1_1)[Booster K1 | Introductory Embodied Development Platform](https://www.booster.tech/booster-k1/)\n\n* * *\n\n**Key Specifications at a Glance**\n\n| Feature                      | Unitree G1 (Base/Standard)                            | Booster K1                                   |\n|------------------------------|-------------------------------------------------------|----------------------------------------------|\n| **Standing Height**          |  ~132 cm (1320 mm)                                    | ~95 cm                                       |\n| **Weight**                   |  ~35 kg (with battery)                                | ~19.5 kg                                     |\n| **Degrees of Freedom (DoF)** |  23 DoF (up to 43+ on EDU/Hand configs)               | 22 DoF total (Legs: 6×2, Arms: 4×2, Head: 2) |\n| **Walking Speed**            |  Varies / Agile dynamic movement                      | Up to 2.0 m/s                                |\n| **AI Compute**               |  NVIDIA Orin NX 16GB (100 TOPS) on EDU variants       | ~200 TOPS AI compute                         |\n| **Battery / Runtime**        |  ~2 hours                                             | ~70 mins (5Ah magnetic, direct charging)     |\n| **Price Range (Approx.)**    |  Starts around €23,000 / $16k–$25k+ depending on tier | ~$11,998 (Geek) to $26,998 (Pro)             |\n\n* * *\n\n**Design & Portability**\n\n  * **Unitree G1:** Taller and heavier (~132 cm, 35 kg), built with industrial-grade crossed-roller joints. It can fold down compactly for storage/transport (~69 cm folded height) and possesses a more mature, human-proportioned bipedal frame. [Unitree G1 Developer Guide](https://support.unitree.com/home/en/G1_developer)\n\n  * **Booster K1:** Noticeably smaller and lighter (~95 cm tall, ~19.5 kg) with a built-in carrying handle, making it much easier to pick up, move around classrooms, or toss into a car trunk without heavy lifting. [Booster K1 | Introductory Embodied Development Platform](https://www.booster.tech/booster-k1/)\n\n**Articulations & Hands**\n\n  * **Unitree G1:** Starts at 23 DoF for the base model, scaling up into 29 DoF (Pro/E) or high-dexterity EDU variants featuring 3-finger or 5-finger force-controlled tactile hands (up to 37–43 DoF). [Unitree G1 | QUADRUPED.DE, 23.000,00 €](https://www.quadruped.de/Unitree-G1_1)[Unitree G1 Developer Guide](https://support.unitree.com/home/en/G1_developer)\n\n  * **Booster K1:** Fixed at 22 DoF total (6 per leg, 4 per arm, 2 in the head), leaning toward a simpler, streamlined kinematic structure rather than ultra-dexterous multi-finger manipulation out of the box. [Booster K1 | Introductory Embodied Development Platform](https://www.booster.tech/booster-k1/)\n\n**Computing & Intelligence**\n\n  * **Unitree G1:** Leverages NVIDIA Orin-based processing options (like the Orin NX 16GB / 100 TOPS on EDU models), paired with deep ecosystem support for VirDyn teleoperation, ROS, and secondary C++/Python development.\n\n  * **Booster K1:** Packed with a surprisingly high-throughput AI compute board (~200 TOPS), voice interaction (English/Chinese), built-in agent presets (Soccer, Dance, Chat), and a beginner-friendly \"Vibe Coding\" / Booster Studio workflow. [Unitree G1 | QUADRUPED.DE, 23.000,00 €](https://www.quadruped.de/Unitree-G1_1)[Booster K1 | Introductory Embodied Development Platform](https://www.booster.tech/booster-k1/)\n\n**Pricing & Tiers**\n\n  * **Unitree G1:**\n    * Basic / Show model: ~€23,000\n    * Pro / EDU variants scale higher depending on hand/sensor add-ons. [Unitree G1 | QUADRUPED.DE, 23.000,00 €](https://www.quadruped.de/Unitree-G1_1)\n\n  * **Booster K1:**\n    * _K1 Geek:_ ~$11,998\n    *  _K1 Edu:_ ~$19,998\n    *  _K1 Pro:_ ~$26,998 [Booster K1 Humanoid Robot: Price & Specs](https://www.roboticscenter.ai/store/product/booster-k1)\n\n* * *\n\n**Which one fits best?**\n\n  * Choose the **Unitree G1** if you need a larger, more human-scaled platform, higher potential for advanced multi-finger dexterous hand integration, and an established industrial pedigree.\n\n  * Choose the **Booster K1** if you want a lighter, more portable, budget-friendly desktop/classroom robot with high AI compute per kilo and fast out-of-the-box app/agent interactivity.\n\nAre you looking at these for **academic research/software development**, **educational lab use**, or **content creation/performance**, and do you have a specific budget in mind?"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "cdabb33a412d4018a3cbe6b15d840f7a",
+   "charged_micro": 2400
+  }
+ }
+}

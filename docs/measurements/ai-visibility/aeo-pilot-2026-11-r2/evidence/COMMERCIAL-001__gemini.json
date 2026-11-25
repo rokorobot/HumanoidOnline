@@ -1,0 +1,89 @@
+{
+ "observed_at": "2026-11-14T07:18:12+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "How much does the Unitree G1 cost?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "The Unitree G1 humanoid robot has a base starting price of $13,500 direct from Unitree's official store, though street prices through US resellers and distributors generally range from about $16,000 to $17,990 to account for shipping, import duties, and regional support.\n\nHowever, the final cost varies significantly depending on the model tier and what you intend to do with it:\n\nBase Model ($13,500 – $17,990): This entry-level version comes with 23 degrees of freedom, a depth camera, 3D LiDAR, and a quick-swap battery. Crucially, this base model does not support secondary software development (you cannot write custom code or program it out-of-the-box; it is primarily meant for display, demos, or basic remote-controlled movement).\n\nG1 EDU / Research Configurations ($43,900 – $73,900+): If you are a research lab, university, or developer looking for full SDK access, Python/C++ programming capabilities, higher torque joints, and upgraded computing (like NVIDIA Jetson modules) or advanced tactile hands, the prices scale up substantially across various EDU and Ultimate tiers.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Unitree G1 Price 2026: From $13,500, EDU Cost & Full Specs - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-review#:~:text=*%20The%20Unitree%20G1%20costs%20%2413%2C500%20direct,support%2C%20though%20availability%20fluctuates%20week%20to%20week.",
+      "description": "* The Unitree G1 costs $13,500 direct from Unitree's own store, and yes, \nanyone can order one — but that base model cannot be programmed, and as of \nJuly 20, 202..."
+     },
+     {
+      "position": 2,
+      "label": "Unitree G1 Robot: Price, Specs & Review 2026 - Humanoza",
+      "url": "https://humanoza.com/robots/unitree-g1#:~:text=%7C%20Dexterous%20hands%2C%20additional%20waist%20DOF%2C%20spare,and%20tactile%20dexterous%20hands%20depending%20on%20tier.",
+      "description": "| Dexterous hands, additional waist DOF, spare batteries, gantry, \nteleoperation kit, shipping and duty. | | G1 EDU Plus (U2) | $53,900 | \nHigher EDU configuratio..."
+     },
+     {
+      "position": 3,
+      "label": "Unitree G1 Robot: Price, Specs & Review 2026 - Humanoza",
+      "url": "https://humanoza.com/robots/unitree-g1#:~:text=%7C%20%7C%20G1%20base%20%2D%20Unitree%20direct,(%24300%2D%241%2C200)%20and%20all%20customs%20duty%20and%20clearance.",
+      "description": "| | G1 base - Unitree direct | $13,500 | 23 DOF bipedal humanoid, 1.32 m, \n~35 kg, depth camera, 3D LiDAR, 4-mic array, 5 W speaker, 9,000 mAh \nquick-swap battery..."
+     },
+     {
+      "position": 4,
+      "label": "Unitree G1 Robot: Price, Specs & Review 2026 - Humanoza",
+      "url": "https://humanoza.com/robots/unitree-g1#:~:text=%7C%20Top%2Dtier%20dexterous%20hands%20and%20the%20full,batteries%2C%20gantry%2C%20teleoperation%20kit%2C%20shipping%20and%20duty.",
+      "description": "| Top-tier dexterous hands and the full Ultimate sensor stack. Confirm SDK \nscope directly with the dealer before ordering. | | G1 EDU Standard (U1) | \n$43,900 | ..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Unitree G1 Price 2026: From $13,500, EDU Cost & Full Specs - Blog",
+      "url": "https://blog.robozaps.com/b/unitree-g1-review#:~:text=*%20The%20Unitree%20G1%20costs%20%2413%2C500%20direct,support%2C%20though%20availability%20fluctuates%20week%20to%20week.",
+      "domain": "blog.robozaps.com",
+      "position": 1,
+      "description": "* The Unitree G1 costs $13,500 direct from Unitree's own store, and yes, \nanyone can order one — but that base model cannot be programmed, and as of \nJuly 20, 202...",
+      "citationPillId": 1
+     },
+     {
+      "label": "Unitree G1 Robot: Price, Specs & Review 2026 - Humanoza",
+      "url": "https://humanoza.com/robots/unitree-g1#:~:text=%7C%20Dexterous%20hands%2C%20additional%20waist%20DOF%2C%20spare,and%20tactile%20dexterous%20hands%20depending%20on%20tier.",
+      "domain": "humanoza.com",
+      "position": 2,
+      "description": "| Dexterous hands, additional waist DOF, spare batteries, gantry, \nteleoperation kit, shipping and duty. | | G1 EDU Plus (U2) | $53,900 | \nHigher EDU configuratio...",
+      "citationPillId": 2
+     },
+     {
+      "label": "Unitree G1 Robot: Price, Specs & Review 2026 - Humanoza",
+      "url": "https://humanoza.com/robots/unitree-g1#:~:text=%7C%20%7C%20G1%20base%20%2D%20Unitree%20direct,(%24300%2D%241%2C200)%20and%20all%20customs%20duty%20and%20clearance.",
+      "domain": "humanoza.com",
+      "position": 3,
+      "description": "| | G1 base - Unitree direct | $13,500 | 23 DOF bipedal humanoid, 1.32 m, \n~35 kg, depth camera, 3D LiDAR, 4-mic array, 5 W speaker, 9,000 mAh \nquick-swap battery...",
+      "citationPillId": 3
+     },
+     {
+      "label": "Unitree G1 Robot: Price, Specs & Review 2026 - Humanoza",
+      "url": "https://humanoza.com/robots/unitree-g1#:~:text=%7C%20Top%2Dtier%20dexterous%20hands%20and%20the%20full,batteries%2C%20gantry%2C%20teleoperation%20kit%2C%20shipping%20and%20duty.",
+      "domain": "humanoza.com",
+      "position": 4,
+      "description": "| Top-tier dexterous hands and the full Ultimate sensor stack. Confirm SDK \nscope directly with the dealer before ordering. | | G1 EDU Standard (U1) | \n$43,900 | ...",
+      "citationPillId": 4
+     }
+    ],
+    "markdown": "The **Unitree G1** humanoid robot has a base starting price of **$13,500** direct from Unitree's official store, though street prices through US resellers and distributors generally range from about **$16,000 to $17,990** to account for shipping, import duties, and regional support. [Unitree G1 Price 2026: From $13,500, EDU Cost & Full Specs - Blog](https://blog.robozaps.com/b/unitree-g1-review#:~:text=*%20The%20Unitree%20G1%20costs%20%2413%2C500%20direct,support%2C%20though%20availability%20fluctuates%20week%20to%20week.)\n\nHowever, the final cost varies significantly depending on the model tier and what you intend to do with it: [Unitree G1 Robot: Price, Specs & Review 2026 - Humanoza](https://humanoza.com/robots/unitree-g1#:~:text=%7C%20Dexterous%20hands%2C%20additional%20waist%20DOF%2C%20spare,and%20tactile%20dexterous%20hands%20depending%20on%20tier.)\n\n  * **Base Model ($13,500 – $17,990):** This entry-level version comes with 23 degrees of freedom, a depth camera, 3D LiDAR, and a quick-swap battery. Crucially, **this base model does not support secondary software development** (you cannot write custom code or program it out-of-the-box; it is primarily meant for display, demos, or basic remote-controlled movement). [Unitree G1 Robot: Price, Specs & Review 2026 - Humanoza](https://humanoza.com/robots/unitree-g1#:~:text=%7C%20%7C%20G1%20base%20%2D%20Unitree%20direct,\\(%24300%2D%241%2C200\\)%20and%20all%20customs%20duty%20and%20clearance.)\n\n  * **G1 EDU / Research Configurations ($43,900 – $73,900+):** If you are a research lab, university, or developer looking for full SDK access, Python/C++ programming capabilities, higher torque joints, and upgraded computing (like NVIDIA Jetson modules) or advanced tactile hands, the prices scale up substantially across various EDU and Ultimate tiers. [Unitree G1 Robot: Price, Specs & Review 2026 - Humanoza](https://humanoza.com/robots/unitree-g1#:~:text=%7C%20Top%2Dtier%20dexterous%20hands%20and%20the%20full,batteries%2C%20gantry%2C%20teleoperation%20kit%2C%20shipping%20and%20duty.)"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "07e58681a6a14ad39235c374b47e42dd",
+   "charged_micro": 2400,
+   "hint": "feedback"
+  }
+ }
+}

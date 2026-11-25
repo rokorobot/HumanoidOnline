@@ -1,0 +1,138 @@
+{
+ "observed_at": "2026-11-14T07:18:57+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "Which humanoid robots have SDK access?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "A growing number of humanoid and bipedal robotic platforms offer software development kits (SDKs), ranging from open-source research platforms to enterprise-restricted industrial units.\n\n1. Open-Source & Research-Focused Humanoid SDKs\n\nUnitree G1 (EDU / Standard Series)\n\nSDK / API: Uses unitree_sdk2 (C++ & Python) supporting secondary development on its dedicated computing unit, alongside ROS 2 and Cyclone DDS integration.\nEcosystem: Well-supported in simulation environments like MuJoCo and NVIDIA Isaac Lab.\nSource Info: Detailed via the Unitree G1 Developer Guide.\n\nPollen Robotics Reachy 2\n\nSDK / API: Built with a native ROS 2 stack and an Apache 2.0 open-source software license. Features a VR-based teleoperation SDK for bimanual manipulation research.\nEcosystem: Tailored for academic and laboratory research published in robotics venues.\nSource Info: Outlined in the Robotics Center Open-Source Humanoid Guide.\n\nBooster Robotics K1 (Geek Edition)\n\nSDK / API: Offers secondary development access and motion control interfaces, sometimes bundled with integrated LLM development hooks.\nSource Info: Referenced via marketplace and technical roundups like Joybuy Developer Insights.\n\n2. Commercial / Industrial Humanoid Platforms (Restricted or Partner-Only SDKs)\n\nAgility Robotics (Digit)\n\nSDK / API: Historically restricted to commercial pilot partners, research institutions under specific agreements, or Agility's cloud/API automation layer (Digit Arc) rather than a public, open download.\n\nFigure AI (Figure 01 / Figure 02)\n\nSDK / API: Uses a proprietary, closed-source motion and vision-language model (VLM) stack. Public SDK access is generally unavailable, limited instead to strategic commercial deployments (e.g., automotive manufacturing partners).\n\nTesla (Optimus)\n\nSDK / API: Closed ecosystem tightly integrated into Tesla’s internal software stack; no public or third-party developer SDK has been released.\n\nBoston Dynamics (Atlas — Electric/Commercial transition)\n\nSDK / API: Historically managed via exclusive academic research programs (like the old Boston Dynamics API or ROS wrappers for older Spot/Atlas generations), with modern commercial humanoid iterations strictly controlled via enterprise partnerships.\n\nIf you are looking to build for a specific use case—such as academic research, industrial automation, or simulation-first prototyping—let me know your budget or technical requirements and I can point you toward the best-fit platform.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Unitree G1 Developer Guide - 宇树文档中心",
+      "url": "https://support.unitree.com/home/en/G1_developer",
+      "description": "The G1 head is equipped with LIVOX-MID360 laser radar, which provides excellent environmental perception capabilities for robots.",
+      "redirectLink": "https://www.google.com/goto?url=CAESbQHEIkXXCb6fd3kl6Psuyiwd2UrLt82_IHPYbGb1XVdDINmwkIes9dXJYEmjV_l3suPaskxJ4ysVgjXK8Vo8omaIGwbeM8LP6anXJg12-8GYlCNLQ2Q2E3qvUDGCea3O7dg9--D_q197t8OgRxk"
+     },
+     {
+      "position": 2,
+      "label": "宇树科技 文档中心",
+      "url": "https://support.unitree.com/home/en/G1_developer/get_sdk",
+      "description": "SDK: unitree_sdk2 by Unitree Technology for new-gen robots; encapsulates motor/high motion control; use with G1 SDK Development Gu...",
+      "redirectLink": "https://www.google.com/goto?url=CAESdQHEIkXXox0yHSuvn_VWEjANyKYQT7nV7UqiJIpeSwXQx7FQiS7S1sbKYFBdwsmEj5FnBD8Iv89B2ApIB_VQRtJLXmeX8qw8SfdaKViVcwNDlVhJXjJYBuIX9bniYI2y7TGyprGgdyowlgoYTkGKhH5c8GDQXw"
+     },
+     {
+      "position": 3,
+      "label": "Humanoid robots for development: SDK and setup requirements",
+      "url": "https://m.joybuy.de/blog/humanoidrobotdevelopment/Mpsh06L9",
+      "description": "Humanoid robots for personal development: SDKs, how to buy and space requirements. First, check the documented control access for ...",
+      "redirectLink": "https://www.google.com/goto?url=CAESdwHEIkXXOy4F3VwI4xR1qAOhzUo2vdfMVQ1gVxh9p3-DqUz6EOZEU8mFkfGS3UYZYvdD9Em29D8G5TRvUDNAxIiu2LkzXB8-OU9PHnEyuaFr8f-xv-JzcECAKswMrPlbjns1R4te0egCvfS6CnsAKofCztYtaJKv"
+     },
+     {
+      "position": 4,
+      "label": "Unitree G1 Developer Guide: SDK, ROS 2 and Simulation",
+      "url": "https://www.speedydrone.ca/blogs/%F0%9F%A4%96-smart-living-beyond/unitree-g1-developer-guide-sdk-ros-2-simulation-and-your-first-research-project",
+      "description": "build the communication layer with SDK2 and Cyclone DDS, use ROS 2 when your research needs ROS nodes and tooling, validate low-le...",
+      "redirectLink": "https://www.google.com/goto?url=CAESzwEBxCJF1wInsCLyUxK0TDoeL5ClE_KsaB7FQCi0DYwxhmK9vEKpK-Z4O2k-c-JX8eUY9Vh8vVGtG_v-MdiVYNvd-cD3CDDw3jCs3YjYk4OM5tx50vHfOeg-0gL1P96GHPJ6jZteUDfhf0yILhQJqmHvLsE3vif6k6qIGn6cNfe-lUCgOB3DaiPOSkn9oKvhgYBgdeO2_-TYfbmKDAyvSLRED-Cwx1dlRyhpzhJWZiwk_WV3qha-8q-INHK8YnD2hfULHlr_Q6sdhY6zDpm37Ms"
+     },
+     {
+      "position": 5,
+      "label": "Open",
+      "url": "https://www.roboticscenter.ai/blog/open-source-humanoid-robots-2025",
+      "description": "Reachy 2 ($70,000) It is a commercial product with fully open-source software (Apache 2.0 license) and native ROS2 stack make it p...",
+      "redirectLink": "https://www.google.com/goto?url=CAESgAEBxCJF1wDM4FJY8NBszcAV96uLjxc89_tRX_AM2qqghvNIPGxU9GlfDLQZo3Fn7_5wvZJ9Ls8YHGTLbGTrfyLZHjcdm3bHD1Oz99QloETuiy04pvfAmUmRFTMOd6xGfxvbzk_yEkzvsts_a39lL0KECuM-rARQZ3i28-SzJpUhAA"
+     },
+     {
+      "position": 6,
+      "label": "Figure 01 - Robot Details, Use Case and Specifications - Aparobot",
+      "url": "https://www.aparobot.com/robots/figure-01",
+      "description": "Figure 01 is a humanoid robot designed for manual labor, Proprietary Figure AI locomotion control and motion planning stack. VLM d...",
+      "redirectLink": "https://www.google.com/goto?url=CAESZgHEIkXXE30E8S_Hy2UrQoyAsHx3yAG6HbZCHbBplfr17uZNLILHiIOctkHT2UKVyTIWodYbXZy4IDpKuQzxyp4EbCsG6k6eGcgcJhXRV9AVoBUaKgVZYCg0pewYjDx15nGBeT5EFg"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Humanoid robots for development: SDK and setup requirements",
+      "citationPillId": 1,
+      "url": "https://m.joybuy.de/blog/humanoidrobotdevelopment/Mpsh06L9",
+      "domain": "m.joybuy.de",
+      "description": "Humanoid robots for personal development: SDKs, how to buy and space requirements. First, check the documented control access for ...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESdwHEIkXXOy4F3VwI4xR1qAOhzUo2vdfMVQ1gVxh9p3-DqUz6EOZEU8mFkfGS3UYZYvdD9Em29D8G5TRvUDNAxIiu2LkzXB8-OU9PHnEyuaFr8f-xv-JzcECAKswMrPlbjns1R4te0egCvfS6CnsAKofCztYtaJKv"
+     },
+     {
+      "label": "Unitree G1 Developer Guide - 宇树文档中心",
+      "citationPillId": 2,
+      "url": "https://support.unitree.com/home/en/G1_developer",
+      "domain": "support.unitree.com",
+      "description": "The G1 head is equipped with LIVOX-MID360 laser radar, which provides excellent environmental perception capabilities for robots.",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESbQHEIkXXCb6fd3kl6Psuyiwd2UrLt82_IHPYbGb1XVdDINmwkIes9dXJYEmjV_l3suPaskxJ4ysVgjXK8Vo8omaIGwbeM8LP6anXJg12-8GYlCNLQ2Q2E3qvUDGCea3O7dg9--D_q197t8OgRxk"
+     },
+     {
+      "label": "宇树科技 文档中心",
+      "citationPillId": 2,
+      "url": "https://support.unitree.com/home/en/G1_developer/get_sdk",
+      "domain": "support.unitree.com",
+      "description": "SDK: unitree_sdk2 by Unitree Technology for new-gen robots; encapsulates motor/high motion control; use with G1 SDK Development Gu...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESdQHEIkXXox0yHSuvn_VWEjANyKYQT7nV7UqiJIpeSwXQx7FQiS7S1sbKYFBdwsmEj5FnBD8Iv89B2ApIB_VQRtJLXmeX8qw8SfdaKViVcwNDlVhJXjJYBuIX9bniYI2y7TGyprGgdyowlgoYTkGKhH5c8GDQXw"
+     },
+     {
+      "label": "Unitree G1 Developer Guide: SDK, ROS 2 and Simulation",
+      "citationPillId": 2,
+      "url": "https://www.speedydrone.ca/blogs/%F0%9F%A4%96-smart-living-beyond/unitree-g1-developer-guide-sdk-ros-2-simulation-and-your-first-research-project",
+      "domain": "speedydrone.ca",
+      "description": "build the communication layer with SDK2 and Cyclone DDS, use ROS 2 when your research needs ROS nodes and tooling, validate low-le...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAESzwEBxCJF1wInsCLyUxK0TDoeL5ClE_KsaB7FQCi0DYwxhmK9vEKpK-Z4O2k-c-JX8eUY9Vh8vVGtG_v-MdiVYNvd-cD3CDDw3jCs3YjYk4OM5tx50vHfOeg-0gL1P96GHPJ6jZteUDfhf0yILhQJqmHvLsE3vif6k6qIGn6cNfe-lUCgOB3DaiPOSkn9oKvhgYBgdeO2_-TYfbmKDAyvSLRED-Cwx1dlRyhpzhJWZiwk_WV3qha-8q-INHK8YnD2hfULHlr_Q6sdhY6zDpm37Ms"
+     },
+     {
+      "label": "Open",
+      "citationPillId": 3,
+      "url": "https://www.roboticscenter.ai/blog/open-source-humanoid-robots-2025",
+      "domain": "roboticscenter.ai",
+      "description": "Reachy 2 ($70,000) It is a commercial product with fully open-source software (Apache 2.0 license) and native ROS2 stack make it p...",
+      "position": 5,
+      "redirectLink": "https://www.google.com/goto?url=CAESgAEBxCJF1wDM4FJY8NBszcAV96uLjxc89_tRX_AM2qqghvNIPGxU9GlfDLQZo3Fn7_5wvZJ9Ls8YHGTLbGTrfyLZHjcdm3bHD1Oz99QloETuiy04pvfAmUmRFTMOd6xGfxvbzk_yEkzvsts_a39lL0KECuM-rARQZ3i28-SzJpUhAA"
+     },
+     {
+      "label": "Humanoid robots for development: SDK and setup requirements",
+      "citationPillId": 4,
+      "url": "https://m.joybuy.de/blog/humanoidrobotdevelopment/Mpsh06L9",
+      "domain": "m.joybuy.de",
+      "description": "Humanoid robots for personal development: SDKs, how to buy and space requirements. First, check the documented control access for ...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESdwHEIkXXOy4F3VwI4xR1qAOhzUo2vdfMVQ1gVxh9p3-DqUz6EOZEU8mFkfGS3UYZYvdD9Em29D8G5TRvUDNAxIiu2LkzXB8-OU9PHnEyuaFr8f-xv-JzcECAKswMrPlbjns1R4te0egCvfS6CnsAKofCztYtaJKv"
+     },
+     {
+      "label": "Figure 01 - Robot Details, Use Case and Specifications - Aparobot",
+      "citationPillId": 5,
+      "url": "https://www.aparobot.com/robots/figure-01",
+      "domain": "aparobot.com",
+      "description": "Figure 01 is a humanoid robot designed for manual labor, Proprietary Figure AI locomotion control and motion planning stack. VLM d...",
+      "position": 6,
+      "redirectLink": "https://www.google.com/goto?url=CAESZgHEIkXXE30E8S_Hy2UrQoyAsHx3yAG6HbZCHbBplfr17uZNLILHiIOctkHT2UKVyTIWodYbXZy4IDpKuQzxyp4EbCsG6k6eGcgcJhXRV9AVoBUaKgVZYCg0pewYjDx15nGBeT5EFg"
+     }
+    ],
+    "markdown": "A growing number of humanoid and bipedal robotic platforms offer software development kits (SDKs), ranging from open-source research platforms to enterprise-restricted industrial units. [Humanoid robots for development: SDK and setup requirements](https://m.joybuy.de/blog/humanoidrobotdevelopment/Mpsh06L9)\n\n* * *\n\n1\\. Open-Source & Research-Focused Humanoid SDKs\n\n  * **Unitree G1 (EDU / Standard Series)**\n    * **SDK / API:** Uses `unitree_sdk2` (C++ & Python) supporting secondary development on its dedicated computing unit, alongside ROS 2 and Cyclone DDS integration.\n    * **Ecosystem:** Well-supported in simulation environments like MuJoCo and NVIDIA Isaac Lab.\n    * **Source Info:** Detailed via the [Unitree G1 Developer Guide](https://support.unitree.com/home/en/G1_developer). [Unitree G1 Developer Guide - 宇树文档中心](https://support.unitree.com/home/en/G1_developer)[宇树科技 文档中心](https://support.unitree.com/home/en/G1_developer/get_sdk)[Unitree G1 Developer Guide: SDK, ROS 2 and Simulation](https://www.speedydrone.ca/blogs/%F0%9F%A4%96-smart-living-beyond/unitree-g1-developer-guide-sdk-ros-2-simulation-and-your-first-research-project)\n\n  * **Pollen Robotics Reachy 2**\n    * **SDK / API:** Built with a native ROS 2 stack and an Apache 2.0 open-source software license. Features a VR-based teleoperation SDK for bimanual manipulation research.\n    * **Ecosystem:** Tailored for academic and laboratory research published in robotics venues.\n    * **Source Info:** Outlined in the [Robotics Center Open-Source Humanoid Guide](https://www.roboticscenter.ai/blog/open-source-humanoid-robots-2025). [Open](https://www.roboticscenter.ai/blog/open-source-humanoid-robots-2025)\n\n  * **Booster Robotics K1 (Geek Edition)**\n    * **SDK / API:** Offers secondary development access and motion control interfaces, sometimes bundled with integrated LLM development hooks.\n    * **Source Info:** Referenced via marketplace and technical roundups like [Joybuy Developer Insights](https://m.joybuy.de/blog/humanoidrobotdevelopment/Mpsh06L9). [Humanoid robots for development: SDK and setup requirements](https://m.joybuy.de/blog/humanoidrobotdevelopment/Mpsh06L9)\n\n* * *\n\n2\\. Commercial / Industrial Humanoid Platforms (Restricted or Partner-Only SDKs)\n\n  * **Agility Robotics (Digit)**\n    * **SDK / API:** Historically restricted to commercial pilot partners, research institutions under specific agreements, or Agility's cloud/API automation layer (Digit Arc) rather than a public, open download.\n\n  * **Figure AI (Figure 01 / Figure 02)**\n    * **SDK / API:** Uses a proprietary, closed-source motion and vision-language model (VLM) stack. Public SDK access is generally unavailable, limited instead to strategic commercial deployments (e.g., automotive manufacturing partners). [Figure 01 - Robot Details, Use Case and Specifications - Aparobot](https://www.aparobot.com/robots/figure-01)\n\n  * **Tesla (Optimus)**\n    * **SDK / API:** Closed ecosystem tightly integrated into Tesla’s internal software stack; no public or third-party developer SDK has been released.\n\n  * **Boston Dynamics (Atlas — Electric/Commercial transition)**\n    * **SDK / API:** Historically managed via exclusive academic research programs (like the old Boston Dynamics API or ROS wrappers for older Spot/Atlas generations), with modern commercial humanoid iterations strictly controlled via enterprise partnerships.\n\n* * *\n\nIf you are looking to build for a specific use case—such as **academic research**, **industrial automation**, or **simulation-first prototyping**—let me know your budget or technical requirements and I can point you toward the best-fit platform."
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "1ba659870d7c432c8012ceff038b8bda",
+   "charged_micro": 2400
+  }
+ }
+}

@@ -1,0 +1,116 @@
+{
+ "observed_at": "2026-11-14T07:19:12+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "Which humanoid robots are suitable for research?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Choosing a humanoid robot for academic or corporate research depends heavily on your budget, whether you focus on software/AI development or hardware/locomotion, and your need for open-source flexibility.\n\nThe industry standards and most widely used humanoid platforms for research include:\n\n1. Unitree G1 (and G1 EDU)\n\nBest For: Entry-to-mid level labs, manipulation research, and high-value prototyping.\n\nOverview: The Unitree G1 has quickly become one of the most popular research humanoids in university labs globally. Priced accessibly (starting around $13,500 to $16,000 for the base model, with EDU/manipulation packages scaling higher), it offers impressive agility, a compact form factor, and robust developer access. The EDU versions provide upgraded compute modules and higher payload capacities for secondary development.\n\n2. Boston Dynamics Atlas (All-Electric)\n\nBest For: Advanced dynamic mobility, whole-body control, and high-performance industrial hardware research.\n\nOverview: The all-electric Atlas represents the bleeding edge of bipedal dynamics, strength, and range of motion. While typically deployed in elite institutional and enterprise research partnerships rather than standard open commercial channels, it remains the benchmark for dynamic human-like movement and extreme physical manipulation.\n\n3. AgiBot X1 / A2 & Tiangong Series\n\nBest For: Open-source research, multi-modal interaction, and machine learning/reinforcement learning testbeds.\n\nOverview: Platforms like AgiBot's research configurations and open-source champions like the Tiangong project are frequently adopted by labs looking for flexible software stacks, expressive multimodal capabilities (vision, voice, and tactile feedback), and open architectures suited for custom neural network training.\n\n4. Apptronik Apollo & Agility Digit\n\nBest For: Applied robotics, logistics automation, and human-robot collaboration frameworks.\n\nOverview: If your research is geared toward real-world industrial task allocation, safety certification, or logistics automation, platforms like Apollo and Digit offer mature software ecosystems, reliable payload capacities, and deep ties into enterprise software suites.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Best Humanoid Robots for STEM Programs & Schools (2026 Guide)",
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education",
+      "description": "The Unitree G1, the most widely used research humanoid in university labs. \nManufacturer footage. A humanoid robot is the most visible STEM purchase a \nschool"
+     },
+     {
+      "position": 2,
+      "label": "Top 10 Humanoid Robots in 2026! - MotorWatt",
+      "url": "https://motorwatt.com/community/community-groups/humanoids-of-the-future-humanoid-robots/videos/top-10-humanoid-robots-in-2026#:~:text=Apollo.%20Commercial%20pilots%20%C2%B7%20USA%20%C2%B7%20~%2480K%2Fyr,Unitree%20G1.%20Shipping%20%C2%B7%20China%20%C2%B7%20%2413.5%2D16K.",
+      "description": " Apollo. Commercial pilots · USA · ~$80K/yr (2027) Unitree G1. Shipping · \nChina · $13.5-16K. "
+     },
+     {
+      "position": 3,
+      "label": "38 Best Humanoid Robots in 2026 (Evidence-Ranked) - Blog",
+      "url": "https://blog.robozaps.com/b/best-humanoid-robots#:~:text=*%20Noetix%20Bumi%20%E2%80%94%20Cheapest%20Announced%20Presale,(V2)%20%E2%80%94%20Watch%2DTier%3A%20The%20Sleeping%20Giant%20Stirred.",
+      "description": "* Noetix Bumi — Cheapest Announced Presale Humanoid (¥9,998) * Rainbow \nRobotics RB-Y1 — Research Dual-Arm Platform. * AgiBot X1 — Best Open-Source \nResearch Huma..."
+     },
+     {
+      "position": 4,
+      "label": "38 Best Humanoid Robots in 2026 (Evidence-Ranked) - Blog",
+      "url": "https://blog.robozaps.com/b/best-humanoid-robots#:~:text=Table_title%3A%20Quick%2DGlance%3A%20Best%20Humanoid%20Robots%20of%202026,Outdoors%20%7C%20DEEP%20Robotics%20DR02%20(IP66)%20%7C",
+      "description": "Table_title: Quick-Glance: Best Humanoid Robots of 2026 Table_content: | \nCategory | Winner | | --- | --- | | Best Overall | Agility Robotics Digit | \n| Best Valu..."
+     },
+     {
+      "position": 5,
+      "label": "Humanoid Robots in 2026: The Complete Market Overview",
+      "url": "https://www.roboticscenter.ai/blog/humanoid-robot-2026#:~:text=8.%20Named%20customers%20include%20GXO%2C%20Schaeffler%20and,or%20wheeled%20mobility%20depending%20on%20the%20site.",
+      "description": "8. Named customers include GXO, Schaeffler and Toyota Motor Manufacturing \nCanada. 8. See Agility Robotics for deployment programs. Good fit for: \nwarehouse and l..."
+     },
+     {
+      "position": 6,
+      "label": "Humanoid Robots in 2026: The Complete Market Overview",
+      "url": "https://www.roboticscenter.ai/blog/humanoid-robot-2026#:~:text=Agility%20Robotics%20Digit.%20Agility%20describes%20Digit%20as,with%20fleet%20software%20and%20support.%20Apptronik%20Apollo.",
+      "description": "Agility Robotics Digit. Agility describes Digit as a humanoid with 65,000 \nhours of real production experience, built for industrial environments and \nassembled i..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Best Humanoid Robots for STEM Programs & Schools (2026 Guide)",
+      "url": "https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education",
+      "domain": "globaldronehq.com",
+      "position": 1,
+      "description": "The Unitree G1, the most widely used research humanoid in university labs. \nManufacturer footage. A humanoid robot is the most visible STEM purchase a \nschool",
+      "citationPillId": 1
+     },
+     {
+      "label": "Top 10 Humanoid Robots in 2026! - MotorWatt",
+      "url": "https://motorwatt.com/community/community-groups/humanoids-of-the-future-humanoid-robots/videos/top-10-humanoid-robots-in-2026#:~:text=Apollo.%20Commercial%20pilots%20%C2%B7%20USA%20%C2%B7%20~%2480K%2Fyr,Unitree%20G1.%20Shipping%20%C2%B7%20China%20%C2%B7%20%2413.5%2D16K.",
+      "domain": "motorwatt.com",
+      "position": 2,
+      "description": " Apollo. Commercial pilots · USA · ~$80K/yr (2027) Unitree G1. Shipping · \nChina · $13.5-16K. ",
+      "citationPillId": 1
+     },
+     {
+      "label": "38 Best Humanoid Robots in 2026 (Evidence-Ranked) - Blog",
+      "url": "https://blog.robozaps.com/b/best-humanoid-robots#:~:text=*%20Noetix%20Bumi%20%E2%80%94%20Cheapest%20Announced%20Presale,(V2)%20%E2%80%94%20Watch%2DTier%3A%20The%20Sleeping%20Giant%20Stirred.",
+      "domain": "blog.robozaps.com",
+      "position": 3,
+      "description": "* Noetix Bumi — Cheapest Announced Presale Humanoid (¥9,998) * Rainbow \nRobotics RB-Y1 — Research Dual-Arm Platform. * AgiBot X1 — Best Open-Source \nResearch Huma...",
+      "citationPillId": 2
+     },
+     {
+      "label": "38 Best Humanoid Robots in 2026 (Evidence-Ranked) - Blog",
+      "url": "https://blog.robozaps.com/b/best-humanoid-robots#:~:text=Table_title%3A%20Quick%2DGlance%3A%20Best%20Humanoid%20Robots%20of%202026,Outdoors%20%7C%20DEEP%20Robotics%20DR02%20(IP66)%20%7C",
+      "domain": "blog.robozaps.com",
+      "position": 4,
+      "description": "Table_title: Quick-Glance: Best Humanoid Robots of 2026 Table_content: | \nCategory | Winner | | --- | --- | | Best Overall | Agility Robotics Digit | \n| Best Valu...",
+      "citationPillId": 3
+     },
+     {
+      "label": "Humanoid Robots in 2026: The Complete Market Overview",
+      "url": "https://www.roboticscenter.ai/blog/humanoid-robot-2026#:~:text=8.%20Named%20customers%20include%20GXO%2C%20Schaeffler%20and,or%20wheeled%20mobility%20depending%20on%20the%20site.",
+      "domain": "roboticscenter.ai",
+      "position": 5,
+      "description": "8. Named customers include GXO, Schaeffler and Toyota Motor Manufacturing \nCanada. 8. See Agility Robotics for deployment programs. Good fit for: \nwarehouse and l...",
+      "citationPillId": 4
+     },
+     {
+      "label": "Humanoid Robots in 2026: The Complete Market Overview",
+      "url": "https://www.roboticscenter.ai/blog/humanoid-robot-2026#:~:text=Agility%20Robotics%20Digit.%20Agility%20describes%20Digit%20as,with%20fleet%20software%20and%20support.%20Apptronik%20Apollo.",
+      "domain": "roboticscenter.ai",
+      "position": 6,
+      "description": "Agility Robotics Digit. Agility describes Digit as a humanoid with 65,000 \nhours of real production experience, built for industrial environments and \nassembled i...",
+      "citationPillId": 5
+     }
+    ],
+    "markdown": "Choosing a humanoid robot for academic or corporate research depends heavily on your budget, whether you focus on software/AI development or hardware/locomotion, and your need for open-source flexibility.\n\nThe industry standards and most widely used humanoid platforms for research include:\n\n### 1\\. Unitree G1 (and G1 EDU)\n\n  * **Best For:** Entry-to-mid level labs, manipulation research, and high-value prototyping.\n\n  * **Overview:** The Unitree G1 has quickly become one of the most popular research humanoids in university labs globally. Priced accessibly (starting around $13,500 to $16,000 for the base model, with EDU/manipulation packages scaling higher), it offers impressive agility, a compact form factor, and robust developer access. The EDU versions provide upgraded compute modules and higher payload capacities for secondary development. [Best Humanoid Robots for STEM Programs & Schools (2026 Guide)](https://globaldronehq.com/blogs/guides/best-humanoid-robots-for-stem-education)[Top 10 Humanoid Robots in 2026! - MotorWatt](https://motorwatt.com/community/community-groups/humanoids-of-the-future-humanoid-robots/videos/top-10-humanoid-robots-in-2026#:~:text=Apollo.%20Commercial%20pilots%20%C2%B7%20USA%20%C2%B7%20~%2480K%2Fyr,Unitree%20G1.%20Shipping%20%C2%B7%20China%20%C2%B7%20%2413.5%2D16K.)\n\n### 2\\. Boston Dynamics Atlas (All-Electric)\n\n  * **Best For:** Advanced dynamic mobility, whole-body control, and high-performance industrial hardware research.\n\n  * **Overview:** The all-electric Atlas represents the bleeding edge of bipedal dynamics, strength, and range of motion. While typically deployed in elite institutional and enterprise research partnerships rather than standard open commercial channels, it remains the benchmark for dynamic human-like movement and extreme physical manipulation.\n\n### 3\\. AgiBot X1 / A2 & Tiangong Series\n\n  * **Best For:** Open-source research, multi-modal interaction, and machine learning/reinforcement learning testbeds. [38 Best Humanoid Robots in 2026 (Evidence-Ranked) - Blog](https://blog.robozaps.com/b/best-humanoid-robots#:~:text=*%20Noetix%20Bumi%20%E2%80%94%20Cheapest%20Announced%20Presale,\\(V2\\)%20%E2%80%94%20Watch%2DTier%3A%20The%20Sleeping%20Giant%20Stirred.)\n\n  * **Overview:** Platforms like AgiBot's research configurations and open-source champions like the Tiangong project are frequently adopted by labs looking for flexible software stacks, expressive multimodal capabilities (vision, voice, and tactile feedback), and open architectures suited for custom neural network training. [38 Best Humanoid Robots in 2026 (Evidence-Ranked) - Blog](https://blog.robozaps.com/b/best-humanoid-robots#:~:text=Table_title%3A%20Quick%2DGlance%3A%20Best%20Humanoid%20Robots%20of%202026,Outdoors%20%7C%20DEEP%20Robotics%20DR02%20\\(IP66\\)%20%7C)\n\n### 4\\. Apptronik Apollo & Agility Digit\n\n  * **Best For:** Applied robotics, logistics automation, and human-robot collaboration frameworks. [Humanoid Robots in 2026: The Complete Market Overview](https://www.roboticscenter.ai/blog/humanoid-robot-2026#:~:text=8.%20Named%20customers%20include%20GXO%2C%20Schaeffler%20and,or%20wheeled%20mobility%20depending%20on%20the%20site.)\n\n  * **Overview:** If your research is geared toward real-world industrial task allocation, safety certification, or logistics automation, platforms like Apollo and Digit offer mature software ecosystems, reliable payload capacities, and deep ties into enterprise software suites. [Humanoid Robots in 2026: The Complete Market Overview](https://www.roboticscenter.ai/blog/humanoid-robot-2026#:~:text=Agility%20Robotics%20Digit.%20Agility%20describes%20Digit%20as,with%20fleet%20software%20and%20support.%20Apptronik%20Apollo.)"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "5d4641d5cdd046499058b148f12fdb56",
+   "charged_micro": 2400
+  }
+ }
+}

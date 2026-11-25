@@ -1,0 +1,24 @@
+{
+ "observed_at": "2026-11-14T07:21:25+00:00",
+ "endpoint": "cloro.ai-search.chatgpt.scrape",
+ "request": {
+  "prompt": "Which humanoid robots can be purchased in Europe?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 1,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "detail": "upstream request failed: ReadTimeout"
+  },
+  "_treg": {
+   "http_status": 502,
+   "call_id": "1fbc288403da42b69bef96470542da2b",
+   "charged_micro": 0
+  }
+ }
+}

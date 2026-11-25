@@ -1,0 +1,151 @@
+{
+ "observed_at": "2026-11-14T07:16:02+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "Which humanoid robots can be purchased in North America?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Commercial and research-grade humanoid robots available for purchase, lease, or direct order in North America span several tiers—ranging from entry-level developer models to enterprise-scale industrial platforms.\n\n1. Developer & Research Humanoids\n\nUnitree G1\n\nType: Bipedal humanoid / developer platform\nApprox. Price: From $13,500 USD (base model) or higher for EDU/Pro variants ($50,000–$64,000 via specialty distributors)\nWhere to get it: Orderable directly through the Unitree Official Store or specialized robotics vendors.\n\nUnitree H1 / H2 Series\n\nType: Full-size bipedal humanoids\nApprox. Price: $29,900 – $90,000+ USD (depending on the generation and EDU add-ons)\nWhere to get it: Available via Unitree Official Store or global industrial robotics brokers.\n\nEngineAI T800 Pro\n\nType: Bipedal general-purpose humanoid\nApprox. Price: $63,000 USD\nWhere to get it: Offered through North American commercial robotics distributors like Robots International.\n\n2. Industrial & Commercial Deployment Humanoids\n\nAgility Robotics Digit\n\nType: Bipedal logistics and warehouse humanoid\nApprox. Price: $200,000 USD (direct purchase + deployment/software fees) or $8,500/month via a Robot-as-a-Service (RaaS) lease model.\nWhere to get it: Enterprise allocation and pilot-to-fleet leasing via Agility Robotics.\n\nUBTECH Walker S2 / Cruzr Series\n\nType: Industrial/service humanoid\nApprox. Price: $15,999 – $149,995 USD depending on service vs. industrial specs.\nWhere to get it: Available through select commercial automation suppliers.\n\n3. Pilot Programs & Pre-Orders (Not Yet Off-the-Shelf)\n\nApptronik Apollo: Available strictly via enterprise pilot scoping (estimated deployment valuation up to $50,000).\n\nFigure AI (Figure 01 / 02): Deployed through targeted commercial pilot partnerships (e.g., manufacturing and automotive testbeds) rather than public retail.\n\nTesla Optimus: Announced for future consumer/commercial tiers, with projected mass-market availability still pending further scale-up.\n\nAre you looking for a robot for academic research/programming, a commercial/warehouse use case, or just exploring what's out there? I can dive deeper into specs, lead times, or software SDKs for any of these models.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Unitree G1 – UnitreeRobotics",
+      "url": "https://shop.unitree.com/products/unitree-g1",
+      "description": "H2 ($29,900), Priced at $13,500 USD with $300-$1,200 shipping. Features 23-43 joints, force control for dexterous hands, and imita...",
+      "redirectLink": "https://www.google.com/goto?url=CAESaQHEIkXXXqEwiqfCnJlTrKo6aC1uimTU8TopRh-jnNzy1NwN15GIakfU6WILlUsHshkUlTKv7cvbw67cE7w-K80t6HsmWZr0vatLywjf8SmPM-In538URvrpcr_euD1iBxMgUVSNUJd3SA"
+     },
+     {
+      "position": 2,
+      "label": "Humanoid Robots for Sale: Prices & US Legality (2026) | RoboZaps",
+      "url": "https://robozaps.com/categories/humanoids",
+      "description": "Costs range from $299 (Robosen … up to $830,000–$960,000. Purchased directly via manufacturer stores, authorized distributors, or ...",
+      "redirectLink": "https://www.google.com/goto?url=CAESZgHEIkXXpinletf7PClzg7PYWIjDIDjC3mgfOaALXN_gpQ8yxTuvDCOEFBBO3qTbO5JouQkwsOf3thjzjMlmqM2dv6gJgs--PiUZmpk3-LToS1MOla3WssUGOCvqU-VTcCjNGVhxuA"
+     },
+     {
+      "position": 3,
+      "label": "Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International",
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm",
+      "description": "Humanoid Robots for Sale: and Bionic platforms. UBTECH Walker S2 ($149,995.00);",
+      "redirectLink": "https://www.google.com/goto?url=CAESdAHEIkXXxXNSOI28ctva5XhM0HV9-0dSNXx6e2Lu35ZXKFo9gCHBc81TuQP9XIv4EzYEr6elzZ_m_6O8Qe5oA39pVkl7zTWFQPIhDc5HvAVCiSpBVnLkTDtvHC3JexG84SHEfaG1rXj7SKrIhKKcxwXPJUkx"
+     },
+     {
+      "position": 4,
+      "label": "Agility's Digit humanoid robot costs $8,500 a month - The Conveyor",
+      "url": "https://www.theconveyor.co/p/agility-robotics-digit-humanoid-robot-cost",
+      "description": "The News Agility Robotics leases its Digit humanoid for $8,500 a month with software and maintenance included, plus a setup fee of...",
+      "redirectLink": "https://www.google.com/goto?url=CAEShAEBxCJF167SVPI3nF3RRpGlEEGScJDd8kxHQsCBvxOzSoUN87qBrlLSSOSbucOCqisohA-taHbfl8BIb_IkENmugkPrPOanLfnA5GKrz-IajIGsiArzk6ElnXWY2c0Agxnnv0ZKEcPUg89N846CpVtG5l4M3T6PYsZHd8tQW2dg-BiFFQc"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Humanoid Robots for Sale: Prices & US Legality (2026) | RoboZaps",
+      "citationPillId": 1,
+      "url": "https://robozaps.com/categories/humanoids",
+      "domain": "robozaps.com",
+      "description": "Costs range from $299 (Robosen … up to $830,000–$960,000. Purchased directly via manufacturer stores, authorized distributors, or ...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESZgHEIkXXpinletf7PClzg7PYWIjDIDjC3mgfOaALXN_gpQ8yxTuvDCOEFBBO3qTbO5JouQkwsOf3thjzjMlmqM2dv6gJgs--PiUZmpk3-LToS1MOla3WssUGOCvqU-VTcCjNGVhxuA"
+     },
+     {
+      "label": "Unitree G1 – UnitreeRobotics",
+      "citationPillId": 2,
+      "url": "https://shop.unitree.com/products/unitree-g1",
+      "domain": "shop.unitree.com",
+      "description": "H2 ($29,900), Priced at $13,500 USD with $300-$1,200 shipping. Features 23-43 joints, force control for dexterous hands, and imita...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESaQHEIkXXXqEwiqfCnJlTrKo6aC1uimTU8TopRh-jnNzy1NwN15GIakfU6WILlUsHshkUlTKv7cvbw67cE7w-K80t6HsmWZr0vatLywjf8SmPM-In538URvrpcr_euD1iBxMgUVSNUJd3SA"
+     },
+     {
+      "label": "Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International",
+      "citationPillId": 2,
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm",
+      "domain": "robotsinternational.com",
+      "description": "Humanoid Robots for Sale: and Bionic platforms. UBTECH Walker S2 ($149,995.00);",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESdAHEIkXXxXNSOI28ctva5XhM0HV9-0dSNXx6e2Lu35ZXKFo9gCHBc81TuQP9XIv4EzYEr6elzZ_m_6O8Qe5oA39pVkl7zTWFQPIhDc5HvAVCiSpBVnLkTDtvHC3JexG84SHEfaG1rXj7SKrIhKKcxwXPJUkx"
+     },
+     {
+      "label": "Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International",
+      "citationPillId": 3,
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm",
+      "domain": "robotsinternational.com",
+      "description": "Humanoid Robots for Sale: and Bionic platforms. UBTECH Walker S2 ($149,995.00);",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESdAHEIkXXxXNSOI28ctva5XhM0HV9-0dSNXx6e2Lu35ZXKFo9gCHBc81TuQP9XIv4EzYEr6elzZ_m_6O8Qe5oA39pVkl7zTWFQPIhDc5HvAVCiSpBVnLkTDtvHC3JexG84SHEfaG1rXj7SKrIhKKcxwXPJUkx"
+     },
+     {
+      "label": "Unitree G1 – UnitreeRobotics",
+      "citationPillId": 3,
+      "url": "https://shop.unitree.com/products/unitree-g1",
+      "domain": "shop.unitree.com",
+      "description": "H2 ($29,900), Priced at $13,500 USD with $300-$1,200 shipping. Features 23-43 joints, force control for dexterous hands, and imita...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESaQHEIkXXXqEwiqfCnJlTrKo6aC1uimTU8TopRh-jnNzy1NwN15GIakfU6WILlUsHshkUlTKv7cvbw67cE7w-K80t6HsmWZr0vatLywjf8SmPM-In538URvrpcr_euD1iBxMgUVSNUJd3SA"
+     },
+     {
+      "label": "Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International",
+      "citationPillId": 4,
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm",
+      "domain": "robotsinternational.com",
+      "description": "Humanoid Robots for Sale: and Bionic platforms. UBTECH Walker S2 ($149,995.00);",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESdAHEIkXXxXNSOI28ctva5XhM0HV9-0dSNXx6e2Lu35ZXKFo9gCHBc81TuQP9XIv4EzYEr6elzZ_m_6O8Qe5oA39pVkl7zTWFQPIhDc5HvAVCiSpBVnLkTDtvHC3JexG84SHEfaG1rXj7SKrIhKKcxwXPJUkx"
+     },
+     {
+      "label": "Humanoid Robots for Sale: Prices & US Legality (2026) | RoboZaps",
+      "citationPillId": 5,
+      "url": "https://robozaps.com/categories/humanoids",
+      "domain": "robozaps.com",
+      "description": "Costs range from $299 (Robosen … up to $830,000–$960,000. Purchased directly via manufacturer stores, authorized distributors, or ...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESZgHEIkXXpinletf7PClzg7PYWIjDIDjC3mgfOaALXN_gpQ8yxTuvDCOEFBBO3qTbO5JouQkwsOf3thjzjMlmqM2dv6gJgs--PiUZmpk3-LToS1MOla3WssUGOCvqU-VTcCjNGVhxuA"
+     },
+     {
+      "label": "Agility's Digit humanoid robot costs $8,500 a month - The Conveyor",
+      "citationPillId": 5,
+      "url": "https://www.theconveyor.co/p/agility-robotics-digit-humanoid-robot-cost",
+      "domain": "theconveyor.co",
+      "description": "The News Agility Robotics leases its Digit humanoid for $8,500 a month with software and maintenance included, plus a setup fee of...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAEShAEBxCJF167SVPI3nF3RRpGlEEGScJDd8kxHQsCBvxOzSoUN87qBrlLSSOSbucOCqisohA-taHbfl8BIb_IkENmugkPrPOanLfnA5GKrz-IajIGsiArzk6ElnXWY2c0Agxnnv0ZKEcPUg89N846CpVtG5l4M3T6PYsZHd8tQW2dg-BiFFQc"
+     },
+     {
+      "label": "Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International",
+      "citationPillId": 6,
+      "url": "https://www.robotsinternational.com/Humanoid-Robots.htm",
+      "domain": "robotsinternational.com",
+      "description": "Humanoid Robots for Sale: and Bionic platforms. UBTECH Walker S2 ($149,995.00);",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESdAHEIkXXxXNSOI28ctva5XhM0HV9-0dSNXx6e2Lu35ZXKFo9gCHBc81TuQP9XIv4EzYEr6elzZ_m_6O8Qe5oA39pVkl7zTWFQPIhDc5HvAVCiSpBVnLkTDtvHC3JexG84SHEfaG1rXj7SKrIhKKcxwXPJUkx"
+     },
+     {
+      "label": "Humanoid Robots for Sale: Prices & US Legality (2026) | RoboZaps",
+      "citationPillId": 7,
+      "url": "https://robozaps.com/categories/humanoids",
+      "domain": "robozaps.com",
+      "description": "Costs range from $299 (Robosen … up to $830,000–$960,000. Purchased directly via manufacturer stores, authorized distributors, or ...",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESZgHEIkXXpinletf7PClzg7PYWIjDIDjC3mgfOaALXN_gpQ8yxTuvDCOEFBBO3qTbO5JouQkwsOf3thjzjMlmqM2dv6gJgs--PiUZmpk3-LToS1MOla3WssUGOCvqU-VTcCjNGVhxuA"
+     }
+    ],
+    "markdown": "Commercial and research-grade humanoid robots available for purchase, lease, or direct order in North America span several tiers—ranging from entry-level developer models to enterprise-scale industrial platforms. [Humanoid Robots for Sale: Prices & US Legality (2026) | RoboZaps](https://robozaps.com/categories/humanoids)\n\n* * *\n\n**1\\. Developer & Research Humanoids**\n\n  * **Unitree G1**\n    * **Type:** Bipedal humanoid / developer platform\n    * **Approx. Price:** From **$13,500 USD** (base model) or higher for EDU/Pro variants ($50,000–$64,000 via specialty distributors)\n    * **Where to get it:** Orderable directly through the [Unitree Official Store](https://shop.unitree.com/products/unitree-g1) or specialized robotics vendors. [Unitree G1 – UnitreeRobotics](https://shop.unitree.com/products/unitree-g1)[Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International](https://www.robotsinternational.com/Humanoid-Robots.htm)\n\n  * **Unitree H1 / H2 Series**\n    * **Type:** Full-size bipedal humanoids\n    * **Approx. Price:** **$29,900 – $90,000+ USD** (depending on the generation and EDU add-ons)\n    * **Where to get it:** Available via Unitree Official Store or global industrial robotics brokers. [Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International](https://www.robotsinternational.com/Humanoid-Robots.htm)[Unitree G1 – UnitreeRobotics](https://shop.unitree.com/products/unitree-g1)\n\n  * **EngineAI T800 Pro**\n    * **Type:** Bipedal general-purpose humanoid\n    * **Approx. Price:** **$63,000 USD**\n    * **Where to get it:** Offered through North American commercial robotics distributors like [Robots International](https://www.robotsinternational.com/Humanoid-Robots.htm). [Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International](https://www.robotsinternational.com/Humanoid-Robots.htm)\n\n* * *\n\n**2\\. Industrial & Commercial Deployment Humanoids**\n\n  * **Agility Robotics Digit**\n    * **Type:** Bipedal logistics and warehouse humanoid\n    * **Approx. Price:** **$200,000 USD** (direct purchase + deployment/software fees) or **$8,500/month** via a Robot-as-a-Service (RaaS) lease model.\n    * **Where to get it:** Enterprise allocation and pilot-to-fleet leasing via Agility Robotics. [Humanoid Robots for Sale: Prices & US Legality (2026) | RoboZaps](https://robozaps.com/categories/humanoids)[Agility's Digit humanoid robot costs $8,500 a month - The Conveyor](https://www.theconveyor.co/p/agility-robotics-digit-humanoid-robot-cost)\n\n  * **UBTECH Walker S2 / Cruzr Series**\n    * **Type:** Industrial/service humanoid\n    * **Approx. Price:** **$15,999 – $149,995 USD** depending on service vs. industrial specs.\n    * **Where to get it:** Available through select commercial automation suppliers. [Humanoid Robots for Sale - Buy for Commercial & General Purpose Use | Robots International](https://www.robotsinternational.com/Humanoid-Robots.htm)\n\n* * *\n\n**3\\. Pilot Programs & Pre-Orders (Not Yet Off-the-Shelf)**\n\n  * **Apptronik Apollo:** Available strictly via enterprise pilot scoping (estimated deployment valuation up to $50,000).\n\n  * **Figure AI (Figure 01 / 02):** Deployed through targeted commercial pilot partnerships (e.g., manufacturing and automotive testbeds) rather than public retail.\n\n  * **Tesla Optimus:** Announced for future consumer/commercial tiers, with projected mass-market availability still pending further scale-up. [Humanoid Robots for Sale: Prices & US Legality (2026) | RoboZaps](https://robozaps.com/categories/humanoids)\n\nAre you looking for a robot for **academic research/programming**, a **commercial/warehouse use case**, or just exploring what's out there? I can dive deeper into **specs, lead times, or software SDKs** for any of these models."
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "1b8c1ebe110b417fac3b13225f8c439d",
+   "charged_micro": 2400
+  }
+ }
+}

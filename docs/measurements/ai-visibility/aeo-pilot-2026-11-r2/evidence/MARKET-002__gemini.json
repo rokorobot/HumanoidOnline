@@ -1,0 +1,116 @@
+{
+ "observed_at": "2026-11-14T07:20:34+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "How many commercial humanoid robots exist?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "There is no single official global census of commercial humanoid robots—manufacturers do not publish uniform deployment totals, and industry counts differ depending on whether you count distinct models/families, units shipped to labs and developers, or units actively working on commercial floors.\n\nHowever, market audits and manufacturer disclosures paint a clear picture:\n\nDistinct commercial models/families: Industry catalog audits identify roughly 30 to 35 commercially addressable bipedal humanoid robot families on the market. Nearly all (~90%) target industrial work, logistics, or research/developer labs, while only a handful target education or consumer/home use.\n\nTotal units shipped (including research & education): The total number of commercial humanoids shipped globally is in the low tens of thousands (roughly 10,000 to 25,000+ units across all makers). Lower-cost research and developer platforms make up the bulk of shipped hardware—for example, Unitree alone has shipped thousands of G1/H1-class units to labs, schools, and early pilots, and Chinese manufacturer AGIBOT reported passing 20,000 total robots produced across its lineup in late 2026.\n\nActive commercial/industrial deployments: Actual revenue-generating deployments on factory and warehouse floors are still much smaller—typically hundreds to a few thousand units across leading players (such as Agility Robotics' Digit, UBTECH's Walker series, Figure's Figure 03, Apptronik's Apollo, and Tesla's internal Optimus pilots), with most companies scaling from dozens of pilot units toward multi-thousand-unit annual production lines.\n\nWhy the Numbers Vary So Much\n\nShipped vs. deployed: A university or startup buying a $12,000–$30,000 developer humanoid (like a Unitree G1 or Booster K1) counts as a shipped commercial unit, even if it spends most of its life in a lab.\n\nPre-orders vs. delivery: Several home-focused humanoids (such as 1X's NEO or NEURA's 4NE1) have opened pre-orders or reservations while deliveries roll out gradually.\n\nEnterprise-only contracts: High-end industrial humanoids are often leased or sold via custom enterprise contracts rather than list prices, keeping exact fleet counts private.\n\nRepresentative Commercial Platforms\n\nPlatform\nMaker\nPrimary Focus\nTypical Status / Pricing\nDigit\nAgility Robotics\nWarehouse & logistics handling\nActive enterprise deployments (hundreds of units)\nWalker S2 / U1\nUBTECH Robotics\nIndustrial assembly & consumer companion\nOver 1,000 Walker-series units delivered; U1 launched\nFigure 03\nFigure AI\nManufacturing & general tasks\nEnterprise pilots & scaling production\nApollo\nApptronik\nManufacturing & logistics\nEnterprise pilots & deployments\nG1 / H1 / R1\nUnitree Robotics\nResearch, education, light tasks\nDirect commercial sales (~$6k–$90k depending on model)\nOptimus\nTesla\nFactory tasks (long-term general purpose)\nInternal factory deployments (1,000+ units)\nNEO\n1X Technologies\nHousehold assistance\nPre-orders / phased rollout (~$20k or subscription)\n\nIn short, commercial humanoids have moved well past one-off lab prototypes—dozens of models exist and tens of thousands of units have shipped—but widespread day-to-day commercial work is still measured in the hundreds to low thousands of active machines.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Commercial humanoid robot market: 33 families, one home model",
+      "url": "https://blog.robozaps.com/b/commercial-humanoid-robots-work-not-home-2026#:~:text=We%20found%2033%20commercial%20humanoid%20robot%20families.,Fankhauser.%20Founder.%20Last%20fact%2Dchecked%20Jul%2020%2C%202026.",
+      "description": "We found 33 commercial humanoid robot families. Just one full-size model \ntargets the home. A review of 74 RoboZaps listings found 33 current, \ncommercially addre..."
+     },
+     {
+      "position": 2,
+      "label": "Commercial humanoid robot market: 33 families, one home model",
+      "url": "https://blog.robozaps.com/b/commercial-humanoid-robots-work-not-home-2026#:~:text=*%20Twenty%2Dnine%20of%20the%2033%20families%20were,call.%20The%20number%20that%20matters%20is%20four.",
+      "description": "* Twenty-nine of the 33 families were built for work or development. * Only \nfour served home, education or consumer uses, including one full-size home \nrobot tha..."
+     },
+     {
+      "position": 3,
+      "label": "Humanoid robotics company registry",
+      "url": "https://www.humanoidsdaily.com/companies#:~:text=raised%20a%20%24165%20million%20Series%20B%20in,converted%20vehicle%20line%20at%20its%20Fremont%20factory.",
+      "description": "raised a $165 million Series B in March 2026 at a $1.15 billion valuation. \nFounded 2024 · 13 stories. Tesla. Austin, United States. Tesla, Inc. \ndevelops Optimus..."
+     },
+     {
+      "position": 4,
+      "label": "Commercial humanoid robot market: 33 families, one home model",
+      "url": "https://blog.robozaps.com/b/commercial-humanoid-robots-work-not-home-2026#:~:text=Even%20there%2C%20configuration%2C%20stock%2C%20shipping%20and%20support,is%20not%20a%20robot%20ready%20to%20ship.",
+      "description": "Even there, configuration, stock, shipping and support affect what a buyer \ncan actually receive. The second route is a paid place in line. 1X NEO can \nbe preorde..."
+     },
+     {
+      "position": 5,
+      "label": "Humanoid Robot Market Tracker 2026 - Presenc AI",
+      "url": "https://presenc.ai/research/humanoid-robot-market-tracker-2026#:~:text=Apptronik%20Apollo.%20%24200%2C000%2B%20(commercial)%20Enterprise%20contract%20only.%20Sanctuary%20Phoenix.%20~%24250%2C000%20(estimated)%20Enterprise%20contract%20only.",
+      "description": "Apptronik Apollo. $200,000+ (commercial) Enterprise contract only. \nSanctuary Phoenix. ~$250,000 (estimated) Enterprise contract only."
+     },
+     {
+      "position": 6,
+      "label": "Humanoid Robot Market Tracker 2026 - Presenc AI",
+      "url": "https://presenc.ai/research/humanoid-robot-market-tracker-2026#:~:text=Tesla%2C%20Figure%2C%20and%201X%20each%20train%20proprietary,Walker%20S2%20%7C%20~200%20in%20pilots%20%7C",
+      "description": "Tesla, Figure, and 1X each train proprietary models on their respective \nfleets. Table_title: Humanoid Robot Manufacturers (May 2026) Table_content: \n| Company | ..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Commercial humanoid robot market: 33 families, one home model",
+      "url": "https://blog.robozaps.com/b/commercial-humanoid-robots-work-not-home-2026#:~:text=We%20found%2033%20commercial%20humanoid%20robot%20families.,Fankhauser.%20Founder.%20Last%20fact%2Dchecked%20Jul%2020%2C%202026.",
+      "domain": "blog.robozaps.com",
+      "position": 1,
+      "description": "We found 33 commercial humanoid robot families. Just one full-size model \ntargets the home. A review of 74 RoboZaps listings found 33 current, \ncommercially addre...",
+      "citationPillId": 1
+     },
+     {
+      "label": "Commercial humanoid robot market: 33 families, one home model",
+      "url": "https://blog.robozaps.com/b/commercial-humanoid-robots-work-not-home-2026#:~:text=*%20Twenty%2Dnine%20of%20the%2033%20families%20were,call.%20The%20number%20that%20matters%20is%20four.",
+      "domain": "blog.robozaps.com",
+      "position": 2,
+      "description": "* Twenty-nine of the 33 families were built for work or development. * Only \nfour served home, education or consumer uses, including one full-size home \nrobot tha...",
+      "citationPillId": 1
+     },
+     {
+      "label": "Humanoid robotics company registry",
+      "url": "https://www.humanoidsdaily.com/companies#:~:text=raised%20a%20%24165%20million%20Series%20B%20in,converted%20vehicle%20line%20at%20its%20Fremont%20factory.",
+      "domain": "humanoidsdaily.com",
+      "position": 3,
+      "description": "raised a $165 million Series B in March 2026 at a $1.15 billion valuation. \nFounded 2024 · 13 stories. Tesla. Austin, United States. Tesla, Inc. \ndevelops Optimus...",
+      "citationPillId": 2
+     },
+     {
+      "label": "Commercial humanoid robot market: 33 families, one home model",
+      "url": "https://blog.robozaps.com/b/commercial-humanoid-robots-work-not-home-2026#:~:text=Even%20there%2C%20configuration%2C%20stock%2C%20shipping%20and%20support,is%20not%20a%20robot%20ready%20to%20ship.",
+      "domain": "blog.robozaps.com",
+      "position": 4,
+      "description": "Even there, configuration, stock, shipping and support affect what a buyer \ncan actually receive. The second route is a paid place in line. 1X NEO can \nbe preorde...",
+      "citationPillId": 3
+     },
+     {
+      "label": "Humanoid Robot Market Tracker 2026 - Presenc AI",
+      "url": "https://presenc.ai/research/humanoid-robot-market-tracker-2026#:~:text=Apptronik%20Apollo.%20%24200%2C000%2B%20(commercial)%20Enterprise%20contract%20only.%20Sanctuary%20Phoenix.%20~%24250%2C000%20(estimated)%20Enterprise%20contract%20only.",
+      "domain": "presenc.ai",
+      "position": 5,
+      "description": "Apptronik Apollo. $200,000+ (commercial) Enterprise contract only. \nSanctuary Phoenix. ~$250,000 (estimated) Enterprise contract only.",
+      "citationPillId": 4
+     },
+     {
+      "label": "Humanoid Robot Market Tracker 2026 - Presenc AI",
+      "url": "https://presenc.ai/research/humanoid-robot-market-tracker-2026#:~:text=Tesla%2C%20Figure%2C%20and%201X%20each%20train%20proprietary,Walker%20S2%20%7C%20~200%20in%20pilots%20%7C",
+      "domain": "presenc.ai",
+      "position": 6,
+      "description": "Tesla, Figure, and 1X each train proprietary models on their respective \nfleets. Table_title: Humanoid Robot Manufacturers (May 2026) Table_content: \n| Company | ...",
+      "citationPillId": 5
+     }
+    ],
+    "markdown": "There is no single official global census of commercial humanoid robots—manufacturers do not publish uniform deployment totals, and industry counts differ depending on whether you count **distinct models/families**, **units shipped to labs and developers**, or **units actively working on commercial floors**.\n\nHowever, market audits and manufacturer disclosures paint a clear picture:\n\n  * **Distinct commercial models/families:** Industry catalog audits identify roughly **30 to 35 commercially addressable bipedal humanoid robot families** on the market. Nearly all (~90%) target industrial work, logistics, or research/developer labs, while only a handful target education or consumer/home use. [Commercial humanoid robot market: 33 families, one home model](https://blog.robozaps.com/b/commercial-humanoid-robots-work-not-home-2026#:~:text=We%20found%2033%20commercial%20humanoid%20robot%20families.,Fankhauser.%20Founder.%20Last%20fact%2Dchecked%20Jul%2020%2C%202026.)[Commercial humanoid robot market: 33 families, one home model](https://blog.robozaps.com/b/commercial-humanoid-robots-work-not-home-2026#:~:text=*%20Twenty%2Dnine%20of%20the%2033%20families%20were,call.%20The%20number%20that%20matters%20is%20four.)\n\n  * **Total units shipped (including research & education):** The total number of commercial humanoids shipped globally is in the **low tens of thousands** (roughly **10,000 to 25,000+ units** across all makers). Lower-cost research and developer platforms make up the bulk of shipped hardware—for example, Unitree alone has shipped thousands of G1/H1-class units to labs, schools, and early pilots, and Chinese manufacturer AGIBOT reported passing 20,000 total robots produced across its lineup in late 2026.\n\n  * **Active commercial/industrial deployments:** Actual revenue-generating deployments on factory and warehouse floors are still much smaller—typically **hundreds to a few thousand units** across leading players (such as Agility Robotics' Digit, UBTECH's Walker series, Figure's Figure 03, Apptronik's Apollo, and Tesla's internal Optimus pilots), with most companies scaling from dozens of pilot units toward multi-thousand-unit annual production lines. [Humanoid robotics company registry](https://www.humanoidsdaily.com/companies#:~:text=raised%20a%20%24165%20million%20Series%20B%20in,converted%20vehicle%20line%20at%20its%20Fremont%20factory.)\n\n### Why the Numbers Vary So Much\n\n  * **Shipped vs. deployed:** A university or startup buying a $12,000–$30,000 developer humanoid (like a Unitree G1 or Booster K1) counts as a shipped commercial unit, even if it spends most of its life in a lab.\n\n  * **Pre-orders vs. delivery:** Several home-focused humanoids (such as 1X's NEO or NEURA's 4NE1) have opened pre-orders or reservations while deliveries roll out gradually. [Commercial humanoid robot market: 33 families, one home model](https://blog.robozaps.com/b/commercial-humanoid-robots-work-not-home-2026#:~:text=Even%20there%2C%20configuration%2C%20stock%2C%20shipping%20and%20support,is%20not%20a%20robot%20ready%20to%20ship.)\n\n  * **Enterprise-only contracts:** High-end industrial humanoids are often leased or sold via custom enterprise contracts rather than list prices, keeping exact fleet counts private. [Humanoid Robot Market Tracker 2026 - Presenc AI](https://presenc.ai/research/humanoid-robot-market-tracker-2026#:~:text=Apptronik%20Apollo.%20%24200%2C000%2B%20\\(commercial\\)%20Enterprise%20contract%20only.%20Sanctuary%20Phoenix.%20~%24250%2C000%20\\(estimated\\)%20Enterprise%20contract%20only.)\n\n### Representative Commercial Platforms\n\n| Platform | Maker | Primary Focus | Typical Status / Pricing |\n|--------------------|-------------------|-------------------------------------------|--------------------------------------------------------|\n| **Digit** |  Agility Robotics | Warehouse & logistics handling | Active enterprise deployments (hundreds of units) |\n| **Walker S2 / U1** |  UBTECH Robotics  | Industrial assembly & consumer companion  | Over 1,000 Walker-series units delivered; U1 launched  |\n| **Figure 03** |  Figure AI | Manufacturing & general tasks | Enterprise pilots & scaling production |\n| **Apollo** |  Apptronik | Manufacturing & logistics | Enterprise pilots & deployments |\n| **G1 / H1 / R1** |  Unitree Robotics | Research, education, light tasks | Direct commercial sales (~$6k–$90k depending on model) |\n| **Optimus** |  Tesla | Factory tasks (long-term general purpose) | Internal factory deployments (1,000+ units) |\n| **NEO** |  1X Technologies  | Household assistance | Pre-orders / phased rollout (~$20k or subscription) |\n\nIn short, commercial humanoids have moved well past one-off lab prototypes—dozens of models exist and tens of thousands of units have shipped—but widespread day-to-day commercial work is still measured in the **hundreds to low thousands** of active machines. [Humanoid Robot Market Tracker 2026 - Presenc AI](https://presenc.ai/research/humanoid-robot-market-tracker-2026#:~:text=Tesla%2C%20Figure%2C%20and%201X%20each%20train%20proprietary,Walker%20S2%20%7C%20~200%20in%20pilots%20%7C)"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "697f584cd0884807be32a47ad9c870ef",
+   "charged_micro": 2400
+  }
+ }
+}

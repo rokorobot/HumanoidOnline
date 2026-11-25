@@ -1,0 +1,142 @@
+{
+ "observed_at": "2026-11-14T07:16:42+00:00",
+ "endpoint": "cloro.google.serp.ai_mode",
+ "request": {
+  "prompt": "Which humanoid robots can be purchased in Asia?",
+  "gl": "DE",
+  "hl": "en",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "Asia—led heavily by China, Japan, and South Korea—is the global epicenter of humanoid robot manufacturing and commercial availability. Several production-grade and research-focused humanoid robots can be purchased directly or through regional distributors:\n\n1. Unitree Robotics (China)\n\nUnitree R1 (~$4,900 USD): An entry-level, lightweight bipedal humanoid (~29 kg) designed for research, education, and hobbyists. It can be found via the Unitree Official Store or regional tech suppliers like RobotsAsia.\n\nUnitree G1 (From $13,500 – $16,000+ USD): A highly flexible, next-generation human-sized robot featuring 23 to 43 joints and voice/AI integration. Available on the Unitree Official Store.\n\nUnitree H2 / H2 Plus ($29,900 – $100,000 USD): Larger, higher-torque industrial and enterprise-class humanoid models.\n\n2. UBTech Robotics (China)\n\nUBTech Walker Series (e.g., Walker Tienkung) ($65,000 – $115,000 USD): Advanced embodied-intelligence humanoids built for voice/vision interaction, smart services, and multi-scene enterprise deployment. Available through specialty commercial distributors like RobotsAsia.\n\n3. Fourier Intelligence (China)\n\nFourier GR-3 Care-Bot (~$99,870 USD): A specialized humanoid robot engineered for elder care, healthcare assistance, and interactive caregiving roles, available via industrial robotics distributors.\n\n4. AgiBot (China)\n\nAgiBot X2 & X2 Ultra ($27,999 – $42,999 USD): Humanoid platforms tailored for retail, events, museums, and public engagement, with modular options like the OmniHand dexterous system.\n\n5. Deep Robotics (China)\n\nDeep Robotics DR02 (~$75,600 USD): All-weather, industrial-grade humanoid/bipedal hybrid systems designed for rugged inspection and heavy-duty tasks.\n\nAre you looking for a humanoid robot for entry-level/education, software development/research, or heavy industrial/commercial deployment? Let me know your budget or preferred use case to narrow down the best option.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "UnitreeRobotics-More than Wisdom, Be with You",
+      "url": "https://shop.unitree.com/",
+      "description": "Unitree Robotics produces consumer and industry-grade quadruped robots, humanoid robots, and dexterous robotic arms. Humanoid Robo...",
+      "redirectLink": "https://www.google.com/goto?url=CAESVQHEIkXXtqsZYDJraT__GL3qQryl2MOCN30kfx6beD204xA3LrY4T_NZUyYwKIbOxfijPL1wk9FobcIQv4svfpprY183d-UYfSlsaq98G8jGq8pJWDU"
+     },
+     {
+      "position": 2,
+      "label": "RobotsAsia.com – Buy Humanoid, Quadruped, Industrial & AI ...",
+      "url": "https://www.robotsasia.com/",
+      "description": "Deep Robotics DR02 All-Weather Industrial Grade Humanoid Robot US$75,600.00. As low as US$8,495.75",
+      "redirectLink": "https://www.google.com/goto?url=CAESVwHEIkXXE18lIyXdiAcgsFmPYh4H7NWyHYWaNg16CfQKHuOGuWLFM1dnONEwPO_1N24UkaOhNXj_HMS3Or7ucAqFG_DSon-A1LWvWJnUFKqVbQf_1oBwyA"
+     },
+     {
+      "position": 3,
+      "label": "AgiBot Robot Price Guide 2026: Every Model and What It Costs",
+      "url": "https://globaldronehq.com/blogs/guides/agibot-robot-price-guide-2026",
+      "description": "AgiBot X2 Humanoid, 131 cm $27,999 Events, booths, retail Available AgiBot X2 Ultra Humanoid, 131 cm $42,999 Lobbies, museums, res...",
+      "redirectLink": "https://www.google.com/goto?url=CAESgAEBxCJF1ybzeozS4-kYMqZ5Mh87om7tJxI56nxioaRHG47KWI3yL7ULHJZ8uJxeS7j16AYvPbRTrJySR-myGxDmcQy9plb0YQTwPgNyOciS1uLIcm6RTPfKEl5WBT2S-Ct1k7yAg67wa6Jh85vYdLJp9bPDCFgJxNmP5MT9UtOAQg"
+     },
+     {
+      "position": 4,
+      "label": "New Arrivals",
+      "url": "https://www.robotsasia.com/New-Robots.htm",
+      "description": "The global humanoid robot market shipped approximately 13,000 to 20,000 units in 2025, with China accounting for roughly 90 percen...",
+      "redirectLink": "https://www.google.com/goto?url=CAESZQHEIkXXcUVXdAe-4_HV0kILOiX61Ok3L1fVN11APfxr-vZeJOlP5GKB1xRSXnqzACj-RUSoDYecSL2zLbkWw2A6bLWcjNNAMJVlyYtxh3RKznaVC5QHjcHwdh9jVBTuB-9gtDyJ"
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "New Arrivals",
+      "citationPillId": 1,
+      "url": "https://www.robotsasia.com/New-Robots.htm",
+      "domain": "robotsasia.com",
+      "description": "The global humanoid robot market shipped approximately 13,000 to 20,000 units in 2025, with China accounting for roughly 90 percen...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAESZQHEIkXXcUVXdAe-4_HV0kILOiX61Ok3L1fVN11APfxr-vZeJOlP5GKB1xRSXnqzACj-RUSoDYecSL2zLbkWw2A6bLWcjNNAMJVlyYtxh3RKznaVC5QHjcHwdh9jVBTuB-9gtDyJ"
+     },
+     {
+      "label": "New Arrivals",
+      "citationPillId": 2,
+      "url": "https://www.robotsasia.com/New-Robots.htm",
+      "domain": "robotsasia.com",
+      "description": "The global humanoid robot market shipped approximately 13,000 to 20,000 units in 2025, with China accounting for roughly 90 percen...",
+      "position": 4,
+      "redirectLink": "https://www.google.com/goto?url=CAESZQHEIkXXcUVXdAe-4_HV0kILOiX61Ok3L1fVN11APfxr-vZeJOlP5GKB1xRSXnqzACj-RUSoDYecSL2zLbkWw2A6bLWcjNNAMJVlyYtxh3RKznaVC5QHjcHwdh9jVBTuB-9gtDyJ"
+     },
+     {
+      "label": "RobotsAsia.com – Buy Humanoid, Quadruped, Industrial & AI ...",
+      "citationPillId": 2,
+      "url": "https://www.robotsasia.com/",
+      "domain": "robotsasia.com",
+      "description": "Deep Robotics DR02 All-Weather Industrial Grade Humanoid Robot US$75,600.00. As low as US$8,495.75",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESVwHEIkXXE18lIyXdiAcgsFmPYh4H7NWyHYWaNg16CfQKHuOGuWLFM1dnONEwPO_1N24UkaOhNXj_HMS3Or7ucAqFG_DSon-A1LWvWJnUFKqVbQf_1oBwyA"
+     },
+     {
+      "label": "UnitreeRobotics-More than Wisdom, Be with You",
+      "citationPillId": 3,
+      "url": "https://shop.unitree.com/",
+      "domain": "shop.unitree.com",
+      "description": "Unitree Robotics produces consumer and industry-grade quadruped robots, humanoid robots, and dexterous robotic arms. Humanoid Robo...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESVQHEIkXXtqsZYDJraT__GL3qQryl2MOCN30kfx6beD204xA3LrY4T_NZUyYwKIbOxfijPL1wk9FobcIQv4svfpprY183d-UYfSlsaq98G8jGq8pJWDU"
+     },
+     {
+      "label": "UnitreeRobotics-More than Wisdom, Be with You",
+      "citationPillId": 4,
+      "url": "https://shop.unitree.com/",
+      "domain": "shop.unitree.com",
+      "description": "Unitree Robotics produces consumer and industry-grade quadruped robots, humanoid robots, and dexterous robotic arms. Humanoid Robo...",
+      "position": 1,
+      "redirectLink": "https://www.google.com/goto?url=CAESVQHEIkXXtqsZYDJraT__GL3qQryl2MOCN30kfx6beD204xA3LrY4T_NZUyYwKIbOxfijPL1wk9FobcIQv4svfpprY183d-UYfSlsaq98G8jGq8pJWDU"
+     },
+     {
+      "label": "RobotsAsia.com – Buy Humanoid, Quadruped, Industrial & AI ...",
+      "citationPillId": 5,
+      "url": "https://www.robotsasia.com/",
+      "domain": "robotsasia.com",
+      "description": "Deep Robotics DR02 All-Weather Industrial Grade Humanoid Robot US$75,600.00. As low as US$8,495.75",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESVwHEIkXXE18lIyXdiAcgsFmPYh4H7NWyHYWaNg16CfQKHuOGuWLFM1dnONEwPO_1N24UkaOhNXj_HMS3Or7ucAqFG_DSon-A1LWvWJnUFKqVbQf_1oBwyA"
+     },
+     {
+      "label": "RobotsAsia.com – Buy Humanoid, Quadruped, Industrial & AI ...",
+      "citationPillId": 6,
+      "url": "https://www.robotsasia.com/",
+      "domain": "robotsasia.com",
+      "description": "Deep Robotics DR02 All-Weather Industrial Grade Humanoid Robot US$75,600.00. As low as US$8,495.75",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESVwHEIkXXE18lIyXdiAcgsFmPYh4H7NWyHYWaNg16CfQKHuOGuWLFM1dnONEwPO_1N24UkaOhNXj_HMS3Or7ucAqFG_DSon-A1LWvWJnUFKqVbQf_1oBwyA"
+     },
+     {
+      "label": "AgiBot Robot Price Guide 2026: Every Model and What It Costs",
+      "citationPillId": 7,
+      "url": "https://globaldronehq.com/blogs/guides/agibot-robot-price-guide-2026",
+      "domain": "globaldronehq.com",
+      "description": "AgiBot X2 Humanoid, 131 cm $27,999 Events, booths, retail Available AgiBot X2 Ultra Humanoid, 131 cm $42,999 Lobbies, museums, res...",
+      "position": 3,
+      "redirectLink": "https://www.google.com/goto?url=CAESgAEBxCJF1ybzeozS4-kYMqZ5Mh87om7tJxI56nxioaRHG47KWI3yL7ULHJZ8uJxeS7j16AYvPbRTrJySR-myGxDmcQy9plb0YQTwPgNyOciS1uLIcm6RTPfKEl5WBT2S-Ct1k7yAg67wa6Jh85vYdLJp9bPDCFgJxNmP5MT9UtOAQg"
+     },
+     {
+      "label": "RobotsAsia.com – Buy Humanoid, Quadruped, Industrial & AI ...",
+      "citationPillId": 8,
+      "url": "https://www.robotsasia.com/",
+      "domain": "robotsasia.com",
+      "description": "Deep Robotics DR02 All-Weather Industrial Grade Humanoid Robot US$75,600.00. As low as US$8,495.75",
+      "position": 2,
+      "redirectLink": "https://www.google.com/goto?url=CAESVwHEIkXXE18lIyXdiAcgsFmPYh4H7NWyHYWaNg16CfQKHuOGuWLFM1dnONEwPO_1N24UkaOhNXj_HMS3Or7ucAqFG_DSon-A1LWvWJnUFKqVbQf_1oBwyA"
+     }
+    ],
+    "markdown": "Asia—led heavily by China, Japan, and South Korea—is the global epicenter of humanoid robot manufacturing and commercial availability. Several production-grade and research-focused humanoid robots can be purchased directly or through regional distributors: [New Arrivals](https://www.robotsasia.com/New-Robots.htm)\n\n1\\. Unitree Robotics (China)\n\n  * **Unitree R1** (~$4,900 USD): An entry-level, lightweight bipedal humanoid (~29 kg) designed for research, education, and hobbyists. It can be found via the [Unitree Official Store](https://shop.unitree.com/?srsltid=AYCX9vJzi--abjKxUx2lI4Bao-CozzPJSquV_jl9uQ88JkhyViwUqSNE) or regional tech suppliers like [RobotsAsia](https://www.robotsasia.com/). [New Arrivals](https://www.robotsasia.com/New-Robots.htm)[RobotsAsia.com – Buy Humanoid, Quadruped, Industrial & AI](https://www.robotsasia.com/)\n\n  * **Unitree G1** (From $13,500 – $16,000+ USD): A highly flexible, next-generation human-sized robot featuring 23 to 43 joints and voice/AI integration. Available on the Unitree Official Store. [UnitreeRobotics-More than Wisdom, Be with You](https://shop.unitree.com/)\n\n  * **Unitree H2 / H2 Plus** ($29,900 – $100,000 USD): Larger, higher-torque industrial and enterprise-class humanoid models. [UnitreeRobotics-More than Wisdom, Be with You](https://shop.unitree.com/)\n\n2\\. UBTech Robotics (China)\n\n  * **UBTech Walker Series (e.g., Walker Tienkung)** ($65,000 – $115,000 USD): Advanced embodied-intelligence humanoids built for voice/vision interaction, smart services, and multi-scene enterprise deployment. Available through specialty commercial distributors like RobotsAsia. [RobotsAsia.com – Buy Humanoid, Quadruped, Industrial & AI](https://www.robotsasia.com/)\n\n3\\. Fourier Intelligence (China)\n\n  * **Fourier GR-3 Care-Bot** (~$99,870 USD): A specialized humanoid robot engineered for elder care, healthcare assistance, and interactive caregiving roles, available via industrial robotics distributors. [RobotsAsia.com – Buy Humanoid, Quadruped, Industrial & AI](https://www.robotsasia.com/)\n\n4\\. AgiBot (China)\n\n  * **AgiBot X2 & X2 Ultra** ($27,999 – $42,999 USD): Humanoid platforms tailored for retail, events, museums, and public engagement, with modular options like the OmniHand dexterous system. [AgiBot Robot Price Guide 2026: Every Model and What It Costs](https://globaldronehq.com/blogs/guides/agibot-robot-price-guide-2026)\n\n5\\. Deep Robotics (China)\n\n  * **Deep Robotics DR02** (~$75,600 USD): All-weather, industrial-grade humanoid/bipedal hybrid systems designed for rugged inspection and heavy-duty tasks. [RobotsAsia.com – Buy Humanoid, Quadruped, Industrial & AI](https://www.robotsasia.com/)\n\nAre you looking for a humanoid robot for **entry-level/education**, **software development/research**, or **heavy industrial/commercial deployment**? Let me know your budget or preferred use case to narrow down the best option."
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "96b4595602334299879459abb2a2c717",
+   "charged_micro": 2400
+  }
+ }
+}

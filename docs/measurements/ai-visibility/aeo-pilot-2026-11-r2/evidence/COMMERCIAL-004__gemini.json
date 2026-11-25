@@ -1,0 +1,144 @@
+{
+ "observed_at": "2026-11-14T07:15:41+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "Which humanoid robots can be purchased in North America?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "The market for humanoid robots in North America has grown rapidly, offering options ranging from developer-focused bipedal platforms available via direct e-commerce to heavy-duty industrial units deployed via enterprise contracts.\n\nDepending on whether you are looking for a research platform, an industrial automation tool, or an enterprise pilot, several humanoid robots are accessible in North America:\n\n1. Directly Purchasable (E-Commerce & Tech Distributors)\n\nThese robots can be ordered online through robotics distributors (such as RobotShop) or manufacturers' web shops for research, education, and software development:\n\nUnitree G1 & H-Series (Unitree Robotics): Unitree offers some of the most accessible bipedal humanoid platforms on the market. The Unitree G1 (starting around $16,000–$19,000 base) and higher-tier EDU versions are widely available for purchase in North America for AI research and lab deployment.\n\nBooster Robotics K1 & T-Series: Models like the Booster K1 (educational/professional variants) and T-series are available through specialized North American robotics suppliers for roughly $11,000 to over $50,000 depending on the dexterity hands and software package selected.\n\nLimX Dynamics TRON 2 / CL-1: Embodied research and developer platforms from LimX are offered via North American automation distributors.\n\n2. Enterprise B2B & Industrial Pilots (Request for Quote)\n\nMost commercial humanoid robots designed for factory automation, logistics, and automotive assembly cannot simply be bought off-the-shelf. Instead, they require a business onboarding process, enterprise agreement, or Robot-as-a-Service (RaaS) model:\n\nDigit (Agility Robotics): Built specifically for warehouse logistics (tote handling and moving items), Digit is actively deployed in North America (including pilot programs with companies like Amazon). Procurement is handled via a direct corporate Request for Quote (RFQ).\n\nFigure 01 / Figure 02 (Figure AI): Focused on heavy manufacturing and assembly line tasks, Figure deploys its robots primarily through strategic commercial partnerships (such as with automotive manufacturers).\n\nPhoenix (Sanctuary AI): A high-dexterity humanoid designed for commercial and light manufacturing tasks, available through structured enterprise pilot agreements.\n\nTesla Optimus: While Tesla has targeted a future consumer price point under $20,000, availability is currently prioritized for internal factory deployment and controlled enterprise partners rather than public retail sale.\n\nSummary Advice for Buyers\n\nFor individual developers, universities, and labs: Brands like Unitree provide immediate checkout options through robotics hardware platforms.\n\nFor businesses and warehouses: Procurement requires reaching out directly to enterprise sales teams for custom integration, safety compliance, and software support packages.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=Commercial%20Availability%3A%20The%20robot%20can%20be%20ordered,Manufacturer%20%7C%20Primary%20Target%20Use%2DCase%20%7C%20Est.",
+      "description": "Commercial Availability: The robot can be ordered directly via e-commerce \nor through established global tech-retail distributors (such as RobotShop). \nTable_titl..."
+     },
+     {
+      "position": 2,
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=compliance%20certifications%20pending%20pilot%20expansion%20%7C%20%7C,or%20certified%20regional%20distributors%20%7C%20CE%20Mark%3B",
+      "description": "compliance certifications pending pilot expansion | | Figure 02/03 (Figure \nAI) | Automotive assembly, structural picking | $30,000 - $150,000 \n(Projected scale) ..."
+     },
+     {
+      "position": 3,
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=Digit%20remains%20the%20industrial%20pioneer%20in%20the,running%20pilot%20shifts%20inside%20Amazon's%20fulfillment%20centers.",
+      "description": "Digit remains the industrial pioneer in the bipedal warehouse space, \nspecifically optimized for repetitive tote recycling and sorting workflows. \n* The Hardware ..."
+     },
+     {
+      "position": 4,
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=Base%20Price%20%2F%20Model%20%7C%20Lead%20Time,months%20build%2Dto%2Dorder%20window%20%7C%20ISO%2013482%20Compliant%3B",
+      "description": "Base Price / Model | Lead Time & Ordering Pathway | E-E-A-T Safety & \nRegulatory Status | | --- | --- | --- | --- | --- | | Digit (Agility \nRobotics) | Logistics,..."
+     },
+     {
+      "position": 5,
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=certified%20for%20co%2Dbot%20spaces%20%7C%20%7C%20Optimus,automotive%20partners%20%7C%20OpenAI%20embodied%20intelligence%20partnership%3B",
+      "description": "certified for co-bot spaces | | Optimus Gen 3 (Tesla) | In-house \nmanufacturing, future home automation | < $20,000 (Targeted at scale) | \nInternal scaling priori..."
+     },
+     {
+      "position": 6,
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=active%20multi%2Dunit%20pilots%20with%20Amazon%20%7C%20%7C,on%20Tesla%20Account%20%7C%20FSD%20Network%20integration%3B",
+      "description": "active multi-unit pilots with Amazon | | Phoenix (Sanctuary AI) | \nHigh-dexterity retail, light manufacturing | $150,000 - $300,000 (Pilot \nrestricted) | Structur..."
+     },
+     {
+      "position": 7,
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=*%20The%20Hardware%20Specs%3A%20Optimus%20Gen%203,updates%20directly%20through%20their%20commercial%20Tesla%20Accounts.",
+      "description": "* The Hardware Specs: Optimus Gen 3 stands 5'8\" tall and weighs 125 pounds. \nIt utilizes custom-engineered in-house actuators that allow for highly \nfluid, human-..."
+     },
+     {
+      "position": 8,
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=field%2Dtested%20at%20BMW%20Spartanburg%20%7C%20%7C%20G1,open%2Dsource%20ROS%2FAPI%20infrastructure%20for%20open%20research%20%7C",
+      "description": "field-tested at BMW Spartanburg | | G1 / H1 (Unitree Robotics) | Advanced \nresearch, low-cost lab development | $16,000 (G1 base) $90,000 (H1) | \nDirect e-commerc..."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=Commercial%20Availability%3A%20The%20robot%20can%20be%20ordered,Manufacturer%20%7C%20Primary%20Target%20Use%2DCase%20%7C%20Est.",
+      "domain": "keyirobot.com",
+      "position": 1,
+      "description": "Commercial Availability: The robot can be ordered directly via e-commerce \nor through established global tech-retail distributors (such as RobotShop). \nTable_titl...",
+      "citationPillId": 1
+     },
+     {
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=compliance%20certifications%20pending%20pilot%20expansion%20%7C%20%7C,or%20certified%20regional%20distributors%20%7C%20CE%20Mark%3B",
+      "domain": "keyirobot.com",
+      "position": 2,
+      "description": "compliance certifications pending pilot expansion | | Figure 02/03 (Figure \nAI) | Automotive assembly, structural picking | $30,000 - $150,000 \n(Projected scale) ...",
+      "citationPillId": 2
+     },
+     {
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=Digit%20remains%20the%20industrial%20pioneer%20in%20the,running%20pilot%20shifts%20inside%20Amazon's%20fulfillment%20centers.",
+      "domain": "keyirobot.com",
+      "position": 3,
+      "description": "Digit remains the industrial pioneer in the bipedal warehouse space, \nspecifically optimized for repetitive tote recycling and sorting workflows. \n* The Hardware ...",
+      "citationPillId": 3
+     },
+     {
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=Base%20Price%20%2F%20Model%20%7C%20Lead%20Time,months%20build%2Dto%2Dorder%20window%20%7C%20ISO%2013482%20Compliant%3B",
+      "domain": "keyirobot.com",
+      "position": 4,
+      "description": "Base Price / Model | Lead Time & Ordering Pathway | E-E-A-T Safety & \nRegulatory Status | | --- | --- | --- | --- | --- | | Digit (Agility \nRobotics) | Logistics,...",
+      "citationPillId": 3
+     },
+     {
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=certified%20for%20co%2Dbot%20spaces%20%7C%20%7C%20Optimus,automotive%20partners%20%7C%20OpenAI%20embodied%20intelligence%20partnership%3B",
+      "domain": "keyirobot.com",
+      "position": 5,
+      "description": "certified for co-bot spaces | | Optimus Gen 3 (Tesla) | In-house \nmanufacturing, future home automation | < $20,000 (Targeted at scale) | \nInternal scaling priori...",
+      "citationPillId": 4
+     },
+     {
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=active%20multi%2Dunit%20pilots%20with%20Amazon%20%7C%20%7C,on%20Tesla%20Account%20%7C%20FSD%20Network%20integration%3B",
+      "domain": "keyirobot.com",
+      "position": 6,
+      "description": "active multi-unit pilots with Amazon | | Phoenix (Sanctuary AI) | \nHigh-dexterity retail, light manufacturing | $150,000 - $300,000 (Pilot \nrestricted) | Structur...",
+      "citationPillId": 5
+     },
+     {
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=*%20The%20Hardware%20Specs%3A%20Optimus%20Gen%203,updates%20directly%20through%20their%20commercial%20Tesla%20Accounts.",
+      "domain": "keyirobot.com",
+      "position": 7,
+      "description": "* The Hardware Specs: Optimus Gen 3 stands 5'8\" tall and weighs 125 pounds. \nIt utilizes custom-engineered in-house actuators that allow for highly \nfluid, human-...",
+      "citationPillId": 6
+     },
+     {
+      "label": "Every Humanoid Robot for Sale in 2026: Prices & Guide",
+      "url": "https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=field%2Dtested%20at%20BMW%20Spartanburg%20%7C%20%7C%20G1,open%2Dsource%20ROS%2FAPI%20infrastructure%20for%20open%20research%20%7C",
+      "domain": "keyirobot.com",
+      "position": 8,
+      "description": "field-tested at BMW Spartanburg | | G1 / H1 (Unitree Robotics) | Advanced \nresearch, low-cost lab development | $16,000 (G1 base) $90,000 (H1) | \nDirect e-commerc...",
+      "citationPillId": 7
+     }
+    ],
+    "markdown": "The market for humanoid robots in North America has grown rapidly, offering options ranging from developer-focused bipedal platforms available via direct e-commerce to heavy-duty industrial units deployed via enterprise contracts. [Every Humanoid Robot for Sale in 2026: Prices & Guide](https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=Commercial%20Availability%3A%20The%20robot%20can%20be%20ordered,Manufacturer%20%7C%20Primary%20Target%20Use%2DCase%20%7C%20Est.)\n\nDepending on whether you are looking for a research platform, an industrial automation tool, or an enterprise pilot, several humanoid robots are accessible in North America:\n\n### 1\\. Directly Purchasable (E-Commerce & Tech Distributors)\n\nThese robots can be ordered online through robotics distributors (such as RobotShop) or manufacturers' web shops for research, education, and software development:\n\n  * **Unitree G1 & H-Series (Unitree Robotics):** Unitree offers some of the most accessible bipedal humanoid platforms on the market. The Unitree G1 (starting around $16,000–$19,000 base) and higher-tier EDU versions are widely available for purchase in North America for AI research and lab deployment. [Every Humanoid Robot for Sale in 2026: Prices & Guide](https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=compliance%20certifications%20pending%20pilot%20expansion%20%7C%20%7C,or%20certified%20regional%20distributors%20%7C%20CE%20Mark%3B)\n\n  * **Booster Robotics K1 & T-Series:** Models like the Booster K1 (educational/professional variants) and T-series are available through specialized North American robotics suppliers for roughly $11,000 to over $50,000 depending on the dexterity hands and software package selected.\n\n  * **LimX Dynamics TRON 2 / CL-1:** Embodied research and developer platforms from LimX are offered via North American automation distributors.\n\n### 2\\. Enterprise B2B & Industrial Pilots (Request for Quote)\n\nMost commercial humanoid robots designed for factory automation, logistics, and automotive assembly cannot simply be bought off-the-shelf. Instead, they require a business onboarding process, enterprise agreement, or Robot-as-a-Service (RaaS) model:\n\n  * **Digit (Agility Robotics):** Built specifically for warehouse logistics (tote handling and moving items), Digit is actively deployed in North America (including pilot programs with companies like Amazon). Procurement is handled via a direct corporate Request for Quote (RFQ). [Every Humanoid Robot for Sale in 2026: Prices & Guide](https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=Digit%20remains%20the%20industrial%20pioneer%20in%20the,running%20pilot%20shifts%20inside%20Amazon's%20fulfillment%20centers.)[Every Humanoid Robot for Sale in 2026: Prices & Guide](https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=Base%20Price%20%2F%20Model%20%7C%20Lead%20Time,months%20build%2Dto%2Dorder%20window%20%7C%20ISO%2013482%20Compliant%3B)\n\n  * **Figure 01 / Figure 02 (Figure AI):** Focused on heavy manufacturing and assembly line tasks, Figure deploys its robots primarily through strategic commercial partnerships (such as with automotive manufacturers). [Every Humanoid Robot for Sale in 2026: Prices & Guide](https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=certified%20for%20co%2Dbot%20spaces%20%7C%20%7C%20Optimus,automotive%20partners%20%7C%20OpenAI%20embodied%20intelligence%20partnership%3B)\n\n  * **Phoenix (Sanctuary AI):** A high-dexterity humanoid designed for commercial and light manufacturing tasks, available through structured enterprise pilot agreements. [Every Humanoid Robot for Sale in 2026: Prices & Guide](https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=active%20multi%2Dunit%20pilots%20with%20Amazon%20%7C%20%7C,on%20Tesla%20Account%20%7C%20FSD%20Network%20integration%3B)\n\n  * **Tesla Optimus:** While Tesla has targeted a future consumer price point under $20,000, availability is currently prioritized for internal factory deployment and controlled enterprise partners rather than public retail sale. [Every Humanoid Robot for Sale in 2026: Prices & Guide](https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=*%20The%20Hardware%20Specs%3A%20Optimus%20Gen%203,updates%20directly%20through%20their%20commercial%20Tesla%20Accounts.)\n\n### Summary Advice for Buyers\n\n  * **For individual developers, universities, and labs:** Brands like **Unitree** provide immediate checkout options through robotics hardware platforms. [Every Humanoid Robot for Sale in 2026: Prices & Guide](https://keyirobot.com/blogs/buying-guide/the-complete-list-every-humanoid-robot-for-sale-on-the-market-today#:~:text=field%2Dtested%20at%20BMW%20Spartanburg%20%7C%20%7C%20G1,open%2Dsource%20ROS%2FAPI%20infrastructure%20for%20open%20research%20%7C)\n\n  * **For businesses and warehouses:** Procurement requires reaching out directly to enterprise sales teams for custom integration, safety compliance, and software support packages."
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "c37494a49f3c4f65b6de912b932cca4b",
+   "charged_micro": 2400
+  }
+ }
+}

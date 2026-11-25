@@ -1,0 +1,244 @@
+{
+ "observed_at": "2026-11-14T07:19:08+00:00",
+ "endpoint": "cloro.ai-search.chatgpt.scrape",
+ "request": {
+  "prompt": "Which humanoid robots are suitable for research?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "model": null,
+    "text": "The most suitable humanoid robot for research depends on the research area: locomotion, reinforcement learning, manipulation, computer vision, human–robot interaction, or embodied AI.\n\nFor a university or robotics research laboratory, I would shortlist Unitree G1, Unitree H1, Booster T1, PAL Robotics TALOS, Fourier GR-1, and iCub.\n\nHere is how I would compare them.\n\n1. Best humanoid robots for research\n\n1. Unitree G1\n\nBest overall choice for general robotics and AI research.\n\nManufacturer: Unitree Robotics\nHeight: Approximately 1.3 m\nWeight: Approximately 35 kg\nDegrees of freedom: Configuration-dependent, approximately 23–43\nResearch applications:\n\nReinforcement learning\nWalking and balance control\nImitation learning\nVision-language-action models\nManipulation\nSim-to-real transfer\n\nAdvantages:\n\nRelatively accessible compared with full-size humanoids.\nDeveloper SDK and simulation support.\nGrowing research community.\nSuitable for real-world AI experiments.\n\nDisadvantages:\n\nSmaller than an adult human.\nAdvanced hands and research configurations increase the cost.\nCheck low-level control access before purchasing.\n\nMy recommendation: Unitree G1 EDU rather than a basic demonstration configuration.\n\n2. Unitree H1\n\nBest for full-size humanoid locomotion research.\n\nManufacturer: Unitree Robotics\nHeight: Approximately 1.8 m\nWeight: Configuration-dependent\nResearch applications:\n\nDynamic walking and running\nWhole-body control\nReinforcement learning\nSim-to-real transfer\nHuman-scale navigation\nBalance and motion planning\n\nAdvantages:\n\nHuman-sized platform.\nSuitable for advanced locomotion experiments.\nSDK and simulation ecosystem.\nUseful for research requiring human-scale movement.\n\nDisadvantages:\n\nMore expensive and demanding to operate than G1.\nRequires a larger testing environment.\nManipulation capabilities depend on the configuration.\n\nMy recommendation: Choose H1 if your primary research involves locomotion, dynamic movement, or whole-body control.\n\n3. Booster T1\n\nBest for compact humanoid development and robot learning.\n\nManufacturer: Booster Robotics\nHeight: Approximately 1.2 m\nWeight: Approximately 30 kg\nResearch applications:\n\nReinforcement learning\nBipedal locomotion\nMotion planning\nRobot learning\nHumanoid control algorithms\n\nAdvantages:\n\nCompact and relatively lightweight.\nDesigned with robotics developers in mind.\nSuitable for laboratory experimentation.\n\nDisadvantages:\n\nSmaller physical workspace than full-size humanoids.\nCheck software documentation and low-level access for the specific version.\n\nIt is worth considering for laboratories investigating learning-based locomotion.\n\n4. PAL Robotics TALOS\n\nBest for advanced academic robotics research.\n\nManufacturer: PAL Robotics\nOrigin: Spain\nType: Full-size torque-controlled humanoid\nResearch applications:\n\nWhole-body control\nForce control\nWalking and manipulation\nHuman–robot interaction\nContact-rich manipulation\nModel predictive control\n\nAdvantages:\n\nDesigned specifically for advanced robotics research.\nTorque-controlled architecture.\nEstablished ROS-based development ecosystem.\nParticularly interesting for control-theory research.\n\nDisadvantages:\n\nExpensive research platform.\nMore complex integration and maintenance.\nRequires an experienced robotics team.\n\nMy recommendation: TALOS is particularly attractive for established university laboratories with dedicated robotics engineering resources.\n\n5. Fourier GR-1\n\nBest for manipulation and human-centred robotics research.\n\nManufacturer: Fourier Intelligence\nType: Full-size humanoid\nResearch applications:\n\nHumanoid manipulation\nHuman–robot interaction\nMotion control\nRehabilitation robotics\nEmbodied AI\n\nAdvantages:\n\nHuman-sized structure.\nDesigned for physical interaction applications.\nInteresting platform for studying humanoid manipulation.\n\nDisadvantages:\n\nVerify SDK openness and low-level actuator access.\nHardware configuration and research support need to be checked before purchase.\n\n6. iCub\n\nBest for cognitive robotics and developmental robotics.\n\nDeveloper: Italian Institute of Technology (IIT)\nType: Child-sized humanoid\nResearch applications:\n\nCognitive robotics\nDevelopmental learning\nComputer vision\nTactile perception\nHuman–robot interaction\nEmbodied intelligence\n\nAdvantages:\n\nStrong academic research heritage.\nOpen-source software ecosystem.\nDesigned around scientific experimentation.\nParticularly interesting for cognitive and developmental robotics.\n\nDisadvantages:\n\nNot designed for heavy industrial manipulation.\nSmaller than an adult human.\nRequires specialised integration and maintenance.\n\n2. Comparison table\n\nRobot\nBest research application\nResearch suitability\nUnitree G1\nAI, RL, manipulation\nExcellent\nUnitree H1\nLocomotion, whole-body control\nExcellent\nBooster T1\nBipedal locomotion, robot learning\nVery good\nPAL TALOS\nAdvanced control, force interaction\nExcellent\nFourier GR-1\nManipulation, human interaction\nVery good\niCub\nCognitive robotics, perception\nExcellent\n\nThese platforms are represented in academic research environments, including the robotics infrastructure at TU Darmstadt.\n\n3. Which robot should you choose by research area?\n\nResearch topic\nMy recommendation\nReinforcement learning\nUnitree G1\nDeep reinforcement learning\nUnitree G1 / H1\nHumanoid locomotion\nUnitree H1\nWhole-body control\nPAL TALOS / H1\nSim-to-real transfer\nUnitree G1 / H1\nDexterous manipulation\nG1 with advanced hands\nComputer vision\nG1 / iCub\nCognitive robotics\niCub\nHuman–robot interaction\niCub / Fourier GR-1\nEmbodied AI\nUnitree G1\n\n4. Important considerations before purchasing\n\nFor serious research, I would evaluate these six criteria:\n\nOpen SDK: Can you implement your own controllers?\nROS 2 support: Can you integrate the robot with your existing software?\nSimulation: Is there support for MuJoCo, Isaac Sim or Gazebo?\nLow-level control: Can you access joint positions, velocities, torques and sensor measurements?\nHardware accessibility: Can you replace actuators, hands, cameras and sensors?\nSafety: Are emergency stops, safe testing procedures and fall-protection provisions available?\n\nThe official Unitree Robotics GitHub repositories are a useful starting point for examining its SDKs and robot models.\n\n5. My final recommendation\n\nIf I were selecting robots for a university research laboratory, my shortlist would be:\n\nFirst choice: Unitree G1 EDU – Best starting point for AI, reinforcement learning, manipulation and embodied AI.\nSecond choice: Unitree H1 – For advanced full-size humanoid locomotion and control research.\nThird choice: PAL TALOS – For sophisticated control engineering and whole-body manipulation.\nFourth choice: iCub – For cognitive robotics and perception research.\n\nOne question to narrow down the selection\n\nWhat is the main research focus of your laboratory?\n\nA. Humanoid locomotion and balance control\nB. Reinforcement learning and deep reinforcement learning\nC. Embodied AI, vision-language-action models and LLM-based robotics\nD. Dexterous manipulation and robotic hands\nE. Human–robot interaction\nF. General-purpose humanoid robotics research\n\nI can then recommend the 5 most suitable humanoid robots, comparing their technical specifications, SDK/ROS 2 support, research capabilities and approximate purchasing costs in Europe.",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Unitree Robotics · GitHub",
+      "url": "https://github.com/unitreerobotics",
+      "footnote": false
+     },
+     {
+      "position": 2,
+      "label": "unitree_ros/robots/README.md at master · unitreerobotics/unitree_ros · GitHub",
+      "url": "https://github.com/unitreerobotics/unitree_ros/blob/master/robots/README.md",
+      "footnote": false
+     },
+     {
+      "position": 3,
+      "label": "Infrastructure - RIG",
+      "url": "https://robotics-institute-germany.de/project/infrastructure/",
+      "footnote": false
+     },
+     {
+      "position": 4,
+      "label": "Intelligent Autonomous Systems | Research / Our Robots",
+      "url": "https://www.ias.informatik.tu-darmstadt.de/Research/Robots",
+      "footnote": false
+     },
+     {
+      "position": 5,
+      "label": "",
+      "url": "https://humanoidroster.com/robots",
+      "footnote": true
+     },
+     {
+      "position": 6,
+      "label": "",
+      "url": "https://humanoidversus.com/lists/humanoid-robots-for-research",
+      "footnote": true
+     },
+     {
+      "position": 7,
+      "label": "",
+      "url": "https://m.joybuy.de/blog/humanoidrobotsresearchlabs/FEpbEkyY",
+      "footnote": true
+     },
+     {
+      "position": 8,
+      "label": "",
+      "url": "https://merarobotics.com/blog/which-humanoid-robot-for-university-research-lab-where-to-buy-europe",
+      "footnote": true
+     },
+     {
+      "position": 9,
+      "label": "",
+      "url": "https://webuildhumanoids.com/guides/humanoid-development-tools",
+      "footnote": true
+     },
+     {
+      "position": 10,
+      "label": "",
+      "url": "https://webuildhumanoids.com/robots",
+      "footnote": true
+     },
+     {
+      "position": 11,
+      "label": "",
+      "url": "https://www.joybuy.de/blog/humanoid-robots-ai-labs/hXh8ZT7B",
+      "footnote": true
+     },
+     {
+      "position": 12,
+      "label": "",
+      "url": "https://www.roboticscenter.ai/guides/best-humanoid-robots-research-2026",
+      "footnote": true
+     },
+     {
+      "position": 13,
+      "label": "",
+      "url": "https://www2.eecs.berkeley.edu/Pubs/TechRpts/2025/Archive/EECS-2025-207.pdf",
+      "footnote": true
+     }
+    ],
+    "entities": [
+     {
+      "type": "vehicle",
+      "name": "Unitree G1"
+     },
+     {
+      "type": "vehicle",
+      "name": "Unitree H1"
+     },
+     {
+      "type": "vehicle",
+      "name": "Booster T1"
+     },
+     {
+      "type": "vehicle",
+      "name": "PAL Robotics TALOS"
+     },
+     {
+      "type": "vehicle",
+      "name": "Fourier GR-1"
+     },
+     {
+      "type": "vehicle",
+      "name": "iCub"
+     }
+    ],
+    "map": [],
+    "followUpForm": null,
+    "markdown": "The most suitable humanoid robot for research depends on the research area: locomotion, reinforcement learning, manipulation, computer vision, human–robot interaction, or embodied AI.\n\nFor a university or robotics research laboratory, I would shortlist **Unitree G1, Unitree H1, Booster T1, PAL Robotics TALOS, Fourier GR-1, and iCub**.\n\nHere is how I would compare them.\n\n## 1. Best humanoid robots for research\n\n### 1. Unitree G1\n\n\n**Best overall choice for general robotics and AI research.**\n\n- Manufacturer: Unitree Robotics\n- Height: Approximately 1.3 m\n- Weight: Approximately 35 kg\n- Degrees of freedom: Configuration-dependent, approximately 23–43\n- Research applications:\n  - Reinforcement learning\n  - Walking and balance control\n  - Imitation learning\n  - Vision-language-action models\n  - Manipulation\n  - Sim-to-real transfer\n\n**Advantages:**\n- Relatively accessible compared with full-size humanoids.\n- Developer SDK and simulation support.\n- Growing research community.\n- Suitable for real-world AI experiments.\n\n**Disadvantages:**\n- Smaller than an adult human.\n- Advanced hands and research configurations increase the cost.\n- Check low-level control access before purchasing.\n\nMy recommendation: **Unitree G1 EDU** rather than a basic demonstration configuration.\n\n### 2. Unitree H1\n\n**Best for full-size humanoid locomotion research.**\n\n- Manufacturer: Unitree Robotics\n- Height: Approximately 1.8 m\n- Weight: Configuration-dependent\n- Research applications:\n  - Dynamic walking and running\n  - Whole-body control\n  - Reinforcement learning\n  - Sim-to-real transfer\n  - Human-scale navigation\n  - Balance and motion planning\n\n**Advantages:**\n- Human-sized platform.\n- Suitable for advanced locomotion experiments.\n- SDK and simulation ecosystem.\n- Useful for research requiring human-scale movement.\n\n**Disadvantages:**\n- More expensive and demanding to operate than G1.\n- Requires a larger testing environment.\n- Manipulation capabilities depend on the configuration.\n\nMy recommendation: Choose H1 if your primary research involves locomotion, dynamic movement, or whole-body control.\n\n### 3. Booster T1\n\n**Best for compact humanoid development and robot learning.**\n\n- Manufacturer: Booster Robotics\n- Height: Approximately 1.2 m\n- Weight: Approximately 30 kg\n- Research applications:\n  - Reinforcement learning\n  - Bipedal locomotion\n  - Motion planning\n  - Robot learning\n  - Humanoid control algorithms\n\n**Advantages:**\n- Compact and relatively lightweight.\n- Designed with robotics developers in mind.\n- Suitable for laboratory experimentation.\n\n**Disadvantages:**\n- Smaller physical workspace than full-size humanoids.\n- Check software documentation and low-level access for the specific version.\n\nIt is worth considering for laboratories investigating learning-based locomotion.\n\n### 4. PAL Robotics TALOS\n\n**Best for advanced academic robotics research.**\n\n- Manufacturer: PAL Robotics\n- Origin: Spain\n- Type: Full-size torque-controlled humanoid\n- Research applications:\n  - Whole-body control\n  - Force control\n  - Walking and manipulation\n  - Human–robot interaction\n  - Contact-rich manipulation\n  - Model predictive control\n\n**Advantages:**\n- Designed specifically for advanced robotics research.\n- Torque-controlled architecture.\n- Established ROS-based development ecosystem.\n- Particularly interesting for control-theory research.\n\n**Disadvantages:**\n- Expensive research platform.\n- More complex integration and maintenance.\n- Requires an experienced robotics team.\n\nMy recommendation: TALOS is particularly attractive for established university laboratories with dedicated robotics engineering resources.\n\n### 5. Fourier GR-1\n\n**Best for manipulation and human-centred robotics research.**\n\n- Manufacturer: Fourier Intelligence\n- Type: Full-size humanoid\n- Research applications:\n  - Humanoid manipulation\n  - Human–robot interaction\n  - Motion control\n  - Rehabilitation robotics\n  - Embodied AI\n\n**Advantages:**\n- Human-sized structure.\n- Designed for physical interaction applications.\n- Interesting platform for studying humanoid manipulation.\n\n**Disadvantages:**\n- Verify SDK openness and low-level actuator access.\n- Hardware configuration and research support need to be checked before purchase.\n\n### 6. iCub\n\n**Best for cognitive robotics and developmental robotics.**\n\n- Developer: Italian Institute of Technology (IIT)\n- Type: Child-sized humanoid\n- Research applications:\n  - Cognitive robotics\n  - Developmental learning\n  - Computer vision\n  - Tactile perception\n  - Human–robot interaction\n  - Embodied intelligence\n\n**Advantages:**\n- Strong academic research heritage.\n- Open-source software ecosystem.\n- Designed around scientific experimentation.\n- Particularly interesting for cognitive and developmental robotics.\n\n**Disadvantages:**\n- Not designed for heavy industrial manipulation.\n- Smaller than an adult human.\n- Requires specialised integration and maintenance.\n\n## 2. Comparison table\n\n| Robot | Best research application | Research suitability |\n|---|---|---|\n| Unitree G1 | AI, RL, manipulation | Excellent |\n| Unitree H1 | Locomotion, whole-body control | Excellent |\n| Booster T1 | Bipedal locomotion, robot learning | Very good |\n| PAL TALOS | Advanced control, force interaction | Excellent |\n| Fourier GR-1 | Manipulation, human interaction | Very good |\n| iCub | Cognitive robotics, perception | Excellent |\n\nThese platforms are represented in academic research environments, including the robotics infrastructure at TU Darmstadt. [ias.informatik.tu-darmstadt.de](https://www.ias.informatik.tu-darmstadt.de/Research/Robots?utm_source=chatgpt.com), [robotics-institute-germany.de](https://robotics-institute-germany.de/project/infrastructure/?utm_source=chatgpt.com)\n\n## 3. Which robot should you choose by research area?\n\n| Research topic | My recommendation |\n|---|---|\n| Reinforcement learning | Unitree G1 |\n| Deep reinforcement learning | Unitree G1 / H1 |\n| Humanoid locomotion | Unitree H1 |\n| Whole-body control | PAL TALOS / H1 |\n| Sim-to-real transfer | Unitree G1 / H1 |\n| Dexterous manipulation | G1 with advanced hands |\n| Computer vision | G1 / iCub |\n| Cognitive robotics | iCub |\n| Human–robot interaction | iCub / Fourier GR-1 |\n| Embodied AI | Unitree G1 |\n\n## 4. Important considerations before purchasing\n\nFor serious research, I would evaluate these six criteria:\n\n1. **Open SDK:** Can you implement your own controllers?\n2. **ROS 2 support:** Can you integrate the robot with your existing software?\n3. **Simulation:** Is there support for MuJoCo, Isaac Sim or Gazebo?\n4. **Low-level control:** Can you access joint positions, velocities, torques and sensor measurements?\n5. **Hardware accessibility:** Can you replace actuators, hands, cameras and sensors?\n6. **Safety:** Are emergency stops, safe testing procedures and fall-protection provisions available?\n\nThe official [Unitree Robotics GitHub repositories](https://github.com/unitreerobotics) are a useful starting point for examining its SDKs and robot models. [github.com](https://github.com/unitreerobotics?utm_source=chatgpt.com), [github.com](https://github.com/unitreerobotics/unitree_ros/blob/master/robots/README.md?utm_source=chatgpt.com)\n\n## 5. My final recommendation\n\nIf I were selecting robots for a university research laboratory, my shortlist would be:\n\n- **First choice: Unitree G1 EDU** – Best starting point for AI, reinforcement learning, manipulation and embodied AI.\n- **Second choice: Unitree H1** – For advanced full-size humanoid locomotion and control research.\n- **Third choice: PAL TALOS** – For sophisticated control engineering and whole-body manipulation.\n- **Fourth choice: iCub** – For cognitive robotics and perception research.\n\n---\n\n## One question to narrow down the selection\n\n**What is the main research focus of your laboratory?**\n\n- A. Humanoid locomotion and balance control\n- B. Reinforcement learning and deep reinforcement learning\n- C. Embodied AI, vision-language-action models and LLM-based robotics\n- D. Dexterous manipulation and robotic hands\n- E. Human–robot interaction\n- F. General-purpose humanoid robotics research\n\nI can then recommend the **5 most suitable humanoid robots, comparing their technical specifications, SDK/ROS 2 support, research capabilities and approximate purchasing costs in Europe**.",
+    "citationPills": [
+     {
+      "url": "https://github.com/unitreerobotics",
+      "label": "Unitree Robotics · GitHub",
+      "domain": "github.com",
+      "type": "groupedWebpage",
+      "citationPillId": 0,
+      "position": 1
+     },
+     {
+      "url": "https://github.com/unitreerobotics/unitree_ros/blob/master/robots/README.md",
+      "label": "unitree_ros/robots/README.md at master · unitreerobotics/unitree_ros · GitHub",
+      "domain": "github.com",
+      "type": "groupedWebpage",
+      "citationPillId": 1,
+      "position": 2
+     },
+     {
+      "url": "https://robotics-institute-germany.de/project/infrastructure/",
+      "label": "Infrastructure - RIG",
+      "domain": "robotics-institute-germany.de",
+      "type": "groupedWebpage",
+      "citationPillId": 2,
+      "position": 3
+     },
+     {
+      "url": "https://www.ias.informatik.tu-darmstadt.de/Research/Robots",
+      "label": "Intelligent Autonomous Systems | Research / Our Robots",
+      "domain": "ias.informatik.tu-darmstadt.de",
+      "type": "groupedWebpage",
+      "citationPillId": 3,
+      "position": 4
+     },
+     {
+      "url": "https://humanoidroster.com/robots",
+      "label": "",
+      "domain": "humanoidroster.com",
+      "type": "groupedWebpage",
+      "citationPillId": 4,
+      "position": 5
+     },
+     {
+      "url": "https://humanoidversus.com/lists/humanoid-robots-for-research",
+      "label": "",
+      "domain": "humanoidversus.com",
+      "type": "groupedWebpage",
+      "citationPillId": 5,
+      "position": 6
+     },
+     {
+      "url": "https://m.joybuy.de/blog/humanoidrobotsresearchlabs/FEpbEkyY",
+      "label": "",
+      "domain": "m.joybuy.de",
+      "type": "groupedWebpage",
+      "citationPillId": 6,
+      "position": 7
+     },
+     {
+      "url": "https://merarobotics.com/blog/which-humanoid-robot-for-university-research-lab-where-to-buy-europe",
+      "label": "",
+      "domain": "merarobotics.com",
+      "type": "groupedWebpage",
+      "citationPillId": 7,
+      "position": 8
+     },
+     {
+      "url": "https://webuildhumanoids.com/guides/humanoid-development-tools",
+      "label": "",
+      "domain": "webuildhumanoids.com",
+      "type": "groupedWebpage",
+      "citationPillId": 8,
+      "position": 9
+     },
+     {
+      "url": "https://webuildhumanoids.com/robots",
+      "label": "",
+      "domain": "webuildhumanoids.com",
+      "type": "groupedWebpage",
+      "citationPillId": 9,
+      "position": 10
+     },
+     {
+      "url": "https://www.joybuy.de/blog/humanoid-robots-ai-labs/hXh8ZT7B",
+      "label": "",
+      "domain": "joybuy.de",
+      "type": "groupedWebpage",
+      "citationPillId": 10,
+      "position": 11
+     },
+     {
+      "url": "https://www.roboticscenter.ai/guides/best-humanoid-robots-research-2026",
+      "label": "",
+      "domain": "roboticscenter.ai",
+      "type": "groupedWebpage",
+      "citationPillId": 11,
+      "position": 12
+     },
+     {
+      "url": "https://www2.eecs.berkeley.edu/Pubs/TechRpts/2025/Archive/EECS-2025-207.pdf",
+      "label": "",
+      "domain": "www2.eecs.berkeley.edu",
+      "type": "groupedWebpage",
+      "citationPillId": 12,
+      "position": 13
+     }
+    ]
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "678a6df0cfc341219d3f2f3a2fba2c5e",
+   "charged_micro": 2800,
+   "hint": "feedback"
+  }
+ }
+}

@@ -1,0 +1,46 @@
+{
+ "observed_at": "2026-11-14T07:20:11+00:00",
+ "endpoint": "cloro.ai-search.gemini.scrape",
+ "request": {
+  "prompt": "How tall is the Unitree G1?",
+  "country": "DE",
+  "include": {
+   "markdown": true
+  }
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": null,
+ "response": {
+  "result": {
+   "success": true,
+   "result": {
+    "text": "The Unitree G1 humanoid robot stands approximately 1.27 meters (127 cm) tall when upright (with some configurations listed around 1.32 meters). When folded down for transport, its height reduces to about 0.69 meters (69 cm).",
+    "sources": [
+     {
+      "position": 1,
+      "label": "Unitree G1",
+      "url": "https://www.unitree.com/g1",
+      "description": "Model. G1. G1 EDU · Height, Width and Thickness（Stand）. 1320x450x200mm. \n1320x450x200mm · Height, Width and Thickness（Fold）. 690x450x300mm. \n690x450x300mm."
+     }
+    ],
+    "citationPills": [
+     {
+      "label": "Unitree G1",
+      "url": "https://www.unitree.com/g1",
+      "domain": "unitree.com",
+      "position": 1,
+      "description": "Model. G1. G1 EDU · Height, Width and Thickness（Stand）. 1320x450x200mm. \n1320x450x200mm · Height, Width and Thickness（Fold）. 690x450x300mm. \n690x450x300mm.",
+      "citationPillId": 1
+     }
+    ],
+    "markdown": "The Unitree G1 humanoid robot stands approximately **1.27 meters (127 cm)** tall when upright (with some configurations listed around 1.32 meters). When folded down for transport, its height reduces to about **0.69 meters (69 cm)**. [Unitree G1](https://www.unitree.com/g1)"
+   }
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "26da4637d90347cb93797ee0ad6224d6",
+   "charged_micro": 2400
+  }
+ }
+}

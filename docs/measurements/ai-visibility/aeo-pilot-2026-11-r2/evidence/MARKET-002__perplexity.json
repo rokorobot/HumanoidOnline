@@ -1,0 +1,301 @@
+{
+ "observed_at": "2026-11-14T07:20:52+00:00",
+ "endpoint": "perplexity.web.answer.fast",
+ "request": {
+  "preset": "fast",
+  "input": "How many commercial humanoid robots exist?",
+  "max_steps": 1,
+  "max_output_tokens": 512
+ },
+ "exit_code": 0,
+ "stdout": null,
+ "stderr": "treg: this answer is 41 KB; to keep it whole send it to a file (> a.json 2> a.err) and read the parts you need with jq (start with jq 'keys' a.json)\n",
+ "response": {
+  "result": {
+   "background": false,
+   "completed_at": 1794640853,
+   "created_at": 1794640853,
+   "effort": "fast@2026-11-11.0",
+   "error": null,
+   "frequency_penalty": 0,
+   "id": "resp_9713bde6-4bb7-43d2-a579-36084dcf8fd4",
+   "incomplete_details": null,
+   "instructions": null,
+   "max_output_tokens": 512,
+   "max_tool_calls": null,
+   "metadata": {},
+   "model": "openai/gpt-6-luna",
+   "object": "response",
+   "output": [
+    {
+     "queries": [
+      "How many commercial humanoid robots exist?"
+     ],
+     "results": [
+      {
+       "date": "2026-03-10",
+       "id": 1,
+       "last_updated": "2026-10-18",
+       "snippet": "This report tracks 26 humanoid robots across 7 countries — 14 commercially available — against more than $5 billion of industry investment.\n...\n- **26 humanoid robots** currently tracked in our database\n...\n- **14 robots commercially available** today (available for purchase or pre-order with confirmed pricing)\n...\n|Price Tier|Price Range|Robot Count|Average Price|Examples|\n|--|--|--|--|--|\n|Consumer|<$25,000|7|$18,017|Unitree R1, 1X NEO, Unitree G1|\n|Commercial|$25,000-$100,000|6|$67,747|Fauna Sprout, Unitree H1, Astribot S1|\n|Industrial|$100,000+|6|$201,166|Digit, Atlas, GR-1|",
+       "source": "web",
+       "title": "Humanoid Robot Industry Report 2026",
+       "url": "https://blog.robozaps.com/b/humanoid-robot-industry-report-2026"
+      },
+      {
+       "date": "2026-05-22",
+       "id": 2,
+       "last_updated": "2026-10-06",
+       "snippet": "|Company|Flagship Model|Deployed Units|Headquarters|\n|--|--|--|--|\n|Tesla|Optimus Gen 3|1,000+ in own factories|USA|\n|Figure|Figure 03|~150 across BMW, partners|USA|\n|Apptronik|Apollo|~80 across Mercedes, NASA, Jabil|USA|\n|1X Technologies|Neo (Gamma)|~120 in pilots|Norway / USA|\n|Sanctuary AI|Phoenix Gen 8|~40 in pilots|Canada|\n|Agility Robotics|Digit (V6)|~250 in logistics deployments|USA|\n|Boston Dynamics|Atlas (electric)|~50 in pilots|USA|\n|Unitree|G1 and H1|~5,500 shipped to date|China|\n|Fourier Intelligence|GR-1, GR-2|~600 shipped|China|\n|XPENG IRON|IRON Gen 2|~150 in pilots|China|\n|UBTech|Walker S2|~200 in pilots|China|\n...\nHow many humanoid robots are operational in 2026?+\nApproximately 7,000 to 8,000 commercial humanoid robots are operational worldwide as of May 2026, with Tesla Optimus Gen 3 (1,000+), Unitree (5,500+ cumulative shipments), Agility Digit (250), Apptronik Apollo (80), Figure 03 (150), and others making up the balance.",
+       "source": "web",
+       "title": "Humanoid Robot Market Tracker 2026",
+       "url": "https://presenc.ai/research/humanoid-robot-market-tracker-2026"
+      },
+      {
+       "date": "2026-11-04",
+       "id": 3,
+       "last_updated": "2026-11-13",
+       "snippet": "# Humanoid Robot Statistics 2026–2027: How Many Exist, Who Ships Them, What They Cost\n...\nFree Humanoid Robot Statistics 2027 DatasetDownload\nSomewhere between 34,700 and 40,600 humanoid robots had been shipped worldwide by June 30, 2026, according to the Axis Intelligence Research Global Humanoid Shipped Base (GHSB).\nMore than half of them left the factory in the first six months of 2026 alone.\nOnly a handful are documented doing production work for a paying operator.\n...\nThe International Federation of Robotics (IFR) counted nearly **7,000 full-size humanoid robots sold in 2025**; Omdia counted **13,318 humanoids shipped** across all form factors.\nIn the first half of 2026, trackers put global shipments between **19,100 and nearly 25,000 units**.\nAxis Intelligence Research’s GHSB puts the cumulative 2024–H1 2026 total at **37,618 units (central reading)**.\n...\n1. According to Axis Intelligence Research, between 34,718 and 40,618 humanoid robots were shipped worldwide from January 2024 to June 30, 2026 — the GHSB baseline reading, central value 37,618.\n...\n## How Many Humanoid Robots Are There in the World?\nNo one publishes an installed base for humanoid robots.\nAxis Intelligence Research built the closest defensible substitute: a cumulative count of units shipped, assembled only from published annual and half-year tracker figures.\n**What is the GHSB?** The Global Humanoid Shipped Base (GHSB) is the running total of humanoid robots shipped worldwide since January 1, 2024, read as a floor, central value and upper bound because the three half-year trackers disagree.\nIt counts units that left a factory, not units still in service.\n### GHSB baseline reading, as of June 30, 2026\n|Period|Units|Source|\n|--|--|--|\n|2024 shipments|2,300|Omdia|\n|2025 shipments|13,318|Omdia|\n|H1 2026 shipments (low)|19,100|Smart Analytics Global|\n|H1 2026 shipments (central)|more than 22,000|Counterpoint Research|\n|H1 2026 shipments (high)|nearly 25,000|IDC|\n|**GHSB floor / central / upper**|**34,718 / 37,618 / 40,618**|Axis Intelligence Research calculation|\n**Formula:** GHSB = Omdia 2024 + Omdia 2025 + H1 2026 tracker estimate.\nFloor uses Smart Analytics Global, central uses Counterpoint, upper uses IDC.\nPre-2024 units are excluded, so every reading is a floor on the true historical total.\nThis is the baseline reading.\n...\n> **Liam Michael:** Thirty-seven thousand shipped is a manufacturing number.\nThe deployment number is a different animal.\nOur Humanoid Robot Deployment Tracker documents eight named operator deployments worldwide.\nSomewhere between those two figures sit tens of thousands of robots in university labs, data-collection rooms and showroom lobbies.\nCount the purchase orders, not the pallets.\n...\n|Source|2025 figure|What it counts|\n|--|--|--|\n|IFR, World Robotics 2026|nearly 7,000 sold|Full-size humanoids taller than 140 cm|\n|Omdia|13,318 shipped|Full-size, half-size and wheeled platforms|\n|Unitree prospectus|more than 5,500 shipped|One company, all humanoid models|",
+       "source": "web",
+       "title": "Humanoid Robot Statistics 2027: Shipments, Prices, Leaders",
+       "url": "https://axis-intelligence.com/humanoid-robot-statistics/"
+      },
+      {
+       "date": "2026-10-21",
+       "id": 4,
+       "last_updated": "2026-11-02",
+       "snippet": "Yes, in a few places, on narrow jobs like moving totes and loading machines.\nIn our deployment ledger 14 of 57 records are commercial or production and 26 are pilots; the performance figures are the companies’ own claims.\n...\n- In our deployment ledger, 14 of 57 records are at commercial or production stage; 26 are pilots, 10 announced and 7 ended.\nEight of the 14 are industrial sites (factories, warehouses, logistics centres, a chemicals plant); the rest are retail, a hotel, a railway station, a theme park and a university.\n[1]\n...\nIn our deployment ledger there are 57 records of humanoid robots at customer sites, as of 21 October 2026.\nBy stage: 26 pilot, 10 announced, 9 commercial, 7 ended and 5 production.\nA record is one customer, site or programme, so the same customer can appear at several stages.\nThe count is a count of records, not of robots.\n[1]\n...\n|Stage|Records|Evidence grades (records)|Example record|\n|--|--|--|--|\n|Pilot|Records26|Evidence grades (records)E1 (17), E2 (8), E3 (1)|Example recordFigure 03 at BMW Spartanburg|\n|Announced|Records10|Evidence grades (records)E0 (6), E1 (1), E3 (3)|Example recordDigit at Mercado Libre, San Antonio|\n|Commercial|Records9|Evidence grades (records)E1 (7), E3 (1), E4 (1)|Example recordDigit at GXO, Flowery Branch|\n|Production|Records5|Evidence grades (records)E1 (3), E2 (1), E4 (1)|Example recordAgiBot G2 at Longcheer, Nanchang|\n|Ended|Records7|Evidence grades (records)E1 (3), E2 (3), E4 (1)|Example recordFigure 02 at BMW Spartanburg|\n...\nFor scale, IDC says nearly 25,000 humanoid robots shipped worldwide in the first half of 2026, and that research and education, performance and display, and government data-collection centres together still took 69% of shipments, down from 83.8% in 2025.\n...\nSee also our report on how many humanoid robots exist.\n...\nIn a few places, on narrow jobs.\nIn our deployment ledger 14 of 57 records are at commercial or production stage, eight of them industrial sites.\nTwo carry measured-outcome evidence (E4): Agility’s Digit moving totes for GXO and AgiBot’s G2 loading tablets for Longcheer.\nThe figures come from the companies.\n[1] [4] [5]\n...\nAt commercial or production stage in our ledger: Agility (Digit at GXO, and a signed agreement with Toyota Motor Manufacturing Canada), AgiBot (G2 at Longcheer and Joyson Electronics, A2-W at Fulin Precision), Leju (KUAVO at Zhaofeng), RobotEra (logistics centres with China Post and SF Group) and Tetrabot (Tiankui 1 at a chemicals site).\n...\n### How many humanoid robots work in factories?\nThere is no reliable count.\nOur ledger lists records, and only three of its 14 commercial and production rows state robots in service (15, 100 and 1).\nIDC counts shipments, not deployments: nearly 25,000 in the first half of 2026, with research, education, performance and data-collection uses taking 69%.\nOrders such as Fulin Precision’s 100 A2-W robots are not installed fleets.\n[1] [33] [12]",
+       "source": "web",
+       "title": "Humanoid Robots in Factories & Warehouses: What’s Deployed",
+       "url": "https://humanoidversus.com/guides/humanoid-robots-in-factories-and-warehouses"
+      },
+      {
+       "date": "2026-10-14",
+       "id": 5,
+       "last_updated": "2026-11-10",
+       "snippet": "Despite these developments, commercial activity remains modest.\nGlobal humanoid shipments reached roughly 19,100 units in the first half of 2026, up 272% year on year, with full-year category revenue estimated at $1.6 billion.\nThe shipment growth is striking, but it comes from a very small base.\nAt individual customer sites in Western markets, fleets generally range from a handful of robots to a few dozen.\n...\nSeveral hundred units already operating inside Tesla plants are reportedly being used for learning and data collection rather than productive work, showing how early deployments can serve as data-generation engines.\n...\nThe corpus that made LLMs possible doesn’t exist for physical interaction.",
+       "source": "web",
+       "title": "Humanoid Robotics: Assessing Where Value May Accrue ...",
+       "url": "https://www.lek.com/insights/technology/humanoid-robotics-assessing-where-value-may-accrue-physical-ai"
+      },
+      {
+       "date": "2026-11-04",
+       "id": 6,
+       "last_updated": "2026-11-06",
+       "snippet": "~25,000\nHumanoid robots shipped worldwide in the first half of 2026, up 432% year on year\n...\n- 1A humanoid robot is a machine with two arms, two legs and hands, built to work in spaces made for people.\nIDC counted about 25,000 shipped in the first half of 2026, while the International Federation of Robotics counted only about 7,000 full-size humanoids sold in all of 2025, because the two use different definitions.\n...\nAbout 25,000 humanoid robots shipped worldwide in the first half of 2026, according to IDC, and most of them were not doing commercial work.\nThey went to research labs, universities, exhibitions, entertainment venues and government data centers.\nA humanoid robot is a machine with two arms, two legs, hands and sensors, built to work in spaces designed for people.\nThe surprising part is that nobody agrees how many exist.\nThe International Federation of Robotics counted about 7,000 full-size humanoids sold in all of 2025.\nIDC counted about 18,000 shipped in the same year, because it includes smaller robots like Unitree's 132-centimeter G1.\nNeither number says how many are useful at work.\n...\nSomewhere between 7,000 and 25,000, depending on who is counting.\nThe three most cited numbers measure different things, so do not add them or average them.\n|Source|Period|Count|What it counts|\n|--|--|--|--|\n|IFR, World Robotics 2026|Full-year 2025|About 7,000|Full-size humanoids over 140 cm sold, from a survey sample|\n|IDC, January 2026|Full-year 2025|About 18,000 units, about $440 million revenue|All humanoid robots shipped, including smaller models|\n|IDC, October 2026|First half 2026|Nearly 25,000 units, over $740 million revenue|Same IDC definition, six months only|\nThe IFR, in its World Robotics 2026 release, counted about 7,000 full-size humanoids sold in 2025, and said the sector is still moving from labs to pilots.\nIt also identified 174 humanoid manufacturers worldwide, which is roughly 40 full-size sales per maker if you divide one by the other, and noted that most applications still need human teleoperation.\nIDC's higher figure includes robots that stand around 1.2 to 1.3 meters.\nLater in 2026 IDC revised its 2025 baseline to about 18,500, and the first half of 2026 alone came in about 35 percent above that.\n...\nIDC says 69 percent of first-half 2026 shipments went to research and education, exhibitions, entertainment and government data centers.\n...\nA shipment is a robot delivered.\nIt is not a robot doing a paid job, and for most of 2026 the two have been different things.\n...\nWith 69 percent of IDC's first-half shipments going to research, exhibitions and similar uses, the number of humanoids doing paid work is far smaller than 25,000.\n...\nWhether the factories exist to absorb that many robots is not.\n...\nHow many humanoid robots have been sold?\nIt depends on the counter.\nThe IFR found about 7,000 full-size units sold in 2025.\nIDC, which also counts small robots, found about 18,000 shipped in 2025 and nearly 25,000 in the first half of 2026.\nMost of those went to labs, shows and data collection rather than paid work.",
+       "source": "web",
+       "title": "Humanoid Robots in 2026: Real Prices, Shipments, Limits",
+       "url": "https://www.aitooldiscovery.com/ai-infra/humanoid-robots-explained"
+      },
+      {
+       "date": "2026-02-24",
+       "id": 7,
+       "last_updated": "2026-10-18",
+       "snippet": "RoboZaps tracks 95 robot brands; 53 currently qualify as humanoid robot companies across nine countries, and ten flagships have source-backed commercial availability today.\n...\n- As of 30 July 2026, 53 of 95 tracked brands qualify through at least one published humanoid robot.\n...\nAs of 30 July 2026, RoboZaps tracks 95 brands in total.\nThe 53 humanoid robot companies in this directory qualify because they have at least one published humanoid robot record.\nThose companies span nine headquarters countries, and ten listed flagships have source-backed commercial availability.\n...\n- **Brands tracked**\n148\n- **Humanoid companies**\n57\n- **Countries**\n9\n- **Commercial flagships**\n10\n...\nThe company count and the commercial count tell different stories.\nAll 53 companies clear the database inclusion rule, while only ten current flagships have evidence strong enough for the commercially available label.\nThe rest may be announced, offered for pre-order, restricted to selected pilots, waitlisted or genuinely unknown.\nA polished demonstration does not move a robot into the commercial column.\nTen flagships now carry the commercially available label, including AGIBOT A3, Booster K1, Dexmate Vega, MagicBot Gen1, Robosen K1 Pro, UBTECH Walker S2 and Unitree H2.\n...\n- **How many humanoid robot companies are there?**\nAs of 30 July 2026, RoboZaps lists 53 humanoid robot companies from a broader database of 95 robot brands.\nA company counts only when it has at least one published robot tagged as a humanoid, so the live total can change when canonical records are added, corrected or reclassified.",
+       "source": "web",
+       "title": "53 Humanoid Robot Companies Compared (2026 Directory)",
+       "url": "https://blog.robozaps.com/b/humanoid-robot-companies"
+      },
+      {
+       "date": "2026-11-13",
+       "id": 8,
+       "last_updated": "2026-11-13",
+       "snippet": "Humanoid robots moved from demo stages to real warehouse floors in 2026, but only in small numbers.\nGlobal installations of humanoid robots reached roughly 16,000 units in 2025, according to Counterpoint Research, and the best-funded builders — Unitree, Figure AI, and Agility Robotics — are each shipping in the hundreds to low thousands, not the tens of thousands some marketing claims suggest.\n...\n11.1 How many humanoid robots exist in the world right now?\n...\nCounterpoint Research estimated that roughly 16,000 humanoid robots were installed worldwide in 2025, across research labs, pilot programs, and early commercial sites combined.\nThe same research firm projects cumulative deployments could pass 100,000 units by 2027 if current order books hold, though that number depends on manufacturers actually hitting their production targets, which has been the hardest part for most of them so far.\n...\nUnitree shipped an estimated 5,500 humanoid units in 2025 and is targeting around 20,000 for 2026, based on figures reported from the company’s own prospectus ahead of its stock listing.\n...\nTesla is the hardest to pin down.\nThe company has never published an official Optimus production count.\nIndependent estimates place internal use at roughly 1,000 to 1,200 units across the Fremont and Giga Texas facilities as of mid-2026, but Tesla has not confirmed those figures, and claims of more than 50,000 cumulative units circulating online are not attributed to any company statement.\nTreat any specific Optimus number you see as unconfirmed until Tesla itself publishes one.\n...\n### How many humanoid robots exist in the world right now?\nRoughly 16,000 humanoid robots were installed worldwide in 2025, according to Counterpoint Research.\nThat figure covers research units, pilot programs, and early commercial deployments combined, not a single standardized robot type.\n...\nIndependent estimates suggest around 1,000 to 1,200 units in internal use as of mid-2026, but Tesla itself has not confirmed that figure.",
+       "source": "web",
+       "title": "Humanoid Robots 2026: 7 Essential Facts About Deployment",
+       "url": "https://tutorialsbynitin.com/humanoid-robots-factory-jobs/"
+      },
+      {
+       "date": "2026-07-20",
+       "id": 9,
+       "last_updated": "2026-10-02",
+       "snippet": "# We found 33 commercial humanoid robot families. Just one full-size model targets the home\nA review of 74 RoboZaps listings found 33 current, commercially addressable bipedal families.\nTwenty-nine target work or development; only one full-size model targets the home.\n...\nRoboZaps audited 74 catalogue listings and found 33 current, commercially addressable bipedal families.\nTwenty-nine target work or development.\nFour serve home, education or consumer uses, including just one full-size home robot, which was still taking preorders.\n...\nRoboZaps reviewed 74 listings in its humanoid robot catalogue and found 33 current bipedal families with a manufacturer-backed route to a customer.\nTwenty-nine were built for work or development.\nOnly four served the home, education or broader consumer market.\nJust one was a full-size humanoid explicitly pitched for the home, and it was taking preorders rather than making immediate deliveries.\n...\nOnly four qualifying families sat outside the work-and-development market: 1X NEO, Maxtronics NAO6, Noetix Dora and Robosen K1 Pro.\n...\nRoboZaps, which publishes the catalogue used in this analysis, froze the 74 rows returned by its live Humanoids filter on July 16, 2026.\nThe review counted one current bipedal family when first-party evidence showed a manufacturer-backed order, paid reservation or preorder, product-specific quote, lease or Robots-as-a-Service route, commercial delivery or committed external fleet.\nDuplicate listings, configurations and predecessor generations were consolidated.\nThirty-three families qualified: 29 work or developer families and four home, education or consumer families.\nThirty-eight rows did not clear the test, while three remained unresolved.\nSources were rechecked July 20, 2026.\nThe result describes the frozen RoboZaps catalogue, not the entire global market.",
+       "source": "web",
+       "title": "Commercial humanoid robot market: 33 families, one home ...",
+       "url": "https://blog.robozaps.com/b/commercial-humanoid-robots-work-not-home-2026"
+      },
+      {
+       "id": 10,
+       "last_updated": "2026-11-08",
+       "snippet": "General-purpose humanoid robots: products, deployments, manufacturing milestones and the companies behind them.\n...\nThe robots are not the news; Robros has already sold 18.\n...\n### AGIBOT reaches 20,000 robots produced, doubling its March total in six months\nAGIBOT has built 20,000 robots, doubling its March total.\nThe half-size X-series is 43.8% of output, and the count is production, not sales.\n...\nRobros’s 154 cm IGRIS-C humanoid can now walk and work under real-time full-body teleoperation.\nThe company has built 36 units and sold 18, with paid trials in a chip cleanroom, a car plant and a cold-chain warehouse.\n...\nAgiBot and Unitree ship about three quarters of the world’s humanoids.\n...\n### IFR’s first humanoid count: about 7,000 robots sold worldwide in 2025\nThe International Federation of Robotics has put a first number on the humanoid market.\nIt is small next to conventional robots, and many of the units sold were bought to generate data rather than to work.",
+       "source": "web",
+       "title": "Humanoids | Embodied Wire",
+       "url": "https://embodiedwire.com/humanoids"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "queries": [
+      "2026 commercial humanoid robots available purchase number deployed paid work"
+     ],
+     "results": [
+      {
+       "date": "2026-10-24",
+       "id": 11,
+       "last_updated": "2026-11-08",
+       "snippet": "In October 2026, sorted by status (every figure is the company’s own claim): **operating**, Agility Robotics’ Digit moves totes for GXO in Georgia (more than 100,000 totes by November 2025; robot count not disclosed), and UBTech says more than 500 Walker S robots were delivered and working at Chinese automakers and electronics makers (December 2025).\n**Contracts, orders and announced deployments**: Agility’s commercial agreement with Toyota’s Canadian plant, AgiBot’s order for 100 robots from Fulin Precision, and Figure 03’s logistics job at BMW, none with a disclosed number of robots at work.\n...\n|Newer figures (checked November 9, 2026)|What it says|Type of number|\n|--|--|--|\n|UBTech, first half of 2026|921 full-size humanoids sold (45 a year earlier), interim report of August 28|Company report, via secondary reports|\n|UBTech, 2026 target|Walker S delivery target raised to 5,000 units|Secondary report (October 27)|\n|Figure|1,000th Figure 03 built on July 23, 2026|CEO post, secondary reports; built, not delivered|\n|Boston Dynamics Atlas|Learning parts sorting and sequencing at Hyundai RMAC in Georgia, opened September 21, 2026|Company and Hyundai statements|\n...\nThese do not change the stages in the tracker below: UBTech's 921 units are sales, not robots confirmed working at named sites, and Figure's 1,000 is a production count.\n...\n## Deployment tracker (October 2026)\n|Robot|Customer and site|Task|Stage|Work done|Robots working|Built, delivered or ordered|\n|--|--|--|--|--|--|--|\n|Agility Digit|GXO, Flowery Branch, Georgia|Moving totes between AMRs and conveyors|**Operating**: paid, multi-year RaaS|100,000+ totes moved (Nov 2025)|Not disclosed|Not disclosed|\n|Agility Digit|Toyota Motor Manufacturing Canada|Not detailed in the release|**Contract**: commercial agreement after pilot (Feb 2026)|Not disclosed|Not disclosed|Not disclosed|\n|UBTech Walker S|BYD, Geely, FAW-VW, Dongfeng Liuzhou, Foxconn and others|Factory tasks (company claim)|**Operating** (company claim)|Not disclosed|500+ delivered and working (Dec 2025)|1,000 built (Dec 2025)|\n|AgiBot A2-W|Fulin Precision (auto parts)|Factory handling|**Order** (Aug 2025)|Not disclosed|Not disclosed|100 ordered|\n|Figure 03|BMW, Spartanburg|Parts sequencing into trolleys|**Deployment announced** (June 2026), after Figure 02 pilot|Not disclosed|Not disclosed|Not disclosed|\n|Boston Dynamics Atlas|Hyundai Metaplant, Georgia|Logistics, parts sequencing training|**Training** (center opened Sept 2026); factory use **planned** from 2028|Not disclosed|Not disclosed|All 2026 production committed (count not disclosed)|\n|Apptronik Apollo|Mercedes-Benz, GXO|Logistics tasks|**Pilot** and data collection|Not disclosed|Not disclosed|Not disclosed|\n|Xiaomi humanoid|Xiaomi EV die-casting workshop|Fitting nuts|**Pilot**: 3-hour trial|90.2% success in the trial|Not disclosed|Not disclosed|\n|Tesla Optimus|Tesla, Fremont|Not disclosed|**Production started** (Oct 2026); factory work not disclosed|Not disclosed|Not disclosed|Production volume not disclosed|\n...\nAgility’s Digit passed 100,000 totes moved in live production at a GXO site in Flowery Branch, Georgia, where it shuttles totes between mobile robots and conveyors under a multi-year robots-as-a-service deal (Assembly, November 2025).\nIn February 2026 Agility signed a commercial agreement with Toyota Motor Manufacturing Canada after a pilot.\n...\nUBTech said in December 2025 that its 1,000th Walker S came off the line and more than 500 were delivered and working, with customers including BYD, Geely, FAW-Volkswagen, Dongfeng Liuzhou, Foxconn and Midea (Interesting Engineering).",
+       "source": "web",
+       "title": "Humanoid Robots in Factories 2026: Real Deployments Tracked",
+       "url": "https://physicalailab.io/en/humanoid-robots-factories-warehouses-deployments-2026/"
+      },
+      {
+       "date": "2026-11-13",
+       "id": 12,
+       "last_updated": "2026-11-13",
+       "snippet": "Humanoid robots moved from demo stages to real warehouse floors in 2026, but only in small numbers.\nGlobal installations of humanoid robots reached roughly 16,000 units in 2025, according to Counterpoint Research, and the best-funded builders — Unitree, Figure AI, and Agility Robotics — are each shipping in the hundreds to low thousands, not the tens of thousands some marketing claims suggest.\n...\nThe humanoid robot market is attracting billions in funding and generating a flood of viral demo videos, but very few of those robots are doing unsupervised, paid work today.\n...\nCounterpoint Research estimated that roughly 16,000 humanoid robots were installed worldwide in 2025, across research labs, pilot programs, and early commercial sites combined.\nThe same research firm projects cumulative deployments could pass 100,000 units by 2027 if current order books hold, though that number depends on manufacturers actually hitting their production targets, which has been the hardest part for most of them so far.\n...\nUnitree shipped an estimated 5,500 humanoid units in 2025 and is targeting around 20,000 for 2026, based on figures reported from the company’s own prospectus ahead of its stock listing.\n...\nFigure AI reached a production rate of roughly one Figure 03 robot per hour at its BotQ facility by June 2026, with a stated target of over 1,000 units for the year.\nIts clearest commercial deployment is a logistics agreement with Catalyst Brands, where Figure robots began working at a distribution center in Reno, Nevada.\nAgility Robotics has the most verifiable real-work evidence.\nIts Digit robot is deployed at a GXO Logistics warehouse in Georgia under what the company calls a Robots-as-a-Service agreement, and Agility’s own reporting says Digit has moved more than 100,000 totes in live commercial operation there — not a lab demo, an actual paid logistics contract.\n...\nThe company has never published an official Optimus production count.\nIndependent estimates place internal use at roughly 1,000 to 1,200 units across the Fremont and Giga Texas facilities as of mid-2026, but Tesla has not confirmed those figures, and claims of more than 50,000 cumulative units circulating online are not attributed to any company statement.\n...\nThe clearest evidence of humanoid robots doing paid, supervised work comes from logistics — moving totes, bins, and packages — rather than from precision manufacturing tasks like welding or wiring harness assembly, which still belong to traditional industrial arms and skilled human workers.\n...\nAutomation supplier Humanoid signed an agreement in May 2026 to deploy an estimated 1,000 to 2,000 humanoid robots across Schaeffler’s global manufacturing sites — but the rollout target is 2032, not 2026.\n...\nPublished prices range from about $16,000 for research-grade units to $250,000 or more for commercial-ready systems.",
+       "source": "web",
+       "title": "Humanoid Robots 2026: 7 Essential Facts About Deployment",
+       "url": "https://tutorialsbynitin.com/humanoid-robots-factory-jobs/"
+      },
+      {
+       "id": 13,
+       "last_updated": "2026-11-13",
+       "snippet": "# Verified humanoid robot updates\n- Unitree R1\nIn production / shipping (announced Jul 2025; deliveries ~Apr 2026)\nAvailable to buy now · $4,900\n...\nIn production / commercially offered\nAvailable to buy now · $90,000 listed\n...\nIn production / shipping to developers & research institutions.\nAvailability: Available from remaining distributor stock; at least one distributor lists the T1 as discontinued ahead of the Booster T2 (no end-of-sale notice from Booster); US import exposed to the 28 July 2026 FCC restriction\nAvailable to buy now · About $29,800\n...\n- AgiBot A2\nIn production and commercially deployed; 1,000+ A2 Ultra units reported in operation as of 2026.\nAvailability: for the A2 Lite via the manufacturer's global store; full-size A2 and A2-W remain enterprise-quote only\n...\nCommercially sold developer platform (Lite/Standard/SP/Pro/Pro Max/Adam-U); listed via US\nAvailable to buy now · Adam-U from ~$45,000\n...\nIn mass production; global delivery launched Jun 27 2025 (Nagoya); batches into 2026\nAvailable to buy now · ~$27,500\n...\nAvailable to buy now · Isaac 0: $3,999 up front + $49/mo, or $249/mo with no up-front cost\n...\nAvailability: Orderable through US resellers as special order or with 4-6 week delivery (Nov 2026)\n...\nN2 lightweight bipedal humanoid (marathon-runner); 2,500+ orders; sold via RBTX and\n...\nLingxi X2 compact 1.3 m bipedal humanoid; companion/education plus commercial service; mass production 2026\n...\nAvailability: Available to order\n...\nDigit v4 in commercial deployment; Digit 5 (v5) launched 15 Sep 2026 - early access expected H1 2027, general availability by end of 2027, not yet delivered.\nAvailability: Available by service contract only — Digit is not sold outright, customers pay per deployment",
+       "source": "web",
+       "title": "Humanoid Robot News & Updates (2026) - Humanoza",
+       "url": "https://humanoza.com/news"
+      },
+      {
+       "date": "2026-10-10",
+       "id": 14,
+       "last_updated": "2026-10-10",
+       "snippet": "Presently, a limited number of humanoid robots are engaged in paid work, primarily in the movement of bins and parts within warehouses and manufacturing facilities.\n...\nIts production for 2026 is already allocated, with Hyundai planning to deploy 25,000 Atlas robots in its manufacturing plants in the coming years.",
+       "source": "web",
+       "title": "What Are Humanoid Robots? Inside The Growing Industry And Where It's Headed",
+       "url": "https://www.forbes.com/sites/technology/article/what-is-a-humanoid-robot/"
+      },
+      {
+       "date": "2026-11-04",
+       "id": 15,
+       "last_updated": "2026-11-06",
+       "snippet": "About 25,000 humanoid robots shipped worldwide in the first half of 2026, according to IDC, and most of them were not doing commercial work.\nThey went to research labs, universities, exhibitions, entertainment venues and government data centers.\n...\n|Type|Size|Examples|Who buys it|Status in late 2026|\n|--|--|--|--|--|\n|Small research and education|About 1.3 m|Unitree G1, Unitree R1|Universities, labs, developers, exhibitions|On sale: G1 from $13,500, R1 launched at $5,900|\n|Full-size industrial|Over 1.4 m|Agility Digit, Figure 03, Boston Dynamics Atlas, Tesla Optimus|Carmakers, logistics operators|Pilots and early production, mostly no public price|\n|Home|1.68 m|1X NEO|Households|Preorders at $20,000 or $499 a month|\n...\nIDC says 69 percent of first-half 2026 shipments went to research and education, exhibitions, entertainment and government data centers.\nThe other 31 percent covers factory and warehouse work and other uses.\nA shipment is a robot delivered.\nIt is not a robot doing a paid job, and for most of 2026 the two have been different things.\n...\n|Company|Robot|Status late 2026|What is verified|\n|--|--|--|--|\n|Unitree (China)|G1, R1, H2|On sale|G1 starts at $13,500, excluding tax and shipping. About 5,000 units shipped in H1 2026 (IDC)|\n|AgiBot (China)|Several models|On sale|About 5,200 units in 2025 and about 8,600 in H1 2026 (IDC)|\n|UBTech (China)|Walker S2|Industrial orders|About 900 units in H1 2026 (IDC estimate)|\n|Tesla|Optimus|Early production|Early production began on the Fremont high-volume line (Oct 21, 2026 call). Outside deliveries expected around the end of 2027|\n|Figure AI|Figure 03|Customer deployment|Logistics work at BMW Spartanburg, announced June 2026|\n|Agility Robotics|Digit|Commercial deployments|Merger with Churchill Capital Corp XI at a $2.5 billion valuation, announced June 24, 2026. Industry trackers name GXO, Schaeffler and Toyota Motor Manufacturing Canada as customers|\n|Boston Dynamics (Hyundai)|Atlas|Production started|2026 output reportedly committed to Hyundai and Google DeepMind. First Hyundai Metaplant use planned from 2028|\n|1X|NEO|Preorder|$200 deposit, then $20,000 or $499 a month|\n...\nIn 2026 a humanoid can do narrow, repeated material-handling jobs inside a mapped, supervised area, and little else without help.\nMost of the 25,000 shipped in the first half are used for research, shows and collecting training data.\n...\nAnd a robot delivered is not a worker employed.\nWith 69 percent of IDC's first-half shipments going to research, exhibitions and similar uses, the number of humanoids doing paid work is far smaller than 25,000.\n...\nUnitree lists the G1 and R1, and 1X takes NEO preorders for a $200 deposit.\nThe full-size industrial models go to businesses through pilots and contracts, so there is no checkout button for them.\n...\nMost of those went to labs, shows and data collection rather than paid work.",
+       "source": "web",
+       "title": "Humanoid Robots in 2026: Real Prices, Shipments, Limits",
+       "url": "https://www.aitooldiscovery.com/ai-infra/humanoid-robots-explained"
+      },
+      {
+       "date": "2026-10-21",
+       "id": 16,
+       "last_updated": "2026-11-13",
+       "snippet": "On October 20, 2026 Agility said it signed a commercial agreement with AGCO.\nThe U.S. pilot is expected to begin in 2027 at AGCO's Hesston, Kansas plant.\nDigit is to start with parts sorting and stacking and with placement of totes.\nThe release gives no robot count, no contract value, and no statement that work has started.\nAgility describes AGCO as joining Toyota, GXO, and Schaeffler among companies deploying Digit, while the same release puts the pilot in 2027.\n...\nAgiBot's September 30 page, citing IDC, still says global humanoid shipments approached 25,000 units in the first half of 2026, up 432.1 percent year on year, with AgiBot first at more than 8,600 units and about 35 percent.\nThe same page restates 20,000 cumulative robots produced in September, a Chimelong deployment of more than 300 robots, and 100 X2 robots in ASD stores.\n...\nAgility's October 13 release still puts earlier Digit generations at more than 65,000 hours of real-world operation and Digit 5 at more than $300 million of committed orders.\nThose orders remain subject to contractual milestones, product features, or specifications.\nEarly-access availability in that release is early 2027.\nThe release says nine customer facilities are committed today and states a company target of up to 25 by the end of 2027.\nDigit 5 is not described as shipped.",
+       "source": "web",
+       "title": "Humanoid Robots - Venture Atlas",
+       "url": "https://www.ventureatlas.org/industry/humanoid-robots"
+      },
+      {
+       "id": 17,
+       "last_updated": "2026-10-19",
+       "snippet": "Twelve commercial humanoid platforms became available for purchase or structured lease in 2026.\n...\nTwelve commercial humanoid platforms are now available for purchase or structured lease, up from just 3 in 2024.",
+       "source": "web",
+       "title": "State of Robotics 2026 Report: Key Numbers and Trends",
+       "url": "https://www.roboticscenter.ai/state-of-robotics-2026"
+      },
+      {
+       "id": 18,
+       "last_updated": "2026-11-05",
+       "snippet": "Twelve commercial humanoid platforms became available for purchase or structured lease in 2026.\n...\nTwelve commercial humanoid platforms are now available for purchase or structured lease, up from\njust 3 in 2024.",
+       "source": "web",
+       "title": "State of Robotics 2026 - roboticscenter.ai",
+       "url": "https://www.roboticscenter.ai/assets/pdf/state-of-robotics-2026.pdf"
+      },
+      {
+       "date": "2026-10-12",
+       "id": 19,
+       "last_updated": "2026-11-13",
+       "snippet": "Now machines shaped like people are clocking shifts on factory lines, in warehouses, and in living rooms on a subscription.\n...\n|Company|Robot|Where it works|Headline result|\n|--|--|--|--|\n|Tesla|Optimus|Tesla's own factories|Internal only; R&D phase (reported)|\n|Figure AI|Figure 02 / 03|BMW plants (US, Germany)|10-month pilot; 30,000+ cars supported|\n|Agility Robotics|Digit|GXO warehouse (GA), plus pilots|First commercial humanoid RaaS contract|\n|Apptronik|Apollo|Mercedes-Benz plants|Logistics pilots; product due 2027+ (target)|\n|Boston Dynamics|Electric Atlas|Hyundai Georgia Metaplant|Parts-sequencing pilot (plan)|\n|1X Technologies|NEO|Preorder stage|First US deliveries scheduled 2026 (company plan)|\n|Sanctuary AI|Phoenix|Pilot scale|Magna alliance; latest model dropped legs for wheels|\n|Unitree|G1 / H1 / H2|Research labs, mostly|5,500+ shipped 2025 (self-reported); 70%+ to research|\n...\nAfter a late-2023 proof of concept, GXO signed a multi-year Robots-as-a-Service agreement in June 2024 — also the first humanoid RaaS contract — putting Digit to work at a GXO-run Spanx facility in Flowery Branch, Georgia, picking totes from autonomous mobile robots onto conveyors.\n...\nPreorders opened at the October 28, 2025 launch: $20,000 outright or $499/month (six-month minimum), first US deliveries scheduled for 2026.\n...\nTesla's reported internal target is an automated line above 1,000 Optimus units per week by end of 2026, with public purchase floated for late 2027.\nFigure's company target is 50,000 units in 2026 from BotQ.\n1X plans first US consumer deliveries of NEO in 2026.\nApptronik's Apollo 3 production versions are expected \"in 2027 and beyond.\"\nBoston Dynamics aims at its first external Atlas customers in early 2027 and production-line deployment at the Georgia Metaplant in 2028.\nUnitree targets 20,000 humanoid deliveries in 2026.\nNone of these are commitments.\nNearly every target here has already been revised: Optimus's 5,000-unit 2025 target was missed at under 10%; Apollo's commercialization date slid from \"2025 general availability\"-era statements to Apollo 3 in \"2027 and beyond.\"\nTreat stated targets as direction of travel.\n...\nIn 2026, humanoids are doing paid work in narrow lanes — one repetitive task each, under human supervision and safety fencing.\nUseful everyday work — a full shift untethered, autonomous handling of varied tasks, certified to work beside people — exists nowhere yet.",
+       "source": "web",
+       "title": "Humanoid Robots in 2026: How Close Are They to Useful Everyday Work?",
+       "url": "https://dev.to/the_daily_flare/humanoid-robots-in-2026-how-close-are-they-to-useful-everyday-work-51kn"
+      },
+      {
+       "date": "2026-02-02",
+       "id": 20,
+       "last_updated": "2026-10-08",
+       "snippet": "Humanoid robots crossed from demonstration into commercial deployment in 2026, and the shape of that transition is different from what the sector's pricing announcements implied.\nFigure AI has a 40-unit fleet of Figure 03 robots working at BMW's largest assembly plant, billed at roughly $25 per robot-operating-hour.\nThat is a services arrangement — BMW is buying labour hours, not machines.\nTesla runs over 1,000 Optimus units inside its Gigafactory Texas facility, sorting parts, carrying components and performing quality inspections.\n...\nDespite all of that, Optimus was still unavailable for external purchase as of April 2026.\nThe units people can actually buy come from elsewhere.\nUnitree shipped over 5,500 robots in 2025 with the G1 listed at $17,990, and the OpenAI-backed 1X NEO has over 10,000 home pre-orders at $20,000 or $499 a month.\n...\nFigure AI has 40 Figure 03 robots commercially deployed at BMW's largest assembly plant in the world.\n...\nThe pricing offers both models: $20,000 to purchase or $499 a month.\n...\nTotal humanoid shipments are forecast to exceed 50,000 units in 2026 across a field including Tesla, Figure, Boston Dynamics, Agility Robotics, Unitree, AgiBot, UBTECH, 1X, Neura Robotics and Kawasaki.\n...\nHumanoid robots reached genuine commercial deployment in 2026, and the milestone was a business model rather than a machine.",
+       "source": "web",
+       "title": "The Humanoid Race: What's Actually Deployed in 2026",
+       "url": "https://factsfigs.com/content/visual/humanoid-race-2026"
+      }
+     ],
+     "type": "search_results"
+    },
+    {
+     "content": [
+      {
+       "annotations": [],
+       "text": "There isn’t one agreed count—it depends on what “commercial” means. If you mean **distinct humanoid models available to buy or lease**, recent industry trackers put the number at about **12–14**.[1][17]\n\nIf you mean **individual robots doing paid work**, there’s no reliable global total; deployments are still limited, and reported shipment numbers include many robots used for research, demonstrations, or pilots rather than commercial work.[6][11]",
+       "type": "output_text"
+      }
+     ],
+     "id": "msg_710983af-c7ca-47a7-aed3-d4154996ed08",
+     "role": "assistant",
+     "status": "completed",
+     "type": "message"
+    }
+   ],
+   "parallel_tool_calls": true,
+   "presence_penalty": 0,
+   "preset": "fast@2026-11-11.0",
+   "previous_response_id": null,
+   "prompt_cache_key": null,
+   "reasoning": null,
+   "safety_identifier": null,
+   "service_tier": "fast",
+   "status": "completed",
+   "store": true,
+   "temperature": 1,
+   "text": {
+    "format": {
+     "type": "text"
+    }
+   },
+   "tool_choice": "auto",
+   "tools": [
+    {
+     "type": "web_search"
+    }
+   ],
+   "top_logprobs": 0,
+   "top_p": 1,
+   "truncation": "",
+   "usage": {
+    "cost": {
+     "cache_creation_cost": 0.00181,
+     "cache_read_cost": 3e-05,
+     "currency": "USD",
+     "input_cost": 1e-05,
+     "output_cost": 8e-05,
+     "tool_calls_cost": 0.002,
+     "tool_calls_cost_details": {
+      "search_web": 0.002
+     },
+     "total_cost": 0.00393
+    },
+    "input_tokens": 18018,
+    "input_tokens_details": {
+     "cache_creation_input_tokens": 14452,
+     "cache_read_input_tokens": 3488,
+     "cached_tokens": 3488
+    },
+    "output_tokens": 155,
+    "output_tokens_details": {
+     "reasoning_tokens": 0
+    },
+    "tool_calls_details": {
+     "search_web": {
+      "cost_usd": 0.002,
+      "invocation": 2
+     }
+    },
+    "total_tokens": 18173
+   },
+   "user": null
+  },
+  "_treg": {
+   "http_status": 200,
+   "call_id": "19019967b4d64fe992e0fd10416d49ab",
+   "charged_micro": 3930,
+   "hint": "feedback"
+  }
+ }
+}

@@ -35,6 +35,8 @@ test("robots.txt is a deliberate inbound policy with a sitemap reference", async
   expect(res.ok()).toBeTruthy();
   const body = await res.text();
   expect(body).toContain("Allow: /");
+  // The combinatorial compare query space is the one thing kept out of crawls.
+  expect(body).toContain("Disallow: /compare?");
   expect(body.toLowerCase()).toContain("sitemap:");
 });
 

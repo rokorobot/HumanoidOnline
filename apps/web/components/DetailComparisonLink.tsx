@@ -6,9 +6,11 @@
 // The compare selection is carried in the URL (`/robots/<slug>?compare=a,b`) and read ONLY on
 // the client after mount: the server component never reads searchParams, so the page's
 // server output, caching and render mode are exactly what they were. No storage.
-//   - the existing "Compare +" action: server HTML keeps its plain `/compare?ids=<this robot>`
-//     href (one static anchor, as before). With a carried selection a click toggles THIS robot
-//     in it in place; with none it navigates as before.
+//   - the existing "Compare +" action: server HTML is one plain anchor to `/compare`. It no
+//     longer carries `?ids=<this robot>`: that put a crawlable link into the query-state compare
+//     space on every robot page (see app/robots.ts). With a carried selection a click toggles
+//     THIS robot in it in place; with none it opens `/compare?ids=<this robot>` as before, but
+//     only on a real click (router.push), never from parsing the HTML.
 //   - a small tray, rendered only when a selection is carried (client-rendered, so it adds
 //     nothing to the delivered document).
 //   - click delegation for server-rendered plain links in the breadcrumb (`.idcrumb`, "Robot Catalogue"): they keep their plain href and carry the selection on click.
@@ -36,7 +38,7 @@ function writeSelection(selection: string[]) {
   window.dispatchEvent(new Event(EVENT));
 }
 
-export function DetailComparisonLink({ slug, name, href }: { slug: string; name: string; href: string }) {
+export function DetailComparisonLink({ slug, name }: { slug: string; name: string }) {
   const router = useRouter();
   // Held in a ref so the listeners below are registered once, not re-registered per render.
   const routerRef = useRef(router);
@@ -74,13 +76,14 @@ export function DetailComparisonLink({ slug, name, href }: { slug: string; name:
     <>
       <Link
         className="btn"
-        href={href}
+        href="/compare"
         onClick={(e) => {
           if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-          const current = readSelection();
-          if (current.length === 0) return; // no carried selection: navigate as before
           e.preventDefault();
-          writeSelection(toggleSlug(current, slug));
+          const current = readSelection();
+          // No carried selection: same destination as before, reached by click only.
+          if (current.length === 0) router.push(`/compare?ids=${slug}`);
+          else writeSelection(toggleSlug(current, slug));
         }}
       >
         <GraphicMarker />{" "}

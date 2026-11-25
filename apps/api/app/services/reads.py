@@ -10,10 +10,12 @@ import uuid
 from decimal import Decimal
 
 from sqlalchemy import select, text
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.models.commercial import AvailabilityOffer, Deployment, PricingOffer
 from app.models.evidence import EvidenceSource
+from app.models.manufacturer import Manufacturer
+from app.models.product_line import ProductLine
 from app.models.robot import Robot
 from app.models.spec import Specification
 from app.schemas.common import EvidenceRead, ManufacturerRef, PriceDisplay
@@ -510,7 +512,24 @@ def _specs_block(robot: Robot) -> SpecsBlock:
 # load_details (single vs batched) can never drift into two independently
 # maintained option lists — the whole point of "one governed read" (`docs/20`
 # §6) is broken if a batching call site has to remember to copy this by hand.
+#
+# Round trips are the cost that matters here: every statement is one sequential
+# network hop to the database, and the hop, not the query, dominates a cold
+# detail or compare read. The maker and product line (each with the maker's
+# country) are single rows per robot that the models would otherwise fetch with
+# one follow-up statement each, so they are JOINed into the robot statement.
+#
+# Deliberately NOT joined: the lookups under the collections (offer provider /
+# region, capability, use case, spec definition). Joining them saves a further
+# eight or so statements, but those collections have no ORDER BY, and a JOIN
+# lets the planner return their rows in a different order, which reorders the
+# offers and capabilities the API returns. That needs an explicit, owner-agreed
+# ordering first. tests/test_compare_batching.py pins the statement budget.
 _DETAIL_LOAD_OPTIONS = (
+    joinedload(Robot.manufacturer).joinedload(Manufacturer.country),
+    joinedload(Robot.product_line)
+    .joinedload(ProductLine.manufacturer)
+    .joinedload(Manufacturer.country),
     selectinload(Robot.variants),
     selectinload(Robot.status_history),
     selectinload(Robot.specifications),

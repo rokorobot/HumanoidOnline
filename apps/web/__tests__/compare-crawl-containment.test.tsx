@@ -171,20 +171,18 @@ describe("MatchesCommercial — Compare these is no longer a crawlable anchor", 
   });
 });
 
-// Deliberately unchanged: a single, static, non-combinatorial link — not the
-// confirmed amplification mechanism, so it stays a real, indexable/shareable
-// anchor exactly as before.
-describe("Robot detail page — single static compare link remains a real anchor", () => {
+// 2026-11-25: the robot detail page's "Compare +" used to be a real anchor to
+// /compare?ids=<this robot> — one crawlable entry into the query-state compare
+// space per robot page. It now points at the bare /compare (robots.txt blocks
+// `/compare?`, see app/robots.ts) and only a click opens the ?ids= URL.
+describe("Robot detail page — no crawlable anchor into the compare query space", () => {
   const webRoot = resolve(process.cwd());
   const read = (rel: string) => readFileSync(resolve(webRoot, rel), "utf8");
 
-  it("still renders a plain Link, not CompareLink, for the single-robot Compare+ action", () => {
-    const src = read("app/robots/[slug]/page.tsx");
-    const compareLinkLine = src
-      .split("\n")
-      .find((l) => l.includes(`href={\`/compare?ids=`));
-    expect(compareLinkLine).toBeTruthy();
-    expect(compareLinkLine).toContain("Link");
-    expect(compareLinkLine).not.toContain("CompareLink");
+  it("neither the page nor its Compare + component renders an href to /compare?ids=", () => {
+    for (const rel of ["app/robots/[slug]/page.tsx", "components/DetailComparisonLink.tsx"]) {
+      expect(read(rel), rel).not.toMatch(/href=[{"'`]+\/compare\?/);
+    }
+    expect(read("components/DetailComparisonLink.tsx")).toContain('href="/compare"');
   });
 });
